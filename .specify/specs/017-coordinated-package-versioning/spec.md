@@ -1,6 +1,7 @@
 # Feature: Coordinated Package Versioning
 
 ## Status
+
 ⚠️ PARTIAL — Lockstep versioning via `fixed` changesets group ships and works; the W1.5 split-package migration is not fully landed (tech-debt #7); v1→v2 collision map lives in `REMAINING-WORK.md` §W1.5.7 and has not yet graduated to a standalone `MIGRATION.md` (tech-debt #8).
 
 ## Overview
@@ -51,6 +52,7 @@ This spec captures both the working state and the gaps so the migration can land
 ## Implementation Status
 
 **Completed:**
+
 - ✅ `.changeset/config.json` `fixed` array enforces lockstep.
 - ✅ All six packages publish; `access: public`.
 - ✅ Acyclic dependency graph stable.
@@ -58,6 +60,7 @@ This spec captures both the working state and the gaps so the migration can land
 - ✅ Constitution §III.F and §III.D capture the invariants.
 
 **Missing / Drift:**
+
 - ⚠️ Tech-debt #7 — W1.5 split-package migration not fully landed. Working backlog in `REMAINING-WORK.md` (57 KB). Owned by the maintainer; estimate not derivable from the worktree.
 - ⚠️ Tech-debt #8 — v1→v2 collision map graduation to standalone `MIGRATION.md` (8 KB) at `2.0.0-pre.1`. Today's `MIGRATION.md` carries the old v1-monolith → v2-split story but not the full symbol-relocation map. Effort: ≈1-2 hours; falls out of #7 at release prep.
 

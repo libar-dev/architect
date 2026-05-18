@@ -139,13 +139,13 @@ All six publishable packages move together via the `fixed` group in `.changeset/
 
 Specs are minimal at the bottom of the ladder and grow as they mature:
 
-| Tier        | Location                  | Soft budget   | Required content                                      |
-| ----------- | ------------------------- | ------------- | ----------------------------------------------------- |
-| `idea`      | `architect/specs/`        | ≤30 lines     | Invariant-only rules, 6 tags                          |
-| `candidate` | `architect/specs/`        | small         | Open questions + single happy-path scenario           |
-| `plan`      | `architect/specs/`        | medium        | Plan-level scope and dependencies                     |
-| `design`    | `architect/specs/`        | larger        | Deliverables table, stubs, exhaustive scenarios, ADRs |
-| `executable`| `tests/features/`         | as needed     | Wired step definitions; the source of truth           |
+| Tier         | Location           | Soft budget | Required content                                      |
+| ------------ | ------------------ | ----------- | ----------------------------------------------------- |
+| `idea`       | `architect/specs/` | ≤30 lines   | Invariant-only rules, 6 tags                          |
+| `candidate`  | `architect/specs/` | small       | Open questions + single happy-path scenario           |
+| `plan`       | `architect/specs/` | medium      | Plan-level scope and dependencies                     |
+| `design`     | `architect/specs/` | larger      | Deliverables table, stubs, exhaustive scenarios, ADRs |
+| `executable` | `tests/features/`  | as needed   | Wired step definitions; the source of truth           |
 
 When a pattern reaches `executable`, the design spec is **deleted** (Tier-1 specs are ephemeral, ADR-003). Its value transfers to JSDoc annotations + executable Gherkin.
 
@@ -169,10 +169,10 @@ These are parsed by **`@cucumber/gherkin`** at doc-gen + pattern-graph-build tim
 
 ### D. Two Gherkin Parsers — Distinguish Them
 
-| Parser                     | What it reads                                              | When it runs                       |
-| -------------------------- | ---------------------------------------------------------- | ---------------------------------- |
-| `@cucumber/gherkin`        | Architect state (`architect/specs/`, `formal-spec/`)       | At doc-gen + pattern-graph-build   |
-| `@amiceli/vitest-cucumber` | Executable specs (`tests/features/`, `packages/*/tests/`)  | At test time via vitest            |
+| Parser                     | What it reads                                             | When it runs                     |
+| -------------------------- | --------------------------------------------------------- | -------------------------------- |
+| `@cucumber/gherkin`        | Architect state (`architect/specs/`, `formal-spec/`)      | At doc-gen + pattern-graph-build |
+| `@amiceli/vitest-cucumber` | Executable specs (`tests/features/`, `packages/*/tests/`) | At test time via vitest          |
 
 Mixing them up causes the most painful "why doesn't my spec work?" debugging in this repo.
 
@@ -235,7 +235,7 @@ Every architect-scoped session in this repo **MUST** load two kernel skills befo
 1. **`architect-session-router`** — resolves session intent (planning / design / implement / refactor / review / handoff) and routes to the matching session skill.
 2. **`architect-data-api`** — canonical reference for the CLI + MCP surface: verb shapes, deterministic gates (`scope-validate`, `query isValidTransition`, `arch dangling --strict`), JSON shapes, parity table, and known quirks.
 
-Load both before running any architect-scoped `Read` / `Glob` / `Grep`, before invoking any other architect-* session skill, and before calling `pnpm architect:query` or any `architect_*` MCP tool. **The Data API (CLI / MCP) is the canonical source of truth about patterns, specs, FSM state, and executable features — file scanning is not.**
+Load both before running any architect-scoped `Read` / `Glob` / `Grep`, before invoking any other architect-_ session skill, and before calling `pnpm architect:query` or any `architect\__` MCP tool. **The Data API (CLI / MCP) is the canonical source of truth about patterns, specs, FSM state, and executable features — file scanning is not.**
 
 ---
 

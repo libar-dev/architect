@@ -113,7 +113,7 @@
 - 21 tools in `ARCHITECT_MCP_TOOLS` (`packages/architect-mcp/src/tool-metadata.ts:1-71`).
 - `z.strictObject(...).readonly()` on every input schema (ADR-009 trust boundary).
 - `--watch` mode + `architect_rebuild`.
-- Wiring snippet in `docs/MCP-SETUP.md` (the wiring section is correct; only the *tool list* is stale).
+- Wiring snippet in `docs/MCP-SETUP.md` (the wiring section is correct; only the _tool list_ is stale).
 - `CLAUDE.md` / `AGENTS.md` §"Package family" cites 21 tools correctly.
 
 **Missing:**
@@ -312,26 +312,26 @@
 
 ## Appendix: Spec-by-Spec Status (from RECONCILIATION_REPORT)
 
-| #   | Spec                                            | Status     | Roadmap Phase | Effort       |
-| --- | ----------------------------------------------- | ---------- | ------------- | ------------ |
-| 001 | Pattern graph construction                      | ✅ COMPLETE | —             | —            |
-| 002 | Trust-boundary validation                       | ✅ COMPLETE | —             | —            |
-| 003 | Pattern-graph read API                          | ✅ COMPLETE | —             | —            |
-| 004 | Fragment projection pipeline                    | ✅ COMPLETE | —             | —            |
-| 005 | CLI surface (24 subcommands, 7 bins)            | ✅ COMPLETE | —             | —            |
-| 006 | MCP server (21 tools)                           | ⚠️ PARTIAL | Phase 1 P0    | ~30 min      |
-| 007 | FSM lifecycle enforcement                       | ✅ COMPLETE | —             | —            |
-| 008 | Completed-pattern protection                    | ✅ COMPLETE | —             | —            |
-| 009 | Scope-creep detection                           | ✅ COMPLETE | —             | —            |
-| 010 | Scope-readiness validation                      | ✅ COMPLETE | —             | —            |
-| 011 | Session handoff                                 | ✅ COMPLETE | —             | —            |
-| 012 | Doc generation pipeline (8 generators)          | ✅ COMPLETE | —             | —            |
-| 013 | Pre-commit guard                                | ✅ COMPLETE | —             | —            |
-| 014 | No-suppression enforcement (No-BC doctrine)     | ✅ COMPLETE | —             | —            |
-| 015 | Dangling-reference tracking (`arch dangling`)   | ✅ COMPLETE | —             | —            |
-| 016 | Tolerant spec ingestion                         | ✅ COMPLETE | —             | —            |
-| 017 | Coordinated package versioning (W1.5 close-out) | ⚠️ PARTIAL | Phase 2 P1    | multi-day    |
-| 018 | Agent skills system                             | ✅ COMPLETE | —             | —            |
-| 019 | Formal-spec package graduation                  | ⚠️ PARTIAL | Phase 2 P1    | ~1-2 days    |
-| 020 | CI workflows + perf gate                        | ❌ MISSING  | Phase 1 P0    | ~4-8 hours   |
-| 021 | Doctrine + doc drift fixes (Phase A bundle)     | ⚠️ PARTIAL | Phase 1 P0    | ~1-2 hours   |
+| #   | Spec                                            | Status      | Roadmap Phase | Effort     |
+| --- | ----------------------------------------------- | ----------- | ------------- | ---------- |
+| 001 | Pattern graph construction                      | ✅ COMPLETE | —             | —          |
+| 002 | Trust-boundary validation                       | ✅ COMPLETE | —             | —          |
+| 003 | Pattern-graph read API                          | ✅ COMPLETE | —             | —          |
+| 004 | Fragment projection pipeline                    | ✅ COMPLETE | —             | —          |
+| 005 | CLI surface (24 subcommands, 7 bins)            | ✅ COMPLETE | —             | —          |
+| 006 | MCP server (21 tools)                           | ⚠️ PARTIAL  | Phase 1 P0    | ~30 min    |
+| 007 | FSM lifecycle enforcement                       | ✅ COMPLETE | —             | —          |
+| 008 | Completed-pattern protection                    | ✅ COMPLETE | —             | —          |
+| 009 | Scope-creep detection                           | ✅ COMPLETE | —             | —          |
+| 010 | Scope-readiness validation                      | ✅ COMPLETE | —             | —          |
+| 011 | Session handoff                                 | ✅ COMPLETE | —             | —          |
+| 012 | Doc generation pipeline (8 generators)          | ✅ COMPLETE | —             | —          |
+| 013 | Pre-commit guard                                | ✅ COMPLETE | —             | —          |
+| 014 | No-suppression enforcement (No-BC doctrine)     | ✅ COMPLETE | —             | —          |
+| 015 | Dangling-reference tracking (`arch dangling`)   | ✅ COMPLETE | —             | —          |
+| 016 | Tolerant spec ingestion                         | ✅ COMPLETE | —             | —          |
+| 017 | Coordinated package versioning (W1.5 close-out) | ⚠️ PARTIAL  | Phase 2 P1    | multi-day  |
+| 018 | Agent skills system                             | ✅ COMPLETE | —             | —          |
+| 019 | Formal-spec package graduation                  | ⚠️ PARTIAL  | Phase 2 P1    | ~1-2 days  |
+| 020 | CI workflows + perf gate                        | ❌ MISSING  | Phase 1 P0    | ~4-8 hours |
+| 021 | Doctrine + doc drift fixes (Phase A bundle)     | ⚠️ PARTIAL  | Phase 1 P0    | ~1-2 hours |

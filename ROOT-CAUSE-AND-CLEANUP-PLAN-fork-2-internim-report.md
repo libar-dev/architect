@@ -18,15 +18,15 @@
 
 **Other hand-written-shadows-schema instances in core:**
 
-| Type | Defined as `interface` (hand-written) | Schema |
-|---|---|---|
-| `PatternGraph` | `validation-schemas/pattern-graph.ts:161` adds `nameIndex` | `PatternGraphSchema:106` (open) |
-| `RuntimePatternGraph` | `generators/pipeline/transform-types.ts:32` extends with `workflow?` | no Zod equivalent |
-| `ExactStatusGroups` / `StatusGroups` / `SourceViews` / `PhaseGroup` / `ArchIndex` | `pattern-graph.ts:125-160` are interfaces (parallel to schemas) | corresponding `z.object` schemas, not `z.infer` |
-| `RoleDefinition` | `config/role-constants.ts:3` interface | `RoleDefinitionSchema` `z.strictObject` in `validation-schemas/tag-registry.ts:11` — and the interface is re-aliased back at `validation-schemas/tag-registry.ts:20` (`export type RoleDefinition = ConfigRoleDefinition`), so the schema's inferred shape is intentionally discarded |
-| `TagRegistry` | `config/tag-registry-contract.ts` interface, re-exported at `tag-registry.ts:52` | `TagRegistrySchema` in `tag-registry.ts:41` |
-| `BundleRouting`, `ProjectionBundle` | `architect-projection/src/fragments/base.ts:6, 27` interfaces with custom `isRoutingLike` shape-check (`base.ts:64-77`) | no Zod schema at all |
-| `ProjectionContext` | `architect-projection/src/context/projection-context.ts:33` interface | no Zod schema |
+| Type                                                                              | Defined as `interface` (hand-written)                                                                                   | Schema                                                                                                                                                                                                                                                                                |
+| --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `PatternGraph`                                                                    | `validation-schemas/pattern-graph.ts:161` adds `nameIndex`                                                              | `PatternGraphSchema:106` (open)                                                                                                                                                                                                                                                       |
+| `RuntimePatternGraph`                                                             | `generators/pipeline/transform-types.ts:32` extends with `workflow?`                                                    | no Zod equivalent                                                                                                                                                                                                                                                                     |
+| `ExactStatusGroups` / `StatusGroups` / `SourceViews` / `PhaseGroup` / `ArchIndex` | `pattern-graph.ts:125-160` are interfaces (parallel to schemas)                                                         | corresponding `z.object` schemas, not `z.infer`                                                                                                                                                                                                                                       |
+| `RoleDefinition`                                                                  | `config/role-constants.ts:3` interface                                                                                  | `RoleDefinitionSchema` `z.strictObject` in `validation-schemas/tag-registry.ts:11` — and the interface is re-aliased back at `validation-schemas/tag-registry.ts:20` (`export type RoleDefinition = ConfigRoleDefinition`), so the schema's inferred shape is intentionally discarded |
+| `TagRegistry`                                                                     | `config/tag-registry-contract.ts` interface, re-exported at `tag-registry.ts:52`                                        | `TagRegistrySchema` in `tag-registry.ts:41`                                                                                                                                                                                                                                           |
+| `BundleRouting`, `ProjectionBundle`                                               | `architect-projection/src/fragments/base.ts:6, 27` interfaces with custom `isRoutingLike` shape-check (`base.ts:64-77`) | no Zod schema at all                                                                                                                                                                                                                                                                  |
+| `ProjectionContext`                                                               | `architect-projection/src/context/projection-context.ts:33` interface                                                   | no Zod schema                                                                                                                                                                                                                                                                         |
 
 Every cross-package read-API contract in core is double-declared: a Zod schema (open) and a parallel `interface` (the actually consumed one). The interfaces are what TypeScript checks; the schemas are decorative.
 
@@ -85,6 +85,7 @@ Core defines `parseAtBoundary` (`validation/boundary.ts:54`), exports it at the 
 ## 6. The `./roles` broken export — CONFIRMED
 
 `packages/architect-core/package.json:30-33`:
+
 ```json
 "./roles": {
   "types": "./dist/roles.d.ts",
@@ -127,5 +128,5 @@ The graph-build seam fails to be one place because **the read model is described
 - `/Users/darkomijic/dev-projects/architect/packages/architect-projection/src/context/projection-context.ts`
 - `/Users/darkomijic/dev-projects/architect/packages/architect-projection/src/fragments/base.ts`
 - `/Users/darkomijic/dev-projects/architect/packages/architect-cli/src/cli/pattern-graph-cli-runtime.ts`</result>
-<usage><total_tokens>104516</total_tokens><tool_uses>64</tool_uses><duration_ms>193190</duration_ms></usage>
-</task-notification>
+  <usage><total_tokens>104516</total_tokens><tool_uses>64</tool_uses><duration_ms>193190</duration_ms></usage>
+  </task-notification>

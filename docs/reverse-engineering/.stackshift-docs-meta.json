@@ -8,16 +8,49 @@
   "implementation_framework": "speckit",
   "extraction_notes": "Path A from analysis-report.md §Recommended Next Steps: external-consumer framing. Four priority docs (integration-points, configuration-reference, decision-rationale, technical-debt-analysis) get full depth; the other seven defer to existing canonical sources (architect/specs/, ADRs, docs/, formal-spec/) rather than fabricate duplicate content.",
   "docs": {
-    "functional-specification.md": { "generated_at": "2026-05-17T19:27:22Z", "commit_hash": "b875ff1131fcf51db7b67686d1e1f6870ff4d4b7" },
-    "integration-points.md":       { "generated_at": "2026-05-17T19:27:22Z", "commit_hash": "b875ff1131fcf51db7b67686d1e1f6870ff4d4b7" },
-    "configuration-reference.md":  { "generated_at": "2026-05-17T19:27:22Z", "commit_hash": "b875ff1131fcf51db7b67686d1e1f6870ff4d4b7" },
-    "data-architecture.md":        { "generated_at": "2026-05-17T19:27:22Z", "commit_hash": "b875ff1131fcf51db7b67686d1e1f6870ff4d4b7" },
-    "operations-guide.md":         { "generated_at": "2026-05-17T19:27:22Z", "commit_hash": "b875ff1131fcf51db7b67686d1e1f6870ff4d4b7" },
-    "technical-debt-analysis.md":  { "generated_at": "2026-05-17T19:27:22Z", "commit_hash": "b875ff1131fcf51db7b67686d1e1f6870ff4d4b7" },
-    "observability-requirements.md": { "generated_at": "2026-05-17T19:27:22Z", "commit_hash": "b875ff1131fcf51db7b67686d1e1f6870ff4d4b7" },
-    "visual-design-system.md":     { "generated_at": "2026-05-17T19:27:22Z", "commit_hash": "b875ff1131fcf51db7b67686d1e1f6870ff4d4b7" },
-    "test-documentation.md":       { "generated_at": "2026-05-17T19:27:22Z", "commit_hash": "b875ff1131fcf51db7b67686d1e1f6870ff4d4b7" },
-    "business-context.md":         { "generated_at": "2026-05-17T19:27:22Z", "commit_hash": "b875ff1131fcf51db7b67686d1e1f6870ff4d4b7" },
-    "decision-rationale.md":       { "generated_at": "2026-05-17T19:27:22Z", "commit_hash": "b875ff1131fcf51db7b67686d1e1f6870ff4d4b7" }
+    "functional-specification.md": {
+      "generated_at": "2026-05-17T19:27:22Z",
+      "commit_hash": "b875ff1131fcf51db7b67686d1e1f6870ff4d4b7"
+    },
+    "integration-points.md": {
+      "generated_at": "2026-05-17T19:27:22Z",
+      "commit_hash": "b875ff1131fcf51db7b67686d1e1f6870ff4d4b7"
+    },
+    "configuration-reference.md": {
+      "generated_at": "2026-05-17T19:27:22Z",
+      "commit_hash": "b875ff1131fcf51db7b67686d1e1f6870ff4d4b7"
+    },
+    "data-architecture.md": {
+      "generated_at": "2026-05-17T19:27:22Z",
+      "commit_hash": "b875ff1131fcf51db7b67686d1e1f6870ff4d4b7"
+    },
+    "operations-guide.md": {
+      "generated_at": "2026-05-17T19:27:22Z",
+      "commit_hash": "b875ff1131fcf51db7b67686d1e1f6870ff4d4b7"
+    },
+    "technical-debt-analysis.md": {
+      "generated_at": "2026-05-17T19:27:22Z",
+      "commit_hash": "b875ff1131fcf51db7b67686d1e1f6870ff4d4b7"
+    },
+    "observability-requirements.md": {
+      "generated_at": "2026-05-17T19:27:22Z",
+      "commit_hash": "b875ff1131fcf51db7b67686d1e1f6870ff4d4b7"
+    },
+    "visual-design-system.md": {
+      "generated_at": "2026-05-17T19:27:22Z",
+      "commit_hash": "b875ff1131fcf51db7b67686d1e1f6870ff4d4b7"
+    },
+    "test-documentation.md": {
+      "generated_at": "2026-05-17T19:27:22Z",
+      "commit_hash": "b875ff1131fcf51db7b67686d1e1f6870ff4d4b7"
+    },
+    "business-context.md": {
+      "generated_at": "2026-05-17T19:27:22Z",
+      "commit_hash": "b875ff1131fcf51db7b67686d1e1f6870ff4d4b7"
+    },
+    "decision-rationale.md": {
+      "generated_at": "2026-05-17T19:27:22Z",
+      "commit_hash": "b875ff1131fcf51db7b67686d1e1f6870ff4d4b7"
+    }
   }
 }

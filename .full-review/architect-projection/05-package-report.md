@@ -39,56 +39,56 @@ Cross-package confirmations from core: **CL-CORE-16/17** (fuzzy-match + extractF
 
 ### Critical (P0)
 
-| ID | Title | Locations |
-|----|-------|-----------|
-| C-PROJ-1 + CP4A-Sharpened-1 | Zod 4 strict-loss chain: `.omit() → .extend()` through PatternDetail | `pattern-summary.ts:28`, `pattern-detail.ts:24`, `supporting.ts:54-58` |
-| C-PROJ-2 | `parseAndProjectOpenQuestionList` bypasses shared trust-boundary wrapper | `pattern-relations/open-question-list.ts:38` |
-| C-PROJ-3 + Cleanup-C-PROJ-1 | Perf gate fully implemented but unwired | `package.json:65`, `tests/perf/compare-baseline.mjs`, `tests/perf/baselines/business-rule-set.baseline.json` |
-| TD-PROJ-1 | README quickstart fails to compile | `README.md:29` (missing required `packageResolver`) |
-| TD-PROJ-2 + TD-PROJ-3 | Documentation falsehoods: "perf gate live in CI" + "renderers operate on Fragments only" | `docs/MIGRATION.md:62`, `README.md:74-75` |
+| ID                          | Title                                                                                    | Locations                                                                                                    |
+| --------------------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| C-PROJ-1 + CP4A-Sharpened-1 | Zod 4 strict-loss chain: `.omit() → .extend()` through PatternDetail                     | `pattern-summary.ts:28`, `pattern-detail.ts:24`, `supporting.ts:54-58`                                       |
+| C-PROJ-2                    | `parseAndProjectOpenQuestionList` bypasses shared trust-boundary wrapper                 | `pattern-relations/open-question-list.ts:38`                                                                 |
+| C-PROJ-3 + Cleanup-C-PROJ-1 | Perf gate fully implemented but unwired                                                  | `package.json:65`, `tests/perf/compare-baseline.mjs`, `tests/perf/baselines/business-rule-set.baseline.json` |
+| TD-PROJ-1                   | README quickstart fails to compile                                                       | `README.md:29` (missing required `packageResolver`)                                                          |
+| TD-PROJ-2 + TD-PROJ-3       | Documentation falsehoods: "perf gate live in CI" + "renderers operate on Fragments only" | `docs/MIGRATION.md:62`, `README.md:74-75`                                                                    |
 
 ### High (P1) — 22 items
 
 **Architecture (10 — from Phase 1 1B):**
 
-| ID | Title |
-|----|-------|
-| H-PROJ-A-1 | Renderer not codec-agnostic (ADR-005 Rule 5 violation) — 10 fragment-kind normalizers + `summarizeTaxonomyDigest` import in `render-markdown.ts` |
-| H-PROJ-A-2 | `disclosure/spec.ts:9` imports `ProjectionFilterSchema` from `projections/_shared/filter.ts` — layering inversion |
-| H-PROJ-A-3 | `summarizeTaxonomyDigest` is a runtime helper inside fragments contracts layer |
-| H-PROJ-A-4 | `BundleRouting`/`ProjectionBundle<T>` hand-written interfaces, not `z.infer` |
-| H-PROJ-A-5 | `render-markdown.ts` 2,227 LOC mixing 8 concerns |
-| H-PROJ-A-6 | Duplicates of `architect-core` utils (CL-CORE-16/17 confirmed at `_shared/pattern-helpers.internal.ts:432-514` + `:274-286`) |
-| H-PROJ-A-7 | Triple-duplicated slug functions — cross-renderer parity defect |
-| H-PROJ-A-8 | Dual schema for `ProjectDocumentationBundleOptions` |
-| H-PROJ-A-9 | `documentation-type-registry.ts` Proxy facade — self-described deletion target |
-| H-PROJ-A-10 | `summarizeTaxonomyDigest` re-exported through both `fragments/` and `projections/` barrels |
+| ID          | Title                                                                                                                                            |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| H-PROJ-A-1  | Renderer not codec-agnostic (ADR-005 Rule 5 violation) — 10 fragment-kind normalizers + `summarizeTaxonomyDigest` import in `render-markdown.ts` |
+| H-PROJ-A-2  | `disclosure/spec.ts:9` imports `ProjectionFilterSchema` from `projections/_shared/filter.ts` — layering inversion                                |
+| H-PROJ-A-3  | `summarizeTaxonomyDigest` is a runtime helper inside fragments contracts layer                                                                   |
+| H-PROJ-A-4  | `BundleRouting`/`ProjectionBundle<T>` hand-written interfaces, not `z.infer`                                                                     |
+| H-PROJ-A-5  | `render-markdown.ts` 2,227 LOC mixing 8 concerns                                                                                                 |
+| H-PROJ-A-6  | Duplicates of `architect-core` utils (CL-CORE-16/17 confirmed at `_shared/pattern-helpers.internal.ts:432-514` + `:274-286`)                     |
+| H-PROJ-A-7  | Triple-duplicated slug functions — cross-renderer parity defect                                                                                  |
+| H-PROJ-A-8  | Dual schema for `ProjectDocumentationBundleOptions`                                                                                              |
+| H-PROJ-A-9  | `documentation-type-registry.ts` Proxy facade — self-described deletion target                                                                   |
+| H-PROJ-A-10 | `summarizeTaxonomyDigest` re-exported through both `fragments/` and `projections/` barrels                                                       |
 
 **Code quality (8 — from Phase 1 1A):**
 
-| ID | Title |
-|----|-------|
-| H-PROJ-Q-2 | `parseBusinessRuleAnnotations` + `deduplicateScenarioNames` duplicated; both on perf-gate path; already drifted |
-| H-PROJ-Q-3 | `getPatternName` exists 3 times within projection |
-| H-PROJ-Q-4 | `createStatusCounts` duplicated + 4-pass filter on perf-gate hot path |
-| H-PROJ-Q-5 | Renderer tabular helpers duplicated verbatim between markdown + UI |
+| ID         | Title                                                                                                                          |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| H-PROJ-Q-2 | `parseBusinessRuleAnnotations` + `deduplicateScenarioNames` duplicated; both on perf-gate path; already drifted                |
+| H-PROJ-Q-3 | `getPatternName` exists 3 times within projection                                                                              |
+| H-PROJ-Q-4 | `createStatusCounts` duplicated + 4-pass filter on perf-gate hot path                                                          |
+| H-PROJ-Q-5 | Renderer tabular helpers duplicated verbatim between markdown + UI                                                             |
 | H-PROJ-Q-6 | `filterPatterns` unconditional `[...patterns]` copy on no-filter path; 14 hot call sites; projection-side analogue of H-CORE-8 |
-| H-PROJ-Q-7 | Two error styles: 16 raw `Error` vs 9 typed `ProjectionError` with discriminated codes |
+| H-PROJ-Q-7 | Two error styles: 16 raw `Error` vs 9 typed `ProjectionError` with discriminated codes                                         |
 
 **Cleanup + tests + docs + language (additive):**
 
-| ID | Title |
-|----|-------|
-| Cleanup-H-PROJ-1 | Triple barrel re-export of `summarizeTaxonomyDigest` (extends H-PROJ-A-10) |
-| Cleanup-H-PROJ-2 | `vitest.perf-report.config.mjs` near-duplicates `vitest.config.ts` |
-| Cleanup-H-PROJ-3 | `documentation-type-registry.ts` Proxy facade (174 LOC) for 12-entry static registry — extends H-PROJ-A-9 |
-| TC-PROJ-H-1 | 3 fragment kinds excluded from parametric gates (`RoadmapTimeline`, `PatternBundleEntry`, `BusinessRuleReference`) |
-| TC-PROJ-H-2 | Perf gate sequencing issue (perf-report writer under different vitest config than comparator reads) |
-| TC-PROJ-H-3 | `parseAndProjectOpenQuestionList` trust-boundary path untested (compounds C-PROJ-2) |
-| DOC-PROJ-H-1 | `ddd-inventory.md` missing 9 fragment kinds present in `FragmentSchema` |
-| DOC-PROJ-H-2 | 23 non-internal, non-barrel files have public exports without `@architect-pattern` (most load-bearing: `blocks/schema.ts`, `context/projection-context.ts`, `routing/route-id.ts`, `projections/errors.ts`, `_shared/filter.ts`) |
-| H-PROJ-F-1 | `StrictKindTable.Kinds` hand-typed subset — `MarkdownNormalizerKind` 10 of 43 kinds, no compile-time exhaustiveness |
-| H-PROJ-F-2 | `ProjectionContext` hand-written interface — projection's analogue of core's `PatternGraph` drift |
+| ID               | Title                                                                                                                                                                                                                            |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Cleanup-H-PROJ-1 | Triple barrel re-export of `summarizeTaxonomyDigest` (extends H-PROJ-A-10)                                                                                                                                                       |
+| Cleanup-H-PROJ-2 | `vitest.perf-report.config.mjs` near-duplicates `vitest.config.ts`                                                                                                                                                               |
+| Cleanup-H-PROJ-3 | `documentation-type-registry.ts` Proxy facade (174 LOC) for 12-entry static registry — extends H-PROJ-A-9                                                                                                                        |
+| TC-PROJ-H-1      | 3 fragment kinds excluded from parametric gates (`RoadmapTimeline`, `PatternBundleEntry`, `BusinessRuleReference`)                                                                                                               |
+| TC-PROJ-H-2      | Perf gate sequencing issue (perf-report writer under different vitest config than comparator reads)                                                                                                                              |
+| TC-PROJ-H-3      | `parseAndProjectOpenQuestionList` trust-boundary path untested (compounds C-PROJ-2)                                                                                                                                              |
+| DOC-PROJ-H-1     | `ddd-inventory.md` missing 9 fragment kinds present in `FragmentSchema`                                                                                                                                                          |
+| DOC-PROJ-H-2     | 23 non-internal, non-barrel files have public exports without `@architect-pattern` (most load-bearing: `blocks/schema.ts`, `context/projection-context.ts`, `routing/route-id.ts`, `projections/errors.ts`, `_shared/filter.ts`) |
+| H-PROJ-F-1       | `StrictKindTable.Kinds` hand-typed subset — `MarkdownNormalizerKind` 10 of 43 kinds, no compile-time exhaustiveness                                                                                                              |
+| H-PROJ-F-2       | `ProjectionContext` hand-written interface — projection's analogue of core's `PatternGraph` drift                                                                                                                                |
 
 ### Medium (P2) — abbreviated
 
@@ -121,7 +121,7 @@ Combined ~35 items across all 4 phases. Mostly regex hoisting, fix small TS idio
 
 ### Sweep 4: In-package consolidation (1-2 days)
 
-11. **H-PROJ-Q-2 through H-PROJ-Q-5** — 8 duplications consolidated into `_shared/` files (status-counts, business-rule-annotations, getPatternName, renderers/_shared/tabular, renderers/_shared/primitives).
+11. **H-PROJ-Q-2 through H-PROJ-Q-5** — 8 duplications consolidated into `_shared/` files (status-counts, business-rule-annotations, getPatternName, renderers/\_shared/tabular, renderers/\_shared/primitives).
 12. **H-PROJ-Q-6** — `filterPatterns` no-copy. After landing, re-baseline perf gate.
 13. **H-PROJ-A-7** — slug canonicalization. Pick `slugForFilename`; delete others. Fixes cross-renderer parity defect.
 

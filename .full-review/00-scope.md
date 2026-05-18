@@ -12,14 +12,14 @@ Status: v2.0 pre-release (each split package at `2.0.0-pre.1`; root is `private:
 
 Dependency direction (acyclic): `core ← projection`, `core ← guard ← cli`, `core, projection ← mcp`. The meta package re-exports all bins and depends on every split.
 
-| # | Package | SLOC src/ | Files | Tests | Purpose |
-| - | ------- | --------- | ----- | ----- | ------- |
-| 1 | `@libar-dev/architect-core`       | 12,360 | 106 | 51 | Canonical model, ingestion, graph build, scanner/extractor, taxonomy, config, read API (`PatternGraphAPI`), utils. |
-| 2 | `@libar-dev/architect-projection` | 15,238 | 145 | 83 | Fragment-based projection pipeline — Named Domain Fragments (Zod), block types, renderers (compact-text, json, markdown, ui). **Has a CI perf gate.** |
-| 3 | `@libar-dev/architect-guard`      |  9,135 |  38 |  5 | Policy, validation, process guard, step-lint, DoD, anti-pattern detection, git helpers. |
-| 4 | `@libar-dev/architect-cli`        |  3,870 |  26 |  9 | Thin composition root — bins for `architect`, `architect-generate`, `architect-guard`, `architect-validate`, `architect-lint-steps`, `architect-lint-patterns`. |
-| 5 | `@libar-dev/architect-mcp`        |  1,630 |   9 |  5 | MCP server (18 tools per package.json description / 21 per AGENTS.md), tool registry, file watcher, pipeline session. Bin: `architect-mcp`. |
-| 6 | `@libar-dev/architect`            |     ~7 |   0 |  0 | Meta-package — bin-only re-export (no JS exports). |
+| #   | Package                           | SLOC src/ | Files | Tests | Purpose                                                                                                                                                         |
+| --- | --------------------------------- | --------- | ----- | ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | `@libar-dev/architect-core`       | 12,360    | 106   | 51    | Canonical model, ingestion, graph build, scanner/extractor, taxonomy, config, read API (`PatternGraphAPI`), utils.                                              |
+| 2   | `@libar-dev/architect-projection` | 15,238    | 145   | 83    | Fragment-based projection pipeline — Named Domain Fragments (Zod), block types, renderers (compact-text, json, markdown, ui). **Has a CI perf gate.**           |
+| 3   | `@libar-dev/architect-guard`      | 9,135     | 38    | 5     | Policy, validation, process guard, step-lint, DoD, anti-pattern detection, git helpers.                                                                         |
+| 4   | `@libar-dev/architect-cli`        | 3,870     | 26    | 9     | Thin composition root — bins for `architect`, `architect-generate`, `architect-guard`, `architect-validate`, `architect-lint-steps`, `architect-lint-patterns`. |
+| 5   | `@libar-dev/architect-mcp`        | 1,630     | 9     | 5     | MCP server (18 tools per package.json description / 21 per AGENTS.md), tool registry, file watcher, pipeline session. Bin: `architect-mcp`.                     |
+| 6   | `@libar-dev/architect`            | ~7        | 0     | 0     | Meta-package — bin-only re-export (no JS exports).                                                                                                              |
 
 Total: ~42,000 source SLOC; 153 test files across the family.
 
@@ -38,7 +38,7 @@ These are not "best practices, take them or leave them"; they are the standards 
 For each package, in order:
 
 1. **Phase 1 — Code Quality & Architecture** (parallel: `code-reviewer` + `architect-review`) → consolidate.
-2. **Phase 2 — Simplification & Cleanup** (parallel: `code-simplifier:code-simplifier` + `codebase-cleanup:code-reviewer`) → consolidate. *(Replaces the orchestrator's default Security+Performance phase per user instruction.)*
+2. **Phase 2 — Simplification & Cleanup** (parallel: `code-simplifier:code-simplifier` + `codebase-cleanup:code-reviewer`) → consolidate. _(Replaces the orchestrator's default Security+Performance phase per user instruction.)_
 3. **Phase 3 — Testing & Documentation** (parallel: test-coverage + documentation-architect agents) → consolidate.
 4. **Phase 4 — Best Practices & Standards** (parallel: framework/language + CI/DevOps agents) → consolidate.
 5. **Phase 5 — Per-package consolidated report** with severity-ranked findings and recommended action plan.

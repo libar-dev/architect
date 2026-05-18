@@ -20,38 +20,38 @@ The perf gate verdict: **mechanically correct, currently silenced, and must be w
 
 ## 2. Module Coverage Map
 
-| `src/` directory | Primary test file(s) | Coverage level | Notes |
-|---|---|---|---|
-| `_internal/format-utils.ts`, `_internal/slug.ts` | None directly | Indirect | Exercised through renderers and projections. No dedicated unit feature. |
-| `blocks/schema.ts` | `scaffold.feature` | Minimal — 9 blocks confirmed parseable | No negative-path or composition tests beyond the smoke. |
-| `context/projection-context.ts` | All projection step files | Strong | Used as shared fixture; shape tested by every projection. |
-| `disclosure/` (levels, spec) | `render-markdown.feature` (disclosure scenarios), `parity-renderer-reuse.feature` | Moderate | All four disclosure levels exercised in markdown rendering and JSON/UI invariance checks; the `ProgressiveDisclosurePolicy` constant itself has no dedicated feature. |
-| `fragments/delivery-reporting/` (5 schemas + supporting) | `fragment-schemas.feature` | Strong schema level | `RoadmapTimeline` excluded from schema parametric runner — see finding TC-H-1. |
-| `fragments/documentation-composition/` (4 schemas + supporting) | `fragment-schemas.feature` | Strong | All 4 kinds covered. |
-| `fragments/execution-context/` (7 schemas + supporting) | `fragment-schemas.feature` | Strong | All 7 kinds covered. |
-| `fragments/governance/` (6 schemas + supporting) | `fragment-schemas.feature`, `business-rule-set-package-scope.feature` | Strong | `BusinessRuleReference` excluded from schema parametric runner — see finding TC-H-1. |
-| `fragments/operational-insights/` (9 schemas + supporting) | `fragment-schemas.feature` | Strong | All 9 kinds covered. |
-| `fragments/pattern-relations/` (11 schemas + supporting) | `fragment-schemas.feature` | Moderate | `PatternBundleEntry` excluded — see finding TC-H-1. |
-| `fragments/fragment-schema.internal.ts` | `fragment-schemas.feature` (discriminated-union scenarios) | Good | Unknown-kind rejection tested; known-kind acceptance tested. |
-| `projections/_shared/parse-and-project.internal.ts` | Implicit — covered via all `parseAndProject*` tests | Good | No isolated unit test; shared behavior verified across 14 callers. |
-| `projections/_shared/filter.ts` | `business-rules.feature` (ProjectionFilter scenarios) | Good | `filterPatterns` + `resolveProjectionFilter` exercised with maturity and status axis combinations. |
-| `projections/_shared/pattern-helpers.internal.ts` | `pattern-detail.feature`, `pattern-summary.feature`, others | Good indirect | No dedicated feature; 515 LOC file fully exercised through domain projections. |
-| `projections/delivery-reporting/index.ts` | `phase-progress-status.feature`, `release-notes.feature`, `roadmap-timeline.feature`, `traceability-matrix.feature`, `smoke-status-distribution.feature` | Strong | All 5 public `project*` functions tested. |
-| `projections/documentation-composition/` (7 files) | `config-documentation.feature`, `smoke-documentation-bundle.feature`, `registry-contract.feature`, `roadmap-markdown.feature` | Strong | All public entrypoints tested; `parseAndProjectDocumentationBundle` rejection for dropped types verified. |
-| `projections/execution-context/` (7 files) | `context-session.feature`, `smoke-session-context.feature` | Strong | All 6 public `project*`/`parseAndProject*` functions exercised with option-rejection scenarios. |
-| `projections/governance/` (6 files) | `business-rules.feature`, `decision-records.feature`, `validation-taxonomy.feature`, `smoke-business-rules.feature` | Strong | All grouping modes (product-area, phase, package, feature) tested; option-rejection for invalid grouping tested. |
-| `projections/operational-insights/index.ts` | `reporting.feature`, `smoke-overview.feature` | Strong | All 7 sub-projections tested; duplicate-feature-name edge cases tested. |
-| `projections/pattern-relations/` (10 files) | `architecture-neighborhood.feature`, `dependency-edges.feature`, `dependency-tree.feature`, `open-question-list.feature`, `pattern-bundle.feature`, `pattern-detail.feature`, `pattern-summary.feature`, `smoke-dependency-tree.feature` | Strong | 14/15 `parseAndProject*` callers tested; `parseAndProjectPatternBundle` not directly exercised — see finding TC-M-1. |
-| `renderers/render-markdown.ts` (2,227 LOC) | `render-markdown.feature` (21 scenarios) | Strong | Security paths, H2 splitting, disclosure, routed output, disambiguation all covered. See §3 for remaining gap. |
-| `renderers/render-compact-text.ts` | `renderer-smoke.feature` (parametric over 39 kinds) | Smoke only | No semantic or edge-case feature. Compact text output never compared to expected content; only "non-empty" assertion. See TC-M-2. |
-| `renderers/render-json.ts` | `render-json.feature` (8 scenarios) | Good | Stable-order, round-trip, bundle structure, forbidden-value errors, plain-object discriminator. |
-| `renderers/render-ui.ts` | `render-ui.feature` (3 scenarios) | Thin | PatternDetail section order and bundle children tested. No multi-kind rendering, no section-count comparison for non-PatternDetail kinds. See TC-M-3. |
-| `renderers/markdown-paths.ts` | Implicit via `render-markdown.feature` | Moderate | `resolveLogicalRoutePath` branches covered by routing scenarios; no explicit unit-level feature. |
-| `renderers/_shared/dispatch.ts` | `contract.feature` (dispatchByKind fallback scenario) | Minimal | Fallback handler tested; no exhaustive kind-dispatch test. |
-| `routing/route-id.ts` | Implicit via `render-markdown.feature` routing scenarios | Moderate | Parser branches exercised indirectly — see TC-M-4. |
-| `shared/plain-object.ts` | `render-json.feature` (plain-object scenarios) | Good | |
-| `projections/documentation-composition/documentation-type-registry*.ts` (4 files) | `registry-contract.feature` | Good | Identity, output-routing, disclosure, and CLI-surface axes all pinned. |
-| `projections/errors.ts` | `decision-records.feature`, `pattern-summary.feature`, `dependency-edges.feature` | Good | `DECISION_NOT_FOUND`, `PATTERN_NOT_FOUND` error shapes tested. |
+| `src/` directory                                                                  | Primary test file(s)                                                                                                                                                                                                                     | Coverage level                         | Notes                                                                                                                                                                 |
+| --------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `_internal/format-utils.ts`, `_internal/slug.ts`                                  | None directly                                                                                                                                                                                                                            | Indirect                               | Exercised through renderers and projections. No dedicated unit feature.                                                                                               |
+| `blocks/schema.ts`                                                                | `scaffold.feature`                                                                                                                                                                                                                       | Minimal — 9 blocks confirmed parseable | No negative-path or composition tests beyond the smoke.                                                                                                               |
+| `context/projection-context.ts`                                                   | All projection step files                                                                                                                                                                                                                | Strong                                 | Used as shared fixture; shape tested by every projection.                                                                                                             |
+| `disclosure/` (levels, spec)                                                      | `render-markdown.feature` (disclosure scenarios), `parity-renderer-reuse.feature`                                                                                                                                                        | Moderate                               | All four disclosure levels exercised in markdown rendering and JSON/UI invariance checks; the `ProgressiveDisclosurePolicy` constant itself has no dedicated feature. |
+| `fragments/delivery-reporting/` (5 schemas + supporting)                          | `fragment-schemas.feature`                                                                                                                                                                                                               | Strong schema level                    | `RoadmapTimeline` excluded from schema parametric runner — see finding TC-H-1.                                                                                        |
+| `fragments/documentation-composition/` (4 schemas + supporting)                   | `fragment-schemas.feature`                                                                                                                                                                                                               | Strong                                 | All 4 kinds covered.                                                                                                                                                  |
+| `fragments/execution-context/` (7 schemas + supporting)                           | `fragment-schemas.feature`                                                                                                                                                                                                               | Strong                                 | All 7 kinds covered.                                                                                                                                                  |
+| `fragments/governance/` (6 schemas + supporting)                                  | `fragment-schemas.feature`, `business-rule-set-package-scope.feature`                                                                                                                                                                    | Strong                                 | `BusinessRuleReference` excluded from schema parametric runner — see finding TC-H-1.                                                                                  |
+| `fragments/operational-insights/` (9 schemas + supporting)                        | `fragment-schemas.feature`                                                                                                                                                                                                               | Strong                                 | All 9 kinds covered.                                                                                                                                                  |
+| `fragments/pattern-relations/` (11 schemas + supporting)                          | `fragment-schemas.feature`                                                                                                                                                                                                               | Moderate                               | `PatternBundleEntry` excluded — see finding TC-H-1.                                                                                                                   |
+| `fragments/fragment-schema.internal.ts`                                           | `fragment-schemas.feature` (discriminated-union scenarios)                                                                                                                                                                               | Good                                   | Unknown-kind rejection tested; known-kind acceptance tested.                                                                                                          |
+| `projections/_shared/parse-and-project.internal.ts`                               | Implicit — covered via all `parseAndProject*` tests                                                                                                                                                                                      | Good                                   | No isolated unit test; shared behavior verified across 14 callers.                                                                                                    |
+| `projections/_shared/filter.ts`                                                   | `business-rules.feature` (ProjectionFilter scenarios)                                                                                                                                                                                    | Good                                   | `filterPatterns` + `resolveProjectionFilter` exercised with maturity and status axis combinations.                                                                    |
+| `projections/_shared/pattern-helpers.internal.ts`                                 | `pattern-detail.feature`, `pattern-summary.feature`, others                                                                                                                                                                              | Good indirect                          | No dedicated feature; 515 LOC file fully exercised through domain projections.                                                                                        |
+| `projections/delivery-reporting/index.ts`                                         | `phase-progress-status.feature`, `release-notes.feature`, `roadmap-timeline.feature`, `traceability-matrix.feature`, `smoke-status-distribution.feature`                                                                                 | Strong                                 | All 5 public `project*` functions tested.                                                                                                                             |
+| `projections/documentation-composition/` (7 files)                                | `config-documentation.feature`, `smoke-documentation-bundle.feature`, `registry-contract.feature`, `roadmap-markdown.feature`                                                                                                            | Strong                                 | All public entrypoints tested; `parseAndProjectDocumentationBundle` rejection for dropped types verified.                                                             |
+| `projections/execution-context/` (7 files)                                        | `context-session.feature`, `smoke-session-context.feature`                                                                                                                                                                               | Strong                                 | All 6 public `project*`/`parseAndProject*` functions exercised with option-rejection scenarios.                                                                       |
+| `projections/governance/` (6 files)                                               | `business-rules.feature`, `decision-records.feature`, `validation-taxonomy.feature`, `smoke-business-rules.feature`                                                                                                                      | Strong                                 | All grouping modes (product-area, phase, package, feature) tested; option-rejection for invalid grouping tested.                                                      |
+| `projections/operational-insights/index.ts`                                       | `reporting.feature`, `smoke-overview.feature`                                                                                                                                                                                            | Strong                                 | All 7 sub-projections tested; duplicate-feature-name edge cases tested.                                                                                               |
+| `projections/pattern-relations/` (10 files)                                       | `architecture-neighborhood.feature`, `dependency-edges.feature`, `dependency-tree.feature`, `open-question-list.feature`, `pattern-bundle.feature`, `pattern-detail.feature`, `pattern-summary.feature`, `smoke-dependency-tree.feature` | Strong                                 | 14/15 `parseAndProject*` callers tested; `parseAndProjectPatternBundle` not directly exercised — see finding TC-M-1.                                                  |
+| `renderers/render-markdown.ts` (2,227 LOC)                                        | `render-markdown.feature` (21 scenarios)                                                                                                                                                                                                 | Strong                                 | Security paths, H2 splitting, disclosure, routed output, disambiguation all covered. See §3 for remaining gap.                                                        |
+| `renderers/render-compact-text.ts`                                                | `renderer-smoke.feature` (parametric over 39 kinds)                                                                                                                                                                                      | Smoke only                             | No semantic or edge-case feature. Compact text output never compared to expected content; only "non-empty" assertion. See TC-M-2.                                     |
+| `renderers/render-json.ts`                                                        | `render-json.feature` (8 scenarios)                                                                                                                                                                                                      | Good                                   | Stable-order, round-trip, bundle structure, forbidden-value errors, plain-object discriminator.                                                                       |
+| `renderers/render-ui.ts`                                                          | `render-ui.feature` (3 scenarios)                                                                                                                                                                                                        | Thin                                   | PatternDetail section order and bundle children tested. No multi-kind rendering, no section-count comparison for non-PatternDetail kinds. See TC-M-3.                 |
+| `renderers/markdown-paths.ts`                                                     | Implicit via `render-markdown.feature`                                                                                                                                                                                                   | Moderate                               | `resolveLogicalRoutePath` branches covered by routing scenarios; no explicit unit-level feature.                                                                      |
+| `renderers/_shared/dispatch.ts`                                                   | `contract.feature` (dispatchByKind fallback scenario)                                                                                                                                                                                    | Minimal                                | Fallback handler tested; no exhaustive kind-dispatch test.                                                                                                            |
+| `routing/route-id.ts`                                                             | Implicit via `render-markdown.feature` routing scenarios                                                                                                                                                                                 | Moderate                               | Parser branches exercised indirectly — see TC-M-4.                                                                                                                    |
+| `shared/plain-object.ts`                                                          | `render-json.feature` (plain-object scenarios)                                                                                                                                                                                           | Good                                   |                                                                                                                                                                       |
+| `projections/documentation-composition/documentation-type-registry*.ts` (4 files) | `registry-contract.feature`                                                                                                                                                                                                              | Good                                   | Identity, output-routing, disclosure, and CLI-surface axes all pinned.                                                                                                |
+| `projections/errors.ts`                                                           | `decision-records.feature`, `pattern-summary.feature`, `dependency-edges.feature`                                                                                                                                                        | Good                                   | `DECISION_NOT_FOUND`, `PATTERN_NOT_FOUND` error shapes tested.                                                                                                        |
 
 ---
 
@@ -64,6 +64,7 @@ The perf gate verdict: **mechanically correct, currently silenced, and must be w
 **Files:** `tests/fixtures/fragments.ts`, `tests/features/fragments/fragment-schemas.feature`, `tests/features/renderers/renderer-smoke.feature`
 
 `RoadmapTimeline`, `PatternBundleEntry`, and `BusinessRuleReference` are the only fragment kinds with `kind: z.literal(...)` schema definitions that are absent from:
+
 - `fragment-schemas.feature` — the 41-kind parse/reject/round-trip outline
 - `renderer-smoke.feature` — the 39-kind all-four-renderers outline
 - `tests/fixtures/fragments.ts` — the `FRAGMENT_VALID_FIXTURES` record used by both
@@ -87,6 +88,7 @@ As confirmed by Phase 2B (`Cleanup-C-PROJ-1`), the comparator is fully implement
 3. The `vitest.perf-report.config.mjs` that runs the report-writer also exists as a separate config, creating a maintenance fork (Phase 2B `Cleanup-H-PROJ-2`).
 
 **Recipe (from Phase 2B, one line):**
+
 ```diff
 - "test": "pnpm test:barrel-audit && pnpm test:jsdoc-boilerplate-audit && pnpm typecheck && vitest run --config vitest.config.ts",
 + "test": "pnpm test:barrel-audit && pnpm test:jsdoc-boilerplate-audit && pnpm typecheck && vitest run --config vitest.config.ts && node tests/perf/compare-baseline.mjs",
@@ -145,6 +147,7 @@ Three scenarios cover `PatternDetail` section hierarchy, section order, and bund
 **File:** `src/routing/route-id.ts`
 
 `parseLogicalRouteId`, `createIndexRouteId`, `createEntityRouteId`, `createChildRouteId` are tested only indirectly through `render-markdown.feature` routing scenarios. The parser's branch coverage (2-segment entity, 2-segment index, 4-segment child, invalid length, invalid segment characters) is exercised incidentally but not pinned. Key unverified edges:
+
 - A 3-segment route id (currently falls to the `default` branch returning `undefined`, which causes `parseLogicalRouteId` to throw — this throw path is never explicitly asserted).
 - A segment starting with a non-alphanumeric character (the `ROUTE_SEGMENT_PATTERN` validates `^[A-Za-z0-9]`).
 - A zero-length segment produced by double-colon input (`foo::index`).
@@ -158,6 +161,7 @@ None of these is a current regression; they are specification gaps that a future
 **Files:** `tests/features/parity/parity-renderer-reuse.feature`, `tests/features/renderers/render-markdown.feature`
 
 The parity feature verifies JSON and UI output are invariant across all four disclosure levels (essential/important/useful/advanced) for a `BusinessRuleSet` bundle. The markdown feature tests essential vs. important vs. useful vs. advanced column counts for `BusinessRuleSet`. However:
+
 - The "advanced" level's filter behavior (candidate-rule inclusion at advanced, tested in `config-documentation.feature` line 81) is tested only through the full documentation-bundle projection, not at the renderer level.
 - No test verifies disclosure-level filtering for `RequirementDigest`, `DecisionCatalog`, or any governance projection other than `BusinessRuleSet`.
 
@@ -206,6 +210,7 @@ Only the happy path (all nine block builders produce valid schema output) is tes
 ### Comparator correctness
 
 `tests/perf/compare-baseline.mjs` is mechanically correct. The logic:
+
 1. Reads both the committed baseline (`baselines/business-rule-set.baseline.json`) and the live evidence file (`.sisyphus/evidence/task-3-business-rule-set-perf-report.json`) in parallel.
 2. For each metric, computes `effectiveBudget = Math.min(hardBudget, baselineValue × 1.5)`.
 3. Sets `process.exitCode = 1` (not `process.exit(1)`) if any metric exceeds its effective budget, allowing remaining checks to complete before the process exits.
@@ -217,12 +222,12 @@ One behavioral note: the script uses `process.exitCode = 1` rather than `process
 
 The gate covers 26 metrics across four categories:
 
-| Category | Metrics covered |
-|---|---|
-| Core projections | `project.avgMs`, `renderObject.avgMs`, `renderPretty.avgMs` |
-| Scalar | `isBundleP50Micros` |
-| Hot paths | `sessionContextBundle`, `scopeReadinessReport`, `documentationView`, `requirementDigestAllAreas`, `requirementDigestExecutable`, `patternSatisfiesTag`, `buildBoundedContext`, `graphBuild` (8 sub-metrics, each `avgMs`) |
-| Render-markdown bundles | `patterns`, `decisions`, `requirements-executable` (3 sub-metrics, each `avgMs`) |
+| Category                | Metrics covered                                                                                                                                                                                                           |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Core projections        | `project.avgMs`, `renderObject.avgMs`, `renderPretty.avgMs`                                                                                                                                                               |
+| Scalar                  | `isBundleP50Micros`                                                                                                                                                                                                       |
+| Hot paths               | `sessionContextBundle`, `scopeReadinessReport`, `documentationView`, `requirementDigestAllAreas`, `requirementDigestExecutable`, `patternSatisfiesTag`, `buildBoundedContext`, `graphBuild` (8 sub-metrics, each `avgMs`) |
+| Render-markdown bundles | `patterns`, `decisions`, `requirements-executable` (3 sub-metrics, each `avgMs`)                                                                                                                                          |
 
 ### What the baseline covers well
 
@@ -243,6 +248,7 @@ Three metrics are absent from the gate that Phase 1/2 identified as perf-sensiti
 The perf-report writer runs under `vitest.perf-report.config.mjs` which is not included in `vitest.config.ts`. The comparator reads `.sisyphus/evidence/task-3-business-rule-set-perf-report.json`. If `pnpm test` is run without first running `vitest run --config vitest.perf-report.config.mjs`, the comparator throws `Unable to read perf report` and exits 1. This is not a silent failure, but it means the two-step invocation must be documented or collapsed into a single step.
 
 **Recommended wiring:**
+
 ```diff
 - "test": "pnpm test:barrel-audit && pnpm test:jsdoc-boilerplate-audit && pnpm typecheck && vitest run --config vitest.config.ts",
 + "test": "pnpm test:barrel-audit && pnpm test:jsdoc-boilerplate-audit && pnpm typecheck && vitest run --config vitest.config.ts && vitest run --config vitest.perf-report.config.mjs && node tests/perf/compare-baseline.mjs",
@@ -254,11 +260,11 @@ Or, per Phase 2B `Cleanup-H-PROJ-2`, collapse the two Vitest configs into one wi
 
 ## 5. Test Residue Cleanup
 
-| Item | File | Action |
-|---|---|---|
-| `.DS_Store` | `tests/.DS_Store` | Delete; add `tests/.DS_Store` to `.gitignore` (`.gitignore` already lists `**/.DS_Store` per Phase 2B audit — confirm the committed file was added before that rule was in place and remove it with `git rm --cached tests/.DS_Store`). |
-| `src/.DS_Store` | `src/.DS_Store` | Same as above — confirmed present by directory listing. |
-| `vitest.perf-report.config.mjs` | Package root | Near-duplicate of `vitest.config.ts`; collapse per Phase 2B `Cleanup-H-PROJ-2`. |
+| Item                                                                | File                     | Action                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| ------------------------------------------------------------------- | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `.DS_Store`                                                         | `tests/.DS_Store`        | Delete; add `tests/.DS_Store` to `.gitignore` (`.gitignore` already lists `**/.DS_Store` per Phase 2B audit — confirm the committed file was added before that rule was in place and remove it with `git rm --cached tests/.DS_Store`).                                                                                                                                                                                                                           |
+| `src/.DS_Store`                                                     | `src/.DS_Store`          | Same as above — confirmed present by directory listing.                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `vitest.perf-report.config.mjs`                                     | Package root             | Near-duplicate of `vitest.config.ts`; collapse per Phase 2B `Cleanup-H-PROJ-2`.                                                                                                                                                                                                                                                                                                                                                                                   |
 | `tests/features/renderers/contract.feature` documentation scenarios | `contract.feature:53-76` | Three scenarios test that a Markdown fixture file (`tests/fixtures/renderers/progressive-disclosure.md`) contains specific prose. This couples tests to fixture content that might drift. The fixture is not generated — it is hand-authored. The scenarios exist to enforce contract documentation decisions remain explicit. This is intentional, but the coupling should be noted: if the Markdown is restructured, these tests break without any code change. |
 
 No orphaned fixture files were found. The two fixture files (`tests/fixtures/renderers/progressive-disclosure.md`, `tests/fixtures/documentation-composition/documentation-types.md`) are both referenced by step files.
@@ -269,12 +275,12 @@ No orphaned fixture files were found. The two fixture files (`tests/fixtures/ren
 
 Phase 2B correctly noted that projection's `test` script is the most disciplined in the family. Remaining gaps:
 
-| Gap | Current state | Recommended fix |
-|---|---|---|
-| Perf gate not wired | `pnpm test` ends after `vitest run` | Add perf-report run + comparator invocation (see §4) |
-| `typecheck` uses only `tsconfig.test.json` | Phase 2B `M-PROJ-Cleanup-5`: drift from family baseline which chains both tsconfigs | Align `typecheck` to run both `tsconfig.json` and `tsconfig.test.json` per family convention |
-| `parseAndProject*` body-shape audit not implemented | `options-schema-barrel-audit.mjs` matches `*OptionsSchema` exports but not `parseAndProject*` body shape (Phase 2B `M-PROJ-Cleanup-1`) | Add 15-LOC second pass to audit script to regex-verify each `parseAndProject*` export routes through the `parseAndProject(` factory |
-| No check that `OpenQuestionList` / `RoadmapTimeline` / `PatternBundleEntry` / `BusinessRuleReference` are in the smoke parametric tables | Not enforced | Could be a lint-rule or a TypeScript assertion in `fragments.ts` that `FRAGMENT_VALID_FIXTURES` covers all schema kinds |
+| Gap                                                                                                                                      | Current state                                                                                                                          | Recommended fix                                                                                                                     |
+| ---------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Perf gate not wired                                                                                                                      | `pnpm test` ends after `vitest run`                                                                                                    | Add perf-report run + comparator invocation (see §4)                                                                                |
+| `typecheck` uses only `tsconfig.test.json`                                                                                               | Phase 2B `M-PROJ-Cleanup-5`: drift from family baseline which chains both tsconfigs                                                    | Align `typecheck` to run both `tsconfig.json` and `tsconfig.test.json` per family convention                                        |
+| `parseAndProject*` body-shape audit not implemented                                                                                      | `options-schema-barrel-audit.mjs` matches `*OptionsSchema` exports but not `parseAndProject*` body shape (Phase 2B `M-PROJ-Cleanup-1`) | Add 15-LOC second pass to audit script to regex-verify each `parseAndProject*` export routes through the `parseAndProject(` factory |
+| No check that `OpenQuestionList` / `RoadmapTimeline` / `PatternBundleEntry` / `BusinessRuleReference` are in the smoke parametric tables | Not enforced                                                                                                                           | Could be a lint-rule or a TypeScript assertion in `fragments.ts` that `FRAGMENT_VALID_FIXTURES` covers all schema kinds             |
 
 ---
 
@@ -283,6 +289,7 @@ Phase 2B correctly noted that projection's `test` script is the most disciplined
 ### 7a. `render-markdown.ts` security paths
 
 `tests/features/renderers/render-markdown.feature` has 21 scenarios, of which 10 are security-tagged (`@security`, `@routing`, `@disclosure`). The fixture in `render-markdown.feature.steps.ts` at lines 147–275 injects 22 distinct hostile link inputs covering:
+
 - `javascript:` scheme
 - Protocol-relative `//` prefix
 - HTML-entity-encoded scheme letters (`&#x61;`)
@@ -309,17 +316,17 @@ Each is asserted explicitly in a step. This is the highest trust-boundary securi
 
 ## Summary Table
 
-| Finding | Severity | Files |
-|---|---|---|
-| TC-H-1: 3 fragment kinds excluded from schema + renderer parametric gates | High | `tests/fixtures/fragments.ts`, `fragment-schemas.feature`, `renderer-smoke.feature` |
-| TC-H-2: Perf gate not wired into `pnpm test` | High | `package.json:65` |
-| TC-H-3: `parseAndProjectOpenQuestionList` trust-boundary untested | High | `open-question-list.ts:34-39`, `open-question-list.steps.ts` |
-| TC-M-1: `parseAndProjectPatternBundle` option-rejection untested | Medium | `pattern-bundle.steps.ts` |
-| TC-M-2: `renderCompactText` smoke-only — no content assertions | Medium | `renderer-smoke.feature.steps.ts` |
-| TC-M-3: `renderUi` tested for PatternDetail only | Medium | `render-ui.feature` |
-| TC-M-4: `routing/route-id.ts` parser edges not pinned | Medium | `route-id.ts` |
-| TC-M-5: Disclosure-level filtering not tested outside BusinessRuleSet | Medium | `registry-contract.feature`, various |
-| TC-M-6: `tests/.DS_Store` committed | Medium | `tests/.DS_Store` |
-| TC-L-1: Audit script failure paths untested | Low | `scripts/options-schema-barrel-audit.mjs` |
-| TC-L-2: `FragmentSchema` union tested with one representative | Low | `fragment-schemas.feature:170-181` |
-| TC-L-3: Block-level error paths untested | Low | `scaffold.feature` |
+| Finding                                                                   | Severity | Files                                                                               |
+| ------------------------------------------------------------------------- | -------- | ----------------------------------------------------------------------------------- |
+| TC-H-1: 3 fragment kinds excluded from schema + renderer parametric gates | High     | `tests/fixtures/fragments.ts`, `fragment-schemas.feature`, `renderer-smoke.feature` |
+| TC-H-2: Perf gate not wired into `pnpm test`                              | High     | `package.json:65`                                                                   |
+| TC-H-3: `parseAndProjectOpenQuestionList` trust-boundary untested         | High     | `open-question-list.ts:34-39`, `open-question-list.steps.ts`                        |
+| TC-M-1: `parseAndProjectPatternBundle` option-rejection untested          | Medium   | `pattern-bundle.steps.ts`                                                           |
+| TC-M-2: `renderCompactText` smoke-only — no content assertions            | Medium   | `renderer-smoke.feature.steps.ts`                                                   |
+| TC-M-3: `renderUi` tested for PatternDetail only                          | Medium   | `render-ui.feature`                                                                 |
+| TC-M-4: `routing/route-id.ts` parser edges not pinned                     | Medium   | `route-id.ts`                                                                       |
+| TC-M-5: Disclosure-level filtering not tested outside BusinessRuleSet     | Medium   | `registry-contract.feature`, various                                                |
+| TC-M-6: `tests/.DS_Store` committed                                       | Medium   | `tests/.DS_Store`                                                                   |
+| TC-L-1: Audit script failure paths untested                               | Low      | `scripts/options-schema-barrel-audit.mjs`                                           |
+| TC-L-2: `FragmentSchema` union tested with one representative             | Low      | `fragment-schemas.feature:170-181`                                                  |
+| TC-L-3: Block-level error paths untested                                  | Low      | `scaffold.feature`                                                                  |

@@ -1,6 +1,7 @@
 # Feature: Doc-Generation Pipeline (`pnpm docs:all`)
 
 ## Status
+
 ✅ COMPLETE — `architect-generate` bin runs 8 default generators against the live PatternGraph: `patterns`, `architecture`, `roadmap`, `changelog`, `requirements-executable`, `requirements-specs`, `decisions`, `taxonomy`. Output to gitignored `docs-live/`. Deterministic: re-running produces byte-identical output.
 
 ## Overview
@@ -53,6 +54,7 @@ Reference: `functional-specification.md` FR-012; `data-architecture.md` §3 Proj
 ## Implementation Status
 
 **Completed:**
+
 - ✅ Bin: `packages/architect-cli/src/cli/generate-docs.ts`.
 - ✅ `DEFAULT_GENERATORS` declared and exported.
 - ✅ All 8 generators implemented with corresponding Fragment + renderer pairs.

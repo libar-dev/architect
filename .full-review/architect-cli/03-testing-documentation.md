@@ -8,22 +8,22 @@
 
 ## Critical findings
 
-| # | Issue | Location |
-|---|-------|----------|
-| TC-CLI-C-1 | **22 of 24 commands have zero tests.** Untested: `status`, `context`, `rules`, `list`, `pattern`, `dep-tree`, `files`, `scope-validate`, `handoff`, `query`, `documentation`, `bundle`, `search`, `tags`, `taxonomy`, `sources`, `unannotated`, `open-questions`, `diagnostics`, `repl`, `help`, `version`. |
-| TC-CLI-C-2 | **`generate-docs.ts` (~670 LOC) zero tests** — including the C-CLI-1 argv parser and the C-CLI-2 duplicated filter helpers. |
-| TC-CLI-C-3 | `runtime-bridge.js` missing-dist error path exercised in production on every bin invocation but never in CI. Closing TC-H-GUARD-7 family-wide (via `pack-smoke.mjs` workspace promotion) covers this. |
-| TC-CLI-C-4 | `error-handler.ts` 12-discriminator `isDocError` has no compile-time link to core's `DocError` union — silent drift risk. Same recipe as H-CLI-2 / DocErrorTypeSchema. |
-| DOC-CLI-C-1 | **No package README** — cli joins guard as the only two publishable packages without one. |
+| #           | Issue                                                                                                                                                                                                                                                                                                       | Location |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| TC-CLI-C-1  | **22 of 24 commands have zero tests.** Untested: `status`, `context`, `rules`, `list`, `pattern`, `dep-tree`, `files`, `scope-validate`, `handoff`, `query`, `documentation`, `bundle`, `search`, `tags`, `taxonomy`, `sources`, `unannotated`, `open-questions`, `diagnostics`, `repl`, `help`, `version`. |
+| TC-CLI-C-2  | **`generate-docs.ts` (~670 LOC) zero tests** — including the C-CLI-1 argv parser and the C-CLI-2 duplicated filter helpers.                                                                                                                                                                                 |
+| TC-CLI-C-3  | `runtime-bridge.js` missing-dist error path exercised in production on every bin invocation but never in CI. Closing TC-H-GUARD-7 family-wide (via `pack-smoke.mjs` workspace promotion) covers this.                                                                                                       |
+| TC-CLI-C-4  | `error-handler.ts` 12-discriminator `isDocError` has no compile-time link to core's `DocError` union — silent drift risk. Same recipe as H-CLI-2 / DocErrorTypeSchema.                                                                                                                                      |
+| DOC-CLI-C-1 | **No package README** — cli joins guard as the only two publishable packages without one.                                                                                                                                                                                                                   |
 
 ## The 4 `@skip` scenarios (resolution)
 
-| # | Recipe |
-|---|--------|
+| #                                     | Recipe                                                                                                                          |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
 | Skip 1 — `--format invalid` rejection | Blocked by H-CLI-Q-7 (`parseSchemaValue` swallows `BoundaryParseError.cause`). Fix the swallowing, then unblock. Do not delete. |
-| Skip 2 — `rules conflicting filters` | Step file assertion expects camelCase; CLI emits hyphenated. **1-line fix unblocks today, no code change.** |
-| Skip 3 — `--format markdown` | `markdown` renderer not wired to `architect` bin. **Aspirational placeholder; delete or promote to design spec.** |
-| Skip 4 — `deprecation warnings` | No invocation triggers it. **Untriggerable; delete or promote.** |
+| Skip 2 — `rules conflicting filters`  | Step file assertion expects camelCase; CLI emits hyphenated. **1-line fix unblocks today, no code change.**                     |
+| Skip 3 — `--format markdown`          | `markdown` renderer not wired to `architect` bin. **Aspirational placeholder; delete or promote to design spec.**               |
+| Skip 4 — `deprecation warnings`       | No invocation triggers it. **Untriggerable; delete or promote.**                                                                |
 
 ## Documentation
 

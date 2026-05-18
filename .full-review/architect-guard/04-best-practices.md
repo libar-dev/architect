@@ -74,96 +74,96 @@ Wrong annotation; doctrine defect under "Architect State is Code." Recipe: chang
 
 ### Language / framework (4A — additive)
 
-| # | Title | Location |
-|---|-------|----------|
-| F4A-G-H-1 | 14 hand-written interfaces in `process-guard/types.ts`, zero `z.infer` (reconfirms C-GUARD-3) | `src/lint/process-guard/types.ts` |
-| F4A-G-H-2 | **Zero `.brand<>()` declarations across 38 files.** `git/` returns stringly-typed everywhere; `sanitizeBranchName(branch: string): string` should be a brand constructor. **Family-wide gap** — core owns 6 brands; guard should consume. | `src/git/`, `src/cli/` |
-| F4A-G-H-3 | **4 CLI bins parse argv by hand** into hand-rolled `interface XCLIConfig` (~360 LOC), zero Zod at trust boundary. `parseInt + isNaN` × 5 in `validate-patterns.ts:222-255`. **Recipe:** `z.coerce.number()` inside Zod argv schema; collapses 5 `parseInt + isNaN` checks. | 4 files in `src/cli/` |
-| F4A-G-H-4 | `parseAtBoundary` adoption at 3 sites (reconfirms C-GUARD-4) | `detect-changes.ts:414,440,452`, CLI argv parsing, `dangling-baseline.ts:102` |
-| F4A-G-H-5 | **3 `void main()` async-call sites evade the local `no-suppression-comments` rule** — same hazard as core F4A-H-9. The `no-restricted-syntax` rule core proposes also catches these. | 3 CLI entrypoint files |
+| #         | Title                                                                                                                                                                                                                                                                      | Location                                                                      |
+| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| F4A-G-H-1 | 14 hand-written interfaces in `process-guard/types.ts`, zero `z.infer` (reconfirms C-GUARD-3)                                                                                                                                                                              | `src/lint/process-guard/types.ts`                                             |
+| F4A-G-H-2 | **Zero `.brand<>()` declarations across 38 files.** `git/` returns stringly-typed everywhere; `sanitizeBranchName(branch: string): string` should be a brand constructor. **Family-wide gap** — core owns 6 brands; guard should consume.                                  | `src/git/`, `src/cli/`                                                        |
+| F4A-G-H-3 | **4 CLI bins parse argv by hand** into hand-rolled `interface XCLIConfig` (~360 LOC), zero Zod at trust boundary. `parseInt + isNaN` × 5 in `validate-patterns.ts:222-255`. **Recipe:** `z.coerce.number()` inside Zod argv schema; collapses 5 `parseInt + isNaN` checks. | 4 files in `src/cli/`                                                         |
+| F4A-G-H-4 | `parseAtBoundary` adoption at 3 sites (reconfirms C-GUARD-4)                                                                                                                                                                                                               | `detect-changes.ts:414,440,452`, CLI argv parsing, `dangling-baseline.ts:102` |
+| F4A-G-H-5 | **3 `void main()` async-call sites evade the local `no-suppression-comments` rule** — same hazard as core F4A-H-9. The `no-restricted-syntax` rule core proposes also catches these.                                                                                       | 3 CLI entrypoint files                                                        |
 
 ### CI / DevOps (4B — additive)
 
-| # | Title | Action |
-|---|-------|--------|
-| CI-G-H-1 | Subpath `exports` map is sparse (only `.` + `./package.json`) | After Phase 2 Cleanup-H-GUARD-1 (barrel curation), curate subpaths for the 9 externally-consumed symbols and the 6 bins. |
-| CI-G-H-2 | `node:` prefix inconsistency in **7 files** (Phase 2 said 6 — `detect-changes.ts:35-36` mixes adjacent styles) | Sweep `from 'fs'` → `from 'node:fs'`. |
-| CI-G-H-3 | Family-wide `vitest.include` pattern normalization | 3-way split across 5 packages (`tests/steps/**`, `tests/features/**`, `tests/**/*.steps.ts`). Pick one. |
-| CI-G-H-4 | Promote `packed-dangling-baseline-smoke.mjs` to workspace-level `pack-smoke.mjs` | Generic smoke: `npm pack --dry-run` + import the resulting `.tgz`'s `main` + each `exports` subpath. Catches core's `./roles` class of bugs across all 5 packages. |
-| CI-G-H-5 | Family-wide `typecheck` scope drift — **guard is correct**; core/projection need alignment | Resolved in family-wide normalization PR. |
-| CI-G-H-6 | Tarball composition post-Phase-2 cleanup | 583 KB → ~392 KB (46% reduction): `tier-a-baseline` deletion + family-wide `declarationMap`/`sourceMap` disable. |
+| #        | Title                                                                                                          | Action                                                                                                                                                             |
+| -------- | -------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| CI-G-H-1 | Subpath `exports` map is sparse (only `.` + `./package.json`)                                                  | After Phase 2 Cleanup-H-GUARD-1 (barrel curation), curate subpaths for the 9 externally-consumed symbols and the 6 bins.                                           |
+| CI-G-H-2 | `node:` prefix inconsistency in **7 files** (Phase 2 said 6 — `detect-changes.ts:35-36` mixes adjacent styles) | Sweep `from 'fs'` → `from 'node:fs'`.                                                                                                                              |
+| CI-G-H-3 | Family-wide `vitest.include` pattern normalization                                                             | 3-way split across 5 packages (`tests/steps/**`, `tests/features/**`, `tests/**/*.steps.ts`). Pick one.                                                            |
+| CI-G-H-4 | Promote `packed-dangling-baseline-smoke.mjs` to workspace-level `pack-smoke.mjs`                               | Generic smoke: `npm pack --dry-run` + import the resulting `.tgz`'s `main` + each `exports` subpath. Catches core's `./roles` class of bugs across all 5 packages. |
+| CI-G-H-5 | Family-wide `typecheck` scope drift — **guard is correct**; core/projection need alignment                     | Resolved in family-wide normalization PR.                                                                                                                          |
+| CI-G-H-6 | Tarball composition post-Phase-2 cleanup                                                                       | 583 KB → ~392 KB (46% reduction): `tier-a-baseline` deletion + family-wide `declarationMap`/`sourceMap` disable.                                                   |
 
 ## Medium (P2)
 
 ### Language / framework (4A)
 
-| # | Issue |
-|---|-------|
-| F4A-G-M-1 | 1 `as never` in test fixture (`guard-runtime.steps.ts:78`) — net-new finding. Replace with proper type or remove. |
-| F4A-G-M-2 | `Result<T, E>` discipline at internal boundaries — matches family — preserve. |
+| #         | Issue                                                                                                                                                                                                                                                                 |
+| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| F4A-G-M-1 | 1 `as never` in test fixture (`guard-runtime.steps.ts:78`) — net-new finding. Replace with proper type or remove.                                                                                                                                                     |
+| F4A-G-M-2 | `Result<T, E>` discipline at internal boundaries — matches family — preserve.                                                                                                                                                                                         |
 | F4A-G-M-3 | No `.extend()`/`.omit()`/`.pick()`/`.partial()`/`.required()` chains anywhere — guard does NOT expose to the family-wide Zod 4 strictness-loss bug. **Preserve by using `z.strictObject({ ...Base.shape, ... })` spread during the upcoming sweep**, not `.extend()`. |
-| F4A-G-M-4 | `lint/idea-tier/`, `lint/steps/` subsystems have minimal Zod schemas — opportunity for the same Zod-first sweep as `process-guard/types.ts`. |
+| F4A-G-M-4 | `lint/idea-tier/`, `lint/steps/` subsystems have minimal Zod schemas — opportunity for the same Zod-first sweep as `process-guard/types.ts`.                                                                                                                          |
 
 ### CI / DevOps (4B)
 
-| # | Issue |
-|---|-------|
-| CI-G-M-1 | Tarball: 583 KB / 155 files; 35% sourcemap bytes; 16% `tier-a-baseline.{js,js.map}` (deletion-bound) | Same family fix as CL-CORE-3. |
-| CI-G-M-2 | Dogfood `pnpm architect:guard --staged` runs in pre-commit context | Document the pre-commit hook integration in the proposed README (DOC-C-GUARD-2). |
-| CI-G-M-3 | `publishConfig.provenance: true` declared but no workflow issues attestation (family-wide; core CI-2) | Resolved when publish workflow lands. |
+| #        | Issue                                                                                                 |
+| -------- | ----------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| CI-G-M-1 | Tarball: 583 KB / 155 files; 35% sourcemap bytes; 16% `tier-a-baseline.{js,js.map}` (deletion-bound)  | Same family fix as CL-CORE-3.                                                    |
+| CI-G-M-2 | Dogfood `pnpm architect:guard --staged` runs in pre-commit context                                    | Document the pre-commit hook integration in the proposed README (DOC-C-GUARD-2). |
+| CI-G-M-3 | `publishConfig.provenance: true` declared but no workflow issues attestation (family-wide; core CI-2) | Resolved when publish workflow lands.                                            |
 
 ## Low (P3)
 
-| # | Source | Issue |
-|---|--------|-------|
-| F4A-G-L-1 | 4A | `import type` usage correct throughout. Preserve. |
-| F4A-G-L-2 | 4A | `as const satisfies T` discipline matches family. Preserve. |
-| F4A-G-L-3 | 4A | No `as unknown as`, no `any`, no `@ts-ignore` — matches family. Preserve. |
-| CI-G-L-1 | 4B | `engines.node: ">=20.0.0"` correct. `.node-version` family-aligned (22). |
+| #         | Source | Issue                                                                     |
+| --------- | ------ | ------------------------------------------------------------------------- |
+| F4A-G-L-1 | 4A     | `import type` usage correct throughout. Preserve.                         |
+| F4A-G-L-2 | 4A     | `as const satisfies T` discipline matches family. Preserve.               |
+| F4A-G-L-3 | 4A     | No `as unknown as`, no `any`, no `@ts-ignore` — matches family. Preserve. |
+| CI-G-L-1  | 4B     | `engines.node: ">=20.0.0"` correct. `.node-version` family-aligned (22).  |
 
 ## Zod 4 audit summary (guard-side)
 
-| Site | Verdict | Notes |
-|------|---------|-------|
-| 1 `z.strictObject` site (1 file) | **Correct** | Reference quality where used. |
-| 1 `z.object` site (`AntiPatternThresholdsSchema`) | **Drift** | F4A-G-2 / C-GUARD-3 — 3-line fix. |
-| 14 hand-written interfaces in `process-guard/types.ts` | **Drift** | C-GUARD-3 sweep. |
-| Zero `.extend()`/`.omit()`/`.pick()`/`.partial()`/`.required()` chains | **Correct** | Guard does NOT expose to the family-wide Zod 4 strictness-loss bug. Preserve by spread pattern during upcoming sweep. |
-| `parseAtBoundary` consumption | **Zero use** | C-GUARD-4; 3 sites need adoption. |
-| `isValidStatusValue` consumption | **Cast instead** | F4A-G-1; depends on one-line core export edit. |
-| `.brand<>()` declarations | **Zero** | F4A-G-H-2; family-wide gap. |
+| Site                                                                   | Verdict          | Notes                                                                                                                 |
+| ---------------------------------------------------------------------- | ---------------- | --------------------------------------------------------------------------------------------------------------------- |
+| 1 `z.strictObject` site (1 file)                                       | **Correct**      | Reference quality where used.                                                                                         |
+| 1 `z.object` site (`AntiPatternThresholdsSchema`)                      | **Drift**        | F4A-G-2 / C-GUARD-3 — 3-line fix.                                                                                     |
+| 14 hand-written interfaces in `process-guard/types.ts`                 | **Drift**        | C-GUARD-3 sweep.                                                                                                      |
+| Zero `.extend()`/`.omit()`/`.pick()`/`.partial()`/`.required()` chains | **Correct**      | Guard does NOT expose to the family-wide Zod 4 strictness-loss bug. Preserve by spread pattern during upcoming sweep. |
+| `parseAtBoundary` consumption                                          | **Zero use**     | C-GUARD-4; 3 sites need adoption.                                                                                     |
+| `isValidStatusValue` consumption                                       | **Cast instead** | F4A-G-1; depends on one-line core export edit.                                                                        |
+| `.brand<>()` declarations                                              | **Zero**         | F4A-G-H-2; family-wide gap.                                                                                           |
 
 ## TS strictness audit
 
-| Issue type | Count |
-|------------|-------|
-| `noPropertyAccessFromIndexSignature` defeated | **0** |
-| `noUncheckedIndexedAccess` evaded | **0** |
-| `Record<string, unknown>` builders | **0** |
-| Strictness lies (cast after type-guard rejected) | **0** in guard itself (consumes core's at decider.ts:300) |
-| `as ProcessStatusValue` casts on raw input | **3 sites** (`detect-changes.ts:414,440,452`) — F4A-G-1 fix |
-| `as keyof typeof` after `Set.has` | **0** in guard (different from projection's M-PROJ-F-4) |
-| `as never` | **1** (`guard-runtime.steps.ts:78`, test only) |
-| `as unknown as X` | **0** |
-| `any` | **0** |
+| Issue type                                       | Count                                                       |
+| ------------------------------------------------ | ----------------------------------------------------------- |
+| `noPropertyAccessFromIndexSignature` defeated    | **0**                                                       |
+| `noUncheckedIndexedAccess` evaded                | **0**                                                       |
+| `Record<string, unknown>` builders               | **0**                                                       |
+| Strictness lies (cast after type-guard rejected) | **0** in guard itself (consumes core's at decider.ts:300)   |
+| `as ProcessStatusValue` casts on raw input       | **3 sites** (`detect-changes.ts:414,440,452`) — F4A-G-1 fix |
+| `as keyof typeof` after `Set.has`                | **0** in guard (different from projection's M-PROJ-F-4)     |
+| `as never`                                       | **1** (`guard-runtime.steps.ts:78`, test only)              |
+| `as unknown as X`                                | **0**                                                       |
+| `any`                                            | **0**                                                       |
 
 ## CI/DevOps audit summary
 
-| Concern | Status |
-|---------|--------|
-| `prepack` placement | **Correct** (Phase 1 confirmed). |
-| `prepack` command | `pnpm clean && pnpm build` — aligned with siblings. |
-| `lint` glob | `eslint src tests` — aligned. |
-| **`typecheck` scope** | **Most disciplined in family** (covers both configs). |
-| `test` chain | `pnpm typecheck && vitest run` — aligned with discipline. |
-| `eslint` in devDeps | Explicit — aligned. |
-| `package.json#exports` | Only `.` + `./package.json` — sparse, curate after Phase 2. |
-| Custom build script | `scripts/copy-dangling-baseline.mjs` — robust, model for `tier-a-baseline` migration. |
-| Post-pack smoke test | `scripts/packed-dangling-baseline-smoke.mjs` — **implemented + unwired**; one-line fix activates. |
-| Tarball | 583 KB / 155 files; projected 46% reduction post-cleanup. |
-| Module-load side effects | **None**. |
-| `publishConfig.provenance: true` | Declared, unimplemented (family blocker). |
-| CI workflows | **None at repo level** — family gap. |
+| Concern                          | Status                                                                                            |
+| -------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `prepack` placement              | **Correct** (Phase 1 confirmed).                                                                  |
+| `prepack` command                | `pnpm clean && pnpm build` — aligned with siblings.                                               |
+| `lint` glob                      | `eslint src tests` — aligned.                                                                     |
+| **`typecheck` scope**            | **Most disciplined in family** (covers both configs).                                             |
+| `test` chain                     | `pnpm typecheck && vitest run` — aligned with discipline.                                         |
+| `eslint` in devDeps              | Explicit — aligned.                                                                               |
+| `package.json#exports`           | Only `.` + `./package.json` — sparse, curate after Phase 2.                                       |
+| Custom build script              | `scripts/copy-dangling-baseline.mjs` — robust, model for `tier-a-baseline` migration.             |
+| Post-pack smoke test             | `scripts/packed-dangling-baseline-smoke.mjs` — **implemented + unwired**; one-line fix activates. |
+| Tarball                          | 583 KB / 155 files; projected 46% reduction post-cleanup.                                         |
+| Module-load side effects         | **None**.                                                                                         |
+| `publishConfig.provenance: true` | Declared, unimplemented (family blocker).                                                         |
+| CI workflows                     | **None at repo level** — family gap.                                                              |
 
 ## What's family-reference quality (preserve)
 

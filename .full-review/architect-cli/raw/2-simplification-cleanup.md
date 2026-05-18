@@ -25,7 +25,7 @@ The cleanup audit (configs, deps, bins, dist) finds **the package is already bes
 **Affected:** 100 LOC (`parseArgs`) + 12 LOC (`ParsedArgs` interface) = 112 LOC → ~55 LOC.
 **Coverage:** Closes C-CLI-1, H-CLI-Q-3 (one of two sites), L-CLI-7 (one of two sites), partial F4A-G-H-3 sibling case.
 
-The dispatcher pattern in `pattern-graph-cli-commands.ts:113-198 parseCommandInput` is the right shape for this bin too — it already routes raw flags through `flagParsers` (kind: 'boolean' | 'value'), preserves `BoundaryParseError.cause` via `formatZodError`, and `parseAtBoundary`s the assembled flags. We don't need the `architect` bin's *runtime* (commands, REPL); we need its *parsing primitive*.
+The dispatcher pattern in `pattern-graph-cli-commands.ts:113-198 parseCommandInput` is the right shape for this bin too — it already routes raw flags through `flagParsers` (kind: 'boolean' | 'value'), preserves `BoundaryParseError.cause` via `formatZodError`, and `parseAtBoundary`s the assembled flags. We don't need the `architect` bin's _runtime_ (commands, REPL); we need its _parsing primitive_.
 
 Two options. **Option A** (recommended): factor the argv→`{positional, flags}` walker out of `pattern-graph-cli-commands.ts` into `commands/_shared/argv.ts` and reuse it. **Option B** (less code): keep `generate-docs` standalone but replace the switch with a schema-driven generator.
 
@@ -85,13 +85,24 @@ const FLAGS: readonly FlagDef[] = [
   { aliases: ['-o', '--output'], kind: 'value', key: 'outputDir' },
   { aliases: ['-f', '--overwrite', '--force'], kind: 'boolean', key: 'overwrite' },
   { aliases: ['--disclosure'], kind: 'value', key: 'disclosureLevel', parse: parseDisclosureLevel },
-  { aliases: ['--filter'], kind: 'value', key: 'projectionFilter', accumulate: 'filter-merge', parse: parseFilterValue },
+  {
+    aliases: ['--filter'],
+    kind: 'value',
+    key: 'projectionFilter',
+    accumulate: 'filter-merge',
+    parse: parseFilterValue,
+  },
 ];
 
 function parseArgs(argv: readonly string[]): GenerateArgs {
   const raw: Record<string, unknown> = {
-    help: false, version: false, listGenerators: false,
-    baseDir: resolveInvocationDir(), input: [], generators: [], overwrite: false,
+    help: false,
+    version: false,
+    listGenerators: false,
+    baseDir: resolveInvocationDir(),
+    input: [],
+    generators: [],
+    overwrite: false,
   };
   const args = argv.filter((arg) => arg !== '--');
 
@@ -106,7 +117,7 @@ function parseArgs(argv: readonly string[]): GenerateArgs {
       continue;
     }
     const next = args[i + 1];
-    assertHasValue(next, arg);                              // single helper, replaces six inline checks
+    assertHasValue(next, arg); // single helper, replaces six inline checks
     const parsed = flag.parse ? flag.parse(next) : next;
 
     switch (flag.accumulate) {
@@ -117,7 +128,10 @@ function parseArgs(argv: readonly string[]): GenerateArgs {
         raw[flag.key] = [...(raw[flag.key] as string[]), parsed];
         break;
       case 'filter-merge':
-        raw[flag.key] = mergeProjectionFilter(raw[flag.key] as ProjectionFilter | undefined, parsed as ProjectionFilter);
+        raw[flag.key] = mergeProjectionFilter(
+          raw[flag.key] as ProjectionFilter | undefined,
+          parsed as ProjectionFilter,
+        );
         break;
       default:
         raw[flag.key] = parsed;
@@ -130,6 +144,7 @@ function parseArgs(argv: readonly string[]): GenerateArgs {
 ```
 
 Net wins:
+
 - Six `if (next === undefined || next.startsWith('-'))` blocks → one `assertHasValue(next, arg)` (already exists in core).
 - Hand-written `ParsedArgs` interface → `z.output<typeof GenerateArgsSchema>`.
 - Bin exit at `:303-314` (`...(outputDir !== undefined ? { outputDir } : {})` spread dance) → schema's `.optional()` does it for free.
@@ -141,7 +156,7 @@ Net wins:
 **Affected:** 42 LOC + 38 LOC = 80 LOC of duplication → one 35-LOC shared module.
 **Coverage:** Closes C-CLI-2.
 
-The two implementations differ only in (a) `parseSchemaValue` (read.ts) vs `parseAtBoundary` (generate-docs.ts) and (b) `mergeProjectionFilter` signature (`readonly ProjectionFilter[]` vs `current?: ProjectionFilter, next: ProjectionFilter`). Both differences are accidental — Phase 1 notes (H-CLI-Q-7) `parseSchemaValue` is *worse* than `parseAtBoundary` because it swallows the Zod cause. **Unify on `parseAtBoundary` directly.**
+The two implementations differ only in (a) `parseSchemaValue` (read.ts) vs `parseAtBoundary` (generate-docs.ts) and (b) `mergeProjectionFilter` signature (`readonly ProjectionFilter[]` vs `current?: ProjectionFilter, next: ProjectionFilter`). Both differences are accidental — Phase 1 notes (H-CLI-Q-7) `parseSchemaValue` is _worse_ than `parseAtBoundary` because it swallows the Zod cause. **Unify on `parseAtBoundary` directly.**
 
 ```typescript
 // New: src/cli/commands/_shared/projection-filter.ts
@@ -179,11 +194,7 @@ export function mergeProjectionFilter(
   next: ProjectionFilter,
 ): ProjectionFilter {
   const status = [...(current?.status ?? []), ...(next.status ?? [])];
-  return parseAtBoundary(
-    ProjectionFilterSchema,
-    status.length > 0 ? { status } : {},
-    '--filter',
-  );
+  return parseAtBoundary(ProjectionFilterSchema, status.length > 0 ? { status } : {}, '--filter');
 }
 
 export function mergeProjectionFilters(
@@ -211,7 +222,7 @@ export function mergeProjectionFilters(
 2. Delete the export block in `architect-core/src/index.ts:237` and the type re-exports (`CLI_SCHEMA`, `CLIOptionDef`, `CLIOptionGroup`, `CLISchema`, `CommandNarrative`, `CommandNarrativeGroup`, `RecipeExample`, `RecipeGroup`, `RecipeStep`).
 3. Run `pnpm -r typecheck` — should be a no-op (Phase 1 confirmed); if any package breaks, the JSDoc comment lied.
 
-**cli has nothing to migrate.** The cli's help system (`commands/_shared/help.ts`) is fully decoupled from `CLI_SCHEMA` (it reads `COMMANDS[name].helpSignature`/`helpDetail`). The H-CORE-5 *premise* is correct; the *recommendation* (move) is wrong — delete.
+**cli has nothing to migrate.** The cli's help system (`commands/_shared/help.ts`) is fully decoupled from `CLI_SCHEMA` (it reads `COMMANDS[name].helpSignature`/`helpDetail`). The H-CORE-5 _premise_ is correct; the _recommendation_ (move) is wrong — delete.
 
 ### Recipe 4 — H-CLI-2: derive `knownTypes` from `DocError` discriminator (or just trust TypeScript)
 
@@ -265,8 +276,7 @@ export function isDocError(error: unknown): error is DocError {
   if (error === null || typeof error !== 'object') return false;
   const maybeError = error as { type?: unknown; message?: unknown };
   return (
-    typeof maybeError.message === 'string' &&
-    DocErrorTypeSchema.safeParse(maybeError.type).success
+    typeof maybeError.message === 'string' && DocErrorTypeSchema.safeParse(maybeError.type).success
   );
 }
 ```
@@ -278,6 +288,7 @@ Recommendation: **Option B** for the cli (deletion is the No-BC default), **Opti
 ### Recipe 5 — H-CLI-Q-1 / M-CLI-11: drive command flag types from `z.infer`, not `as` casts
 
 **Files:** 10 cast sites + 3 shared-helper cast sites = 13 sites:
+
 - `commands/meta.ts:63, 72, 103`
 - `commands/read.ts:159, 226, 284, 326`
 - `commands/reporting.ts:76, 110, 145`
@@ -285,6 +296,7 @@ Recommendation: **Option B** for the cli (deletion is the No-BC default), **Opti
 - `commands/_shared/projection-options.ts:11, 53`
 
 Each looks like:
+
 ```typescript
 const flags = parsed.flags as { readonly count?: boolean; readonly namesOnly?: boolean };
 ```
@@ -295,7 +307,9 @@ This is a hand-rolled witness duplicating the schema. The schemas already exist 
 
 ```typescript
 // pattern-graph-cli-commands.ts — replaces the existing CommandDef
-export interface CommandDef<TFlags extends Readonly<Record<string, unknown>> = Readonly<Record<string, unknown>>> {
+export interface CommandDef<
+  TFlags extends Readonly<Record<string, unknown>> = Readonly<Record<string, unknown>>,
+> {
   readonly name: CommandName;
   readonly positional: z.ZodType<readonly string[]>;
   readonly flags: z.ZodType<TFlags>;
@@ -315,7 +329,7 @@ export interface CommandDef<TFlags extends Readonly<Record<string, unknown>> = R
 
 export interface ParsedCommandInput<TFlags = Readonly<Record<string, unknown>>> {
   readonly positional: readonly string[];
-  readonly flags: TFlags;                       // typed, not `Readonly<Record<string, unknown>>`
+  readonly flags: TFlags; // typed, not `Readonly<Record<string, unknown>>`
   readonly rawArgv: readonly string[];
 }
 ```
@@ -337,19 +351,19 @@ execute(context, parsed): void {
 
 Removes 13 `as` casts, ~75 lines of hand-written flag-shape declarations, and the only Zod-discipline gap inside the package. **Type witness aligns with runtime parser by construction.**
 
-The remaining `Object.values(ruleSet.children) as { rules: ... }[]` at `commands/meta.ts:72` (L-CLI-5) is a *different* cast — it's projection's bundle accessor missing a typed `.children` shape; that's a projection-side fix, not cli's.
+The remaining `Object.values(ruleSet.children) as { rules: ... }[]` at `commands/meta.ts:72` (L-CLI-5) is a _different_ cast — it's projection's bundle accessor missing a typed `.children` shape; that's a projection-side fix, not cli's.
 
 ### Recipe 6 — H-CLI-Q-4: unify three exit-code strategies on one helper
 
 **Current state:**
 
-| Site | Pattern | Exit code |
-|---|---|---|
-| `error-handler.ts:231` | `process.exit(exitCode)` | parameter, default 1 |
-| `pattern-graph-cli.ts:273` | `process.exit(1)` | fixed 1 |
-| `pattern-graph-cli.ts:236` | `process.exit(1)` | fixed 1 (no-arg help) |
-| `generate-docs.ts:671` | `process.exit(error instanceof BoundaryParseError ? 2 : 1)` | branched |
-| `commands/_shared/structured.ts:227` | `process.exitCode = 1` | deferred |
+| Site                                 | Pattern                                                     | Exit code             |
+| ------------------------------------ | ----------------------------------------------------------- | --------------------- |
+| `error-handler.ts:231`               | `process.exit(exitCode)`                                    | parameter, default 1  |
+| `pattern-graph-cli.ts:273`           | `process.exit(1)`                                           | fixed 1               |
+| `pattern-graph-cli.ts:236`           | `process.exit(1)`                                           | fixed 1 (no-arg help) |
+| `generate-docs.ts:671`               | `process.exit(error instanceof BoundaryParseError ? 2 : 1)` | branched              |
+| `commands/_shared/structured.ts:227` | `process.exitCode = 1`                                      | deferred              |
 
 Three different strategies; one of them (`generate-docs`) has the "right" idea (distinguish argv parse failures with code 2) but only on its own bin.
 
@@ -362,7 +376,7 @@ import { BoundaryParseError } from '@libar-dev/architect-core';
 const EXIT_CODES = {
   success: 0,
   generic: 1,
-  argvParse: 2,            // BoundaryParseError at the trust boundary
+  argvParse: 2, // BoundaryParseError at the trust boundary
 } as const;
 
 export async function runCliEntrypoint(main: () => Promise<void>): Promise<never> {
@@ -386,6 +400,7 @@ await runCliEntrypoint(main);
 ```
 
 Notes:
+
 - Replaces `void main().catch(…)` (closes L-CLI-7, H-CLI-Q-3 in both files) with `await` — the family-wide ESLint rule banning `void <expression>` (core's F4A-H-9, guard's F4A-G-H-5) catches both sites in one move.
 - `commands/_shared/structured.ts:227 process.exitCode = 1` (the `arch dangling --strict` drift case, M-CLI-8) is preserved: the helper reads `process.exitCode` and respects it. The "strict failed" deferred-exit semantics survive verbatim; the inconsistency is the only acceptable one because the response is still written to stdout (per M-CLI-8 it's a documented quirk, not a bug — but the new helper makes it explicit).
 - `console.error` in `error-handler.ts:219, 222, 224, 228` (H-CLI-Q-2) — if Option B in Recipe 4 lands (delete the file), this is moot. Otherwise replace with `process.stderr.write(...)` to match the rest of the package.
@@ -396,45 +411,45 @@ Notes:
 
 ### High
 
-| ID | Finding | Location | Recipe |
-|---|---|---|---|
-| CL-CLI-H1 | `src/index.ts` JS surface has no workspace consumers. Three exports (`isDocError`, `formatDocError`, `handleCliError`) compile to `dist/index.js` + 4 `.d.ts.map` artifacts and ship via `main`/`module`/`types` for zero callers. | `src/index.ts:1`; `package.json:22-29` | Delete `src/index.ts`, `src/cli/error-handler.ts` (232 LOC); drop `main`, `module`, `types`, `.` export from `package.json`; `files` array becomes `["bin", "dist", "runtime-bridge.js"]` (already correct, but dist/index.* will no longer exist). Closes H-CLI-1, H-CLI-5, H-CLI-Q-2, M-CLI-1 in one delete. |
-| CL-CLI-H2 | `generated-docs-manifest.ts:157-191` is 30 LOC of hand-rolled JSON validation that should be `z.strictObject`. | `src/cli/generated-docs-manifest.ts:48-50, 157-191` | Replace `isGeneratedDocsManifest`/`isGeneratorManifest`/`isManifestEntry` triple with three schemas + `safeParse`. ~20 LOC. Closes H-CLI-6, H-CLI-Q-6. Aligned with core's C-CORE-4 fix; defer until that lands so the cli inherits the recipe. |
-| CL-CLI-H3 | `pattern-graph-cli-runtime.ts:33-80 resolveSourcePlan` and `:153-173 resolveTagRegistryForTaxonomy` both fetch `workspaceSources`/`configResult`/`configPath` independently. | `src/cli/pattern-graph-cli-runtime.ts:33-80, 153-173` | Extract `loadCliConfigContext(args)` returning `{ workspaceSources, hasWorkspaceSources, configPath, configResult }`. Closes H-CLI-3; ~25 LOC saved. |
-| CL-CLI-H4 | Two `--category` legacy rejects: inline at `pattern-graph-cli.ts:144-149` and via the exported `rejectLegacyCategory()` at `pattern-graph-cli-commands.ts:105-107, 123-124`. | (cited) | Replace the inline `case '--category'` + the `default` branch's `startsWith('--category=')` check in `pattern-graph-cli.ts` with a single call to the exported `rejectLegacyCategory()`. Closes H-CLI-8; ~6 LOC saved. |
-| CL-CLI-H5 | The `architect` bin's `parseArgs` (`pattern-graph-cli.ts:46-179`) is the *only* parser that correctly uses `parseAtBoundary` at exit — but `--feature`/`--session`/`--depth` have a "if remaining is non-empty, push to remaining instead" rule (`:101-127`) that makes flag order matter (M-CLI-5). | `src/cli/pattern-graph-cli.ts:100-127` | Document explicitly in the function's JSDoc; ideally restructure as positional-first walk (split argv at the first non-flag token, then run flag-walk only on the prefix). Defer; behaviour-stable refactor only after Recipe 5 lands. |
+| ID        | Finding                                                                                                                                                                                                                                                                                              | Location                                              | Recipe                                                                                                                                                                                                                                                                                                          |
+| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| CL-CLI-H1 | `src/index.ts` JS surface has no workspace consumers. Three exports (`isDocError`, `formatDocError`, `handleCliError`) compile to `dist/index.js` + 4 `.d.ts.map` artifacts and ship via `main`/`module`/`types` for zero callers.                                                                   | `src/index.ts:1`; `package.json:22-29`                | Delete `src/index.ts`, `src/cli/error-handler.ts` (232 LOC); drop `main`, `module`, `types`, `.` export from `package.json`; `files` array becomes `["bin", "dist", "runtime-bridge.js"]` (already correct, but dist/index.\* will no longer exist). Closes H-CLI-1, H-CLI-5, H-CLI-Q-2, M-CLI-1 in one delete. |
+| CL-CLI-H2 | `generated-docs-manifest.ts:157-191` is 30 LOC of hand-rolled JSON validation that should be `z.strictObject`.                                                                                                                                                                                       | `src/cli/generated-docs-manifest.ts:48-50, 157-191`   | Replace `isGeneratedDocsManifest`/`isGeneratorManifest`/`isManifestEntry` triple with three schemas + `safeParse`. ~20 LOC. Closes H-CLI-6, H-CLI-Q-6. Aligned with core's C-CORE-4 fix; defer until that lands so the cli inherits the recipe.                                                                 |
+| CL-CLI-H3 | `pattern-graph-cli-runtime.ts:33-80 resolveSourcePlan` and `:153-173 resolveTagRegistryForTaxonomy` both fetch `workspaceSources`/`configResult`/`configPath` independently.                                                                                                                         | `src/cli/pattern-graph-cli-runtime.ts:33-80, 153-173` | Extract `loadCliConfigContext(args)` returning `{ workspaceSources, hasWorkspaceSources, configPath, configResult }`. Closes H-CLI-3; ~25 LOC saved.                                                                                                                                                            |
+| CL-CLI-H4 | Two `--category` legacy rejects: inline at `pattern-graph-cli.ts:144-149` and via the exported `rejectLegacyCategory()` at `pattern-graph-cli-commands.ts:105-107, 123-124`.                                                                                                                         | (cited)                                               | Replace the inline `case '--category'` + the `default` branch's `startsWith('--category=')` check in `pattern-graph-cli.ts` with a single call to the exported `rejectLegacyCategory()`. Closes H-CLI-8; ~6 LOC saved.                                                                                          |
+| CL-CLI-H5 | The `architect` bin's `parseArgs` (`pattern-graph-cli.ts:46-179`) is the _only_ parser that correctly uses `parseAtBoundary` at exit — but `--feature`/`--session`/`--depth` have a "if remaining is non-empty, push to remaining instead" rule (`:101-127`) that makes flag order matter (M-CLI-5). | `src/cli/pattern-graph-cli.ts:100-127`                | Document explicitly in the function's JSDoc; ideally restructure as positional-first walk (split argv at the first non-flag token, then run flag-walk only on the prefix). Defer; behaviour-stable refactor only after Recipe 5 lands.                                                                          |
 
 ### Medium
 
-| ID | Finding | Location |
-|---|---|---|
-| CL-CLI-M1 | `runtime-helpers.ts:30 new URL('../../package.json', import.meta.url).pathname` is POSIX-only — breaks on Windows. `:59` and `pattern-graph-cli-runtime.ts:60` use `fileURLToPath` correctly. | `src/cli/runtime-helpers.ts:30` |
-| CL-CLI-M2 | `runtime-bridge.js:6 path.dirname(new URL(import.meta.url).pathname)` — same Windows hazard in the bin resolver. | `runtime-bridge.js:6` |
-| CL-CLI-M3 | `pattern-graph-cli-runtime.ts:132 CacheRecordSchema.parse(JSON.parse(...))` is the only cli call that bypasses `parseAtBoundary`. | `src/cli/pattern-graph-cli-runtime.ts:132` |
-| CL-CLI-M4 | `pattern-graph-cli-types.ts:33-41 SourcePlan` and `:52-60 CliContext` are hand-written interfaces while siblings `ParsedArgsSchema` and `CacheRecordSchema` in the same file are Zod schemas. | `src/cli/pattern-graph-cli-types.ts:33-60` |
-| CL-CLI-M5 | `COMMANDS` registry spread (`pattern-graph-cli-commands.ts:97-103`) has no disjointness assertion across the 5 module records — a duplicate key silently wins-by-spread-order. | `src/cli/pattern-graph-cli-commands.ts:97-103` |
+| ID        | Finding                                                                                                                                                                                       | Location                                       |
+| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
+| CL-CLI-M1 | `runtime-helpers.ts:30 new URL('../../package.json', import.meta.url).pathname` is POSIX-only — breaks on Windows. `:59` and `pattern-graph-cli-runtime.ts:60` use `fileURLToPath` correctly. | `src/cli/runtime-helpers.ts:30`                |
+| CL-CLI-M2 | `runtime-bridge.js:6 path.dirname(new URL(import.meta.url).pathname)` — same Windows hazard in the bin resolver.                                                                              | `runtime-bridge.js:6`                          |
+| CL-CLI-M3 | `pattern-graph-cli-runtime.ts:132 CacheRecordSchema.parse(JSON.parse(...))` is the only cli call that bypasses `parseAtBoundary`.                                                             | `src/cli/pattern-graph-cli-runtime.ts:132`     |
+| CL-CLI-M4 | `pattern-graph-cli-types.ts:33-41 SourcePlan` and `:52-60 CliContext` are hand-written interfaces while siblings `ParsedArgsSchema` and `CacheRecordSchema` in the same file are Zod schemas. | `src/cli/pattern-graph-cli-types.ts:33-60`     |
+| CL-CLI-M5 | `COMMANDS` registry spread (`pattern-graph-cli-commands.ts:97-103`) has no disjointness assertion across the 5 module records — a duplicate key silently wins-by-spread-order.                | `src/cli/pattern-graph-cli-commands.ts:97-103` |
 
 Fixes for M1/M2 are mechanical: import `fileURLToPath` and wrap the `new URL(...)` call. Total diff ~4 lines.
 
 ### Low
 
-| ID | Finding | Location |
-|---|---|---|
-| CL-CLI-L1 | `version.ts:42` fallback returns `'architect'`, causing `printVersion` to render `"architect (architect) vX.Y.Z"`. | `src/cli/version.ts:42-47` |
-| CL-CLI-L2 | `tests/features/.DS_Store` checked in. | (cited) |
-| CL-CLI-L3 | `tests/support/run-cli.ts:31 split(/\s+/)` mishandles quoted args — fine for current suite (no quoted args) but a latent foot-gun. | `tests/support/run-cli.ts:31` |
-| CL-CLI-L4 | `commands/lifecycle.ts:46`, `meta.ts:141`, `planning.ts:121`, `read.ts:401`, `reporting.ts:166` all repeat `satisfies Pick<Record<CommandName, CommandDef>, …>`. A `CommandModule<K>` alias deduplicates. | (cited) |
+| ID        | Finding                                                                                                                                                                                                   | Location                      |
+| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
+| CL-CLI-L1 | `version.ts:42` fallback returns `'architect'`, causing `printVersion` to render `"architect (architect) vX.Y.Z"`.                                                                                        | `src/cli/version.ts:42-47`    |
+| CL-CLI-L2 | `tests/features/.DS_Store` checked in.                                                                                                                                                                    | (cited)                       |
+| CL-CLI-L3 | `tests/support/run-cli.ts:31 split(/\s+/)` mishandles quoted args — fine for current suite (no quoted args) but a latent foot-gun.                                                                        | `tests/support/run-cli.ts:31` |
+| CL-CLI-L4 | `commands/lifecycle.ts:46`, `meta.ts:141`, `planning.ts:121`, `read.ts:401`, `reporting.ts:166` all repeat `satisfies Pick<Record<CommandName, CommandDef>, …>`. A `CommandModule<K>` alias deduplicates. | (cited)                       |
 
 ### Test-feature `@skip` audit (Phase 1 H-CLI-T-2 follow-up)
 
 The 4 `@skip` scenarios in `tests/features/cli-flag-parsing.feature` and `cli-output-formatting.feature`:
 
-| File:Line | Tag | Reason (from comment) | Fix path |
-|---|---|---|---|
-| `cli-flag-parsing.feature:41-45` | `@skip @validation` | Current CLI emits `--format must be compact or json` rather than a Zod-shaped `Invalid…format` diagnostic. | **Lands automatically with Recipe 5 + 6:** once `parseCommandInput` flag failures preserve `BoundaryParseError.cause` (already does at `:185-191`) AND the value parser at `pattern-graph-cli.ts:136-140` stops catching+rethrowing as `'--format must be compact or json'`. Today's `try { parseAtBoundary(RenderFormatSchema, next, '--format'); } catch { throw new Error('--format must be compact or json'); }` block is the offender — swallows the structured Zod error. Delete the try/catch; let `BoundaryParseError` propagate. Scenario then passes verbatim. |
-| `cli-flag-parsing.feature:49-53` | `@skip @negative` | Expects `pattern and productArea cannot be used together` (camelCase); CLI emits `--pattern and --product-area cannot be used together` (kebab). | One-line fix in `commands/_shared/projection-options.ts:69` — `throw new Error('--pattern, --product-area, --package, and --feature cannot be combined');` already lists 4 flags but scenario expects 2-flag wording. Either update the scenario to match the 4-flag list (better) or change the error to camelCase keys (worse — kebab is canonical flag spelling). **Recommend: rewrite scenario.** |
-| `cli-output-formatting.feature:42-46` | `@skip @happy-path` | `--format markdown` not implemented; CLI accepts only `compact|json`. | Aspirational — the scenario is forward-looking. Either delete the scenario (No-BC: aspirational tests are dead code) or implement markdown rendering in the CLI. **Recommend: delete the scenario** until a use case lands. |
-| `cli-output-formatting.feature:50-54` | `@skip @contract` | No CLI invocation currently triggers a deprecation warning. | Same as above — aspirational contract test for a feature that doesn't exist. **Recommend: delete until first deprecation lands.** |
+| File:Line                             | Tag                 | Reason (from comment)                                                                                                                            | Fix path                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| ------------------------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `cli-flag-parsing.feature:41-45`      | `@skip @validation` | Current CLI emits `--format must be compact or json` rather than a Zod-shaped `Invalid…format` diagnostic.                                       | **Lands automatically with Recipe 5 + 6:** once `parseCommandInput` flag failures preserve `BoundaryParseError.cause` (already does at `:185-191`) AND the value parser at `pattern-graph-cli.ts:136-140` stops catching+rethrowing as `'--format must be compact or json'`. Today's `try { parseAtBoundary(RenderFormatSchema, next, '--format'); } catch { throw new Error('--format must be compact or json'); }` block is the offender — swallows the structured Zod error. Delete the try/catch; let `BoundaryParseError` propagate. Scenario then passes verbatim. |
+| `cli-flag-parsing.feature:49-53`      | `@skip @negative`   | Expects `pattern and productArea cannot be used together` (camelCase); CLI emits `--pattern and --product-area cannot be used together` (kebab). | One-line fix in `commands/_shared/projection-options.ts:69` — `throw new Error('--pattern, --product-area, --package, and --feature cannot be combined');` already lists 4 flags but scenario expects 2-flag wording. Either update the scenario to match the 4-flag list (better) or change the error to camelCase keys (worse — kebab is canonical flag spelling). **Recommend: rewrite scenario.**                                                                                                                                                                    |
+| `cli-output-formatting.feature:42-46` | `@skip @happy-path` | `--format markdown` not implemented; CLI accepts only `compact                                                                                   | json`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | Aspirational — the scenario is forward-looking. Either delete the scenario (No-BC: aspirational tests are dead code) or implement markdown rendering in the CLI. **Recommend: delete the scenario** until a use case lands. |
+| `cli-output-formatting.feature:50-54` | `@skip @contract`   | No CLI invocation currently triggers a deprecation warning.                                                                                      | Same as above — aspirational contract test for a feature that doesn't exist. **Recommend: delete until first deprecation lands.**                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 
 Net: 2 of 4 skipped scenarios become live tests with Recipe-5/6 changes; 2 should be deleted as aspirational dead code (No-BC: pre-1.0 doesn't accumulate forward-looking skipped tests).
 
@@ -446,37 +461,37 @@ Phase 1 brief asked: "Phase 4 for projection found projection/mcp need typecheck
 
 ### `typecheck` script comparison
 
-| Package | `typecheck` command | Status |
-|---|---|---|
-| `architect-core` | `tsc --noEmit -p tsconfig.test.json` | One config — relies on test config extending main; covers both tree shapes through inheritance. |
-| `architect-projection` | `tsc --noEmit -p tsconfig.test.json` | Same as core. |
-| `architect-guard` | `tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.test.json` | **Both configs.** Best-in-family alongside cli. |
-| **`architect-cli`** | `tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.test.json` | **Both configs.** Best-in-family alongside guard. |
-| `architect-mcp` | `tsc --noEmit -p tsconfig.test.json` | One config — same as core/projection. |
+| Package                | `typecheck` command                                                   | Status                                                                                          |
+| ---------------------- | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `architect-core`       | `tsc --noEmit -p tsconfig.test.json`                                  | One config — relies on test config extending main; covers both tree shapes through inheritance. |
+| `architect-projection` | `tsc --noEmit -p tsconfig.test.json`                                  | Same as core.                                                                                   |
+| `architect-guard`      | `tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.test.json` | **Both configs.** Best-in-family alongside cli.                                                 |
+| **`architect-cli`**    | `tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.test.json` | **Both configs.** Best-in-family alongside guard.                                               |
+| `architect-mcp`        | `tsc --noEmit -p tsconfig.test.json`                                  | One config — same as core/projection.                                                           |
 
 **Confirmed: cli is correct.** Brief's claim verified — projection and mcp need to add `tsc --noEmit -p tsconfig.json` to their `typecheck` scripts to match cli/guard. cli has no work item here.
 
 ### `lint` scope comparison
 
-| Package | `lint` command |
-|---|---|
-| `architect-core` | `eslint src` |
+| Package                | `lint` command     |
+| ---------------------- | ------------------ |
+| `architect-core`       | `eslint src`       |
 | `architect-projection` | `eslint src tests` |
-| `architect-guard` | `eslint src tests` |
-| **`architect-cli`** | `eslint src tests` |
-| `architect-mcp` | `eslint src tests` |
+| `architect-guard`      | `eslint src tests` |
+| **`architect-cli`**    | `eslint src tests` |
+| `architect-mcp`        | `eslint src tests` |
 
 cli lints both — correct. Only core is incomplete (CL-CORE-10 per Phase 1 cross-reference).
 
 ### `prepack` placement
 
-| Package | `prepack` |
-|---|---|
-| `architect-core` | `pnpm build` (outside `scripts` block per C-CORE-6) |
-| `architect-projection` | `pnpm clean && pnpm build` |
-| `architect-guard` | `pnpm clean && pnpm build` |
-| **`architect-cli`** | `pnpm clean && pnpm build` (inside `scripts`) |
-| `architect-mcp` | `pnpm clean && pnpm build` |
+| Package                | `prepack`                                           |
+| ---------------------- | --------------------------------------------------- |
+| `architect-core`       | `pnpm build` (outside `scripts` block per C-CORE-6) |
+| `architect-projection` | `pnpm clean && pnpm build`                          |
+| `architect-guard`      | `pnpm clean && pnpm build`                          |
+| **`architect-cli`**    | `pnpm clean && pnpm build` (inside `scripts`)       |
+| `architect-mcp`        | `pnpm clean && pnpm build`                          |
 
 cli is correct. The C-CORE-6 misplacement does not exist here.
 
@@ -510,14 +525,14 @@ cli relaxes 6 rules for `tests/**/*.ts` (`eslint.config.mjs:15-24`) — `@typesc
 }
 ```
 
-| Check | Result |
-|---|---|
-| All `dependencies` used? | core: yes (12 imports); projection: yes (10 imports); guard: yes (4 `runXxxCli` + 5 dangling-baseline types in `commands/_shared/structured.ts`); zod: yes (`commands/_shared/schemas.ts`, `pattern-graph-cli-types.ts`, `pattern-graph-cli-commands.ts`). **No dead deps.** |
-| All `devDependencies` used? | vitest-cucumber: yes (feature files); types/node: yes (`fs/promises`, `path`, etc.); eslint: yes; typescript: yes; vitest: yes. **Clean.** |
-| Any prod dep that should be a peer? | No — `architect-cli` is the consumer; the meta package re-exports its bins. Workspace-internal `workspace:*` correctly captured. |
-| Any peer dep gap? | No peer deps declared; not applicable for a bin package. |
-| Engines pin? | `"node": ">=20.0.0"` consistent with family AGENTS.md "Node.js 20+". |
-| Pinned versions match family? | zod 4.1.11, typescript 5.8, vitest 4.1, node-types 24.12 — same versions used across family per Phase 1 cross-references. **No drift.** |
+| Check                               | Result                                                                                                                                                                                                                                                                       |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| All `dependencies` used?            | core: yes (12 imports); projection: yes (10 imports); guard: yes (4 `runXxxCli` + 5 dangling-baseline types in `commands/_shared/structured.ts`); zod: yes (`commands/_shared/schemas.ts`, `pattern-graph-cli-types.ts`, `pattern-graph-cli-commands.ts`). **No dead deps.** |
+| All `devDependencies` used?         | vitest-cucumber: yes (feature files); types/node: yes (`fs/promises`, `path`, etc.); eslint: yes; typescript: yes; vitest: yes. **Clean.**                                                                                                                                   |
+| Any prod dep that should be a peer? | No — `architect-cli` is the consumer; the meta package re-exports its bins. Workspace-internal `workspace:*` correctly captured.                                                                                                                                             |
+| Any peer dep gap?                   | No peer deps declared; not applicable for a bin package.                                                                                                                                                                                                                     |
+| Engines pin?                        | `"node": ">=20.0.0"` consistent with family AGENTS.md "Node.js 20+".                                                                                                                                                                                                         |
+| Pinned versions match family?       | zod 4.1.11, typescript 5.8, vitest 4.1, node-types 24.12 — same versions used across family per Phase 1 cross-references. **No drift.**                                                                                                                                      |
 
 **Action:** none. cli's `dependencies` block is the family reference.
 
@@ -553,14 +568,14 @@ import { runArchitectCliEntrypoint } from '../runtime-bridge.js';
 await runArchitectCliEntrypoint('cli/pattern-graph-cli.js');
 ```
 
-| File | Relative entry | Drift |
-|---|---|---|
-| `bin/architect.js` | `cli/pattern-graph-cli.js` | none |
-| `bin/architect-generate.js` | `cli/generate-docs.js` | none |
-| `bin/architect-guard.js` | `cli/lint-process.js` | none |
-| `bin/architect-lint-patterns.js` | `cli/lint-patterns.js` | none |
-| `bin/architect-lint-steps.js` | `cli/lint-steps.js` | none |
-| `bin/architect-validate.js` | `cli/validate-patterns.js` | none |
+| File                             | Relative entry             | Drift |
+| -------------------------------- | -------------------------- | ----- |
+| `bin/architect.js`               | `cli/pattern-graph-cli.js` | none  |
+| `bin/architect-generate.js`      | `cli/generate-docs.js`     | none  |
+| `bin/architect-guard.js`         | `cli/lint-process.js`      | none  |
+| `bin/architect-lint-patterns.js` | `cli/lint-patterns.js`     | none  |
+| `bin/architect-lint-steps.js`    | `cli/lint-steps.js`        | none  |
+| `bin/architect-validate.js`      | `cli/validate-patterns.js` | none  |
 
 **Uniform.** Each is 5 lines, no logic, no parameters baked in. Best-in-family.
 
@@ -600,19 +615,19 @@ Net: ~8 emit artifacts removed; the `prepack: pnpm clean && pnpm build` ensures 
 
 Each step is independently shippable as a No-BC change. Order is chosen so each step compiles against the previous one's output without touching the same file twice.
 
-| # | Step | Files | Closes |
-|---|---|---|---|
-| 1 | **Extract `_shared/projection-filter.ts`.** Move 3 functions out of `generate-docs.ts:128-169` and `commands/read.ts:62-99`. Both files now import from the new module. | new: `commands/_shared/projection-filter.ts`. edit: `generate-docs.ts`, `commands/read.ts`. | C-CLI-2, H-CLI-Q-7 (for filter path) |
-| 2 | **Rewrite `generate-docs.ts` argv parser** as `GenerateArgsSchema` + `FLAGS` table. Depends on Step 1 (imports `parseFilterValue`/`parseDisclosureLevel`/`mergeProjectionFilter`). | `generate-docs.ts:41-52, 214-315`. new: `commands/_shared/generate-args.ts`. | C-CLI-1, partial F4A-G-H-3 sibling |
-| 3 | **Introduce `runCliEntrypoint` helper + apply to both bins.** Replaces `void main().catch(...)` in `pattern-graph-cli.ts:271-274` and `generate-docs.ts:669-672`. Removes the `try/catch` around `RenderFormatSchema.parse` in `pattern-graph-cli.ts:134-143` to let `BoundaryParseError` propagate (unlocks `@skip` scenario at `cli-flag-parsing.feature:41-45`). | new: `commands/_shared/entrypoint.ts`. edit: both bin TS files. | H-CLI-Q-3, H-CLI-Q-4, L-CLI-7, partial H-CLI-T-2 |
-| 4 | **Delete `CLI_SCHEMA` / `showHelp` / `CliReferenceGenerator` from `architect-core`.** (Cross-package; cli has nothing to migrate, but landing order matters because the typecheck across the workspace must stay green.) | core: `src/config/cli-schema.ts` (delete), `src/index.ts:237-240` (delete block). | C-CLI-3, supersedes H-CORE-5, M-CORE-3 |
-| 5 | **Parametrize `CommandDef<TFlags>` and remove 13 flag-cast sites.** Updates `pattern-graph-cli-commands.ts` first; then 5 command modules + 2 helper modules. | edit: `pattern-graph-cli-commands.ts` (interface widening), all `commands/*.ts`, `commands/_shared/handoff.ts`, `commands/_shared/projection-options.ts`. | H-CLI-Q-1, M-CLI-11 |
-| 6 | **Derive `isDocError` from `DocErrorTypeSchema`** OR delete `src/index.ts` entirely. Recommend deletion (Option B in Recipe 4) — closes H-CLI-1 and H-CLI-5 simultaneously. If kept, apply Option A and update core. | delete: `src/index.ts`, `src/cli/error-handler.ts`. edit: `package.json` (drop `main`/`module`/`types`/`.` export). | H-CLI-1, H-CLI-2, H-CLI-5, H-CLI-Q-2, M-CLI-1 |
-| 7 | **Refactor `generated-docs-manifest.ts` hand-rolled validators to `z.strictObject`.** Coordinate with core's C-CORE-4 fix landing first (same recipe). | edit: `src/cli/generated-docs-manifest.ts:6-30, 157-191`. | H-CLI-6, H-CLI-Q-6 |
-| 8 | **Extract `loadCliConfigContext`** to deduplicate `pattern-graph-cli-runtime.ts:33-80` vs `:153-173`. | edit: `pattern-graph-cli-runtime.ts`. | H-CLI-3 |
-| 9 | **Inline-call `rejectLegacyCategory()`** in `pattern-graph-cli.ts:144-149`. | edit: `pattern-graph-cli.ts`. | H-CLI-8 |
-| 10 | **Cleanup:** `fileURLToPath` in `runtime-helpers.ts:30` and `runtime-bridge.js:6`; delete `tests/features/.DS_Store`; rewrite or delete the 2 aspirational `@skip` scenarios in `cli-output-formatting.feature`; fix the wording of the rules-conflict `@skip` scenario in `cli-flag-parsing.feature:49-53`. | edit + delete (cited). | CL-CLI-M1, CL-CLI-M2, CL-CLI-L2, H-CLI-T-2 (remaining 2 scenarios) |
-| 11 | **Promote `runtime-bridge.js` to workspace template.** Apply the package-name parameter generalization; copy or symlink-import from mcp and meta. | new pattern across packages. | Phase 1 cross-package recommendation |
+| #   | Step                                                                                                                                                                                                                                                                                                                                                                | Files                                                                                                                                                     | Closes                                                             |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| 1   | **Extract `_shared/projection-filter.ts`.** Move 3 functions out of `generate-docs.ts:128-169` and `commands/read.ts:62-99`. Both files now import from the new module.                                                                                                                                                                                             | new: `commands/_shared/projection-filter.ts`. edit: `generate-docs.ts`, `commands/read.ts`.                                                               | C-CLI-2, H-CLI-Q-7 (for filter path)                               |
+| 2   | **Rewrite `generate-docs.ts` argv parser** as `GenerateArgsSchema` + `FLAGS` table. Depends on Step 1 (imports `parseFilterValue`/`parseDisclosureLevel`/`mergeProjectionFilter`).                                                                                                                                                                                  | `generate-docs.ts:41-52, 214-315`. new: `commands/_shared/generate-args.ts`.                                                                              | C-CLI-1, partial F4A-G-H-3 sibling                                 |
+| 3   | **Introduce `runCliEntrypoint` helper + apply to both bins.** Replaces `void main().catch(...)` in `pattern-graph-cli.ts:271-274` and `generate-docs.ts:669-672`. Removes the `try/catch` around `RenderFormatSchema.parse` in `pattern-graph-cli.ts:134-143` to let `BoundaryParseError` propagate (unlocks `@skip` scenario at `cli-flag-parsing.feature:41-45`). | new: `commands/_shared/entrypoint.ts`. edit: both bin TS files.                                                                                           | H-CLI-Q-3, H-CLI-Q-4, L-CLI-7, partial H-CLI-T-2                   |
+| 4   | **Delete `CLI_SCHEMA` / `showHelp` / `CliReferenceGenerator` from `architect-core`.** (Cross-package; cli has nothing to migrate, but landing order matters because the typecheck across the workspace must stay green.)                                                                                                                                            | core: `src/config/cli-schema.ts` (delete), `src/index.ts:237-240` (delete block).                                                                         | C-CLI-3, supersedes H-CORE-5, M-CORE-3                             |
+| 5   | **Parametrize `CommandDef<TFlags>` and remove 13 flag-cast sites.** Updates `pattern-graph-cli-commands.ts` first; then 5 command modules + 2 helper modules.                                                                                                                                                                                                       | edit: `pattern-graph-cli-commands.ts` (interface widening), all `commands/*.ts`, `commands/_shared/handoff.ts`, `commands/_shared/projection-options.ts`. | H-CLI-Q-1, M-CLI-11                                                |
+| 6   | **Derive `isDocError` from `DocErrorTypeSchema`** OR delete `src/index.ts` entirely. Recommend deletion (Option B in Recipe 4) — closes H-CLI-1 and H-CLI-5 simultaneously. If kept, apply Option A and update core.                                                                                                                                                | delete: `src/index.ts`, `src/cli/error-handler.ts`. edit: `package.json` (drop `main`/`module`/`types`/`.` export).                                       | H-CLI-1, H-CLI-2, H-CLI-5, H-CLI-Q-2, M-CLI-1                      |
+| 7   | **Refactor `generated-docs-manifest.ts` hand-rolled validators to `z.strictObject`.** Coordinate with core's C-CORE-4 fix landing first (same recipe).                                                                                                                                                                                                              | edit: `src/cli/generated-docs-manifest.ts:6-30, 157-191`.                                                                                                 | H-CLI-6, H-CLI-Q-6                                                 |
+| 8   | **Extract `loadCliConfigContext`** to deduplicate `pattern-graph-cli-runtime.ts:33-80` vs `:153-173`.                                                                                                                                                                                                                                                               | edit: `pattern-graph-cli-runtime.ts`.                                                                                                                     | H-CLI-3                                                            |
+| 9   | **Inline-call `rejectLegacyCategory()`** in `pattern-graph-cli.ts:144-149`.                                                                                                                                                                                                                                                                                         | edit: `pattern-graph-cli.ts`.                                                                                                                             | H-CLI-8                                                            |
+| 10  | **Cleanup:** `fileURLToPath` in `runtime-helpers.ts:30` and `runtime-bridge.js:6`; delete `tests/features/.DS_Store`; rewrite or delete the 2 aspirational `@skip` scenarios in `cli-output-formatting.feature`; fix the wording of the rules-conflict `@skip` scenario in `cli-flag-parsing.feature:49-53`.                                                        | edit + delete (cited).                                                                                                                                    | CL-CLI-M1, CL-CLI-M2, CL-CLI-L2, H-CLI-T-2 (remaining 2 scenarios) |
+| 11  | **Promote `runtime-bridge.js` to workspace template.** Apply the package-name parameter generalization; copy or symlink-import from mcp and meta.                                                                                                                                                                                                                   | new pattern across packages.                                                                                                                              | Phase 1 cross-package recommendation                               |
 
 **Why this order:**
 

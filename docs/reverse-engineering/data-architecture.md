@@ -20,19 +20,19 @@ This document inventories those shapes. Source-of-truth files cited inline.
 
 `packages/architect-core/src/validation-schemas/pattern-graph.ts:106-123`
 
-| Field                  | Type                                            | Notes                                                                                            |
-| ---------------------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| `patterns`             | `ExtractedPattern[]`                            | All discovered patterns (see §1b).                                                               |
-| `tagRegistry`          | `TagRegistry`                                   | Tag prefix + metadata-tag definitions.                                                           |
-| `byStatus`             | `ExactStatusGroups`                             | 5 buckets: `candidate` / `roadmap` / `active` / `completed` / `deferred`.                        |
-| `byNormalizedStatus`   | `StatusGroups`                                  | 4 buckets: `completed` / `active` / `planned` / `candidate`.                                     |
-| `byMaturity`           | `Record<string, ExtractedPattern[]>`            | `idea` / `plan` / `design` / `executable` (see §1d).                                             |
-| `byPhase`              | `PhaseGroup[]`                                  | `{ phaseNumber, phaseName?, patterns, counts }`.                                                  |
-| `byQuarter`, `byRole`, `bySourceType`, `byProductArea` | indexes                  | Additional grouping views.                                                                       |
-| `counts`               | `StatusCounts`                                  | `{ completed, active, planned, candidate, total }` (`pattern-graph.ts:57`).                       |
-| `relationshipIndex`    | `Record<string, RelationshipEntry>` (optional)  | Edge index keyed by pattern name (see §1c).                                                      |
-| `archIndex`            | `ArchIndex` (optional)                          | `byRole` / `byContext` / `byLayer` / `byView`.                                                   |
-| `featureParseFailures` | `PatternParseFailure[]` (optional)              | Tolerant-ingestion artifact — features that failed to parse are kept here, not silently dropped. |
+| Field                                                  | Type                                           | Notes                                                                                            |
+| ------------------------------------------------------ | ---------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `patterns`                                             | `ExtractedPattern[]`                           | All discovered patterns (see §1b).                                                               |
+| `tagRegistry`                                          | `TagRegistry`                                  | Tag prefix + metadata-tag definitions.                                                           |
+| `byStatus`                                             | `ExactStatusGroups`                            | 5 buckets: `candidate` / `roadmap` / `active` / `completed` / `deferred`.                        |
+| `byNormalizedStatus`                                   | `StatusGroups`                                 | 4 buckets: `completed` / `active` / `planned` / `candidate`.                                     |
+| `byMaturity`                                           | `Record<string, ExtractedPattern[]>`           | `idea` / `plan` / `design` / `executable` (see §1d).                                             |
+| `byPhase`                                              | `PhaseGroup[]`                                 | `{ phaseNumber, phaseName?, patterns, counts }`.                                                 |
+| `byQuarter`, `byRole`, `bySourceType`, `byProductArea` | indexes                                        | Additional grouping views.                                                                       |
+| `counts`                                               | `StatusCounts`                                 | `{ completed, active, planned, candidate, total }` (`pattern-graph.ts:57`).                      |
+| `relationshipIndex`                                    | `Record<string, RelationshipEntry>` (optional) | Edge index keyed by pattern name (see §1c).                                                      |
+| `archIndex`                                            | `ArchIndex` (optional)                         | `byRole` / `byContext` / `byLayer` / `byView`.                                                   |
+| `featureParseFailures`                                 | `PatternParseFailure[]` (optional)             | Tolerant-ingestion artifact — features that failed to parse are kept here, not silently dropped. |
 
 > The **top-level** schema uses `z.object` (open) so future fields can be added; **sub-schemas** like `SourceInfoSchema` and `ExtractedPatternBaseSchema` use `z.strictObject` (closed) per the Zod-first doctrine in §Engineering doctrine of AGENTS.md.
 
@@ -42,26 +42,26 @@ This document inventories those shapes. Source-of-truth files cited inline.
 
 **Identity:**
 
-| Field         | Type                       | Constraint                                                                                       |
-| ------------- | -------------------------- | ------------------------------------------------------------------------------------------------ |
-| `id`          | `PatternId` (branded string) | matches `pattern-[a-f0-9]{8}` (`extracted-pattern.ts:23-26`)                                  |
-| `name`        | `PatternIdentifier`        | matches `^[A-Z][A-Za-z0-9]+$` — **PascalCase only** (`pattern-contract.ts:3,12-16`)                |
-| `status`      | enum                       | `candidate` \| `roadmap` \| `active` \| `completed` \| `deferred`                                |
-| `role`        | string                     | lowercased `[a-z0-9-]+`                                                                          |
-| `source`      | `{ file, lines: [start,end] }` | file must end `.ts`, `.feature`, or `.feature.md`                                            |
-| `extractedAt` | string                     | ISO 8601                                                                                         |
+| Field         | Type                           | Constraint                                                                          |
+| ------------- | ------------------------------ | ----------------------------------------------------------------------------------- |
+| `id`          | `PatternId` (branded string)   | matches `pattern-[a-f0-9]{8}` (`extracted-pattern.ts:23-26`)                        |
+| `name`        | `PatternIdentifier`            | matches `^[A-Z][A-Za-z0-9]+$` — **PascalCase only** (`pattern-contract.ts:3,12-16`) |
+| `status`      | enum                           | `candidate` \| `roadmap` \| `active` \| `completed` \| `deferred`                   |
+| `role`        | string                         | lowercased `[a-z0-9-]+`                                                             |
+| `source`      | `{ file, lines: [start,end] }` | file must end `.ts`, `.feature`, or `.feature.md`                                   |
+| `extractedAt` | string                         | ISO 8601                                                                            |
 
 **Edges** (all readonly arrays of strings unless noted):
 
-| Field                | Edge kind             | Notes                                                                                       |
-| -------------------- | --------------------- | ------------------------------------------------------------------------------------------- |
-| `uses`               | dependency            | `PatternReference[]` — allows `package-id:PatternName`                                       |
-| `implementsPatterns` | UML realization       | TS code → spec patterns it realizes                                                          |
-| `extendsPattern`     | generalization        | single string                                                                                |
-| `seeAlso`            | cross-ref             | no dependency implication                                                                    |
-| `apiRef`             | API reference         |                                                                                              |
-| `parent` / `children` | hierarchy            |                                                                                              |
-| `executableSpecs`    | spec linkage          | paths to `.feature` files                                                                    |
+| Field                 | Edge kind       | Notes                                                  |
+| --------------------- | --------------- | ------------------------------------------------------ |
+| `uses`                | dependency      | `PatternReference[]` — allows `package-id:PatternName` |
+| `implementsPatterns`  | UML realization | TS code → spec patterns it realizes                    |
+| `extendsPattern`      | generalization  | single string                                          |
+| `seeAlso`             | cross-ref       | no dependency implication                              |
+| `apiRef`              | API reference   |                                                        |
+| `parent` / `children` | hierarchy       |                                                        |
+| `executableSpecs`     | spec linkage    | paths to `.feature` files                              |
 
 **Process metadata:** `phase`, `release`, `quarter` (`YYYY-Qn`), `completed` (`YYYY-MM-DD`), `effort`, `effortActual`, `team`, `productArea`, `priority`, `risk`, `workflow`.
 
@@ -85,15 +85,15 @@ CLAUDE.md frames the graph as having four edges (`depends-on`, `uses`, `implemen
 
 The graph index (`RelationshipEntry` in `pattern-graph.ts:85-96`) tracks them as forward + reverse pairs:
 
-| Forward             | Reverse             |
-| ------------------- | ------------------- |
-| `uses`              | `usedBy`            |
-| `dependsOn`         | (derived from `uses`) |
-| `enables`           | (reverse of `dependsOn` in some views) |
-| `implementsPatterns` | `implementedBy`   |
-| `extendsPattern`    | `extendedBy`        |
-| `seeAlso`           | `seeAlso` (symmetric) |
-| `apiRef`            | `apiRef`            |
+| Forward              | Reverse                                |
+| -------------------- | -------------------------------------- |
+| `uses`               | `usedBy`                               |
+| `dependsOn`          | (derived from `uses`)                  |
+| `enables`            | (reverse of `dependsOn` in some views) |
+| `implementsPatterns` | `implementedBy`                        |
+| `extendsPattern`     | `extendedBy`                           |
+| `seeAlso`            | `seeAlso` (symmetric)                  |
+| `apiRef`             | `apiRef`                               |
 
 When reading code, remember: **`ExtractedPattern` has forward-only fields**; aggregated reverse edges (`usedBy`, `implementedBy`, `extendedBy`) appear only on `RelationshipEntry` in the graph index.
 
@@ -102,7 +102,7 @@ When reading code, remember: **`ExtractedPattern` has forward-only fields**; agg
 The "four-tier ladder" CLAUDE.md refers to is the **maturity axis**, not the edge taxonomy. From `packages/architect-core/src/taxonomy/maturity-values.ts:3`:
 
 ```ts
-MATURITY_VALUES = ['idea', 'plan', 'design', 'executable']
+MATURITY_VALUES = ['idea', 'plan', 'design', 'executable'];
 ```
 
 Default mapping from `status` → `maturity` (`:7-13`):
@@ -117,13 +117,13 @@ Default mapping from `status` → `maturity` (`:7-13`):
 
 Valid combinations (`:28-34`):
 
-| status      | allowed maturities         |
-| ----------- | -------------------------- |
-| `candidate` | `idea`, `plan`             |
-| `roadmap`   | `plan`, `design`           |
-| `active`    | `design`, `executable`     |
-| `completed` | `executable`               |
-| `deferred`  | `plan`, `design`           |
+| status      | allowed maturities     |
+| ----------- | ---------------------- |
+| `candidate` | `idea`, `plan`         |
+| `roadmap`   | `plan`, `design`       |
+| `active`    | `design`, `executable` |
+| `completed` | `executable`           |
+| `deferred`  | `plan`, `design`       |
 
 ### 1e. FSM (ProcessGuard) — **lives in core, enforced by guard**
 
@@ -149,7 +149,7 @@ deferred  → roadmap
 **Protection levels** (`packages/architect-core/src/validation/fsm/states.ts:18-23`):
 
 ```ts
-ProtectionLevel = 'none' | 'scope' | 'hard'
+ProtectionLevel = 'none' | 'scope' | 'hard';
 ```
 
 - `roadmap` → `none`
@@ -174,39 +174,39 @@ The grammar is configurable: default prefix `@architect-` and default opt-in `@a
 
 (`packages/architect-core/src/taxonomy/registry-builder.ts:152-291`)
 
-| Tag                          | Format         | Purpose / values                                                            |
-| ---------------------------- | -------------- | --------------------------------------------------------------------------- |
-| `@architect-pattern`         | value (required) | Explicit PascalCase pattern name                                          |
-| `@architect-status`          | enum           | `candidate` / `roadmap` / `active` / `completed` / `deferred` (default `roadmap`) |
-| `@architect-unlock-reason`   | quoted-value   | Override the `completed` hard-lock                                          |
-| `@architect-uses`            | csv            | Patterns this depends on                                                    |
-| `@architect-level`           | enum           | `epic` / `phase` / `task` / `slice` (hierarchy axis, independent of status) |
-| `@architect-parent`          | value          | Hierarchy parent (must be strictly higher level)                            |
-| `@architect-implements`      | csv            | TS file → spec patterns realized                                            |
-| `@architect-extends`         | value          | Generalization edge                                                         |
-| `@architect-completed`       | value          | `YYYY-MM-DD`                                                                |
-| `@architect-product-area`    | value          | PRD grouping (ADR-001 Rule 1)                                               |
-| `@architect-adr`             | value          | ADR/PDR number (zero-padded)                                                |
-| `@architect-adr-status`      | enum           | (default `proposed`)                                                        |
-| `@architect-adr-category`    | enum           | per ADR-001 Rule 2                                                          |
-| `@architect-adr-supersedes` / `-superseded-by` | value | |
-| `@architect-adr-theme`       | enum           | Theme grouping                                                              |
-| `@architect-adr-layer`       | enum           | Evolutionary layer                                                          |
-| `@architect-title`           | quoted-value   | Display title with spaces                                                   |
-| `@architect-see-also`        | csv            | Cross-ref without dependency                                                |
-| `@architect-target`          | value          | Stub → implementation path                                                  |
-| `@architect-role`            | value          | Canonical role (registry-driven) — `registry-builder.ts:115`                |
-| `@architect-bounded-context` | value          | Subgraph grouping — `registry-builder.ts:122`                               |
+| Tag                                            | Format           | Purpose / values                                                                  |
+| ---------------------------------------------- | ---------------- | --------------------------------------------------------------------------------- |
+| `@architect-pattern`                           | value (required) | Explicit PascalCase pattern name                                                  |
+| `@architect-status`                            | enum             | `candidate` / `roadmap` / `active` / `completed` / `deferred` (default `roadmap`) |
+| `@architect-unlock-reason`                     | quoted-value     | Override the `completed` hard-lock                                                |
+| `@architect-uses`                              | csv              | Patterns this depends on                                                          |
+| `@architect-level`                             | enum             | `epic` / `phase` / `task` / `slice` (hierarchy axis, independent of status)       |
+| `@architect-parent`                            | value            | Hierarchy parent (must be strictly higher level)                                  |
+| `@architect-implements`                        | csv              | TS file → spec patterns realized                                                  |
+| `@architect-extends`                           | value            | Generalization edge                                                               |
+| `@architect-completed`                         | value            | `YYYY-MM-DD`                                                                      |
+| `@architect-product-area`                      | value            | PRD grouping (ADR-001 Rule 1)                                                     |
+| `@architect-adr`                               | value            | ADR/PDR number (zero-padded)                                                      |
+| `@architect-adr-status`                        | enum             | (default `proposed`)                                                              |
+| `@architect-adr-category`                      | enum             | per ADR-001 Rule 2                                                                |
+| `@architect-adr-supersedes` / `-superseded-by` | value            |                                                                                   |
+| `@architect-adr-theme`                         | enum             | Theme grouping                                                                    |
+| `@architect-adr-layer`                         | enum             | Evolutionary layer                                                                |
+| `@architect-title`                             | quoted-value     | Display title with spaces                                                         |
+| `@architect-see-also`                          | csv              | Cross-ref without dependency                                                      |
+| `@architect-target`                            | value            | Stub → implementation path                                                        |
+| `@architect-role`                              | value            | Canonical role (registry-driven) — `registry-builder.ts:115`                      |
+| `@architect-bounded-context`                   | value            | Subgraph grouping — `registry-builder.ts:122`                                     |
 
 ### Aggregation tags
 
 (`registry-builder.ts:292-308`)
 
-| Tag                   | Target doc       | Purpose                                |
-| --------------------- | ---------------- | -------------------------------------- |
-| `@architect-overview` | `OVERVIEW.md`    | Architecture overview                  |
-| `@architect-decision` | `DECISIONS.md`   | ADR-style, auto-numbered               |
-| `@architect-intro`    | (none)           | Package introduction placeholder       |
+| Tag                   | Target doc     | Purpose                          |
+| --------------------- | -------------- | -------------------------------- |
+| `@architect-overview` | `OVERVIEW.md`  | Architecture overview            |
+| `@architect-decision` | `DECISIONS.md` | ADR-style, auto-numbered         |
+| `@architect-intro`    | (none)         | Package introduction placeholder |
 
 ### Deprecated / legacy
 
@@ -220,20 +220,20 @@ Every Fragment is a `z.strictObject` with a `kind: z.literal('…')` discriminat
 
 ### Pattern relations (`fragments/pattern-relations/`)
 
-| Fragment                  | Purpose                                                                                                        |
-| ------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| `PatternSummary`          | Compact name / status / role / phase row                                                                        |
-| `PatternDetail`           | Full per-pattern detail with relationships, hierarchy, rules                                                   |
-| `PatternCatalog`          | Collection of summaries grouped by index                                                                       |
-| `DependencyEdge`          | One typed edge `{ kind, from, to, relationKind }` (`dependency-edge.ts:16-21`)                                  |
-| `DependencyEdgeSet`       | Collection of edges                                                                                            |
-| `DependencyTree`          | Recursive `DependencyTreeNode` (`supporting.ts:76-92`) for `dep-tree` CLI                                       |
-| `ArchitectureContext`     | Patterns grouped by bounded context (`BoundedContextSchema`)                                                   |
-| `ArchitectureNeighborhood`| Patterns adjacent to a focal pattern                                                                           |
-| `ArchitectureComparison`  | Diff between two architecture states                                                                           |
-| `PatternBundleEntry`      | Single entry for a multi-pattern bundle                                                                        |
-| `OpenQuestionList`        | Open question per pattern (planning aid)                                                                       |
-| `OrphanPatternList`       | Patterns with no edges                                                                                         |
+| Fragment                   | Purpose                                                                        |
+| -------------------------- | ------------------------------------------------------------------------------ |
+| `PatternSummary`           | Compact name / status / role / phase row                                       |
+| `PatternDetail`            | Full per-pattern detail with relationships, hierarchy, rules                   |
+| `PatternCatalog`           | Collection of summaries grouped by index                                       |
+| `DependencyEdge`           | One typed edge `{ kind, from, to, relationKind }` (`dependency-edge.ts:16-21`) |
+| `DependencyEdgeSet`        | Collection of edges                                                            |
+| `DependencyTree`           | Recursive `DependencyTreeNode` (`supporting.ts:76-92`) for `dep-tree` CLI      |
+| `ArchitectureContext`      | Patterns grouped by bounded context (`BoundedContextSchema`)                   |
+| `ArchitectureNeighborhood` | Patterns adjacent to a focal pattern                                           |
+| `ArchitectureComparison`   | Diff between two architecture states                                           |
+| `PatternBundleEntry`       | Single entry for a multi-pattern bundle                                        |
+| `OpenQuestionList`         | Open question per pattern (planning aid)                                       |
+| `OrphanPatternList`        | Patterns with no edges                                                         |
 
 ### Delivery reporting (`fragments/delivery-reporting/`)
 
@@ -245,25 +245,25 @@ Every Fragment is a `z.strictObject` with a `kind: z.literal('…')` discriminat
 
 ### Execution context (`fragments/execution-context/`)
 
-| Fragment                 | Purpose                                                                                                                                                |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `SessionContextBundle`   | Session-opening bundle — patterns, deps, stubs, deliverables, FSM (`session-context-bundle.ts:24-39`)                                                  |
-| `ScopeReadinessCheck`    | One readiness check `{ checkId, label, severity, passed, details? }`                                                                                   |
-| `ScopeReadinessReport`   | `{ pattern, sessionType, checks[], verdict: 'PASS' \| 'BLOCKED' \| 'WARN' }` (`scope-readiness-report.ts:17-22`; verdict enum at `supporting.ts:18`)    |
-| `DeliverableManifest`, `Deliverable` | Deliverable status tracking                                                                                                                  |
-| `FileReadingList`        | Ordered files-to-read for session bootstrap                                                                                                            |
-| `HandoffRecord`          | Session-end handoff state                                                                                                                              |
+| Fragment                             | Purpose                                                                                                                                              |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `SessionContextBundle`               | Session-opening bundle — patterns, deps, stubs, deliverables, FSM (`session-context-bundle.ts:24-39`)                                                |
+| `ScopeReadinessCheck`                | One readiness check `{ checkId, label, severity, passed, details? }`                                                                                 |
+| `ScopeReadinessReport`               | `{ pattern, sessionType, checks[], verdict: 'PASS' \| 'BLOCKED' \| 'WARN' }` (`scope-readiness-report.ts:17-22`; verdict enum at `supporting.ts:18`) |
+| `DeliverableManifest`, `Deliverable` | Deliverable status tracking                                                                                                                          |
+| `FileReadingList`                    | Ordered files-to-read for session bootstrap                                                                                                          |
+| `HandoffRecord`                      | Session-end handoff state                                                                                                                            |
 
 ### Operational insights (`fragments/operational-insights/`)
 
-| Fragment                                       | Purpose                                                                                              |
-| ---------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `OverviewDigest`                               | Overview CLI shape: `{ progress, activePhases[], blocking[], cliHints? }` (`overview-digest.ts:18-23`) |
-| `AnnotationCoverage`                           | Coverage of annotations across source                                                                |
-| `RequirementDigest`                            | Per-requirement summary                                                                              |
-| `RoleProfile`, `RoleProfileCollection`         | Patterns grouped by role                                                                             |
-| `SourceInventoryDigest` + `SourceInventoryEntry` | Source-file inventory                                                                              |
-| `TagUsageMatrix` + `TagUsageEntry`             | Tag usage statistics                                                                                 |
+| Fragment                                         | Purpose                                                                                                |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| `OverviewDigest`                                 | Overview CLI shape: `{ progress, activePhases[], blocking[], cliHints? }` (`overview-digest.ts:18-23`) |
+| `AnnotationCoverage`                             | Coverage of annotations across source                                                                  |
+| `RequirementDigest`                              | Per-requirement summary                                                                                |
+| `RoleProfile`, `RoleProfileCollection`           | Patterns grouped by role                                                                               |
+| `SourceInventoryDigest` + `SourceInventoryEntry` | Source-file inventory                                                                                  |
+| `TagUsageMatrix` + `TagUsageEntry`               | Tag usage statistics                                                                                   |
 
 ### Documentation composition (`fragments/documentation-composition/`)
 
@@ -291,10 +291,20 @@ Returns `OverviewDigestSchema` (`fragments/operational-insights/overview-digest.
 ```json
 {
   "kind": "OverviewDigest",
-  "progress": { /* OverviewProgressSchema — counts by status */ },
-  "activePhases": [ { /* ActivePhaseEntry — phase + counts */ } ],
-  "blocking":     [ { /* BlockingEntry — patterns blocking progress */ } ],
-  "cliHints":     ["..."]
+  "progress": {
+    /* OverviewProgressSchema — counts by status */
+  },
+  "activePhases": [
+    {
+      /* ActivePhaseEntry — phase + counts */
+    }
+  ],
+  "blocking": [
+    {
+      /* BlockingEntry — patterns blocking progress */
+    }
+  ],
+  "cliHints": ["..."]
 }
 ```
 
@@ -307,16 +317,34 @@ Returns `SessionContextBundleSchema` (`fragments/execution-context/session-conte
   "kind": "SessionContextBundle",
   "patterns": ["..."],
   "sessionType": "planning|design|implement",
-  "metadata": [ /* PatternContextMeta[] */ ],
+  "metadata": [
+    /* PatternContextMeta[] */
+  ],
   "specFiles": ["..."],
-  "stubs": [ /* StubRef[] */ ],
-  "dependencies": [ /* DepEntry[] */ ],
-  "sharedDependencies": [ /* DepEntry[] */ ],
-  "consumers": [ /* DepEntry[] */ ],
-  "architectureNeighbors": [ /* NeighborEntry[] */ ],
-  "deliverables": [ /* Deliverable[] */ ],
-  "fsm": { /* FsmContext */ },
-  "fsmByPattern": [ /* PatternFsmEntry[] */ ],
+  "stubs": [
+    /* StubRef[] */
+  ],
+  "dependencies": [
+    /* DepEntry[] */
+  ],
+  "sharedDependencies": [
+    /* DepEntry[] */
+  ],
+  "consumers": [
+    /* DepEntry[] */
+  ],
+  "architectureNeighbors": [
+    /* NeighborEntry[] */
+  ],
+  "deliverables": [
+    /* Deliverable[] */
+  ],
+  "fsm": {
+    /* FsmContext */
+  },
+  "fsmByPattern": [
+    /* PatternFsmEntry[] */
+  ],
   "testFiles": ["..."]
 }
 ```
@@ -331,8 +359,14 @@ Returns `ScopeReadinessReportSchema` (`fragments/execution-context/scope-readine
   "pattern": "PatternName",
   "sessionType": "design|implement",
   "checks": [
-    { "kind": "ScopeReadinessCheck", "checkId": "...", "label": "...",
-      "severity": "error|warning|info", "passed": true, "details": "..." }
+    {
+      "kind": "ScopeReadinessCheck",
+      "checkId": "...",
+      "label": "...",
+      "severity": "error|warning|info",
+      "passed": true,
+      "details": "..."
+    }
   ],
   "verdict": "PASS"
 }
@@ -352,21 +386,21 @@ The `verdict` field is the deterministic gate. `PASS` permits the FSM transition
 
 The codebase is itself organized into bounded contexts visible in the package split:
 
-| Bounded Context             | Package                       | Aggregates / entities                                                                                                                                |
-| --------------------------- | ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Canonical Model**         | `@libar-dev/architect-core`   | `PatternGraph` (root aggregate), `ExtractedPattern`, `TagRegistry`, `WorkflowConfig`, FSM state machine                                               |
-| **Projection / Rendering**  | `@libar-dev/architect-projection` | `Fragment` (per-kind), `RenderableDocument` (codec output), `Renderer` (markdown / json / compact)                                                |
-| **Process Enforcement**     | `@libar-dev/architect-guard`  | `ProcessState`, `SessionState`, `ProcessViolation`, lint engine                                                                                       |
-| **Surface Composition**     | `@libar-dev/architect-cli`    | CLI dispatch only — no domain types                                                                                                                  |
-| **Surface Composition**     | `@libar-dev/architect-mcp`    | MCP tool registry, pipeline session, file watcher                                                                                                    |
-| **Methodology**             | `@libar-dev/architect-spec` (`formal-spec/`, private) | The Architect Spec itself — defines the *language* the other packages parse                                                  |
+| Bounded Context            | Package                                               | Aggregates / entities                                                                                   |
+| -------------------------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| **Canonical Model**        | `@libar-dev/architect-core`                           | `PatternGraph` (root aggregate), `ExtractedPattern`, `TagRegistry`, `WorkflowConfig`, FSM state machine |
+| **Projection / Rendering** | `@libar-dev/architect-projection`                     | `Fragment` (per-kind), `RenderableDocument` (codec output), `Renderer` (markdown / json / compact)      |
+| **Process Enforcement**    | `@libar-dev/architect-guard`                          | `ProcessState`, `SessionState`, `ProcessViolation`, lint engine                                         |
+| **Surface Composition**    | `@libar-dev/architect-cli`                            | CLI dispatch only — no domain types                                                                     |
+| **Surface Composition**    | `@libar-dev/architect-mcp`                            | MCP tool registry, pipeline session, file watcher                                                       |
+| **Methodology**            | `@libar-dev/architect-spec` (`formal-spec/`, private) | The Architect Spec itself — defines the _language_ the other packages parse                             |
 
 **Cross-domain relationships:**
 
 - `architect-projection` consumes `PatternGraph` from `architect-core` — read-only.
 - `architect-guard` consumes `PatternGraph` + FSM types from core — read + validation logic only, no graph mutation.
 - `architect-cli` and `architect-mcp` are composition roots — they wire core + projection + guard without owning domain types.
-- `formal-spec/` is the *language definition* the implementation parses; no JS dependency between them (it ships as a separate package at v1.0).
+- `formal-spec/` is the _language definition_ the implementation parses; no JS dependency between them (it ships as a separate package at v1.0).
 
 ---
 
@@ -397,14 +431,14 @@ architect/
 
 **Naming conventions:**
 
-| Kind                 | Convention                                                                  |
-| -------------------- | --------------------------------------------------------------------------- |
-| Single-spec features | `<kebab-case-name>.feature` (e.g. `data-api-relationship-graph.feature`)    |
-| Spec sets            | Numbered `NN-<name>.feature` within a subdir                                 |
-| ADRs                 | `adr-NNN-<slug>.feature`                                                    |
-| PDRs                 | `pdr-NNN-<slug>.feature`                                                    |
-| Releases             | `v<semver>.feature` and `vNEXT.feature`                                     |
-| Stub directories     | `architect/stubs/<pattern-slug>/` + `architect/step-stubs/<pattern-slug>/`  |
+| Kind                 | Convention                                                                 |
+| -------------------- | -------------------------------------------------------------------------- |
+| Single-spec features | `<kebab-case-name>.feature` (e.g. `data-api-relationship-graph.feature`)   |
+| Spec sets            | Numbered `NN-<name>.feature` within a subdir                               |
+| ADRs                 | `adr-NNN-<slug>.feature`                                                   |
+| PDRs                 | `pdr-NNN-<slug>.feature`                                                   |
+| Releases             | `v<semver>.feature` and `vNEXT.feature`                                    |
+| Stub directories     | `architect/stubs/<pattern-slug>/` + `architect/step-stubs/<pattern-slug>/` |
 
 > **The two-parser rule** (CLAUDE.md §"Two Gherkin parsers — distinguish them"): `architect/specs/` and `architect/decisions/` are parsed by `@cucumber/gherkin` at doc-gen / PatternGraph build time only. They are **NOT compiled by TS** and **NOT executed by vitest-cucumber**. The executable tier lives in `tests/features/` and `packages/*/tests/features/` (128 `.feature` files, ~2828 tests) and is parsed by `@amiceli/vitest-cucumber` at test time.
 

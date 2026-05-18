@@ -10,7 +10,7 @@ allowed-tools:
 
 # Architect Base Context
 
-Operational baseline for every session in this Architect repo. Self-contained — does not require any other architect-* skill to be loaded first.
+Operational baseline for every session in this Architect repo. Self-contained — does not require any other architect-\* skill to be loaded first.
 
 When you load this skill, state briefly that the **architect-base** context is loaded so the user can confirm it activated.
 
@@ -32,15 +32,15 @@ The **canonical source of truth** is annotated production code + executable Gher
 
 ## 2. The delivery process in this repo
 
-| Aspect              | Value                                                                                                            |
-| ------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| Config              | `architect.config.ts` at the repo root                                                                           |
-| Working state       | `architect/` (specs, decisions, releases, stubs, step-stubs, design-reviews, ideations)                          |
-| Source of truth     | Annotated `packages/*/src/**/*.ts` + executable Gherkin under `tests/features/` and `packages/*/tests/features/` |
-| CLI                 | `pnpm architect:query <verb>` (canonical script name across architect-managed repos)                             |
-| MCP                 | `architect` server → `mcp__architect__*` callable tools                                                          |
-| Validation entry    | `pnpm typecheck`, `pnpm test`, `pnpm validate:all`, `pnpm architect:guard --staged`                              |
-| Doc regeneration    | `pnpm docs:all` → `docs-live/` (gitignored, derived)                                                             |
+| Aspect           | Value                                                                                                            |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Config           | `architect.config.ts` at the repo root                                                                           |
+| Working state    | `architect/` (specs, decisions, releases, stubs, step-stubs, design-reviews, ideations)                          |
+| Source of truth  | Annotated `packages/*/src/**/*.ts` + executable Gherkin under `tests/features/` and `packages/*/tests/features/` |
+| CLI              | `pnpm architect:query <verb>` (canonical script name across architect-managed repos)                             |
+| MCP              | `architect` server → `mcp__architect__*` callable tools                                                          |
+| Validation entry | `pnpm typecheck`, `pnpm test`, `pnpm validate:all`, `pnpm architect:guard --staged`                              |
+| Doc regeneration | `pnpm docs:all` → `docs-live/` (gitignored, derived)                                                             |
 
 When this package family is consumed by another project, the consumer wires their own `architect.config.ts` and exposes their own `architect:query` script — the contracts above are stable across architect-managed repos.
 
@@ -48,17 +48,17 @@ When this package family is consumed by another project, the consumer wires thei
 
 `architect/` holds **working state**, not the source of truth. It is parsed by `@cucumber/gherkin` for projection / extraction and is explicitly **excluded from TypeScript compile, ESLint, vitest**.
 
-| Folder                       | Role                                                                                                     | Lifetime           |
-| ---------------------------- | -------------------------------------------------------------------------------------------------------- | ------------------ |
-| `architect/specs/ideas/`     | Idea-tier specs (lightest authored shape)                                                                | Until promotion    |
-| `architect/specs/candidates/`| Candidate-tier specs (open questions + 1-2 scenarios)                                                    | Until promotion    |
-| `architect/specs/`           | Plan- and design-tier specs (deliverables + full scenarios + stubs)                                      | **Until value transferred to executable Gherkin, then deleted** |
-| `architect/stubs/`           | Design-tier TS contract scaffolds (one folder per pattern)                                               | Ephemeral          |
-| `architect/step-stubs/`      | Design-tier stub step definitions                                                                        | Ephemeral          |
-| `architect/decisions/`       | ADRs / PDRs — compact, durable, decisions-only (no operational or temporal context)                      | **Permanent**      |
-| `architect/releases/`        | Release notes, roadmap, phase plans                                                                      | Permanent          |
-| `architect/design-reviews/`  | Design review captures                                                                                   | Reference          |
-| `architect/ideations/`       | Pre-idea-tier notes                                                                                      | Until promoted     |
+| Folder                        | Role                                                                                | Lifetime                                                        |
+| ----------------------------- | ----------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| `architect/specs/ideas/`      | Idea-tier specs (lightest authored shape)                                           | Until promotion                                                 |
+| `architect/specs/candidates/` | Candidate-tier specs (open questions + 1-2 scenarios)                               | Until promotion                                                 |
+| `architect/specs/`            | Plan- and design-tier specs (deliverables + full scenarios + stubs)                 | **Until value transferred to executable Gherkin, then deleted** |
+| `architect/stubs/`            | Design-tier TS contract scaffolds (one folder per pattern)                          | Ephemeral                                                       |
+| `architect/step-stubs/`       | Design-tier stub step definitions                                                   | Ephemeral                                                       |
+| `architect/decisions/`        | ADRs / PDRs — compact, durable, decisions-only (no operational or temporal context) | **Permanent**                                                   |
+| `architect/releases/`         | Release notes, roadmap, phase plans                                                 | Permanent                                                       |
+| `architect/design-reviews/`   | Design review captures                                                              | Reference                                                       |
+| `architect/ideations/`        | Pre-idea-tier notes                                                                 | Until promoted                                                  |
 
 **Two Gherkin parsers, do not confuse them:**
 
@@ -98,18 +98,18 @@ A **pattern** is a named architectural unit (a feature, service, component, cont
 
 ## 6. Validation layers
 
-| Layer                          | Command                              | What it checks                                                                |
-| ------------------------------ | ------------------------------------ | ----------------------------------------------------------------------------- |
-| Type system                    | `pnpm typecheck`                     | Strict TS (see CLAUDE.md "TypeScript strictness")                             |
-| Annotation lint + DoD          | `pnpm validate:all`                  | Definition-of-done, anti-patterns, dangling references                        |
-| Process Guard (FSM)            | `pnpm architect:guard --staged`      | FSM transitions, `@architect-unlock-reason` rules, structural invariants      |
-| Graph integrity                | `pnpm architect:query arch dangling --strict --baseline <path>` | Cross-pattern reference drift |
+| Layer                 | Command                                                         | What it checks                                                           |
+| --------------------- | --------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| Type system           | `pnpm typecheck`                                                | Strict TS (see CLAUDE.md "TypeScript strictness")                        |
+| Annotation lint + DoD | `pnpm validate:all`                                             | Definition-of-done, anti-patterns, dangling references                   |
+| Process Guard (FSM)   | `pnpm architect:guard --staged`                                 | FSM transitions, `@architect-unlock-reason` rules, structural invariants |
+| Graph integrity       | `pnpm architect:query arch dangling --strict --baseline <path>` | Cross-pattern reference drift                                            |
 
 All of these are CI-enforced. Failing gates are stop-and-surface; never `--no-verify`.
 
 ## 7. Key ADRs (load-bearing, decisions-only)
 
-These records carry *decisions* and the rationale for them. They do not carry operational or temporal context (status, work-in-progress, ETAs). Read before changing anything in the relevant area.
+These records carry _decisions_ and the rationale for them. They do not carry operational or temporal context (status, work-in-progress, ETAs). Read before changing anything in the relevant area.
 
 - **ADR-003** — Source-First Pattern Architecture
 - **ADR-005** — Codec / Renderer Separation
@@ -138,14 +138,14 @@ Sampled completed patterns like `ConfigLoader` and `DefineConfig` carry zero JSD
 
 There are **six** levels along the detail/maturity axis. Four are authored in `architect/specs/`; two are post-spec.
 
-| Level         | Where                                  | What it adds vs the level above                                                 |
-| ------------- | -------------------------------------- | ------------------------------------------------------------------------------- |
-| Idea          | `architect/specs/ideas/`               | User story + 1-3 invariant-only rules; **≤30 lines soft cap**                  |
-| Candidate     | `architect/specs/candidates/`          | `**Open Questions:**` block + 1-2 happy-path scenarios                          |
-| Plan          | `architect/specs/`                     | Deliverables table, full scenario set, `**Rationale:**` / `**Verified by:**`    |
-| Design        | `architect/specs/`                     | Stubs in `architect/stubs/<pattern>/`, error/edge/integration scenarios, ADR refs |
-| Executable    | `tests/features/`, `packages/*/tests/features/` | Realization (`@architect-implements:`) + executable scenarios that prove invariants hold |
-| Maintenance   | Shipped code + its executable feature  | Evolves in place; scenarios grow as behavior grows                              |
+| Level       | Where                                           | What it adds vs the level above                                                          |
+| ----------- | ----------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| Idea        | `architect/specs/ideas/`                        | User story + 1-3 invariant-only rules; **≤30 lines soft cap**                            |
+| Candidate   | `architect/specs/candidates/`                   | `**Open Questions:**` block + 1-2 happy-path scenarios                                   |
+| Plan        | `architect/specs/`                              | Deliverables table, full scenario set, `**Rationale:**` / `**Verified by:**`             |
+| Design      | `architect/specs/`                              | Stubs in `architect/stubs/<pattern>/`, error/edge/integration scenarios, ADR refs        |
+| Executable  | `tests/features/`, `packages/*/tests/features/` | Realization (`@architect-implements:`) + executable scenarios that prove invariants hold |
+| Maintenance | Shipped code + its executable feature           | Evolves in place; scenarios grow as behavior grows                                       |
 
 **Promotion is linear**: `idea → candidate → plan → design → executable`. Skipping rungs is rejected EXCEPT for the **refactoring carve-out** — backfilling coverage for code that already ships skips directly to design or executable tier, using the `<Pattern>ExecutableTests` convention.
 

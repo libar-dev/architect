@@ -4,7 +4,7 @@
 
 **Stance:** Pre-1.0, No-BC. **Breaking changes are wanted.** Deprecation aliases are forbidden. Adapters, compat shims, and "softening" wrappers from previous refactor waves are dead weight that the next refactor will trip on. Every class below prefers **deletion + consumer migration** over "rename and re-export the old name."
 
-**Out of scope of this document:** detailed implementation plan, line-level edits, sequencing PRs. This document defines *what* and *why* — planning + execution happen in subsequent sessions and must use this as canonical scope.
+**Out of scope of this document:** detailed implementation plan, line-level edits, sequencing PRs. This document defines _what_ and _why_ — planning + execution happen in subsequent sessions and must use this as canonical scope.
 
 **How to use this:** Each section is a **class of issue**, not a list of isolated fixes. A class describes (a) the pattern, (b) where it manifests across packages, (c) why it matters for the family, (d) the breaking-change posture, (e) the definition of done that a planning agent must validate against. When a planning session investigates a class it should expand into individual fix sites against the underlying `.full-review/*/05-package-report.md` and `.full-review/99-master-report.md` reports for exact locations.
 
@@ -22,11 +22,12 @@ These are not "best practices" — they are the gates that turn each class into 
 
 ---
 
-## Class A — Adapter / compat-shim / preset removal *(the primary theme)*
+## Class A — Adapter / compat-shim / preset removal _(the primary theme)_
 
 **Pattern.** Previous refactor waves renamed canonical exports but preserved the old names as aliases "for compatibility." The aliases now ship in published barrels, cement old names into consumer code, and prevent the next refactor from being clean. The doctrine has explicitly forbidden this for ~6 sessions; the cruft keeps surviving because each fix was scoped narrowly.
 
 **Canonical example confirmed in current main:**
+
 - `packages/architect-core/src/config/role-constants.ts` ships `export const DDD_ES_CQRS_ROLES = LOCKED_WAVE_ONE_ROLES;` — pure alias from a prior wave.
 - Re-exported through `src/config/index.ts` and `src/index.ts` so the alias becomes a public 2.0 contract.
 
@@ -39,7 +40,7 @@ These are not "best practices" — they are the gates that turn each class into 
 - **Core — `./roles` `package.json#exports` entry** — points to `dist/roles.{js,d.ts}` files `tsc -b` never produces. Install-time 404 for any consumer who follows it. Zero callers.
 - **Core — 10 additional dead exports** (`parseMarkdownToBlocks`, `formatUserZodError`, `FEATURE_LAYERS`, `validateStatus`, `validateCompletionMetadata`, `validatePatternStatus`, `isFullyEditable`, `isScopeLocked`, `createFileLoader`, `formatCodecError`) — grep-verified zero workspace consumers.
 - **Core — `cloneTagRegistry` hand-rebuild** — exists only because the registry schema carries a `z.function()` `transform` field that defeats `structuredClone`. Adapter around a doctrine breach.
-- **Cli — entire `src/index.ts` JS API surface** — verified zero workspace consumers. The only `handleCliError` import in the workspace resolves to a *different* function in guard. Cli should become bin-only.
+- **Cli — entire `src/index.ts` JS API surface** — verified zero workspace consumers. The only `handleCliError` import in the workspace resolves to a _different_ function in guard. Cli should become bin-only.
 - **Guard — `tier-a-baseline.ts` (1,138 LOC)** — dogfood lint baseline shipped in the published barrel as `TIER_A_LINT_BASELINE`. 45.8 KB / 7.8% of the tarball. Hardcoded in-repo paths exported to consumers who cannot override.
 - **Guard — `loadConfig`** — 12-line wrapper duplicating `loadProjectConfig`. 4 of 6 callers already migrated; the wrapper survives.
 - **Projection — `documentation-type-registry.ts` (174 LOC Proxy facade)** — wraps a 12-entry static registry; the file's own comment marks it "campaign deletion target."
@@ -50,6 +51,7 @@ These are not "best practices" — they are the gates that turn each class into 
 **Breaking-change posture:** Yes. Every alias deletion is a 2.0 break by design. v1 consumers who track this repo follow the No-BC doctrine and expect this — and the npm metadata (`2.0.0-pre.1` family-wide) signals the break.
 
 **Definition of done:**
+
 - No `export const X = Y` aliases anywhere in `src/` (where Y is the canonical name). The `DDD_ES_CQRS_ROLES` shape, in all forms, is gone.
 - No "removed-but-kept-for-compat" comments. If something is deleted, its name is deleted too.
 - No `'foo' + 'Bar'` runtime-obfuscation strips or similar adapters around deleted concepts.
@@ -67,7 +69,7 @@ These are not "best practices" — they are the gates that turn each class into 
 **Manifestations:**
 
 - **Core (28 sites)** — `PatternGraphSchema` (the ADR-006 single read model) is `z.object`, shadowed by a hand-written `PatternGraph` interface that adds a `nameIndex` field the schema doesn't validate. 28 schemas under `validation-schemas/` use `z.object` where doctrine requires `strictObject`. Hand-written `BundleRouting`, `ProjectionBundle`, `ProjectionContext`, etc., parallel to (or instead of) `z.infer` from authoritative schemas.
-- **Core — duplicate type-of-record** for `TagRegistry` / `RoleDefinition` / `MetadataTagDefinition` / `AggregationTagDefinition`. The same record exists three times: `config/tag-registry-contract.ts` (interface), `config/role-constants.ts` (another interface), `validation-schemas/tag-registry.ts` (Zod schema that *re-exports the interface type*). Pick one source; eliminate the other two.
+- **Core — duplicate type-of-record** for `TagRegistry` / `RoleDefinition` / `MetadataTagDefinition` / `AggregationTagDefinition`. The same record exists three times: `config/tag-registry-contract.ts` (interface), `config/role-constants.ts` (another interface), `validation-schemas/tag-registry.ts` (Zod schema that _re-exports the interface type_). Pick one source; eliminate the other two.
 - **Core — `z.function().optional()`** on the `transform` field of `TagRegistry`. Zod-3 idiom Zod 4 redefined; `@typescript-eslint/no-deprecated` flags it; functions don't belong in boundary contracts. Replace with `z.enum(KNOWN_TRANSFORM_NAMES).optional()` and resolve names→functions inside the registry builder.
 - **Core — `PackageConfigSchema = PackageSchema.extend({...})`** — Zod 4 `.extend` silently drops strict mode.
 - **Projection — strictness-loss chain `pattern-summary.ts` (`.omit()`) → `pattern-detail.ts` (`.extend()`) → `supporting.ts` (`.omit().extend()`)** — compounded loss on the most-consumed fragment (`PatternDetailSchema`).
@@ -80,8 +82,9 @@ These are not "best practices" — they are the gates that turn each class into 
 **Breaking-change posture:** Strictifying schemas is a behavioral break for consumers who pass extra fields. Wanted.
 
 **Definition of done:**
+
 - Family-wide grep finds zero `z\.object\(` in `src/` for cross-package or trust-boundary contracts. (Internal helpers may use `z.object` if they aren't crossing module boundaries — but default to strict.)
-- Every `.extend()`/`.omit()`/`.pick()`/`.partial()`/`.required()` chain either ends in `.strict()` *or* is replaced with `z.strictObject({ ...Base.shape, ...newFields })` spread.
+- Every `.extend()`/`.omit()`/`.pick()`/`.partial()`/`.required()` chain either ends in `.strict()` _or_ is replaced with `z.strictObject({ ...Base.shape, ...newFields })` spread.
 - Workspace audit script (extension of projection's `options-schema-barrel-audit.mjs`) runs in CI and fails on strictness-loss chains.
 - Zero hand-written interfaces shadowing Zod schemas. Every cross-package type derives via `z.infer`.
 - `TagRegistry`/`RoleDefinition`/`MetadataTagDefinition` exist exactly once (schema-derived).
@@ -106,11 +109,13 @@ These are not "best practices" — they are the gates that turn each class into 
 - **Cli — `parseSchemaValue`** swallows `BoundaryParseError.cause`, breaking the diagnostic chain.
 
 **Reference shapes the family already has** (don't reinvent — copy):
+
 - `architect-cli/src/cli/pattern-graph-cli-commands.ts` — `parseCommandInput` is the family reference for `parseAtBoundary` with `cause` preserved.
 - `architect-projection` `_shared/parse-and-project.internal.ts` — universal trust-boundary wrapper for projection entrypoints.
 - `architect-mcp` — 1 universal `parseAtBoundary` site at the MCP request boundary.
 
 **Definition of done:**
+
 - Every external input boundary across the family parses through `parseAtBoundary` (or `parseAndProject` for projection-shaped entrypoints).
 - Zero `as X` casts on values coming out of any boundary (git captures, file reads, argv, map lookups, MCP request payloads).
 - No raw `ZodError` ever leaves a package boundary — `BoundaryParseError` with preserved `cause` is the only shape consumers see.
@@ -119,15 +124,17 @@ These are not "best practices" — they are the gates that turn each class into 
 
 ---
 
-## Class D — FSM trust-boundary collapse *(highest-leverage single edit in the family)*
+## Class D — FSM trust-boundary collapse _(highest-leverage single edit in the family)_
 
 **Pattern.** The FSM defining the spec lifecycle (`idea → candidate → plan → design → executable → completed → archived`) is implemented in `architect-core/src/validation/fsm/`, consumed on the production path by `architect-guard/src/lint/process-guard/decider.ts:300`, and tested **zero times in either package**. Both packages defer testing to "the other side." A `process-guard-rules.feature` even cites a "phase-state-machine feature suite" that doesn't exist.
 
 **Both packages cast strings to `ProcessStatusValue` at the boundary:**
+
 - Core's `validateTransition` casts after `isValidStatusValue` already rejected — the type guard lies.
-- Guard adds 3 fresh casts on raw regex captures from git diff text *before* feeding core's already-lying validator.
+- Guard adds 3 fresh casts on raw regex captures from git diff text _before_ feeding core's already-lying validator.
 
 **The one-line cross-package unblock:** `isValidStatusValue` already exists at `architect-core/src/validation/fsm/validator.ts` as a non-exported local; `ProcessStatusSchema` exists at `domain-enums.ts`. Adding `export` + 2 re-export lines lets:
+
 - Guard parse boundary captures via `parseAtBoundary(StatusValueSchema, ...)`.
 - Projection drop 3 `Set.has` cast sites.
 - Core drop 3 `as ProcessStatusValue` lines in its own `validateTransition` via a discriminated `TransitionValidationResult` union.
@@ -137,6 +144,7 @@ These are not "best practices" — they are the gates that turn each class into 
 **Why this matters.** The FSM is a contract between two packages with zero shared test surface. The trust-boundary collapse turns a contract into a coincidence.
 
 **Definition of done:**
+
 - `isValidStatusValue` exported from core; `StatusValueSchema` re-exported.
 - `TransitionValidationResult` is a discriminated union; consumers narrow via the discriminator, not via casts.
 - Zero casts on FSM status values across core + guard + projection.
@@ -145,7 +153,7 @@ These are not "best practices" — they are the gates that turn each class into 
 
 ---
 
-## Class E — Annotation correctness *(PatternGraph honesty)*
+## Class E — Annotation correctness _(PatternGraph honesty)_
 
 **Pattern.** "Architect State is Code" depends on `@architect-pattern` annotations on production files being correct and present. Today the annotation rate ranges from 15% (cli) to 60% (projection) to 0% in some core subsystems. Worse, boilerplate "When to Use" text generated during a documentation pass is wrong for many files.
 
@@ -162,6 +170,7 @@ These are not "best practices" — they are the gates that turn each class into 
 - **Doc-genertion lies:** projection's README claims renderers are codec-agnostic; `render-markdown.ts` imports `summarizeTaxonomyDigest` and 10 fragment-aware normalizers, contradicting both the README and ADR-005.
 
 **Definition of done:**
+
 - An ESLint or workspace audit rule (extend `jsdoc-boilerplate-audit.mjs`) flags every exported symbol without `@architect-pattern` or an explicit exemption.
 - Every annotated module's "When to Use" text matches the file's actual concern (no boilerplate carryover).
 - Bounded-context annotations match the module's actual consumer set.
@@ -187,6 +196,7 @@ These are not "best practices" — they are the gates that turn each class into 
 **Tarball multiplier (one line + this class):** the family base tsconfig sets `sourceMap: true, declarationMap: true`. Disabling cuts each publishable package's tarball by ~46–50% — `architect-core` 426 → ~170 files, projection 582 → ~290 files, guard 583 KB → ~315 KB, cli 52 KB → ~37 KB. The dead-code deletion compounds on top.
 
 **Definition of done:**
+
 - Zero `export *` in any `src/index.ts` across the family. Every barrel is explicit named exports.
 - A workspace post-build audit fails when a publicly-exported symbol has zero workspace consumers and is not marked as a public API anchor in a manifest.
 - `sourceMap` + `declarationMap` off family-wide in `tsconfig.architect-base.json`.
@@ -197,13 +207,13 @@ These are not "best practices" — they are the gates that turn each class into 
 
 ---
 
-## Class G — Single-source rule violations *(duplication that has already drifted)*
+## Class G — Single-source rule violations _(duplication that has already drifted)_
 
-**Pattern.** When the same algorithm is implemented twice, one is wrong by definition. The family has multiple cases where the duplicates have *already* drifted — silently producing different outputs for the same input.
+**Pattern.** When the same algorithm is implemented twice, one is wrong by definition. The family has multiple cases where the duplicates have _already_ drifted — silently producing different outputs for the same input.
 
 **Manifestations:**
 
-- **Core — `buildRoleLookup` exists 4 times.** Two of the copies are called *inside per-tag loops*, rebuilding the map on every tag — a real allocation bug masquerading as duplication.
+- **Core — `buildRoleLookup` exists 4 times.** Two of the copies are called _inside per-tag loops_, rebuilding the map on every tag — a real allocation bug masquerading as duplication.
 - **Core — two parallel `@architect-*` tag parsers** (JSDoc + Gherkin AST) implementing the same format dispatch. Should share a single `applyTagValue` applier under `taxonomy/tag-parsing.ts`; both parsers become tokenizers + applier-call.
 - **Core — sync/async near-clone in `gherkin-extractor.ts`** (~135 LOC duplicated; already drifted on `unrecognizedEnums`). Keep async only; the sync wrapper exists purely for an unnecessary `existsSync`.
 - **Core — `ExtractedPatternSchema` parsed three times** along the pipeline.
@@ -221,6 +231,7 @@ These are not "best practices" — they are the gates that turn each class into 
 **Why this matters.** Every drift here is a silent contract break — same input, different outputs, depending on which call site the consumer reached. The slug parity defect is the bite-waiting-to-happen.
 
 **Definition of done:**
+
 - Each duplicated helper has exactly one canonical implementation.
 - Every caller imports from the canonical location (no in-package re-implementation, no copy-paste justified by "this one is slightly different").
 - `madge --circular` clean (some consolidations require dependency-direction fixes — handle as part of Class H).
@@ -238,15 +249,16 @@ These are not "best practices" — they are the gates that turn each class into 
 - **Core hosts projection concerns** — `src/package/` directory ships `ProjectionError` (a projection concept), and `package/` name collides with `package.json` semantics. Move to projection; rename core's directory to `workspace-package/`.
 - **Core hardcodes dogfood layer hints** — `layer-inference.ts` matches `/orders/` and `/inventory/` as "domain" cues. Pure dogfood leak; delete.
 - **Core hardcodes its own workspace root** — `self-hosting.ts` runs `createArchitect()` at module load. Class A overlaps.
-- **Guard `git/` module** — annotated `@architect-bounded-context:generator`; actually consumed only by `process-guard/detect-changes.ts` *inside* guard. Phase 1 said "promote to core because consumed by core"; Phase 2 verified that's false. Demote to `src/lint/process-guard/_git/`.
+- **Guard `git/` module** — annotated `@architect-bounded-context:generator`; actually consumed only by `process-guard/detect-changes.ts` _inside_ guard. Phase 1 said "promote to core because consumed by core"; Phase 2 verified that's false. Demote to `src/lint/process-guard/_git/`.
 - **Guard — `validateCompletionMetadata` deletion in core creates a DoD gap in guard.** Either preserve the logic in guard's DoD checker before core deletes, or accept the feature loss explicitly.
 - **Guard — `getDeliverableWorkflowPatterns`** belongs in core's `PatternGraphAPI`.
 - **Projection — `disclosure/spec.ts` imports `ProjectionFilterSchema` from `projections/_shared/filter.ts`** — disclosure is a layer-0 primitive that should not drag application code.
 - **Projection — `render-markdown.ts` imports `summarizeTaxonomyDigest` from the fragments runtime layer** — ADR-005 Rule 5 violation. The README claim "renderers operate on Fragments only" is contradicted by the code.
-- **Projection — `summarizeTaxonomyDigest`** is a runtime helper inside the `fragments/` *contracts* layer; move to `projections/`, delete from fragments.
+- **Projection — `summarizeTaxonomyDigest`** is a runtime helper inside the `fragments/` _contracts_ layer; move to `projections/`, delete from fragments.
 - **Projection — 10 fragment-kind-specific normalizers inside the renderer** — codec-agnostic violation. Move per-fragment composition out of the renderer or update ADR-005 to acknowledge fragment-aware renderers.
 
 **Definition of done:**
+
 - Every module sits in the layer that owns its concern; the package dependency graph (`core ← projection`, `core ← guard ← cli`, `core, projection ← mcp`) is the only allowed shape.
 - No cross-layer imports through internal paths — only through public contracts.
 - README claims about layer/codec posture match the code (or the code matches the README and ADR-005 is updated).
@@ -269,6 +281,7 @@ These are not "best practices" — they are the gates that turn each class into 
 - **Guard — `tier-a-baseline.ts` 1,138 LOC** of generated content (Class A overlap).
 
 **Definition of done:**
+
 - Each file ≤ ~500 LOC, or an ADR explicitly justifies the size.
 - Concerns separated by directory; one canonical entry-point per directory.
 - Coverage threshold met for every helper after split.
@@ -289,6 +302,7 @@ These are not "best practices" — they are the gates that turn each class into 
 - **Cli + mcp — `runtime-bridge.js:6` Windows-breaking bug.** Two copies; `new URL(import.meta.url).pathname` returns paths with a leading `/` on Windows drive paths. Replace with `fileURLToPath(new URL('.', import.meta.url))`; consolidate to one canonical TS file under a workspace template.
 
 **Definition of done:**
+
 - Every CLI bin parses argv through a Zod argv schema + `parseAtBoundary`.
 - Zero `as` casts in `execute()` flag-narrowing.
 - One `runCliEntrypoint(main)` helper across the family.
@@ -297,7 +311,7 @@ These are not "best practices" — they are the gates that turn each class into 
 
 ---
 
-## Class K — Test coverage and quality gates *(automation that exists but isn't wired)*
+## Class K — Test coverage and quality gates _(automation that exists but isn't wired)_
 
 **Pattern.** Several quality gates already exist as code, just unwired. Several load-bearing modules have zero tests. The gap is **automation**, not "we need to write a test framework."
 
@@ -332,6 +346,7 @@ These are not "best practices" — they are the gates that turn each class into 
 - **Test fixtures using `as unknown as ExtractedPattern`** instead of `ExtractedPatternSchema.parse`.
 
 **Definition of done:**
+
 - `.github/workflows/ci.yml` — pnpm install + lint + typecheck + test on PR/push, matrix `node: [20, 22]`.
 - `.github/workflows/publish.yml` — tag-push trigger with OIDC provenance for `npm publish`.
 - Projection perf gate runs in CI; baseline updated explicitly via committed PR, not silently.
@@ -361,6 +376,7 @@ These are not "best practices" — they are the gates that turn each class into 
 - **`ddd-inventory.md` missing 9 fragment kinds** present in `FragmentSchema`.
 
 **Definition of done:**
+
 - Every publishable package has a README that compiles its own examples.
 - Every cited symbol in every doc actually exists in the public API at the cited path.
 - Every claim about runtime behavior (perf gate, codec-agnostic renderers, tool counts, FSM enforcement decision) matches the code, or the code matches the claim.
@@ -391,6 +407,7 @@ These are not "best practices" — they are the gates that turn each class into 
 - **Custom audit scripts are not workspace-promoted:** projection's `options-schema-barrel-audit.mjs` + `jsdoc-boilerplate-audit.mjs` (only 2 mechanical surface audits in the family) and guard's `packed-dangling-baseline-smoke.mjs` + cli's `tests/support/run-cli.ts` (the only post-pack contract test infrastructure) live in single packages.
 
 **Definition of done:**
+
 - `.github/workflows/ci.yml` — pnpm + lint + typecheck + test on PR/push, matrix `node: [20, 22]`, pnpm-store cache.
 - `.github/workflows/publish.yml` — tag-push trigger; OIDC provenance attestation; `changeset publish` orchestration. Provenance flag becomes real.
 - Single normalization PR aligns `prepack`/`lint`/`typecheck`/`test`/`module`/`eslint`/`vitest.include`/`node:` prefix across all 5 publishable packages.
@@ -400,7 +417,7 @@ These are not "best practices" — they are the gates that turn each class into 
 
 ---
 
-## Class N — Operational correctness for long-running processes *(MCP-specific)*
+## Class N — Operational correctness for long-running processes _(MCP-specific)_
 
 **Pattern.** MCP is the family's only long-running consumer. Several patterns that are fine for one-shot CLI invocations are real correctness defects when the process lives for hours and serves many requests. These were measured during the MCP review and need to be addressed before the family advertises MCP stability.
 
@@ -414,6 +431,7 @@ These are not "best practices" — they are the gates that turn each class into 
 - **`Reflect.set(globalThis.console, 'log', ...)` monkey-patch** in `server.ts` — a band-aid for upstream `console.log` calls in src that the family `no-console-log` ESLint rule fixes at the root.
 
 **Definition of done:**
+
 - `process.chdir` wrapped in a SIGINT-safe try/finally that always restores cwd.
 - Graceful shutdown awaits in-flight tool calls (Promise.allSettled with a timeout).
 - `awaitWriteFinish: { stabilityThreshold: 200 }` set on chokidar.
@@ -438,6 +456,7 @@ These are not "best practices" — they are the gates that turn each class into 
 **Why this matters.** Projection has the family's only enforced perf gate (`baseline × 1.5`, 26 metrics). Once Class K wires it, the core fix here translates directly into headroom on the gate. The cli/mcp consumers benefit too — MCP especially, because it rebuilds the projection context 19× per non-cached tool call (Class N).
 
 **Definition of done:**
+
 - The graph + tag registry are frozen once at API construction (`deepFreeze`); no per-read cloning.
 - `filterPatterns` no-op fast path on no-filter.
 - Hot-path duplicates consolidated (Class G).
@@ -445,7 +464,7 @@ These are not "best practices" — they are the gates that turn each class into 
 
 ---
 
-## Cross-cutting systematic actions *(do these once, family-wide)*
+## Cross-cutting systematic actions _(do these once, family-wide)_
 
 Several "do this once across all packages" moves close many findings simultaneously. Subsequent planning sessions should treat each of these as a single workstream:
 
@@ -462,7 +481,7 @@ Several "do this once across all packages" moves close many findings simultaneou
 
 ---
 
-## Preserve list *(don't break)*
+## Preserve list _(don't break)_
 
 The reviews identified ~20 patterns as "family reference quality" — explicitly preserve these during cleanup. They are the templates the rest of the family should standardize on:
 
@@ -489,7 +508,7 @@ The reviews identified ~20 patterns as "family reference quality" — explicitly
 
 ---
 
-## Suggested high-level ordering *(not a plan — a sequencing rationale)*
+## Suggested high-level ordering _(not a plan — a sequencing rationale)_
 
 This is sequencing logic only. A subsequent planning session will turn this into PRs.
 
@@ -497,7 +516,7 @@ This is sequencing logic only. A subsequent planning session will turn this into
 - **M2 — Family normalization sweep** (Class M scripts + Class F barrel curation + Class A bulk-deletion of the dead surface revealed by M1). The big "delete dead weight" PR.
 - **M3 — Contract integrity** (Class B + Class C + Class D). Doctrine compliance at the boundaries. The audit scripts from M2 keep this from re-rotting.
 - **M4 — Layering corrections** (Class H + Class G consolidations + Class I splits). The structural reshape that the deletions in M1/M2 made possible.
-- **M5 — Documentation truth** (Class L + Class E). After M3/M4 the code matches what the docs *should* say; now align the docs.
+- **M5 — Documentation truth** (Class L + Class E). After M3/M4 the code matches what the docs _should_ say; now align the docs.
 - **M6 — Coverage backfill + perf gate enforcement** (Class K + Class O re-baseline). Lock in the cleanup so it can't silently regress.
 - **M7 — Operational hardening for MCP** (Class N). Specifically gates MCP's stability label.
 - **M8 — CI/CD activation** (Class M workflows). With the audit scripts and ESLint rules from M2 in place, CI is enforcement, not discovery.
@@ -506,7 +525,7 @@ The master report's release-readiness order — **MCP first, meta with it, proje
 
 ---
 
-## Overall definition of done *(what "ready for 2.0 stable" means)*
+## Overall definition of done _(what "ready for 2.0 stable" means)_
 
 The mandate is complete when the following are simultaneously true:
 

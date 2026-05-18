@@ -1,6 +1,7 @@
 # Feature: Agent Skills System
 
 ## Status
+
 ✅ COMPLETE — Nine architect skills (two kernels + seven session skills) live under `.agents/skills/`; Claude Code reads them via `.claude/skills/` symlinks; `_shared/` doctrine kernel is loaded transparently.
 
 ## Overview
@@ -23,7 +24,7 @@ There are **nine** skills, organized into two tiers:
 
 The **`_shared/` directory** holds the harness-agnostic doctrine kernel: four-tier ladder, FSM transitions, value transfer, annotation ownership, canonical references, multi-session coordination, the rule-block template, session preamble, and spec-pattern relationships. Skills reference these files by relative path; loading the router surfaces the pointers without inlining the bodies.
 
-**Operational invariant (from constitution §VIII):** the kernel pair **must** be loaded before any architect-scoped `Read` / `Glob` / `Grep`, before invoking any other architect-* session skill, and **before calling `pnpm architect:query` or any `architect_*` MCP tool**. The Data API (CLI / MCP) is the canonical source of truth about patterns, specs, FSM state, and executable features — file scanning is not.
+**Operational invariant (from constitution §VIII):** the kernel pair **must** be loaded before any architect-scoped `Read` / `Glob` / `Grep`, before invoking any other architect-_ session skill, and \*\*before calling `pnpm architect:query` or any `architect\__` MCP tool\*\*. The Data API (CLI / MCP) is the canonical source of truth about patterns, specs, FSM state, and executable features — file scanning is not.
 
 ## User Stories
 
@@ -60,6 +61,7 @@ The **`_shared/` directory** holds the harness-agnostic doctrine kernel: four-ti
 ## Implementation Status
 
 **Completed:**
+
 - ✅ Nine skills under `.agents/skills/` (two kernels + seven session skills).
 - ✅ `.claude/skills/` symlink projection wired for Claude Code.
 - ✅ `_shared/` doctrine kernel referenced by relative path from skills.

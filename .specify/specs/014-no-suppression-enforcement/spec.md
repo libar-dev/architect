@@ -1,6 +1,7 @@
 # Feature: No-Suppression / No-BC Enforcement
 
 ## Status
+
 ✅ COMPLETE — Custom ESLint rule + guard script reject every form of suppression and backward-compatibility shim in `packages/*/src/`; doctrine documented in AGENTS.md §"No-BC".
 
 ## Overview
@@ -47,11 +48,12 @@ The rule scope is **production code only**: `packages/*/src/**`. Test files, des
 ## Implementation Status
 
 **Completed:**
+
 - ✅ Custom ESLint rule registered in `eslint.config.mjs`.
 - ✅ Guard script at `scripts/guard-no-suppressions.mjs`.
 - ✅ Doctrine documented in AGENTS.md §"Engineering doctrine" → "No-BC".
 - ✅ Wired as a quality gate in the constitution.
-- ✅ Re-enforced at every PR via the `tech-debt-analysis.md` doctrinal posture: *"the code base 'deletes don't defers.'"*
+- ✅ Re-enforced at every PR via the `tech-debt-analysis.md` doctrinal posture: _"the code base 'deletes don't defers.'"_
 
 ## Dependencies
 
@@ -63,6 +65,6 @@ The rule scope is **production code only**: `packages/*/src/**`. Test files, des
 
 - AGENTS.md §"No-BC".
 - Constitution §III.A (No-BC) — this spec is the runtime realization of that section.
-- `technical-debt-analysis.md` doctrine note: traditional placeholder/TODO smells are deliberately *absent* by policy.
+- `technical-debt-analysis.md` doctrine note: traditional placeholder/TODO smells are deliberately _absent_ by policy.
 - `functional-specification.md` FR-014, NFR-003.
 - Spec 013 (`pre-commit-guard`) — the process-guard runs alongside this in pre-commit but addresses a different surface (FSM, not source-level suppression).

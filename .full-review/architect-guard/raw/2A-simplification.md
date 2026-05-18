@@ -23,13 +23,19 @@ Five highest-leverage moves account for ~1,400 LOC of deletions / contract-stric
 ```ts
 // src/lint/tier-a-baseline.ts:19 — 1,022 lines of inlined data
 export const TIER_A_LINT_BASELINE: readonly TierABaselineEntry[] = [
-  { path: 'packages/architect-cli/src/cli/error-handler.ts',
-    rule: 'missing-pattern-name', line: 3,
-    message: 'Pattern missing explicit name. Add @architect-pattern YourPatternName' },
+  {
+    path: 'packages/architect-cli/src/cli/error-handler.ts',
+    rule: 'missing-pattern-name',
+    line: 3,
+    message: 'Pattern missing explicit name. Add @architect-pattern YourPatternName',
+  },
   // … 1,021 more entries hardcoded …
 ] as const;
 
-export function applyTierABaseline(summary: LintSummary, options: TierABaselineFilterOptions): LintSummary {
+export function applyTierABaseline(
+  summary: LintSummary,
+  options: TierABaselineFilterOptions,
+): LintSummary {
   if (TIER_A_LINT_BASELINE.length === 0) return summary;
   // …
 }
@@ -81,8 +87,7 @@ export interface TierABaselineFilterOptions {
 }
 
 const DEFAULT_BASELINE_FILE_URL = new URL('./tier-a-baseline.json', import.meta.url);
-export const TIER_A_BASELINE_SOURCE_PATH =
-  'packages/architect-guard/src/lint/tier-a-baseline.json';
+export const TIER_A_BASELINE_SOURCE_PATH = 'packages/architect-guard/src/lint/tier-a-baseline.json';
 
 export async function readTierABaseline(
   baselinePath?: string,
@@ -285,7 +290,9 @@ Both findings share one missing primitive: **core needs to export `isValidProces
 
 ```ts
 // Before: src/lint/process-guard/detect-changes.ts:414, 440, 452
-if (PROCESS_STATUS_VALUES.includes(toStatus as ProcessStatusValue)) { /* … */ }
+if (PROCESS_STATUS_VALUES.includes(toStatus as ProcessStatusValue)) {
+  /* … */
+}
 // …
 const toStatus = toStatusRaw as ProcessStatusValue;
 // …
@@ -297,7 +304,9 @@ fromStatus = fromStatusRaw ? (fromStatusRaw as ProcessStatusValue) : DEFAULT_STA
 import { isValidProcessStatus } from '@libar-dev/architect-core';
 
 // Line 414 — type guard narrows automatically:
-if (isValidProcessStatus(toStatus)) { /* toStatus is ProcessStatusValue */ }
+if (isValidProcessStatus(toStatus)) {
+  /* toStatus is ProcessStatusValue */
+}
 
 // Line 440 — early-return on parse failure (already pre-filtered upstream, but explicit narrowing):
 if (!isValidProcessStatus(toStatusRaw)) continue;
@@ -374,14 +383,14 @@ return parseAtBoundary(DanglingBaselineSchema, JSON.parse(content) as unknown)
 
 ### Consumer audit (workspace grep)
 
-| Caller | Function | Notes |
-|--------|----------|-------|
-| `architect-guard/validate-patterns.ts:753` | `loadConfig` | Uses `isDefault` + `path` + `instance` |
-| `architect-guard/lint-patterns.ts:218` | `loadConfig` | Same fields |
-| `architect-guard/lint-process.ts:264` | `loadProjectConfig` | Uses `instance.registry` + `project.sources` |
-| `architect-cli/generate-docs.ts:202` | `loadProjectConfig` | |
-| `architect-cli/pattern-graph-cli-runtime.ts:38, 158` | `loadProjectConfig` | |
-| `architect-mcp/pipeline-session.ts:180` | `loadProjectConfig` | |
+| Caller                                               | Function            | Notes                                        |
+| ---------------------------------------------------- | ------------------- | -------------------------------------------- |
+| `architect-guard/validate-patterns.ts:753`           | `loadConfig`        | Uses `isDefault` + `path` + `instance`       |
+| `architect-guard/lint-patterns.ts:218`               | `loadConfig`        | Same fields                                  |
+| `architect-guard/lint-process.ts:264`                | `loadProjectConfig` | Uses `instance.registry` + `project.sources` |
+| `architect-cli/generate-docs.ts:202`                 | `loadProjectConfig` |                                              |
+| `architect-cli/pattern-graph-cli-runtime.ts:38, 158` | `loadProjectConfig` |                                              |
+| `architect-mcp/pipeline-session.ts:180`              | `loadProjectConfig` |                                              |
 
 **4 of 6 callers use `loadProjectConfig` already.** `loadConfig`'s only added value is the boolean `found` field, which `validate-patterns.ts:759` immediately destructures as `!isDefault && configPath`. Redundant.
 
@@ -417,15 +426,15 @@ const configSource = !isDefault && configPath ? configPath : '(built-in default 
 
 Six references in source + two in `.feature` files cite "PDR-005 FSM" — no `architect/decisions/PDR-005-*.md` exists. PDR-001 governs `scope-validate`/`handoff` in `architect-cli`, not guard.
 
-| File | Line | Text |
-|------|------|------|
-| `src/lint/process-guard/decider.ts` | 33 | `* 2. **Status Transition** - Transitions must follow PDR-005 FSM` |
-| `src/lint/process-guard/decider.ts` | 58 | `* **Invariant:** Status transitions must follow the PDR-005 FSM path.` |
-| `src/lint/process-guard/decider.ts` | 283 | `* Uses FSM validation from phase-state-machine module.` |
-| `src/lint/process-guard/index.ts` | 14 | `* - Status transitions (must follow PDR-005 FSM)` |
-| `src/lint/process-guard/types.ts` | 29 | `* - Protection levels from PDR-005 FSM` |
-| `src/cli/lint-process.ts` | 170 | `error    invalid-status-transition  Status transition must follow PDR-005 FSM` |
-| `tests/features/process-guard-rules.feature` | 38, 49 | `phase-state-machine` feature suite citation |
+| File                                         | Line   | Text                                                                            |
+| -------------------------------------------- | ------ | ------------------------------------------------------------------------------- |
+| `src/lint/process-guard/decider.ts`          | 33     | `* 2. **Status Transition** - Transitions must follow PDR-005 FSM`              |
+| `src/lint/process-guard/decider.ts`          | 58     | `* **Invariant:** Status transitions must follow the PDR-005 FSM path.`         |
+| `src/lint/process-guard/decider.ts`          | 283    | `* Uses FSM validation from phase-state-machine module.`                        |
+| `src/lint/process-guard/index.ts`            | 14     | `* - Status transitions (must follow PDR-005 FSM)`                              |
+| `src/lint/process-guard/types.ts`            | 29     | `* - Protection levels from PDR-005 FSM`                                        |
+| `src/cli/lint-process.ts`                    | 170    | `error    invalid-status-transition  Status transition must follow PDR-005 FSM` |
+| `tests/features/process-guard-rules.feature` | 38, 49 | `phase-state-machine` feature suite citation                                    |
 
 **Recommendation:** Author `architect/decisions/PDR-005-process-status-fsm.md` documenting the FSM transition table (already canonically defined in `architect-core/src/validation/fsm/transitions.ts`). The FSM is a real decision worth recording. Once authored, replace the user-facing line 170 string with `"must follow @architect-decision PDR005ProcessStatusFSM"` and leave the JSDoc references as-is — they become valid.
 
@@ -441,16 +450,16 @@ Six references in source + two in `.feature` files cite "PDR-005 FSM" — no `ar
 
 `architect-cli` is the only `architect-guard` consumer in the workspace. It imports **8 named symbols total**:
 
-| Symbol | Source |
-|--------|--------|
-| `runLintPatternsCli` | `lint-patterns.ts` |
-| `runLintProcessCli` | `lint-process.ts` |
-| `runLintStepsCli` | `lint-steps.ts` |
-| `runValidatePatternsCli` | `validate-patterns.ts` |
-| `compareDanglingBaseline` | `dangling-baseline.ts` |
-| `writeDanglingBaseline` | `dangling-baseline.ts` |
-| `DANGLING_BASELINE_SOURCE_PATH` | `dangling-baseline.ts` |
-| `runProcessGuard` | (cited in `architect/README.md:26`) |
+| Symbol                          | Source                              |
+| ------------------------------- | ----------------------------------- |
+| `runLintPatternsCli`            | `lint-patterns.ts`                  |
+| `runLintProcessCli`             | `lint-process.ts`                   |
+| `runLintStepsCli`               | `lint-steps.ts`                     |
+| `runValidatePatternsCli`        | `validate-patterns.ts`              |
+| `compareDanglingBaseline`       | `dangling-baseline.ts`              |
+| `writeDanglingBaseline`         | `dangling-baseline.ts`              |
+| `DANGLING_BASELINE_SOURCE_PATH` | `dangling-baseline.ts`              |
+| `runProcessGuard`               | (cited in `architect/README.md:26`) |
 
 ### After
 
@@ -486,9 +495,15 @@ export {
 // Process guard API:
 export { runProcessGuard } from './lint/process-guard/index.js';
 export type {
-  ProcessState, FileState, SessionState,
-  ChangeDetection, StatusTransition, DeliverableChange,
-  ValidationResult, ProcessViolation, ProcessGuardRule,
+  ProcessState,
+  FileState,
+  SessionState,
+  ChangeDetection,
+  StatusTransition,
+  DeliverableChange,
+  ValidationResult,
+  ProcessViolation,
+  ProcessGuardRule,
 } from './lint/process-guard/types.js';
 ```
 
@@ -543,11 +558,15 @@ Guard-side callers (`validate-patterns.ts:520`, `dod-validator.ts:193`) consume 
 ```ts
 // Before:
 import { getDeliverableWorkflowPatterns } from '../validation/dod-validator.js';
-for (const p of getDeliverableWorkflowPatterns(dataset)) { /* … */ }
+for (const p of getDeliverableWorkflowPatterns(dataset)) {
+  /* … */
+}
 
 // After (core's API already used elsewhere):
 const api = createPatternGraphAPI(dataset);
-for (const p of api.getDeliverableWorkflowPatterns()) { /* … */ }
+for (const p of api.getDeliverableWorkflowPatterns()) {
+  /* … */
+}
 ```
 
 Delete the guard-side `getDeliverableWorkflowPatterns` (lines 154–166). One more piece of pattern-graph traversal back where it belongs.
@@ -556,14 +575,14 @@ Delete the guard-side `getDeliverableWorkflowPatterns` (lines 154–166). One mo
 
 ## Medium-leverage recipes (table)
 
-| ID | Recipe | Files |
-|----|--------|-------|
-| H-GUARD-12 | Replace `console.warn`/`console.error` with the `Result<T, GuardError>` pattern that `engine.ts` already exposes; the 4 CLI files use both styles inconsistently | `cli/*.ts` |
-| H-GUARD-14 | Define one shared `LintDiagnostic` type in `src/lint/types.ts` (currently `lint/`, `lint/steps/`, `lint/process-guard/`, `validation/` each have their own violation shape — 4 near-isomorphic interfaces) | `src/lint/*/types.ts`, `src/validation/types.ts` |
-| H-GUARD-6 | `dangling-baseline.ts:106-117` `writeDanglingBaseline` dual-write — only write to `SOURCE_BASELINE_RESOURCE_PATH` and let `prepack` copy. Eliminate `resolveWritableBaselinePaths`; consumer-side write becomes single-target | `lint/dangling-baseline.ts:48-58` |
-| M-SIMP-GUARD-1 | `hasAcceptanceCriteria` (dod-validator.ts:56) + `extractAcceptanceCriteriaScenarios` (line 72) duplicate the `semanticMatch || tagMatch` predicate — extract `isAcceptanceCriteriaScenario(scenario)` once | `validation/dod-validator.ts:56-82` |
-| M-SIMP-GUARD-2 | `validate-patterns.ts:419-574` does name-map building twice (TS→Gherkin at lines 425-434, Gherkin→TS at 498-516) — extract `buildPatternNameMap(patterns)` helper | `cli/validate-patterns.ts` |
-| M-SIMP-GUARD-3 | Replace `parseInt(nextArg, 10) + isNaN` with `Number.parseInt` + `Number.isNaN` family-wide (matches core F4A-M-4) | `cli/*.ts` (12 sites) |
+| ID             | Recipe                                                                                                                                                                                                                        | Files                                            |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ | ------------------------------------------------------------------------- | ----------------------------------- |
+| H-GUARD-12     | Replace `console.warn`/`console.error` with the `Result<T, GuardError>` pattern that `engine.ts` already exposes; the 4 CLI files use both styles inconsistently                                                              | `cli/*.ts`                                       |
+| H-GUARD-14     | Define one shared `LintDiagnostic` type in `src/lint/types.ts` (currently `lint/`, `lint/steps/`, `lint/process-guard/`, `validation/` each have their own violation shape — 4 near-isomorphic interfaces)                    | `src/lint/*/types.ts`, `src/validation/types.ts` |
+| H-GUARD-6      | `dangling-baseline.ts:106-117` `writeDanglingBaseline` dual-write — only write to `SOURCE_BASELINE_RESOURCE_PATH` and let `prepack` copy. Eliminate `resolveWritableBaselinePaths`; consumer-side write becomes single-target | `lint/dangling-baseline.ts:48-58`                |
+| M-SIMP-GUARD-1 | `hasAcceptanceCriteria` (dod-validator.ts:56) + `extractAcceptanceCriteriaScenarios` (line 72) duplicate the `semanticMatch                                                                                                   |                                                  | tagMatch`predicate — extract`isAcceptanceCriteriaScenario(scenario)` once | `validation/dod-validator.ts:56-82` |
+| M-SIMP-GUARD-2 | `validate-patterns.ts:419-574` does name-map building twice (TS→Gherkin at lines 425-434, Gherkin→TS at 498-516) — extract `buildPatternNameMap(patterns)` helper                                                             | `cli/validate-patterns.ts`                       |
+| M-SIMP-GUARD-3 | Replace `parseInt(nextArg, 10) + isNaN` with `Number.parseInt` + `Number.isNaN` family-wide (matches core F4A-M-4)                                                                                                            | `cli/*.ts` (12 sites)                            |
 
 ---
 

@@ -11,20 +11,20 @@
 
 `architect-projection` is **doctrinally cleaner than `architect-core` on every dimension this phase cares about**. Where the core Phase 4A surfaced 9 High-severity language findings (16 `as` casts in tag parsing, `z.function().optional()`, 28 `z.object` sites needing strict-sweep, 3 `void X` expressions, hand-written `PatternGraph` interface drifting from its schema), projection has **none** of the equivalent class:
 
-| Class of breach | Core | Projection | Notes |
-|-----------------|------|------------|-------|
-| `z.object` sites needing strict-sweep | 28 | **0** | 107 `z.strictObject` callsites, zero `z.object`. |
-| `as unknown as` casts in `src/` | 0 | **0** | Both clean. |
-| `void X;` expression-statement suppressions | 3 | **0** | Eight `: void {` are return-type annotations, not suppressions. |
-| `console.*` calls in `src/` | 2 | **0** | Clean. |
-| `from 'fs'` / `from 'path'` legacy imports | mixed | **0** | Zero `node:` *and* zero unprefixed Node imports in `src/` — data-layer purity. |
-| `@ts-ignore` / `@ts-expect-error` / `eslint-disable` | 0 | **0** | Both clean (root rule `architect-local/no-suppression-comments`). |
-| `z.function().optional()` Zod-3 idiom | 1 (F4A-C-2) | **0** | Function contracts don't escape the trust boundary here. |
-| `@typescript-eslint/no-explicit-any: error` violations | 0 | **0** | Both clean. |
-| `Map<string, unknown>` builder + `as X` casts after `.get()` | 16 sites (F4A-H-1) | **0** | The class doesn't exist here. |
-| `[key: string]: unknown` index-signature defeats `noPropertyAccessFromIndexSignature` | yes (F4A-H-2) | **0** | The package has no `Record<string, unknown>` builders propagated through `ReturnType<...>`. |
-| Hand-written interface shadowing a schema | `PatternGraph` (C-CORE-2) | **1** (`ProjectionContext`) | But it's a *context* type, not a wire contract — see L-PROJ-F-2 below. |
-| `z.input<T>` vs `z.output<T>` separation | 1 reference site (`extracted-shape.ts`) | **0** | Projection doesn't use defaults/transforms at the boundary, so the distinction doesn't bite — but adopting `z.input<typeof OptionsSchema>` for the test-fixture builders would tighten safety (L-PROJ-F-1). |
+| Class of breach                                                                       | Core                                    | Projection                  | Notes                                                                                                                                                                                                       |
+| ------------------------------------------------------------------------------------- | --------------------------------------- | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `z.object` sites needing strict-sweep                                                 | 28                                      | **0**                       | 107 `z.strictObject` callsites, zero `z.object`.                                                                                                                                                            |
+| `as unknown as` casts in `src/`                                                       | 0                                       | **0**                       | Both clean.                                                                                                                                                                                                 |
+| `void X;` expression-statement suppressions                                           | 3                                       | **0**                       | Eight `: void {` are return-type annotations, not suppressions.                                                                                                                                             |
+| `console.*` calls in `src/`                                                           | 2                                       | **0**                       | Clean.                                                                                                                                                                                                      |
+| `from 'fs'` / `from 'path'` legacy imports                                            | mixed                                   | **0**                       | Zero `node:` _and_ zero unprefixed Node imports in `src/` — data-layer purity.                                                                                                                              |
+| `@ts-ignore` / `@ts-expect-error` / `eslint-disable`                                  | 0                                       | **0**                       | Both clean (root rule `architect-local/no-suppression-comments`).                                                                                                                                           |
+| `z.function().optional()` Zod-3 idiom                                                 | 1 (F4A-C-2)                             | **0**                       | Function contracts don't escape the trust boundary here.                                                                                                                                                    |
+| `@typescript-eslint/no-explicit-any: error` violations                                | 0                                       | **0**                       | Both clean.                                                                                                                                                                                                 |
+| `Map<string, unknown>` builder + `as X` casts after `.get()`                          | 16 sites (F4A-H-1)                      | **0**                       | The class doesn't exist here.                                                                                                                                                                               |
+| `[key: string]: unknown` index-signature defeats `noPropertyAccessFromIndexSignature` | yes (F4A-H-2)                           | **0**                       | The package has no `Record<string, unknown>` builders propagated through `ReturnType<...>`.                                                                                                                 |
+| Hand-written interface shadowing a schema                                             | `PatternGraph` (C-CORE-2)               | **1** (`ProjectionContext`) | But it's a _context_ type, not a wire contract — see L-PROJ-F-2 below.                                                                                                                                      |
+| `z.input<T>` vs `z.output<T>` separation                                              | 1 reference site (`extracted-shape.ts`) | **0**                       | Projection doesn't use defaults/transforms at the boundary, so the distinction doesn't bite — but adopting `z.input<typeof OptionsSchema>` for the test-fixture builders would tighten safety (L-PROJ-F-1). |
 
 The Phase 4 angle for this package is therefore **inverted**: not "what should projection adopt from core?" but **"what should the rest of the family adopt from projection?"**. Sections 5 and 6 catalog the family-reference patterns and one (and only one) Zod 4 wrinkle that's still open.
 
@@ -49,11 +49,11 @@ The `as keyof typeof VALID_TRANSITIONS` cast at `session-context.internal.ts:264
 
 All three of Phase 1's Criticals are reconfirmed from the language-framework lens. **No new C0 items from 4A.**
 
-| ID | Phase 1 ref | Phase 4A angle |
-|----|-------------|----------------|
-| C-PROJ-1 | Phase 1 C-PROJ-1 | Zod 4 `.extend()` silently drops strict mode. **Section 3.1** explains why (Zod 4's `ZodObject._def.catchall` propagation rule changed in v4 internals) and gives the typed regression test that would catch it. |
-| C-PROJ-2 | Phase 1 C-PROJ-2 | Outlier's raw `ZodError` throw is a TS-surface defect on top of the boundary-uniformity defect — see M-PROJ-F-2 above. |
-| C-PROJ-3 | Phase 1 C-PROJ-3 + Phase 2 Cleanup-C-PROJ-1 | CI/perf wire-up — addressed in 4B; mentioned here only because the regression Phase 2B observed (`project.avgMs = 2.05 ms`) is downstream of language-shape issues like `filterPatterns` defensive copy. |
+| ID       | Phase 1 ref                                 | Phase 4A angle                                                                                                                                                                                                   |
+| -------- | ------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| C-PROJ-1 | Phase 1 C-PROJ-1                            | Zod 4 `.extend()` silently drops strict mode. **Section 3.1** explains why (Zod 4's `ZodObject._def.catchall` propagation rule changed in v4 internals) and gives the typed regression test that would catch it. |
+| C-PROJ-2 | Phase 1 C-PROJ-2                            | Outlier's raw `ZodError` throw is a TS-surface defect on top of the boundary-uniformity defect — see M-PROJ-F-2 above.                                                                                           |
+| C-PROJ-3 | Phase 1 C-PROJ-3 + Phase 2 Cleanup-C-PROJ-1 | CI/perf wire-up — addressed in 4B; mentioned here only because the regression Phase 2B observed (`project.avgMs = 2.05 ms`) is downstream of language-shape issues like `filterPatterns` defensive copy.         |
 
 ### High (P1) — TS-specific
 
@@ -63,27 +63,27 @@ All three of Phase 1's Criticals are reconfirmed from the language-framework len
 
 ### Medium (P2) — TS-specific
 
-| ID | Location | Issue |
-|----|----------|-------|
-| M-PROJ-F-1 | `_shared/parse-and-project.internal.ts:22-27` | `schema: z.ZodType<Options>` doesn't constrain to a strict object. Phase 2 M-PROJ-9 has the runtime assertion recipe; type-level variant in Section 3.3. |
-| M-PROJ-F-2 | `pattern-relations/open-question-list.ts:34-39` | Raw `ZodError` throw bypasses `BoundaryParseError` discriminant. TS angle on Phase 1 C-PROJ-2. |
-| M-PROJ-F-3 | `documentation-type-registry.ts:138-174` | `Proxy<readonly TValue[]>` typing review — Section 4.5. Phase 1 H-PROJ-A-9 already targets the module for deletion; if it survives, the cast safety needs the explicit narrowing in 4.5. |
-| M-PROJ-F-4 | `session-context.internal.ts:264`, `render-compact-text.ts:454` | `Set.has` doesn't narrow; the resulting `as keyof typeof X` casts are working-as-typed because `VALID_PROCESS_STATUS_SET: ReadonlySet<string>`. Type-guard recipe in Section 3.2. |
-| M-PROJ-F-5 | `parse-and-project.internal.ts:9` | `NO_DEFAULT_RAW_OPTIONS = Symbol(...)` sentinel — Phase 2 M-SIMP-9 already flagged for replacement with an explicit `defaults?: Options` parameter. TS angle: the sentinel weakens the type signature (`defaultRawOptions: unknown`) compared to an explicit `defaults?: Options`. |
-| M-PROJ-F-6 | `documentation-type-registry.ts:53` | `type DocumentationTypeMetadata = SupportedDocumentationTypeMetadata` — two type names for the same shape (M-PROJ-A-7 from Phase 1). TS doesn't catch the drift; only structural identity exists. Replace one with the other or delete the alias. |
-| M-PROJ-F-7 | `fragments/pattern-relations/supporting.ts:85-92` | `DependencyTreeNodeSchema: z.ZodType<DependencyTreeNode> = z.strictObject({...children: z.array(z.lazy(...))})` — this is the **correct** Zod 4 recursive idiom (Section 4.4 promotes it), but it inverts the type-from-schema direction (the schema is annotated with a hand-written type rather than deriving the type via `z.infer`). Acceptable because Zod 4 cannot infer recursive lazy unions; preserve the pattern but note the type is the source of truth, not the schema. |
+| ID         | Location                                                        | Issue                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| ---------- | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| M-PROJ-F-1 | `_shared/parse-and-project.internal.ts:22-27`                   | `schema: z.ZodType<Options>` doesn't constrain to a strict object. Phase 2 M-PROJ-9 has the runtime assertion recipe; type-level variant in Section 3.3.                                                                                                                                                                                                                                                                                                                             |
+| M-PROJ-F-2 | `pattern-relations/open-question-list.ts:34-39`                 | Raw `ZodError` throw bypasses `BoundaryParseError` discriminant. TS angle on Phase 1 C-PROJ-2.                                                                                                                                                                                                                                                                                                                                                                                       |
+| M-PROJ-F-3 | `documentation-type-registry.ts:138-174`                        | `Proxy<readonly TValue[]>` typing review — Section 4.5. Phase 1 H-PROJ-A-9 already targets the module for deletion; if it survives, the cast safety needs the explicit narrowing in 4.5.                                                                                                                                                                                                                                                                                             |
+| M-PROJ-F-4 | `session-context.internal.ts:264`, `render-compact-text.ts:454` | `Set.has` doesn't narrow; the resulting `as keyof typeof X` casts are working-as-typed because `VALID_PROCESS_STATUS_SET: ReadonlySet<string>`. Type-guard recipe in Section 3.2.                                                                                                                                                                                                                                                                                                    |
+| M-PROJ-F-5 | `parse-and-project.internal.ts:9`                               | `NO_DEFAULT_RAW_OPTIONS = Symbol(...)` sentinel — Phase 2 M-SIMP-9 already flagged for replacement with an explicit `defaults?: Options` parameter. TS angle: the sentinel weakens the type signature (`defaultRawOptions: unknown`) compared to an explicit `defaults?: Options`.                                                                                                                                                                                                   |
+| M-PROJ-F-6 | `documentation-type-registry.ts:53`                             | `type DocumentationTypeMetadata = SupportedDocumentationTypeMetadata` — two type names for the same shape (M-PROJ-A-7 from Phase 1). TS doesn't catch the drift; only structural identity exists. Replace one with the other or delete the alias.                                                                                                                                                                                                                                    |
+| M-PROJ-F-7 | `fragments/pattern-relations/supporting.ts:85-92`               | `DependencyTreeNodeSchema: z.ZodType<DependencyTreeNode> = z.strictObject({...children: z.array(z.lazy(...))})` — this is the **correct** Zod 4 recursive idiom (Section 4.4 promotes it), but it inverts the type-from-schema direction (the schema is annotated with a hand-written type rather than deriving the type via `z.infer`). Acceptable because Zod 4 cannot infer recursive lazy unions; preserve the pattern but note the type is the source of truth, not the schema. |
 
 ### Low (P3) — TS-specific
 
-| ID | Issue |
-|----|-------|
+| ID         | Issue                                                                                                                                                                                                                                                                                                                                                       |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | L-PROJ-F-1 | No `z.input<typeof Schema>` usage in `src/`. Options schemas don't currently use `.default()` or `.transform()`, so `z.input ≡ z.infer`. If any future option schema adds a default, callers of `parseAndProject` will pass `Options` (post-default) when they should pass `z.input<typeof Schema>` (pre-default). Flag for follow-up when defaults arrive. |
-| L-PROJ-F-2 | `ProjectionContext` (Section H-PROJ-F-2) is hand-written. Acceptable because `PackageResolver` is a function; flag for review if any sub-property becomes JSON-serializable. |
-| L-PROJ-F-3 | `BLOCK_TYPES = new Set<BlockType>([...])` at `blocks/schema.ts:127-137` lists 9 entries by hand; `isBlock` at `:139-146` uses it. If `BlockSchema` adds a new variant, this set won't fail compile. Recipe: derive via `BLOCK_TYPES = new Set(BlockSchema.options.map(o => o.shape.type.value))` (or whatever Zod 4 exposes on `ZodDiscriminatedUnion`). |
-| L-PROJ-F-4 | `isBlock` at `blocks/schema.ts:139-146` casts to `(value as { type: BlockType }).type` for the `Set.has` check. Same class as Section 3.2 — but on a `Set<BlockType>`, so `Set.has` *can* narrow if the input is already typed `unknown`. The cast is therefore avoidable: `BLOCK_TYPES.has(value.type as BlockType)` after a `'type' in value` guard. |
-| L-PROJ-F-5 | `Object.getPrototypeOf(value)` cast chain in `renderJson.ts:205-217` is correct (and necessary because TS types `Object.getPrototypeOf` as returning `any` in lib.es5 — wait, no, since TS 5.0 it returns `unknown`). The defensive `typeof prototype !== 'object' \|\| prototype === null` check is exemplary. Preserve. |
-| L-PROJ-F-6 | Three `as const satisfies T` sites — `disclosure/levels.ts:65`, `documentation-type-registry.output-routing.ts:59`, `documentation-type-registry.disclosure.ts:76`, `requirement-routes.ts:19`, `documentation-type-registry.identity.ts:87`. All correct TS 5 idiom. Preserve. |
-| L-PROJ-F-7 | `import * as` style absent — 147 `import type` declarations across the package. ESM hygiene is reference quality. |
+| L-PROJ-F-2 | `ProjectionContext` (Section H-PROJ-F-2) is hand-written. Acceptable because `PackageResolver` is a function; flag for review if any sub-property becomes JSON-serializable.                                                                                                                                                                                |
+| L-PROJ-F-3 | `BLOCK_TYPES = new Set<BlockType>([...])` at `blocks/schema.ts:127-137` lists 9 entries by hand; `isBlock` at `:139-146` uses it. If `BlockSchema` adds a new variant, this set won't fail compile. Recipe: derive via `BLOCK_TYPES = new Set(BlockSchema.options.map(o => o.shape.type.value))` (or whatever Zod 4 exposes on `ZodDiscriminatedUnion`).    |
+| L-PROJ-F-4 | `isBlock` at `blocks/schema.ts:139-146` casts to `(value as { type: BlockType }).type` for the `Set.has` check. Same class as Section 3.2 — but on a `Set<BlockType>`, so `Set.has` _can_ narrow if the input is already typed `unknown`. The cast is therefore avoidable: `BLOCK_TYPES.has(value.type as BlockType)` after a `'type' in value` guard.      |
+| L-PROJ-F-5 | `Object.getPrototypeOf(value)` cast chain in `renderJson.ts:205-217` is correct (and necessary because TS types `Object.getPrototypeOf` as returning `any` in lib.es5 — wait, no, since TS 5.0 it returns `unknown`). The defensive `typeof prototype !== 'object' \|\| prototype === null` check is exemplary. Preserve.                                   |
+| L-PROJ-F-6 | Three `as const satisfies T` sites — `disclosure/levels.ts:65`, `documentation-type-registry.output-routing.ts:59`, `documentation-type-registry.disclosure.ts:76`, `requirement-routes.ts:19`, `documentation-type-registry.identity.ts:87`. All correct TS 5 idiom. Preserve.                                                                             |
+| L-PROJ-F-7 | `import * as` style absent — 147 `import type` declarations across the package. ESM hygiene is reference quality.                                                                                                                                                                                                                                           |
 
 ---
 
@@ -92,6 +92,7 @@ All three of Phase 1's Criticals are reconfirmed from the language-framework len
 ### 3.1. `.extend()` on a `z.strictObject` (C-PROJ-1 reconfirmed)
 
 **Sites:**
+
 - `fragments/pattern-relations/pattern-detail.ts:24` — `PatternDetailSchema = PatternIdentitySchema.extend({...})`
 - `fragments/pattern-relations/supporting.ts:54-58` — `EmbeddedDeliverableManifestSchema = DeliverableManifestSchema.omit({kind: true}).extend({items: ...})`
 
@@ -123,12 +124,14 @@ const PatternDetailSchema = z.strictObject({
 ### 3.2. `Set.has` doesn't narrow — the `as keyof typeof` pattern (M-PROJ-F-4)
 
 **Sites:**
+
 - `projections/execution-context/session-context.internal.ts:264` — `const processStatus = status as keyof typeof VALID_TRANSITIONS;`
 - `renderers/render-compact-text.ts:454` — `return isDeliverableStatusComplete(status as DeliverableStatus);`
 
 **Why TS doesn't narrow.** `VALID_PROCESS_STATUS_SET` at `architect-core/src/taxonomy/status-values.ts:11` is declared `ReadonlySet<string>`, so `.has(string): boolean`. `Set<T>.has` signature is `has(value: T): boolean` — it doesn't have a `value is T extends ... ? ... : T` predicate form. Even if you typed the Set as `ReadonlySet<ProcessStatusValue>`, calling `.has(arbitraryString)` would be a compile error (you can't widen the input).
 
 **The general pattern.** `Set.prototype.has` cannot narrow because:
+
 1. TS 5.5+ does provide `Set<T> extends ReadonlySet<infer U> ? ... : ...` patterns in some lib variants, but mainstream `lib.es2015.collection.d.ts` types `has(value: T): boolean` without a type predicate.
 2. Adding a type-predicate form would require `Set<T>.has<V extends T>(value: V): value is V` — TS does support this kind of generic predicate but `Set.has`'s lib type doesn't.
 
@@ -210,7 +213,7 @@ export function parseAndProject<Options, Output>(
 
 `fragments/pattern-relations/supporting.ts:52` — `export const EmbeddedDeliverableSchema = DeliverableSchema.omit({ kind: true });`
 
-Same root cause as `.extend()` (Section 3.1) — Zod 4's `pick/omit/extend/merge/partial/required` family all reset `unknownKeys` to `strip`. **`PatternIdentitySchema` is therefore open**, and `PatternDetailSchema.extend(PatternIdentitySchema)` compounds the loss: even Option A in 3.1 (`.strict()` chained after `.extend()`) wouldn't fully fix it because the *spread-shape* recipe at Option B needs `PatternIdentitySchema.shape`, which still works regardless of strict state.
+Same root cause as `.extend()` (Section 3.1) — Zod 4's `pick/omit/extend/merge/partial/required` family all reset `unknownKeys` to `strip`. **`PatternIdentitySchema` is therefore open**, and `PatternDetailSchema.extend(PatternIdentitySchema)` compounds the loss: even Option A in 3.1 (`.strict()` chained after `.extend()`) wouldn't fully fix it because the _spread-shape_ recipe at Option B needs `PatternIdentitySchema.shape`, which still works regardless of strict state.
 
 **Recommended sweep:** audit every `.omit()` / `.pick()` / `.extend()` / `.merge()` / `.partial()` site in the package (3 sites total) and adopt the spread-shape pattern. Add a `no-restricted-syntax` ESLint rule banning `.extend(` / `.omit(` / `.pick(` / `.merge(` calls on Zod schemas in `src/`:
 
@@ -226,16 +229,16 @@ This is **the second family-wide Zod 4 audit script** (after the existing `optio
 
 ### 3.5. Zod 4 modernisms — call-site verdicts
 
-| Site | API | Verdict |
-|------|-----|---------|
-| `blocks/schema.ts:113` | `z.ZodType<Block>: z.discriminatedUnion('type', [...])` with `z.lazy` on `CollapsibleBlockSchema.content` | **Correct** — the canonical Zod 4 recursive-discriminated-union pattern. Reference for family. |
-| `fragments/fragment-schema.internal.ts:70` | `z.discriminatedUnion('kind', [43 strictObject literals])` | **Correct** — O(1) discriminant dispatch, structured errors. |
-| `fragments/governance/business-rule-set.ts:26` | Nested `z.discriminatedUnion('scope', [...])` where each branch carries `kind: z.literal('BusinessRuleSet')` | **Correct** — Zod 4 supports a `discriminatedUnion` member that is itself a `strictObject` (not another `discriminatedUnion`), so the outer `FragmentSchema = discriminatedUnion('kind', [...])` flattens this via `kind` while the inner `scope` discriminator narrows further at the BusinessRuleSet branch only. Subtle but right. |
-| `fragments/pattern-relations/supporting.ts:85-92` | `DependencyTreeNodeSchema: z.ZodType<DependencyTreeNode> = z.strictObject({...children: z.array(z.lazy(() => DependencyTreeNodeSchema))})` | **Correct** — Zod 4 cannot infer recursive lazy unions, so the type is hand-written and the schema is annotated. Preserve. Note: type is source of truth, not schema (M-PROJ-F-7). |
-| `disclosure/spec.ts:29-54` | `z.strictObject({...}).describe(...)` chain | **Correct** — `.describe()` on every field; surfaces in MCP tool descriptions if `getDocumentationTypeMetadata` is wired into MCP later. |
-| `routing/route-id.ts:29-32` | `z.string().refine(isLogicalRouteId, {message: '...'})` | **Correct** — type narrowing via `.refine` predicate. The `LogicalRouteId` is a template-literal type, but `refine` doesn't carry that into `z.infer` — it stays `string`. Acceptable; the route-id functions return template-literal types directly. |
-| `_shared/filter.ts:11-14` | `z.strictObject({maturity: z.array(...).min(1).optional(), status: z.array(...).min(1).optional()})` | **Correct** — `.min(1)` rejects empty arrays at the boundary; `.optional()` allows absence. Reference for filter-schema pattern. |
-| **Not used and not needed:** | `z.preprocess`, `z.coerce`, `z.pipe`, `z.transform` — projection has no preprocessing or type-coercion concerns (it's a read-side library). Zero sites. |
+| Site                                              | API                                                                                                                                                     | Verdict                                                                                                                                                                                                                                                                                                                               |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `blocks/schema.ts:113`                            | `z.ZodType<Block>: z.discriminatedUnion('type', [...])` with `z.lazy` on `CollapsibleBlockSchema.content`                                               | **Correct** — the canonical Zod 4 recursive-discriminated-union pattern. Reference for family.                                                                                                                                                                                                                                        |
+| `fragments/fragment-schema.internal.ts:70`        | `z.discriminatedUnion('kind', [43 strictObject literals])`                                                                                              | **Correct** — O(1) discriminant dispatch, structured errors.                                                                                                                                                                                                                                                                          |
+| `fragments/governance/business-rule-set.ts:26`    | Nested `z.discriminatedUnion('scope', [...])` where each branch carries `kind: z.literal('BusinessRuleSet')`                                            | **Correct** — Zod 4 supports a `discriminatedUnion` member that is itself a `strictObject` (not another `discriminatedUnion`), so the outer `FragmentSchema = discriminatedUnion('kind', [...])` flattens this via `kind` while the inner `scope` discriminator narrows further at the BusinessRuleSet branch only. Subtle but right. |
+| `fragments/pattern-relations/supporting.ts:85-92` | `DependencyTreeNodeSchema: z.ZodType<DependencyTreeNode> = z.strictObject({...children: z.array(z.lazy(() => DependencyTreeNodeSchema))})`              | **Correct** — Zod 4 cannot infer recursive lazy unions, so the type is hand-written and the schema is annotated. Preserve. Note: type is source of truth, not schema (M-PROJ-F-7).                                                                                                                                                    |
+| `disclosure/spec.ts:29-54`                        | `z.strictObject({...}).describe(...)` chain                                                                                                             | **Correct** — `.describe()` on every field; surfaces in MCP tool descriptions if `getDocumentationTypeMetadata` is wired into MCP later.                                                                                                                                                                                              |
+| `routing/route-id.ts:29-32`                       | `z.string().refine(isLogicalRouteId, {message: '...'})`                                                                                                 | **Correct** — type narrowing via `.refine` predicate. The `LogicalRouteId` is a template-literal type, but `refine` doesn't carry that into `z.infer` — it stays `string`. Acceptable; the route-id functions return template-literal types directly.                                                                                 |
+| `_shared/filter.ts:11-14`                         | `z.strictObject({maturity: z.array(...).min(1).optional(), status: z.array(...).min(1).optional()})`                                                    | **Correct** — `.min(1)` rejects empty arrays at the boundary; `.optional()` allows absence. Reference for filter-schema pattern.                                                                                                                                                                                                      |
+| **Not used and not needed:**                      | `z.preprocess`, `z.coerce`, `z.pipe`, `z.transform` — projection has no preprocessing or type-coercion concerns (it's a read-side library). Zero sites. |
 
 **Verdict:** 107 `z.strictObject` callsites with **two** `.extend`-strictness-loss bugs and **two** `.omit`-strictness-loss bugs at the boundary of the same chain (`PatternSummarySchema → PatternIdentitySchema → PatternDetailSchema`). Sweep is mechanical; lint rule (Section 3.4) prevents recurrence.
 
@@ -248,12 +251,13 @@ This is **the second family-wide Zod 4 audit script** (after the existing `optio
 From `tsconfig.base.json`: `strict: true`, `noUncheckedIndexedAccess: true`, `exactOptionalPropertyTypes: true`, `verbatimModuleSyntax: true`, `useUnknownInCatchVariables: true`. From `tsconfig.architect-base.json`: `noPropertyAccessFromIndexSignature: true`. Projection inherits both.
 
 Verified:
+
 - **`as unknown as`** in `src/`: 0 (Phase 2B already confirmed).
 - **`@ts-ignore` / `@ts-expect-error` / `eslint-disable`**: 0.
 - **`any` keyword in `src/`**: 0 (`@typescript-eslint/no-explicit-any: error` enforced).
 - **`void X;` expression statements**: 0 (`void` only as return-type annotation, 8 sites — verified by inspection).
 - **`Map.get(...) as X`** after `unknown` value type: 0 (no `Map<string, unknown>` builders).
-- **`[key: string]: unknown`** index signature: 0 (audited via the package's own `Record<string, unknown>` greps; only `transformObject` in `render-json.ts:173` uses it intentionally as a *defensive* read-side wrapper).
+- **`[key: string]: unknown`** index signature: 0 (audited via the package's own `Record<string, unknown>` greps; only `transformObject` in `render-json.ts:173` uses it intentionally as a _defensive_ read-side wrapper).
 
 ### 4.2. `dispatchByKind` — the load-bearing cast is documented and bounded
 
@@ -310,10 +314,8 @@ If `FragmentSchema` gains a new discriminator (e.g. `'NewFragmentKind'`), nothin
 
 ```typescript
 // fragments/index.ts (or a new fragments/classification.ts)
-export type FirstClassFragmentKind =
-  | 'ArchitectureDiagram'
-  | 'BusinessRuleSet'
-  // ... (10 entries)
+export type FirstClassFragmentKind = 'ArchitectureDiagram' | 'BusinessRuleSet';
+// ... (10 entries)
 export type GenericFragmentKind = Exclude<FragmentKind, FirstClassFragmentKind>;
 
 // compile-time exhaustiveness check — uncovered union members fail here
@@ -376,7 +378,7 @@ The same pattern is needed for the proposed `projectionBundleSchema<T>(fragmentS
 // fragments/base.ts (replacing the hand-coded isBundle + isRoutingLike chain)
 export const BundleRoutingSchema = z.strictObject({
   rootRouteId: LogicalRouteIdSchema,
-  childRouteIds: z.record(z.string(), LogicalRouteIdSchema),  // Zod 4 record(keySchema, valueSchema)
+  childRouteIds: z.record(z.string(), LogicalRouteIdSchema), // Zod 4 record(keySchema, valueSchema)
   childPathStrategy: z.enum(['flat', 'nested']),
   anchorStrategy: z.enum(['heading-slug', 'kind-id']),
   disclosureSpec: DisclosureSpecSchema.optional(),
@@ -390,7 +392,7 @@ export type BundleRouting = z.infer<typeof BundleRoutingSchema>;
 export function projectionBundleSchema<T extends z.ZodType<Fragment>>(fragmentSchema: T) {
   return z.strictObject({
     root: fragmentSchema,
-    children: z.record(z.string(), FragmentSchema),  // FragmentSchema for the cross-bundle children
+    children: z.record(z.string(), FragmentSchema), // FragmentSchema for the cross-bundle children
     routing: BundleRoutingSchema.optional(),
   });
 }
@@ -404,7 +406,7 @@ export type ProjectionBundle<T extends Fragment> = {
 // or just z.infer<ReturnType<typeof projectionBundleSchema<typeof PatternDetailSchema>>>
 ```
 
-Note `z.lazy` is **not** strictly required here because the bundle isn't self-referential at the schema level — `children: Record<string, Fragment>` is a flat map, not a tree. `z.lazy` only matters when `FragmentSchema` is referenced *inside its own discriminant tree*, which Block already handles correctly.
+Note `z.lazy` is **not** strictly required here because the bundle isn't self-referential at the schema level — `children: Record<string, Fragment>` is a flat map, not a tree. `z.lazy` only matters when `FragmentSchema` is referenced _inside its own discriminant tree_, which Block already handles correctly.
 
 ### 4.5. `Proxy<readonly TValue[]>` in `documentation-type-registry.ts` — typing review (M-PROJ-F-3)
 
@@ -427,15 +429,27 @@ function createLazyReadonlyArrayFacade<TValue>(load: () => readonly TValue[]): r
       initialize();
       return Reflect.get(currentTarget, property, receiver) as unknown;
     },
-    getOwnPropertyDescriptor(currentTarget, property) { initialize(); return Reflect.getOwnPropertyDescriptor(currentTarget, property); },
-    has(currentTarget, property) { initialize(); return Reflect.has(currentTarget, property); },
-    ownKeys(currentTarget) { initialize(); return Reflect.ownKeys(currentTarget); },
-    set() { initialize(); return false; },
+    getOwnPropertyDescriptor(currentTarget, property) {
+      initialize();
+      return Reflect.getOwnPropertyDescriptor(currentTarget, property);
+    },
+    has(currentTarget, property) {
+      initialize();
+      return Reflect.has(currentTarget, property);
+    },
+    ownKeys(currentTarget) {
+      initialize();
+      return Reflect.ownKeys(currentTarget);
+    },
+    set() {
+      initialize();
+      return false;
+    },
   });
 }
 ```
 
-**TS-typing verdict.** The signature `Proxy<TValue[]>` returns `TValue[]`, and the function annotates `readonly TValue[]` — that widening is fine. The cast `Reflect.get(...) as unknown` is the *only* `as unknown` in the package's production source (Phase 2 said zero; this one slipped because it's followed by a `: unknown` return type, not a `as unknown as X` chain). The cast is *necessary* because:
+**TS-typing verdict.** The signature `Proxy<TValue[]>` returns `TValue[]`, and the function annotates `readonly TValue[]` — that widening is fine. The cast `Reflect.get(...) as unknown` is the _only_ `as unknown` in the package's production source (Phase 2 said zero; this one slipped because it's followed by a `: unknown` return type, not a `as unknown as X` chain). The cast is _necessary_ because:
 
 1. `Reflect.get` returns `unknown` since TS 5.0+ (`lib.es2015.reflect.d.ts` was updated).
 2. The proxy handler's `get` return type is `unknown` (correct — Proxy traps must allow arbitrary access).
@@ -484,12 +498,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 ```
 
 **What's idiomatic:**
+
 - `let state: <Name>State | null = null` + `state!` non-null assertions inside step bodies (TS strict + Vitest's lifecycle hooks make this hard to avoid). 27 `state!` assertions in `fragment-schemas.feature.steps.ts` alone — high-frequency but consistent.
 - `AfterEachScenario(() => { state = null })` for cleanup. **34 of 36 step files use it** (94%). Phase 3 (TC-M-6) flagged 4 step files in `architect-core` missing this; projection does it right.
 - `RuleScenarioOutline` with `examples: Record<string, unknown>` second parameter — the package's `kindFromExamples(examples)` helper at `fragment-schemas.feature.steps.ts:44-50` and `renderer-smoke.feature.steps.ts:34-40` does the `kind in FRAGMENT_SCHEMAS` check before `as PublicFragmentKind` cast, so the cast is safe-by-construction.
 - `loadFeature` at module top-level using top-level `await` — pure ESM (`"type": "module"`) makes this work; the alternative `beforeAll(async () => ...)` would be more vitest-y but `vitest-cucumber`'s API takes `feature` as a constructor arg, so top-level await is the cleanest fit.
 
 **What's worth promoting to family-wide:**
+
 - The `state: T | null` + `createState()` + `AfterEachScenario` triplet — the **canonical state-isolation pattern** under vitest-cucumber. Promote to a family `tests/_shared/feature-state.ts` helper that wraps `describeFeature` and threads a `createState` factory. Reduces the 27-`state!` count to ~3-5 per file.
 - The `kindFromExamples`-style runtime guard before the cast — promote to a `tests/_shared/examples.ts` helper.
 
@@ -537,12 +553,12 @@ The package uses two complementary conventions for "internal":
 
 **Enforcement status:**
 
-| Mechanism | What it does | Where |
-|-----------|--------------|-------|
-| Root ESLint `no-restricted-imports` `patterns: [{ group: ['../**/*.internal.js'], ... }]` | Bans `.internal.js` cross-layer imports **from `src/renderers/**/*.ts` only** | `eslint.config.mjs:134-140` |
-| `options-schema-barrel-audit.mjs` | Verifies every `*OptionsSchema` in a domain barrel is re-exported from root | `scripts/options-schema-barrel-audit.mjs` |
-| `jsdoc-boilerplate-audit.mjs` | Bans the core DOC-H-3 boilerplate "When to Use" anti-pattern | `scripts/jsdoc-boilerplate-audit.mjs` |
-| TS `package.json#exports` | Restricts importable subpaths to 7 named entries | `package.json:25-50` |
+| Mechanism                                                                                 | What it does                                                                     | Where                                     |
+| ----------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ----------------------------------------- |
+| Root ESLint `no-restricted-imports` `patterns: [{ group: ['../**/*.internal.js'], ... }]` | Bans `.internal.js` cross-layer imports **from `src/renderers/**/\*.ts` only\*\* | `eslint.config.mjs:134-140`               |
+| `options-schema-barrel-audit.mjs`                                                         | Verifies every `*OptionsSchema` in a domain barrel is re-exported from root      | `scripts/options-schema-barrel-audit.mjs` |
+| `jsdoc-boilerplate-audit.mjs`                                                             | Bans the core DOC-H-3 boilerplate "When to Use" anti-pattern                     | `scripts/jsdoc-boilerplate-audit.mjs`     |
+| TS `package.json#exports`                                                                 | Restricts importable subpaths to 7 named entries                                 | `package.json:25-50`                      |
 
 **Family-reference quality, with one extension worth landing:**
 
@@ -590,10 +606,12 @@ The 100 `.internal.js` imports currently in `src/` are virtually all **same-dire
 ### 7.3. `renderJson` defensive validation (`renderers/render-json.ts`)
 
 The fail-loud validation chain at `renderers/render-json.ts:120-171`:
+
 - `bigint` / `function` / `symbol` / `Date` / `Map` / `Set` / non-finite numbers / non-plain-object — each gets a typed error with the JSON path (`$.children.foo.bar[3]`).
 - `getConstructorName(value)` at `:205-217` handles the edge case where `value` has a null prototype.
 
 This is **the reference for any future JSON serializer in the family**. The pattern combines:
+
 1. Defensive `unknown` typing on the recursive `transformValue` parameter.
 2. JSON-path threading through every recursion frame.
 3. Typed error messages that name the failed assertion explicitly.
@@ -625,7 +643,7 @@ Reference quality. Promote as the family's standard for "constant tables that mu
 
 This is the family's cleanest ESM-hygiene baseline. **Reference.**
 
-### 7.8. `Proxy` *non*-use elsewhere
+### 7.8. `Proxy` _non_-use elsewhere
 
 Section 4.5's caveat aside, projection has exactly one Proxy in `src/` — and Phase 1/2 have already flagged the module for deletion. The package overwhelmingly uses **plain closures + lazy module-level state** for caching/memoization. This is the right TS posture: Proxies defeat structural typing and are nearly always replaced by cheaper patterns.
 
@@ -633,23 +651,23 @@ Section 4.5's caveat aside, projection has exactly one Proxy in `src/` — and P
 
 ## 8. Zod 4 audit summary table
 
-| Site | API | Verdict | Notes |
-|------|-----|---------|-------|
-| 107 sites | `z.strictObject({...})` | **Correct** | Doctrine-aligned; zero `z.object` in `src/`. |
-| `fragments/pattern-relations/pattern-summary.ts:28` | `.omit({kind: true})` on a strictObject | **Bug** (Section 3.4) | Same root cause as `.extend` (C-PROJ-1) — `unknownKeys` reset to `strip` in Zod 4. |
-| `fragments/pattern-relations/pattern-detail.ts:24` | `.extend(...)` on a strict-derived schema | **Bug** (C-PROJ-1) | Compounded `.omit` + `.extend` strictness loss. |
-| `fragments/pattern-relations/supporting.ts:52` | `.omit({kind: true})` | **Bug** | Same as Section 3.4. |
-| `fragments/pattern-relations/supporting.ts:54-58` | `.omit(...).extend(...)` | **Bug** (C-PROJ-1) | Two strictness drops in one chain. |
-| `fragments/fragment-schema.internal.ts:70` | `z.discriminatedUnion('kind', [...43])` | **Correct** | O(1) discriminant dispatch. Reference. |
-| `blocks/schema.ts:113` | `z.ZodType<Block> = z.discriminatedUnion('type', [...])` w/ `z.lazy` | **Correct** | Reference recursive idiom. |
-| `fragments/pattern-relations/supporting.ts:85-92` | `z.ZodType<DependencyTreeNode> = z.strictObject({...children: z.array(z.lazy(...))})` | **Correct** | Reference recursive idiom. |
-| `fragments/governance/business-rule-set.ts:26` | Nested `z.discriminatedUnion('scope', [...])` w/ `kind: z.literal('BusinessRuleSet')` on each branch | **Correct** | Subtle but right; outer `FragmentSchema` discriminator `kind` still flattens. |
-| `_shared/filter.ts:11-14` | `z.strictObject({...optional, ...optional})` | **Correct** | Reference filter-schema. |
-| `routing/route-id.ts:29` | `z.string().refine(isLogicalRouteId, {...})` | **Correct** | Refine loses template-literal narrowing; the `LogicalRouteId` type lives separately. Acceptable. |
-| `disclosure/spec.ts:29-54` | `z.strictObject({...}).describe(...)` chain | **Correct** | Reference for MCP-discoverable schemas. |
-| `_shared/parse-and-project.internal.ts:22-27` | `schema: z.ZodType<Options>` (widest type) | **M-PROJ-F-1** | Doesn't enforce strict-object; Phase 2 M-PROJ-9 has the runtime fix; Section 3.3 has the (impractical) type-level alternative. |
-| `pattern-relations/open-question-list.ts:38` | `OpenQuestionListOptionsSchema.parse(rawOptions)` | **C-PROJ-2** | Bypasses `parseAndProject`; throws raw `ZodError` not `BoundaryParseError`. |
-| `documentation-type-registry.ts:22` | `z.record(ProgressiveDisclosureLevelSchema, DisclosureSpecSchema)` | **Correct** | Zod 4 `z.record(keySchema, valueSchema)` is the right form (Zod 3 took only valueSchema). |
+| Site                                                | API                                                                                                  | Verdict               | Notes                                                                                                                          |
+| --------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| 107 sites                                           | `z.strictObject({...})`                                                                              | **Correct**           | Doctrine-aligned; zero `z.object` in `src/`.                                                                                   |
+| `fragments/pattern-relations/pattern-summary.ts:28` | `.omit({kind: true})` on a strictObject                                                              | **Bug** (Section 3.4) | Same root cause as `.extend` (C-PROJ-1) — `unknownKeys` reset to `strip` in Zod 4.                                             |
+| `fragments/pattern-relations/pattern-detail.ts:24`  | `.extend(...)` on a strict-derived schema                                                            | **Bug** (C-PROJ-1)    | Compounded `.omit` + `.extend` strictness loss.                                                                                |
+| `fragments/pattern-relations/supporting.ts:52`      | `.omit({kind: true})`                                                                                | **Bug**               | Same as Section 3.4.                                                                                                           |
+| `fragments/pattern-relations/supporting.ts:54-58`   | `.omit(...).extend(...)`                                                                             | **Bug** (C-PROJ-1)    | Two strictness drops in one chain.                                                                                             |
+| `fragments/fragment-schema.internal.ts:70`          | `z.discriminatedUnion('kind', [...43])`                                                              | **Correct**           | O(1) discriminant dispatch. Reference.                                                                                         |
+| `blocks/schema.ts:113`                              | `z.ZodType<Block> = z.discriminatedUnion('type', [...])` w/ `z.lazy`                                 | **Correct**           | Reference recursive idiom.                                                                                                     |
+| `fragments/pattern-relations/supporting.ts:85-92`   | `z.ZodType<DependencyTreeNode> = z.strictObject({...children: z.array(z.lazy(...))})`                | **Correct**           | Reference recursive idiom.                                                                                                     |
+| `fragments/governance/business-rule-set.ts:26`      | Nested `z.discriminatedUnion('scope', [...])` w/ `kind: z.literal('BusinessRuleSet')` on each branch | **Correct**           | Subtle but right; outer `FragmentSchema` discriminator `kind` still flattens.                                                  |
+| `_shared/filter.ts:11-14`                           | `z.strictObject({...optional, ...optional})`                                                         | **Correct**           | Reference filter-schema.                                                                                                       |
+| `routing/route-id.ts:29`                            | `z.string().refine(isLogicalRouteId, {...})`                                                         | **Correct**           | Refine loses template-literal narrowing; the `LogicalRouteId` type lives separately. Acceptable.                               |
+| `disclosure/spec.ts:29-54`                          | `z.strictObject({...}).describe(...)` chain                                                          | **Correct**           | Reference for MCP-discoverable schemas.                                                                                        |
+| `_shared/parse-and-project.internal.ts:22-27`       | `schema: z.ZodType<Options>` (widest type)                                                           | **M-PROJ-F-1**        | Doesn't enforce strict-object; Phase 2 M-PROJ-9 has the runtime fix; Section 3.3 has the (impractical) type-level alternative. |
+| `pattern-relations/open-question-list.ts:38`        | `OpenQuestionListOptionsSchema.parse(rawOptions)`                                                    | **C-PROJ-2**          | Bypasses `parseAndProject`; throws raw `ZodError` not `BoundaryParseError`.                                                    |
+| `documentation-type-registry.ts:22`                 | `z.record(ProgressiveDisclosureLevelSchema, DisclosureSpecSchema)`                                   | **Correct**           | Zod 4 `z.record(keySchema, valueSchema)` is the right form (Zod 3 took only valueSchema).                                      |
 
 **Zod 4 idioms not used (and not needed for projection's surface):** `z.preprocess`, `z.coerce`, `z.pipe`, `z.transform`, `.brand<...>()`. The package operates on already-validated data from `PatternGraph`; no coercion/preprocessing is required.
 
@@ -659,27 +677,27 @@ Section 4.5's caveat aside, projection has exactly one Proxy in `src/` — and P
 
 ## 9. TS strictness audit summary
 
-| Class | Count in projection | Count in core | Verdict |
-|-------|---------------------|---------------|---------|
-| All strictness flags ON | yes | yes | **Match** |
-| `@ts-ignore` / `@ts-expect-error` / `eslint-disable` | 0 | 0 | Both clean |
-| `any` keyword | 0 | 0 | Both clean (`no-explicit-any: error`) |
-| `as unknown as X` | 0 | 0 | Both clean |
-| `as unknown` (without further cast) | 1 (defensive, `documentation-type-registry.ts:155`) | 0 | Projection minor; harmless |
-| `void X;` expression statements | 0 | 3 (core F4A-H-9) | Projection wins |
-| `Map.get(...) as X` after `unknown` value | 0 | 16 (core F4A-H-1) | Projection wins |
-| `Record<string, unknown>` builders propagated via `ReturnType<...>` | 0 | 6 (core F4A-H-2/H-4) | Projection wins |
-| `[key: string]: unknown` index signatures | 0 in result types; 1 defensive in `JsonObject` | 1 production-path (core H-CORE-15) | Projection wins (`JsonObject` is a serialization output, not a result-propagation type) |
-| Strictness lies (`as X` after rejected type guard) | 0 | 1 (core F4A-C-1 `validateTransition`) | Projection wins |
-| `as keyof typeof X` after `Set.has` | 2 (M-PROJ-F-4) | 0 (core uses the FSM machinery instead) | Projection minor; depends on core exporting `isProcessStatusValue` |
-| `as const satisfies T` | 5 | 3 | Both reference quality |
-| Branded types via `z.brand<...>()` | 0 (LogicalRouteId is template-literal not branded) | 6 (core's `branded.ts`) | Different design; projection's template-literal types are arguably stronger for this domain |
-| `z.input<typeof S>` separate from `z.infer<typeof S>` | 0 | 1 (`extracted-shape.ts`) | Projection has no `.default()`/`.transform()` chains, so the distinction doesn't matter — yet |
-| Recursive `z.ZodType<T>: z.lazy(...)` | 2 (Block, DependencyTreeNode) | 1 (section-block) | Both reference |
-| `noUncheckedIndexedAccess` evasions | 0 documented | 16 (core F4A-H-1) | Projection wins |
-| `noPropertyAccessFromIndexSignature` defeats | 0 | 3 (core H-CORE-15) | Projection wins |
-| `import type` discipline | 147 sites | 97 sites | Both reference |
-| `import.meta.url` vs `__dirname` | 1 mixed (`vitest.config.ts` uses `__dirname`) | 0 mixed | Projection minor (Section 5.4) |
+| Class                                                               | Count in projection                                 | Count in core                           | Verdict                                                                                       |
+| ------------------------------------------------------------------- | --------------------------------------------------- | --------------------------------------- | --------------------------------------------------------------------------------------------- |
+| All strictness flags ON                                             | yes                                                 | yes                                     | **Match**                                                                                     |
+| `@ts-ignore` / `@ts-expect-error` / `eslint-disable`                | 0                                                   | 0                                       | Both clean                                                                                    |
+| `any` keyword                                                       | 0                                                   | 0                                       | Both clean (`no-explicit-any: error`)                                                         |
+| `as unknown as X`                                                   | 0                                                   | 0                                       | Both clean                                                                                    |
+| `as unknown` (without further cast)                                 | 1 (defensive, `documentation-type-registry.ts:155`) | 0                                       | Projection minor; harmless                                                                    |
+| `void X;` expression statements                                     | 0                                                   | 3 (core F4A-H-9)                        | Projection wins                                                                               |
+| `Map.get(...) as X` after `unknown` value                           | 0                                                   | 16 (core F4A-H-1)                       | Projection wins                                                                               |
+| `Record<string, unknown>` builders propagated via `ReturnType<...>` | 0                                                   | 6 (core F4A-H-2/H-4)                    | Projection wins                                                                               |
+| `[key: string]: unknown` index signatures                           | 0 in result types; 1 defensive in `JsonObject`      | 1 production-path (core H-CORE-15)      | Projection wins (`JsonObject` is a serialization output, not a result-propagation type)       |
+| Strictness lies (`as X` after rejected type guard)                  | 0                                                   | 1 (core F4A-C-1 `validateTransition`)   | Projection wins                                                                               |
+| `as keyof typeof X` after `Set.has`                                 | 2 (M-PROJ-F-4)                                      | 0 (core uses the FSM machinery instead) | Projection minor; depends on core exporting `isProcessStatusValue`                            |
+| `as const satisfies T`                                              | 5                                                   | 3                                       | Both reference quality                                                                        |
+| Branded types via `z.brand<...>()`                                  | 0 (LogicalRouteId is template-literal not branded)  | 6 (core's `branded.ts`)                 | Different design; projection's template-literal types are arguably stronger for this domain   |
+| `z.input<typeof S>` separate from `z.infer<typeof S>`               | 0                                                   | 1 (`extracted-shape.ts`)                | Projection has no `.default()`/`.transform()` chains, so the distinction doesn't matter — yet |
+| Recursive `z.ZodType<T>: z.lazy(...)`                               | 2 (Block, DependencyTreeNode)                       | 1 (section-block)                       | Both reference                                                                                |
+| `noUncheckedIndexedAccess` evasions                                 | 0 documented                                        | 16 (core F4A-H-1)                       | Projection wins                                                                               |
+| `noPropertyAccessFromIndexSignature` defeats                        | 0                                                   | 3 (core H-CORE-15)                      | Projection wins                                                                               |
+| `import type` discipline                                            | 147 sites                                           | 97 sites                                | Both reference                                                                                |
+| `import.meta.url` vs `__dirname`                                    | 1 mixed (`vitest.config.ts` uses `__dirname`)       | 0 mixed                                 | Projection minor (Section 5.4)                                                                |
 
 **Verdict:** projection's TS strictness is **stricter than core's** by every measurable lens. The two `as keyof typeof` casts (M-PROJ-F-4) are working-as-typed under the library type's design constraint, not a strictness gap.
 
@@ -707,7 +725,7 @@ Items 1-5 are doctrine-aligned wins (each catches a class of breach). Items 6-7 
 The Phase 5 per-package report should foreground:
 
 1. **`architect-projection` is the family's TS/Zod 4 reference package.** Every other package in the family should be measured against projection's posture: 107 `z.strictObject`, zero `z.object`, zero `as unknown as`, zero suppressions, zero `void X;`, zero `console.*`, zero unprefixed Node imports, 147 `import type` declarations, recursive `z.ZodType<T>: z.lazy(...)` correctly typed in 2 of 2 places, kind-dispatch via `StrictKindTable` + load-bearing-cast-with-invariant-comment, `as const satisfies T` in 5 of 5 constant-table sites. **The package is what "right" looks like in this codebase.**
-2. **The two remaining Critical bugs are the same class (Zod 4 strict-loss on schema combinators) at a four-site chain.** One PR closes C-PROJ-1, the related `.omit()` sites, *and* installs the ESLint rule that prevents recurrence. This is the highest-leverage Phase 4A action.
+2. **The two remaining Critical bugs are the same class (Zod 4 strict-loss on schema combinators) at a four-site chain.** One PR closes C-PROJ-1, the related `.omit()` sites, _and_ installs the ESLint rule that prevents recurrence. This is the highest-leverage Phase 4A action.
 3. **`StrictKindTable<Out, Options, Kinds>` deserves a doc-level callout.** Section 4.3 walks through the limitation; Recipe A is concrete. Coupled with the codec-agnostic renderer split (H-PROJ-A-1), this becomes the family's primary "how to add a new fragment kind" doctrine.
 4. **`parseAndProject` is the family's canonical trust-boundary helper.** Core's `parseAtBoundary` exists but is unused inside core (TD-CORE-1); projection is its only real consumer. Phase 5's family-aggregate report should treat this as a one-way dependency: when guard / cli / mcp need similar parse-at-boundary discipline, they should follow projection's `parseAndProject` pattern, not invent a new one.
 5. **Two audit scripts ready for workspace promotion.** `options-schema-barrel-audit.mjs` (with the 15-LOC extension from Phase 2 Cleanup-M-PROJ-1) catches the C-PROJ-2 outlier mechanically; `jsdoc-boilerplate-audit.mjs` catches core's DOC-H-3 boilerplate text. Both should move to `<repo>/scripts/architect-audits/` and be invoked by every package's `test` script.

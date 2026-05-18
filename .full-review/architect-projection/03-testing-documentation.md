@@ -44,41 +44,41 @@ The doc says: "The projection perf gate is now live in CI." Phase 2B confirmed t
 
 ### Test coverage gaps
 
-| # | Source | Issue | Recipe |
-|---|--------|-------|--------|
-| TC-PROJ-H-1 | 3A | 3 fragment kinds (`RoadmapTimeline`, `PatternBundleEntry`, `BusinessRuleReference`) excluded from both `fragment-schemas.feature` and `renderer-smoke.feature` | Add the three kinds to `PublicFragmentKind` union; `BusinessRuleReference` has a valid fixture that needs to be referenced. |
-| TC-PROJ-H-2 | 3A | Perf gate correct but unwired + sequencing issue (perf-report writer runs under different vitest config than the comparator reads) | Cleanup-C-PROJ-1 wires the gate; also resolve Cleanup-H-PROJ-2 (collapse `vitest.perf-report.config.mjs`) for clean sequencing. |
-| TC-PROJ-H-3 | 3A | `parseAndProjectOpenQuestionList` trust-boundary untested — no scenario confirms invalid options are rejected | Add an option-rejection scenario after C-PROJ-2 is fixed (when the function routes through `parseAndProject`); the existing pattern from sibling features applies. |
+| #           | Source | Issue                                                                                                                                                          | Recipe                                                                                                                                                             |
+| ----------- | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| TC-PROJ-H-1 | 3A     | 3 fragment kinds (`RoadmapTimeline`, `PatternBundleEntry`, `BusinessRuleReference`) excluded from both `fragment-schemas.feature` and `renderer-smoke.feature` | Add the three kinds to `PublicFragmentKind` union; `BusinessRuleReference` has a valid fixture that needs to be referenced.                                        |
+| TC-PROJ-H-2 | 3A     | Perf gate correct but unwired + sequencing issue (perf-report writer runs under different vitest config than the comparator reads)                             | Cleanup-C-PROJ-1 wires the gate; also resolve Cleanup-H-PROJ-2 (collapse `vitest.perf-report.config.mjs`) for clean sequencing.                                    |
+| TC-PROJ-H-3 | 3A     | `parseAndProjectOpenQuestionList` trust-boundary untested — no scenario confirms invalid options are rejected                                                  | Add an option-rejection scenario after C-PROJ-2 is fixed (when the function routes through `parseAndProject`); the existing pattern from sibling features applies. |
 
 ### Documentation gaps
 
-| # | Source | Issue |
-|---|--------|-------|
-| DOC-PROJ-H-1 | 3B | **`ddd-inventory.md` has 41 of 43 fragment kinds — 9 absent on disk** (some entries in the inventory cover supporting/base files, but 9 distinct fragment files exist in the discriminated union without inventory entries): `business-rule-reference`, `open-question-list`, `dependency-edge-set`, `architecture-comparison`, `architecture-context`, `orphan-pattern-list`, `pattern-bundle-entry`, `role-profile-collection`, `source-inventory-digest`. **Recipe:** regenerate or add the 9 entries; ideally automate via a script extracting from `FragmentKind` union. |
-| DOC-PROJ-H-2 | 3B | 23 non-internal, non-barrel files have public exports without `@architect-pattern` annotation — invisible to PatternGraph and generated docs. Most load-bearing: `blocks/schema.ts` (entire Block hierarchy), `context/projection-context.ts` (`ProjectionContext` itself), `routing/route-id.ts` (route ID contract), `projections/errors.ts` (public error surface — confirms L-PROJ-A-5), `projections/_shared/filter.ts`. **Recipe:** add `@architect-pattern` module blocks. |
-| DOC-PROJ-H-3 | 3B | README has no section telling `cli`/`mcp` consumers what NOT to import. `_internal/` directory vs `.internal.ts` suffix conventions are mentioned only obliquely in lint rule descriptions. **Recipe:** add an "Internal vs. public API" section to README. |
-| DOC-PROJ-H-4 | 3B | ADR-005, ADR-006, ADR-009 referenced by name in README and MIGRATION.md but **no link** to actual `architect/decisions/*.feature` files. **Recipe:** add `[ADR-005]: ../../architect/decisions/ADR005CodecRendererSeparation.feature` references at end of README. |
+| #            | Source | Issue                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| ------------ | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| DOC-PROJ-H-1 | 3B     | **`ddd-inventory.md` has 41 of 43 fragment kinds — 9 absent on disk** (some entries in the inventory cover supporting/base files, but 9 distinct fragment files exist in the discriminated union without inventory entries): `business-rule-reference`, `open-question-list`, `dependency-edge-set`, `architecture-comparison`, `architecture-context`, `orphan-pattern-list`, `pattern-bundle-entry`, `role-profile-collection`, `source-inventory-digest`. **Recipe:** regenerate or add the 9 entries; ideally automate via a script extracting from `FragmentKind` union. |
+| DOC-PROJ-H-2 | 3B     | 23 non-internal, non-barrel files have public exports without `@architect-pattern` annotation — invisible to PatternGraph and generated docs. Most load-bearing: `blocks/schema.ts` (entire Block hierarchy), `context/projection-context.ts` (`ProjectionContext` itself), `routing/route-id.ts` (route ID contract), `projections/errors.ts` (public error surface — confirms L-PROJ-A-5), `projections/_shared/filter.ts`. **Recipe:** add `@architect-pattern` module blocks.                                                                                             |
+| DOC-PROJ-H-3 | 3B     | README has no section telling `cli`/`mcp` consumers what NOT to import. `_internal/` directory vs `.internal.ts` suffix conventions are mentioned only obliquely in lint rule descriptions. **Recipe:** add an "Internal vs. public API" section to README.                                                                                                                                                                                                                                                                                                                   |
+| DOC-PROJ-H-4 | 3B     | ADR-005, ADR-006, ADR-009 referenced by name in README and MIGRATION.md but **no link** to actual `architect/decisions/*.feature` files. **Recipe:** add `[ADR-005]: ../../architect/decisions/ADR005CodecRendererSeparation.feature` references at end of README.                                                                                                                                                                                                                                                                                                            |
 
 ## Medium (P2)
 
-| # | Source | Issue |
-|---|--------|-------|
-| TC-PROJ-M-1 | 3A | Perf gate metric gaps — `filterPatterns` allocation (H-PROJ-Q-6, 14 hot-call-sites) has no named metric; `RequirementDigest` markdown rendering has no `renderMarkdownBundles` entry; no `p99`/`maxMs` check (comparator uses `avgMs` only, so a spike with low average passes silently). |
-| TC-PROJ-M-2 | 3A | Test residue: `tests/.DS_Store` and `src/.DS_Store` are committed. Add to `.gitignore`. |
-| TC-PROJ-M-3 | 3A | `vitest.perf-report.config.mjs` near-duplicates `vitest.config.ts` — fold (Cleanup-H-PROJ-2). The sequencing issue in TC-PROJ-H-2 dissolves when this lands. |
-| DOC-PROJ-M-1 | 3B | `summarizeTaxonomyDigest` documented as fragments-side (per re-export) but runtime helper — H-PROJ-A-3 fix repositions both code and docs. |
-| DOC-PROJ-M-2 | 3B | `docs/MIGRATION.md` is a v1 codec→projection mapping document but doesn't note which v1 codec symbols are now deleted vs renamed. |
-| DOC-PROJ-M-3 | 3B | `docs/PERF.md` opening sentence calls the gate "CI gate" then describes a local procedure — internally contradictory. Rewrite once C-PROJ-1 lands. |
-| DOC-PROJ-M-4 | 3B | The renderer trust-boundary code paths (`sanitizeMarkdownLinkTarget`, `normalizeRoutedOutputPath`, `escapePlainMarkdownText`) are well-tested but the *security invariants* are not documented anywhere except as code comments. The README acknowledges them at a high level but doesn't catalog them (I3 is named once without explanation). |
+| #            | Source | Issue                                                                                                                                                                                                                                                                                                                                          |
+| ------------ | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TC-PROJ-M-1  | 3A     | Perf gate metric gaps — `filterPatterns` allocation (H-PROJ-Q-6, 14 hot-call-sites) has no named metric; `RequirementDigest` markdown rendering has no `renderMarkdownBundles` entry; no `p99`/`maxMs` check (comparator uses `avgMs` only, so a spike with low average passes silently).                                                      |
+| TC-PROJ-M-2  | 3A     | Test residue: `tests/.DS_Store` and `src/.DS_Store` are committed. Add to `.gitignore`.                                                                                                                                                                                                                                                        |
+| TC-PROJ-M-3  | 3A     | `vitest.perf-report.config.mjs` near-duplicates `vitest.config.ts` — fold (Cleanup-H-PROJ-2). The sequencing issue in TC-PROJ-H-2 dissolves when this lands.                                                                                                                                                                                   |
+| DOC-PROJ-M-1 | 3B     | `summarizeTaxonomyDigest` documented as fragments-side (per re-export) but runtime helper — H-PROJ-A-3 fix repositions both code and docs.                                                                                                                                                                                                     |
+| DOC-PROJ-M-2 | 3B     | `docs/MIGRATION.md` is a v1 codec→projection mapping document but doesn't note which v1 codec symbols are now deleted vs renamed.                                                                                                                                                                                                              |
+| DOC-PROJ-M-3 | 3B     | `docs/PERF.md` opening sentence calls the gate "CI gate" then describes a local procedure — internally contradictory. Rewrite once C-PROJ-1 lands.                                                                                                                                                                                             |
+| DOC-PROJ-M-4 | 3B     | The renderer trust-boundary code paths (`sanitizeMarkdownLinkTarget`, `normalizeRoutedOutputPath`, `escapePlainMarkdownText`) are well-tested but the _security invariants_ are not documented anywhere except as code comments. The README acknowledges them at a high level but doesn't catalog them (I3 is named once without explanation). |
 
 ## Architect State coverage (annotation rate) [3B]
 
-| Area | Coverage | Notes |
-|------|----------|-------|
-| Overall | 87/145 = 60% | More than 2× core's 26%. |
-| `.internal.ts` files | unannotated by convention | ~27 files; expected. |
-| Barrel `index.ts` files | unannotated | ~12 files; expected. |
-| Public-export files without annotation | 23 files | The 23 above include the load-bearing primitives (Block schema, ProjectionContext, RouteId, errors, filter). |
+| Area                                   | Coverage                  | Notes                                                                                                        |
+| -------------------------------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Overall                                | 87/145 = 60%              | More than 2× core's 26%.                                                                                     |
+| `.internal.ts` files                   | unannotated by convention | ~27 files; expected.                                                                                         |
+| Barrel `index.ts` files                | unannotated               | ~12 files; expected.                                                                                         |
+| Public-export files without annotation | 23 files                  | The 23 above include the load-bearing primitives (Block schema, ProjectionContext, RouteId, errors, filter). |
 
 ## Perf-gate verdict (consolidated)
 
@@ -91,13 +91,13 @@ When wired AND `filterPatterns` (H-PROJ-Q-6) lands, projection has a real, self-
 
 ## Test residue cleanup [3A]
 
-| Item | Recipe |
-|------|--------|
-| `tests/.DS_Store`, `src/.DS_Store` | Remove from git; add to `.gitignore`. |
-| `vitest.perf-report.config.mjs` | Fold into `vitest.config.ts` per Cleanup-H-PROJ-2; eliminates sequencing issue (TC-PROJ-H-2). |
-| `tests/perf/baselines/business-rule-set.baseline.json` | Keep — this is the real baseline. Regenerate after H-CORE-8 fix lands; pin updated values. |
-| `tests/perf/compare-baseline.mjs` | Keep — the real gate. Wire into test script. |
-| `.sisyphus/evidence/` | Operational artifact; cleanup convention should be documented or scoped (Phase 2 Cleanup M-PROJ-Cleanup-4). |
+| Item                                                   | Recipe                                                                                                      |
+| ------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
+| `tests/.DS_Store`, `src/.DS_Store`                     | Remove from git; add to `.gitignore`.                                                                       |
+| `vitest.perf-report.config.mjs`                        | Fold into `vitest.config.ts` per Cleanup-H-PROJ-2; eliminates sequencing issue (TC-PROJ-H-2).               |
+| `tests/perf/baselines/business-rule-set.baseline.json` | Keep — this is the real baseline. Regenerate after H-CORE-8 fix lands; pin updated values.                  |
+| `tests/perf/compare-baseline.mjs`                      | Keep — the real gate. Wire into test script.                                                                |
+| `.sisyphus/evidence/`                                  | Operational artifact; cleanup convention should be documented or scoped (Phase 2 Cleanup M-PROJ-Cleanup-4). |
 
 ## What's well-tested (preserve)
 

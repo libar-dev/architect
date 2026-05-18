@@ -8,9 +8,9 @@
 
 ## 1. Executive Summary
 
-The package has the right *posture* for a strict, Zod-first, TS 5 / Node 20 / pure-ESM codebase: `verbatimModuleSyntax` + `exactOptionalPropertyTypes` + `noUncheckedIndexedAccess` + `noPropertyAccessFromIndexSignature` all on; zero `@ts-ignore`/`@ts-expect-error`/`eslint-disable` in `src/`; one local ESLint rule (`architect-local/no-suppression-comments`) actively guards the doctrine; `import type` and `.js`-extension relative imports are used consistently; `import.meta.url`/`fileURLToPath` rather than `__dirname`; Zod 4 APIs (`z.prettifyError`, `z.iso.datetime`, `.brand<…>()`, `z.discriminatedUnion` for `ExportInfoSchema`) appear where they should.
+The package has the right _posture_ for a strict, Zod-first, TS 5 / Node 20 / pure-ESM codebase: `verbatimModuleSyntax` + `exactOptionalPropertyTypes` + `noUncheckedIndexedAccess` + `noPropertyAccessFromIndexSignature` all on; zero `@ts-ignore`/`@ts-expect-error`/`eslint-disable` in `src/`; one local ESLint rule (`architect-local/no-suppression-comments`) actively guards the doctrine; `import type` and `.js`-extension relative imports are used consistently; `import.meta.url`/`fileURLToPath` rather than `__dirname`; Zod 4 APIs (`z.prettifyError`, `z.iso.datetime`, `.brand<…>()`, `z.discriminatedUnion` for `ExportInfoSchema`) appear where they should.
 
-The framework-angle gaps cluster in three places. **First, Zod 4 idiom drift on the load-bearing read model** — `PatternGraphSchema` and 8 nested shapes use `z.object` (Zod 4 keeps these open at runtime; `.extend()` in v4 no longer propagates strictness), and `nameIndex: ReadonlyMap` is in the hand-typed `PatternGraph` interface but not in the schema, so `parseAtBoundary` silently drops it. **Second, the TS strictness flags are quietly defeated in three production-path files**: 16× `as ProcessStatusValue`/`as string[]`/`as DocDirective['level']` in `scanner/ast-parser.ts:279-296` after a `Map.get` returns `unknown`; 2× `as UnrecognizedEnumEntry[]` reads through the `[key: string]: unknown` index signature in `scanner/gherkin-ast-parser.ts:494,525`; and `validation/fsm/validator.ts:92,93,102` casts strings to `ProcessStatusValue` *after* the type guard rejected them. **Third, Node-stdlib hygiene is mixed** — three synchronous fs calls (`readFileSync` in `doc-extractor.ts:231`, `existsSync` in `gherkin-extractor.ts:502`, `realpathSync` in `validation-schemas/config.ts:10`) sit on hot paths; `path.join` is used with `path.sep` rather than `path.posix` for IDs, which leaks Windows backslashes into source-file paths inside the graph; and three `void X;` expressions (`doc-extractor.ts:249,252`, `gherkin-extractor.ts:604`) survive only because the local lint rule pattern doesn't catch `UnaryExpression[operator="void"]`.
+The framework-angle gaps cluster in three places. **First, Zod 4 idiom drift on the load-bearing read model** — `PatternGraphSchema` and 8 nested shapes use `z.object` (Zod 4 keeps these open at runtime; `.extend()` in v4 no longer propagates strictness), and `nameIndex: ReadonlyMap` is in the hand-typed `PatternGraph` interface but not in the schema, so `parseAtBoundary` silently drops it. **Second, the TS strictness flags are quietly defeated in three production-path files**: 16× `as ProcessStatusValue`/`as string[]`/`as DocDirective['level']` in `scanner/ast-parser.ts:279-296` after a `Map.get` returns `unknown`; 2× `as UnrecognizedEnumEntry[]` reads through the `[key: string]: unknown` index signature in `scanner/gherkin-ast-parser.ts:494,525`; and `validation/fsm/validator.ts:92,93,102` casts strings to `ProcessStatusValue` _after_ the type guard rejected them. **Third, Node-stdlib hygiene is mixed** — three synchronous fs calls (`readFileSync` in `doc-extractor.ts:231`, `existsSync` in `gherkin-extractor.ts:502`, `realpathSync` in `validation-schemas/config.ts:10`) sit on hot paths; `path.join` is used with `path.sep` rather than `path.posix` for IDs, which leaks Windows backslashes into source-file paths inside the graph; and three `void X;` expressions (`doc-extractor.ts:249,252`, `gherkin-extractor.ts:604`) survive only because the local lint rule pattern doesn't catch `UnaryExpression[operator="void"]`.
 
 **Two most impactful TS/Zod modernization wins.** (1) Sweep `z.object → z.strictObject` in `validation-schemas/` (28 sites; aligns with Phase 1 C-CORE-2/H-CORE-7) and replace the hand-written `PatternGraph`/`StatusGroups`/`ExactStatusGroups`/`PhaseGroup`/`SourceViews`/`ArchIndex` interfaces with `z.infer<typeof XSchema>`. (2) Build the gherkin raw pattern as a typed `z.input<typeof ExtractedPatternSchema>` rather than `Record<string, unknown>` (closes H-CORE-15 + H-CORE-16 in one pass and eliminates the `[key: string]: unknown` index signature that defeats `noPropertyAccessFromIndexSignature`).
 
@@ -84,7 +84,7 @@ The three `as ProcessStatusValue` lines disappear; callers who today do `result.
 ```ts
 export const MetadataTagDefinitionSchema = z.strictObject({
   // ...
-  transform: z.function().optional(),         // <-- Zod 4: this is a deprecated, near-no-op shape
+  transform: z.function().optional(), // <-- Zod 4: this is a deprecated, near-no-op shape
 });
 ```
 
@@ -102,7 +102,7 @@ type KnownTransformName = (typeof KNOWN_TRANSFORM_NAMES)[number];
 
 export const MetadataTagDefinitionSchema = z.strictObject({
   // ...
-  transform: z.enum(KNOWN_TRANSFORM_NAMES).optional(),   // serializable boundary
+  transform: z.enum(KNOWN_TRANSFORM_NAMES).optional(), // serializable boundary
 });
 
 // taxonomy/registry-builder.ts — internal resolution
@@ -132,8 +132,8 @@ for (const tagDef of registry.metadataTags) {
   if (result !== undefined) metadataResults.set(tagDef.tag, result);
 }
 
-const patternName = metadataResults.get('pattern') as string | undefined;          // :279
-const status = metadataResults.get('status') as AcceptedStatusValue | undefined;   // :280
+const patternName = metadataResults.get('pattern') as string | undefined; // :279
+const status = metadataResults.get('status') as AcceptedStatusValue | undefined; // :280
 const boundedContext = metadataResults.get('bounded-context') as string | undefined;
 const uses = metadataResults.get('uses') as string[] | undefined;
 const phase = metadataResults.get('phase') as number | undefined;
@@ -141,7 +141,7 @@ const level = metadataResults.get('level') as DocDirective['level'];
 // ... 10 more casts through line 296
 ```
 
-The map's `unknown` value type forces every read to be an `as`-cast. None of them are validated by Zod (the cast is just told-you-so). When Phase 1 H-SIMP-6 lands (one `applyTagValue` applier in `taxonomy/tag-parsing.ts`), the applier already has format-typed value shapes — the casts then disappear *automatically*. But before H-SIMP-6, these 16 sites are the largest cluster of TS-strictness-evasion in `src/`.
+The map's `unknown` value type forces every read to be an `as`-cast. None of them are validated by Zod (the cast is just told-you-so). When Phase 1 H-SIMP-6 lands (one `applyTagValue` applier in `taxonomy/tag-parsing.ts`), the applier already has format-typed value shapes — the casts then disappear _automatically_. But before H-SIMP-6, these 16 sites are the largest cluster of TS-strictness-evasion in `src/`.
 
 **Recipe (after-shape):** instead of `Map<string, unknown>`, return a typed result from `applyTagValue` keyed by the metadata tag definition's `format` (already a Zod enum).
 
@@ -227,7 +227,7 @@ Two Zod-4-specific framework concerns on top of the doctrine breach Phase 1 alre
 export const PatternGraphSchema = z.strictObject({
   patterns: z.array(ExtractedPatternSchema),
   tagRegistry: TagRegistrySchema,
-  byStatus: ExactStatusGroupsSchema,   // also z.strictObject
+  byStatus: ExactStatusGroupsSchema, // also z.strictObject
   byNormalizedStatus: StatusGroupsSchema,
   byMaturity: z.record(z.string(), z.array(ExtractedPatternSchema)),
   // ... no `nameIndex` ...
@@ -249,22 +249,22 @@ Every `interface` from line 125-179 collapses to a one-line `export type X = z.i
 
 ```ts
 function collectDeprecatedTagDiagnostics(
-  metadata: ReturnType<typeof extractPatternTags>,    // <- exports the index-signature shape
+  metadata: ReturnType<typeof extractPatternTags>, // <- exports the index-signature shape
   filePath: string,
   roles: readonly RoleLike[],
-): ExtractionDiagnostic[]
+): ExtractionDiagnostic[];
 ```
 
-`ReturnType<T>` is the right TS 5 idiom in general, but here it propagates the `[key: string]: unknown` index signature (F4A-H-2) into every consumer. Today 6 sites consume `metadata._roleTagValues`/`metadata._unrecognizedRoleValues`/`metadata._deprecatedTags` through this index signature — and these properties are *not* in the explicit field list at `gherkin-ast-parser.ts:364-417`; they're only present as part of the open bag. If the H-CORE-15 fix lands without H-CORE-6 (collapse sync/async extractor) coordinating, these consumers silently lose the `_*` fields.
+`ReturnType<T>` is the right TS 5 idiom in general, but here it propagates the `[key: string]: unknown` index signature (F4A-H-2) into every consumer. Today 6 sites consume `metadata._roleTagValues`/`metadata._unrecognizedRoleValues`/`metadata._deprecatedTags` through this index signature — and these properties are _not_ in the explicit field list at `gherkin-ast-parser.ts:364-417`; they're only present as part of the open bag. If the H-CORE-15 fix lands without H-CORE-6 (collapse sync/async extractor) coordinating, these consumers silently lose the `_*` fields.
 
 **Recipe (after-shape):** consumers depend on a named explicit shape, not `ReturnType<typeof ...>`:
 
 ```ts
 function collectDeprecatedTagDiagnostics(
-  diagnostics: FeatureMetadataDiagnostics,    // from F4A-H-2 recipe
+  diagnostics: FeatureMetadataDiagnostics, // from F4A-H-2 recipe
   filePath: string,
   roles: readonly RoleLike[],
-): ExtractionDiagnostic[]
+): ExtractionDiagnostic[];
 ```
 
 Land F4A-H-2, F4A-H-4, H-SIMP-5, and H-SIMP-1 in one PR or none. The chain is fragile if split.
@@ -334,8 +334,8 @@ A round-trip parsing test for `PackageConfigSchema` with an extra property is th
 
 **Files:** `src/extractor/doc-extractor.ts:231` (`fs.readFileSync`), `src/extractor/gherkin-extractor.ts:502` (`fs.existsSync`), `src/validation-schemas/config.ts:10` (`fs.realpathSync`). Extends Phase 1 **H-CORE-6** with the Node-stdlib angle.
 
-- `doc-extractor.ts:231` reads the source file *for every pattern in the graph* to look up tagged shapes (`sourceContent.includes('architect-shape')`). The 318-pattern dogfood graph reads up to 318 files synchronously, blocking the event loop. The shape extraction runs inside `processFile`, which is already inside `Promise.all`-friendly territory.
-- `gherkin-extractor.ts:502` (`fileExistsSync`) is the only reason `extractPatternsFromGherkin` (sync) and `extractPatternsFromGherkinAsync` (async) are two functions — the sync wrapper exists *purely* to call `fs.existsSync`. The async version uses `fs.promises.access` correctly at line 510.
+- `doc-extractor.ts:231` reads the source file _for every pattern in the graph_ to look up tagged shapes (`sourceContent.includes('architect-shape')`). The 318-pattern dogfood graph reads up to 318 files synchronously, blocking the event loop. The shape extraction runs inside `processFile`, which is already inside `Promise.all`-friendly territory.
+- `gherkin-extractor.ts:502` (`fileExistsSync`) is the only reason `extractPatternsFromGherkin` (sync) and `extractPatternsFromGherkinAsync` (async) are two functions — the sync wrapper exists _purely_ to call `fs.existsSync`. The async version uses `fs.promises.access` correctly at line 510.
 - `validation-schemas/config.ts:10` (`safeRealpathSync`) inside a Zod `.refine` — Zod refines can't be async without `.refineAsync`, but the refine is checking that `outputDirectory` is within `baseDir`. This is a config-load-time call (happens once at boot), not hot — acceptable.
 
 **Recipe:** for the first two, collapse to async-only (matches Phase 1 H-CORE-6 + Phase 2 H-SIMP-1). For the third, leave as-is and add an `@architect-status` comment noting why sync is acceptable here ("Zod refine context — config-load only, not hot").
@@ -357,12 +357,13 @@ const relativePath = path.relative(baseDir, filePath);
 
 `build-pipeline.ts` knows that pattern-graph IDs (and the `source.file` branded path) need stable, POSIX-style separators because the graph crosses serialization boundaries (JSON output, MCP transport, golden snapshot files). The two extractors don't do the conversion before branding the path. On macOS/Linux this is a no-op; on Windows the brand carries backslashes that then mismatch grep, JSON comparisons, and the dogfood snapshot fixtures.
 
-**Recipe:** factor a single helper `toPosixPath(p: string): string` in `utils/` (or call `path.posix.normalize` after converting separators) and call it everywhere `asSourceFilePath` or `asOutputFilePath` is built. The brand constructor `asSourceFilePath` should *itself* do the conversion — that's the right place to enforce the invariant.
+**Recipe:** factor a single helper `toPosixPath(p: string): string` in `utils/` (or call `path.posix.normalize` after converting separators) and call it everywhere `asSourceFilePath` or `asOutputFilePath` is built. The brand constructor `asSourceFilePath` should _itself_ do the conversion — that's the right place to enforce the invariant.
 
 ```ts
 // types/branded.ts
-const SourceFilePathSchema = z.string()
-  .transform((p) => p.split(/[\\/]/).join('/'))   // normalize before branding
+const SourceFilePathSchema = z
+  .string()
+  .transform((p) => p.split(/[\\/]/).join('/')) // normalize before branding
   .brand<'SourceFilePath'>();
 ```
 
@@ -408,6 +409,7 @@ Two of the three `void` sites have a legitimate accumulator (`extractionWarnings
 #### F4A-M-1. 19 schemas in `validation-schemas/{output-schemas,extracted-shape,extracted-pattern}.ts` use `z.object` — the CLI/MCP output boundary is open
 
 **Files:**
+
 - `src/validation-schemas/output-schemas.ts:10-78` — 10 schemas (the CLI/MCP output contract).
 - `src/validation-schemas/extracted-shape.ts:7-74` — 8 schemas.
 - `src/validation-schemas/extracted-pattern.ts:13` — `BusinessRuleSchema`.
@@ -439,6 +441,7 @@ Or — if there are no callers (Phase 1 says there aren't) — delete the export
 #### F4A-M-3. Per-file `z.iso.datetime` is used correctly once but `z.string().regex(...)` for ISO/semver is used elsewhere
 
 **Files:**
+
 - `src/validation-schemas/extracted-pattern.ts:74` — `z.iso.datetime({ error: 'Must be valid ISO 8601 timestamp' })` (Zod 4 modern idiom).
 - `src/validation-schemas/workflow-config.ts:33` — `z.string().regex(/^\d+\.\d+\.\d+$/, 'Version must be semver format')` (a fine pattern, but Zod 4 has no native `z.semver` — keep as-is, note for consistency).
 - `src/validation-schemas/extracted-pattern.ts:91` and `dual-source.ts:30` — `z.string().regex(QUARTER_PATTERN)` (no error message — Zod default suffices but worth a sentence).
@@ -530,26 +533,26 @@ Vitest 4 has `expect.poll` for retried-until-stable assertions and `expect.soft`
 
 ## 3. Zod 4 Audit (call sites)
 
-| Site | API | Verdict | Notes |
-|---|---|---|---|
-| `validation-schemas/pattern-graph.ts:42-123` | 9× `z.object` | **Drift** | Open at runtime; should be `z.strictObject`. Phase 1 C-CORE-2. |
-| `validation-schemas/output-schemas.ts:10-78` | 10× `z.object` | **Drift** | CLI/MCP output boundary; should be `z.strictObject`. |
-| `validation-schemas/extracted-shape.ts:7-74` | 8× `z.object` | **Drift** | Should be `z.strictObject`. |
-| `validation-schemas/extracted-pattern.ts:13` | 1× `z.object` (`BusinessRuleSchema`) | **Drift** | Other 6 schemas in same file are correctly `z.strictObject`. |
-| `package/package-config.ts:10` | `.extend()` on `PackageSchema` | **Drift** | Zod 4 `.extend()` doesn't propagate strictness. Re-declare as `z.strictObject({ ...PackageSchema.shape, … })`. |
-| `validation-schemas/tag-registry.ts:32` | `transform: z.function().optional()` | **Wrong shape** | Zod 4 `z.function()` semantics changed; functions don't belong in boundary contracts anyway. Replace with `z.enum(KNOWN_TRANSFORM_NAMES).optional()`. |
-| `config/section-block.ts:75-152` | 3× `z.union` + 9× `z.literal('…')` + 3× `z.lazy` | **Correct** | Tagged with `type: z.literal('…')` discriminant — would benefit from `z.discriminatedUnion('type', […])` for faster parsing + better errors, but the `z.lazy` recursion makes this non-trivial in Zod 4. **Acceptable as-is**; flag for revisit if Zod's recursive discriminated-union support improves. |
-| `validation-schemas/export-info.ts:36` | `z.discriminatedUnion('type', [...])` | **Correct** | Reference implementation for the rest of the codebase. |
-| `validation-schemas/pattern-graph.ts:27,34` | 2× `z.literal('FEATURE_PARSE_ERROR'\|'spec-parse-failed')` | **Could be discriminated** | `FeatureParseErrorSchema` and `PatternParseFailureSchema` are siblings carrying different `type`/`kind` discriminants — not a union today. If they ever join one, `z.discriminatedUnion` is the right shape. |
-| `validation-schemas/config.ts:26,32,52` | `z.string().transform(path.resolve)` | **Correct** | Transform-at-boundary, the right Zod idiom. |
-| `validation-schemas/extracted-pattern.ts:26,46,51` | 3× `z.string().transform(...)` brand applicators | **Correct** | Brand + transform composition is the right Zod 4 pattern. |
-| `validation-schemas/extracted-pattern.ts:74` | `z.iso.datetime({...})` | **Correct** | Zod 4 modern format API; preserve. |
-| `utils/argv-hygiene.ts:25-34` | `z.string().refine(no-null-byte)` | **Correct** | Trust-boundary primitive. |
-| `validation/boundary.ts:54-65` | `z.prettifyError(parsed.error)` | **Correct** | Zod 4 modern error formatter (replaced Zod 3's `error.format()`). |
-| `validation-schemas/extracted-pattern.ts:128` | `z.output<typeof ExtractedPatternBaseSchema>` | **Correct** | Right choice — `z.output` for post-transform shape. |
-| `validation-schemas/extracted-shape.ts:82` | `z.input<typeof ShapeExtractionOptionsSchema>` | **Correct** | Exemplary — uses `z.input` for the pre-default shape passed by callers, `z.infer/output` for the post-default shape. The H-SIMP-5 recipe should follow this template. |
-| `types/branded.ts:7-12` | 6× `z.string().brand<'…'>()` | **Correct** | Native Zod 4 branded types — exemplary. |
-| `package/package-config.ts:5` | `z.instanceof(RegExp)` | **Correct (with caveat)** | Boundary contracts ideally shouldn't ship `RegExp` instances (don't serialize); but `PackageMatcherSchema` is the union of a regex and a string-prefix and is consumed internally only. Acceptable. |
+| Site                                               | API                                                        | Verdict                    | Notes                                                                                                                                                                                                                                                                                                    |
+| -------------------------------------------------- | ---------------------------------------------------------- | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `validation-schemas/pattern-graph.ts:42-123`       | 9× `z.object`                                              | **Drift**                  | Open at runtime; should be `z.strictObject`. Phase 1 C-CORE-2.                                                                                                                                                                                                                                           |
+| `validation-schemas/output-schemas.ts:10-78`       | 10× `z.object`                                             | **Drift**                  | CLI/MCP output boundary; should be `z.strictObject`.                                                                                                                                                                                                                                                     |
+| `validation-schemas/extracted-shape.ts:7-74`       | 8× `z.object`                                              | **Drift**                  | Should be `z.strictObject`.                                                                                                                                                                                                                                                                              |
+| `validation-schemas/extracted-pattern.ts:13`       | 1× `z.object` (`BusinessRuleSchema`)                       | **Drift**                  | Other 6 schemas in same file are correctly `z.strictObject`.                                                                                                                                                                                                                                             |
+| `package/package-config.ts:10`                     | `.extend()` on `PackageSchema`                             | **Drift**                  | Zod 4 `.extend()` doesn't propagate strictness. Re-declare as `z.strictObject({ ...PackageSchema.shape, … })`.                                                                                                                                                                                           |
+| `validation-schemas/tag-registry.ts:32`            | `transform: z.function().optional()`                       | **Wrong shape**            | Zod 4 `z.function()` semantics changed; functions don't belong in boundary contracts anyway. Replace with `z.enum(KNOWN_TRANSFORM_NAMES).optional()`.                                                                                                                                                    |
+| `config/section-block.ts:75-152`                   | 3× `z.union` + 9× `z.literal('…')` + 3× `z.lazy`           | **Correct**                | Tagged with `type: z.literal('…')` discriminant — would benefit from `z.discriminatedUnion('type', […])` for faster parsing + better errors, but the `z.lazy` recursion makes this non-trivial in Zod 4. **Acceptable as-is**; flag for revisit if Zod's recursive discriminated-union support improves. |
+| `validation-schemas/export-info.ts:36`             | `z.discriminatedUnion('type', [...])`                      | **Correct**                | Reference implementation for the rest of the codebase.                                                                                                                                                                                                                                                   |
+| `validation-schemas/pattern-graph.ts:27,34`        | 2× `z.literal('FEATURE_PARSE_ERROR'\|'spec-parse-failed')` | **Could be discriminated** | `FeatureParseErrorSchema` and `PatternParseFailureSchema` are siblings carrying different `type`/`kind` discriminants — not a union today. If they ever join one, `z.discriminatedUnion` is the right shape.                                                                                             |
+| `validation-schemas/config.ts:26,32,52`            | `z.string().transform(path.resolve)`                       | **Correct**                | Transform-at-boundary, the right Zod idiom.                                                                                                                                                                                                                                                              |
+| `validation-schemas/extracted-pattern.ts:26,46,51` | 3× `z.string().transform(...)` brand applicators           | **Correct**                | Brand + transform composition is the right Zod 4 pattern.                                                                                                                                                                                                                                                |
+| `validation-schemas/extracted-pattern.ts:74`       | `z.iso.datetime({...})`                                    | **Correct**                | Zod 4 modern format API; preserve.                                                                                                                                                                                                                                                                       |
+| `utils/argv-hygiene.ts:25-34`                      | `z.string().refine(no-null-byte)`                          | **Correct**                | Trust-boundary primitive.                                                                                                                                                                                                                                                                                |
+| `validation/boundary.ts:54-65`                     | `z.prettifyError(parsed.error)`                            | **Correct**                | Zod 4 modern error formatter (replaced Zod 3's `error.format()`).                                                                                                                                                                                                                                        |
+| `validation-schemas/extracted-pattern.ts:128`      | `z.output<typeof ExtractedPatternBaseSchema>`              | **Correct**                | Right choice — `z.output` for post-transform shape.                                                                                                                                                                                                                                                      |
+| `validation-schemas/extracted-shape.ts:82`         | `z.input<typeof ShapeExtractionOptionsSchema>`             | **Correct**                | Exemplary — uses `z.input` for the pre-default shape passed by callers, `z.infer/output` for the post-default shape. The H-SIMP-5 recipe should follow this template.                                                                                                                                    |
+| `types/branded.ts:7-12`                            | 6× `z.string().brand<'…'>()`                               | **Correct**                | Native Zod 4 branded types — exemplary.                                                                                                                                                                                                                                                                  |
+| `package/package-config.ts:5`                      | `z.instanceof(RegExp)`                                     | **Correct (with caveat)**  | Boundary contracts ideally shouldn't ship `RegExp` instances (don't serialize); but `PackageMatcherSchema` is the union of a regex and a string-prefix and is consumed internally only. Acceptable.                                                                                                      |
 
 **Zod 4 idioms not used and not needed:** `z.preprocess`, `z.pipe`, `z.coerce`. The codebase preprocesses through explicit `.transform(...)` chains; the cases where `z.coerce.number()` could shorten a `z.string().transform(Number)` aren't present.
 
@@ -559,44 +562,44 @@ Vitest 4 has `expect.poll` for retried-until-stable assertions and `expect.soft`
 
 ### `noPropertyAccessFromIndexSignature` defeated
 
-| File:line | Pattern | Recipe |
-|---|---|---|
-| `scanner/gherkin-ast-parser.ts:418` | `[key: string]: unknown` on return type | Split into `ParsedFeatureMetadata` + `FeatureMetadataDiagnostics` (F4A-H-2). |
-| `scanner/gherkin-ast-parser.ts:494,525` | `metadata['_unrecognizedEnums'] as UnrecognizedEnumEntry[] \| undefined` | Falls out when F4A-H-2 lands. |
-| `extractor/gherkin-extractor.ts:372-374` | `metadata['_unrecognizedEnums'] as { tag, value, validValues }[] \| undefined` | Same. |
+| File:line                                | Pattern                                                                        | Recipe                                                                       |
+| ---------------------------------------- | ------------------------------------------------------------------------------ | ---------------------------------------------------------------------------- |
+| `scanner/gherkin-ast-parser.ts:418`      | `[key: string]: unknown` on return type                                        | Split into `ParsedFeatureMetadata` + `FeatureMetadataDiagnostics` (F4A-H-2). |
+| `scanner/gherkin-ast-parser.ts:494,525`  | `metadata['_unrecognizedEnums'] as UnrecognizedEnumEntry[] \| undefined`       | Falls out when F4A-H-2 lands.                                                |
+| `extractor/gherkin-extractor.ts:372-374` | `metadata['_unrecognizedEnums'] as { tag, value, validValues }[] \| undefined` | Same.                                                                        |
 
 ### `noUncheckedIndexedAccess` evaded
 
-| File:line | Pattern | Recipe |
-|---|---|---|
+| File:line                       | Pattern                                            | Recipe                                                                           |
+| ------------------------------- | -------------------------------------------------- | -------------------------------------------------------------------------------- |
 | `scanner/ast-parser.ts:279-296` | 16× `metadataResults.get('key') as X \| undefined` | Replace `Map<string, unknown>` with typed result from `applyTagValue` (F4A-H-1). |
 
 ### `exactOptionalPropertyTypes` partial — `...(x !== undefined && { x })` spreads
 
-This is the *correct* idiom for `exactOptionalPropertyTypes` at object construction time (a property with value `undefined` is rejected). The codebase uses it consistently. Phase 2 sweep #2 proposed an `omitUndefined()` helper to compress these — that's an ergonomics call, not a strictness one. **Preserve current pattern**.
+This is the _correct_ idiom for `exactOptionalPropertyTypes` at object construction time (a property with value `undefined` is rejected). The codebase uses it consistently. Phase 2 sweep #2 proposed an `omitUndefined()` helper to compress these — that's an ergonomics call, not a strictness one. **Preserve current pattern**.
 
 ### Strictness lies (casts after type-guard rejection)
 
-| File:line | Pattern | Severity |
-|---|---|---|
+| File:line                               | Pattern                                                        | Severity               |
+| --------------------------------------- | -------------------------------------------------------------- | ---------------------- |
 | `validation/fsm/validator.ts:92,93,102` | `from as ProcessStatusValue` after `!isValidStatusValue(from)` | **Critical** (F4A-C-1) |
 
 ### `Record<string, unknown>` builders (one-off objects assembled before parse)
 
-| File:line | Pattern | Recipe |
-|---|---|---|
-| `extractor/gherkin-extractor.ts:223,206` | `const rawPattern: Record<string, unknown> = {...}` with 35 quoted-key assignments | Use `z.input<typeof ExtractedPatternSchema>` (F4A-H-5). |
-| `extractor/doc-extractor.ts:254-292` | Same shape, 28 fields | Same recipe. |
-| `config/config-loader.ts:190` | `const copy = { ...(exported as Record<string, unknown>) }` | Falls out when `isProjectConfig` deletion + `Reflect.deleteProperty` string-concat go (Phase 1 C-CORE-4 / H-CORE-4). |
-| `config/project-config-schema.ts:123` | `const obj = value as Record<string, unknown>` | Same — `isProjectConfig` itself is deletion-candidate. |
+| File:line                                | Pattern                                                                            | Recipe                                                                                                               |
+| ---------------------------------------- | ---------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `extractor/gherkin-extractor.ts:223,206` | `const rawPattern: Record<string, unknown> = {...}` with 35 quoted-key assignments | Use `z.input<typeof ExtractedPatternSchema>` (F4A-H-5).                                                              |
+| `extractor/doc-extractor.ts:254-292`     | Same shape, 28 fields                                                              | Same recipe.                                                                                                         |
+| `config/config-loader.ts:190`            | `const copy = { ...(exported as Record<string, unknown>) }`                        | Falls out when `isProjectConfig` deletion + `Reflect.deleteProperty` string-concat go (Phase 1 C-CORE-4 / H-CORE-4). |
+| `config/project-config-schema.ts:123`    | `const obj = value as Record<string, unknown>`                                     | Same — `isProjectConfig` itself is deletion-candidate.                                                               |
 
 ### `as const satisfies T` — used correctly
 
-| File:line | Pattern |
-|---|---|
+| File:line                     | Pattern                                        |
+| ----------------------------- | ---------------------------------------------- |
 | `config/role-constants.ts:64` | `as const satisfies readonly RoleDefinition[]` |
-| `config/self-hosting.ts:68` | `as const satisfies readonly RoleDefinition[]` |
-| `config/resolve-config.ts:41` | `satisfies readonly ContextInferenceRule[]` |
+| `config/self-hosting.ts:68`   | `as const satisfies readonly RoleDefinition[]` |
+| `config/resolve-config.ts:41` | `satisfies readonly ContextInferenceRule[]`    |
 
 Three sites total. These are exemplary TS 5 idioms — `satisfies` keeps the narrow literal types for read access while validating against the interface. Preserve.
 
@@ -614,29 +617,29 @@ Grep confirms zero `as unknown as X` casts in `src/`. The one `as ArchitectProje
 
 ### Pure ESM correctness
 
-| Concern | Verdict | Evidence |
-|---|---|---|
-| `.js` extensions on relative imports | **Correct** | All 160 `^import {` lines in `src/` have `.js` suffix on relative imports. |
-| `import type` for type-only imports | **Correct** | 97 `^import type` declarations; `@typescript-eslint/consistent-type-imports: 'error'` in root config. `verbatimModuleSyntax: true` enforces. |
-| `import.meta.url` instead of `__dirname` | **Correct** | Only one use: `config/self-hosting.ts:7`. No `__dirname`/`__filename` anywhere in `src/`. |
-| `require()` calls | **Zero** | Grep confirms. |
-| Top-level `await` | **Not used** | All async work is inside async functions. No reason it'd be needed in the current API surface. |
-| Dynamic `import()` | **Used once** | `config-loader.ts` likely uses it for the user-config-as-module load. Acceptable. |
+| Concern                                  | Verdict       | Evidence                                                                                                                                     |
+| ---------------------------------------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `.js` extensions on relative imports     | **Correct**   | All 160 `^import {` lines in `src/` have `.js` suffix on relative imports.                                                                   |
+| `import type` for type-only imports      | **Correct**   | 97 `^import type` declarations; `@typescript-eslint/consistent-type-imports: 'error'` in root config. `verbatimModuleSyntax: true` enforces. |
+| `import.meta.url` instead of `__dirname` | **Correct**   | Only one use: `config/self-hosting.ts:7`. No `__dirname`/`__filename` anywhere in `src/`.                                                    |
+| `require()` calls                        | **Zero**      | Grep confirms.                                                                                                                               |
+| Top-level `await`                        | **Not used**  | All async work is inside async functions. No reason it'd be needed in the current API surface.                                               |
+| Dynamic `import()`                       | **Used once** | `config-loader.ts` likely uses it for the user-config-as-module load. Acceptable.                                                            |
 
 ### Node stdlib
 
-| Concern | Verdict | Site(s) |
-|---|---|---|
-| Sync FS on hot paths | **3 sites** | `doc-extractor.ts:231` (`readFileSync` per-pattern), `gherkin-extractor.ts:502` (`existsSync` in sync wrapper), `validation-schemas/config.ts:10` (`realpathSync` in Zod refine — acceptable). |
-| `fs/promises` vs `fs` | **Mixed** | Async sites correctly use `fs/promises`; sync sites use `fs`. Once F4A-H-7 collapses sync extractor, only `validation-schemas/config.ts` keeps sync. |
-| POSIX path normalization | **Inconsistent** | `build-pipeline.ts:108` does it right; `doc-extractor.ts`/`gherkin-extractor.ts` brand `path.relative(...)` directly. F4A-H-8. |
-| `Buffer.from(string)` without encoding | **Not used** | Grep confirms — no `Buffer.from`/`new Buffer` anywhere. |
-| `fs.exists` (legacy) | **Not used** | The sync sites use `existsSync` (not deprecated) and the async sites use `fs.promises.access` (idiomatic Node 20). |
-| `util.promisify` | **Not used** | All async APIs use native promises. |
-| `AbortSignal` / `AbortController` | **Not used** | No I/O paths take `AbortSignal`. Acceptable — `architect-core` doesn't do long-running streaming I/O. Phase 2 CL-CORE-4 (file-watcher leak) is `architect-mcp`'s problem; `package-resolver.ts:34-49` is the cache that needs invalidation, not cancellation. |
-| `crypto` | **Not used** | No hash needs — `generatePatternId` uses a deterministic non-crypto digest (presumably `pattern-{8-char-hex}` from line+filepath). Confirms ID generation doesn't need `crypto.createHash`. |
-| `console.*` | **2 sites** | `extractor/dual-source-extractor.ts:94,178` — Phase 1 M-CORE-12 / Phase 2 CL-CORE-13 already document. Diagnostic channel is in scope; should surface there. |
-| `import * as fs from 'fs'` vs `'node:fs'` | **Mixed** | F4A-L-1. |
+| Concern                                   | Verdict          | Site(s)                                                                                                                                                                                                                                                       |
+| ----------------------------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Sync FS on hot paths                      | **3 sites**      | `doc-extractor.ts:231` (`readFileSync` per-pattern), `gherkin-extractor.ts:502` (`existsSync` in sync wrapper), `validation-schemas/config.ts:10` (`realpathSync` in Zod refine — acceptable).                                                                |
+| `fs/promises` vs `fs`                     | **Mixed**        | Async sites correctly use `fs/promises`; sync sites use `fs`. Once F4A-H-7 collapses sync extractor, only `validation-schemas/config.ts` keeps sync.                                                                                                          |
+| POSIX path normalization                  | **Inconsistent** | `build-pipeline.ts:108` does it right; `doc-extractor.ts`/`gherkin-extractor.ts` brand `path.relative(...)` directly. F4A-H-8.                                                                                                                                |
+| `Buffer.from(string)` without encoding    | **Not used**     | Grep confirms — no `Buffer.from`/`new Buffer` anywhere.                                                                                                                                                                                                       |
+| `fs.exists` (legacy)                      | **Not used**     | The sync sites use `existsSync` (not deprecated) and the async sites use `fs.promises.access` (idiomatic Node 20).                                                                                                                                            |
+| `util.promisify`                          | **Not used**     | All async APIs use native promises.                                                                                                                                                                                                                           |
+| `AbortSignal` / `AbortController`         | **Not used**     | No I/O paths take `AbortSignal`. Acceptable — `architect-core` doesn't do long-running streaming I/O. Phase 2 CL-CORE-4 (file-watcher leak) is `architect-mcp`'s problem; `package-resolver.ts:34-49` is the cache that needs invalidation, not cancellation. |
+| `crypto`                                  | **Not used**     | No hash needs — `generatePatternId` uses a deterministic non-crypto digest (presumably `pattern-{8-char-hex}` from line+filepath). Confirms ID generation doesn't need `crypto.createHash`.                                                                   |
+| `console.*`                               | **2 sites**      | `extractor/dual-source-extractor.ts:94,178` — Phase 1 M-CORE-12 / Phase 2 CL-CORE-13 already document. Diagnostic channel is in scope; should surface there.                                                                                                  |
+| `import * as fs from 'fs'` vs `'node:fs'` | **Mixed**        | F4A-L-1.                                                                                                                                                                                                                                                      |
 
 ---
 

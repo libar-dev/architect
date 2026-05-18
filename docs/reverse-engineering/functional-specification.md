@@ -55,26 +55,26 @@ The platform's behavior is documented at three levels of precision:
 
 Rather than enumerate `FR-001..FR-NNN` here (the live specs do this exhaustively), the table below maps the **functional capabilities** to their canonical surfaces:
 
-| FR ID    | Capability                                                                                                                          | Canonical surface                                                                                                                       |
-| -------- | ----------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| FR-001   | Scan annotated TypeScript + Gherkin sources and build a typed PatternGraph in memory.                                               | `buildPatternGraph` (`@libar-dev/architect-core`); CLI `architect overview`.                                                            |
-| FR-002   | Validate every CLI/MCP input at the trust boundary via Zod `strictObject` schemas.                                                  | `parseAtBoundary` (`architect-core`); ADR-009.                                                                                          |
-| FR-003   | Expose the graph through a stable read-side API (`PatternGraphAPI`).                                                                | `createPatternGraphAPI` (`architect-core`); see `integration-points.md` §JS API Exports.                                                |
-| FR-004   | Project the graph into typed Fragments (markdown / JSON / compact).                                                                 | `project*` and `parseAndProject*` functions in `@libar-dev/architect-projection`; ADR-005, ADR-009.                                     |
-| FR-005   | Provide CLI parity for every projection (`overview`, `status`, `context`, `dep-tree`, `files`, `scope-validate`, `handoff`, etc.).  | The 24 subcommands of `architect` (`integration-points.md` §CLI Surface).                                                               |
-| FR-006   | Provide MCP parity for the same surface.                                                                                            | 21 MCP tools in `ARCHITECT_MCP_TOOLS` (`integration-points.md` §MCP Surface).                                                            |
-| FR-007   | Enforce an FSM lifecycle on patterns: roadmap → active → completed; deferred branch.                                                | `architect-core/validation/fsm/`; enforced by `architect-guard`. See `data-architecture.md` §1e.                                         |
-| FR-008   | Protect `completed` patterns from modification without `@architect-unlock-reason`.                                                  | ProcessGuard rule `completed-protection`.                                                                                               |
-| FR-009   | Detect scope creep on `active` patterns.                                                                                            | ProcessGuard rule `scope-creep`.                                                                                                        |
-| FR-010   | Provide a deterministic readiness check (`scope-validate`) that returns `PASS` / `BLOCKED` / `WARN`.                                | `projectScopeReadinessReport` → `ScopeReadinessReport`; PDR-001 DD-4.                                                                   |
-| FR-011   | Provide a session-handoff verb that captures state for the next agent session.                                                      | `architect handoff` / `architect_handoff` (`integration-points.md`).                                                                    |
-| FR-012   | Generate 8 categories of doc artifacts via `pnpm docs:all`.                                                                          | `architect-generate`; default generators in `DEFAULT_GENERATORS`.                                                                       |
-| FR-013   | Provide a pre-commit gate for FSM enforcement (`architect-guard --staged`).                                                          | `pnpm architect:guard` in `package.json`.                                                                                               |
-| FR-014   | Reject all `// eslint-disable`, `@ts-ignore`, `@ts-expect-error`, `@ts-nocheck`, and `@deprecated`-as-shim in production code.       | `architect-local/no-suppression-comments` ESLint rule + `scripts/guard-no-suppressions.mjs`.                                            |
-| FR-015   | Track unresolved cross-references with `arch dangling [--strict]`.                                                                   | `architect arch dangling` CLI verb (`integration-points.md`).                                                                           |
-| FR-016   | Provide tolerant ingestion of malformed specs (failures land in `featureParseFailures`, never silent drops).                         | `PatternGraph.featureParseFailures` field (`data-architecture.md` §1a).                                                                 |
-| FR-017   | Watch the file system and rebuild the graph on change (debounced 500 ms).                                                            | `architect-mcp --watch`.                                                                                                                |
-| FR-018   | Version all six publishable packages in lockstep via the `fixed` group.                                                              | `.changeset/config.json`.                                                                                                               |
+| FR ID  | Capability                                                                                                                         | Canonical surface                                                                                   |
+| ------ | ---------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| FR-001 | Scan annotated TypeScript + Gherkin sources and build a typed PatternGraph in memory.                                              | `buildPatternGraph` (`@libar-dev/architect-core`); CLI `architect overview`.                        |
+| FR-002 | Validate every CLI/MCP input at the trust boundary via Zod `strictObject` schemas.                                                 | `parseAtBoundary` (`architect-core`); ADR-009.                                                      |
+| FR-003 | Expose the graph through a stable read-side API (`PatternGraphAPI`).                                                               | `createPatternGraphAPI` (`architect-core`); see `integration-points.md` §JS API Exports.            |
+| FR-004 | Project the graph into typed Fragments (markdown / JSON / compact).                                                                | `project*` and `parseAndProject*` functions in `@libar-dev/architect-projection`; ADR-005, ADR-009. |
+| FR-005 | Provide CLI parity for every projection (`overview`, `status`, `context`, `dep-tree`, `files`, `scope-validate`, `handoff`, etc.). | The 24 subcommands of `architect` (`integration-points.md` §CLI Surface).                           |
+| FR-006 | Provide MCP parity for the same surface.                                                                                           | 21 MCP tools in `ARCHITECT_MCP_TOOLS` (`integration-points.md` §MCP Surface).                       |
+| FR-007 | Enforce an FSM lifecycle on patterns: roadmap → active → completed; deferred branch.                                               | `architect-core/validation/fsm/`; enforced by `architect-guard`. See `data-architecture.md` §1e.    |
+| FR-008 | Protect `completed` patterns from modification without `@architect-unlock-reason`.                                                 | ProcessGuard rule `completed-protection`.                                                           |
+| FR-009 | Detect scope creep on `active` patterns.                                                                                           | ProcessGuard rule `scope-creep`.                                                                    |
+| FR-010 | Provide a deterministic readiness check (`scope-validate`) that returns `PASS` / `BLOCKED` / `WARN`.                               | `projectScopeReadinessReport` → `ScopeReadinessReport`; PDR-001 DD-4.                               |
+| FR-011 | Provide a session-handoff verb that captures state for the next agent session.                                                     | `architect handoff` / `architect_handoff` (`integration-points.md`).                                |
+| FR-012 | Generate 8 categories of doc artifacts via `pnpm docs:all`.                                                                        | `architect-generate`; default generators in `DEFAULT_GENERATORS`.                                   |
+| FR-013 | Provide a pre-commit gate for FSM enforcement (`architect-guard --staged`).                                                        | `pnpm architect:guard` in `package.json`.                                                           |
+| FR-014 | Reject all `// eslint-disable`, `@ts-ignore`, `@ts-expect-error`, `@ts-nocheck`, and `@deprecated`-as-shim in production code.     | `architect-local/no-suppression-comments` ESLint rule + `scripts/guard-no-suppressions.mjs`.        |
+| FR-015 | Track unresolved cross-references with `arch dangling [--strict]`.                                                                 | `architect arch dangling` CLI verb (`integration-points.md`).                                       |
+| FR-016 | Provide tolerant ingestion of malformed specs (failures land in `featureParseFailures`, never silent drops).                       | `PatternGraph.featureParseFailures` field (`data-architecture.md` §1a).                             |
+| FR-017 | Watch the file system and rebuild the graph on change (debounced 500 ms).                                                          | `architect-mcp --watch`.                                                                            |
+| FR-018 | Version all six publishable packages in lockstep via the `fixed` group.                                                            | `.changeset/config.json`.                                                                           |
 
 Acceptance criteria for each of FR-001..FR-018 live in the executable Gherkin features under `tests/features/` and `packages/*/tests/features/`. They are not duplicated here.
 
@@ -86,43 +86,43 @@ Stories phrased in the AI-augmented-developer voice. Priority labels are inferre
 
 ### P0 — must work for the platform to be useful at all
 
-- *As a developer with an AI agent, I want to annotate a TypeScript file with `@architect-pattern:Foo` and have the agent see `Foo` in `architect_overview`, `architect_context`, and `architect_dep_tree`* — so the agent knows the project's structure without re-reading every file.
-- *As a developer, I want `pnpm architect:guard --staged` to block a commit that violates the FSM* — so I cannot accidentally re-open a completed pattern, skip lifecycle states, or land scope creep.
-- *As an agent, I want a `PASS` / `BLOCKED` / `WARN` verdict from `architect_scope_validate` before I begin design or implementation* — so I never start work the project guard would reject.
+- _As a developer with an AI agent, I want to annotate a TypeScript file with `@architect-pattern:Foo` and have the agent see `Foo` in `architect_overview`, `architect_context`, and `architect_dep_tree`_ — so the agent knows the project's structure without re-reading every file.
+- _As a developer, I want `pnpm architect:guard --staged` to block a commit that violates the FSM_ — so I cannot accidentally re-open a completed pattern, skip lifecycle states, or land scope creep.
+- _As an agent, I want a `PASS` / `BLOCKED` / `WARN` verdict from `architect_scope_validate` before I begin design or implementation_ — so I never start work the project guard would reject.
 
 ### P1 — important for the methodology to hold
 
-- *As a developer, I want `pnpm docs:all` to regenerate all eight doc categories from the current source* — so generated documentation is never stale relative to code.
-- *As an agent, I want `architect_handoff` to emit a structured handoff record at the end of a session* — so the next session can resume without context loss.
-- *As an agent, I want to call any MCP tool without re-parsing the project (cached after first call)* — so latency stays sub-second on follow-ups.
+- _As a developer, I want `pnpm docs:all` to regenerate all eight doc categories from the current source_ — so generated documentation is never stale relative to code.
+- _As an agent, I want `architect_handoff` to emit a structured handoff record at the end of a session_ — so the next session can resume without context loss.
+- _As an agent, I want to call any MCP tool without re-parsing the project (cached after first call)_ — so latency stays sub-second on follow-ups.
 
 ### P2 — quality-of-life
 
-- *As a developer, I want `architect arch dangling --strict` to fail my CI if any pattern reference is unresolved* — so I catch typos and renames at PR time.
-- *As a developer, I want the `--json` flag on every CLI verb so I can pipe output into my own tooling* — confirmed for the canonical verbs (`overview`, `context`, `scope-validate`, etc.).
-- *As a developer, I want `defineConfig(...)` to give me autocomplete for `architect.config.ts`* — provided by `packages/architect-core/src/config/define-config.ts`.
+- _As a developer, I want `architect arch dangling --strict` to fail my CI if any pattern reference is unresolved_ — so I catch typos and renames at PR time.
+- _As a developer, I want the `--json` flag on every CLI verb so I can pipe output into my own tooling_ — confirmed for the canonical verbs (`overview`, `context`, `scope-validate`, etc.).
+- _As a developer, I want `defineConfig(...)` to give me autocomplete for `architect.config.ts`_ — provided by `packages/architect-core/src/config/define-config.ts`.
 
 ### P3 — nice to have / future
 
-- *As a methodology reader, I want `@libar-dev/architect-spec` to be a citable, standalone package separate from the reference implementation* — scheduled for v1.0 graduation.
-- *As a CI maintainer, I want a committed `.github/workflows/` directory in the repo* — currently absent (see `technical-debt-analysis.md` Item #5).
+- _As a methodology reader, I want `@libar-dev/architect-spec` to be a citable, standalone package separate from the reference implementation_ — scheduled for v1.0 graduation.
+- _As a CI maintainer, I want a committed `.github/workflows/` directory in the repo_ — currently absent (see `technical-debt-analysis.md` Item #5).
 
 ---
 
 ## Non-Functional Requirements
 
-| NFR ID   | Requirement                                                                                                                          | Evidence                                                                                                                                                |
-| -------- | ------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| NFR-001  | Type safety throughout the JS API. Strict TypeScript with `noUncheckedIndexedAccess`, `noPropertyAccessFromIndexSignature`, `exactOptionalPropertyTypes`, `verbatimModuleSyntax`. | `tsconfig.base.json` + `tsconfig.architect-base.json`.                                                                                              |
-| NFR-002  | Zod `strictObject` at every cross-package and CLI/MCP boundary.                                                                       | Engineering doctrine in AGENTS.md; ADR-009.                                                                                                             |
-| NFR-003  | No backward-compatibility shims in production code.                                                                                   | AGENTS.md §No-BC; `architect-local/no-suppression-comments` ESLint rule.                                                                                |
-| NFR-004  | Projection-pipeline median latency must stay within `baseline × 1.5` against the 36-pattern / 108-rule fixture.                       | Perf regression gate in `@libar-dev/architect-projection` (AGENTS.md §"Perf regression gate").                                                          |
-| NFR-005  | MCP server cold-start ≤ ~2 s on the dogfood workspace (329 source files).                                                              | Measured implicitly; observed in agent sessions. No committed budget.                                                                                   |
-| NFR-006  | Pure-function domain logic in `scope-validate` / `handoff` (no shell calls inside the domain layer).                                  | PDR-001 DD-2 (*"Git integration opt-in via `--git`; domain logic never invokes shell."*).                                                                |
-| NFR-007  | Deterministic verdict vocabulary (`PASS` / `BLOCKED` / `WARN`) consistent with ProcessGuard severity levels.                          | PDR-001 DD-4.                                                                                                                                           |
-| NFR-008  | Acyclic package dependency graph: `core ← projection`, `core ← guard ← cli`, `core, projection ← mcp`.                                | AGENTS.md §"Dependency direction".                                                                                                                      |
-| NFR-009  | MIT license; npm `access: public`.                                                                                                    | `LICENSE`; `.changeset/config.json`.                                                                                                                     |
-| NFR-010  | All six publishable packages in lockstep via the `fixed` changesets group.                                                            | `.changeset/config.json` `fixed` array.                                                                                                                  |
+| NFR ID  | Requirement                                                                                                                                                                       | Evidence                                                                                       |
+| ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| NFR-001 | Type safety throughout the JS API. Strict TypeScript with `noUncheckedIndexedAccess`, `noPropertyAccessFromIndexSignature`, `exactOptionalPropertyTypes`, `verbatimModuleSyntax`. | `tsconfig.base.json` + `tsconfig.architect-base.json`.                                         |
+| NFR-002 | Zod `strictObject` at every cross-package and CLI/MCP boundary.                                                                                                                   | Engineering doctrine in AGENTS.md; ADR-009.                                                    |
+| NFR-003 | No backward-compatibility shims in production code.                                                                                                                               | AGENTS.md §No-BC; `architect-local/no-suppression-comments` ESLint rule.                       |
+| NFR-004 | Projection-pipeline median latency must stay within `baseline × 1.5` against the 36-pattern / 108-rule fixture.                                                                   | Perf regression gate in `@libar-dev/architect-projection` (AGENTS.md §"Perf regression gate"). |
+| NFR-005 | MCP server cold-start ≤ ~2 s on the dogfood workspace (329 source files).                                                                                                         | Measured implicitly; observed in agent sessions. No committed budget.                          |
+| NFR-006 | Pure-function domain logic in `scope-validate` / `handoff` (no shell calls inside the domain layer).                                                                              | PDR-001 DD-2 (_"Git integration opt-in via `--git`; domain logic never invokes shell."_).      |
+| NFR-007 | Deterministic verdict vocabulary (`PASS` / `BLOCKED` / `WARN`) consistent with ProcessGuard severity levels.                                                                      | PDR-001 DD-4.                                                                                  |
+| NFR-008 | Acyclic package dependency graph: `core ← projection`, `core ← guard ← cli`, `core, projection ← mcp`.                                                                            | AGENTS.md §"Dependency direction".                                                             |
+| NFR-009 | MIT license; npm `access: public`.                                                                                                                                                | `LICENSE`; `.changeset/config.json`.                                                           |
+| NFR-010 | All six publishable packages in lockstep via the `fixed` changesets group.                                                                                                        | `.changeset/config.json` `fixed` array.                                                        |
 
 ---
 

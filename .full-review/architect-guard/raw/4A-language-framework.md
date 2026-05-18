@@ -28,6 +28,7 @@ The four highest-leverage Phase 4 fixes (each cascades):
 **File:line:** `architect-guard/src/lint/process-guard/detect-changes.ts:414, 440, 452` (consume); `architect-core/src/validation/fsm/validator.ts:52` (the type-guard exists but is not exported); `architect-core/src/validation/fsm/index.ts:1-32` (barrel; missing the export).
 
 **Verified by grep:**
+
 - `architect-core/src/validation/fsm/validator.ts:52: function isValidStatusValue(status: string): status is ProcessStatusValue` — local, non-exported.
 - `architect-core/src/domain-enums.ts:26: export const ProcessStatusSchema = z.enum(PROCESS_STATUS_VALUES)` — exported, but not under the `StatusValueSchema` name guard's recipe wants.
 - `architect-core/src/index.ts` — no `isValidProcessStatus`/`isValidStatusValue` export.
@@ -114,6 +115,7 @@ The `DEFAULT_THRESHOLDS.parse({})` pattern is what core's Phase 4A §1 §2 promo
 ### F4A-G-H-2. Zero `.brand<>()` in guard — `git/` returns stringly-typed paths **[net-new]**
 
 **Files:**
+
 - `git/helpers.ts:59 sanitizeBranchName(branch: string): string` — validates regex, returns plain `string`.
 - `git/name-status.ts:19-23` — `ParsedGitNameStatus.{modified, added, deleted}: readonly string[]`.
 - `git/branch-diff.ts:46-59 getChangedFilesList(...): Result<readonly string[]>`.
@@ -122,7 +124,8 @@ These are the package's primary boundary types. None are nominal. Core's `types/
 
 ```ts
 // architect-core/src/types/branded.ts — add three brands (~12 LOC)
-export const BranchNameSchema = z.string()
+export const BranchNameSchema = z
+  .string()
   .regex(/^[a-zA-Z0-9._\-/]+$/, 'invalid branch')
   .refine((s) => !s.startsWith('-') && !s.includes('..'), 'invalid branch')
   .brand<'BranchName'>();
@@ -145,6 +148,7 @@ Compile-time benefit: the entire `lint/process-guard/` pipeline distinguishes "a
 ### F4A-G-H-3. 4 CLI bins parse argv by hand without Zod **[net-new on architectural framing]**
 
 **Files (~360 LOC total):**
+
 - `cli/lint-process.ts:73-137` (`parseArgs` returning hand-rolled `ProcessGuardCLIConfig`).
 - `cli/lint-patterns.ts:78-144`.
 - `cli/lint-steps.ts:43-108`.
@@ -214,15 +218,15 @@ The Phase 4 angle: this is a load-bearing magic string. The literal `'PDR-005 FS
 
 Files using bare `from 'fs'` / `from 'path'` / `from 'child_process'`:
 
-| File | Bare imports |
-|------|--------------|
+| File                                      | Bare imports                                                                                                  |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
 | `lint/process-guard/detect-changes.ts:36` | `import * as path from 'path'` (NB: `:35` uses `import * as fs from 'node:fs'` — same file mixes both styles) |
-| `lint/process-guard/derive-state.ts:30` | `import * as path from 'path'` |
-| `lint/steps/pair-resolver.ts:6-7` | `from 'fs'` + `from 'path'` |
-| `lint/steps/runner.ts:8` | `from 'fs'` |
-| `lint/idea-tier/runner.ts:7` | `from 'fs'` |
-| `validation/anti-patterns.ts:33` | `from 'fs'` |
-| `git/helpers.ts:19` | `from 'child_process'` |
+| `lint/process-guard/derive-state.ts:30`   | `import * as path from 'path'`                                                                                |
+| `lint/steps/pair-resolver.ts:6-7`         | `from 'fs'` + `from 'path'`                                                                                   |
+| `lint/steps/runner.ts:8`                  | `from 'fs'`                                                                                                   |
+| `lint/idea-tier/runner.ts:7`              | `from 'fs'`                                                                                                   |
+| `validation/anti-patterns.ts:33`          | `from 'fs'`                                                                                                   |
+| `git/helpers.ts:19`                       | `from 'child_process'`                                                                                        |
 
 `cli/shared.ts:1-3`, `lint/dangling-baseline.ts:1-2`, `lint/tier-a-baseline.ts:1-2`, `lint/process-guard/session-state-reader.ts:26` use `node:` correctly. Mechanical sweep; no behavior change. Core's Phase 4A F4A-L-1 noted the same family pattern.
 
@@ -234,7 +238,9 @@ Files using bare `from 'fs'` / `from 'path'` / `from 'child_process'`:
 ### `tests/steps/guard-runtime.steps.ts:78` — `as never` in test fixture **[net-new]**
 
 ```ts
-state.dodResult = validateDoDForPhase('ExamplePattern', 9, { /* shape with deliverable + scenarios */ } as never);
+state.dodResult = validateDoDForPhase('ExamplePattern', 9, {
+  /* shape with deliverable + scenarios */
+} as never);
 ```
 
 `as never` is a TS escape hatch typically used when the call signature has been narrowed beyond what the fixture wants to express. The harness file (`tests/steps/hierarchy-parent-level-mismatch.steps.ts`) doesn't use it. **Recipe:** either define a fixture-builder helper that produces the correct `Phase` input type, or expose a `Phase` schema fixture from the production module so the test imports a strict shape rather than asserting one. The pattern weakens the test's coverage signal — Phase 3A flagged the test surface as "structurally correct but applied to too few scenarios"; this cast is a small additional weakness in what's being applied.
@@ -256,35 +262,35 @@ Unlike projection's M-PROJ-F-4 (which has 3 `Set.has` narrowing limits waiting o
 
 ## Zod 4 audit (call-site verdicts)
 
-| Site | API | Verdict |
-|------|-----|---------|
-| `lint/dangling-baseline.ts:7 DanglingBaselineEntrySchema` | `z.strictObject({ pattern, field, missing })` | **Correct** — reference-quality for guard's own contracts. |
-| `lint/dangling-baseline.ts:13` | `z.array(...).readonly()` | **Correct** — preserve. |
-| `lint/dangling-baseline.ts:15` | `z.infer<typeof DanglingBaselineEntrySchema>` | **Correct** — sole `z.infer` site in guard. |
-| `validation/types.ts:81 AntiPatternThresholdsSchema` | `z.object({ ... })` | **Drift** — open at runtime. F4A-G-2 fix. |
-| `validation/types.ts:90` | `z.infer<typeof AntiPatternThresholdsSchema>` | **Correct (mechanically)** — but derives from an open schema. |
-| `validation/types.ts:95-99 DEFAULT_THRESHOLDS` literal | hand-written object | **Drift** — should be `.parse({})`. F4A-G-2 fix. |
-| Everywhere else | (no schemas) | **Absent** — guard has only 2 schemas total; projection has 107. |
+| Site                                                      | API                                           | Verdict                                                          |
+| --------------------------------------------------------- | --------------------------------------------- | ---------------------------------------------------------------- |
+| `lint/dangling-baseline.ts:7 DanglingBaselineEntrySchema` | `z.strictObject({ pattern, field, missing })` | **Correct** — reference-quality for guard's own contracts.       |
+| `lint/dangling-baseline.ts:13`                            | `z.array(...).readonly()`                     | **Correct** — preserve.                                          |
+| `lint/dangling-baseline.ts:15`                            | `z.infer<typeof DanglingBaselineEntrySchema>` | **Correct** — sole `z.infer` site in guard.                      |
+| `validation/types.ts:81 AntiPatternThresholdsSchema`      | `z.object({ ... })`                           | **Drift** — open at runtime. F4A-G-2 fix.                        |
+| `validation/types.ts:90`                                  | `z.infer<typeof AntiPatternThresholdsSchema>` | **Correct (mechanically)** — but derives from an open schema.    |
+| `validation/types.ts:95-99 DEFAULT_THRESHOLDS` literal    | hand-written object                           | **Drift** — should be `.parse({})`. F4A-G-2 fix.                 |
+| Everywhere else                                           | (no schemas)                                  | **Absent** — guard has only 2 schemas total; projection has 107. |
 
 **Zod 4 idioms not used in guard:** `z.strictObject` (except 1 site), `z.discriminatedUnion`, `z.brand`, `z.input`, `z.output`, `z.prettifyError`, `parseAtBoundary`, `BoundaryParseError`, `z.ZodType<T>: z.lazy(...)`, `z.coerce.number()`. Compare to projection's 7 family-reference patterns (`raw/4A-language-framework.md:178-188`); guard uses zero of them.
 
 ## TS strictness audit
 
-| Issue type | Count | Sites |
-|------------|-------|-------|
-| `as ProcessStatusValue` after `.includes()` / on regex captures | 3 | `detect-changes.ts:414,440,452` (C-GUARD-1) |
-| `as unknown` | 1 | `dangling-baseline.ts:102` (cosmetic) |
-| `as never` | 1 | `tests/steps/guard-runtime.steps.ts:78` (test fixture; F4A-G-H-6 / Medium) |
-| `as any` | **0** | clean |
-| `@ts-ignore`/`@ts-expect-error`/`eslint-disable` | **0** | clean (matches family) |
-| `void <async-call>` expressions evading no-suppressions | 3 | `lint-process.ts:397`, `lint-patterns.ts:395`, `validate-patterns.ts:931` (F4A-G-H-5) |
-| `Map<string, unknown>` builders | **0** | clean (unlike core F4A-H-1 16 sites) |
-| `Record<string, unknown>` builders | **0** | clean |
-| `[key: string]: unknown` index signature | **0** | clean |
-| `process.argv` mutation | 4 | `runXCli` functions across all 4 bins (F4A-G-H-4) |
-| `parseInt` + `isNaN` instead of `Number.*` | 5 | F4A-G-H-3 / Medium |
-| Hand-written interfaces shadowing absent schemas | 22 | F4A-G-H-1 (14 in `process-guard/types.ts`) + 8 across `validation/types.ts`, `lint/steps/types.ts`, `lint/idea-tier/types.ts`, `git/name-status.ts` |
-| Branded types (`.brand<>`) | **0** | F4A-G-H-2 |
+| Issue type                                                      | Count | Sites                                                                                                                                               |
+| --------------------------------------------------------------- | ----- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `as ProcessStatusValue` after `.includes()` / on regex captures | 3     | `detect-changes.ts:414,440,452` (C-GUARD-1)                                                                                                         |
+| `as unknown`                                                    | 1     | `dangling-baseline.ts:102` (cosmetic)                                                                                                               |
+| `as never`                                                      | 1     | `tests/steps/guard-runtime.steps.ts:78` (test fixture; F4A-G-H-6 / Medium)                                                                          |
+| `as any`                                                        | **0** | clean                                                                                                                                               |
+| `@ts-ignore`/`@ts-expect-error`/`eslint-disable`                | **0** | clean (matches family)                                                                                                                              |
+| `void <async-call>` expressions evading no-suppressions         | 3     | `lint-process.ts:397`, `lint-patterns.ts:395`, `validate-patterns.ts:931` (F4A-G-H-5)                                                               |
+| `Map<string, unknown>` builders                                 | **0** | clean (unlike core F4A-H-1 16 sites)                                                                                                                |
+| `Record<string, unknown>` builders                              | **0** | clean                                                                                                                                               |
+| `[key: string]: unknown` index signature                        | **0** | clean                                                                                                                                               |
+| `process.argv` mutation                                         | 4     | `runXCli` functions across all 4 bins (F4A-G-H-4)                                                                                                   |
+| `parseInt` + `isNaN` instead of `Number.*`                      | 5     | F4A-G-H-3 / Medium                                                                                                                                  |
+| Hand-written interfaces shadowing absent schemas                | 22    | F4A-G-H-1 (14 in `process-guard/types.ts`) + 8 across `validation/types.ts`, `lint/steps/types.ts`, `lint/idea-tier/types.ts`, `git/name-status.ts` |
+| Branded types (`.brand<>`)                                      | **0** | F4A-G-H-2                                                                                                                                           |
 
 The strictness flags are on; guard doesn't actively defeat them by way of `Map<string, unknown>` or `Record<string, unknown>` or index signatures (core F4A's three biggest categories). **Guard's strictness defeats are concentrated at the FSM boundary (3 casts) and at the absence of schemas (22 hand-written shapes that should be `z.infer`).** This is structurally different from core's "we have schemas but they're open" and projection's "everything is correct except 2 chained-strict slips."
 

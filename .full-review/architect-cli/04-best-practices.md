@@ -8,48 +8,48 @@ Cli is **the doctrine reference for CLI trust boundaries** (12 `parseAtBoundary`
 
 ## Zod 4 audit
 
-| Site | Verdict |
-|------|---------|
-| 13 `z.strictObject` sites; 0 `z.object` | **Correct** — no strict-sweep needed. |
-| 0 `.extend()/.omit()/.pick()/.partial()/.required()` chains | **Correct** — preserves doctrine. |
-| 0 `z.function()` | **Correct** — no Zod-3 idiom. |
-| 0 `.brand<>()` declarations | **Family-wide gap** (F4A-CLI-H-1, matches guard F4A-G-H-2). |
-| 12 `parseAtBoundary` call sites | **Family reference**. |
-| `parseSchemaValue` swallows `BoundaryParseError.cause` | F4A-CLI-M-3 — closes Skip 1 from Phase 3 when fixed. |
+| Site                                                                                                           | Verdict                                                      |
+| -------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| 13 `z.strictObject` sites; 0 `z.object`                                                                        | **Correct** — no strict-sweep needed.                        |
+| 0 `.extend()/.omit()/.pick()/.partial()/.required()` chains                                                    | **Correct** — preserves doctrine.                            |
+| 0 `z.function()`                                                                                               | **Correct** — no Zod-3 idiom.                                |
+| 0 `.brand<>()` declarations                                                                                    | **Family-wide gap** (F4A-CLI-H-1, matches guard F4A-G-H-2).  |
+| 12 `parseAtBoundary` call sites                                                                                | **Family reference**.                                        |
+| `parseSchemaValue` swallows `BoundaryParseError.cause`                                                         | F4A-CLI-M-3 — closes Skip 1 from Phase 3 when fixed.         |
 | `CommandDef.flags: z.ZodType<Readonly<Record<string, unknown>>>` erases per-command flag types → 13 `as` casts | F4A-CLI-H-3; cured by `CommandDef<F>` generic (F4A-CLI-M-5). |
 
 ## TS strictness audit
 
-| Issue | Count |
-|-------|-------|
-| `any` | **0** |
-| `as unknown as` | **0** |
-| `@ts-ignore` / `@ts-expect-error` | **0** |
-| Unprefixed legacy node imports | **0** |
-| `Number.parseInt` consistency | **Correct** |
-| `void main()` async-call sites | **2** (family hazard, matches guard F4A-G-H-5 / core F4A-H-9) |
-| `Set.has` narrowing exposure | **0** (all `Set<string>` — Phase 4A projection's M-PROJ-F-4 doesn't recur here) |
+| Issue                             | Count                                                                           |
+| --------------------------------- | ------------------------------------------------------------------------------- |
+| `any`                             | **0**                                                                           |
+| `as unknown as`                   | **0**                                                                           |
+| `@ts-ignore` / `@ts-expect-error` | **0**                                                                           |
+| Unprefixed legacy node imports    | **0**                                                                           |
+| `Number.parseInt` consistency     | **Correct**                                                                     |
+| `void main()` async-call sites    | **2** (family hazard, matches guard F4A-G-H-5 / core F4A-H-9)                   |
+| `Set.has` narrowing exposure      | **0** (all `Set<string>` — Phase 4A projection's M-PROJ-F-4 doesn't recur here) |
 
 ## CI/DevOps audit
 
-| Concern | Status |
-|---------|--------|
-| `prepack` placement | **Correct** (under scripts). |
-| `prepack` command | `pnpm clean && pnpm build` — aligned. |
-| `typecheck` scope | **Best-in-family** alongside guard (both configs). |
-| `lint` glob | `eslint src tests` — aligned. |
-| `package.json#exports` ↔ `#bin` agreement | **Verified correct**. |
-| Bin shebangs + `chmod +x` | **Correct**. |
-| Tarball | **52.1 kB packed / 253.7 kB unpacked / 112 files** — 46% map files by count, 28% by bytes. Same family CL-CORE-3 fix. |
+| Concern                                   | Status                                                                                                                |
+| ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `prepack` placement                       | **Correct** (under scripts).                                                                                          |
+| `prepack` command                         | `pnpm clean && pnpm build` — aligned.                                                                                 |
+| `typecheck` scope                         | **Best-in-family** alongside guard (both configs).                                                                    |
+| `lint` glob                               | `eslint src tests` — aligned.                                                                                         |
+| `package.json#exports` ↔ `#bin` agreement | **Verified correct**.                                                                                                 |
+| Bin shebangs + `chmod +x`                 | **Correct**.                                                                                                          |
+| Tarball                                   | **52.1 kB packed / 253.7 kB unpacked / 112 files** — 46% map files by count, 28% by bytes. Same family CL-CORE-3 fix. |
 
 ## New Phase 4 findings
 
-| ID | Title | Action |
-|----|-------|--------|
-| **CL-CLI-1** (Critical, family-wide) | `tsconfig.base.json` sourceMap/declarationMap disable | Same as CL-CORE-3 family fix. |
-| **F4A-CLI-H-4 + H-5** | `runtime-bridge.js` is the package's only `.js` production file; un-typechecked, un-linted; **Windows-breaking `new URL(...).pathname` bug at line 6** | Convert to `.ts` under `src/`, fix the bug, then promote to workspace template. |
-| **CL-CLI-H-1** | No pack-smoke test (`tests/support/run-cli.ts` is the harness shape ready to use) | Complement to guard's CI-G-C-1. |
-| **CL-CLI-H-2** | `vitest.config.ts:11` uses `__dirname` in pure ESM (latent foot-gun) | Replace with `import.meta.dirname`. |
+| ID                                   | Title                                                                                                                                                  | Action                                                                          |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------- |
+| **CL-CLI-1** (Critical, family-wide) | `tsconfig.base.json` sourceMap/declarationMap disable                                                                                                  | Same as CL-CORE-3 family fix.                                                   |
+| **F4A-CLI-H-4 + H-5**                | `runtime-bridge.js` is the package's only `.js` production file; un-typechecked, un-linted; **Windows-breaking `new URL(...).pathname` bug at line 6** | Convert to `.ts` under `src/`, fix the bug, then promote to workspace template. |
+| **CL-CLI-H-1**                       | No pack-smoke test (`tests/support/run-cli.ts` is the harness shape ready to use)                                                                      | Complement to guard's CI-G-C-1.                                                 |
+| **CL-CLI-H-2**                       | `vitest.config.ts:11` uses `__dirname` in pure ESM (latent foot-gun)                                                                                   | Replace with `import.meta.dirname`.                                             |
 
 ## What's family-reference quality (preserve)
 

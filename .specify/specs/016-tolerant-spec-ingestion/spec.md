@@ -1,11 +1,12 @@
 # Feature: Tolerant Spec Ingestion
 
 ## Status
+
 ✅ COMPLETE — Malformed Gherkin / annotation parse failures land in `PatternGraph.featureParseFailures` rather than crashing the build; never silent drops.
 
 ## Overview
 
-The build pipeline (`buildPatternGraph` in `@libar-dev/architect-core`) ingests two kinds of source: annotated TypeScript files and Gherkin `.feature` files (architect-state specs in `architect/specs/`, decisions in `architect/decisions/`, executable features in `tests/features/`). At repo scale (329 TypeScript files, 128 `.feature` files at the pinned commit), the probability that *every* source file is well-formed at every commit is near zero — files in progress, mid-rename, mid-promotion are normal.
+The build pipeline (`buildPatternGraph` in `@libar-dev/architect-core`) ingests two kinds of source: annotated TypeScript files and Gherkin `.feature` files (architect-state specs in `architect/specs/`, decisions in `architect/decisions/`, executable features in `tests/features/`). At repo scale (329 TypeScript files, 128 `.feature` files at the pinned commit), the probability that _every_ source file is well-formed at every commit is near zero — files in progress, mid-rename, mid-promotion are normal.
 
 Tolerant ingestion is the policy that the build pipeline **must not crash** on a malformed file. Instead, the failure is captured into structured diagnostic fields on the resulting `PatternGraph`:
 
@@ -35,7 +36,7 @@ This is the runtime realization of FR-016 and a load-bearing piece of the source
 - [x] `architect diagnostics` enumerates these diagnostic fields.
 - [x] Well-formed patterns remain query-able while malformed siblings are diagnosed (no all-or-nothing failure).
 - [x] No silent drops — every dropped file is named in one of the diagnostic fields.
-- [x] Tolerant ingestion does not paper over schema errors in well-formed-shaped files: a file that *parses* but violates Zod still produces a `MalformedPattern` record.
+- [x] Tolerant ingestion does not paper over schema errors in well-formed-shaped files: a file that _parses_ but violates Zod still produces a `MalformedPattern` record.
 - [x] `architect-mcp --watch` rebuilds tolerantly on file changes (500ms debounce) and surfaces new failures in subsequent tool calls.
 
 ## Technical Requirements
@@ -53,6 +54,7 @@ This is the runtime realization of FR-016 and a load-bearing piece of the source
 ## Implementation Status
 
 **Completed:**
+
 - ✅ `featureParseFailures` field on `PatternGraph` (`data-architecture.md` §1a).
 - ✅ `MalformedPattern`, `PipelineError`, `PipelineWarning`, `BuildResult` types exported from `architect-core`.
 - ✅ `parseFeatureFile` wraps `@cucumber/gherkin` with capture-on-failure semantics.

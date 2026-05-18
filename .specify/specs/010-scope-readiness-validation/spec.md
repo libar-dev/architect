@@ -1,15 +1,16 @@
 # Feature: Scope-Readiness Validation (`scope-validate`)
 
 ## Status
+
 ✅ COMPLETE — Deterministic verdict gate returning `PASS` / `BLOCKED` / `WARN`; CLI `architect scope-validate`, MCP `architect_scope_validate`, projection `projectScopeReadinessReport()` returning `ScopeReadinessReport` (`fragments/execution-context/scope-readiness-report.ts:17-22`); pure-function domain (PDR-001 DD-2, NFR-006).
 
 ## Overview
 
-`scope-validate` is the pre-flight readiness check every agent (human or AI) runs before opening a design or implementation session for a pattern. It answers a single question: *"Is it safe to start this session on this pattern right now?"* The answer is one of three deterministic verdict words — **`PASS`**, **`BLOCKED`**, **`WARN`** — aligned with ProcessGuard severity (PDR-001 DD-4). `PASS` permits the FSM transition the session intent implies; `BLOCKED` does not; `WARN` is informational unless `--strict` is passed, in which case it promotes to `BLOCKED`.
+`scope-validate` is the pre-flight readiness check every agent (human or AI) runs before opening a design or implementation session for a pattern. It answers a single question: _"Is it safe to start this session on this pattern right now?"_ The answer is one of three deterministic verdict words — **`PASS`**, **`BLOCKED`**, **`WARN`** — aligned with ProcessGuard severity (PDR-001 DD-4). `PASS` permits the FSM transition the session intent implies; `BLOCKED` does not; `WARN` is informational unless `--strict` is passed, in which case it promotes to `BLOCKED`.
 
 The check is composed of multiple `ScopeReadinessCheck` entries — open questions resolved? dependencies in the right state? deliverables enumerated? FSM transition legal? — and the report aggregates them. The verdict is `PASS` only if no check has `severity: 'error'` and (in `--strict` mode) no check has `severity: 'warning'`. The composition is pure: the domain layer reads `PatternGraph` and returns the report. It never invokes the shell, the filesystem, or the network. Git integration is opt-in via `--git` and lives in an adapter outside the domain (PDR-001 DD-2).
 
-`scope-validate` is the gate the entire delivery process pivots on. Every architect-* session skill calls it before doing real work. Because the domain is pure and the verdict vocabulary is small, both the CLI and MCP surfaces emit byte-identical `ScopeReadinessReport` JSON — agents and humans see the same report.
+`scope-validate` is the gate the entire delivery process pivots on. Every architect-\* session skill calls it before doing real work. Because the domain is pure and the verdict vocabulary is small, both the CLI and MCP surfaces emit byte-identical `ScopeReadinessReport` JSON — agents and humans see the same report.
 
 Reference: `functional-specification.md` FR-010; `data-architecture.md` §3 Execution context + §4c JSON shape; `decision-rationale.md` PDR-001 DD-2 + DD-4; `integration-points.md` MCP tool table.
 
@@ -52,6 +53,7 @@ Reference: `functional-specification.md` FR-010; `data-architecture.md` §3 Exec
 ## Implementation Status
 
 **Completed:**
+
 - ✅ Fragment schema: `packages/architect-projection/src/fragments/execution-context/scope-readiness-report.ts:17-22`.
 - ✅ Verdict enum: `packages/architect-projection/src/fragments/execution-context/supporting.ts:18`.
 - ✅ Domain builder: `projectScopeReadinessReport` + `parseAndProjectScopeReadinessReport`.

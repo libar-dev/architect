@@ -110,7 +110,11 @@ const intentBundles: IntentBundle[] = [
     summary: 'Read a design-tier spec for implementation readiness, find gaps.',
     verbs: [
       { name: 'overview' },
-      { name: 'scope-validate', flags: '<Pattern> implement', note: 'PASS / WARN / BLOCKED is the gate' },
+      {
+        name: 'scope-validate',
+        flags: '<Pattern> implement',
+        note: 'PASS / WARN / BLOCKED is the gate',
+      },
       { name: 'bundle', flags: '<Pattern> --mode review --format json' },
       { name: 'dep-tree', flags: '<Pattern>' },
       { name: 'arch', flags: 'blocking', note: 'global blocker view' },
@@ -187,8 +191,10 @@ interface DeterministicGate {
 const deterministicGates: DeterministicGate[] = [
   {
     verb: 'scope-validate <Pattern> <design|implement>',
-    purpose: 'Pre-flight check before starting design or implement work. Only design/implement accepted.',
-    verdictShape: 'Per-criterion [PASS] / [WARN] / [BLOCKED]; final verdict READY / READY (with warnings) / BLOCKED.',
+    purpose:
+      'Pre-flight check before starting design or implement work. Only design/implement accepted.',
+    verdictShape:
+      'Per-criterion [PASS] / [WARN] / [BLOCKED]; final verdict READY / READY (with warnings) / BLOCKED.',
   },
   {
     verb: 'query isValidTransition <from> <to>',
@@ -306,7 +312,9 @@ function renderSkill(catalog: CliCatalog): string {
 
   lines.push('## Anti-patterns');
   lines.push('');
-  lines.push('- Reading files (`Read` / `Glob` / `Grep`) on architect-scoped paths before any CLI/MCP call.');
+  lines.push(
+    '- Reading files (`Read` / `Glob` / `Grep`) on architect-scoped paths before any CLI/MCP call.',
+  );
   lines.push('- Hand-writing hyphenated MCP names — they 404. See full reference.');
   lines.push('- Using `scope-validate <X> planning` — only `design` and `implement` are accepted.');
   lines.push('');
@@ -340,10 +348,18 @@ function renderDocs(catalog: CliCatalog): string {
   lines.push('');
   lines.push('| If you want to… | Go to |');
   lines.push('| --- | --- |');
-  lines.push('| Look up a verb by what your session is doing | [Verbs by session intent](#verbs-by-session-intent) |');
-  lines.push('| Find the MCP twin of a CLI verb (or vice versa) | [CLI ↔ MCP parity table](#cli--mcp-parity-table) |');
-  lines.push('| Know which verbs produce deterministic verdicts | [Deterministic gates](#deterministic-gates) |');
-  lines.push('| Read every verb shape, ordered alphabetically | [Per-verb reference](#per-verb-reference) |');
+  lines.push(
+    '| Look up a verb by what your session is doing | [Verbs by session intent](#verbs-by-session-intent) |',
+  );
+  lines.push(
+    '| Find the MCP twin of a CLI verb (or vice versa) | [CLI ↔ MCP parity table](#cli--mcp-parity-table) |',
+  );
+  lines.push(
+    '| Know which verbs produce deterministic verdicts | [Deterministic gates](#deterministic-gates) |',
+  );
+  lines.push(
+    '| Read every verb shape, ordered alphabetically | [Per-verb reference](#per-verb-reference) |',
+  );
   lines.push('| Avoid the known traps | [Known quirks](#known-quirks) |');
   lines.push('');
 
@@ -390,7 +406,9 @@ function renderDocs(catalog: CliCatalog): string {
 
   lines.push('## Per-verb reference');
   lines.push('');
-  lines.push('Sorted alphabetically. Each entry shows the signature from the live Zod schema; flags and quirks are in the dedicated sections.');
+  lines.push(
+    'Sorted alphabetically. Each entry shows the signature from the live Zod schema; flags and quirks are in the dedicated sections.',
+  );
   lines.push('');
   const sorted = [...catalog.verbs].sort((a, b) => a.name.localeCompare(b.name));
   for (const verb of sorted) {
@@ -455,6 +473,8 @@ function writeOutput(relativePath: string, body: string): void {
 }
 
 const catalog = buildCatalog();
-console.log(`built CliCatalog: ${catalog.verbs.length} verbs, ${catalog.intentBundles.length} intent bundles`);
+console.log(
+  `built CliCatalog: ${catalog.verbs.length} verbs, ${catalog.intentBundles.length} intent bundles`,
+);
 writeOutput('.agents/skills/architect-cli-overview/SKILL.md', renderSkill(catalog));
 writeOutput('.pr-coordination/proto-output/cli-docs/INDEX.md', renderDocs(catalog));

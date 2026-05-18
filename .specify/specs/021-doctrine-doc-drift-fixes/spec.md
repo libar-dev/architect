@@ -1,6 +1,7 @@
 # Feature: Doctrine + Documentation Drift Fixes (Phase A Bundle)
 
 ## Status
+
 ⚠️ PARTIAL — the underlying code is correct; the docs (`AGENTS.md`, `docs/MCP-SETUP.md`, the meta-package `description`, `REMAINING-WORK.md`) carry stale facts that mislead consumers and downstream contributors. Bundled as a single ≈1–2-hour PR per `technical-debt-analysis.md` §Suggested Migration Phases / Phase A.
 
 ## Overview
@@ -9,13 +10,13 @@ A reverse-engineering pass at the pinned commit (`b875ff1`) surfaces four code-v
 
 The four items (plus one supplementary No-BC violation surfaced during spec generation) are:
 
-1. **PWD/INIT_CWD/cwd precedence drift** (tech-debt #1, **High Impact / Low Effort / Quick Win**). `AGENTS.md` states *"The `architect-cli` resolves config via `process.env.PWD` before `process.cwd()`. This is fragile when embedding the CLI in subprocesses — strip `PWD` and `INIT_CWD` from the child env if you want the child to honour the `cwd:` you set."* The runtime does the opposite — `process.cwd()` is tried first, with `INIT_CWD` and `PWD` as fallbacks only on failure (`packages/architect-cli/src/cli/runtime-helpers.ts:36-56`; `packages/architect-mcp/src/runtime-helpers.ts:16-36`). Consumers following the doctrine attempt to strip env vars that would have been ignored anyway — wasted effort and confusion.
+1. **PWD/INIT_CWD/cwd precedence drift** (tech-debt #1, **High Impact / Low Effort / Quick Win**). `AGENTS.md` states _"The `architect-cli` resolves config via `process.env.PWD` before `process.cwd()`. This is fragile when embedding the CLI in subprocesses — strip `PWD` and `INIT_CWD` from the child env if you want the child to honour the `cwd:` you set."_ The runtime does the opposite — `process.cwd()` is tried first, with `INIT_CWD` and `PWD` as fallbacks only on failure (`packages/architect-cli/src/cli/runtime-helpers.ts:36-56`; `packages/architect-mcp/src/runtime-helpers.ts:16-36`). Consumers following the doctrine attempt to strip env vars that would have been ignored anyway — wasted effort and confusion.
 
 2. **MCP tool-count drift** (tech-debt #2 + #12, Medium Impact / Low Effort / Quick Win). `CLAUDE.md` says **21** tools and is correct. The meta-package `description` in `packages/architect/package.json` says **18**, and `docs/MCP-SETUP.md:88-106` lists 18. The authoritative registry is `packages/architect-mcp/src/tool-metadata.ts:1-71` (`ARCHITECT_MCP_TOOLS`) — 21 tools. Consumers reading either stale source build mental models with three missing tools.
 
 3. **"Four edges" framing in CLAUDE.md is incomplete** (tech-debt #3, Medium Impact / Low Effort / Quick Win). `CLAUDE.md` §"Pattern graph" frames the model with four edge kinds. The projection layer has **seven** relation kinds: `depends-on`, `uses`, `enables`, `implements`, `extends`, `see-also`, `api-ref` (`packages/architect-projection/src/fragments/pattern-relations/supporting.ts:66-74`). External consumers writing edge-filter logic against the docs miss `enables`, `extends`, and `api-ref`. The fix is either to enumerate all seven or to be explicit that "four edges" is the high-level model and the seven are the projection-level enum.
 
-4. **REMAINING-WORK.md PWD note** (tech-debt #6, Low Impact / Low Effort, couples with #1). `AGENTS.md` §"Operational notes" says *"Worth revisiting (tracked in REMAINING-WORK.md)."* The runtime patch is already in place (see #1) — the open question is whether the doctrine doc, the working backlog, or both need updates. Resolves as a side-effect of #1.
+4. **REMAINING-WORK.md PWD note** (tech-debt #6, Low Impact / Low Effort, couples with #1). `AGENTS.md` §"Operational notes" says _"Worth revisiting (tracked in REMAINING-WORK.md)."_ The runtime patch is already in place (see #1) — the open question is whether the doctrine doc, the working backlog, or both need updates. Resolves as a side-effect of #1.
 
 5. **Dead BC alias `DDD_ES_CQRS_ROLES`** (NEW — surfaced during Gear-3 spec generation, not in `technical-debt-analysis.md`; Low Impact / Low Effort / Quick Win). `packages/architect-core/src/config/role-constants.ts:68` exports `DDD_ES_CQRS_ROLES = LOCKED_WAVE_ONE_ROLES` as a second name for the same array also exported as `DEFAULT_ROLES`. Grep across `packages/*/src/` finds **zero internal callers** for `DDD_ES_CQRS_ROLES` (only barrel re-exports in `index.ts` and `config/index.ts`). The active caller (`factory.ts:30`, `registry-builder.ts:146`) uses `DEFAULT_ROLES`. This is precisely the "Backward-compatibility aliases (re-exporting an old name from a new location)" pattern forbidden by constitution §III.A. The doctrine fix is to **delete the alias** and the corresponding line in both barrels (`src/index.ts:65`, `src/config/index.ts:44`). External consumers, if any, get a 2.0.0-pre.1 breaking-change note — consistent with the No-BC release strategy. This item couples with spec 017 (W1.5 cleanup) more than the other Phase-A drift items; the maintainer may prefer to roll it into the 2.0.0-pre.1 release rather than Phase-A.
 
@@ -72,6 +73,7 @@ The doctrine note in `technical-debt-analysis.md` is the key context: the `no-su
 ## Implementation Status
 
 **Completed:**
+
 - ✅ Runtime cwd precedence correctly implemented (`process.cwd()` first) in both `architect-cli` and `architect-mcp`.
 - ✅ MCP tool registry contains the correct 21 tools (`ARCHITECT_MCP_TOOLS` in `tool-metadata.ts:1-71`).
 - ✅ All seven projection-layer relation kinds are implemented (`supporting.ts:66-74`).
@@ -80,6 +82,7 @@ The doctrine note in `technical-debt-analysis.md` is the key context: the `no-su
 - ✅ Phase A estimate published (≈1–2 hours, single PR).
 
 **Missing / Drift:**
+
 - ⚠️ `AGENTS.md` §"Operational notes" claims PWD-first precedence (tech-debt #1) — fix pending.
 - ⚠️ `packages/architect/package.json` `description` says 18 tools (tech-debt #2) — fix pending.
 - ⚠️ `docs/MCP-SETUP.md:88-106` lists 18 tools (tech-debt #12) — fix pending; same root cause as #2 but separate file.

@@ -1,6 +1,7 @@
 # Feature: Fragment Projection Pipeline
 
 ## Status
+
 ✅ COMPLETE — Codec / renderer separation per ADR-005. CI perf-regression gate enforces median latency drift ≤ `baseline × 1.5`.
 
 ## Overview
@@ -47,6 +48,7 @@ The pipeline is governed by a **perf-regression gate** in CI: a 36-pattern / 108
 ## Implementation Status
 
 **Completed:**
+
 - ✅ All `project*` and `parseAndProject*` families exported from `packages/architect-projection/src/index.ts` (see `integration-points.md` §JS API).
 - ✅ Renderer module with `RenderMarkdownOptions`, `RenderJsonOptions`, `RenderCompactOptions`, `RenderUiOptions`.
 - ✅ `MarkdownRenderEvent` event surface for renderer observability.

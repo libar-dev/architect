@@ -1,6 +1,7 @@
 # Feature: Pre-Commit Process Guard
 
 ## Status
+
 ✅ COMPLETE — `pnpm architect:guard --staged` blocks commits that violate FSM doctrine; shipped as `architect-guard` bin with rule registry, exit codes, and parity with `--all` / `--files` modes.
 
 ## Overview
@@ -48,6 +49,7 @@ The guard never invokes the shell from its domain layer (NFR-006 / PDR-001 DD-2)
 ## Implementation Status
 
 **Completed:**
+
 - ✅ `architect-guard` bin entry at `packages/architect-guard/src/cli/lint-process.ts:391`.
 - ✅ Rule IDs and severity enum at `packages/architect-guard/src/lint/process-guard/types.ts:210-216`.
 - ✅ Session-aware mode reading handoff records.

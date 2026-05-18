@@ -1,8 +1,8 @@
 ---
 workflowType: ux-design
-project_name: "@libar-dev/architect-* (architect package family)"
-date: "2026-05-17"
-synthesize_mode: "yolo"
+project_name: '@libar-dev/architect-* (architect package family)'
+date: '2026-05-17'
+synthesize_mode: 'yolo'
 inputDocuments:
   - docs/reverse-engineering/visual-design-system.md
   - docs/reverse-engineering/business-context.md
@@ -34,8 +34,8 @@ coverage_score: 45
 6. **Evolve.** Updates pinned version when changeset notes accept the breaking change. Reads `MIGRATION.md`. Adopts new doctrine.
 
 **Touchpoints:** `pnpm` scripts, `.mcp.json`, `architect.config.ts`, generated `docs-live/`, terminal output, agent-rendered tool responses.
-**Emotions:** *(designed-for)* — confident the agent sees the same reality the human does; trusting the FSM to catch process drift; minimal friction modifying patterns.
-**Pain points:** *(latent)* — first-time annotation effort; two-Gherkin-parser confusion (well-documented but still a footgun); breaking changes between pre-1.0 versions.
+**Emotions:** _(designed-for)_ — confident the agent sees the same reality the human does; trusting the FSM to catch process drift; minimal friction modifying patterns.
+**Pain points:** _(latent)_ — first-time annotation effort; two-Gherkin-parser confusion (well-documented but still a footgun); breaking changes between pre-1.0 versions.
 
 ### Persona 2: AI coding agent (secondary, non-human)
 
@@ -50,8 +50,8 @@ coverage_score: 45
 5. **Handoff.** Calls `architect_handoff` to emit `HandoffRecord` for the next session.
 
 **Touchpoints:** MCP tool registry, JSON tool responses, the nine `.agents/skills/SKILL.md` files.
-**Emotions:** *(N/A — non-human persona)*; success criteria are deterministic verdict words and stable typed shapes.
-**Pain points:** *(latent)* — verdict prose changing without version bumps; tool-count discrepancy between docs and registry (Known Issue #2); stale cached PatternGraph (mitigated by `architect_rebuild` or `--watch`).
+**Emotions:** _(N/A — non-human persona)_; success criteria are deterministic verdict words and stable typed shapes.
+**Pain points:** _(latent)_ — verdict prose changing without version bumps; tool-count discrepancy between docs and registry (Known Issue #2); stale cached PatternGraph (mitigated by `architect_rebuild` or `--watch`).
 
 ### Persona 3: Architect maintainer (tertiary)
 
@@ -271,7 +271,7 @@ Verbs that may block (`scope-validate`, `arch dangling --strict`) print the dete
 
 ### Pattern 3: Source-first, design-spec-ephemeral (ADR-003)
 
-`@architect-pattern` *defines* (exactly one file per pattern). `@architect-implements` is many-to-one (UML realization). Once a pattern is `executable`, **delete the design spec** — the durable artifact is the annotated production code + the executable Gherkin.
+`@architect-pattern` _defines_ (exactly one file per pattern). `@architect-implements` is many-to-one (UML realization). Once a pattern is `executable`, **delete the design spec** — the durable artifact is the annotated production code + the executable Gherkin.
 
 ### Pattern 4: Two parsers, two paths (AGENTS.md)
 
@@ -351,4 +351,4 @@ If you are integrating `@libar-dev/architect-*` into your own project and readin
 
 ---
 
-> *This document is a placeholder shape that the BMAD template expects. The underlying truth — that the architect platform has no visual surface — is captured here so future automation does not re-attempt extraction. If a UI is ever added (e.g., a web dashboard for the PatternGraph), this document should be rewritten from scratch.*
+> _This document is a placeholder shape that the BMAD template expects. The underlying truth — that the architect platform has no visual surface — is captured here so future automation does not re-attempt extraction. If a UI is ever added (e.g., a web dashboard for the PatternGraph), this document should be rewritten from scratch._

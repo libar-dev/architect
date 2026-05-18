@@ -1,6 +1,7 @@
 # Feature: CI Workflows + Perf Regression Gate
 
 ## Status
+
 ❌ MISSING — `.github/workflows/` is absent from this worktree at the pinned commit; the perf regression test code exists in `architect-projection`'s test suite but the CI surface that enforces it on every PR is invisible.
 
 ## Overview
@@ -64,6 +65,7 @@ The "Either CI runs elsewhere or has not been re-introduced post-split" ambiguit
 ## Implementation Status
 
 **Completed:**
+
 - ✅ Perf regression test code exists in `architect-projection`'s test suite (referenced in `AGENTS.md` §"Perf regression gate").
 - ✅ All workspace scripts exist and are runnable locally: `pnpm typecheck`, `pnpm test`, `pnpm validate:all`, `pnpm format:check`, `pnpm guard:no-suppressions`, `pnpm architect:guard --staged`.
 - ✅ `architect-local/no-suppression-comments` ESLint rule + `scripts/guard-no-suppressions.mjs` enforce the no-BC doctrine when invoked.
@@ -71,6 +73,7 @@ The "Either CI runs elsewhere or has not been re-introduced post-split" ambiguit
 - ✅ ESLint config (`eslint.config.mjs`, 434 lines) is substantive — not boilerplate.
 
 **Missing / Drift:**
+
 - ❌ `.github/workflows/` directory absent (tech-debt #5, High Impact / Medium Effort, Strategic quadrant).
 - ❌ No `ci.yml` wiring the six gates.
 - ❌ No `release.yml` consuming changesets.

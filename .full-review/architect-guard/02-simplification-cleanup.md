@@ -24,12 +24,12 @@ The five highest-leverage simplifications (Phase 2A) account for ~1,150 LOC dele
 
 ## Critical (P0)
 
-| ID | Title | Source |
-|----|-------|--------|
-| Cleanup-C-GUARD-1 | **94% dead surface** through `src/index.ts` barrel — Phase 1 H-GUARD-1 sharpened by grep | 2B |
-| Cleanup-C-GUARD-2 | **`tier-a-baseline.ts` 45.8KB / 7.8% of tarball** with zero cross-package callers — Phase 1 C-GUARD-2 sharpened | 2B |
-| Cleanup-C-GUARD-3 | **`packed-dangling-baseline-smoke.mjs` not wired into CI** — family's only post-pack publish-contract test, dormant | 2B |
-| (Phase 1 reconfirmed) | C-GUARD-1 (FSM cast collapse), C-GUARD-3 (process-guard types not Zod-first), C-GUARD-4 (parseAtBoundary unused) | both |
+| ID                    | Title                                                                                                               | Source |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------- | ------ |
+| Cleanup-C-GUARD-1     | **94% dead surface** through `src/index.ts` barrel — Phase 1 H-GUARD-1 sharpened by grep                            | 2B     |
+| Cleanup-C-GUARD-2     | **`tier-a-baseline.ts` 45.8KB / 7.8% of tarball** with zero cross-package callers — Phase 1 C-GUARD-2 sharpened     | 2B     |
+| Cleanup-C-GUARD-3     | **`packed-dangling-baseline-smoke.mjs` not wired into CI** — family's only post-pack publish-contract test, dormant | 2B     |
+| (Phase 1 reconfirmed) | C-GUARD-1 (FSM cast collapse), C-GUARD-3 (process-guard types not Zod-first), C-GUARD-4 (parseAtBoundary unused)    | both   |
 
 **Recipes (Phase 2A §1-§3 + 2B):**
 
@@ -37,7 +37,7 @@ The five highest-leverage simplifications (Phase 2A) account for ~1,150 LOC dele
 // 1. tier-a-baseline.ts — full recipe (2A §1, 70 LOC total):
 
 // architect/tier-a-baseline.json (new — dogfood data, repo root)
-[]
+[];
 
 // src/lint/tier-a-baseline.ts (new — schema + loader, ~70 LOC)
 import { parseAtBoundary } from '@libar-dev/architect-core';
@@ -89,7 +89,11 @@ export const DEFAULT_THRESHOLDS = AntiPatternThresholdsSchema.parse({});
 const fromStatus = parseAtBoundary(StatusValueSchema, match[1], 'parseFsmDiff');
 
 // dangling-baseline.ts:102 — replace JSON.parse
-const baseline = parseAtBoundary(DanglingBaselineSchema, JSON.parse(content), 'loadDanglingBaseline');
+const baseline = parseAtBoundary(
+  DanglingBaselineSchema,
+  JSON.parse(content),
+  'loadDanglingBaseline',
+);
 
 // CLI argv (per bin):
 const argv = parseAtBoundary(LintPatternsArgvSchema, process.argv.slice(2), 'lint-patterns-argv');
@@ -97,36 +101,36 @@ const argv = parseAtBoundary(LintPatternsArgvSchema, process.argv.slice(2), 'lin
 
 ## High (P1)
 
-| # | Title | Source | Action |
-|---|-------|--------|--------|
-| Cleanup-H-GUARD-1 | `src/index.ts` 12 wildcards → 8 named exports actually consumed by cli | 2B | One PR, breaking change OK (No-BC). |
-| Cleanup-H-GUARD-2 | `tier-a-baseline.ts` deletion (45.8KB tarball reduction) | 2B | Sweep 1 of action plan. |
-| Cleanup-H-GUARD-3 | **`git/` module → `process-guard/_git/`** (Phase 2 supersedes Phase 1 H-GUARD-3 wrong-direction recipe) | 2B | Demote, not promote. Drop `@architect-bounded-context:generator` annotation. |
-| Cleanup-H-GUARD-4 | Promote `packed-dangling-baseline-smoke.mjs` to workspace-level `pack-smoke.mjs` | 2B | Would have caught core C-CORE-1 pre-publish. |
-| Cleanup-H-GUARD-5 | `dangling-baseline.json` is empty `[]` — the entire dual-write apparatus exists for a zero-entry fixture today | 2B | Document the intent or simplify. |
-| H-SIMP-1 | `validate-patterns.ts` 935 LOC mixing 8 concerns split into 6 files | 2A §5 | Mechanical split. |
-| H-SIMP-2 | `loadConfig` deletion (12 lines, mostly-migrated callers) | 2A §4 | Pure migration. |
-| H-SIMP-3 | Phantom PDR-005 cleanup — author or strip 6 references | 2A §6 | Decision then mechanical. |
-| H-SIMP-4 | `src/index.ts` curated 12 wildcards → 8 explicit named exports | 2A §7 | Pairs with Cleanup-H-GUARD-1. |
-| H-SIMP-5 | `getDeliverableWorkflowPatterns` → core's `PatternGraphAPI` | 2A §8 | Cross-package move; coordinate with core. |
-| H-SIMP-6 | Add `--baseline` override to `tier-a-baseline` CLI | 2A §1 | Bundled with tier-a deletion. |
-| H-SIMP-7 | FSM transition tests in guard (`tests/features/validation/fsm-transitions-via-guard.feature`) | 2A | Closes C-GUARD-1; pairs with core TD-CORE-3. |
+| #                 | Title                                                                                                          | Source | Action                                                                       |
+| ----------------- | -------------------------------------------------------------------------------------------------------------- | ------ | ---------------------------------------------------------------------------- |
+| Cleanup-H-GUARD-1 | `src/index.ts` 12 wildcards → 8 named exports actually consumed by cli                                         | 2B     | One PR, breaking change OK (No-BC).                                          |
+| Cleanup-H-GUARD-2 | `tier-a-baseline.ts` deletion (45.8KB tarball reduction)                                                       | 2B     | Sweep 1 of action plan.                                                      |
+| Cleanup-H-GUARD-3 | **`git/` module → `process-guard/_git/`** (Phase 2 supersedes Phase 1 H-GUARD-3 wrong-direction recipe)        | 2B     | Demote, not promote. Drop `@architect-bounded-context:generator` annotation. |
+| Cleanup-H-GUARD-4 | Promote `packed-dangling-baseline-smoke.mjs` to workspace-level `pack-smoke.mjs`                               | 2B     | Would have caught core C-CORE-1 pre-publish.                                 |
+| Cleanup-H-GUARD-5 | `dangling-baseline.json` is empty `[]` — the entire dual-write apparatus exists for a zero-entry fixture today | 2B     | Document the intent or simplify.                                             |
+| H-SIMP-1          | `validate-patterns.ts` 935 LOC mixing 8 concerns split into 6 files                                            | 2A §5  | Mechanical split.                                                            |
+| H-SIMP-2          | `loadConfig` deletion (12 lines, mostly-migrated callers)                                                      | 2A §4  | Pure migration.                                                              |
+| H-SIMP-3          | Phantom PDR-005 cleanup — author or strip 6 references                                                         | 2A §6  | Decision then mechanical.                                                    |
+| H-SIMP-4          | `src/index.ts` curated 12 wildcards → 8 explicit named exports                                                 | 2A §7  | Pairs with Cleanup-H-GUARD-1.                                                |
+| H-SIMP-5          | `getDeliverableWorkflowPatterns` → core's `PatternGraphAPI`                                                    | 2A §8  | Cross-package move; coordinate with core.                                    |
+| H-SIMP-6          | Add `--baseline` override to `tier-a-baseline` CLI                                                             | 2A §1  | Bundled with tier-a deletion.                                                |
+| H-SIMP-7          | FSM transition tests in guard (`tests/features/validation/fsm-transitions-via-guard.feature`)                  | 2A     | Closes C-GUARD-1; pairs with core TD-CORE-3.                                 |
 
 ## Medium (P2)
 
-| # | Title | Source |
-|---|-------|--------|
-| Cleanup-M-GUARD-1 | `AntiPatternThresholdsSchema` is the only open `z.object` in guard + parallel `DEFAULT_THRESHOLDS` data literal (3-line fix) | 2B |
-| Cleanup-M-GUARD-2 | `node:` prefix inconsistency in 6 files (idea-tier/runner, steps/pair-resolver, steps/runner, process-guard/derive-state, detect-changes, anti-patterns) | 2B |
-| Cleanup-M-GUARD-3 | vitest `include` pattern drift family-wide (guard uses `tests/**/*.steps.ts`; core `tests/steps/**`; projection/mcp `tests/features/**`) | 2B |
-| Cleanup-M-GUARD-4 | `validateCompletionMetadata` gap when core deletes (Phase 1 H-GUARD-9 confirmed) — guard has no equivalent | 2B |
-| Cleanup-M-GUARD-5 | `src/cli/shared.ts` has no consumers beyond guard's own bins | 2B |
-| Cleanup-M-GUARD-6 | `git/` module annotation `@architect-bounded-context:generator` is wrong regardless of re-homing decision | 2B |
-| M-SIMP-1 | `detect-changes.ts` regex captures cleanup after `parseAtBoundary` lands | 2A |
-| M-SIMP-2 | Dual `loadConfig`/`loadProjectConfig` — covered by H-SIMP-2 |  2A |
-| M-SIMP-3 | `dangling-baseline.ts` consumer-side absence robustness (H-GUARD-13) | 2A |
-| M-SIMP-4 | `process-guard-rules.feature:43-48` phantom upstream suite reference cleanup | 2A |
-| M-SIMP-5 | Anti-pattern detector emits via `console.log` rather than diagnostic channel | 2A |
+| #                 | Title                                                                                                                                                    | Source |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
+| Cleanup-M-GUARD-1 | `AntiPatternThresholdsSchema` is the only open `z.object` in guard + parallel `DEFAULT_THRESHOLDS` data literal (3-line fix)                             | 2B     |
+| Cleanup-M-GUARD-2 | `node:` prefix inconsistency in 6 files (idea-tier/runner, steps/pair-resolver, steps/runner, process-guard/derive-state, detect-changes, anti-patterns) | 2B     |
+| Cleanup-M-GUARD-3 | vitest `include` pattern drift family-wide (guard uses `tests/**/*.steps.ts`; core `tests/steps/**`; projection/mcp `tests/features/**`)                 | 2B     |
+| Cleanup-M-GUARD-4 | `validateCompletionMetadata` gap when core deletes (Phase 1 H-GUARD-9 confirmed) — guard has no equivalent                                               | 2B     |
+| Cleanup-M-GUARD-5 | `src/cli/shared.ts` has no consumers beyond guard's own bins                                                                                             | 2B     |
+| Cleanup-M-GUARD-6 | `git/` module annotation `@architect-bounded-context:generator` is wrong regardless of re-homing decision                                                | 2B     |
+| M-SIMP-1          | `detect-changes.ts` regex captures cleanup after `parseAtBoundary` lands                                                                                 | 2A     |
+| M-SIMP-2          | Dual `loadConfig`/`loadProjectConfig` — covered by H-SIMP-2                                                                                              | 2A     |
+| M-SIMP-3          | `dangling-baseline.ts` consumer-side absence robustness (H-GUARD-13)                                                                                     | 2A     |
+| M-SIMP-4          | `process-guard-rules.feature:43-48` phantom upstream suite reference cleanup                                                                             | 2A     |
+| M-SIMP-5          | Anti-pattern detector emits via `console.log` rather than diagnostic channel                                                                             | 2A     |
 
 ## Low (P3) — abbreviated
 
@@ -134,26 +138,26 @@ const argv = parseAtBoundary(LintPatternsArgvSchema, process.argv.slice(2), 'lin
 
 ## Configuration audit (vs family base configs)
 
-| Setting | Guard | Verdict |
-|---------|-------|---------|
-| `prepack` location | scripts ✓ | Aligned. |
-| `prepack` command | `pnpm clean && pnpm build` | Aligned. |
-| `lint` glob | `eslint src tests` | Aligned. |
-| `typecheck` scope | **both `tsconfig.json` AND `tsconfig.test.json`** | **Most disciplined `typecheck` posture in family** (only `cli` matches). |
-| `test` chain | `pnpm typecheck && vitest run --config vitest.config.ts` | Aligned with discipline. |
-| `eslint` in devDeps | Explicit | Aligned. |
-| `vitest.include` pattern | `tests/**/*.steps.ts` | **Family drift** — core uses `tests/steps/**`; projection/mcp use `tests/features/**`. Pick one. |
-| `package.json#exports` | only `.` and `./package.json` | **Sparse** — no curated subpaths. After Cleanup-H-GUARD-1, define explicit subpaths for the 6 bins. |
-| `node:` prefix in src/ | Inconsistent (6 files use bare `fs`/`path`) | Sweep. |
+| Setting                  | Guard                                                    | Verdict                                                                                             |
+| ------------------------ | -------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `prepack` location       | scripts ✓                                                | Aligned.                                                                                            |
+| `prepack` command        | `pnpm clean && pnpm build`                               | Aligned.                                                                                            |
+| `lint` glob              | `eslint src tests`                                       | Aligned.                                                                                            |
+| `typecheck` scope        | **both `tsconfig.json` AND `tsconfig.test.json`**        | **Most disciplined `typecheck` posture in family** (only `cli` matches).                            |
+| `test` chain             | `pnpm typecheck && vitest run --config vitest.config.ts` | Aligned with discipline.                                                                            |
+| `eslint` in devDeps      | Explicit                                                 | Aligned.                                                                                            |
+| `vitest.include` pattern | `tests/**/*.steps.ts`                                    | **Family drift** — core uses `tests/steps/**`; projection/mcp use `tests/features/**`. Pick one.    |
+| `package.json#exports`   | only `.` and `./package.json`                            | **Sparse** — no curated subpaths. After Cleanup-H-GUARD-1, define explicit subpaths for the 6 bins. |
+| `node:` prefix in src/   | Inconsistent (6 files use bare `fs`/`path`)              | Sweep.                                                                                              |
 
 ## Dependency audit
 
-| Dep | Version | Used in src? | Notes |
-|-----|---------|-------------|-------|
-| `@libar-dev/architect-core` (workspace:*) | local | yes | Only workspace runtime dep. |
-| `glob` ^10.3.10 | aligned with core | yes — 4 import sites | Genuinely used. |
-| `zod` ^4.1.11 | aligned with family | yes — pervasive | Aligned. |
-| devDeps | `@amiceli/vitest-cucumber ^6.3.0`, `@types/node ^24.12.0`, `eslint ^9.17.0`, `typescript ^5.8.2`, `vitest ^4.1.4` | aligned | All five pins match family. |
+| Dep                                        | Version                                                                                                           | Used in src?         | Notes                       |
+| ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- | -------------------- | --------------------------- |
+| `@libar-dev/architect-core` (workspace:\*) | local                                                                                                             | yes                  | Only workspace runtime dep. |
+| `glob` ^10.3.10                            | aligned with core                                                                                                 | yes — 4 import sites | Genuinely used.             |
+| `zod` ^4.1.11                              | aligned with family                                                                                               | yes — pervasive      | Aligned.                    |
+| devDeps                                    | `@amiceli/vitest-cucumber ^6.3.0`, `@types/node ^24.12.0`, `eslint ^9.17.0`, `typescript ^5.8.2`, `vitest ^4.1.4` | aligned              | All five pins match family. |
 
 **Verdict: dependencies are pristine.** Zero drift. No unique-to-guard deps beyond `glob` (which core also uses). Zero phantom deps; no devDep leaks into `src/`.
 
@@ -161,23 +165,23 @@ const argv = parseAtBoundary(LintPatternsArgvSchema, process.argv.slice(2), 'lin
 
 From `src/index.ts`'s 12 wildcards, only these are consumed externally:
 
-| Symbol | Source | Consumer |
-|--------|--------|----------|
-| `runValidatePatternsCli`, `runLintStepsCli`, `runLintPatternsCli`, `runLintProcessCli` | `cli/` | `architect-cli` bins |
-| `compareDanglingBaseline`, `writeDanglingBaseline` | `lint/dangling-baseline.ts` | `architect-cli` |
-| `DANGLING_BASELINE_SOURCE_PATH` | `lint/dangling-baseline.ts` | `architect-cli` |
-| `DanglingBaselineComparison`, `DanglingBaselineEntry` | `lint/dangling-baseline.ts` | `architect-cli` |
+| Symbol                                                                                 | Source                      | Consumer             |
+| -------------------------------------------------------------------------------------- | --------------------------- | -------------------- |
+| `runValidatePatternsCli`, `runLintStepsCli`, `runLintPatternsCli`, `runLintProcessCli` | `cli/`                      | `architect-cli` bins |
+| `compareDanglingBaseline`, `writeDanglingBaseline`                                     | `lint/dangling-baseline.ts` | `architect-cli`      |
+| `DANGLING_BASELINE_SOURCE_PATH`                                                        | `lint/dangling-baseline.ts` | `architect-cli`      |
+| `DanglingBaselineComparison`, `DanglingBaselineEntry`                                  | `lint/dangling-baseline.ts` | `architect-cli`      |
 
 **~141 of ~150 symbols have zero external consumers.** Recipe: replace 12 wildcards in `src/index.ts` with 9 explicit named exports. **Pre-1.0 No-BC: this is the right time.**
 
 ## Files that should not be in `dist/`
 
-| Path pattern | Count / Size | Action |
-|--------------|--------------|--------|
-| `dist/**/*.{js,d.ts}.map` | ~35% of bytes (54/155 files) | Family-wide CL-CORE-3 fix. |
-| `dist/lint/tier-a-baseline.{js,js.map}` | 45.8KB (7.8%) | Delete file; replace with JSON loader. |
-| `dist/git/**` (post-demotion) | ~12 KB | Move to `dist/lint/process-guard/_git/`. |
-| `dist/cli/shared.{js,d.ts}` (no external consumer) | small | Internal-only; mark `.internal.ts`. |
+| Path pattern                                       | Count / Size                 | Action                                   |
+| -------------------------------------------------- | ---------------------------- | ---------------------------------------- |
+| `dist/**/*.{js,d.ts}.map`                          | ~35% of bytes (54/155 files) | Family-wide CL-CORE-3 fix.               |
+| `dist/lint/tier-a-baseline.{js,js.map}`            | 45.8KB (7.8%)                | Delete file; replace with JSON loader.   |
+| `dist/git/**` (post-demotion)                      | ~12 KB                       | Move to `dist/lint/process-guard/_git/`. |
+| `dist/cli/shared.{js,d.ts}` (no external consumer) | small                        | Internal-only; mark `.internal.ts`.      |
 
 After all cleanups: **583 KB → ~315 KB (46% reduction)** with zero behavioral change.
 

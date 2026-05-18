@@ -126,15 +126,15 @@ The single most common debugging trap is documented in AGENTS.md and repeated he
 
 There are **two Gherkin parsers** in this repo. Confusing them is the most painful debugging experience here.
 
-| Parser                     | Reads                                                                | Runs                                 |
-| -------------------------- | -------------------------------------------------------------------- | ------------------------------------ |
-| `@cucumber/gherkin`        | `architect/specs/`, `architect/decisions/`, `formal-spec/`           | At doc-gen + PatternGraph build time |
-| `@amiceli/vitest-cucumber` | `tests/features/`, `packages/*/tests/features/`                      | At test time via vitest              |
+| Parser                     | Reads                                                      | Runs                                 |
+| -------------------------- | ---------------------------------------------------------- | ------------------------------------ |
+| `@cucumber/gherkin`        | `architect/specs/`, `architect/decisions/`, `formal-spec/` | At doc-gen + PatternGraph build time |
+| `@amiceli/vitest-cucumber` | `tests/features/`, `packages/*/tests/features/`            | At test time via vitest              |
 
 Symptoms and fixes:
 
-- *"My spec under `architect/specs/` doesn't run as a test."* It is not supposed to. Architect-state specs are parsed only at build/doc-gen time. To make a scenario executable, write a corresponding feature under `tests/features/` (with step definitions in `tests/steps/`).
-- *"My executable feature isn't appearing in the PatternGraph."* Only `architect/specs/` and `architect/decisions/` are scanned for PatternGraph extraction. Executable specs *link back* via `@architect-implements` on their step files.
+- _"My spec under `architect/specs/` doesn't run as a test."_ It is not supposed to. Architect-state specs are parsed only at build/doc-gen time. To make a scenario executable, write a corresponding feature under `tests/features/` (with step definitions in `tests/steps/`).
+- _"My executable feature isn't appearing in the PatternGraph."_ Only `architect/specs/` and `architect/decisions/` are scanned for PatternGraph extraction. Executable specs _link back_ via `@architect-implements` on their step files.
 
 ### "The CLI can't find my config"
 

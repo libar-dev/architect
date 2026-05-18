@@ -61,10 +61,9 @@ export const RenderMarkdownOptionsSchema = z
     disclosureSpec: DisclosureSpecSchema.optional(),
     routeProfile: MarkdownRouteProfileSchema.optional(),
     onRenderDocument: z
-      .custom<NonNullable<RenderMarkdownOptions['onRenderDocument']>>(
-        (value) => typeof value === 'function',
-        'Expected render event callback',
-      )
+      .custom<
+        NonNullable<RenderMarkdownOptions['onRenderDocument']>
+      >((value) => typeof value === 'function', 'Expected render event callback')
       .optional(),
   })
   .readonly();

@@ -1,13 +1,14 @@
 # Feature: Dangling Reference Tracking
 
 ## Status
+
 ✅ COMPLETE — `architect arch dangling [--strict] [--baseline <p>] [--write-baseline]` enumerates unresolved pattern references with baseline-aware comparison; `--strict` exits non-zero on any unresolved reference.
 
 ## Overview
 
 When a pattern in the PatternGraph references another pattern by name — via `@architect-implements`, `depends-on`, `uses`, `enables`, `extends`, `see-also`, or `api-ref` — the build pipeline resolves that reference to a concrete node. If the target does not exist (typo, rename, deleted pattern), the reference is **dangling**. Dangling references are not fatal during build (FR-016: tolerant ingestion), but they degrade graph queries and erode trust in the source-first invariant (ADR-003) over time.
 
-This feature gives operators a way to enumerate dangling references at any time and, crucially, to **gate CI** on their absence. The `--strict` flag converts the report into a non-zero exit; the `--baseline <p>` flag enables progressive tightening — capture the current set as a baseline, then fail only on *new* dangles. The `--write-baseline` flag updates the baseline file in place after the maintainer has accepted a known-good state.
+This feature gives operators a way to enumerate dangling references at any time and, crucially, to **gate CI** on their absence. The `--strict` flag converts the report into a non-zero exit; the `--baseline <p>` flag enables progressive tightening — capture the current set as a baseline, then fail only on _new_ dangles. The `--write-baseline` flag updates the baseline file in place after the maintainer has accepted a known-good state.
 
 This is the runtime realization of FR-015 and supports the constitution's Principle 5 (Deterministic Verdicts) by making "is the graph clean?" a one-command, single-exit-code question.
 
@@ -47,6 +48,7 @@ This is the runtime realization of FR-015 and supports the constitution's Princi
 ## Implementation Status
 
 **Completed:**
+
 - ✅ `arch dangling` verb wired via the `arch` dispatcher in the CLI.
 - ✅ `DanglingReference` type exported from `architect-core`.
 - ✅ Resolution emitted at build time alongside `featureParseFailures` and other diagnostics.

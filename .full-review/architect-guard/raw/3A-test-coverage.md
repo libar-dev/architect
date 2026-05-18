@@ -8,34 +8,34 @@
 
 ## Module Coverage Map
 
-| Module (path under `src/`) | SLOC | Tested? | Test coverage |
-|---|---|---|---|
-| `lint/process-guard/detect-changes.ts` | 649 | Partial | `detectFileChanges` integration via `guard-runtime` scenario "Detect status transitions for added files in files mode". Only the happy-path added-file branch. FSM cast sites (lines 414, 440, 452) untested. Inner functions `detectStatusTransitions`, `detectDeliverableChanges`, `detectBranchChanges`, `detectStagedChanges` have zero direct tests. |
-| `lint/process-guard/decider.ts` | 518 | Partial | `validateChanges` called in one scenario (completed-protection rule only). `checkStatusTransitions` (decider:286) not reached by any test. `checkScopeCreep` (decider:343) not reached. `checkSessionScope` (decider:385) not reached. Helpers `hasErrors`, `hasWarnings`, `getAllIssues`, `getViolationsByRule`, `summarizeResult` untested. |
-| `lint/tier-a-baseline.ts` | 1,138 | None | Zero tests. Deletion-bound per Cleanup-C-GUARD-2; do not add tests. |
-| `cli/validate-patterns.ts` | 934 | None | `validatePatterns` (934 LOC, the package's largest validation function), `parseArgs`, `printHelp`, `runValidatePatternsCli` — zero tests. |
-| `validation/anti-patterns.ts` | 437 | Partial | `detectAntiPatterns` and `detectProcessInCode` covered via 2 guard-runtime scenarios. `detectRemovedTags`, `detectMagicComments`, `detectScenarioBloat`, `detectMegaFeature`, `formatAntiPatternReport`, `toValidationIssues` — zero tests. |
-| `validation/dod-validator.ts` | 263 | Partial | `validateDoDForPhase` covered by one scenario (happy path: DoD met). `validateDoD`, `getDeliverableWorkflowPatterns`, `isDeliverableComplete`, `hasAcceptanceCriteria` — zero tests. Failure paths (missing deliverables, missing acceptance-criteria) untested. |
-| `lint/dangling-baseline.ts` | 139 | None | `readDanglingBaseline`, `writeDanglingBaseline`, `compareDanglingBaseline`, `normalizeDanglingBaselineEntries` — zero in-process tests. Only exercised by the unwired `packed-dangling-baseline-smoke.mjs`. |
-| `lint/idea-tier/idea-tier-checks.ts` | 278 | Partial | `runIdeaTierChecks` indirectly via 5 `runIdeaTierLint` scenarios. Individual check functions (`checkLineBudget`, `checkNoScenarios`, `checkNoBackground`, `checkRuleHasInvariant`, `checkTagMinimum`, `detectIdeaTier`) have no direct unit tests; threshold edges untested. |
-| `lint/idea-tier/runner.ts` | 94 | Partial | `runIdeaTierLint` covered via the 5 idea-tier scenarios in `guard-runtime.feature`. |
-| `lint/engine.ts` | 300 | Partial | `runLintEngine` reached transitively via `runStepLint`. JSON output path, `formatLintOutput`, `filterRules` untested. |
-| `lint/rules.ts` | ~150 | Partial | `hierarchyParentLevelMismatch` has 2 direct scenarios (positive + negative). Other rules (`defaultRules`, `missingStat`, `missingRelationshipTarget`, etc.) untested. |
-| `lint/steps/runner.ts` | 175 | Partial | `runStepLint` covered by one happy-path scenario. Error paths (missing step file, unpaired feature) untested. |
-| `lint/steps/pair-resolver.ts` | 90 | None | `resolveFeatureStepPairs` — zero direct tests. |
-| `lint/steps/cross-checks.ts` | ~100 | None | Cross-check rules — zero tests. |
-| `lint/steps/feature-checks.ts` | ~100 | None | Feature-file check rules — zero tests. |
-| `lint/steps/step-checks.ts` | ~100 | None | Step-file check rules — zero tests. |
-| `lint/process-guard/derive-state.ts` | 172 | None | `deriveProcessState` — zero tests. This is the read-model builder upstream of `validateChanges`. |
-| `lint/process-guard/session-state-reader.ts` | 241 | None | Session state reading — zero tests. |
-| `git/branch-diff.ts` | 59 | None | Zero tests. |
-| `git/helpers.ts` | 72 | None | `execGitSafe`, `sanitizeBranchName` — zero tests. |
-| `git/name-status.ts` | 77 | None | `parseGitNameStatus` — zero tests. |
-| `cli/lint-patterns.ts` | ~389 | None | `runLintPatternsCli` — zero tests. |
-| `cli/lint-process.ts` | ~391 | None | `runLintProcessCli` — zero tests. |
-| `cli/lint-steps.ts` | ~223 | None | `runLintStepsCli` — zero tests. |
-| `validation/types.ts` | ~50 | Partial | Types consumed; `AntiPatternThresholdsSchema` open `z.object` per Cleanup-M-GUARD-1. |
-| `scripts/packed-dangling-baseline-smoke.mjs` | 81 | Unwired | Present; exercises `readDanglingBaseline` + missing-resource negative path. Not in `test`, `prepack`, or CI. |
+| Module (path under `src/`)                   | SLOC  | Tested? | Test coverage                                                                                                                                                                                                                                                                                                                                             |
+| -------------------------------------------- | ----- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `lint/process-guard/detect-changes.ts`       | 649   | Partial | `detectFileChanges` integration via `guard-runtime` scenario "Detect status transitions for added files in files mode". Only the happy-path added-file branch. FSM cast sites (lines 414, 440, 452) untested. Inner functions `detectStatusTransitions`, `detectDeliverableChanges`, `detectBranchChanges`, `detectStagedChanges` have zero direct tests. |
+| `lint/process-guard/decider.ts`              | 518   | Partial | `validateChanges` called in one scenario (completed-protection rule only). `checkStatusTransitions` (decider:286) not reached by any test. `checkScopeCreep` (decider:343) not reached. `checkSessionScope` (decider:385) not reached. Helpers `hasErrors`, `hasWarnings`, `getAllIssues`, `getViolationsByRule`, `summarizeResult` untested.             |
+| `lint/tier-a-baseline.ts`                    | 1,138 | None    | Zero tests. Deletion-bound per Cleanup-C-GUARD-2; do not add tests.                                                                                                                                                                                                                                                                                       |
+| `cli/validate-patterns.ts`                   | 934   | None    | `validatePatterns` (934 LOC, the package's largest validation function), `parseArgs`, `printHelp`, `runValidatePatternsCli` — zero tests.                                                                                                                                                                                                                 |
+| `validation/anti-patterns.ts`                | 437   | Partial | `detectAntiPatterns` and `detectProcessInCode` covered via 2 guard-runtime scenarios. `detectRemovedTags`, `detectMagicComments`, `detectScenarioBloat`, `detectMegaFeature`, `formatAntiPatternReport`, `toValidationIssues` — zero tests.                                                                                                               |
+| `validation/dod-validator.ts`                | 263   | Partial | `validateDoDForPhase` covered by one scenario (happy path: DoD met). `validateDoD`, `getDeliverableWorkflowPatterns`, `isDeliverableComplete`, `hasAcceptanceCriteria` — zero tests. Failure paths (missing deliverables, missing acceptance-criteria) untested.                                                                                          |
+| `lint/dangling-baseline.ts`                  | 139   | None    | `readDanglingBaseline`, `writeDanglingBaseline`, `compareDanglingBaseline`, `normalizeDanglingBaselineEntries` — zero in-process tests. Only exercised by the unwired `packed-dangling-baseline-smoke.mjs`.                                                                                                                                               |
+| `lint/idea-tier/idea-tier-checks.ts`         | 278   | Partial | `runIdeaTierChecks` indirectly via 5 `runIdeaTierLint` scenarios. Individual check functions (`checkLineBudget`, `checkNoScenarios`, `checkNoBackground`, `checkRuleHasInvariant`, `checkTagMinimum`, `detectIdeaTier`) have no direct unit tests; threshold edges untested.                                                                              |
+| `lint/idea-tier/runner.ts`                   | 94    | Partial | `runIdeaTierLint` covered via the 5 idea-tier scenarios in `guard-runtime.feature`.                                                                                                                                                                                                                                                                       |
+| `lint/engine.ts`                             | 300   | Partial | `runLintEngine` reached transitively via `runStepLint`. JSON output path, `formatLintOutput`, `filterRules` untested.                                                                                                                                                                                                                                     |
+| `lint/rules.ts`                              | ~150  | Partial | `hierarchyParentLevelMismatch` has 2 direct scenarios (positive + negative). Other rules (`defaultRules`, `missingStat`, `missingRelationshipTarget`, etc.) untested.                                                                                                                                                                                     |
+| `lint/steps/runner.ts`                       | 175   | Partial | `runStepLint` covered by one happy-path scenario. Error paths (missing step file, unpaired feature) untested.                                                                                                                                                                                                                                             |
+| `lint/steps/pair-resolver.ts`                | 90    | None    | `resolveFeatureStepPairs` — zero direct tests.                                                                                                                                                                                                                                                                                                            |
+| `lint/steps/cross-checks.ts`                 | ~100  | None    | Cross-check rules — zero tests.                                                                                                                                                                                                                                                                                                                           |
+| `lint/steps/feature-checks.ts`               | ~100  | None    | Feature-file check rules — zero tests.                                                                                                                                                                                                                                                                                                                    |
+| `lint/steps/step-checks.ts`                  | ~100  | None    | Step-file check rules — zero tests.                                                                                                                                                                                                                                                                                                                       |
+| `lint/process-guard/derive-state.ts`         | 172   | None    | `deriveProcessState` — zero tests. This is the read-model builder upstream of `validateChanges`.                                                                                                                                                                                                                                                          |
+| `lint/process-guard/session-state-reader.ts` | 241   | None    | Session state reading — zero tests.                                                                                                                                                                                                                                                                                                                       |
+| `git/branch-diff.ts`                         | 59    | None    | Zero tests.                                                                                                                                                                                                                                                                                                                                               |
+| `git/helpers.ts`                             | 72    | None    | `execGitSafe`, `sanitizeBranchName` — zero tests.                                                                                                                                                                                                                                                                                                         |
+| `git/name-status.ts`                         | 77    | None    | `parseGitNameStatus` — zero tests.                                                                                                                                                                                                                                                                                                                        |
+| `cli/lint-patterns.ts`                       | ~389  | None    | `runLintPatternsCli` — zero tests.                                                                                                                                                                                                                                                                                                                        |
+| `cli/lint-process.ts`                        | ~391  | None    | `runLintProcessCli` — zero tests.                                                                                                                                                                                                                                                                                                                         |
+| `cli/lint-steps.ts`                          | ~223  | None    | `runLintStepsCli` — zero tests.                                                                                                                                                                                                                                                                                                                           |
+| `validation/types.ts`                        | ~50   | Partial | Types consumed; `AntiPatternThresholdsSchema` open `z.object` per Cleanup-M-GUARD-1.                                                                                                                                                                                                                                                                      |
+| `scripts/packed-dangling-baseline-smoke.mjs` | 81    | Unwired | Present; exercises `readDanglingBaseline` + missing-resource negative path. Not in `test`, `prepack`, or CI.                                                                                                                                                                                                                                              |
 
 ---
 
@@ -106,6 +106,7 @@ The step file must construct `ProcessState` and `ChangeDetection` directly (same
 **Gap:** `validatePatterns` is the primary cross-source validation engine. It calls `detectAntiPatterns`, `validateDoD`, and baseline comparison. Zero behavioral assertions exist for any of its code paths. The three sentinel behaviors — "missing in Gherkin", "missing in TypeScript", "dangling baseline regression" — are untested. `runValidatePatternsCli` is one of the 9 live barrel symbols; it runs against the real filesystem and is exercised only by manual invocation.
 
 **Recipe:** Add `tests/features/validation/validate-patterns-engine.feature` with a Scenario Outline over `RuntimePatternGraph` fixtures:
+
 - Matched TS+Gherkin pattern pair → no issues.
 - TS pattern with no matching Gherkin file → one "missing-in-gherkin" issue.
 - Gherkin with no TS counterpart → one "missing-in-typescript" issue.
@@ -125,6 +126,7 @@ Use `buildPatternGraph` with inline fixture strings rather than real files to ke
 **Gap:** `process-guard-rules.feature` claims these rules are "verified by: session-scope step bindings in the guard test suite" and "scope-creep step bindings in guard-runtime fixtures" — but `guard-runtime.steps.ts` contains no such bindings. The single `validateChanges` call in tests passes `deliverableChanges: new Map()` (empty), so scope-creep is never triggered. `ignoreSession: false` is set but `changes.modifiedFiles` only contains the completed-spec file, which is caught by protection-level before reaching session-scope. Both rules have zero scenarios that actually fire them.
 
 **Recipe:** Add two `RuleScenario` blocks to `guard-runtime.feature` + steps:
+
 1. `Scope creep: active spec with added deliverable → scope-creep violation`. Build a `ProcessState` with one `active` file; `ChangeDetection` with `deliverableChanges` containing `{ added: ['src/new.ts'] }`.
 2. `Session scope: file modified outside session boundary → session-scope warning`. Build `ProcessState` with a session constraint; `changes.modifiedFiles` includes a file outside it.
 
@@ -139,6 +141,7 @@ These are pure-function tests — same pattern as completed-protection. No I/O n
 **Gap:** The three externally consumed functions (`compareDanglingBaseline`, `writeDanglingBaseline`, `DANGLING_BASELINE_SOURCE_PATH`) are the live barrel symbols. Their behavior — key comparison logic in `createDanglingEntryKey`, `compareDanglingEntries`, new-entries and removed-entries detection — has zero in-process test coverage. The smoke script tests only `readDanglingBaseline` + the missing-file error path; it does not exercise `compareDanglingBaseline` or `writeDanglingBaseline`.
 
 **Recipe:** Add `tests/features/lint/dangling-baseline.feature`:
+
 - Empty baseline + zero current entries → `newEntries: []`, `removedEntries: []`.
 - Baseline with one entry, current with same entry → no diff.
 - Baseline with entry A, current with entry A+B → `newEntries: [B]`, `removedEntries: []`.
@@ -156,6 +159,7 @@ All scenarios use `writeFile` to a temp dir for the baseline JSON; no pack step 
 **Gap:** `detectAntiPatterns` is called in two scenarios but with empty `features: []`, so `detectRemovedTags`, `detectMagicComments`, `detectScenarioBloat`, and `detectMegaFeature` are never reached. Four of five sub-detectors have zero coverage. `formatAntiPatternReport` and `toValidationIssues` are also untested.
 
 **Recipe:** Extend `guard-runtime.feature` with four scenarios (or add `tests/features/validation/anti-patterns.feature`):
+
 - `detectRemovedTags`: a `ScannedGherkinFile` fixture file with `@architect-brief` tag → one `removed-tag` violation.
 - `detectMagicComments`: fixture file with 6 `# GENERATOR:` lines, threshold 5 → one `magic-comments` warning.
 - `detectScenarioBloat`: fixture with 21 scenarios, threshold 20 → one `scenario-bloat` warning.
@@ -181,6 +185,7 @@ All scenarios use `writeFile` to a temp dir for the baseline JSON; no pack step 
 **Gap:** One happy-path scenario covers `validateDoDForPhase` (DoD met, all deliverables complete, acceptance criteria present). The failure paths — missing deliverables, non-terminal deliverable status, missing acceptance-criteria tag — are untested. `validateDoD` (the full-graph sweep) has zero coverage.
 
 **Recipe:** Add two `RuleScenario` entries to `guard-runtime.feature`:
+
 - Pending deliverable → `isDoDMet: false`, `pendingDeliverables` non-empty.
 - No acceptance-criteria scenario → `missingAcceptanceCriteria: true`.
 
@@ -205,6 +210,7 @@ All scenarios use `writeFile` to a temp dir for the baseline JSON; no pack step 
 **Gap:** Line 46 reads: "the FSM-validity rejection path is covered by the upstream `phase-state-machine` feature suite." This suite does not exist. The feature is narrative-only and exercises no code directly (no step bindings at all beyond what `guard-runtime.feature` already covers). The phantom reference creates a false sense of coverage.
 
 **Recipe:** One of two actions:
+
 - (a) Delete the deferral sentence and replace it with "Verified by: `fsm-transitions-via-guard.feature`" once TC-C-GUARD-1 lands.
 - (b) If the intent is a separate FSM-only feature file, create `tests/features/validation/fsm-transitions-via-guard.feature` (TC-C-GUARD-1 recipe) and update the reference to point there.
 
@@ -219,6 +225,7 @@ Do not create a file named `phase-state-machine.feature` — the concept is FSM-
 **Gap:** `runStepLint` is covered by one happy-path scenario with a trivially minimal fixture (1 scenario, 1 step). All four sub-modules that implement the actual lint rules have zero direct test coverage. The error paths (missing step file, unpaired feature, step definition present but wrong count) are untested.
 
 **Recipe:** Extend `guard-runtime.feature` with two failure-path scenarios:
+
 - Feature file with no matching steps file → `errorCount > 0`.
 - Steps file with no matching feature file → `errorCount > 0`.
 
@@ -233,6 +240,7 @@ Then add a `tests/features/lint/step-lint-rules.feature` with one scenario per r
 **Gap:** `parseGitNameStatus` and `sanitizeBranchName` are pure string-parsing functions with zero tests. `execGitSafe` wraps `child_process.spawnSync` and is never mocked or directly tested. These are consumed by `detectStagedChanges` and `detectBranchChanges`, both of which also have zero tests.
 
 **Recipe:** Add `tests/features/git/git-helpers.feature` with:
+
 - `parseGitNameStatus` Scenario Outline over M/A/D/R status codes.
 - `sanitizeBranchName` with branch names containing slashes and special chars.
 
@@ -299,18 +307,21 @@ These are pure functions; no real git repo needed.
 **Target state:** After landing, the chain from git-diff input through `validateTransition` to `ProcessViolation` output has at least one positive + one negative + one invalid-input scenario.
 
 **Step 1 — Core (lands first):**
+
 - Add `tests/features/validation/fsm-transitions.feature` per core TD-CORE-3 recipe.
 - Fix `validateTransition` to return discriminated `TransitionValidationResult` (not a cast shape).
 - Export `isValidProcessStatus(value: unknown): value is ProcessStatusValue` type-guard.
 - Fix `getValidTransitionsFrom` to return `readonly ProcessStatusValue[] | undefined` (already typed that way in FSM table) — guard null-check at call site.
 
 **Step 2 — Guard (lands in same PR as core or immediately after):**
+
 - Add `tests/features/validation/fsm-transitions-via-guard.feature` (TC-C-GUARD-1 recipe above — 10 scenarios across 3 Rules).
 - Step bindings: construct `ProcessState` + `ChangeDetection` directly; call `validateChanges`; assert `violations` array.
 - Replace the three `as ProcessStatusValue` casts in `detect-changes.ts:414,440,452` with `parseAtBoundary(StatusValueSchema, captured, 'parseFsmDiff')` — casts disappear, FSM tests become the regression guard.
 - Update `process-guard-rules.feature:46` to cite the new feature file.
 
 **Step 3 — Smoke:**
+
 - The "Garbage from status does not cause TypeError" scenario (Rule 3 in the recipe) is the regression test for the runtime crash. It must pass before Step 2 merges.
 
 **Coordination note:** Steps 1+2 should land in the same PR or back-to-back PRs. Core's TD-CORE-3 recipe already lists this. The guard FSM feature file cannot be written as a pure guard test without core exporting the `isValidProcessStatus` guard first.
@@ -337,14 +348,14 @@ These are pure functions; no real git repo needed.
 
 ## Test Residue Cleanup
 
-| Item | File:line | Action |
-|---|---|---|
-| `.DS_Store` | `tests/.DS_Store` | Delete; add to `.gitignore`. |
-| `as never` × 4 | `tests/steps/guard-runtime.steps.ts:78,107,137,165` | Replace with typed fixtures or `satisfies`. |
-| Phantom suite reference | `tests/features/process-guard-rules.feature:46` | Update to cite real feature file once TC-C-GUARD-1 lands. |
-| False "scope-creep step bindings" claim | `tests/features/process-guard-rules.feature:70-72` | Update once TC-H-GUARD-1 lands. |
-| False "session-scope step bindings" claim | `tests/features/process-guard-rules.feature:75-77` | Update once TC-H-GUARD-1 lands. |
-| `vitest.include` pattern | `vitest.config.ts:7` | Align with family in normalization PR. |
+| Item                                      | File:line                                           | Action                                                    |
+| ----------------------------------------- | --------------------------------------------------- | --------------------------------------------------------- |
+| `.DS_Store`                               | `tests/.DS_Store`                                   | Delete; add to `.gitignore`.                              |
+| `as never` × 4                            | `tests/steps/guard-runtime.steps.ts:78,107,137,165` | Replace with typed fixtures or `satisfies`.               |
+| Phantom suite reference                   | `tests/features/process-guard-rules.feature:46`     | Update to cite real feature file once TC-C-GUARD-1 lands. |
+| False "scope-creep step bindings" claim   | `tests/features/process-guard-rules.feature:70-72`  | Update once TC-H-GUARD-1 lands.                           |
+| False "session-scope step bindings" claim | `tests/features/process-guard-rules.feature:75-77`  | Update once TC-H-GUARD-1 lands.                           |
+| `vitest.include` pattern                  | `vitest.config.ts:7`                                | Align with family in normalization PR.                    |
 
 No `.skip` or `.only` present in either step file (confirmed by grep).
 

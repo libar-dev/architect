@@ -1,8 +1,8 @@
 ---
 workflowType: prd
-project_name: "@libar-dev/architect-* (architect package family)"
-date: "2026-05-17"
-synthesize_mode: "yolo"
+project_name: '@libar-dev/architect-* (architect package family)'
+date: '2026-05-17'
+synthesize_mode: 'yolo'
 inputDocuments:
   - docs/reverse-engineering/business-context.md
   - docs/reverse-engineering/functional-specification.md
@@ -20,7 +20,7 @@ coverage_score: 78
 
 ## Product Vision
 
-> *"Engineering lifecycle platform for AI-assisted development — annotate your code, get structured AI context, enforced delivery workflows, and a design workbench that makes AI implementation near-deterministic."*
+> _"Engineering lifecycle platform for AI-assisted development — annotate your code, get structured AI context, enforced delivery workflows, and a design workbench that makes AI implementation near-deterministic."_
 > — `README.md` line 3
 
 - **Problem.** AI coding assistants produce non-deterministic, drift-prone implementations when given a free-form codebase. Reasoning that should flow from a stable model of "what this codebase actually is" instead flows from whatever the assistant happened to read into context.
@@ -307,17 +307,17 @@ The platform encodes a small set of load-bearing invariants. They are enforced b
 
 (From `integration-points.md` — no runtime external service dependencies; build-time and registry-time only.)
 
-| Surface | Service | Purpose |
-| --- | --- | --- |
-| Distribution | **npm registry** | Six publishable packages via `@changesets/cli` (`access: public`). |
-| MCP transport | **stdio (local)** | MCP server runs as a child process of the agent. No network. |
-| Spec parsing (architect state) | `@cucumber/gherkin` | Parses `architect/specs/`, `architect/decisions/`, `formal-spec/`. |
-| Spec parsing (executable) | `@amiceli/vitest-cucumber` `^6.3.0` | Parses `tests/features/` at test time. |
-| Schema validation | `zod` `^4.1.11` | Every CLI/MCP input is `z.strictObject(...).readonly()`. |
-| MCP SDK | `@modelcontextprotocol/sdk` | Used by `@libar-dev/architect-mcp` only. |
-| Test runner | `vitest` `^4.1.4` | All test execution via the cucumber adapter. |
-| Release tooling | `@changesets/cli` `^2.27.0` | Versioning and publishing (`fixed` group across the 6 publishables). |
-| Build / TS execution | `tsx` `^4.7.0` | Direct TS execution. |
+| Surface                        | Service                             | Purpose                                                              |
+| ------------------------------ | ----------------------------------- | -------------------------------------------------------------------- |
+| Distribution                   | **npm registry**                    | Six publishable packages via `@changesets/cli` (`access: public`).   |
+| MCP transport                  | **stdio (local)**                   | MCP server runs as a child process of the agent. No network.         |
+| Spec parsing (architect state) | `@cucumber/gherkin`                 | Parses `architect/specs/`, `architect/decisions/`, `formal-spec/`.   |
+| Spec parsing (executable)      | `@amiceli/vitest-cucumber` `^6.3.0` | Parses `tests/features/` at test time.                               |
+| Schema validation              | `zod` `^4.1.11`                     | Every CLI/MCP input is `z.strictObject(...).readonly()`.             |
+| MCP SDK                        | `@modelcontextprotocol/sdk`         | Used by `@libar-dev/architect-mcp` only.                             |
+| Test runner                    | `vitest` `^4.1.4`                   | All test execution via the cucumber adapter.                         |
+| Release tooling                | `@changesets/cli` `^2.27.0`         | Versioning and publishing (`fixed` group across the 6 publishables). |
+| Build / TS execution           | `tsx` `^4.7.0`                      | Direct TS execution.                                                 |
 
 ---
 

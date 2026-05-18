@@ -31,12 +31,12 @@ If the user asks you to also do the work — refuse politely. Generate the plan;
 
 Prometheus's upstream prompt targets `.omo/`. This repo uses `.sisyphus/` as the OmO state folder. Rewrite throughout:
 
-| Upstream (Prometheus) | This repo (use this) |
-| --- | --- |
-| `.omo/plans/{name}.md` | `.sisyphus/plans/{slug}.md` |
-| `.omo/evidence/task-{N}-{slug}.{ext}` | `.sisyphus/evidence/task-{N}-{slug}.{ext}` |
-| `.omo/drafts/` | **Do not use drafts** — Claude Code authoring is single-shot |
-| `.omo/notepads/` (per-plan notes) | `.sisyphus/notepads/{slug}/` |
+| Upstream (Prometheus)                 | This repo (use this)                                         |
+| ------------------------------------- | ------------------------------------------------------------ |
+| `.omo/plans/{name}.md`                | `.sisyphus/plans/{slug}.md`                                  |
+| `.omo/evidence/task-{N}-{slug}.{ext}` | `.sisyphus/evidence/task-{N}-{slug}.{ext}`                   |
+| `.omo/drafts/`                        | **Do not use drafts** — Claude Code authoring is single-shot |
+| `.omo/notepads/` (per-plan notes)     | `.sisyphus/notepads/{slug}/`                                 |
 
 The plan body text itself must use the `.sisyphus/...` form. Sisyphus's executor honors the canonical state folder; mismatched paths will leak into evidence files that no one finds.
 
@@ -170,11 +170,11 @@ What this means for the plan you author:
 
 Prometheus + Atlas now support three execution shapes. The mode is part of the plan and shapes its phase structure.
 
-| Mode | When to pick | Plan shape |
-| --- | --- | --- |
-| `single-shot` | Scope fits one Atlas session without breaching a hard checkpoint (rare for 24h+ scope) | One linear plan, no phase markers, no handover points |
-| `loop` | Full scope is fully planned up front, but execution is chunked at critical gates / mandatory commits / time splits. Atlas hands back to Prometheus on phase completion OR on critical issues. | Full plan + explicit phase markers + handover triggers per phase |
-| `hybrid-loop` (**ideal for huge scope**) | Prometheus has good context on the full scope but **only plans the first phase in detail**. When Atlas hands over, a fresh Prometheus session inspects completed work and plans the next phase. | Phase 1 detailed + Phase 2+ outlined as scope-only headlines |
+| Mode                                     | When to pick                                                                                                                                                                                    | Plan shape                                                       |
+| ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| `single-shot`                            | Scope fits one Atlas session without breaching a hard checkpoint (rare for 24h+ scope)                                                                                                          | One linear plan, no phase markers, no handover points            |
+| `loop`                                   | Full scope is fully planned up front, but execution is chunked at critical gates / mandatory commits / time splits. Atlas hands back to Prometheus on phase completion OR on critical issues.   | Full plan + explicit phase markers + handover triggers per phase |
+| `hybrid-loop` (**ideal for huge scope**) | Prometheus has good context on the full scope but **only plans the first phase in detail**. When Atlas hands over, a fresh Prometheus session inspects completed work and plans the next phase. | Phase 1 detailed + Phase 2+ outlined as scope-only headlines     |
 
 **Default to `hybrid-loop` for any plan whose full scope cannot be Atlas-executed in a single session.** Single-shot is the exception, not the rule.
 
@@ -220,13 +220,13 @@ Human-time estimates are nonsensical for these plans — Atlas's clock is not a 
 
 The `Estimated Effort` field in the TL;DR uses **scope/complexity buckets**, not duration:
 
-| Bucket | Meaning |
-| --- | --- |
-| `Quick` | One focused file edit, ≤2 acceptance criteria |
-| `Short` | Single module, ≤5 acceptance criteria, no cross-cutting concerns |
-| `Medium` | Multi-module, single bounded context, ≤15 acceptance criteria |
-| `Large` | Multiple bounded contexts, 15-50 acceptance criteria, cross-cutting work |
-| `XL` | Multi-package / migration / repo-wide / dependency-bump-cascade, 50+ acceptance criteria |
+| Bucket   | Meaning                                                                                  |
+| -------- | ---------------------------------------------------------------------------------------- |
+| `Quick`  | One focused file edit, ≤2 acceptance criteria                                            |
+| `Short`  | Single module, ≤5 acceptance criteria, no cross-cutting concerns                         |
+| `Medium` | Multi-module, single bounded context, ≤15 acceptance criteria                            |
+| `Large`  | Multiple bounded contexts, 15-50 acceptance criteria, cross-cutting work                 |
+| `XL`     | Multi-package / migration / repo-wide / dependency-bump-cascade, 50+ acceptance criteria |
 
 Use these as **organizing buckets** when sizing waves. Never as time estimates. Never write "this will take 2 hours" or "estimated 3 days" in a plan body.
 
@@ -257,6 +257,7 @@ This is the Prometheus Claude-default template, paths rewritten to `.sisyphus/`.
 > **Quick Summary**: [1-2 sentences capturing the core objective and approach]
 >
 > **Deliverables**: [Bullet list of concrete outputs]
+>
 > - [Output 1]
 > - [Output 2]
 >
@@ -268,12 +269,14 @@ This is the Prometheus Claude-default template, paths rewritten to `.sisyphus/`.
 ---
 
 ## Phase Plan
+
 <!-- INCLUDE THIS SECTION ONLY IF Execution Mode is `loop` or `hybrid-loop`. Delete the section entirely for single-shot. -->
 
 > **Mode**: loop | hybrid-loop
 > **Current phase**: {N} of {total} (this plan body covers Phase {N})
 
 ### Phase 1 — {Title}
+
 - **Scope**: [1-2 sentences capturing what this phase delivers]
 - **End condition**: [Concrete trigger — e.g., "F1-F4 verdicts all APPROVE for tasks 1-N", or "Subsystem X compiles and tests green"]
 - **Mandatory commit boundaries within phase**: [List the COMMIT: MANDATORY anchors that must land before phase end]
@@ -285,25 +288,30 @@ This is the Prometheus Claude-default template, paths rewritten to `.sisyphus/`.
   - [Custom trigger specific to this plan]
 - **Detail level**: full TODOs in this plan body
 
-### Phase 2 — {Title}  <!-- hybrid-loop only: outlined, not planned -->
+### Phase 2 — {Title} <!-- hybrid-loop only: outlined, not planned -->
+
 - **Scope**: [1-2 sentences — what the next phase will cover]
 - **Why deferred to fresh planning**: [Why we plan this fresh after Phase 1 lands — usually: needs inspection of Phase 1's actual implementation]
 - **Detail level**: TBD by next Prometheus session
 
-### Phase N — ...  <!-- additional phases for loop mode (fully planned) or hybrid-loop (headline only) -->
+### Phase N — ... <!-- additional phases for loop mode (fully planned) or hybrid-loop (headline only) -->
 
 ---
 
 ## Context
 
 ### Original Request
+
 [User's initial description verbatim]
 
 ### Interview Summary
+
 **Key Discussions**:
+
 - [Point 1]: [User's decision/preference]
 
 **Research Findings**:
+
 - [Finding 1]: [Implication]
 
 ---
@@ -311,18 +319,23 @@ This is the Prometheus Claude-default template, paths rewritten to `.sisyphus/`.
 ## Work Objectives
 
 ### Core Objective
+
 [1-2 sentences]
 
 ### Concrete Deliverables
+
 - [Exact file / endpoint / feature]
 
 ### Definition of Done
+
 - [ ] [Verifiable condition with command]
 
 ### Must Have
+
 - [Non-negotiable requirement]
 
 ### Must NOT Have (Guardrails)
+
 - [Explicit exclusion]
 - [AI slop pattern to avoid: excessive comments, over-abstraction, generic names like `data`/`result`/`item`/`temp`]
 - [Scope boundary]
@@ -335,12 +348,14 @@ This is the Prometheus Claude-default template, paths rewritten to `.sisyphus/`.
 > Acceptance criteria requiring "user manually tests/confirms" are FORBIDDEN.
 
 ### Test Decision
+
 - **Infrastructure exists**: [YES/NO]
 - **Automated tests**: [TDD / Tests-after / None]
 - **Framework**: [bun test / vitest / jest / pytest / none]
 - **If TDD**: Each task follows RED (failing test) → GREEN (minimal impl) → REFACTOR
 
 ### QA Policy
+
 Every task MUST include agent-executed QA scenarios (see TODO template below).
 Evidence saved to `.sisyphus/evidence/task-{N}-{scenario-slug}.{ext}`.
 
@@ -357,8 +372,8 @@ Evidence saved to `.sisyphus/evidence/task-{N}-{scenario-slug}.{ext}`.
 
 > Group independent tasks into parallel waves. Each wave completes before the next begins.
 > Target: 5-8 tasks per wave. Fewer than 3 per wave (except final) = under-splitting.
-
 ```
+
 Wave 1 (Start Immediately — foundation + scaffolding):
 ├── Task 1: [...] [quick]
 ├── Task 2: [...] [quick]
@@ -382,6 +397,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 Critical Path: [task chain → ...] → F1-F4 → user okay
 Parallel Speedup: ~N% faster than sequential
 Max Concurrent: [N] (Wave [k])
+
 ```
 
 ### Dependency Matrix (full — show ALL tasks)
@@ -466,49 +482,46 @@ Max Concurrent: [N] (Wave [k])
   > Minimum: 1 happy path + 1 failure/edge case per task.
   > Each scenario = exact tool + exact steps + exact assertions + evidence path.
 
-  ```
-  Scenario: [Happy path — what SHOULD work]
-    Tool: [Playwright / interactive_bash / Bash (curl)]
-    Preconditions: [Exact setup state]
-    Steps:
-      1. [Exact action — specific command/selector/endpoint]
-      2. [Next action — with expected intermediate state]
-      3. [Assertion — exact expected value]
-    Expected Result: [Concrete, observable, binary pass/fail]
-    Failure Indicators: [What specifically would mean this failed]
-    Evidence: .sisyphus/evidence/task-{N}-{scenario-slug}.{ext}
+```
 
-  Scenario: [Failure/edge case]
-    Tool: [same format]
-    Preconditions: [Invalid input / missing dependency / error state]
-    Steps:
-      1. [Trigger the error condition]
-      2. [Assert error is handled correctly]
-    Expected Result: [Graceful failure with correct error message/code]
-    Evidence: .sisyphus/evidence/task-{N}-{scenario-slug}-error.{ext}
-  ```
+Scenario: [Happy path — what SHOULD work]
+Tool: [Playwright / interactive_bash / Bash (curl)]
+Preconditions: [Exact setup state]
+Steps: 1. [Exact action — specific command/selector/endpoint] 2. [Next action — with expected intermediate state] 3. [Assertion — exact expected value]
+Expected Result: [Concrete, observable, binary pass/fail]
+Failure Indicators: [What specifically would mean this failed]
+Evidence: .sisyphus/evidence/task-{N}-{scenario-slug}.{ext}
 
-  > **Specificity requirements:** specific CSS selectors, concrete test data, exact assertions, wait conditions where relevant, at least ONE failure/error scenario per task.
-  >
-  > **Anti-patterns (scenario is INVALID if it looks like this):**
-  > - "Verify it works correctly" — HOW? What does "correctly" mean?
-  > - "Check the API returns data" — WHAT data? WHAT fields?
-  > - "Test the component renders" — WHERE? WHAT selector?
-  > - Any scenario without an evidence path
+Scenario: [Failure/edge case]
+Tool: [same format]
+Preconditions: [Invalid input / missing dependency / error state]
+Steps: 1. [Trigger the error condition] 2. [Assert error is handled correctly]
+Expected Result: [Graceful failure with correct error message/code]
+Evidence: .sisyphus/evidence/task-{N}-{scenario-slug}-error.{ext}
 
-  **Evidence to Capture:**
-  - [ ] Each evidence file named: `task-{N}-{scenario-slug}.{ext}`
-  - [ ] Screenshots for UI, terminal output for CLI, response bodies for API
+````
 
-  **Commit**: MANDATORY | NO (groups with N)
-  - **If MANDATORY**: Atlas MUST commit at this boundary. Weak language = no commit.
-  - Message: `type(scope): imperative summary` (exact, no placeholders)
-  - Files: `path/to/file1`, `path/to/file2` (exact, no `git add -A`)
-  - Pre-commit gate: `exact verification command(s)` — STOP commit on non-zero exit
+> **Specificity requirements:** specific CSS selectors, concrete test data, exact assertions, wait conditions where relevant, at least ONE failure/error scenario per task.
+>
+> **Anti-patterns (scenario is INVALID if it looks like this):**
+> - "Verify it works correctly" — HOW? What does "correctly" mean?
+> - "Check the API returns data" — WHAT data? WHAT fields?
+> - "Test the component renders" — WHERE? WHAT selector?
+> - Any scenario without an evidence path
 
-  **Gate after this task** (if applicable):
-  - **MANDATORY GATE**: [exact condition — e.g., "`pnpm typecheck && pnpm test` must return exit 0"]
-  - **On gate failure**: HANDOVER to Prometheus immediately (do NOT silently retry, do NOT mask)
+**Evidence to Capture:**
+- [ ] Each evidence file named: `task-{N}-{scenario-slug}.{ext}`
+- [ ] Screenshots for UI, terminal output for CLI, response bodies for API
+
+**Commit**: MANDATORY | NO (groups with N)
+- **If MANDATORY**: Atlas MUST commit at this boundary. Weak language = no commit.
+- Message: `type(scope): imperative summary` (exact, no placeholders)
+- Files: `path/to/file1`, `path/to/file2` (exact, no `git add -A`)
+- Pre-commit gate: `exact verification command(s)` — STOP commit on non-zero exit
+
+**Gate after this task** (if applicable):
+- **MANDATORY GATE**: [exact condition — e.g., "`pnpm typecheck && pnpm test` must return exit 0"]
+- **On gate failure**: HANDOVER to Prometheus immediately (do NOT silently retry, do NOT mask)
 
 ---
 
@@ -519,20 +532,20 @@ Max Concurrent: [N] (Wave [k])
 > **Never mark F1-F4 as checked before getting user's okay.**
 
 - [ ] F1. **Plan Compliance Audit** — `oracle`
-  Read the plan end-to-end. For each "Must Have": verify implementation exists (read file, curl endpoint, run command). For each "Must NOT Have": search codebase for forbidden patterns — reject with file:line if found. Check evidence files exist in `.sisyphus/evidence/`. Compare deliverables against plan.
-  Output: `Must Have [N/N] | Must NOT Have [N/N] | Tasks [N/N] | VERDICT: APPROVE/REJECT`
+Read the plan end-to-end. For each "Must Have": verify implementation exists (read file, curl endpoint, run command). For each "Must NOT Have": search codebase for forbidden patterns — reject with file:line if found. Check evidence files exist in `.sisyphus/evidence/`. Compare deliverables against plan.
+Output: `Must Have [N/N] | Must NOT Have [N/N] | Tasks [N/N] | VERDICT: APPROVE/REJECT`
 
 - [ ] F2. **Code Quality Review** — `unspecified-high`
-  Run `tsc --noEmit` + linter + `bun test` (or this repo's equivalent: `pnpm typecheck && pnpm test && pnpm validate:all`). Review all changed files for: `as any`/`@ts-ignore`, empty catches, console.log in prod, commented-out code, unused imports. Check AI slop: excessive comments, over-abstraction, generic names (data/result/item/temp).
-  Output: `Build [PASS/FAIL] | Lint [PASS/FAIL] | Tests [N pass/N fail] | Files [N clean/N issues] | VERDICT`
+Run `tsc --noEmit` + linter + `bun test` (or this repo's equivalent: `pnpm typecheck && pnpm test && pnpm validate:all`). Review all changed files for: `as any`/`@ts-ignore`, empty catches, console.log in prod, commented-out code, unused imports. Check AI slop: excessive comments, over-abstraction, generic names (data/result/item/temp).
+Output: `Build [PASS/FAIL] | Lint [PASS/FAIL] | Tests [N pass/N fail] | Files [N clean/N issues] | VERDICT`
 
 - [ ] F3. **Real Manual QA** — `unspecified-high` (+ `playwright` skill if UI)
-  Start from clean state. Execute EVERY QA scenario from EVERY task — follow exact steps, capture evidence. Test cross-task integration (features working together, not isolation). Edge cases: empty state, invalid input, rapid actions. Save to `.sisyphus/evidence/final-qa/`.
-  Output: `Scenarios [N/N pass] | Integration [N/N] | Edge Cases [N tested] | VERDICT`
+Start from clean state. Execute EVERY QA scenario from EVERY task — follow exact steps, capture evidence. Test cross-task integration (features working together, not isolation). Edge cases: empty state, invalid input, rapid actions. Save to `.sisyphus/evidence/final-qa/`.
+Output: `Scenarios [N/N pass] | Integration [N/N] | Edge Cases [N tested] | VERDICT`
 
 - [ ] F4. **Scope Fidelity Check** — `deep`
-  For each task: read "What to do", read actual diff (git log/diff). Verify 1:1 — everything in spec was built (no missing), nothing beyond spec was built (no creep). Check "Must NOT do" compliance. Detect cross-task contamination: Task N touching Task M's files. Flag unaccounted changes.
-  Output: `Tasks [N/N compliant] | Contamination [CLEAN/N issues] | Unaccounted [CLEAN/N files] | VERDICT`
+For each task: read "What to do", read actual diff (git log/diff). Verify 1:1 — everything in spec was built (no missing), nothing beyond spec was built (no creep). Check "Must NOT do" compliance. Detect cross-task contamination: Task N touching Task M's files. Flag unaccounted changes.
+Output: `Tasks [N/N compliant] | Contamination [CLEAN/N issues] | Unaccounted [CLEAN/N files] | VERDICT`
 
 ---
 
@@ -547,9 +560,10 @@ Max Concurrent: [N] (Wave [k])
 ### Verification Commands
 ```bash
 command  # Expected: output
-```
+````
 
 ### Final Checklist
+
 - [ ] All "Must Have" present
 - [ ] All "Must NOT Have" absent
 - [ ] All tests pass
@@ -558,6 +572,7 @@ command  # Expected: output
 - [ ] User explicit "okay" recorded
 
 ---
+
 ```
 
 ## 8. What you do NOT do here
@@ -577,3 +592,4 @@ Source of truth for the Prometheus Claude-default plan format:
 - `~/dev-projects/pi-setup-hq/reference-repos/oh-my-openagent/src/agents/prometheus/plan-generation.ts` — workflow phases (Metis / Oracle / Momus — out of scope for Claude Code use)
 
 If Prometheus changes its template upstream, refresh this skill against those files. The Claude-default variant is selected by `getPrometheusPrompt()` when the agent's model is not GPT and not Gemini.
+```

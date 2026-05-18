@@ -1,6 +1,7 @@
 # Feature: CLI Surface
 
 ## Status
+
 ✅ COMPLETE — 24 subcommands across 7 bins, pinned to commit `b875ff1`. `--json` parity on canonical verbs.
 
 ## Overview
@@ -43,6 +44,7 @@ CLI flag parsing flows through `CLI_SCHEMA` (a Zod schema in `@libar-dev/archite
 ## Implementation Status
 
 **Completed:**
+
 - ✅ All 7 bins shipped, registered in `packages/architect-cli/package.json` and `packages/architect/package.json` (meta).
 - ✅ 24 subcommands wired in `packages/architect-cli/src/cli/pattern-graph-cli-commands.ts` (`COMMAND_NAMES` array, lines 17-42).
 - ✅ `CLI_SCHEMA` Zod schema in `@libar-dev/architect-core` validates flags at the boundary.

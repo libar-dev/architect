@@ -13,16 +13,16 @@
 Every immediate (§ 4) and parallel (§ 5) item is done. One deferred item
 (D-1) is also done. Cleanup plan: `pre-w-docs-1-debt-cleanup.md`.
 
-| Section | Item | Commit | Notes |
-| ------- | ---- | ------ | ----- |
-| § 4 A-1 | Commit uncommitted fixups | `882c189` | Both hunks landed verbatim |
-| § 4 A-2 | Polish backlog issue | `fea0383`, `c95517c`, `aae1993` | Items inlined as commits instead of a backlog issue |
-| § 4 A-3 | Repo-wide Prettier sweep | `4f6a171` (+ drift fix `37ac815`) | 317 files, single atomic commit |
-| § 5 P-1 | Rename `DeliverableManifestSchema` pair | `aae1993` | Done pre-emptively (E in cleanup plan) |
-| § 5 P-2 | WHY comment in `splitOversizedDocument` | `fea0383` | One-line at `render-markdown.ts:2158` |
-| § 5 P-3 | Compare-baseline comparator dedup | `fea0383` | `checkBudget` helper, 4 → 1 call sites |
-| § 5 P-4 | `resolveInvocationDir` precedence audit | `f7f4e30` | Inverted to cwd-first; regression test in `architect-cli` |
-| § 6 D-1 | `@architect-usecase` retire-or-narrow | `691da3c` | **Retired.** End-to-end (registry + Zod schemas + AST extractor + 8 doc files). Net taxonomy delta: -1 tag |
+| Section | Item                                    | Commit                            | Notes                                                                                                      |
+| ------- | --------------------------------------- | --------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| § 4 A-1 | Commit uncommitted fixups               | `882c189`                         | Both hunks landed verbatim                                                                                 |
+| § 4 A-2 | Polish backlog issue                    | `fea0383`, `c95517c`, `aae1993`   | Items inlined as commits instead of a backlog issue                                                        |
+| § 4 A-3 | Repo-wide Prettier sweep                | `4f6a171` (+ drift fix `37ac815`) | 317 files, single atomic commit                                                                            |
+| § 5 P-1 | Rename `DeliverableManifestSchema` pair | `aae1993`                         | Done pre-emptively (E in cleanup plan)                                                                     |
+| § 5 P-2 | WHY comment in `splitOversizedDocument` | `fea0383`                         | One-line at `render-markdown.ts:2158`                                                                      |
+| § 5 P-3 | Compare-baseline comparator dedup       | `fea0383`                         | `checkBudget` helper, 4 → 1 call sites                                                                     |
+| § 5 P-4 | `resolveInvocationDir` precedence audit | `f7f4e30`                         | Inverted to cwd-first; regression test in `architect-cli`                                                  |
+| § 6 D-1 | `@architect-usecase` retire-or-narrow   | `691da3c`                         | **Retired.** End-to-end (registry + Zod schemas + AST extractor + 8 doc files). Net taxonomy delta: -1 tag |
 
 **Deliberate non-actions** (per `1833126` revert commit):
 

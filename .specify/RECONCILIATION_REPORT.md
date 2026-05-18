@@ -13,7 +13,7 @@
 
 - **Specs existed**: 0 under `.specify/` (none in Spec Kit format).
 - **Coverage**: 0% via Spec Kit. The repo already maintained a sophisticated parallel spec system at `architect/specs/` (Gherkin features) + `formal-spec/` + ADRs, but no `.specify/` tree.
-- **Why this is unusual**: most StackShift'd repos have ad-hoc specs and many gaps. This repo's gaps are *meta* — CI infrastructure, doctrine doc drift, and W1.5 migration completion. The platform itself is mature.
+- **Why this is unusual**: most StackShift'd repos have ad-hoc specs and many gaps. This repo's gaps are _meta_ — CI infrastructure, doctrine doc drift, and W1.5 migration completion. The platform itself is mature.
 
 ---
 
@@ -26,49 +26,49 @@
 
 ### Status breakdown
 
-| Bucket          | Count | Spec IDs                                                         | Plan? |
-| --------------- | ----: | ---------------------------------------------------------------- | ----- |
-| ✅ **COMPLETE** | 15    | 001-005, 007-016, 018                                            | No    |
-| ⚠️ **PARTIAL**  | 4     | 006, 017, 019, 021                                               | Yes   |
-| ❌ **MISSING**  | 1     | 020                                                              | Yes   |
-| **Plans only**  | —     | (overlap with above: 006, 017, 019, 020, 021)                    | 5     |
-| **Total**       | 21    |                                                                  | 5     |
+| Bucket          | Count | Spec IDs                                      | Plan? |
+| --------------- | ----: | --------------------------------------------- | ----- |
+| ✅ **COMPLETE** |    15 | 001-005, 007-016, 018                         | No    |
+| ⚠️ **PARTIAL**  |     4 | 006, 017, 019, 021                            | Yes   |
+| ❌ **MISSING**  |     1 | 020                                           | Yes   |
+| **Plans only**  |     — | (overlap with above: 006, 017, 019, 020, 021) | 5     |
+| **Total**       |    21 |                                               | 5     |
 
 ### Spec inventory
 
-| #   | Spec                                              | Status        | Source                                                              |
-| --- | ------------------------------------------------- | ------------- | ------------------------------------------------------------------- |
-| 001 | Pattern graph construction                         | ✅ COMPLETE   | FR-001                                                              |
-| 002 | Trust-boundary validation                          | ✅ COMPLETE   | FR-002, ADR-009                                                     |
-| 003 | Pattern-graph read API                             | ✅ COMPLETE   | FR-003, ADR-006                                                     |
-| 004 | Fragment projection pipeline                       | ✅ COMPLETE   | FR-004, ADR-005, NFR-004                                            |
-| 005 | CLI surface (24 subcommands, 7 bins)               | ✅ COMPLETE   | FR-005                                                              |
-| 006 | MCP server (21 tools, `--watch`)                   | ⚠️ PARTIAL    | FR-006, FR-017 — tool-count doc drift (TD #2, #12)                  |
-| 007 | FSM lifecycle enforcement                          | ✅ COMPLETE   | FR-007                                                              |
-| 008 | Completed-pattern protection                       | ✅ COMPLETE   | FR-008                                                              |
-| 009 | Scope-creep detection                              | ✅ COMPLETE   | FR-009                                                              |
-| 010 | Scope-readiness validation                         | ✅ COMPLETE   | FR-010, PDR-001 DD-4                                                |
-| 011 | Session handoff                                    | ✅ COMPLETE   | FR-011                                                              |
-| 012 | Doc generation pipeline (8 generators)             | ✅ COMPLETE   | FR-012                                                              |
-| 013 | Pre-commit guard                                   | ✅ COMPLETE   | FR-013                                                              |
-| 014 | No-suppression enforcement (No-BC doctrine)        | ✅ COMPLETE   | FR-014                                                              |
-| 015 | Dangling-reference tracking (`arch dangling`)      | ✅ COMPLETE   | FR-015                                                              |
-| 016 | Tolerant spec ingestion                            | ✅ COMPLETE   | FR-016                                                              |
-| 017 | Coordinated package versioning (W1.5 lift)         | ⚠️ PARTIAL    | FR-018 — W1.5 not fully landed (TD #7); MIGRATION map (TD #8)       |
-| 018 | Agent skills system (`.agents/skills/`, kernels)   | ✅ COMPLETE   | Agent kernels + 7 sessions                                          |
-| 019 | Formal-spec package (`@libar-dev/architect-spec`)  | ⚠️ PARTIAL    | v0.2 private → v1.0 graduation pending                              |
-| 020 | CI workflows + perf gate                           | ❌ MISSING    | NFR-004 + TD #5 (no `.github/workflows/` committed)                 |
-| 021 | Doctrine + doc drift cleanup (Phase A bundle)      | ⚠️ PARTIAL    | TD #1, #2, #3, #6, #12 + supplementary No-BC violation (see below) |
+| #   | Spec                                              | Status      | Source                                                             |
+| --- | ------------------------------------------------- | ----------- | ------------------------------------------------------------------ |
+| 001 | Pattern graph construction                        | ✅ COMPLETE | FR-001                                                             |
+| 002 | Trust-boundary validation                         | ✅ COMPLETE | FR-002, ADR-009                                                    |
+| 003 | Pattern-graph read API                            | ✅ COMPLETE | FR-003, ADR-006                                                    |
+| 004 | Fragment projection pipeline                      | ✅ COMPLETE | FR-004, ADR-005, NFR-004                                           |
+| 005 | CLI surface (24 subcommands, 7 bins)              | ✅ COMPLETE | FR-005                                                             |
+| 006 | MCP server (21 tools, `--watch`)                  | ⚠️ PARTIAL  | FR-006, FR-017 — tool-count doc drift (TD #2, #12)                 |
+| 007 | FSM lifecycle enforcement                         | ✅ COMPLETE | FR-007                                                             |
+| 008 | Completed-pattern protection                      | ✅ COMPLETE | FR-008                                                             |
+| 009 | Scope-creep detection                             | ✅ COMPLETE | FR-009                                                             |
+| 010 | Scope-readiness validation                        | ✅ COMPLETE | FR-010, PDR-001 DD-4                                               |
+| 011 | Session handoff                                   | ✅ COMPLETE | FR-011                                                             |
+| 012 | Doc generation pipeline (8 generators)            | ✅ COMPLETE | FR-012                                                             |
+| 013 | Pre-commit guard                                  | ✅ COMPLETE | FR-013                                                             |
+| 014 | No-suppression enforcement (No-BC doctrine)       | ✅ COMPLETE | FR-014                                                             |
+| 015 | Dangling-reference tracking (`arch dangling`)     | ✅ COMPLETE | FR-015                                                             |
+| 016 | Tolerant spec ingestion                           | ✅ COMPLETE | FR-016                                                             |
+| 017 | Coordinated package versioning (W1.5 lift)        | ⚠️ PARTIAL  | FR-018 — W1.5 not fully landed (TD #7); MIGRATION map (TD #8)      |
+| 018 | Agent skills system (`.agents/skills/`, kernels)  | ✅ COMPLETE | Agent kernels + 7 sessions                                         |
+| 019 | Formal-spec package (`@libar-dev/architect-spec`) | ⚠️ PARTIAL  | v0.2 private → v1.0 graduation pending                             |
+| 020 | CI workflows + perf gate                          | ❌ MISSING  | NFR-004 + TD #5 (no `.github/workflows/` committed)                |
+| 021 | Doctrine + doc drift cleanup (Phase A bundle)     | ⚠️ PARTIAL  | TD #1, #2, #3, #6, #12 + supplementary No-BC violation (see below) |
 
 ### Plans
 
-| #   | Plan                                              | Lines | Notes                                                               |
-| --- | ------------------------------------------------- | ----: | ------------------------------------------------------------------- |
-| 006 | MCP server doc-drift remediation                  |  101  | Overlaps with plan 021; recommended single combined PR              |
-| 017 | W1.5 lift completion + MIGRATION.md graduation    |  109  | Strategic; effort owned by maintainer                               |
-| 019 | Formal-spec graduation to v1.0                    |  123  | Depends on 017 (`2.0.0-pre.1` cut); blocks methodology citability   |
-| 020 | CI workflows + perf gate commit                   |  133  | Phase B; ≈4-8 hours; blocks 017's release cut                       |
-| 021 | Phase-A doctrine doc drift bundle                 |  131  | ≈1-2 hours; includes supplementary No-BC item (#5 — see below)      |
+| #   | Plan                                           | Lines | Notes                                                             |
+| --- | ---------------------------------------------- | ----: | ----------------------------------------------------------------- |
+| 006 | MCP server doc-drift remediation               |   101 | Overlaps with plan 021; recommended single combined PR            |
+| 017 | W1.5 lift completion + MIGRATION.md graduation |   109 | Strategic; effort owned by maintainer                             |
+| 019 | Formal-spec graduation to v1.0                 |   123 | Depends on 017 (`2.0.0-pre.1` cut); blocks methodology citability |
+| 020 | CI workflows + perf gate commit                |   133 | Phase B; ≈4-8 hours; blocks 017's release cut                     |
+| 021 | Phase-A doctrine doc drift bundle              |   131 | ≈1-2 hours; includes supplementary No-BC item (#5 — see below)    |
 
 ---
 
@@ -93,22 +93,23 @@ export const DDD_ES_CQRS_ROLES = LOCKED_WAVE_ONE_ROLES;
 
 This repo now hosts **two complementary spec systems**:
 
-| System              | Lives at              | Source of truth?                                                  | Primary audience                        |
-| ------------------- | --------------------- | ----------------------------------------------------------------- | --------------------------------------- |
-| Spec Kit specs      | `.specify/specs/`     | High-level features + status; **projection** of source of truth   | Spec Kit `/speckit.*` workflow; humans  |
-| Architect specs     | `architect/specs/`    | Design-tier Gherkin features (tier 4 before promotion to tests)   | Architect plan/design/implement skills  |
-| Executable Gherkin  | `tests/features/`     | **Source of truth** for behavior (constitution §II Principle 2)    | Test runner; doctrine                   |
-| ADRs / PDRs         | `architect/decisions/`| **Source of truth** for architectural decisions                    | All contributors                        |
+| System             | Lives at               | Source of truth?                                                | Primary audience                       |
+| ------------------ | ---------------------- | --------------------------------------------------------------- | -------------------------------------- |
+| Spec Kit specs     | `.specify/specs/`      | High-level features + status; **projection** of source of truth | Spec Kit `/speckit.*` workflow; humans |
+| Architect specs    | `architect/specs/`     | Design-tier Gherkin features (tier 4 before promotion to tests) | Architect plan/design/implement skills |
+| Executable Gherkin | `tests/features/`      | **Source of truth** for behavior (constitution §II Principle 2) | Test runner; doctrine                  |
+| ADRs / PDRs        | `architect/decisions/` | **Source of truth** for architectural decisions                 | All contributors                       |
 
-**The constitution (§II Principle 2) is preserved**: annotated production code + executable Gherkin remains the single source of truth. `.specify/specs/` is a higher-level projection — a "table of contents" for the application — that enables `/speckit.*` workflows alongside the architect-* session skills. Future changes to executable behavior should still update Gherkin first; the `.specify/specs/` checkboxes can be flipped retroactively or maintained in lockstep.
+**The constitution (§II Principle 2) is preserved**: annotated production code + executable Gherkin remains the single source of truth. `.specify/specs/` is a higher-level projection — a "table of contents" for the application — that enables `/speckit.*` workflows alongside the architect-\* session skills. Future changes to executable behavior should still update Gherkin first; the `.specify/specs/` checkboxes can be flipped retroactively or maintained in lockstep.
 
-If the maintainer judges that two parallel spec systems creates more maintenance burden than value, the cheapest unwind is to delete `.specify/specs/` and rely on `architect/specs/` + the architect-* skills exclusively. The reverse-engineering docs at `docs/reverse-engineering/` remain useful regardless.
+If the maintainer judges that two parallel spec systems creates more maintenance burden than value, the cheapest unwind is to delete `.specify/specs/` and rely on `architect/specs/` + the architect-\* skills exclusively. The reverse-engineering docs at `docs/reverse-engineering/` remain useful regardless.
 
 ---
 
 ## Verification Checklist (Step 7)
 
 ### All levels
+
 - [x] `.specify/` directory exists
 - [x] `.specify/memory/constitution.md` exists (252 lines, non-empty)
 - [x] 21 `.specify/specs/NNN-feature-name/` directories
@@ -116,10 +117,12 @@ If the maintainer judges that two parallel spec systems creates more maintenance
 - [x] `.specify/scripts/bash/check-prerequisites.sh` exists
 
 ### Thoroughness Level 2 (specs + plans)
+
 - [x] Every PARTIAL/MISSING feature has `plan.md` (5/5 = 100%)
 - [x] Plans cite tech-debt item numbers and constitution sections
 
 ### Spec Kit script installation
+
 - [x] `check-prerequisites.sh` (downloaded)
 - [x] `setup-plan.sh` (downloaded)
 - [x] `create-new-feature.sh` (downloaded)

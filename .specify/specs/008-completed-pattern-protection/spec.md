@@ -1,15 +1,16 @@
 # Feature: Completed-Pattern Protection
 
 ## Status
+
 ✅ COMPLETE — `completed` patterns carry `ProtectionLevel = 'hard'` (`states.ts:18-23`); modification is blocked by ProcessGuard rule `completed-protection` unless the change carries `@architect-unlock-reason "<reason>"`.
 
 ## Overview
 
 A pattern that reaches the `completed` state is shipped, value-transferred, and load-bearing. Allowing arbitrary edits to such patterns silently re-opens scope that the FSM, the design spec, and prior reviews already closed. The platform therefore enforces a **hard lock** on `completed` patterns: any modification to a `completed` pattern's annotations, deliverables, or executable Gherkin is rejected at `architect-guard` time unless the offending change explicitly carries an `@architect-unlock-reason "<reason>"` annotation.
 
-The unlock annotation is intentionally textual rather than boolean. It forces the change author — human or agent — to articulate *why* the lock is being broken. The reason becomes part of the commit's audit trail and is surfaced in the guard report. This is the same protection model used for the `no-suppressions` doctrine: the cost of suppression is visibility, not impossibility.
+The unlock annotation is intentionally textual rather than boolean. It forces the change author — human or agent — to articulate _why_ the lock is being broken. The reason becomes part of the commit's audit trail and is surfaced in the guard report. This is the same protection model used for the `no-suppressions` doctrine: the cost of suppression is visibility, not impossibility.
 
-Hard-lock semantics complement the broader FSM (`007-fsm-lifecycle-enforcement`) by treating `completed` as terminal rather than just "the last cell in a transition table." Re-entry from `completed` is not in the transition table at all; an unlock attempt produces a *new* transition (typically `completed → active`) which itself must be justified.
+Hard-lock semantics complement the broader FSM (`007-fsm-lifecycle-enforcement`) by treating `completed` as terminal rather than just "the last cell in a transition table." Re-entry from `completed` is not in the transition table at all; an unlock attempt produces a _new_ transition (typically `completed → active`) which itself must be justified.
 
 Reference: `functional-specification.md` FR-008, business rule #3; `data-architecture.md` §1e Protection levels; `decision-rationale.md` "Deletion over deprecation" principle.
 
@@ -46,6 +47,7 @@ Reference: `functional-specification.md` FR-008, business rule #3; `data-archite
 ## Implementation Status
 
 **Completed:**
+
 - ✅ Protection-level mapping: `packages/architect-core/src/validation/fsm/states.ts:18-23`.
 - ✅ Guard rule: `packages/architect-guard/src/lint/process-guard/types.ts:210-216` (`completed-protection`).
 - ✅ Pre-commit binding: `pnpm architect:guard --staged` in `package.json`.

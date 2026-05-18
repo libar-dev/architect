@@ -14,7 +14,7 @@ The architect repo currently maintains ~14,000 lines of hand-authored markdown a
 The substrate matured this quarter:
 
 - **Pattern graph + projection pipeline are stable** (W1.5 lift complete; perf gate green; ADR-006 boundary lint-enforced; `parseAndProject*` trust-boundary discipline holds).
-- **The four-renderer split is in place** — `renderCompactText`, `renderJson`, `renderMarkdown`, `renderUi`. Markdown is *already* a renderer; the missing piece is the `DocDefinition` / composition surface that turns existing fragments into doc shapes.
+- **The four-renderer split is in place** — `renderCompactText`, `renderJson`, `renderMarkdown`, `renderUi`. Markdown is _already_ a renderer; the missing piece is the `DocDefinition` / composition surface that turns existing fragments into doc shapes.
 - **The cross-corpus duplication map is concrete** — `docgen-mapping/00-synthesis.md` enumerates the 11 highest-leverage fragments (D1 FSM, D2 tag registry, D3 four-tier ladder, …) and assigns canonical owners.
 - **The D8 CLI catalog prototype** (`scripts/proto/cli-catalog.ts` + `proto-output/FINDINGS.md`) proved the design holds at small scale and surfaced four concrete substrate gaps (A-D) before any production code lands.
 
@@ -32,13 +32,13 @@ The campaign is done when:
 
 These are doctrine; deviations require an explicit campaign-level decision and a recorded rationale.
 
-| Constraint | Where it lives | What it forbids |
-|---|---|---|
-| **No new annotation carriers** | `DECISIONS.md` D3'' | Inventing tags like `@architect-doc-inclusion` to drive doc membership — the campaign honors selector options 1, 2, 3, 5–9 (see `MATRIX-FRAMEWORK.md` § 3) over a new carrier. Reopening D3'' requires explicit decision. |
-| **SourceCanonical** | `architect/specs/documentation-projection/04-source-canonical.feature` | Parallel-tree narrative files that own claims about shipped behavior. Editorial framing carve-out (if any) must be tightly scoped. |
-| **ADR-006 Single Read Model** | `architect/decisions/`; lint-enforced via `[arch-boundary:*]` | Any consumer that re-derives pattern data outside `PatternGraph`. New `DocDefinition` substrate honors the same boundary. |
-| **No-BC doctrine** | Root `AGENTS.md` § "Engineering doctrine" | Backward-compat shims, aliases, `@deprecated` markers, `eslint-disable` / `ts-ignore`. The campaign produces clean breaks; migration is hard cuts with `MIGRATION.md` updates. |
-| **Zod-first boundaries** | Root `AGENTS.md` § "Engineering doctrine" | Hand-written TypeScript type mirrors for cross-package contracts. New `DocDefinition` shapes are Zod-derived; types flow from schemas. |
+| Constraint                     | Where it lives                                                         | What it forbids                                                                                                                                                                                                           |
+| ------------------------------ | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **No new annotation carriers** | `DECISIONS.md` D3''                                                    | Inventing tags like `@architect-doc-inclusion` to drive doc membership — the campaign honors selector options 1, 2, 3, 5–9 (see `MATRIX-FRAMEWORK.md` § 3) over a new carrier. Reopening D3'' requires explicit decision. |
+| **SourceCanonical**            | `architect/specs/documentation-projection/04-source-canonical.feature` | Parallel-tree narrative files that own claims about shipped behavior. Editorial framing carve-out (if any) must be tightly scoped.                                                                                        |
+| **ADR-006 Single Read Model**  | `architect/decisions/`; lint-enforced via `[arch-boundary:*]`          | Any consumer that re-derives pattern data outside `PatternGraph`. New `DocDefinition` substrate honors the same boundary.                                                                                                 |
+| **No-BC doctrine**             | Root `AGENTS.md` § "Engineering doctrine"                              | Backward-compat shims, aliases, `@deprecated` markers, `eslint-disable` / `ts-ignore`. The campaign produces clean breaks; migration is hard cuts with `MIGRATION.md` updates.                                            |
+| **Zod-first boundaries**       | Root `AGENTS.md` § "Engineering doctrine"                              | Hand-written TypeScript type mirrors for cross-package contracts. New `DocDefinition` shapes are Zod-derived; types flow from schemas.                                                                                    |
 
 ## 5. Scope
 

@@ -11,7 +11,7 @@ Cli is **the family doctrine reference for CLI trust boundaries** (12 `parseAtBo
 
 The Critical findings cluster in three places:
 
-1. **C-CLI-3 supersedes core's H-CORE-5.** The Phase 1 cli review verified via grep that `CLI_SCHEMA`/`showHelp`/`CliReferenceGenerator` in core (610 LOC) have **zero workspace src consumers**. Cli already has its own self-contained help system in `commands/_shared/help.ts`. Core's H-CORE-5 recommended *moving* — Phase 1 says **delete from core, don't move**. The single highest-leverage cli-side finding that affects core directly.
+1. **C-CLI-3 supersedes core's H-CORE-5.** The Phase 1 cli review verified via grep that `CLI_SCHEMA`/`showHelp`/`CliReferenceGenerator` in core (610 LOC) have **zero workspace src consumers**. Cli already has its own self-contained help system in `commands/_shared/help.ts`. Core's H-CORE-5 recommended _moving_ — Phase 1 says **delete from core, don't move**. The single highest-leverage cli-side finding that affects core directly.
 
 2. **`src/index.ts` is dead.** Phase 2 grep confirmed: the only matching `handleCliError` import in the workspace resolves to a **separate function** at `architect-guard/src/cli/shared.ts:24`, not to cli's export. **Recommendation: drop the entire JS API surface; cli becomes bin-only.** Net deletion ~60 LOC + the entire barrel.
 
@@ -32,39 +32,39 @@ Phase 4 found one Windows-breaking bug in `runtime-bridge.js:6` (`new URL(...).p
 
 ### Critical (P0)
 
-| ID | Title | Location |
-|----|-------|----------|
-| **C-CLI-3** | Confirm-and-delete `CLI_SCHEMA`/`showHelp`/`CliReferenceGenerator` in core — supersedes H-CORE-5 (move) with delete | `architect-core/src/config/cli-schema.ts` (610 LOC) |
-| C-CLI-1 | `generate-docs.ts:214-315` 112-LOC hand-rolled argv → Zod argv schema + `parseAtBoundary` | `src/cli/generate-docs.ts:214-315` |
-| C-CLI-2 | `parseDisclosureLevel`/`parseFilterValue`/`mergeProjectionFilter` duplicated byte-for-byte with drifted call paths | `src/cli/generate-docs.ts:128-169`, `src/cli/commands/read.ts:62-99` |
-| **Dead-cli-index** | `src/index.ts` JS API surface has **zero workspace consumers** — drop entirely; cli becomes bin-only | `packages/architect-cli/src/index.ts` |
-| TC-CLI-C-1 | **22 of 24 commands untested** | `tests/features/`, `tests/support/run-cli.ts` is the harness |
-| TC-CLI-C-2 | `architect-generate` bin (~670 LOC) zero tests | `src/cli/generate-docs.ts` |
-| DOC-CLI-C-1 | No package README (cli + guard are only ones without) | `packages/architect-cli/README.md` (absent) |
-| **CL-CLI-1** (family-wide) | `tsconfig.base.json` sourceMap/declarationMap disable — same as CL-CORE-3 | `tsconfig.base.json` |
-| F4A-CLI-H-4+H-5 | `runtime-bridge.js:6` Windows-breaking `new URL(...).pathname` bug; un-typechecked, un-linted | `packages/architect-cli/runtime-bridge.js:6` |
+| ID                         | Title                                                                                                               | Location                                                             |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| **C-CLI-3**                | Confirm-and-delete `CLI_SCHEMA`/`showHelp`/`CliReferenceGenerator` in core — supersedes H-CORE-5 (move) with delete | `architect-core/src/config/cli-schema.ts` (610 LOC)                  |
+| C-CLI-1                    | `generate-docs.ts:214-315` 112-LOC hand-rolled argv → Zod argv schema + `parseAtBoundary`                           | `src/cli/generate-docs.ts:214-315`                                   |
+| C-CLI-2                    | `parseDisclosureLevel`/`parseFilterValue`/`mergeProjectionFilter` duplicated byte-for-byte with drifted call paths  | `src/cli/generate-docs.ts:128-169`, `src/cli/commands/read.ts:62-99` |
+| **Dead-cli-index**         | `src/index.ts` JS API surface has **zero workspace consumers** — drop entirely; cli becomes bin-only                | `packages/architect-cli/src/index.ts`                                |
+| TC-CLI-C-1                 | **22 of 24 commands untested**                                                                                      | `tests/features/`, `tests/support/run-cli.ts` is the harness         |
+| TC-CLI-C-2                 | `architect-generate` bin (~670 LOC) zero tests                                                                      | `src/cli/generate-docs.ts`                                           |
+| DOC-CLI-C-1                | No package README (cli + guard are only ones without)                                                               | `packages/architect-cli/README.md` (absent)                          |
+| **CL-CLI-1** (family-wide) | `tsconfig.base.json` sourceMap/declarationMap disable — same as CL-CORE-3                                           | `tsconfig.base.json`                                                 |
+| F4A-CLI-H-4+H-5            | `runtime-bridge.js:6` Windows-breaking `new URL(...).pathname` bug; un-typechecked, un-linted                       | `packages/architect-cli/runtime-bridge.js:6`                         |
 
 ### High (P1) — 18 from Phase 1 + 8 from later phases
 
 **Code quality / Architecture (18 from Phase 1):**
 
-| ID | Title |
-|----|-------|
-| H-CLI-2 | `error-handler.ts` `knownTypes` array drifts silently from core's `DocError` discriminator |
-| H-CLI-Q-1 | 13 `as` casts in command `execute()` flag-narrowing — cured by `CommandDef<F>` generic |
-| H-CLI-Q-4 | Three exit-code strategies — unify on `runCliEntrypoint(main)` helper |
-| H-CLI-Q-7 | `parseSchemaValue` swallows `BoundaryParseError.cause` — closes Skip 1 from Phase 3 |
-| H-CLI-7 | **CLOSED in Phase 3** — all 6 bin shims now route through `runtime-bridge.js` |
-| H-CLI-3 to H-CLI-15 (partial) | Various architectural / code-quality items captured in Phase 1 raw |
-| Phase 4 H-1 to H-3 | `runtime-bridge.js` `.ts` conversion + workspace promotion; pack-smoke wire-up; vitest.config `__dirname` |
+| ID                            | Title                                                                                                     |
+| ----------------------------- | --------------------------------------------------------------------------------------------------------- |
+| H-CLI-2                       | `error-handler.ts` `knownTypes` array drifts silently from core's `DocError` discriminator                |
+| H-CLI-Q-1                     | 13 `as` casts in command `execute()` flag-narrowing — cured by `CommandDef<F>` generic                    |
+| H-CLI-Q-4                     | Three exit-code strategies — unify on `runCliEntrypoint(main)` helper                                     |
+| H-CLI-Q-7                     | `parseSchemaValue` swallows `BoundaryParseError.cause` — closes Skip 1 from Phase 3                       |
+| H-CLI-7                       | **CLOSED in Phase 3** — all 6 bin shims now route through `runtime-bridge.js`                             |
+| H-CLI-3 to H-CLI-15 (partial) | Various architectural / code-quality items captured in Phase 1 raw                                        |
+| Phase 4 H-1 to H-3            | `runtime-bridge.js` `.ts` conversion + workspace promotion; pack-smoke wire-up; vitest.config `__dirname` |
 
 **Testing / Documentation (Phase 3):**
 
-| ID | Title |
-|----|-------|
-| TC-CLI-H-1 | 4 `@skip` scenarios — 2 unblockable today, 2 should be deleted (untriggerable aspirational) |
-| DOC-CLI-H-1 | Zero ADR references in source |
-| DOC-CLI-H-2 | 15% `@architect-pattern` annotation rate — lowest in family |
+| ID          | Title                                                                                       |
+| ----------- | ------------------------------------------------------------------------------------------- |
+| TC-CLI-H-1  | 4 `@skip` scenarios — 2 unblockable today, 2 should be deleted (untriggerable aspirational) |
+| DOC-CLI-H-1 | Zero ADR references in source                                                               |
+| DOC-CLI-H-2 | 15% `@architect-pattern` annotation rate — lowest in family                                 |
 
 ### Medium (P2) — abbreviated
 

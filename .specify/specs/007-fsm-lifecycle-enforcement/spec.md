@@ -1,6 +1,7 @@
 # Feature: FSM Lifecycle Enforcement
 
 ## Status
+
 ✅ COMPLETE — FSM contract lives in `@libar-dev/architect-core` (`validation/fsm/`), enforced by `@libar-dev/architect-guard` via the `invalid-status-transition` rule; transitions table at `transitions.ts:22-29`.
 
 ## Overview
@@ -47,6 +48,7 @@ Reference: `functional-specification.md` FR-007; `data-architecture.md` §1e; `d
 ## Implementation Status
 
 **Completed:**
+
 - ✅ Canonical transition table: `packages/architect-core/src/validation/fsm/transitions.ts:22-29`.
 - ✅ States and protection levels: `packages/architect-core/src/validation/fsm/states.ts:18-23`.
 - ✅ Guard rule IDs: `packages/architect-guard/src/lint/process-guard/types.ts:210-216`.

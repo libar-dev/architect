@@ -12,34 +12,34 @@
 
 ## Section A — Confirmed surviving module-scope aliases
 
-| File:line | Alias | Aliases-to | Wave | Workspace consumers (excl. defining file) |
-|---|---|---|---|---|
-| `packages/architect-core/src/config/role-constants.ts:66` | `DEFAULT_ROLES` | `LOCKED_WAVE_ONE_ROLES` | Wave 1 (tag taxonomy lock) | 0 (only `index.ts` barrel re-exports) |
-| `packages/architect-core/src/config/role-constants.ts:68` | `DDD_ES_CQRS_ROLES` | `LOCKED_WAVE_ONE_ROLES` | Wave 1 (DDD/CQRS rename) | 0 (only `index.ts` + `config/index.ts` re-exports) |
-| `packages/architect-core/src/validation-schemas/feature.ts:100` | `ParsedStepSchema` | `GherkinStepSchema` | "Parsed→Gherkin" Zod refactor | 0 (barrel only) |
-| `packages/architect-core/src/validation-schemas/feature.ts:101` | `ParsedScenarioSchema` | `GherkinScenarioSchema` | same | 0 |
-| `packages/architect-core/src/validation-schemas/feature.ts:102` | `ParsedBackgroundSchema` | `GherkinBackgroundSchema` | same | 0 |
-| `packages/architect-core/src/validation-schemas/feature.ts:103` | `ParsedFeatureSchema` | `GherkinFeatureSchema` | same | 0 |
-| `packages/architect-core/src/validation-schemas/feature.ts:104` | `FeatureFileSchema` | `ScannedGherkinFileSchema` | same | 0 |
-| `packages/architect-core/src/validation-schemas/feature.ts:106-110` | `ParsedStep`/`ParsedScenario`/`ParsedBackground`/`ParsedFeature`/`FeatureFile` types | `z.infer` of the alias schemas | same | 0 |
-| `packages/architect-core/src/validation-schemas/extracted-pattern.ts:126` | `ExtractedPatternSchema` | `ExtractedPatternBaseSchema` | renamed; `Base` is local-only | Heavy (but the rename made `Base` private, so the export is the alias — pure rename adapter) |
-| `packages/architect-projection/src/projections/_shared/filter.ts:8` | `MaturityValueSchema` | `MaturitySchema` | post-rename | 0 |
-| `packages/architect-projection/src/projections/_shared/filter.ts:9` | `StatusValueSchema` | `AcceptedStatusSchema` | post-rename | 0 |
-| `packages/architect-mcp/src/tool-input-schemas.ts:115` | `PatternNameSchema` | `NonEmptySafeStringSchema` | semantic re-label | 9 (legit usage) |
-| `packages/architect-core/src/config/workflow-loader.ts:42,43` | `CANONICAL_PHASE_NAMES`, `CANONICAL_PHASE_ORDINALS` | `.map(...)` derivations exported | unknown wave | 0 |
+| File:line                                                                 | Alias                                                                                | Aliases-to                       | Wave                          | Workspace consumers (excl. defining file)                                                    |
+| ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ | -------------------------------- | ----------------------------- | -------------------------------------------------------------------------------------------- |
+| `packages/architect-core/src/config/role-constants.ts:66`                 | `DEFAULT_ROLES`                                                                      | `LOCKED_WAVE_ONE_ROLES`          | Wave 1 (tag taxonomy lock)    | 0 (only `index.ts` barrel re-exports)                                                        |
+| `packages/architect-core/src/config/role-constants.ts:68`                 | `DDD_ES_CQRS_ROLES`                                                                  | `LOCKED_WAVE_ONE_ROLES`          | Wave 1 (DDD/CQRS rename)      | 0 (only `index.ts` + `config/index.ts` re-exports)                                           |
+| `packages/architect-core/src/validation-schemas/feature.ts:100`           | `ParsedStepSchema`                                                                   | `GherkinStepSchema`              | "Parsed→Gherkin" Zod refactor | 0 (barrel only)                                                                              |
+| `packages/architect-core/src/validation-schemas/feature.ts:101`           | `ParsedScenarioSchema`                                                               | `GherkinScenarioSchema`          | same                          | 0                                                                                            |
+| `packages/architect-core/src/validation-schemas/feature.ts:102`           | `ParsedBackgroundSchema`                                                             | `GherkinBackgroundSchema`        | same                          | 0                                                                                            |
+| `packages/architect-core/src/validation-schemas/feature.ts:103`           | `ParsedFeatureSchema`                                                                | `GherkinFeatureSchema`           | same                          | 0                                                                                            |
+| `packages/architect-core/src/validation-schemas/feature.ts:104`           | `FeatureFileSchema`                                                                  | `ScannedGherkinFileSchema`       | same                          | 0                                                                                            |
+| `packages/architect-core/src/validation-schemas/feature.ts:106-110`       | `ParsedStep`/`ParsedScenario`/`ParsedBackground`/`ParsedFeature`/`FeatureFile` types | `z.infer` of the alias schemas   | same                          | 0                                                                                            |
+| `packages/architect-core/src/validation-schemas/extracted-pattern.ts:126` | `ExtractedPatternSchema`                                                             | `ExtractedPatternBaseSchema`     | renamed; `Base` is local-only | Heavy (but the rename made `Base` private, so the export is the alias — pure rename adapter) |
+| `packages/architect-projection/src/projections/_shared/filter.ts:8`       | `MaturityValueSchema`                                                                | `MaturitySchema`                 | post-rename                   | 0                                                                                            |
+| `packages/architect-projection/src/projections/_shared/filter.ts:9`       | `StatusValueSchema`                                                                  | `AcceptedStatusSchema`           | post-rename                   | 0                                                                                            |
+| `packages/architect-mcp/src/tool-input-schemas.ts:115`                    | `PatternNameSchema`                                                                  | `NonEmptySafeStringSchema`       | semantic re-label             | 9 (legit usage)                                                                              |
+| `packages/architect-core/src/config/workflow-loader.ts:42,43`             | `CANONICAL_PHASE_NAMES`, `CANONICAL_PHASE_ORDINALS`                                  | `.map(...)` derivations exported | unknown wave                  | 0                                                                                            |
 
 ### Type-only aliases (forwarder shape)
 
-| File:line | Alias | Aliases-to | Workspace consumers |
-|---|---|---|---|
-| `packages/architect-core/src/types/branded.ts:33` | `type ModuleId = PatternId` (+ `asModuleId`) | `PatternId` | 0 |
-| `packages/architect-core/src/types/errors.ts:193` | `type ScanError = FileSystemError \| FileParseError \| DirectiveValidationError` | union | 0 |
-| `packages/architect-core/src/types/errors.ts:204` | `type GenerationError = MarkdownGenerationError \| FileWriteError \| RegistryValidationError` | union | 0 |
-| `packages/architect-core/src/validation-schemas/tag-registry.ts:20` | `type RoleDefinition` | `ConfigRoleDefinition` (re-imported with `as` rename) | barrel only |
-| `packages/architect-core/src/validation-schemas/doc-directive.ts:36` | `type PatternStatus` | `AcceptedStatusValue` | 0 |
-| `packages/architect-core/src/validation-schemas/dual-source.ts:15,16,19,22` | `ProcessStatus`, `AcceptedStatus`, `HierarchyLevel`, `RiskLevel` | taxonomy types (re-imported `as Taxonomy*`) | barrel + intra-module |
-| `packages/architect-core/src/validation-schemas/lint.ts:6` | `type LintSeverity = SeverityType` | `SeverityType` | 12+ (legit usage) |
-| `packages/architect-projection/src/projections/documentation-composition/documentation-type-registry.ts:53` | `type DocumentationTypeMetadata = SupportedDocumentationTypeMetadata` | parent type | within file only |
+| File:line                                                                                                   | Alias                                                                                         | Aliases-to                                            | Workspace consumers   |
+| ----------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- | ----------------------------------------------------- | --------------------- |
+| `packages/architect-core/src/types/branded.ts:33`                                                           | `type ModuleId = PatternId` (+ `asModuleId`)                                                  | `PatternId`                                           | 0                     |
+| `packages/architect-core/src/types/errors.ts:193`                                                           | `type ScanError = FileSystemError \| FileParseError \| DirectiveValidationError`              | union                                                 | 0                     |
+| `packages/architect-core/src/types/errors.ts:204`                                                           | `type GenerationError = MarkdownGenerationError \| FileWriteError \| RegistryValidationError` | union                                                 | 0                     |
+| `packages/architect-core/src/validation-schemas/tag-registry.ts:20`                                         | `type RoleDefinition`                                                                         | `ConfigRoleDefinition` (re-imported with `as` rename) | barrel only           |
+| `packages/architect-core/src/validation-schemas/doc-directive.ts:36`                                        | `type PatternStatus`                                                                          | `AcceptedStatusValue`                                 | 0                     |
+| `packages/architect-core/src/validation-schemas/dual-source.ts:15,16,19,22`                                 | `ProcessStatus`, `AcceptedStatus`, `HierarchyLevel`, `RiskLevel`                              | taxonomy types (re-imported `as Taxonomy*`)           | barrel + intra-module |
+| `packages/architect-core/src/validation-schemas/lint.ts:6`                                                  | `type LintSeverity = SeverityType`                                                            | `SeverityType`                                        | 12+ (legit usage)     |
+| `packages/architect-projection/src/projections/documentation-composition/documentation-type-registry.ts:53` | `type DocumentationTypeMetadata = SupportedDocumentationTypeMetadata`                         | parent type                                           | within file only      |
 
 ### Parser-branch BC adapter (not a const, but the same shape)
 
@@ -47,22 +47,22 @@
 
 ## Section B — Dogfood-as-public-API survivors
 
-| File | Public path | Consumer count outside defining file |
-|---|---|---|
-| `packages/architect-core/src/config/cli-schema.ts` (610 LOC) | Re-exported as `CLI_SCHEMA` + 7 types from `architect-core/src/index.ts:236-246` | **0** (referenced only by `architect-guard/src/lint/tier-a-baseline.ts:81` as a *file path* in the baseline list) |
-| `packages/architect-core/src/config/presentation-contracts.ts` (70 LOC) | Re-exported from `architect-core/src/index.ts:226-235` (`CodecOptions`, `DiagramScope`, `DiagramSource`, `DocumentEntry`, `IndexCodecOptionsContract`, `ReferenceDocConfig`, `ShapeSelector`) | Used internally by core configs, but the public re-export is dogfood-shaped |
-| `packages/architect-core/src/config/self-hosting.ts` (110 LOC) — `ARCHITECT_PACKAGE_ROLES`, `PACKAGE_SELF_HOSTING_SOURCES` | `architect-core/src/index.ts:27-28` + `config/index.ts:25-26` | 1 — `architect-projection/tests/features/perf/business-rule-set-report.steps.ts` (test fixture only) |
-| `packages/architect-core/src/extractor/layer-inference.ts` (43 LOC) — hardcoded `/orders/` and `/inventory/` substrings at line 33 | `architect-core/src/extractor/index.ts:22` → public `FEATURE_LAYERS`, `inferFeatureLayer` | Bug-shaped: `/orders/` and `/inventory/` belong to a downstream demo app, not core |
-| `packages/architect-guard/src/lint/tier-a-baseline.ts` (1,138 LOC) — `TIER_A_LINT_BASELINE` | NOT re-exported from `architect-guard/src/index.ts` or `lint/index.ts`; **internally used only by `cli/lint-patterns.ts:45`** | OK on the surface, but 1.1k LOC of "current state of this monorepo's own lint debt" lives inside a publishable package |
-| `packages/architect-cli/src/index.ts` (1 line) | Public `main` of `@libar-dev/architect-cli`: `export { isDocError, formatDocError, handleCliError } from './cli/error-handler.js';` | **0** — `architect-guard` imports its own local `handleCliError` from `cli/shared.ts`. Entire JS API of `architect-cli` is dead. |
+| File                                                                                                                               | Public path                                                                                                                                                                                   | Consumer count outside defining file                                                                                             |
+| ---------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `packages/architect-core/src/config/cli-schema.ts` (610 LOC)                                                                       | Re-exported as `CLI_SCHEMA` + 7 types from `architect-core/src/index.ts:236-246`                                                                                                              | **0** (referenced only by `architect-guard/src/lint/tier-a-baseline.ts:81` as a _file path_ in the baseline list)                |
+| `packages/architect-core/src/config/presentation-contracts.ts` (70 LOC)                                                            | Re-exported from `architect-core/src/index.ts:226-235` (`CodecOptions`, `DiagramScope`, `DiagramSource`, `DocumentEntry`, `IndexCodecOptionsContract`, `ReferenceDocConfig`, `ShapeSelector`) | Used internally by core configs, but the public re-export is dogfood-shaped                                                      |
+| `packages/architect-core/src/config/self-hosting.ts` (110 LOC) — `ARCHITECT_PACKAGE_ROLES`, `PACKAGE_SELF_HOSTING_SOURCES`         | `architect-core/src/index.ts:27-28` + `config/index.ts:25-26`                                                                                                                                 | 1 — `architect-projection/tests/features/perf/business-rule-set-report.steps.ts` (test fixture only)                             |
+| `packages/architect-core/src/extractor/layer-inference.ts` (43 LOC) — hardcoded `/orders/` and `/inventory/` substrings at line 33 | `architect-core/src/extractor/index.ts:22` → public `FEATURE_LAYERS`, `inferFeatureLayer`                                                                                                     | Bug-shaped: `/orders/` and `/inventory/` belong to a downstream demo app, not core                                               |
+| `packages/architect-guard/src/lint/tier-a-baseline.ts` (1,138 LOC) — `TIER_A_LINT_BASELINE`                                        | NOT re-exported from `architect-guard/src/index.ts` or `lint/index.ts`; **internally used only by `cli/lint-patterns.ts:45`**                                                                 | OK on the surface, but 1.1k LOC of "current state of this monorepo's own lint debt" lives inside a publishable package           |
+| `packages/architect-cli/src/index.ts` (1 line)                                                                                     | Public `main` of `@libar-dev/architect-cli`: `export { isDocError, formatDocError, handleCliError } from './cli/error-handler.js';`                                                           | **0** — `architect-guard` imports its own local `handleCliError` from `cli/shared.ts`. Entire JS API of `architect-cli` is dead. |
 
 ## Section C — Self-declared deletion targets that haven't been deleted
 
-| File:line | Marker comment |
-|---|---|
-| `packages/architect-projection/src/projections/documentation-composition/documentation-bundle.internal.ts:64` | `WARNING: This table is a campaign deletion target for W-DOCS-1. … DocDefinition.build(graph) is the replacement path. Do NOT add new entries here. See .pr-coordination/PROPOSED-DESIGN.md.` |
+| File:line                                                                                                      | Marker comment                                                                                                                                                                                                                    |
+| -------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `packages/architect-projection/src/projections/documentation-composition/documentation-bundle.internal.ts:64`  | `WARNING: This table is a campaign deletion target for W-DOCS-1. … DocDefinition.build(graph) is the replacement path. Do NOT add new entries here. See .pr-coordination/PROPOSED-DESIGN.md.`                                     |
 | `packages/architect-projection/src/projections/documentation-composition/documentation-type-registry.ts:55-63` | `Documentation-type registry — closed dispatch table for legacy doc-gen. DO NOT ADD ENTRIES HERE. … This module exists only to carry the 12 pre-campaign entries until they migrate; it will be deleted once the campaign lands.` |
-| `packages/architect-core/src/config/config-loader.ts:188-196` | Implicit deletion target — `'codec' + 'Options'` and `'referenceDoc' + 'Configs'` runtime concat to strip BC keys before Zod parse. The concat exists only to hide the key names from a static checker. |
+| `packages/architect-core/src/config/config-loader.ts:188-196`                                                  | Implicit deletion target — `'codec' + 'Options'` and `'referenceDoc' + 'Configs'` runtime concat to strip BC keys before Zod parse. The concat exists only to hide the key names from a static checker.                           |
 
 No other `// TODO delete`, `// remove after`, `// kept for compat`, or `@deprecated` JSDoc tags survive in production source — those have been pruned. The two markers above are the survivors.
 
@@ -71,7 +71,7 @@ No other `// TODO delete`, `// remove after`, `// kept for compat`, or `@depreca
 1. **`runtime-bridge.js`** — two near-identical files:
    - `packages/architect-cli/runtime-bridge.js`
    - `packages/architect-mcp/runtime-bridge.js`
-   Differ by 2 lines (package name in the error string, exported function name). Both line 6 carry the Windows bug `path.dirname(new URL(import.meta.url).pathname)`. Neither is canonical.
+     Differ by 2 lines (package name in the error string, exported function name). Both line 6 carry the Windows bug `path.dirname(new URL(import.meta.url).pathname)`. Neither is canonical.
 
 2. **`handleCliError`** — `packages/architect-cli/src/cli/error-handler.ts` (publicly re-exported from `architect-cli/src/index.ts`) AND `packages/architect-guard/src/cli/shared.ts:24` (used by all 4 guard CLI entrypoints). Guard does not consume the architect-cli version → the cli version is the duplicate-and-dead copy.
 
@@ -118,7 +118,7 @@ Categorizing why each adapter survived a "No-BC" PR:
 
 ## Section G — Root-cause statement
 
-Every "No-BC" PR enforces *additive* discipline (new types, new schemas, new tags) but lacks a *subtractive* gate: nothing in CI fails when an old name continues to be exported after its replacement ships. The repo has type-checking, ESLint, the Zod boundary rule, the perf gate, and `arch dangling --strict` — but no **workspace-consumer audit**. Authors hedge "leave the alias in for one release" and the alias becomes load-bearing for nobody and load-bearing for everyone simultaneously. The obfuscated `'codec' + 'Options'` concat is the smoking gun: it proves the author *knew* a static check would have flagged the BC shim and chose to evade it rather than delete it.
+Every "No-BC" PR enforces _additive_ discipline (new types, new schemas, new tags) but lacks a _subtractive_ gate: nothing in CI fails when an old name continues to be exported after its replacement ships. The repo has type-checking, ESLint, the Zod boundary rule, the perf gate, and `arch dangling --strict` — but no **workspace-consumer audit**. Authors hedge "leave the alias in for one release" and the alias becomes load-bearing for nobody and load-bearing for everyone simultaneously. The obfuscated `'codec' + 'Options'` concat is the smoking gun: it proves the author _knew_ a static check would have flagged the BC shim and chose to evade it rather than delete it.
 
 **Single CI mechanism that would catch every flavor above:** a workspace-wide **public-export consumer audit** run on each PR. For every `export` reachable from each package's `package.json` `main` / `exports` field, walk the workspace dependency graph and count consumers; fail the build when (a) consumer count is 0, (b) a symbol is module-scope `export const|type X = Y` where `Y` is itself exported (pure aliasing), (c) a `.ts` file contains string concatenation that produces a property name later passed to `Reflect.deleteProperty` (the evasion smell), or (d) a JSDoc/comment contains `deletion target` / `kept for compat` / `legacy` / `TODO remove` markers on a symbol that has shipped a release. The same script can lift the dogfood-leak detection by checking that any file whose path matches `*self-hosting*`, `*tier-*-baseline*`, or whose top-of-file JSDoc declares `@architect-bounded-context:dogfood` is not transitively reachable from a published `exports` entry.
 
@@ -147,5 +147,5 @@ Every "No-BC" PR enforces *additive* discipline (new types, new schemas, new tag
 - `/Users/darkomijic/dev-projects/architect/packages/architect-cli/src/index.ts`
 - `/Users/darkomijic/dev-projects/architect/packages/architect-cli/runtime-bridge.js`
 - `/Users/darkomijic/dev-projects/architect/packages/architect-mcp/runtime-bridge.js`</result>
-<usage><total_tokens>75109</total_tokens><tool_uses>61</tool_uses><duration_ms>352952</duration_ms></usage>
-</task-notification>
+  <usage><total_tokens>75109</total_tokens><tool_uses>61</tool_uses><duration_ms>352952</duration_ms></usage>
+  </task-notification>

@@ -14,6 +14,7 @@
 From `DocDirectiveSchema` + observed grep:
 
 **Identity / classification (8)**
+
 - `@architect-pattern <Name>` — pattern identifier (REQUIRED)
 - `@architect-status <roadmap|active|completed|candidate|...>`
 - `@architect-role:<role>` — canonical role tag (lookup against `TagRegistry.roles`)
@@ -24,6 +25,7 @@ From `DocDirectiveSchema` + observed grep:
 - `@architect-phase <int>`
 
 **Relationships (6)**
+
 - `@architect-uses <Pattern[,…]>`
 - `@architect-depends-on <Pattern[,…]>`
 - `@architect-implements <Pattern[,…]>`
@@ -32,12 +34,14 @@ From `DocDirectiveSchema` + observed grep:
 - `@architect-target <path>` — target deliverable path (stubs)
 
 **Lifecycle/governance (4)**
+
 - `@architect-completed <date>`
 - `@architect-since <version>`
 - `@architect-unlock-reason <≥10-char rationale>` — bypass for FSM gate
 - `@architect-title <human title>`
 
 **ADR-specific (7)**
+
 - `@architect-adr <id>`
 - `@architect-adr-status`
 - `@architect-adr-category`
@@ -47,6 +51,7 @@ From `DocDirectiveSchema` + observed grep:
 - `@architect-adr-superseded-by <ADR-id>`
 
 **Other (2)**
+
 - `@architect-decision` — aggregation tag (flags this block as a decision)
 - `@architect-validation` — validation marker
 - `@architect-cli` — CLI bin marker
@@ -84,14 +89,17 @@ This is the JSDoc-prose-to-structured-data path. It captures **per-property JSDo
 From `feature.ts` + `gherkin-extractor.ts` + `dual-source-extractor.ts`:
 
 **Feature-level tags** parsed into structured fields:
+
 - `@pattern:<Name>` → `process.pattern`
 - `@phase:<n>`, `@status:<v>`, `@quarter:<v>`, `@effort:<v>`, `@team:<v>`, `@workflow:<v>`, `@completed:<v>`, `@effort-actual:<v>`, `@risk:<v>`, `@product-area:<v>`, `@user-role:<v>`, `@business-value:"<v>"`
 
 **Background data tables** → `Deliverable[]` (one row per deliverable):
+
 - Headers recognised: `Deliverable`, `Status`, `Tests`, `Location`, `Finding`, `Release`
 - Status validates against `DELIVERABLE_STATUS_VALUES`
 
 **Rules + Scenarios** → `BusinessRule[]` on the pattern, plus full `GherkinScenario` records:
+
 - `Rule:` header + tags + scenarios + docstring → projection `BusinessRule { invariant, rationale, verifiedBy[], scenarioCount, package, productArea }`
 - Scenario semantic tags (whitelisted in `SEMANTIC_SCENARIO_TAGS`): `happy-path`, `validation`, `business-failure`, `business-rule`, `compensation`, `idempotency`, `expiration`, `workflow-state`
 - Every step keeps its `keyword`, `text`, optional `dataTable`, optional `docString` (with `mediaType`)
@@ -118,7 +126,7 @@ The Zod schema in `validation-schemas/extracted-pattern.ts` is the canonical sha
 
 ## 6. Projection Fragments — 42 discriminated-union kinds
 
-These are the *typed shapes you actually get out of the CLI/MCP*. From `FragmentSchema`:
+These are the _typed shapes you actually get out of the CLI/MCP_. From `FragmentSchema`:
 
 **Pattern-relations (12)**
 `PatternCatalog`, `PatternSummary`, `PatternDetail`, `PatternBundleEntry`, `BoundedContext`, `ArchitectureNeighborhood`, `ArchitectureComparison`, `DependencyEdge`, `DependencyEdgeSet`, `DependencyTree`, `OpenQuestionList`, `OrphanPatternList`

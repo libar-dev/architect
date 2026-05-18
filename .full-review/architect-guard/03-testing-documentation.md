@@ -66,30 +66,30 @@ Only publishable package without one. **Recipe:** create `packages/architect-gua
 
 ### Test coverage
 
-| # | Title | Action |
-|---|-------|--------|
-| TC-H-GUARD-1 | `decider.ts:343,385` (`checkScopeCreep`, `checkSessionScope`) have zero scenarios despite `process-guard-rules.feature` claiming "Verified by step bindings" (false) | Add 2 scenarios to `guard-runtime.feature` matching the completed-protection test pattern. |
-| TC-H-GUARD-2 | `dangling-baseline.ts` — `compareDanglingBaseline`/`writeDanglingBaseline`/`normalizeDanglingBaselineEntries` zero in-process tests; smoke script only covers `readDanglingBaseline` | Add `tests/features/lint/dangling-baseline.feature` (5 scenarios, temp-dir fixtures). |
-| TC-H-GUARD-3 | **4 of 5 anti-pattern sub-detectors NEVER REACHED** (`detectRemovedTags`, `detectMagicComments`, `detectScenarioBloat`, `detectMegaFeature`) because existing tests pass `features: []` | Add 4 scenarios with feature-content fixtures. |
-| TC-H-GUARD-4 | `derive-state.ts` (172 LOC) zero tests | Add coverage for the state-derivation paths. |
-| TC-H-GUARD-5 | DoD failure paths zero tests | Add coverage. |
-| TC-H-GUARD-6 | `process-guard-rules.feature:46` (phantom upstream suite), `:70-72`, `:75-77` (phantom step bindings) — load-bearing documentation with false claims | Update references when the corresponding test files land per TC-C-GUARD-1 and TC-H-GUARD-1. |
-| TC-H-GUARD-7 | `packed-dangling-baseline-smoke.mjs` unwired | **Recipe: wire `prepack` to run it: `"prepack": "pnpm clean && pnpm build && node scripts/packed-dangling-baseline-smoke.mjs"`.** No CI required; catches dist-resource regressions before every publish. Workspace promotion (Cleanup-H-GUARD-4) follows. |
+| #            | Title                                                                                                                                                                                   | Action                                                                                                                                                                                                                                                     |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TC-H-GUARD-1 | `decider.ts:343,385` (`checkScopeCreep`, `checkSessionScope`) have zero scenarios despite `process-guard-rules.feature` claiming "Verified by step bindings" (false)                    | Add 2 scenarios to `guard-runtime.feature` matching the completed-protection test pattern.                                                                                                                                                                 |
+| TC-H-GUARD-2 | `dangling-baseline.ts` — `compareDanglingBaseline`/`writeDanglingBaseline`/`normalizeDanglingBaselineEntries` zero in-process tests; smoke script only covers `readDanglingBaseline`    | Add `tests/features/lint/dangling-baseline.feature` (5 scenarios, temp-dir fixtures).                                                                                                                                                                      |
+| TC-H-GUARD-3 | **4 of 5 anti-pattern sub-detectors NEVER REACHED** (`detectRemovedTags`, `detectMagicComments`, `detectScenarioBloat`, `detectMegaFeature`) because existing tests pass `features: []` | Add 4 scenarios with feature-content fixtures.                                                                                                                                                                                                             |
+| TC-H-GUARD-4 | `derive-state.ts` (172 LOC) zero tests                                                                                                                                                  | Add coverage for the state-derivation paths.                                                                                                                                                                                                               |
+| TC-H-GUARD-5 | DoD failure paths zero tests                                                                                                                                                            | Add coverage.                                                                                                                                                                                                                                              |
+| TC-H-GUARD-6 | `process-guard-rules.feature:46` (phantom upstream suite), `:70-72`, `:75-77` (phantom step bindings) — load-bearing documentation with false claims                                    | Update references when the corresponding test files land per TC-C-GUARD-1 and TC-H-GUARD-1.                                                                                                                                                                |
+| TC-H-GUARD-7 | `packed-dangling-baseline-smoke.mjs` unwired                                                                                                                                            | **Recipe: wire `prepack` to run it: `"prepack": "pnpm clean && pnpm build && node scripts/packed-dangling-baseline-smoke.mjs"`.** No CI required; catches dist-resource regressions before every publish. Workspace promotion (Cleanup-H-GUARD-4) follows. |
 
 ### Documentation
 
-| # | Title | Action |
-|---|-------|--------|
-| DOC-H-GUARD-1 | `@architect-bounded-context:generator` on all 4 `git/` files — wrong annotation, Critical doctrine defect | Change to `:process-guard` immediately, independent of Phase 2 Cleanup-H-GUARD-3 demotion decision. |
-| DOC-H-GUARD-2 | Entire `lint/steps/` (7 of 8 files) + `lint/idea-tier/` (4 of 4 files) unannotated | Add `@architect-pattern` module blocks. |
-| DOC-H-GUARD-3 | `dangling-baseline.ts` (3 externally-consumed symbols) no JSDoc header | Add module + function-level JSDoc. |
-| DOC-H-GUARD-4 | `src/index.ts` no header — public contract invisible | Add header (matches core TD-CORE-4 recipe). |
-| DOC-H-GUARD-5 | `AGENTS.md:165` cites `ProcessGuard` — symbol does not exist in the barrel | Replace with `runLintProcessCli` + dangling-baseline functions. |
-| DOC-H-GUARD-6 | `docs/VALIDATION.md` + `docs/PROCESS-GUARD.md` carry "Deprecated — superseded by auto-generated docs" banner; replacement lives in gitignored `docs-live/` | Either ungitignore the live docs or remove the deprecation banner. |
-| DOC-H-GUARD-7 | All 4 CLIs hardcode `main` as the branch for `--all` mode with no documentation | Document the limitation in CLI help text. |
-| DOC-H-GUARD-8 | `architect-lint-patterns --help` doesn't explain tier-A baseline or its absence of override | Document; flag for update after Phase 2 H-SIMP-6 `--baseline` flag lands. |
-| DOC-H-GUARD-9 | Zero `@architect-decision`/`@architect-see-also` annotations in guard source despite being ADR-003 enforcement point | Add. `anti-patterns.ts:51` cites ADR-001 — should be ADR-007. |
-| DOC-H-GUARD-10 | MIGRATION.md correctly maps the `architect-guard` bin but entirely omits the guard JS API surface | Add v1→v2 mapping for `runLintProcessCli`/`compareDanglingBaseline`/etc. |
+| #              | Title                                                                                                                                                      | Action                                                                                              |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| DOC-H-GUARD-1  | `@architect-bounded-context:generator` on all 4 `git/` files — wrong annotation, Critical doctrine defect                                                  | Change to `:process-guard` immediately, independent of Phase 2 Cleanup-H-GUARD-3 demotion decision. |
+| DOC-H-GUARD-2  | Entire `lint/steps/` (7 of 8 files) + `lint/idea-tier/` (4 of 4 files) unannotated                                                                         | Add `@architect-pattern` module blocks.                                                             |
+| DOC-H-GUARD-3  | `dangling-baseline.ts` (3 externally-consumed symbols) no JSDoc header                                                                                     | Add module + function-level JSDoc.                                                                  |
+| DOC-H-GUARD-4  | `src/index.ts` no header — public contract invisible                                                                                                       | Add header (matches core TD-CORE-4 recipe).                                                         |
+| DOC-H-GUARD-5  | `AGENTS.md:165` cites `ProcessGuard` — symbol does not exist in the barrel                                                                                 | Replace with `runLintProcessCli` + dangling-baseline functions.                                     |
+| DOC-H-GUARD-6  | `docs/VALIDATION.md` + `docs/PROCESS-GUARD.md` carry "Deprecated — superseded by auto-generated docs" banner; replacement lives in gitignored `docs-live/` | Either ungitignore the live docs or remove the deprecation banner.                                  |
+| DOC-H-GUARD-7  | All 4 CLIs hardcode `main` as the branch for `--all` mode with no documentation                                                                            | Document the limitation in CLI help text.                                                           |
+| DOC-H-GUARD-8  | `architect-lint-patterns --help` doesn't explain tier-A baseline or its absence of override                                                                | Document; flag for update after Phase 2 H-SIMP-6 `--baseline` flag lands.                           |
+| DOC-H-GUARD-9  | Zero `@architect-decision`/`@architect-see-also` annotations in guard source despite being ADR-003 enforcement point                                       | Add. `anti-patterns.ts:51` cites ADR-001 — should be ADR-007.                                       |
+| DOC-H-GUARD-10 | MIGRATION.md correctly maps the `architect-guard` bin but entirely omits the guard JS API surface                                                          | Add v1→v2 mapping for `runLintProcessCli`/`compareDanglingBaseline`/etc.                            |
 
 ## Medium / Low — abbreviated
 
@@ -99,51 +99,51 @@ Phase 3B medium: docs-sources/gherkin-patterns.md phantom PDR-005 propagation; A
 
 ## Annotation rate audit (consolidated from Phase 3B)
 
-| Area | Annotated / Total | Notes |
-|------|-------------------|-------|
-| `cli/` | partial | 4 CLI entrypoints annotated; helpers not. |
-| `git/` | annotated but **wrong context** | All 4 files carry `:generator` annotation. |
-| `lint/process-guard/` | partial | Core members annotated; `types.ts` not. |
-| `lint/steps/` | 1 of 8 | Subsystem invisible to PatternGraph. |
-| `lint/idea-tier/` | 0 of 4 | Subsystem invisible to PatternGraph. |
-| `validation/` | partial | Most files annotated; `types.ts` not. |
-| `src/index.ts` | no header | (DOC-H-GUARD-4) |
-| **Overall** | **21 of 38 = 55%** | Behind projection (60%), ahead of core (26%). |
+| Area                  | Annotated / Total               | Notes                                         |
+| --------------------- | ------------------------------- | --------------------------------------------- |
+| `cli/`                | partial                         | 4 CLI entrypoints annotated; helpers not.     |
+| `git/`                | annotated but **wrong context** | All 4 files carry `:generator` annotation.    |
+| `lint/process-guard/` | partial                         | Core members annotated; `types.ts` not.       |
+| `lint/steps/`         | 1 of 8                          | Subsystem invisible to PatternGraph.          |
+| `lint/idea-tier/`     | 0 of 4                          | Subsystem invisible to PatternGraph.          |
+| `validation/`         | partial                         | Most files annotated; `types.ts` not.         |
+| `src/index.ts`        | no header                       | (DOC-H-GUARD-4)                               |
+| **Overall**           | **21 of 38 = 55%**              | Behind projection (60%), ahead of core (26%). |
 
 ## The phantom PDR-005 inventory (final)
 
-| Location | Type | Visibility |
-|----------|------|-----------|
-| `packages/architect-guard/src/lint/process-guard/index.ts:14` | source | low |
-| `packages/architect-guard/src/lint/process-guard/types.ts:29` | source | low |
-| `packages/architect-guard/src/lint/process-guard/decider.ts:33,58` | source (×2) | low |
-| `packages/architect-guard/src/cli/lint-process.ts:170` | **CLI help output** | **HIGH (user-visible)** |
-| `packages/architect-core/src/taxonomy/registry-builder.ts:162` | source | low |
-| `packages/architect-guard/docs/VALIDATION.md` | doc | medium |
-| `packages/architect-guard/docs/GHERKIN-PATTERNS.md` | doc | medium |
-| `packages/architect-guard/docs-sources/gherkin-patterns.md` | **doc source feeding generator** | **HIGH (propagates)** |
-| (1-2 more low-priority sites per 3B grep) | | |
+| Location                                                           | Type                             | Visibility              |
+| ------------------------------------------------------------------ | -------------------------------- | ----------------------- |
+| `packages/architect-guard/src/lint/process-guard/index.ts:14`      | source                           | low                     |
+| `packages/architect-guard/src/lint/process-guard/types.ts:29`      | source                           | low                     |
+| `packages/architect-guard/src/lint/process-guard/decider.ts:33,58` | source (×2)                      | low                     |
+| `packages/architect-guard/src/cli/lint-process.ts:170`             | **CLI help output**              | **HIGH (user-visible)** |
+| `packages/architect-core/src/taxonomy/registry-builder.ts:162`     | source                           | low                     |
+| `packages/architect-guard/docs/VALIDATION.md`                      | doc                              | medium                  |
+| `packages/architect-guard/docs/GHERKIN-PATTERNS.md`                | doc                              | medium                  |
+| `packages/architect-guard/docs-sources/gherkin-patterns.md`        | **doc source feeding generator** | **HIGH (propagates)**   |
+| (1-2 more low-priority sites per 3B grep)                          |                                  |                         |
 
 **11 total** vs Phase 2's inventory of 6. Decision: author PDR-005 or strip all 11 in one coordinated PR.
 
 ## CLI help-text audit
 
-| Bin | Status |
-|-----|--------|
-| `architect-guard` | **Phantom PDR-005 in help output** (DOC-C-GUARD-1). |
-| `architect-validate` | Accurate; `--update-baseline` flag correctly documented. |
-| `architect-lint-steps` | Accurate text; module unannotated (invisible to PatternGraph). |
+| Bin                       | Status                                                                |
+| ------------------------- | --------------------------------------------------------------------- |
+| `architect-guard`         | **Phantom PDR-005 in help output** (DOC-C-GUARD-1).                   |
+| `architect-validate`      | Accurate; `--update-baseline` flag correctly documented.              |
+| `architect-lint-steps`    | Accurate text; module unannotated (invisible to PatternGraph).        |
 | `architect-lint-patterns` | Does not explain tier-A baseline absence-of-override (DOC-H-GUARD-8). |
-| All 4 | Hardcoded `main` branch for `--all`, undocumented (DOC-H-GUARD-7). |
+| All 4                     | Hardcoded `main` branch for `--all`, undocumented (DOC-H-GUARD-7).    |
 
 ## ADR linkage table
 
-| ADR | Relevance to guard | Currently referenced? |
-|-----|-------------------|----------------------|
-| ADR-003 Source-First Pattern Architecture | **Guard is the enforcement point** | **Zero `@architect-decision`/`@architect-see-also` annotations** |
-| ADR-007 Coordinated Taxonomy Redesign | `anti-patterns.ts:51` cites this concept | **Cites ADR-001 incorrectly** |
-| ADR-009 Projection Trust Boundary | Guard violates by omission (no `parseAtBoundary`) | Not cited; should reference + remediate per Phase 2 C-GUARD-4 |
-| (Phantom PDR-005) | Cited 11 times | **Does not exist** |
+| ADR                                       | Relevance to guard                                | Currently referenced?                                            |
+| ----------------------------------------- | ------------------------------------------------- | ---------------------------------------------------------------- |
+| ADR-003 Source-First Pattern Architecture | **Guard is the enforcement point**                | **Zero `@architect-decision`/`@architect-see-also` annotations** |
+| ADR-007 Coordinated Taxonomy Redesign     | `anti-patterns.ts:51` cites this concept          | **Cites ADR-001 incorrectly**                                    |
+| ADR-009 Projection Trust Boundary         | Guard violates by omission (no `parseAtBoundary`) | Not cited; should reference + remediate per Phase 2 C-GUARD-4    |
+| (Phantom PDR-005)                         | Cited 11 times                                    | **Does not exist**                                               |
 
 ## What's well-tested (preserve)
 

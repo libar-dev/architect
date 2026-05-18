@@ -27,7 +27,7 @@ This document captures the **why** behind the technical choices in `@libar-dev/a
 
 **Why this fits:**
 
-- The product is *itself* a framework for spec-driven workflows. Building on top of an opinionated app framework (Next.js, Nest, etc.) would have leaked that framework's choices into the platform's surface.
+- The product is _itself_ a framework for spec-driven workflows. Building on top of an opinionated app framework (Next.js, Nest, etc.) would have leaked that framework's choices into the platform's surface.
 - Zod-first boundaries (see ADR-009) require parser-level control; an application framework's middleware model is the wrong granularity.
 
 ### Database: None (PatternGraph as in-memory read model)
@@ -64,7 +64,7 @@ The nine on-disk decisions, summarized. Each lives in `architect/decisions/<id>-
 - **Status:** accepted / completed (unlocked once to add process-workflow include tag) · **Category:** testing
 - **Context:** The package generates documentation from `.feature` files but had **97 legacy `.test.ts` files alongside Gherkin features**, undermining the thesis that Gherkin IS sufficient.
 - **Decision:** All tests are `.feature` files with step definitions; no new `.test.ts` files; edge cases use Scenario Outline + Examples.
-- **Rationale (verbatim):** *"Parallel `.test.ts` files create a hidden test layer invisible to the documentation pipeline, undermining the single source of truth principle this package enforces."*
+- **Rationale (verbatim):** _"Parallel `.test.ts` files create a hidden test layer invisible to the documentation pipeline, undermining the single source of truth principle this package enforces."_
 - **Consequences:** Single source of truth for tests AND docs; "the package practices what it preaches"; living documentation always matches test coverage; Scenario Outline syntax is more verbose than parameterized tests.
 
 ### ADR-003 — Source-first pattern architecture
@@ -72,16 +72,16 @@ The nine on-disk decisions, summarized. Each lives in `architect/decisions/<id>-
 - **Status:** accepted / completed · **Category:** process
 - **Context:** The original model put pattern definitions in tier-1 specs and limited TS code to `@architect-implements`. At scale: tier-1 specs went stale after implementation (only 39% of 44 specs had traceability to executable specs), retroactive annotation triggered merge conflicts, and tier-1 specs duplicated 200–400 lines that lived in better form in executable specs.
 - **Decision:** **Invert ownership.** TS source code is the canonical pattern definition. Tier-1 specs become ephemeral planning documents. The three durable artifacts are annotated source, executable specs, and decision specs.
-- **Rationale (verbatim):** *"If pattern identity lives in tier 1 specs, it becomes stale after implementation and diverges from the code that actually realizes the pattern."*
+- **Rationale (verbatim):** _"If pattern identity lives in tier 1 specs, it becomes stale after implementation and diverges from the code that actually realizes the pattern."_
 - **Consequences:** Pattern identity travels with the code; tier-1 specs lose their maintenance burden; executable specs become the living specification; retroactive annotation works without merge conflicts.
-- **Key rule:** `@architect-pattern` *defines* (exactly one file per pattern); `@architect-implements` is UML *realization* (many-to-one).
+- **Key rule:** `@architect-pattern` _defines_ (exactly one file per pattern); `@architect-implements` is UML _realization_ (many-to-one).
 
 ### ADR-005 — Codec-based markdown rendering (codec / renderer separation)
 
 - **Status:** accepted / completed (retroactive unlock during rebrand) · **Category:** architecture
 - **Context:** Initial doc generators used direct string concatenation, mixing data selection, formatting logic, and output assembly. The result: hard to test, impossible to render the same data in multiple formats.
 - **Decision:** Adopt a codec architecture inspired by serialization codecs. Each document type has a **codec** that decodes a PatternGraph into a `RenderableDocument` (sections, headings, tables, paragraphs, code blocks). A separate **renderer** turns that IR into markdown.
-- **Rationale (verbatim):** *"Pure functions are deterministic and trivially testable. For the same PatternGraph, a codec always produces the same RenderableDocument."* And: *"Codecs express intent ('this is a table with these rows') and the renderer handles syntax ('pipe-delimited markdown with separator row'). Switching output format requires only a new renderer, not changes to every codec."*
+- **Rationale (verbatim):** _"Pure functions are deterministic and trivially testable. For the same PatternGraph, a codec always produces the same RenderableDocument."_ And: _"Codecs express intent ('this is a table with these rows') and the renderer handles syntax ('pipe-delimited markdown with separator row'). Switching output format requires only a new renderer, not changes to every codec."_
 - **Consequences:** Codecs are pure functions; the IR is inspectable (assert on structure, not strings); composable via `CompositeCodec`; same dataset → multiple outputs. Cost: extra abstraction; the IR vocabulary must cover every needed output pattern.
 
 ### ADR-006 — Single read-model architecture
@@ -89,16 +89,16 @@ The nine on-disk decisions, summarized. Each lives in `architect/decisions/<id>-
 - **Status:** accepted / completed (unlocked to add Verified-by sections and acceptance criteria) · **Category:** architecture · **Uses ADR-005.**
 - **Context:** The platform applies event sourcing to itself — git is the event store, annotated source is authoritative state, generated docs are projections. The **PatternGraph is the read model**. But the validation layer was bypassing it, wiring its own mini-pipeline from raw scanner/extractor output, creating a lossy local type that discarded relationships and then needed ad-hoc re-derivation.
 - **Decision:** The PatternGraph is the **single** read model for all consumers. Validators, codecs, and query APIs consume the same pre-computed model.
-- **Rationale (verbatim):** *"Bypassing the read model forces consumers to re-derive data that the PatternGraph already computes, creating duplicate logic and divergent behavior when the pipeline evolves."*
+- **Rationale (verbatim):** _"Bypassing the read model forces consumers to re-derive data that the PatternGraph already computes, creating duplicate logic and divergent behavior when the pipeline evolves."_
 - **Consequences:** Relationship resolution happens once; lossy local types are eliminated; validators benefit from new PatternGraph views automatically; schema changes affect more consumers.
-- **Negative space principle:** Stage-1 exceptions (`lint-patterns.ts`, `AntiPatternDetector`, `CoverageAnalyzer`, `SessionStateReader`) exist only for consumers that need data the PatternGraph *intentionally doesn't model*.
+- **Negative space principle:** Stage-1 exceptions (`lint-patterns.ts`, `AntiPatternDetector`, `CoverageAnalyzer`, `SessionStateReader`) exist only for consumers that need data the PatternGraph _intentionally doesn't model_.
 
 ### ADR-007 — Coordinated taxonomy redesign
 
 - **Status:** accepted / **active** (the only currently-active ADR) · **Category:** architecture · **Uses ADR-001, EnforcementConfiguration, PerspectiveAwareProjections.**
 - **Context:** Supersedes three independently-designed specs (CandidateStatusExtraction, TrackTagSupport, TaxonomyPresetArchitecture) whose design overlap revealed redundancy. Also fixes two silent drops in the extraction pipeline making candidate specs invisible to the PatternGraph, and removes a category system where 10 of 21 DDD categories had zero usage in a 242K-LOC project.
 - **Decision:** Replace the binary track tag with a maturity axis (`idea` / `plan` / `design` / `executable`); replace categories+presets with a unified role system; add `EnforcementConfiguration` for ProcessGuard; add `PerspectiveAwareProjections`; migrate `derive-state.ts` and `DoDValidator` to the PatternGraph; add Zod output schemas for MCP tools. **"All seven changes ship as ONE coordinated breaking change. Three internal consumers, no public users, pre-release only. All consumers update simultaneously."**
-- **Rationale:** Eliminates redundancy, enables coordinated migration without merge conflicts, surfaces silent extraction failures. *"Net simplification — fewer concepts, more capability."*
+- **Rationale:** Eliminates redundancy, enables coordinated migration without merge conflicts, surfaces silent extraction failures. _"Net simplification — fewer concepts, more capability."_
 - **Consequences:** Larger single-phase scope but smaller long-term surface; tags `arch-context` / `arch-layer` migrate across three consumers.
 
 ### ADR-008 — Step-definition stubs live in the architect-state folder
@@ -106,7 +106,7 @@ The nine on-disk decisions, summarized. Each lives in `architect/decisions/<id>-
 - **Status:** accepted / completed · **Category:** process · **Uses ADR-003, ADR-002.**
 - **Context:** Design-level specs declare which scenarios must become executable tests during implementation. Code stubs (`architect/stubs/`) had already solved the analogous problem for implementation code; step-definition stubs needed the same treatment.
 - **Decision:** Step stubs live in `architect/step-stubs/{pattern-name}/` as TypeScript files with real vitest-cucumber structure and `throw new Error` bodies. They move to `tests/steps/` during implementation and are deleted from `step-stubs/` when complete. Each carries `@architect-implements` and `@architect-target` annotations.
-- **Rationale (verbatim):** *"Code stubs proved that design artifacts must live outside compiled/linted/executed paths. The same principle applies to test skeletons."*
+- **Rationale (verbatim):** _"Code stubs proved that design artifacts must live outside compiled/linted/executed paths. The same principle applies to test skeletons."_
 - **Consequences:** All design outputs are co-located in `architect/`; the extraction pipeline can track resolution uniformly; no vitest/eslint/tsconfig exclusion plumbing required; real vitest-cucumber structure prevents the Two-Pattern Problem.
 
 ### ADR-009 — Projection trust boundary & W7 naming
@@ -114,7 +114,7 @@ The nine on-disk decisions, summarized. Each lives in `architect/decisions/<id>-
 - **Status:** accepted / completed · **Category:** architecture (refinement) · **See-also ADR-005, ADR-006.**
 - **Context:** The W7 simplification wave replaced the deleted presentation-codec stack and the dissolved query package with a Fragment / Projection / Renderer pipeline. Public projection entrypoints were renamed so exported names match fragment kinds and external callers use validated `parseAndProject*` boundaries.
 - **Decision:** **`parseAndProject*` functions are the raw-input trust boundary for external consumers.** They parse options once, then call typed `project*` helpers. Projection builders construct typed fragments directly and do not re-parse their own outputs on hot paths. Additionally a separate Markdown content boundary: fragment text fields are plain text unless a renderer-owned block explicitly marks inline Markdown as trusted. Markdown renderers escape labels, validate URL schemes, reject protocol-relative targets, and allow raw content only for intentional surfaces (code fences, mermaid diagrams).
-- **Rationale (verbatim):** *"Re-parsing projection outputs contradicts the trust-boundary contract and makes CLI/MCP hot paths pay for duplicate full-object walks."*
+- **Rationale (verbatim):** _"Re-parsing projection outputs contradicts the trust-boundary contract and makes CLI/MCP hot paths pay for duplicate full-object walks."_
 - **Consequences:** CLI, MCP, docs, and Studio share one projection pipeline; hot paths avoid duplicate Zod walks after boundary validation; contract-freeze tests protect canonical public entrypoints; breaking surface changes require coordinated downstream updates.
 
 ### PDR-001 (= ADR-004) — Session-workflow-command design decisions
@@ -122,10 +122,10 @@ The nine on-disk decisions, summarized. Each lives in `architect/decisions/<id>-
 - **Status:** accepted / roadmap · **Category:** process · **Product area:** DataAPI.
 - **Context:** Adding `scope-validate` (pre-flight session-readiness check) and `handoff` (session-end state summary) raised seven design questions about how the commands should behave.
 - **Decision** (seven design decisions, DD-1..DD-7):
-  - **DD-1 Text output with `=== SECTION ===` markers, never JSON** *(rationale: "Inconsistent output formats force consumers to detect and branch on format type, breaking the dual output path contract.")*
-  - **DD-2 Git integration opt-in via `--git`; domain logic never invokes shell** *("Shell dependencies in domain logic make functions untestable without git fixtures and break deterministic behavior.")*
+  - **DD-1 Text output with `=== SECTION ===` markers, never JSON** _(rationale: "Inconsistent output formats force consumers to detect and branch on format type, breaking the dual output path contract.")_
+  - **DD-2 Git integration opt-in via `--git`; domain logic never invokes shell** _("Shell dependencies in domain logic make functions untestable without git fixtures and break deterministic behavior.")_
   - **DD-3 Session type inferred from FSM status, overridable by `--session`.** Mapping: `candidate→planning`, `roadmap→design`, `active→implement`, `completed→review`, `deferred→design`.
-  - **DD-4 Severity matches ProcessGuard: PASS / BLOCKED / WARN; `--strict` promotes WARN→BLOCKED.** *("Divergent severity models cause confusion when the same violation appears in both systems with different classifications.")*
+  - **DD-4 Severity matches ProcessGuard: PASS / BLOCKED / WARN; `--strict` promotes WARN→BLOCKED.** _("Divergent severity models cause confusion when the same violation appears in both systems with different classifications.")_
   - **DD-5..DD-7** address date handling, output composition, and overlap with `ProcessGuard`; the file is >100 lines and not fully transcribed here — consult `architect/decisions/pdr-001-*.feature` directly.
 - **Consequences:** Pure-function domain logic stays testable; consumers get a single text-output contract; severity vocabulary stays consistent with ProcessGuard; status-based ergonomic defaults reduce friction.
 
@@ -135,15 +135,15 @@ The nine on-disk decisions, summarized. Each lives in `architect/decisions/<id>-
 
 The codebase makes the same opinionated choice in many places. Together they form a coherent value system.
 
-| Principle                                        | Evidence                                                                                                                                              |
-| ------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Type safety over convenience**                 | Four CLAUDE.md strictness flags, the no-`any` rule, custom `architect-local/no-suppression-comments` ESLint plugin + `scripts/guard-no-suppressions.mjs`. |
-| **Parse once at the trust boundary**             | ADR-009; every cross-package contract is a Zod `strictObject`; consumer-facing entrypoints are `parseAndProject*`.                                    |
-| **Single source of truth**                       | ADR-003 (source-first), ADR-006 (single read model), ADR-002 (Gherkin-only — tests and docs share one source).                                        |
-| **Deletion over deprecation**                    | AGENTS.md §No-BC: no `@deprecated`, no BC aliases, no `_var` renames; the no-suppressions guard enforces this on CI.                                  |
-| **Determinism over flexibility**                 | Codec/renderer split (ADR-005); pure-function projections; deterministic verdict words (PASS / BLOCKED / WARN); perf-regression gate on projection.   |
-| **Acyclic, declared dependencies**               | `core ← projection`, `core ← guard ← cli`, `core,projection ← mcp` — documented as load-bearing in AGENTS.md; no circular imports enforced by lint.   |
-| **Architecture-as-fitness-function**             | `scope-validate`, `arch dangling --strict`, `arch blocking`, the ProcessGuard FSM — all enforce architectural invariants in CI rather than reviews.   |
+| Principle                            | Evidence                                                                                                                                                  |
+| ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Type safety over convenience**     | Four CLAUDE.md strictness flags, the no-`any` rule, custom `architect-local/no-suppression-comments` ESLint plugin + `scripts/guard-no-suppressions.mjs`. |
+| **Parse once at the trust boundary** | ADR-009; every cross-package contract is a Zod `strictObject`; consumer-facing entrypoints are `parseAndProject*`.                                        |
+| **Single source of truth**           | ADR-003 (source-first), ADR-006 (single read model), ADR-002 (Gherkin-only — tests and docs share one source).                                            |
+| **Deletion over deprecation**        | AGENTS.md §No-BC: no `@deprecated`, no BC aliases, no `_var` renames; the no-suppressions guard enforces this on CI.                                      |
+| **Determinism over flexibility**     | Codec/renderer split (ADR-005); pure-function projections; deterministic verdict words (PASS / BLOCKED / WARN); perf-regression gate on projection.       |
+| **Acyclic, declared dependencies**   | `core ← projection`, `core ← guard ← cli`, `core,projection ← mcp` — documented as load-bearing in AGENTS.md; no circular imports enforced by lint.       |
+| **Architecture-as-fitness-function** | `scope-validate`, `arch dangling --strict`, `arch blocking`, the ProcessGuard FSM — all enforce architectural invariants in CI rather than reviews.       |
 
 ---
 
@@ -153,8 +153,8 @@ The doctrine commits hard choices. Cross-referenced with `technical-debt-analysi
 
 - **Velocity + cleanliness over backward compatibility.** The pre-1.0 phase is paid for by breaking changes (already one v1→v2 split, more possible). External consumers carry the cost of migration; the maintainer carries near-zero shim cost. Long-term, the platform is bet on quality and on a small, opinionated consumer base rather than broad reach.
 - **Implementation flexibility over methodology immutability.** `@libar-dev/architect-spec` (`formal-spec/`) is the durable artifact; the implementation can be rewritten. Inverse of most products.
-- **No CI workflow file in the repo.** AGENTS.md claims "CI-enforced doctrine," but `.github/workflows/` is absent in this worktree (see `technical-debt-analysis.md` §Item 1). The doctrine is enforced *somewhere* but the surface is invisible.
-- **Two Gherkin parsers in play.** `@cucumber/gherkin` parses architect-state at doc-gen/build time; `@amiceli/vitest-cucumber` parses executable specs at test time. AGENTS.md calls this *"the most painful 'why doesn't my spec work?' debugging in this repo."* Mitigated by documentation; structurally still a footgun.
+- **No CI workflow file in the repo.** AGENTS.md claims "CI-enforced doctrine," but `.github/workflows/` is absent in this worktree (see `technical-debt-analysis.md` §Item 1). The doctrine is enforced _somewhere_ but the surface is invisible.
+- **Two Gherkin parsers in play.** `@cucumber/gherkin` parses architect-state at doc-gen/build time; `@amiceli/vitest-cucumber` parses executable specs at test time. AGENTS.md calls this _"the most painful 'why doesn't my spec work?' debugging in this repo."_ Mitigated by documentation; structurally still a footgun.
 - **No telemetry, no analytics, no usage signal.** The platform is committed to local-only execution. Trade-off: no data-driven decisions about which verbs / tools / sessions are actually used.
 - **Strictness vs ergonomics in TypeScript.** `noUncheckedIndexedAccess` + `exactOptionalPropertyTypes` add real authoring friction. The codebase pays that cost willingly because the alternative is bugs that don't surface until a downstream consumer hits them.
 

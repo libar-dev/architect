@@ -11,7 +11,7 @@ This is a **developer-tool / meta-platform**, not an end-user product. The stand
 
 ## Product Vision
 
-> *"Engineering lifecycle platform for AI-assisted development — annotate your code, get structured AI context, enforced delivery workflows, and a design workbench that makes AI implementation near-deterministic."*
+> _"Engineering lifecycle platform for AI-assisted development — annotate your code, get structured AI context, enforced delivery workflows, and a design workbench that makes AI implementation near-deterministic."_
 > — `README.md` line 3
 
 The elevator pitch (verbatim from README) tells the story:
@@ -76,7 +76,7 @@ The closest peers are tools in the **AI-context / spec-driven-development** spac
 - **Cucumber / SpecFlow** ecosystems — provide Gherkin parsing and execution but no FSM, no projection pipeline, no annotation-based PatternGraph.
 - **In-house "architectural-fitness-function" tooling** (ArchUnit, Structurizr, etc.) — provide architectural assertions or diagrams but not session orchestration or AI-context projection.
 
-**What differentiates architect:** the combination of (a) source-first annotation, (b) Gherkin-driven executable specs *and* design specs, (c) FSM-enforced lifecycle, (d) MCP/CLI parity, and (e) Zod-validated projection pipeline. Each component exists somewhere else; the combination as a single, opinionated workflow does not.
+**What differentiates architect:** the combination of (a) source-first annotation, (b) Gherkin-driven executable specs _and_ design specs, (c) FSM-enforced lifecycle, (d) MCP/CLI parity, and (e) Zod-validated projection pipeline. Each component exists somewhere else; the combination as a single, opinionated workflow does not.
 
 `[NEEDS USER INPUT]` on which tools the maintainer considers true peers vs. complements.
 
@@ -84,13 +84,13 @@ The closest peers are tools in the **AI-context / spec-driven-development** spac
 
 ## Stakeholder Map
 
-| Stakeholder              | Role                                                                                                               | Evidence                                                                |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------- |
-| **Maintainer(s)**        | Own architecture, doctrine, release cadence; commit to `main`.                                                     | `MAINTAINERS.md`, git author history `[INFERRED]`                       |
-| **Contributors**         | Land PRs against the package family.                                                                               | `CONTRIBUTING.md`                                                       |
-| **Downstream consumers** | Configure `architect.config.ts` in their own repo, install `@libar-dev/architect`, point their AI agents at it.    | `docs/CROSS-INSTANCE-CONVENTIONS.md`                                    |
-| **AI agents**            | Read MCP tools / CLI JSON; follow `.agents/skills/` workflows.                                                     | The entire `.agents/skills/` directory                                  |
-| **Methodology readers**  | Read `formal-spec/` to evaluate the underlying spec language regardless of the reference implementation.           | `formal-spec/` private package + AGENTS.md notes about 1.0 graduation   |
+| Stakeholder              | Role                                                                                                            | Evidence                                                              |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| **Maintainer(s)**        | Own architecture, doctrine, release cadence; commit to `main`.                                                  | `MAINTAINERS.md`, git author history `[INFERRED]`                     |
+| **Contributors**         | Land PRs against the package family.                                                                            | `CONTRIBUTING.md`                                                     |
+| **Downstream consumers** | Configure `architect.config.ts` in their own repo, install `@libar-dev/architect`, point their AI agents at it. | `docs/CROSS-INSTANCE-CONVENTIONS.md`                                  |
+| **AI agents**            | Read MCP tools / CLI JSON; follow `.agents/skills/` workflows.                                                  | The entire `.agents/skills/` directory                                |
+| **Methodology readers**  | Read `formal-spec/` to evaluate the underlying spec language regardless of the reference implementation.        | `formal-spec/` private package + AGENTS.md notes about 1.0 graduation |
 
 There is no CODEOWNERS file checked in (`[NEEDS USER INPUT]` on whether one is used in CI for the v2 split), no PR template, no issue templates visible in this worktree.
 
@@ -127,7 +127,7 @@ Not applicable. No user data path, no PII handling, no HIPAA/GDPR/SOC2 surface. 
 - **Market maturity:** early. The "AI coding agent" category is two-to-three years old; "spec-driven AI implementation" is roughly one year old in terms of broad adoption. The categories the platform competes against (Spec Kit, BMAD, Cursor's `.cursorrules`, etc.) are themselves moving fast.
 - **Maturity signal:** the choice to ship a **formal specification** (`@libar-dev/architect-spec`) alongside the implementation is a signal that the maintainer believes the **vocabulary** (Pattern, four-tier ladder, FSM states, annotation grammar) is the durable artifact, and the implementation is a substitutable detail. That is a category-defining move, not an early-adopter move.
 
-The domain vocabulary (PatternGraph, FSM, codec/renderer, projection) is borrowed from established CS fields (event sourcing, formal methods, compiler design). The platform is *consciously not* inventing new jargon — it is re-applying known patterns to a new problem.
+The domain vocabulary (PatternGraph, FSM, codec/renderer, projection) is borrowed from established CS fields (event sourcing, formal methods, compiler design). The platform is _consciously not_ inventing new jargon — it is re-applying known patterns to a new problem.
 
 ---
 

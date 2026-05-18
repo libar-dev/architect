@@ -23,6 +23,7 @@ The local scripts are disciplined (`typecheck` covers both configs, `prepack` in
 ## The `prepack` wire-up recipe (TC-H-GUARD-7 operationalization)
 
 **Current state:**
+
 ```json
 {
   "scripts": {
@@ -37,6 +38,7 @@ The local scripts are disciplined (`typecheck` covers both configs, `prepack` in
 The smoke script **exists and is fully implemented** (Phase 3 verified: untars the package, symlinks zod, dynamic-imports the dist module, exercises the baseline-load path, validates the missing-resource negative case). It is **never executed** because `test:pack-smoke` is a manual target, not wired to CI or `prepack`.
 
 **Recipe — one-line fix:**
+
 ```json
 {
   "scripts": {
@@ -46,6 +48,7 @@ The smoke script **exists and is fully implemented** (Phase 3 verified: untars t
 ```
 
 **Why this matters:**
+
 - Before every `pnpm publish`, npm/pnpm runs `prepack`. This ensures the smoke test runs locally and catches regressions in tarball composition.
 - It's the **local-CI equivalent of projection's perf-gate wire-up** (Cleanup-C-PROJ-1). Both are one-line package.json fixes that gate publication.
 - **Would have caught core's broken `./roles` export** (C-CORE-1) — the smoke script imports the dist module, and an export cycle or missing resource throws immediately.
@@ -60,12 +63,14 @@ The smoke script **exists and is fully implemented** (Phase 3 verified: untars t
 Phase 2 Cleanup-H-GUARD-4 flagged promotion as a family-wide opportunity. Here's the generalization:
 
 **Current infrastructure:**
+
 - Guard has `scripts/packed-dangling-baseline-smoke.mjs` (360 LOC) — smoke-tests the unpacked tarball.
 - Core has nothing equivalent.
 - Projection has a perf-gate + baseline comparator (280 LOC).
 
 **Promotion opportunity:**
 Create a **workspace-level `scripts/pack-smoke.mjs`** that:
+
 1. Packs each of the 5 publishable packages (`architect-core`, `architect-projection`, `architect-guard`, `architect-cli`, `architect-mcp`).
 2. Untars each into a temp directory.
 3. For each, **symlinks node_modules (zod, the core types, etc.) and dynamic-imports the entry point** to validate the basic import path works.
@@ -79,11 +84,12 @@ Create a **workspace-level `scripts/pack-smoke.mjs`** that:
 **Location:** `/Users/darkomijic/dev-projects/architect/scripts/pack-smoke.mjs` (workspace root, not per-package).
 
 **Wiring into CI:** Once `.github/workflows/ci.yml` lands (core CI-1), add:
+
 ```yaml
 jobs:
   publish-contract:
     runs-on: ubuntu-latest
-    if: success()  # after lint/typecheck/test
+    if: success() # after lint/typecheck/test
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -95,6 +101,7 @@ jobs:
 ```
 
 This gate runs on every PR. It would have caught:
+
 - **Core C-CORE-1** (`./roles` export missing).
 - **Core CL-CORE-4** (`self-hosting.ts` module-load cost).
 - **Guard Cleanup-C-GUARD-3** (if the `dangling-baseline.json` build-time copy were fragile on the consumer side).
@@ -106,16 +113,17 @@ This gate runs on every PR. It would have caught:
 
 ### Lifecycle hook placement (vs family baseline)
 
-| Setting | Guard | Core | Siblings | Verdict |
-|---------|-------|------|----------|---------|
-| `prepack` location | `scripts` ✓ | JSON root (broken — CL-CORE-1) | all correct | **ALIGNED** |
-| `prepack` command | `pnpm clean && pnpm build` | `pnpm build` (incomplete) | aligned | **ALIGNED** |
-| `prepare` hook | Not used | Not used | Not used | N/A |
-| `prepublishOnly` hook | Not used | Not used | Not used | N/A |
+| Setting               | Guard                      | Core                           | Siblings    | Verdict     |
+| --------------------- | -------------------------- | ------------------------------ | ----------- | ----------- |
+| `prepack` location    | `scripts` ✓                | JSON root (broken — CL-CORE-1) | all correct | **ALIGNED** |
+| `prepack` command     | `pnpm clean && pnpm build` | `pnpm build` (incomplete)      | aligned     | **ALIGNED** |
+| `prepare` hook        | Not used                   | Not used                       | Not used    | N/A         |
+| `prepublishOnly` hook | Not used                   | Not used                       | Not used    | N/A         |
 
 ### `package.json#exports` audit
 
 Guard declares:
+
 ```json
 "exports": {
   ".": {
@@ -127,6 +135,7 @@ Guard declares:
 ```
 
 **Verdict:**
+
 - ✓ No broken exports (unlike core's `./roles`).
 - ✓ Entry point (`dist/index.js` + `dist/index.d.ts`) is valid.
 - ✗ **No curated subpaths** for the 4 CLI bins or the 9 external API symbols. Phase 2 Cleanup-H-GUARD-1 recommends explicit named exports to replace the 12 wildcards in `src/index.ts`; post-cleanup, add subpaths:
@@ -152,9 +161,9 @@ Guard declares:
 }
 ```
 
-| Concern | Status | Notes |
-|---------|--------|-------|
-| `access: public` | ✓ Correct | Package is published to npm public registry. |
+| Concern            | Status                      | Notes                                                              |
+| ------------------ | --------------------------- | ------------------------------------------------------------------ |
+| `access: public`   | ✓ Correct                   | Package is published to npm public registry.                       |
 | `provenance: true` | **Declared, unimplemented** | No workflow to issue SLSA attestation. Family blocker (core CI-2). |
 
 **Recipe:** Once `.github/workflows/publish.yml` lands (core CI-2), guard automatically benefits. No per-package action required.
@@ -171,13 +180,14 @@ Guard declares:
 
 ### Dependency audit (runtime vs devDeps)
 
-| Package | Declared | Used in `src/` | Verdict |
-|---------|----------|----------------|---------|
-| `@libar-dev/architect-core` | workspace:* | yes — process-guard imports core's FSM types | ✓ Correct |
-| `glob` | ^10.3.10 | yes — 4 import sites | ✓ Correct, pinned identically to core |
-| `zod` | ^4.1.11 | yes — pervasive | ✓ Correct, pinned identically to family |
+| Package                     | Declared     | Used in `src/`                               | Verdict                                 |
+| --------------------------- | ------------ | -------------------------------------------- | --------------------------------------- |
+| `@libar-dev/architect-core` | workspace:\* | yes — process-guard imports core's FSM types | ✓ Correct                               |
+| `glob`                      | ^10.3.10     | yes — 4 import sites                         | ✓ Correct, pinned identically to core   |
+| `zod`                       | ^4.1.11      | yes — pervasive                              | ✓ Correct, pinned identically to family |
 
 **devDeps:**
+
 - `@amiceli/vitest-cucumber`, `@types/node`, `eslint`, `typescript`, `vitest` — all pinned identically to siblings ✓
 - ESLint is explicit in guard (unlike core, which relies on root hoist) ✓
 
@@ -186,6 +196,7 @@ Guard declares:
 ### Tarball composition (pre-Phase-2)
 
 Current state (after Phase 3 measurement):
+
 - **Size:** 972 KB on disk; ~583 KB packed (per Phase 2 raw/2B inventory).
 - **Files:** 153 total; 76 are `.map` files (50% of file count).
 - **Content breakdown:**
@@ -195,6 +206,7 @@ Current state (after Phase 3 measurement):
 
 **Post-Phase-2 cleanup projection:**
 After Cleanup-C-GUARD-2 (`tier-a-baseline.ts` deletion) + family CL-CORE-3 (sourceMap disable):
+
 - `tier-a-baseline` removed: -45.8 KB.
 - Sourcemaps disabled: -~145 KB.
 - **Projected size:** 583 - 45.8 - 145 ≈ **392 KB packed** (46% reduction).
@@ -206,13 +218,13 @@ Exact numbers depend on whether Phase 2 splits introduce new `.d.ts` width (unli
 
 **Guard's configuration:**
 
-| Setting | Value | Aligned? |
-|---------|-------|----------|
-| `prepack` | `pnpm clean && pnpm build` | ✓ Yes (matches siblings) |
-| `lint` | `eslint src tests` | ✓ Yes (aligned; core drifts: `src` only) |
-| `typecheck` | `tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.test.json` | ✓ Yes (most disciplined; core/projection drift) |
-| `test` | `pnpm typecheck && vitest run --config vitest.config.ts` | ✓ Yes (aligned; core/projection drift: no typecheck guard) |
-| `vitest.include` pattern | `tests/**/*.steps.ts` | ⚠ Family drift (core: `tests/steps/**`; projection/mcp: `tests/features/**`) |
+| Setting                  | Value                                                                 | Aligned?                                                                     |
+| ------------------------ | --------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `prepack`                | `pnpm clean && pnpm build`                                            | ✓ Yes (matches siblings)                                                     |
+| `lint`                   | `eslint src tests`                                                    | ✓ Yes (aligned; core drifts: `src` only)                                     |
+| `typecheck`              | `tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.test.json` | ✓ Yes (most disciplined; core/projection drift)                              |
+| `test`                   | `pnpm typecheck && vitest run --config vitest.config.ts`              | ✓ Yes (aligned; core/projection drift: no typecheck guard)                   |
+| `vitest.include` pattern | `tests/**/*.steps.ts`                                                 | ⚠ Family drift (core: `tests/steps/**`; projection/mcp: `tests/features/**`) |
 
 **Verdict:** Guard is the family benchmark for script discipline. Only drift is `vitest.include` (3-way split: guard/core use suffix-based patterns; projection/mcp use directory-based). Recommend picking one family convention (either `tests/features/**` to match projection's audit-script-driven convention, or `tests/**/*.steps.ts` to match the BDD naming).
 
@@ -223,6 +235,7 @@ Exact numbers depend on whether Phase 2 splits introduce new `.d.ts` width (unli
 Guard is consumed in two contexts:
 
 ### 1. **Dependency by `architect-cli` (static import)**
+
 **Risk level:** LOW
 
 - `architect-cli` imports guard's CLI entrypoints (`runValidatePatternsCli`, `runLintStepsCli`, etc.) at startup.
@@ -231,9 +244,11 @@ Guard is consumed in two contexts:
 - **Mitigation:** Dependency upgrades are automatic via pnpm resolution. No special long-running risk.
 
 ### 2. **Dogfood in pre-commit hook (`pnpm architect:guard --staged`)**
+
 **Risk level:** MEDIUM
 
 From Phase 1 H-GUARD-2 and AGENTS.md:165:
+
 ```json
 {
   "scripts": {
@@ -245,26 +260,29 @@ From Phase 1 H-GUARD-2 and AGENTS.md:165:
 (Actual command may differ; Phase 1 flagged `ProcessGuard` symbol doesn't exist in the barrel. Phase 2 Cleanup-H-GUARD-1 addresses this.)
 
 **Risks:**
+
 - **CLI startup latency:** `architect:guard` runs **4 separate bin invocations** on every staged commit. Each is a Node.js process with full TypeScript load + schema parsing. No measurement available, but likely 1-2 seconds total.
-  - *Mitigation:* Consider composing the 4 bins into a single `architect-guard` CLI with subcommands, or lazy-loading the sub-checks. Not critical pre-1.0; acceptable for pre-commit.
-  
+  - _Mitigation:_ Consider composing the 4 bins into a single `architect-guard` CLI with subcommands, or lazy-loading the sub-checks. Not critical pre-1.0; acceptable for pre-commit.
 - **Tarball-size creep:** If guard's tarball grows, each `pnpm install` (CI, developer onboarding) becomes slower. Phase 2 Cleanup-C-GUARD-2 addresses the single largest bloat vector (tier-a-baseline).
-  - *Mitigation:* Post-cleanup tarball audit + Phase 2 CL-CORE-3 (sourcemaps) should stabilize size.
+  - _Mitigation:_ Post-cleanup tarball audit + Phase 2 CL-CORE-3 (sourcemaps) should stabilize size.
 
 - **Breaking dependency changes:** Guard depends on core. If core lands a breaking change in the FSM (Phase 2 M-SIMP-2, core C-CORE-5 recipe), guard's `decider.ts` must update in the same release cycle.
-  - *Mitigation:* Coordinated release PR; CI validation (once CI lands) ensures the contract doesn't break.
+  - _Mitigation:_ Coordinated release PR; CI validation (once CI lands) ensures the contract doesn't break.
 
 ## Recommendations summary
 
 ### Immediate (one-line fix, no CI required)
+
 1. **Wire `packed-dangling-baseline-smoke.mjs` to `prepack`** (TC-H-GUARD-7 operationalization).
    ```json
    "prepack": "pnpm clean && pnpm build && node scripts/packed-dangling-baseline-smoke.mjs"
    ```
+
    - Local-CI equivalent. Catches tarball-composition regressions before `pnpm publish`.
    - Would have caught core C-CORE-1 (broken `./roles`).
 
 ### Phase 2 cleanup (bundled with code cleanup)
+
 2. **After Cleanup-H-GUARD-1 (barrel curation):** Add explicit subpaths to `exports`:
    ```json
    "exports": {
@@ -272,9 +290,11 @@ From Phase 1 H-GUARD-2 and AGENTS.md:165:
      "./package.json": "./package.json"
    }
    ```
+
    - Signals stable API surface to consumers.
 
 ### Family-wide effort (not per-package)
+
 3. **Promote `packed-dangling-baseline-smoke.mjs` to workspace `scripts/pack-smoke.mjs`** (Cleanup-H-GUARD-4 family implementation).
    - Covers all 5 publishable packages.
    - Wire into CI `publish-contract` job (after core CI-1/CI-2 land).

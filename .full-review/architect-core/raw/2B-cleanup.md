@@ -82,6 +82,7 @@ shape leaking into the tarball.
 #### CL-CORE-2. `./roles` subpath has zero workspace consumers — delete the export, don't author a barrel
 
 **Files:**
+
 - `packages/architect-core/package.json:34-37` (the export declaration).
 - `dist/` (confirmed: no `roles.{js,d.ts}` artifact produced by `tsc -b`).
 
@@ -103,6 +104,7 @@ through the package root, which IS the consumer entry point everyone uses.
 #### CL-CORE-3. Published bundle ships `.map` files and a 509 KB `.d.ts`
 
 **Files:**
+
 - `packages/architect-core/tsconfig.json` (extends `tsconfig.architect-base.json` → `tsconfig.base.json`).
 - `tsconfig.base.json:13-15` — `"declarationMap": true, "sourceMap": true`.
 - `dist/validation-schemas/pattern-graph.d.ts` — 508,940 bytes, 10,438 lines (from a 179-line `.ts` source).
@@ -126,7 +128,7 @@ everywhere), the inferred shapes won't shrink unless the surface itself does.
 **Recipe (two-part):**
 
 1. **Stop shipping maps to npm.** Either (a) set `sourceMap: false,
-   declarationMap: false` in `tsconfig.architect-base.json` and accept slightly
+declarationMap: false` in `tsconfig.architect-base.json` and accept slightly
    harder local debugging, or (b) keep them in dev and have `prepack` re-run
    the build with `--sourceMap false --declarationMap false`. The family
    choice should be made once at the base config. Option (a) is the simpler
@@ -143,6 +145,7 @@ indirectly — its workspace install pulls less metadata.
 #### CL-CORE-4. Module-load-time side effects in a `sideEffects: false` package
 
 **Files:**
+
 - `package.json:21` — `"sideEffects": false`.
 - `src/config/self-hosting.ts:7` — computes `workspaceRoot` via
   `path.dirname(fileURLToPath(import.meta.url))` at module load.
@@ -155,7 +158,7 @@ indirectly — its workspace install pulls less metadata.
 vite) that any import from this package can be tree-shaken if its exports
 aren't used. Eager module-load work doesn't break the bundler — TypeScript
 ESM treats side-effect-free declarations as values — but it does mean every
-process that even *imports the barrel* (and thus drags
+process that even _imports the barrel_ (and thus drags
 `config/self-hosting.ts` transitively) pays for `createArchitect` building a
 tag registry, whether or not it uses `WORKSPACE_TAG_REGISTRY`.
 
@@ -177,6 +180,7 @@ is, **module-load `createArchitect` is wrong**.
 #### CL-CORE-5. Dead exports through the public barrel (10 additional symbols beyond Phase 1)
 
 Phase 1 covered:
+
 - `presentation-contracts.ts` types (H-CORE-4)
 - `cli-schema.ts` types (H-CORE-5)
 - `feature.ts` BC aliases (H-CORE-12)
@@ -185,20 +189,21 @@ This audit grepped each export in the public barrel for non-self,
 non-barrel-re-export callers across the workspace. Additional zero-caller
 exports:
 
-| # | Symbol | File | Notes |
-|---|--------|------|-------|
-| 1 | `parseMarkdownToBlocks` | `src/utils/markdown-parser.ts:84` | 216-line markdown→`SectionBlock[]` parser. Zero callers anywhere. The whole file is dead. |
-| 2 | `formatUserZodError` | `src/utils/session-helpers.ts:22` | One-line `.trim()` wrapper around `formatZodError`. Zero callers. |
-| 3 | `FEATURE_LAYERS` | `src/extractor/layer-inference.ts:14` | The exported array constant; only `FeatureLayer` type is referenced (1 site, via index re-export). |
-| 4 | `validateStatus` | `src/validation/fsm/validator.ts:60` | Zero callers across all packages. |
-| 5 | `validateCompletionMetadata` | `src/validation/fsm/validator.ts:121` | Zero callers across all packages. |
-| 6 | `validatePatternStatus` | `src/validation/fsm/validator.ts:146` | Zero callers across all packages. |
-| 7 | `isFullyEditable` | `src/validation/fsm/states.ts:33` | Zero callers across all packages. |
-| 8 | `isScopeLocked` | `src/validation/fsm/states.ts:37` | Zero callers across all packages. |
-| 9 | `createFileLoader` | `src/validation-schemas/codec-utils.ts:148` | Zero non-test callers; tested but not consumed in product. |
-| 10 | `formatCodecError` | `src/validation-schemas/codec-utils.ts:171` | Zero non-test callers. |
+| #   | Symbol                       | File                                        | Notes                                                                                              |
+| --- | ---------------------------- | ------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| 1   | `parseMarkdownToBlocks`      | `src/utils/markdown-parser.ts:84`           | 216-line markdown→`SectionBlock[]` parser. Zero callers anywhere. The whole file is dead.          |
+| 2   | `formatUserZodError`         | `src/utils/session-helpers.ts:22`           | One-line `.trim()` wrapper around `formatZodError`. Zero callers.                                  |
+| 3   | `FEATURE_LAYERS`             | `src/extractor/layer-inference.ts:14`       | The exported array constant; only `FeatureLayer` type is referenced (1 site, via index re-export). |
+| 4   | `validateStatus`             | `src/validation/fsm/validator.ts:60`        | Zero callers across all packages.                                                                  |
+| 5   | `validateCompletionMetadata` | `src/validation/fsm/validator.ts:121`       | Zero callers across all packages.                                                                  |
+| 6   | `validatePatternStatus`      | `src/validation/fsm/validator.ts:146`       | Zero callers across all packages.                                                                  |
+| 7   | `isFullyEditable`            | `src/validation/fsm/states.ts:33`           | Zero callers across all packages.                                                                  |
+| 8   | `isScopeLocked`              | `src/validation/fsm/states.ts:37`           | Zero callers across all packages.                                                                  |
+| 9   | `createFileLoader`           | `src/validation-schemas/codec-utils.ts:148` | Zero non-test callers; tested but not consumed in product.                                         |
+| 10  | `formatCodecError`           | `src/validation-schemas/codec-utils.ts:171` | Zero non-test callers.                                                                             |
 
 **Recipe:**
+
 - **#1**: delete `src/utils/markdown-parser.ts` and its barrel entry
   (`utils/index.ts:10`, `src/index.ts` via `export * from './utils/index.js'`).
 - **#2**: delete the function in `session-helpers.ts`; remove the export at
@@ -390,6 +395,7 @@ once these go.
 #### CL-CORE-14. The `module` field duplicates `main` — drop it
 
 **File:** `package.json:22-23`:
+
 ```
 "main": "dist/index.js",
 "module": "dist/index.js",
@@ -425,6 +431,7 @@ re-export.
 #### CL-CORE-16. Fuzzy-match helpers exist in two places (core + projection)
 
 **Files:**
+
 - `src/utils/fuzzy-match.ts:10` — `levenshteinDistance`, `fuzzyMatchPatterns`, `findBestMatch`.
 - `architect-projection/src/projections/_shared/pattern-helpers.internal.ts:432-484` — `findBestMatch` + `levenshteinDistance` duplicated locally.
 
@@ -440,6 +447,7 @@ existing imports from line 6 of that file.)
 #### CL-CORE-17. `extractFirstSentenceRaw` is duplicated in projection too
 
 **Files:**
+
 - `src/utils/session-helpers.ts:26` — defined here.
 - `architect-projection/src/projections/_shared/pattern-helpers.internal.ts:274` — duplicated.
 
@@ -488,33 +496,34 @@ Comparing the four config files (`package.json`, `tsconfig.json`,
 `tsconfig.test.json`, `eslint.config.mjs`, `vitest.config.ts`) against the
 family bases and the four sibling packages.
 
-| Setting | architect-core | architect-projection | architect-guard | architect-cli | architect-mcp | Verdict |
-|--|--|--|--|--|--|--|
-| `package.json:prepack` location | top-level (broken — CL-CORE-1) | `scripts` | `scripts` | `scripts` | `scripts` | **DRIFT — fix core** |
-| `prepack` command | `pnpm build` (no clean) | `pnpm clean && pnpm build` | `pnpm clean && pnpm build` | `pnpm clean && pnpm build` | `pnpm clean && pnpm build` | **DRIFT — align core** |
-| `scripts.lint` | `eslint src` | `eslint src tests` | `eslint src tests` | `eslint src tests` | `eslint src tests` | **DRIFT — add `tests`** |
-| `scripts.typecheck` | only `tsconfig.test.json` | only `tsconfig.test.json` | both | both | only `tsconfig.test.json` | Mixed — core matches projection/mcp |
-| `scripts.test` shape | `vitest run` | `pnpm test:barrel-audit && pnpm test:jsdoc-boilerplate-audit && pnpm typecheck && vitest run --config vitest.config.ts` | `pnpm typecheck && vitest run --config vitest.config.ts` | `pnpm build && vitest run --config vitest.config.ts` | `pnpm typecheck && vitest run --config vitest.config.ts` | Core lacks typecheck-before-test guard — siblings have it |
-| `package.json:files` | `["dist"]` | `["dist"]` | `["dist"]` | `["bin","dist","runtime-bridge.js"]` | `["bin","dist","runtime-bridge.js"]` | OK |
-| `package.json:exports` keys | `.` + `./config` + `./roles` + `./package.json` | `.` + 7 subpaths + `./package.json` | `.` + `./package.json` | `.` + 6 bin-subpaths + `./package.json` | `.` + `./bin/architect-mcp` + `./package.json` | **`./roles` broken — CL-CORE-2** |
-| `package.json:sideEffects` | `false` | `false` | `false` | `false` | `false` | OK; but inconsistent with CL-CORE-4 |
-| `main` + `module` | both `dist/index.js` (redundant `module` — CL-CORE-14) | same | same | same | same | Family-wide cosmetic |
-| `engines.node` | `>=20.0.0` | `>=20.0.0` | `>=20.0.0` | `>=20.0.0` | `>=20.0.0` | OK |
-| `tsconfig.json:tsBuildInfoFile` | (default) | explicit `"./tsconfig.tsbuildinfo"` | (default) | (default) | (default) | Cosmetic drift (CL-CORE-20) |
-| `tsconfig.json:types` | (default) | `["node"]` | (default) | (default) | (default) | Projection explicit — others rely on `tsconfig.architect-base.json` inheritance which doesn't pin `@types/node`. Worth confirming `noImplicitAny` errors don't sneak in. |
-| `tsconfig.json:references` | none (leaf) | refs to core | refs to core | refs to core, projection, guard | refs to core, projection | Correct dependency graph |
-| `tsconfig.test.json:include` | `src/**/*`, `tests/**/*.ts`, `vitest.config.ts` | same | same | same | same | OK |
-| `tsconfig.test.json:tsBuildInfoFile` | (default) | `"./tsconfig.test.tsbuildinfo"` | (default) | (default) | (default) | Cosmetic |
-| `tsconfig.test.json:composite` override | `false` | (inherits `true`) | `false` | `false` | `false` | Mixed |
-| `eslint.config.mjs` | extends root, adds parser project + test relaxations | extends root, adds same + `arch-projection:shared-plain-object` rule | (uncited — pattern same) | (uncited — pattern same) | (uncited — pattern same) | OK |
-| `vitest.config.ts:include` | `tests/steps/**/*.steps.ts` | `tests/features/**/*.steps.ts` | (similar) | (similar) | (similar) | **DRIFT — core uses `steps/` glob, projection uses `features/`**; tests live in `tests/steps/` in core. Investigate whether projection's `features/` glob is a different convention or unintended drift. |
-| `vitest.config.ts:coverage` | not configured | not configured | not configured | not configured | not configured | OK across family — coverage tooling isn't wired into CI |
-| Repo-root `tsconfig.eslint.json` | exists, referenced by family eslint config | same | same | same | same | OK |
-| Repo-root `deny.toml` | recently added (in git status) | n/a | n/a | n/a | n/a | Note: not in committed tree yet |
+| Setting                                 | architect-core                                         | architect-projection                                                                                                    | architect-guard                                          | architect-cli                                        | architect-mcp                                            | Verdict                                                                                                                                                                                                  |
+| --------------------------------------- | ------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- | ---------------------------------------------------- | -------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `package.json:prepack` location         | top-level (broken — CL-CORE-1)                         | `scripts`                                                                                                               | `scripts`                                                | `scripts`                                            | `scripts`                                                | **DRIFT — fix core**                                                                                                                                                                                     |
+| `prepack` command                       | `pnpm build` (no clean)                                | `pnpm clean && pnpm build`                                                                                              | `pnpm clean && pnpm build`                               | `pnpm clean && pnpm build`                           | `pnpm clean && pnpm build`                               | **DRIFT — align core**                                                                                                                                                                                   |
+| `scripts.lint`                          | `eslint src`                                           | `eslint src tests`                                                                                                      | `eslint src tests`                                       | `eslint src tests`                                   | `eslint src tests`                                       | **DRIFT — add `tests`**                                                                                                                                                                                  |
+| `scripts.typecheck`                     | only `tsconfig.test.json`                              | only `tsconfig.test.json`                                                                                               | both                                                     | both                                                 | only `tsconfig.test.json`                                | Mixed — core matches projection/mcp                                                                                                                                                                      |
+| `scripts.test` shape                    | `vitest run`                                           | `pnpm test:barrel-audit && pnpm test:jsdoc-boilerplate-audit && pnpm typecheck && vitest run --config vitest.config.ts` | `pnpm typecheck && vitest run --config vitest.config.ts` | `pnpm build && vitest run --config vitest.config.ts` | `pnpm typecheck && vitest run --config vitest.config.ts` | Core lacks typecheck-before-test guard — siblings have it                                                                                                                                                |
+| `package.json:files`                    | `["dist"]`                                             | `["dist"]`                                                                                                              | `["dist"]`                                               | `["bin","dist","runtime-bridge.js"]`                 | `["bin","dist","runtime-bridge.js"]`                     | OK                                                                                                                                                                                                       |
+| `package.json:exports` keys             | `.` + `./config` + `./roles` + `./package.json`        | `.` + 7 subpaths + `./package.json`                                                                                     | `.` + `./package.json`                                   | `.` + 6 bin-subpaths + `./package.json`              | `.` + `./bin/architect-mcp` + `./package.json`           | **`./roles` broken — CL-CORE-2**                                                                                                                                                                         |
+| `package.json:sideEffects`              | `false`                                                | `false`                                                                                                                 | `false`                                                  | `false`                                              | `false`                                                  | OK; but inconsistent with CL-CORE-4                                                                                                                                                                      |
+| `main` + `module`                       | both `dist/index.js` (redundant `module` — CL-CORE-14) | same                                                                                                                    | same                                                     | same                                                 | same                                                     | Family-wide cosmetic                                                                                                                                                                                     |
+| `engines.node`                          | `>=20.0.0`                                             | `>=20.0.0`                                                                                                              | `>=20.0.0`                                               | `>=20.0.0`                                           | `>=20.0.0`                                               | OK                                                                                                                                                                                                       |
+| `tsconfig.json:tsBuildInfoFile`         | (default)                                              | explicit `"./tsconfig.tsbuildinfo"`                                                                                     | (default)                                                | (default)                                            | (default)                                                | Cosmetic drift (CL-CORE-20)                                                                                                                                                                              |
+| `tsconfig.json:types`                   | (default)                                              | `["node"]`                                                                                                              | (default)                                                | (default)                                            | (default)                                                | Projection explicit — others rely on `tsconfig.architect-base.json` inheritance which doesn't pin `@types/node`. Worth confirming `noImplicitAny` errors don't sneak in.                                 |
+| `tsconfig.json:references`              | none (leaf)                                            | refs to core                                                                                                            | refs to core                                             | refs to core, projection, guard                      | refs to core, projection                                 | Correct dependency graph                                                                                                                                                                                 |
+| `tsconfig.test.json:include`            | `src/**/*`, `tests/**/*.ts`, `vitest.config.ts`        | same                                                                                                                    | same                                                     | same                                                 | same                                                     | OK                                                                                                                                                                                                       |
+| `tsconfig.test.json:tsBuildInfoFile`    | (default)                                              | `"./tsconfig.test.tsbuildinfo"`                                                                                         | (default)                                                | (default)                                            | (default)                                                | Cosmetic                                                                                                                                                                                                 |
+| `tsconfig.test.json:composite` override | `false`                                                | (inherits `true`)                                                                                                       | `false`                                                  | `false`                                              | `false`                                                  | Mixed                                                                                                                                                                                                    |
+| `eslint.config.mjs`                     | extends root, adds parser project + test relaxations   | extends root, adds same + `arch-projection:shared-plain-object` rule                                                    | (uncited — pattern same)                                 | (uncited — pattern same)                             | (uncited — pattern same)                                 | OK                                                                                                                                                                                                       |
+| `vitest.config.ts:include`              | `tests/steps/**/*.steps.ts`                            | `tests/features/**/*.steps.ts`                                                                                          | (similar)                                                | (similar)                                            | (similar)                                                | **DRIFT — core uses `steps/` glob, projection uses `features/`**; tests live in `tests/steps/` in core. Investigate whether projection's `features/` glob is a different convention or unintended drift. |
+| `vitest.config.ts:coverage`             | not configured                                         | not configured                                                                                                          | not configured                                           | not configured                                       | not configured                                           | OK across family — coverage tooling isn't wired into CI                                                                                                                                                  |
+| Repo-root `tsconfig.eslint.json`        | exists, referenced by family eslint config             | same                                                                                                                    | same                                                     | same                                                 | same                                                     | OK                                                                                                                                                                                                       |
+| Repo-root `deny.toml`                   | recently added (in git status)                         | n/a                                                                                                                     | n/a                                                      | n/a                                                  | n/a                                                      | Note: not in committed tree yet                                                                                                                                                                          |
 
 **Intentional vs unintentional drift:**
+
 - `architect-core` lacking `tests` from its `lint` script and `pnpm clean &&
-  pnpm build` from `prepack` — **unintentional** (no doctrine reason, all
+pnpm build` from `prepack` — **unintentional** (no doctrine reason, all
   siblings have it).
 - `architect-core` lacking explicit `"types": ["node"]` — **probably
   unintentional**; projection's explicit declaration suggests the family was
@@ -534,19 +543,20 @@ Architect-core's declared dependencies, cross-referenced against
 `architect-projection`, `architect-guard`, `architect-cli`, `architect-mcp`,
 and `architect` meta-package.
 
-| Dep | Version (core) | Used in `src/`? | Shared with siblings? | Risk note |
-|-----|---|---|---|---|
-| `@cucumber/gherkin` | `^29.0.0` | yes — `scanner/gherkin-ast-parser.ts` | core only | Healthy. Active package. |
-| `@cucumber/messages` | `^25.0.1` | yes — `scanner/gherkin-ast-parser.ts:18` | core only | Healthy. Companion to `@cucumber/gherkin`. |
-| `@typescript-eslint/typescript-estree` | `^8.18.0` | yes — `scanner/ast-parser.ts:18`, `extractor/shape-extractor.ts:12-13` | core only | Heavy install (pulls TS itself transitively, ~30 MB). Justified — core does AST work on TS source. |
-| `glob` | `^10.3.10` | yes — `scanner/pattern-scanner.ts:19`, `scanner/gherkin-scanner.ts:19` | **yes** — `architect-guard` (`^10.3.10`, same version) | Both core and guard use `^10.3.10`. **Aligned, no drift.** |
-| `zod` | `^4.1.11` | yes (25+ files) | **yes** — projection, guard, cli, mcp, and root devDeps all on `^4.1.11` | **Aligned. No drift.** |
-| `@amiceli/vitest-cucumber` (dev) | `^6.3.0` | n/a (test runner) | **yes** — all five packages on `^6.3.0` | Aligned |
-| `@types/node` (dev) | `^24.12.0` | n/a | **yes** — all on `^24.12.0` | Aligned |
-| `typescript` (dev) | `^5.8.2` | n/a | **yes** — all on `^5.8.2` | Aligned |
-| `vitest` (dev) | `^4.1.4` | n/a | **yes** — all on `^4.1.4` | Aligned |
+| Dep                                    | Version (core) | Used in `src/`?                                                        | Shared with siblings?                                                    | Risk note                                                                                          |
+| -------------------------------------- | -------------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- |
+| `@cucumber/gherkin`                    | `^29.0.0`      | yes — `scanner/gherkin-ast-parser.ts`                                  | core only                                                                | Healthy. Active package.                                                                           |
+| `@cucumber/messages`                   | `^25.0.1`      | yes — `scanner/gherkin-ast-parser.ts:18`                               | core only                                                                | Healthy. Companion to `@cucumber/gherkin`.                                                         |
+| `@typescript-eslint/typescript-estree` | `^8.18.0`      | yes — `scanner/ast-parser.ts:18`, `extractor/shape-extractor.ts:12-13` | core only                                                                | Heavy install (pulls TS itself transitively, ~30 MB). Justified — core does AST work on TS source. |
+| `glob`                                 | `^10.3.10`     | yes — `scanner/pattern-scanner.ts:19`, `scanner/gherkin-scanner.ts:19` | **yes** — `architect-guard` (`^10.3.10`, same version)                   | Both core and guard use `^10.3.10`. **Aligned, no drift.**                                         |
+| `zod`                                  | `^4.1.11`      | yes (25+ files)                                                        | **yes** — projection, guard, cli, mcp, and root devDeps all on `^4.1.11` | **Aligned. No drift.**                                                                             |
+| `@amiceli/vitest-cucumber` (dev)       | `^6.3.0`       | n/a (test runner)                                                      | **yes** — all five packages on `^6.3.0`                                  | Aligned                                                                                            |
+| `@types/node` (dev)                    | `^24.12.0`     | n/a                                                                    | **yes** — all on `^24.12.0`                                              | Aligned                                                                                            |
+| `typescript` (dev)                     | `^5.8.2`       | n/a                                                                    | **yes** — all on `^5.8.2`                                                | Aligned                                                                                            |
+| `vitest` (dev)                         | `^4.1.4`       | n/a                                                                    | **yes** — all on `^4.1.4`                                                | Aligned                                                                                            |
 
 **Findings:**
+
 - **All shared deps are pinned identically across the family.** Notable
   alignment discipline; no drift. This is rare for a multi-package pnpm
   workspace and worth preserving.
@@ -564,8 +574,8 @@ and `architect` meta-package.
   `eslint-config-prettier` — all declared in the **root** package's
   `devDependencies`. The package script `eslint src` works because pnpm
   hoists from the workspace root. Siblings all explicitly declare `"eslint":
-  "^9.17.0"` in their own `devDependencies`. **Recipe:** add `"eslint":
-  "^9.17.0"` to `architect-core/package.json:devDependencies`. Either every
+"^9.17.0"` in their own `devDependencies`. **Recipe:** add `"eslint":
+"^9.17.0"` to `architect-core/package.json:devDependencies`. Either every
   package owns its lint toolchain or none does; family convention is the
   former.
 
@@ -575,17 +585,17 @@ and `architect` meta-package.
 
 Computed from `npm pack --dry-run`. The published tarball contains:
 
-| Path pattern | Count | Reason it's there | Recommended action |
-|---|---|---|---|
-| `dist/**/*.js.map` | 106 | `sourceMap: true` in `tsconfig.base.json:14` | **Delete from publish** — see CL-CORE-3. Either turn off in base, or strip in `prepack`. |
-| `dist/**/*.d.ts.map` | 106 | `declarationMap: true` in `tsconfig.base.json:13` | **Delete from publish** — same fix as above. |
-| `dist/config/self-hosting.{js,d.ts}` | 2 | `src/config/self-hosting.ts` is in `src/`, ships by default | Delete `self-hosting.ts` per Phase 1 H-CORE-10. Cleanup recipe CL-CORE-4. |
-| `dist/config/presentation-contracts.{js,d.ts}` | 2 | `src/config/presentation-contracts.ts` exists | Delete the file per Phase 1 H-CORE-4. |
-| `dist/config/cli-schema.{js,d.ts}` | 2 (24.5 KB JS!) | `src/config/cli-schema.ts` shouldn't be in core | Move to `architect-cli` per Phase 1 H-CORE-5. |
-| `dist/extractor/layer-inference.{js,d.ts}` | 2 | hardcoded `/orders/` / `/inventory/` paths | Delete the path heuristics per Phase 1 H-CORE-11; keep `inferFeatureLayer` if it has a sensible non-hardcoded form. |
-| `dist/utils/markdown-parser.{js,d.ts}` | 2 | zero callers (CL-CORE-5 #1) | Delete the file. |
-| `dist/validation-schemas/pattern-graph.d.ts` | 1 file, 509 KB | TS-inferred-types explosion from Zod schemas | See CL-CORE-3 — fix the schema surface (C-CORE-2), or accept the size after measuring. |
-| `dist/config/tag-registry-contract.{js,d.ts}` | 2 | duplicate of `validation-schemas/tag-registry.ts` (C-CORE-3) | Delete the file per Phase 1 C-CORE-3. |
+| Path pattern                                   | Count           | Reason it's there                                            | Recommended action                                                                                                  |
+| ---------------------------------------------- | --------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------- |
+| `dist/**/*.js.map`                             | 106             | `sourceMap: true` in `tsconfig.base.json:14`                 | **Delete from publish** — see CL-CORE-3. Either turn off in base, or strip in `prepack`.                            |
+| `dist/**/*.d.ts.map`                           | 106             | `declarationMap: true` in `tsconfig.base.json:13`            | **Delete from publish** — same fix as above.                                                                        |
+| `dist/config/self-hosting.{js,d.ts}`           | 2               | `src/config/self-hosting.ts` is in `src/`, ships by default  | Delete `self-hosting.ts` per Phase 1 H-CORE-10. Cleanup recipe CL-CORE-4.                                           |
+| `dist/config/presentation-contracts.{js,d.ts}` | 2               | `src/config/presentation-contracts.ts` exists                | Delete the file per Phase 1 H-CORE-4.                                                                               |
+| `dist/config/cli-schema.{js,d.ts}`             | 2 (24.5 KB JS!) | `src/config/cli-schema.ts` shouldn't be in core              | Move to `architect-cli` per Phase 1 H-CORE-5.                                                                       |
+| `dist/extractor/layer-inference.{js,d.ts}`     | 2               | hardcoded `/orders/` / `/inventory/` paths                   | Delete the path heuristics per Phase 1 H-CORE-11; keep `inferFeatureLayer` if it has a sensible non-hardcoded form. |
+| `dist/utils/markdown-parser.{js,d.ts}`         | 2               | zero callers (CL-CORE-5 #1)                                  | Delete the file.                                                                                                    |
+| `dist/validation-schemas/pattern-graph.d.ts`   | 1 file, 509 KB  | TS-inferred-types explosion from Zod schemas                 | See CL-CORE-3 — fix the schema surface (C-CORE-2), or accept the size after measuring.                              |
+| `dist/config/tag-registry-contract.{js,d.ts}`  | 2               | duplicate of `validation-schemas/tag-registry.ts` (C-CORE-3) | Delete the file per Phase 1 C-CORE-3.                                                                               |
 
 After applying the Phase 1 deletions plus CL-CORE-3 (map stripping) and
 CL-CORE-5 (dead-export sweep), the published tarball should drop from **426

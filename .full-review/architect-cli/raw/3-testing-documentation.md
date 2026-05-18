@@ -15,41 +15,41 @@ Documentation is in the same posture as guard: **no package README** (the only t
 
 One Phase 1 finding has been **resolved since that phase was written**: H-CLI-7 stated that the 4 guard bin shims bypass `runtime-bridge.js`. All 6 bins now go through `runtime-bridge.js` (confirmed at `bin/architect-guard.js`, `bin/architect-validate.js`, `bin/architect-lint-steps.js`, `bin/architect-lint-patterns.js`). The H-CLI-7 finding is closed.
 
-One Phase 1 finding is **sharpened**: H-CLI-2 (`error-handler.ts` knownTypes drifts from `DocError` union) is now confirmed with a concrete missing discriminator. The `DocError` union in `architect-core/src/types/errors.ts:174-186` has exactly 12 members; `error-handler.ts:74-87` lists exactly 12 strings — matching. However, `errors.ts:213` defines `BatchError<E>` with `type: 'BATCH_ERROR'` as a *separate specialized type* (not a `DocError` member). The drift risk is real but the discriminator lists are currently aligned. The structural hazard remains: any new `DocError` variant in core will silently break `isDocError` without a compile-time signal. **H-CLI-2 remains open as a structural drift risk.**
+One Phase 1 finding is **sharpened**: H-CLI-2 (`error-handler.ts` knownTypes drifts from `DocError` union) is now confirmed with a concrete missing discriminator. The `DocError` union in `architect-core/src/types/errors.ts:174-186` has exactly 12 members; `error-handler.ts:74-87` lists exactly 12 strings — matching. However, `errors.ts:213` defines `BatchError<E>` with `type: 'BATCH_ERROR'` as a _separate specialized type_ (not a `DocError` member). The drift risk is real but the discriminator lists are currently aligned. The structural hazard remains: any new `DocError` variant in core will silently break `isDocError` without a compile-time signal. **H-CLI-2 remains open as a structural drift risk.**
 
 ---
 
 ## 2. Module Coverage Map
 
-| Source file | Lines | Executable test coverage | Notes |
-|---|---|---|---|
-| `src/index.ts` | 1 | None | Exports `isDocError`, `formatDocError`, `handleCliError` — no consumers anywhere in workspace |
-| `src/cli/error-handler.ts` | 233 | None | 12-discriminator type-guard untested; `console.error` vs `stderr.write` drift untested |
-| `src/cli/generate-docs.ts` | ~670 | None | Entire `architect-generate` bin is untested |
-| `src/cli/generated-docs-manifest.ts` | 191 | None | Hand-rolled JSON validators, `pruneStaleGeneratedFiles` untested |
-| `src/cli/lint-patterns.ts` | 5 | None (guard's tests cover this) | Shim only; guard test surface is the relevant test |
-| `src/cli/lint-process.ts` | 5 | None | Same |
-| `src/cli/lint-steps.ts` | 5 | None | Same |
-| `src/cli/validate-patterns.ts` | 5 | None | Same |
-| `src/cli/pattern-graph-cli.ts` | ~275 | Partial (2 scenarios via subprocess) | `parseAtBoundary` at exit tested implicitly; `--category` reject path untested |
-| `src/cli/pattern-graph-cli-commands.ts` | ~220 | Partial (2 of 24 commands) | `COMMAND_NAMES` has 24 entries; only `overview` and `arch dangling` are tested |
-| `src/cli/pattern-graph-cli-runtime.ts` | ~250 | None (implicit via above) | Cache read/write, dual config paths, `resolveTagRegistryForTaxonomy` untested |
-| `src/cli/pattern-graph-cli-types.ts` | ~60 | None | Type-only; no logic to test |
-| `src/cli/runtime-helpers.ts` | 86 | Partial | `resolveInvocationDir` tested (3 scenarios in `cli-invocation-dir.feature`); `readCliPackageMetadata`, `resolveCliBaseDirArg`, `resolveWorkspaceRoot` untested |
-| `src/cli/version.ts` | ~50 | None | `getPackageName` fallback (`'architect'` cosmetic bug, L-CLI-1) untested |
-| `runtime-bridge.js` | 25 | None | Missing-dist error path untested; POSIX-only `pathname` (M-CLI-4) untested |
-| `src/cli/commands/_shared/help.ts` | 74 | None | `printGlobalHelp`, `printCommandHelp`, `printReplHelp` untested |
-| `src/cli/commands/_shared/schemas.ts` | 190 | None | `parseSchemaValue` cause-swallowing (H-CLI-Q-7) untested; 8 `parse*` helpers untested |
-| `src/cli/commands/_shared/output.ts` | ~70 | None | `createValidationMetadata` untested |
-| `src/cli/commands/_shared/structured.ts` | ~240 | Partial (1 command) | `arch dangling` tested as subprocess; `process.exitCode = 1` deferred-exit path (M-CLI-8) not directly verified |
-| `src/cli/commands/_shared/handoff.ts` | ~30 | None | Flag narrowing anti-pattern (M-CLI-11) untested |
-| `src/cli/commands/_shared/projection-options.ts` | ~60 | None | Same anti-pattern |
-| `src/cli/commands/_shared/runtime.ts` | ~30 | None | |
-| `src/cli/commands/lifecycle.ts` | ~50 | None | `repl`, `help`, `version` commands untested |
-| `src/cli/commands/meta.ts` | ~150 | None | `arch`, `rules`, `diagnostics`, `taxonomy`, `sources`, `unannotated` untested |
-| `src/cli/commands/planning.ts` | ~130 | None | `scope-validate`, `handoff` untested |
-| `src/cli/commands/read.ts` | ~420 | None | `pattern`, `documentation`, `bundle`, `list`, `open-questions`, `search`, `context`, `dep-tree`, `files`, `status`, `query`, `tags` untested; `parseDisclosureLevel`/`parseFilterValue`/`mergeProjectionFilter` (C-CLI-2 duplicates) untested |
-| `src/cli/commands/reporting.ts` | ~180 | None | `overview` tested (1 scenario); `arch`, `unannotated` untested |
+| Source file                                      | Lines | Executable test coverage             | Notes                                                                                                                                                                                                                                         |
+| ------------------------------------------------ | ----- | ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/index.ts`                                   | 1     | None                                 | Exports `isDocError`, `formatDocError`, `handleCliError` — no consumers anywhere in workspace                                                                                                                                                 |
+| `src/cli/error-handler.ts`                       | 233   | None                                 | 12-discriminator type-guard untested; `console.error` vs `stderr.write` drift untested                                                                                                                                                        |
+| `src/cli/generate-docs.ts`                       | ~670  | None                                 | Entire `architect-generate` bin is untested                                                                                                                                                                                                   |
+| `src/cli/generated-docs-manifest.ts`             | 191   | None                                 | Hand-rolled JSON validators, `pruneStaleGeneratedFiles` untested                                                                                                                                                                              |
+| `src/cli/lint-patterns.ts`                       | 5     | None (guard's tests cover this)      | Shim only; guard test surface is the relevant test                                                                                                                                                                                            |
+| `src/cli/lint-process.ts`                        | 5     | None                                 | Same                                                                                                                                                                                                                                          |
+| `src/cli/lint-steps.ts`                          | 5     | None                                 | Same                                                                                                                                                                                                                                          |
+| `src/cli/validate-patterns.ts`                   | 5     | None                                 | Same                                                                                                                                                                                                                                          |
+| `src/cli/pattern-graph-cli.ts`                   | ~275  | Partial (2 scenarios via subprocess) | `parseAtBoundary` at exit tested implicitly; `--category` reject path untested                                                                                                                                                                |
+| `src/cli/pattern-graph-cli-commands.ts`          | ~220  | Partial (2 of 24 commands)           | `COMMAND_NAMES` has 24 entries; only `overview` and `arch dangling` are tested                                                                                                                                                                |
+| `src/cli/pattern-graph-cli-runtime.ts`           | ~250  | None (implicit via above)            | Cache read/write, dual config paths, `resolveTagRegistryForTaxonomy` untested                                                                                                                                                                 |
+| `src/cli/pattern-graph-cli-types.ts`             | ~60   | None                                 | Type-only; no logic to test                                                                                                                                                                                                                   |
+| `src/cli/runtime-helpers.ts`                     | 86    | Partial                              | `resolveInvocationDir` tested (3 scenarios in `cli-invocation-dir.feature`); `readCliPackageMetadata`, `resolveCliBaseDirArg`, `resolveWorkspaceRoot` untested                                                                                |
+| `src/cli/version.ts`                             | ~50   | None                                 | `getPackageName` fallback (`'architect'` cosmetic bug, L-CLI-1) untested                                                                                                                                                                      |
+| `runtime-bridge.js`                              | 25    | None                                 | Missing-dist error path untested; POSIX-only `pathname` (M-CLI-4) untested                                                                                                                                                                    |
+| `src/cli/commands/_shared/help.ts`               | 74    | None                                 | `printGlobalHelp`, `printCommandHelp`, `printReplHelp` untested                                                                                                                                                                               |
+| `src/cli/commands/_shared/schemas.ts`            | 190   | None                                 | `parseSchemaValue` cause-swallowing (H-CLI-Q-7) untested; 8 `parse*` helpers untested                                                                                                                                                         |
+| `src/cli/commands/_shared/output.ts`             | ~70   | None                                 | `createValidationMetadata` untested                                                                                                                                                                                                           |
+| `src/cli/commands/_shared/structured.ts`         | ~240  | Partial (1 command)                  | `arch dangling` tested as subprocess; `process.exitCode = 1` deferred-exit path (M-CLI-8) not directly verified                                                                                                                               |
+| `src/cli/commands/_shared/handoff.ts`            | ~30   | None                                 | Flag narrowing anti-pattern (M-CLI-11) untested                                                                                                                                                                                               |
+| `src/cli/commands/_shared/projection-options.ts` | ~60   | None                                 | Same anti-pattern                                                                                                                                                                                                                             |
+| `src/cli/commands/_shared/runtime.ts`            | ~30   | None                                 |                                                                                                                                                                                                                                               |
+| `src/cli/commands/lifecycle.ts`                  | ~50   | None                                 | `repl`, `help`, `version` commands untested                                                                                                                                                                                                   |
+| `src/cli/commands/meta.ts`                       | ~150  | None                                 | `arch`, `rules`, `diagnostics`, `taxonomy`, `sources`, `unannotated` untested                                                                                                                                                                 |
+| `src/cli/commands/planning.ts`                   | ~130  | None                                 | `scope-validate`, `handoff` untested                                                                                                                                                                                                          |
+| `src/cli/commands/read.ts`                       | ~420  | None                                 | `pattern`, `documentation`, `bundle`, `list`, `open-questions`, `search`, `context`, `dep-tree`, `files`, `status`, `query`, `tags` untested; `parseDisclosureLevel`/`parseFilterValue`/`mergeProjectionFilter` (C-CLI-2 duplicates) untested |
+| `src/cli/commands/reporting.ts`                  | ~180  | None                                 | `overview` tested (1 scenario); `arch`, `unannotated` untested                                                                                                                                                                                |
 
 **Summary:** 2 of 24 `COMMAND_NAMES` exercised end-to-end (`overview`, `arch dangling`). `resolveInvocationDir` is the only internal function with direct unit-style tests. 22 of 26 src files have no direct test coverage. 4 of 5 command modules have zero test scenarios.
 
@@ -59,11 +59,11 @@ One Phase 1 finding is **sharpened**: H-CLI-2 (`error-handler.ts` knownTypes dri
 
 ### Critical (P0)
 
-| ID | Title | Location |
-|----|-------|----------|
-| TC-C-CLI-1 | 22 of 24 `COMMAND_NAMES` have zero end-to-end test coverage | `tests/features/cli-command-resolution.feature` |
-| TC-C-CLI-2 | `architect-generate` bin (670 LOC, `generate-docs.ts`) has zero tests of any kind | `src/cli/generate-docs.ts` |
-| DOC-C-CLI-1 | No package README — second publishable package without one (guard is the other) | `packages/architect-cli/README.md` (absent) |
+| ID          | Title                                                                             | Location                                        |
+| ----------- | --------------------------------------------------------------------------------- | ----------------------------------------------- |
+| TC-C-CLI-1  | 22 of 24 `COMMAND_NAMES` have zero end-to-end test coverage                       | `tests/features/cli-command-resolution.feature` |
+| TC-C-CLI-2  | `architect-generate` bin (670 LOC, `generate-docs.ts`) has zero tests of any kind | `src/cli/generate-docs.ts`                      |
+| DOC-C-CLI-1 | No package README — second publishable package without one (guard is the other)   | `packages/architect-cli/README.md` (absent)     |
 
 **TC-C-CLI-1 evidence:** `COMMAND_NAMES` at `pattern-graph-cli-commands.ts:16-41` declares 24 commands. `cli-command-resolution.steps.ts` runs `architect overview` and `architect arch dangling` — 2 commands. The remaining 22 (`status`, `context`, `dep-tree`, `files`, `scope-validate`, `handoff`, `query`, `pattern`, `documentation`, `bundle`, `list`, `open-questions`, `search`, `rules`, `diagnostics`, `tags`, `taxonomy`, `sources`, `unannotated`, `repl`, `help`, `version`) have no acceptance scenario, no unit test, and no smoke invocation.
 
@@ -71,16 +71,16 @@ One Phase 1 finding is **sharpened**: H-CLI-2 (`error-handler.ts` knownTypes dri
 
 ### High (P1)
 
-| ID | Title | Location |
-|----|-------|----------|
-| TC-H-CLI-1 | Corpus coupling: all subprocess tests fail when `architect.config.ts` is invalid | `tests/support/run-cli.ts:8,47` |
-| TC-H-CLI-2 | `error-handler.ts` discriminator list (`isDocError:74-87`) has no compile-time link to `DocError` union — silent drift on core change | `src/cli/error-handler.ts:74-87` + `architect-core/src/types/errors.ts:174-186` |
-| TC-H-CLI-3 | `parseSchemaValue` cause-swallowing (`H-CLI-Q-7`) untested — downstream consumers have no way to discover the lost `BoundaryParseError.cause` | `src/cli/commands/_shared/schemas.ts:115-121` |
-| TC-H-CLI-4 | `runtime-bridge.js` missing-dist guard untested — the family's only dist-existence check is in production but not in test | `runtime-bridge.js:13-17` |
-| TC-H-CLI-5 | Guard bin shims (4 files, 5 LOC each) have zero cli-side smoke invocations for `architect-guard`, `architect-validate`, `architect-lint-steps`, `architect-lint-patterns` | `src/cli/{lint-process,lint-steps,lint-patterns,validate-patterns}.ts` |
-| DOC-H-CLI-1 | `@architect-pattern` annotation rate: 4 of 26 files (15%) — lowest in the family | 4 annotated files vs 22 unannotated |
-| DOC-H-CLI-2 | `AGENTS.md` documents all 6 bin names but zero flag surfaces, exit-code contracts, or invocation examples beyond `pnpm architect:query -- <subcommand>` | `architect/AGENTS.md:35,144` |
-| DOC-H-CLI-3 | No ADR references in any `src/` file — cli's conformance to ADR-006, ADR-009, and Zod-first is implicit; ADR linkage rate is 0% | `src/cli/*.ts` |
+| ID          | Title                                                                                                                                                                     | Location                                                                        |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| TC-H-CLI-1  | Corpus coupling: all subprocess tests fail when `architect.config.ts` is invalid                                                                                          | `tests/support/run-cli.ts:8,47`                                                 |
+| TC-H-CLI-2  | `error-handler.ts` discriminator list (`isDocError:74-87`) has no compile-time link to `DocError` union — silent drift on core change                                     | `src/cli/error-handler.ts:74-87` + `architect-core/src/types/errors.ts:174-186` |
+| TC-H-CLI-3  | `parseSchemaValue` cause-swallowing (`H-CLI-Q-7`) untested — downstream consumers have no way to discover the lost `BoundaryParseError.cause`                             | `src/cli/commands/_shared/schemas.ts:115-121`                                   |
+| TC-H-CLI-4  | `runtime-bridge.js` missing-dist guard untested — the family's only dist-existence check is in production but not in test                                                 | `runtime-bridge.js:13-17`                                                       |
+| TC-H-CLI-5  | Guard bin shims (4 files, 5 LOC each) have zero cli-side smoke invocations for `architect-guard`, `architect-validate`, `architect-lint-steps`, `architect-lint-patterns` | `src/cli/{lint-process,lint-steps,lint-patterns,validate-patterns}.ts`          |
+| DOC-H-CLI-1 | `@architect-pattern` annotation rate: 4 of 26 files (15%) — lowest in the family                                                                                          | 4 annotated files vs 22 unannotated                                             |
+| DOC-H-CLI-2 | `AGENTS.md` documents all 6 bin names but zero flag surfaces, exit-code contracts, or invocation examples beyond `pnpm architect:query -- <subcommand>`                   | `architect/AGENTS.md:35,144`                                                    |
+| DOC-H-CLI-3 | No ADR references in any `src/` file — cli's conformance to ADR-006, ADR-009, and Zod-first is implicit; ADR linkage rate is 0%                                           | `src/cli/*.ts`                                                                  |
 
 **TC-H-CLI-1 detail:** `run-cli.ts:7-8` derives `dogfoodRoot` = monorepo root; `execFile` runs with `cwd: dogfoodRoot`. Every subprocess test therefore reads the live `architect.config.ts`. If the config is temporarily invalid (mid-refactor, broken TypeScript syntax), all 5 subprocess-based scenarios fail with spurious exits unrelated to the tested behavior. Fixture-based isolation (a minimal `architect.config.ts` in a temp directory) would decouple test stability from dogfood corpus state.
 
@@ -90,16 +90,16 @@ One Phase 1 finding is **sharpened**: H-CLI-2 (`error-handler.ts` knownTypes dri
 
 ### Medium (P2)
 
-| ID | Title | Location |
-|----|-------|----------|
-| TC-M-CLI-1 | `generate-docs.ts:214-315 parseArgs` — `--base-dir`, `--generators`, `--input`, `--output`, `--disclosure`, `--filter` all have zero flag-parsing tests; the "if next is undefined or starts with -" guard repeated 6× is untested error path | `src/cli/generate-docs.ts:249,257,265,273,285,292` |
-| TC-M-CLI-2 | `version.ts` `getPackageName()` fallback returns `'architect'` (L-CLI-1) — untested; an empty/malformed `package.json` would produce the wrong display name silently | `src/cli/version.ts:42-47` |
-| TC-M-CLI-3 | `generated-docs-manifest.ts:157-191` hand-rolled JSON validators (`isGeneratedDocsManifest`, `isGeneratorManifest`, `isManifestEntry`) have zero tests — the manifests they validate gate file pruning | `src/cli/generated-docs-manifest.ts:157-191` |
-| TC-M-CLI-4 | `pattern-graph-cli.ts` flag-order dependency (M-CLI-5): `--feature`, `--session`, `--depth` routing into `remaining` vs parsed depends on command position — no scenario exercises this with mixed flag order | `src/cli/pattern-graph-cli.ts:100-127` |
-| TC-M-CLI-5 | `pattern-graph-cli-commands.ts:113-198 parseCommandInput` two-path error fidelity (M-CLI-6): positional failures suppress Zod cause; flag failures preserve it — no negative test exercises either path directly | `src/cli/pattern-graph-cli-commands.ts:167-191` |
-| TC-M-CLI-6 | Test harness `run-cli.ts:31` splits on whitespace — quoted args like `"two words"` silently misparse; no quoted-argument test exists (L-CLI-4) | `tests/support/run-cli.ts:31` |
-| DOC-M-CLI-1 | `architect-generate --help` (via `generate-docs.ts:317-340 printHelp`) has no phantom PDR references (clean), but documents `--disclosure level: essential, important, useful, advanced` without citing whether `useful` or `important` maps to the level 3 enum — low-fidelity for API consumers | `src/cli/generate-docs.ts:331` |
-| DOC-M-CLI-2 | `commands/_shared/help.ts:29` `printGlobalHelp` references `architect-data-api` skill for agent environments — useful, but the help text is not tested and the reference only appears at runtime | `src/cli/commands/_shared/help.ts:29-31` |
+| ID          | Title                                                                                                                                                                                                                                                                                             | Location                                           |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| TC-M-CLI-1  | `generate-docs.ts:214-315 parseArgs` — `--base-dir`, `--generators`, `--input`, `--output`, `--disclosure`, `--filter` all have zero flag-parsing tests; the "if next is undefined or starts with -" guard repeated 6× is untested error path                                                     | `src/cli/generate-docs.ts:249,257,265,273,285,292` |
+| TC-M-CLI-2  | `version.ts` `getPackageName()` fallback returns `'architect'` (L-CLI-1) — untested; an empty/malformed `package.json` would produce the wrong display name silently                                                                                                                              | `src/cli/version.ts:42-47`                         |
+| TC-M-CLI-3  | `generated-docs-manifest.ts:157-191` hand-rolled JSON validators (`isGeneratedDocsManifest`, `isGeneratorManifest`, `isManifestEntry`) have zero tests — the manifests they validate gate file pruning                                                                                            | `src/cli/generated-docs-manifest.ts:157-191`       |
+| TC-M-CLI-4  | `pattern-graph-cli.ts` flag-order dependency (M-CLI-5): `--feature`, `--session`, `--depth` routing into `remaining` vs parsed depends on command position — no scenario exercises this with mixed flag order                                                                                     | `src/cli/pattern-graph-cli.ts:100-127`             |
+| TC-M-CLI-5  | `pattern-graph-cli-commands.ts:113-198 parseCommandInput` two-path error fidelity (M-CLI-6): positional failures suppress Zod cause; flag failures preserve it — no negative test exercises either path directly                                                                                  | `src/cli/pattern-graph-cli-commands.ts:167-191`    |
+| TC-M-CLI-6  | Test harness `run-cli.ts:31` splits on whitespace — quoted args like `"two words"` silently misparse; no quoted-argument test exists (L-CLI-4)                                                                                                                                                    | `tests/support/run-cli.ts:31`                      |
+| DOC-M-CLI-1 | `architect-generate --help` (via `generate-docs.ts:317-340 printHelp`) has no phantom PDR references (clean), but documents `--disclosure level: essential, important, useful, advanced` without citing whether `useful` or `important` maps to the level 3 enum — low-fidelity for API consumers | `src/cli/generate-docs.ts:331`                     |
+| DOC-M-CLI-2 | `commands/_shared/help.ts:29` `printGlobalHelp` references `architect-data-api` skill for agent environments — useful, but the help text is not tested and the reference only appears at runtime                                                                                                  | `src/cli/commands/_shared/help.ts:29-31`           |
 
 ---
 
@@ -107,12 +107,12 @@ One Phase 1 finding is **sharpened**: H-CLI-2 (`error-handler.ts` knownTypes dri
 
 ### Inventory
 
-| Feature file | Line | Tag(s) | Scenario |
-|---|---|---|---|
-| `cli-flag-parsing.feature` | 41 | `@skip @validation` | `--format with an unknown value is rejected` |
-| `cli-flag-parsing.feature` | 49 | `@skip @negative` | `rules subcommand rejects conflicting filters` |
-| `cli-output-formatting.feature` | 42 | `@skip @happy-path` | `markdown format emits a markdown heading on stdout` |
-| `cli-output-formatting.feature` | 50 | `@skip @contract` | `deprecation warnings appear only on stderr` |
+| Feature file                    | Line | Tag(s)              | Scenario                                             |
+| ------------------------------- | ---- | ------------------- | ---------------------------------------------------- |
+| `cli-flag-parsing.feature`      | 41   | `@skip @validation` | `--format with an unknown value is rejected`         |
+| `cli-flag-parsing.feature`      | 49   | `@skip @negative`   | `rules subcommand rejects conflicting filters`       |
+| `cli-output-formatting.feature` | 42   | `@skip @happy-path` | `markdown format emits a markdown heading on stdout` |
+| `cli-output-formatting.feature` | 50   | `@skip @contract`   | `deprecation warnings appear only on stderr`         |
 
 ### Scenario Analysis
 
@@ -142,12 +142,12 @@ Recipe: Same as Skip 3 — delete or move to Architect State. A `@skip @contract
 
 ### Summary verdict
 
-| Skip | Action |
-|---|---|
-| Skip 1 (`--format invalid`) | Fix H-CLI-Q-7 first; then fix step assertion. **Do not delete.** |
+| Skip                                 | Action                                                                                        |
+| ------------------------------------ | --------------------------------------------------------------------------------------------- |
+| Skip 1 (`--format invalid`)          | Fix H-CLI-Q-7 first; then fix step assertion. **Do not delete.**                              |
 | Skip 2 (`rules conflicting filters`) | Fix assertion string to match current CLI message. **Unblock today** — no code change needed. |
-| Skip 3 (`--format markdown`) | Delete or move to `architect/specs/` as a design spec. Not a test until the feature exists. |
-| Skip 4 (`deprecation warnings`) | Delete or move to `architect/specs/`. Untriggerable by any current invocation. |
+| Skip 3 (`--format markdown`)         | Delete or move to `architect/specs/` as a design spec. Not a test until the feature exists.   |
+| Skip 4 (`deprecation warnings`)      | Delete or move to `architect/specs/`. Untriggerable by any current invocation.                |
 
 ---
 
@@ -166,18 +166,21 @@ Family comparison: core 26%, guard 55%, projection 60%, cli **15%** — lowest b
 ### Help-text audit (all 6 bins)
 
 **`architect --help`** (via `commands/_shared/help.ts:16-32`):
+
 - No phantom PDR/ADR references. Clean.
 - "architect query helper" is the stated name — slightly confusing for consumers who expect "architect CLI" or "architect".
 - References `architect-data-api` skill at `:29` — useful for agents, opaque for human users. No explanation of what the skill is.
 - Verdict: **Low severity cosmetic issue only.**
 
 **`architect-generate --help`** (via `generate-docs.ts:317-340`):
+
 - Lists `--disclosure level: essential, important, useful, advanced` without documenting enum ordinal or what each level means.
 - `--filter <status=csv>` is documented with no example of valid status values (e.g., `active`, `completed`). The only example in the help block uses `status=active,completed` — the values are correct but not formally listed.
 - No phantom references. Clean.
 - Verdict: **Low severity — functional but thin for API consumers.**
 
 **`architect-guard --help`**, **`architect-validate --help`**, **`architect-lint-steps --help`**, **`architect-lint-patterns --help`**:
+
 - These are implemented in guard's `cli/lint-process.ts:170`, `cli/validate-patterns.ts`, etc.
 - `lint-process.ts:170` (guard source) contains the phantom `PDR-005` reference that guard Phase 1 flagged as DOC-C-GUARD-1 (user-visible CLI help). This is a **guard finding**, not a cli finding, but it surfaces via the cli's bin. The cli has no way to fix it — it is a pure shim.
 - Verdict: The phantom PDR-005 in `architect-guard --help` is owned by guard (DOC-C-GUARD-1). Cli's responsibility is only to ensure the bin shim routes correctly, which it does.
@@ -258,27 +261,29 @@ The `--format` flag is listed in `GLOBAL_OPTIONS` at `help.ts:4-14` but the enum
 
 `generate-docs.ts:317-340` is a static string — not table-driven. Alignment with the actual flag set:
 
-| Flag documented | Implemented | Notes |
-|---|---|---|
-| `-b, --base-dir` | Yes | |
-| `-i, --input` | Yes | |
-| `-g, --generators` | Yes | |
-| `-o, --output` | Yes | |
-| `-f, --overwrite, --force` | Yes | `--force` is an alias — not documented |
-| `--disclosure` | Yes | Enum values documented but no ordinal |
-| `--filter` | Yes | Format shown in example only |
-| `--list-generators` | Yes | |
-| `-h, --help` | Yes | |
-| `-v, --version` | Yes | |
+| Flag documented            | Implemented | Notes                                  |
+| -------------------------- | ----------- | -------------------------------------- |
+| `-b, --base-dir`           | Yes         |                                        |
+| `-i, --input`              | Yes         |                                        |
+| `-g, --generators`         | Yes         |                                        |
+| `-o, --output`             | Yes         |                                        |
+| `-f, --overwrite, --force` | Yes         | `--force` is an alias — not documented |
+| `--disclosure`             | Yes         | Enum values documented but no ordinal  |
+| `--filter`                 | Yes         | Format shown in example only           |
+| `--list-generators`        | Yes         |                                        |
+| `-h, --help`               | Yes         |                                        |
+| `-v, --version`            | Yes         |                                        |
 
 No phantom references. No flags present in help but absent from implementation, or vice versa. **Clean.**
 
 ### Runtime-bridge dist-check error message
 
 `runtime-bridge.js:14-16`:
+
 ```
 Missing runtime artifact: ${relativePath}. Run "pnpm --filter @libar-dev/architect-cli build" first.
 ```
+
 This message is correct, actionable, and citable. It is the family's only pre-flight dist-existence diagnostic. The message is not tested — if the string changes, nothing breaks until a developer hits the real missing-dist scenario.
 
 ---
@@ -286,6 +291,7 @@ This message is correct, actionable, and citable. It is the family's only pre-fl
 ## 8. `runtime-bridge.js` Coverage
 
 `runtime-bridge.js` provides two behaviors:
+
 1. **Happy path:** `resolveBuiltEntrypoint` + `runArchitectCliEntrypoint` chain that loads `dist/cli/*.js` via dynamic import.
 2. **Error path:** `fs.existsSync(distPath) === false` throws an `Error` with the helpful build instruction.
 
@@ -333,10 +339,10 @@ This message is correct, actionable, and citable. It is the family's only pre-fl
 
 ## 10. Corrections to Phase 1 Findings
 
-| Phase 1 finding | Status | Correction |
-|---|---|---|
-| H-CLI-7 (4 guard bin shims bypass `runtime-bridge.js`) | **Closed** | All 6 bins now route through `runtime-bridge.js`. Verified at `bin/architect-guard.js`, `bin/architect-validate.js`, `bin/architect-lint-steps.js`, `bin/architect-lint-patterns.js`. |
-| L-CLI-6 (`tests/features/.DS_Store` present) | **Closed** | `.DS_Store` absent from `tests/features/` as of review date. |
+| Phase 1 finding                                             | Status              | Correction                                                                                                                                                                                                                                                                                                                              |
+| ----------------------------------------------------------- | ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| H-CLI-7 (4 guard bin shims bypass `runtime-bridge.js`)      | **Closed**          | All 6 bins now route through `runtime-bridge.js`. Verified at `bin/architect-guard.js`, `bin/architect-validate.js`, `bin/architect-lint-steps.js`, `bin/architect-lint-patterns.js`.                                                                                                                                                   |
+| L-CLI-6 (`tests/features/.DS_Store` present)                | **Closed**          | `.DS_Store` absent from `tests/features/` as of review date.                                                                                                                                                                                                                                                                            |
 | H-CLI-T-2 ("three of four feature files have `@skip` tags") | **Corrected count** | Exactly 4 scenarios across 2 feature files are `@skip` (2 in `cli-flag-parsing.feature`, 2 in `cli-output-formatting.feature`). `cli-command-resolution.feature` and `cli-invocation-dir.feature` have zero skipped scenarios. The count of skipped scenarios (4) is correct; the "three of four files" characterization was imprecise. |
 
 ---

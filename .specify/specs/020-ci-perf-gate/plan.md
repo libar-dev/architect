@@ -63,7 +63,7 @@ After this plan lands:
    - §"Engineering doctrine" — link to `.github/workflows/ci.yml`.
    - §"Perf regression gate" — link to the perf job in `ci.yml` and to the baseline policy doc.
    - §"Operational notes" — if non-GitHub CI also runs, document its location.
-   Update repo-root `README.md` with a CI badge.
+     Update repo-root `README.md` with a CI badge.
 
 8. **Coordinate with plan 017 and plan 019.** Plan 017 needs `release.yml` to cut `2.0.0-pre.1`; plan 019 needs it to publish `@libar-dev/architect-spec@1.0.0`. This plan ships `release.yml` first.
 

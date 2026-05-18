@@ -105,7 +105,7 @@ console.log(renderCompactText(bundle));
 
 ---
 
-### 2.2 Architecture Invariants — "project* functions"
+### 2.2 Architecture Invariants — "project\* functions"
 
 **Location:** `README.md:68–77`
 
@@ -178,7 +178,7 @@ verification. Each rule's `[scope:rule-id]` tag format is documented. The TRUSTE
 One minor gap: the table references "repo-root `eslint.config.mjs`" but does not
 link to it or provide a path. Consumers grepping a lint error with a `[trust-boundary:*]`
 tag have no direct link to navigate to the rule definition. A parenthetical
-`(root `eslint.config.mjs`, lines covering `src/renderers/**/*.ts`)` would close
+`(root `eslint.config.mjs`, lines covering `src/renderers/\*_/_.ts`)` would close
 this navigation gap without requiring a full path reference.
 
 ---
@@ -272,36 +272,36 @@ running `pnpm test` will pass even when the perf baseline is exceeded.
 
 ### 3.1 Summary Statistics
 
-| Layer | Files | Annotated | Rate | Notes |
-|-------|-------|-----------|------|-------|
-| `fragments/` | 49 | 36 | 73% | All named fragment schemas annotated; supporting.ts files, base.ts, open-question-list.ts, pattern-bundle-entry.ts miss annotation |
-| `projections/` | 57 | 32 | 56% | All `.ts` public files annotated; all `.internal.ts` and index barrels unannotated by convention |
-| `renderers/` | 8 | 5 | 63% | `markdown-paths.ts`, `types.ts`, `index.ts` unannotated |
-| `blocks/` | 1 | 0 | 0% | `blocks/schema.ts` — major public surface, no annotation |
-| `disclosure/` | 3 | 0 | 0% | Three disclosure files, zero annotations |
-| `routing/` | 2 | 0 | 0% | `route-id.ts` and barrel unannotated |
-| `context/` | 1 | 0 | 0% | `projection-context.ts` — load-bearing public type, unannotated |
-| `_internal/` | 2 | 0 | 0% | By convention (private); expected |
-| `shared/` | 1 | 0 | 0% | `plain-object.ts` unannotated |
-| **Total** | **145** | **87** | **60%** | vs core's 28/106 = 26% |
+| Layer          | Files   | Annotated | Rate    | Notes                                                                                                                              |
+| -------------- | ------- | --------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `fragments/`   | 49      | 36        | 73%     | All named fragment schemas annotated; supporting.ts files, base.ts, open-question-list.ts, pattern-bundle-entry.ts miss annotation |
+| `projections/` | 57      | 32        | 56%     | All `.ts` public files annotated; all `.internal.ts` and index barrels unannotated by convention                                   |
+| `renderers/`   | 8       | 5         | 63%     | `markdown-paths.ts`, `types.ts`, `index.ts` unannotated                                                                            |
+| `blocks/`      | 1       | 0         | 0%      | `blocks/schema.ts` — major public surface, no annotation                                                                           |
+| `disclosure/`  | 3       | 0         | 0%      | Three disclosure files, zero annotations                                                                                           |
+| `routing/`     | 2       | 0         | 0%      | `route-id.ts` and barrel unannotated                                                                                               |
+| `context/`     | 1       | 0         | 0%      | `projection-context.ts` — load-bearing public type, unannotated                                                                    |
+| `_internal/`   | 2       | 0         | 0%      | By convention (private); expected                                                                                                  |
+| `shared/`      | 1       | 0         | 0%      | `plain-object.ts` unannotated                                                                                                      |
+| **Total**      | **145** | **87**    | **60%** | vs core's 28/106 = 26%                                                                                                             |
 
 ### 3.2 Public Surfaces Missing Annotation
 
 The following non-internal, non-barrel files with public exports lack `@architect-pattern`:
 
-| File | Public Exports | Priority |
-|------|---------------|----------|
-| `src/blocks/schema.ts` | All block types (HeadingBlock, ParagraphBlock, CodeBlock, etc.) — the entire Block discriminated union | High |
-| `src/context/projection-context.ts` | `ProjectionContext`, `PerspectiveHint`, `TagExampleOverride` | High |
-| `src/projections/errors.ts` | `ProjectionError`, `ProjectionErrorCode` | High (cited as L-PROJ-A-5) |
-| `src/projections/_shared/filter.ts` | `filterPattern`, `filterPatterns`, `ProjectionFilterSchema` | High |
-| `src/routing/route-id.ts` | `LogicalRouteId`, `createIndexRouteId`, `createEntityRouteId`, `parseLogicalRouteId` | High |
-| `src/disclosure/spec.ts` | `DisclosureLevel`, `DisclosureSpec` | Medium |
-| `src/disclosure/levels.ts` | Level constants | Medium |
-| `src/fragments/base.ts` | `ProjectionBundle<T>`, `BundleRouting`, `isBundle`, `projectSingle` | Medium |
-| `src/fragments/pattern-relations/open-question-list.ts` | `OpenQuestionList` | Medium |
-| `src/fragments/pattern-relations/pattern-bundle-entry.ts` | `PatternBundleEntry` | Medium |
-| `src/projections/documentation-composition/documentation-type-registry.ts` | Registry facade (deletion candidate per H-PROJ-A-9) | Low (slated for deletion) |
+| File                                                                       | Public Exports                                                                                         | Priority                   |
+| -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ | -------------------------- |
+| `src/blocks/schema.ts`                                                     | All block types (HeadingBlock, ParagraphBlock, CodeBlock, etc.) — the entire Block discriminated union | High                       |
+| `src/context/projection-context.ts`                                        | `ProjectionContext`, `PerspectiveHint`, `TagExampleOverride`                                           | High                       |
+| `src/projections/errors.ts`                                                | `ProjectionError`, `ProjectionErrorCode`                                                               | High (cited as L-PROJ-A-5) |
+| `src/projections/_shared/filter.ts`                                        | `filterPattern`, `filterPatterns`, `ProjectionFilterSchema`                                            | High                       |
+| `src/routing/route-id.ts`                                                  | `LogicalRouteId`, `createIndexRouteId`, `createEntityRouteId`, `parseLogicalRouteId`                   | High                       |
+| `src/disclosure/spec.ts`                                                   | `DisclosureLevel`, `DisclosureSpec`                                                                    | Medium                     |
+| `src/disclosure/levels.ts`                                                 | Level constants                                                                                        | Medium                     |
+| `src/fragments/base.ts`                                                    | `ProjectionBundle<T>`, `BundleRouting`, `isBundle`, `projectSingle`                                    | Medium                     |
+| `src/fragments/pattern-relations/open-question-list.ts`                    | `OpenQuestionList`                                                                                     | Medium                     |
+| `src/fragments/pattern-relations/pattern-bundle-entry.ts`                  | `PatternBundleEntry`                                                                                   | Medium                     |
+| `src/projections/documentation-composition/documentation-type-registry.ts` | Registry facade (deletion candidate per H-PROJ-A-9)                                                    | Low (slated for deletion)  |
 
 ### 3.3 The `parseAndProject*` / `project*` Function-Level JSDoc
 
@@ -416,7 +416,7 @@ code comments, not doc-visible) to learn subpath preferences.
 
 #### DOC-PROJ-M-2. README architecture invariant overstates `project*` read scope
 
-`README.md:68`: "project* functions must only read `ProjectionContext.graph`" — but
+`README.md:68`: "project\* functions must only read `ProjectionContext.graph`" — but
 `ProjectionContext.packageResolver`, `projectMetadata`, `perspective`, and
 `tagExampleOverrides` are also read by projections at runtime.
 
@@ -528,11 +528,11 @@ implemented and can be run locally; CI wiring is tracked separately."
 
 ## 5. ADR Linkage Table
 
-| ADR | Governed Concepts | Referenced in README | Referenced in MIGRATION.md | Linked to `architect/decisions/`? |
-|-----|------------------|--------------------|---------------------------|-----------------------------------|
-| ADR-005 Codec/Renderer Separation | Renderer codec-agnosticism; MARKDOWN_NORMALIZERS | Line 89 (inline in lint table only) | No direct reference | No |
-| ADR-006 Single Read Model | `project*` reads from graph only; ADR-006 lint rules | Line 70 (inline) | Lines 157–170 (ADR-006 leaks section) | No |
-| ADR-009 Projection Trust Boundary | `parseAndProject*` parse-once rule; markdown escaping; `TRUSTED_MARKDOWN` | Line 89 (inline in lint table) | No direct reference | No |
+| ADR                               | Governed Concepts                                                         | Referenced in README                | Referenced in MIGRATION.md            | Linked to `architect/decisions/`? |
+| --------------------------------- | ------------------------------------------------------------------------- | ----------------------------------- | ------------------------------------- | --------------------------------- |
+| ADR-005 Codec/Renderer Separation | Renderer codec-agnosticism; MARKDOWN_NORMALIZERS                          | Line 89 (inline in lint table only) | No direct reference                   | No                                |
+| ADR-006 Single Read Model         | `project*` reads from graph only; ADR-006 lint rules                      | Line 70 (inline)                    | Lines 157–170 (ADR-006 leaks section) | No                                |
+| ADR-009 Projection Trust Boundary | `parseAndProject*` parse-once rule; markdown escaping; `TRUSTED_MARKDOWN` | Line 89 (inline in lint table)      | No direct reference                   | No                                |
 
 **Overall:** All three ADRs are referenced by number in the README and MIGRATION.md,
 but never as clickable links and never with a navigation pointer to `architect/decisions/`.
@@ -559,11 +559,11 @@ These invariants are codified in three ADRs in `architect/decisions/`:
 87 of 145 source files carry `@architect-pattern` (60%). 58 files are unannotated.
 Breaking this down:
 
-| Category | Count | Expected annotation? |
-|----------|-------|---------------------|
-| `.internal.ts` files (implementation private) | ~27 | No — convention |
-| `index.ts` barrel files | ~12 | Some — subdomain barrels carry `@architect-bounded-context` |
-| Non-internal, non-barrel unannotated | 23 | **Yes** — these are the gaps |
+| Category                                      | Count | Expected annotation?                                        |
+| --------------------------------------------- | ----- | ----------------------------------------------------------- |
+| `.internal.ts` files (implementation private) | ~27   | No — convention                                             |
+| `index.ts` barrel files                       | ~12   | Some — subdomain barrels carry `@architect-bounded-context` |
+| Non-internal, non-barrel unannotated          | 23    | **Yes** — these are the gaps                                |
 
 ### 6.2 Fragments Layer (47 claimed, 43 actual)
 
@@ -573,23 +573,23 @@ document inaccuracy, not a code defect.
 
 All 43 fragment schemas that ARE in the discriminated union are annotated except:
 
-| Fragment file | Missing annotation |
-|--------------|-------------------|
-| `fragments/base.ts` | `ProjectionBundle<T>`, `BundleRouting` — cross-cutting foundation |
-| `fragments/pattern-relations/open-question-list.ts` | `OpenQuestionList` fragment schema |
-| `fragments/pattern-relations/pattern-bundle-entry.ts` | `PatternBundleEntry` |
+| Fragment file                                         | Missing annotation                                                |
+| ----------------------------------------------------- | ----------------------------------------------------------------- |
+| `fragments/base.ts`                                   | `ProjectionBundle<T>`, `BundleRouting` — cross-cutting foundation |
+| `fragments/pattern-relations/open-question-list.ts`   | `OpenQuestionList` fragment schema                                |
+| `fragments/pattern-relations/pattern-bundle-entry.ts` | `PatternBundleEntry`                                              |
 
 The following 9 fragment files exist on disk but are NOT in `ddd-inventory.md`:
 
-| File | Reason absent from inventory |
-|------|------------------------------|
+| File                         | Reason absent from inventory    |
+| ---------------------------- | ------------------------------- |
 | `business-rule-reference.ts` | Not in ddd-inventory.md catalog |
-| `open-question-list.ts` | Not in ddd-inventory.md catalog |
-| `dependency-edge-set.ts` | Not in ddd-inventory.md catalog |
+| `open-question-list.ts`      | Not in ddd-inventory.md catalog |
+| `dependency-edge-set.ts`     | Not in ddd-inventory.md catalog |
 | `architecture-comparison.ts` | Not in ddd-inventory.md catalog |
-| `architecture-context.ts` | Not in ddd-inventory.md catalog |
-| `orphan-pattern-list.ts` | Not in ddd-inventory.md catalog |
-| `pattern-bundle-entry.ts` | Not in ddd-inventory.md catalog |
+| `architecture-context.ts`    | Not in ddd-inventory.md catalog |
+| `orphan-pattern-list.ts`     | Not in ddd-inventory.md catalog |
+| `pattern-bundle-entry.ts`    | Not in ddd-inventory.md catalog |
 | `role-profile-collection.ts` | Not in ddd-inventory.md catalog |
 | `source-inventory-digest.ts` | Not in ddd-inventory.md catalog |
 
@@ -610,6 +610,7 @@ level.
 ### 6.4 Renderers Layer
 
 Four of five renderer files are annotated:
+
 - `render-markdown.ts` — `@architect-pattern MarkdownRenderer` ✓
 - `render-json.ts` — `@architect-pattern JsonRenderer` ✓
 - `render-compact-text.ts` — `@architect-pattern CompactTextRenderer` ✓
@@ -698,17 +699,17 @@ The inventory covers 41 fragment file entries (including `supporting.ts` files a
 files. The missing 9 are all real, annotated fragments that appear in
 `fragment-schema.internal.ts`:
 
-| Missing from inventory | Subdomain | Classification |
-|-----------------------|-----------|---------------|
-| `business-rule-reference.ts` (BusinessRuleReference) | governance | Primitive |
-| `open-question-list.ts` (OpenQuestionList) | pattern-relations | Primitive |
-| `dependency-edge-set.ts` (DependencyEdgeSet) | pattern-relations | Composite |
-| `architecture-comparison.ts` (ArchitectureComparison) | pattern-relations | Composite |
-| `architecture-context.ts` (BoundedContext) | pattern-relations | Primitive |
-| `orphan-pattern-list.ts` (OrphanPatternList) | pattern-relations | Primitive |
-| `pattern-bundle-entry.ts` (PatternBundleEntry) | pattern-relations | Primitive |
-| `role-profile-collection.ts` (RoleProfileCollection) | operational-insights | Composite |
-| `source-inventory-digest.ts` (SourceInventoryDigest) | operational-insights | Composite |
+| Missing from inventory                                | Subdomain            | Classification |
+| ----------------------------------------------------- | -------------------- | -------------- |
+| `business-rule-reference.ts` (BusinessRuleReference)  | governance           | Primitive      |
+| `open-question-list.ts` (OpenQuestionList)            | pattern-relations    | Primitive      |
+| `dependency-edge-set.ts` (DependencyEdgeSet)          | pattern-relations    | Composite      |
+| `architecture-comparison.ts` (ArchitectureComparison) | pattern-relations    | Composite      |
+| `architecture-context.ts` (BoundedContext)            | pattern-relations    | Primitive      |
+| `orphan-pattern-list.ts` (OrphanPatternList)          | pattern-relations    | Primitive      |
+| `pattern-bundle-entry.ts` (PatternBundleEntry)        | pattern-relations    | Primitive      |
+| `role-profile-collection.ts` (RoleProfileCollection)  | operational-insights | Composite      |
+| `source-inventory-digest.ts` (SourceInventoryDigest)  | operational-insights | Composite      |
 
 The "47 kinds" count in the review scope document is also inaccurate: the
 discriminated union at `fragment-schema.internal.ts:70–114` has exactly 43 members.
@@ -728,7 +729,8 @@ This is good housekeeping.
 `PERF.md:3`: "The projection package has a CI gate for the BusinessRuleSet hot path"
 
 `PERF.md:12–16`: "Run the gate locally from the monorepo root:
-```bash
+
+````bash
 pnpm --filter @libar-dev/architect-projection exec vitest --config vitest.perf-report.config.mjs run
 node packages/architect-projection/tests/perf/compare-baseline.mjs
 ```"
@@ -803,3 +805,4 @@ wired, run both commands above after any projection-layer change on the hot path
 
 - **No core DOC-H-3 boilerplate recurrence** — the `jsdoc-boilerplate-audit.mjs`
   audit is working exactly as designed.
+````

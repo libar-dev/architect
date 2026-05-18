@@ -30,6 +30,7 @@
 **Critical: `prepack` at JSON root in core (CL-CORE-1).**
 
 `packages/architect-core/package.json:66`
+
 ```json
   "prepack": "pnpm build"
 }
@@ -46,6 +47,7 @@
 ### 1.2 `publishConfig` audit
 
 `packages/architect-core/package.json:16-19`
+
 ```json
   "publishConfig": {
     "access": "public",
@@ -59,6 +61,7 @@
 - `provenance: true` — correct and required for npm provenance attestation **if the publish workflow issues attestations**. ⚠️ **No such workflow exists yet** (see §3 CI Workflow).
 
 **Missing fields:**
+
 - No `registry` override (will publish to the npm public registry — correct).
 - No `tag` field (defaults to `latest` — correct for a release, but pre-1.0 `2.0.0-pre.1` would benefit from `"tag": "next"` if the intention is to keep `latest` on v1.x for backward compatibility). Verify with the team.
 
@@ -69,6 +72,7 @@
 ### 1.3 `files` allowlist
 
 `packages/architect-core/package.json:60-62`
+
 ```json
   "files": [
     "dist"
@@ -86,6 +90,7 @@ The allowlist only includes `dist/`. Cross-check: the `exports` map declares `.`
 ### 1.4 `exports` map correctness
 
 `packages/architect-core/package.json:25-39`
+
 ```json
   "exports": {
     ".": {
@@ -120,6 +125,7 @@ The allowlist only includes `dist/`. Cross-check: the `exports` map declares `.`
 ### 1.5 Tarball size & source map impact (CL-CORE-3)
 
 **Package size measurements (npm pack --dry-run):**
+
 - **Total files:** 426
 - **Source map files (`.map`):** 212 (49.8% of file count)
 - **Packed size:** 195.8 KB
@@ -128,6 +134,7 @@ The allowlist only includes `dist/`. Cross-check: the `exports` map declares `.`
 **Largest single artifact:** `dist/validation-schemas/pattern-graph.d.ts` — **509 KB** (from 179 lines of source).
 
 **Issue:** The tarball includes **212 `.js.map` and `.d.ts.map` files**. Maps are intended for consumer debugging; shipping 50% of the file manifest as maps increases:
+
 - Install time and disk footprint.
 - Dependency cache bloat (CI and developer machines).
 - Bandwidth cost.
@@ -138,6 +145,7 @@ The allowlist only includes `dist/`. Cross-check: the `exports` map declares `.`
 **Phase 2 finding (CL-CORE-3):** Disabling both for publish cuts the tarball **roughly in half** without losing consumer debugging (VS Code / Node.js / browser dev tools can still resolve TypeScript from `node_modules/@libar-dev/architect-core/src/` if the source is made available via a different channel).
 
 **Recipe:** Set `sourceMap: false, declarationMap: false` in `tsconfig.architect-base.json` (the family-wide base config). This is a one-line change per flag:
+
 ```json
   "compilerOptions": {
     "noPropertyAccessFromIndexSignature": true,
@@ -153,6 +161,7 @@ The allowlist only includes `dist/`. Cross-check: the `exports` map declares `.`
 ### 1.6 `engines` field
 
 `packages/architect-core/package.json:63-65`
+
 ```json
   "engines": {
     "node": ">=20.0.0"
@@ -176,6 +185,7 @@ The allowlist only includes `dist/`. Cross-check: the `exports` map declares `.`
 **Status: Declared but not implemented.**
 
 `publishConfig.provenance: true` signals the intent to issue npm provenance attestations. This requires:
+
 1. **GitHub Actions workflow** that runs `npm publish --provenance` inside a GitHub-hosted runner.
 2. **npm CLI ≥9.5** (already satisfied; `package.json` does not pin npm, relying on workspace pnpm).
 3. **OIDC trust relationship** between npm registry and the GitHub repo (requires npm account configuration).
@@ -191,6 +201,7 @@ The allowlist only includes `dist/`. Cross-check: the `exports` map declares `.`
 ### 2.1 `tsc -b` (project references)
 
 **Core `tsconfig.json`:**
+
 ```json
 {
   "extends": "../../tsconfig.architect-base.json",
@@ -221,6 +232,7 @@ The allowlist only includes `dist/`. Cross-check: the `exports` map declares `.`
 ### 2.2 Incremental build correctness
 
 **Build artifacts from `tsc -b`:**
+
 - `dist/` — 426 files (includes `.js`, `.d.ts`, and `.map` files).
 - `architect-core.tsbuildinfo` — incremental build state.
 
@@ -237,6 +249,7 @@ The allowlist only includes `dist/`. Cross-check: the `exports` map declares `.`
 **Estimated duration:** ~2–3 seconds for a clean build (TypeScript compiler on a modern machine, 106 files in core, ~12,000 SLOC). Incremental builds are sub-second for small changes. ✓
 
 **Parallelism in CI:** No CI exists. Once added, consider:
+
 - Parallel package builds via `pnpm -r --filter …` (limited by dependency graph).
 - Caching `node_modules` and `.tsbuildinfo` to skip re-compilation for unchanged packages.
 
@@ -247,6 +260,7 @@ The allowlist only includes `dist/`. Cross-check: the `exports` map declares `.`
 **Finding:** **No `.github/workflows/` directory exists.** The family has no GitHub Actions, Azure Pipelines, or any automated CI/CD.
 
 **Current publish workflow:** Manual.
+
 1. Developer runs `pnpm build`, `pnpm test`, `pnpm lint` locally.
 2. Developer runs `changeset add` to create a changeset entry.
 3. On release day, developer runs `changeset version` (bumps version, updates `CHANGELOG.md`).
@@ -254,6 +268,7 @@ The allowlist only includes `dist/`. Cross-check: the `exports` map declares `.`
 5. Commits and tags are pushed to GitHub.
 
 **Risks with manual gate:**
+
 - Quality gates are honored by developer discipline, not automation. Easy to skip tests.
 - No Node version matrix; can't discover incompatibilities with Node 20 vs 22.
 - No security scanning (no `npm audit`, no SAST, no dependency vulnerability checks).
@@ -283,15 +298,16 @@ The allowlist only includes `dist/`. Cross-check: the `exports` map declares `.`
 
 ## 4. Lifecycle Hooks Audit
 
-| Hook | Location | Command | Status | Risk |
-|------|----------|---------|--------|------|
-| `prepack` | Core: line 66 (JSON root) | `pnpm build` | ❌ **Broken — at JSON root, not in scripts** | **Critical:** silently ignored; ships stale `dist/`. |
-| `prepack` | Siblings (cli, guard, mcp, projection) | `pnpm clean && pnpm build` | ✓ | — |
-| `prepare` | (not used) | — | ✓ | — |
-| `postinstall` | (not used) | — | ✓ | — |
-| `prepublishOnly` | (not used) | — | ✓ | — |
+| Hook             | Location                               | Command                    | Status                                       | Risk                                                 |
+| ---------------- | -------------------------------------- | -------------------------- | -------------------------------------------- | ---------------------------------------------------- |
+| `prepack`        | Core: line 66 (JSON root)              | `pnpm build`               | ❌ **Broken — at JSON root, not in scripts** | **Critical:** silently ignored; ships stale `dist/`. |
+| `prepack`        | Siblings (cli, guard, mcp, projection) | `pnpm clean && pnpm build` | ✓                                            | —                                                    |
+| `prepare`        | (not used)                             | —                          | ✓                                            | —                                                    |
+| `postinstall`    | (not used)                             | —                          | ✓                                            | —                                                    |
+| `prepublishOnly` | (not used)                             | —                          | ✓                                            | —                                                    |
 
 **Other lifecycle observations:**
+
 - No `prepare` scripts (would run on `npm install` and `npm ci`). Not needed for this family.
 - `prepack` is the only pack-time hook used.
 - No publish-time hooks beyond `prepack`. ✓
@@ -306,13 +322,13 @@ The allowlist only includes `dist/`. Cross-check: the `exports` map declares `.`
 
 ### 5.1 `prepack` inconsistency (CL-CORE-1)
 
-| Package | Location | Command |
-|---------|----------|---------|
-| `architect-core` | JSON root (broken) | `pnpm build` |
-| `architect-cli` | `scripts` ✓ | `pnpm clean && pnpm build` |
-| `architect-guard` | `scripts` ✓ | `pnpm clean && pnpm build` |
-| `architect-mcp` | `scripts` ✓ | `pnpm clean && pnpm build` |
-| `architect-projection` | `scripts` ✓ | `pnpm clean && pnpm build` |
+| Package                | Location           | Command                    |
+| ---------------------- | ------------------ | -------------------------- |
+| `architect-core`       | JSON root (broken) | `pnpm build`               |
+| `architect-cli`        | `scripts` ✓        | `pnpm clean && pnpm build` |
+| `architect-guard`      | `scripts` ✓        | `pnpm clean && pnpm build` |
+| `architect-mcp`        | `scripts` ✓        | `pnpm clean && pnpm build` |
+| `architect-projection` | `scripts` ✓        | `pnpm clean && pnpm build` |
 
 **Action:** Align core to siblings (move into `scripts`, add `clean`).
 
@@ -320,12 +336,12 @@ The allowlist only includes `dist/`. Cross-check: the `exports` map declares `.`
 
 ### 5.2 `lint` script glob (CL-CORE-10, Phase 2 finding)
 
-| Package | Glob |
-|---------|------|
-| `architect-core` | `eslint src` |
-| `architect-cli` | `eslint src tests` ✓ |
-| `architect-guard` | `eslint src tests` ✓ |
-| `architect-mcp` | `eslint src tests` ✓ |
+| Package                | Glob                 |
+| ---------------------- | -------------------- |
+| `architect-core`       | `eslint src`         |
+| `architect-cli`        | `eslint src tests` ✓ |
+| `architect-guard`      | `eslint src tests` ✓ |
+| `architect-mcp`        | `eslint src tests` ✓ |
 | `architect-projection` | `eslint src tests` ✓ |
 
 **Issue in core:** `tests/` contains 51 step files and is excluded from linting. Soft-suppression debt in test files goes undetected.
@@ -336,13 +352,13 @@ The allowlist only includes `dist/`. Cross-check: the `exports` map declares `.`
 
 ### 5.3 `typecheck` scope (CL-CORE-11, Phase 2 finding)
 
-| Package | Command |
-|---------|---------|
-| `architect-core` | `tsc --noEmit -p tsconfig.test.json` |
-| `architect-cli` | `tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.test.json` ✓ |
-| `architect-guard` | `tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.test.json` ✓ |
-| `architect-mcp` | `tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.test.json` ✓ |
-| `architect-projection` | `tsc --noEmit -p tsconfig.test.json` |
+| Package                | Command                                                                 |
+| ---------------------- | ----------------------------------------------------------------------- |
+| `architect-core`       | `tsc --noEmit -p tsconfig.test.json`                                    |
+| `architect-cli`        | `tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.test.json` ✓ |
+| `architect-guard`      | `tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.test.json` ✓ |
+| `architect-mcp`        | `tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.test.json` ✓ |
+| `architect-projection` | `tsc --noEmit -p tsconfig.test.json`                                    |
 
 **Issue in core:** Only `tsconfig.test.json` is checked, skipping the main `tsconfig.json` configuration. Breaks in main source go undetected.
 
@@ -352,13 +368,13 @@ The allowlist only includes `dist/`. Cross-check: the `exports` map declares `.`
 
 ### 5.4 `test` script typechecking guard (CI-1, Phase 3 finding)
 
-| Package | Command |
-|---------|---------|
-| `architect-core` | `vitest run` |
-| `architect-cli` | `pnpm build && vitest run --config vitest.config.ts` |
-| `architect-guard` | `pnpm typecheck && vitest run --config vitest.config.ts` ✓ |
-| `architect-mcp` | `vitest run` |
-| `architect-projection` | `vitest run` |
+| Package                | Command                                                    |
+| ---------------------- | ---------------------------------------------------------- |
+| `architect-core`       | `vitest run`                                               |
+| `architect-cli`        | `pnpm build && vitest run --config vitest.config.ts`       |
+| `architect-guard`      | `pnpm typecheck && vitest run --config vitest.config.ts` ✓ |
+| `architect-mcp`        | `vitest run`                                               |
+| `architect-projection` | `vitest run`                                               |
 
 **Issue:** Core, mcp, projection skip typecheck before tests. Guards/cli enforce it.
 
@@ -368,10 +384,10 @@ The allowlist only includes `dist/`. Cross-check: the `exports` map declares `.`
 
 ### 5.5 `module` field redundancy (CL-CORE-14, Phase 2 finding)
 
-| Package | Has `module` field? |
-|---------|-------------------|
-| `architect-core` | ✗ (removed) |
-| All others | ✗ (removed in W1.5) |
+| Package          | Has `module` field? |
+| ---------------- | ------------------- |
+| `architect-core` | ✗ (removed)         |
+| All others       | ✗ (removed in W1.5) |
 
 **Assessment:** This was already fixed across the family. ✓
 
@@ -379,13 +395,13 @@ The allowlist only includes `dist/`. Cross-check: the `exports` map declares `.`
 
 ### 5.6 `eslint` as explicit devDep (Phase 2 finding, not yet actioned)
 
-| Package | Has `eslint` in `devDependencies`? |
-|---------|-----------------------------------|
-| `architect-core` | ✗ (relies on root hoist) |
-| `architect-cli` | ✓ |
-| `architect-guard` | ✓ |
-| `architect-mcp` | ✓ |
-| `architect-projection` | ✓ |
+| Package                | Has `eslint` in `devDependencies`? |
+| ---------------------- | ---------------------------------- |
+| `architect-core`       | ✗ (relies on root hoist)           |
+| `architect-cli`        | ✓                                  |
+| `architect-guard`      | ✓                                  |
+| `architect-mcp`        | ✓                                  |
+| `architect-projection` | ✓                                  |
 
 **Issue:** Core relies on pnpm hoisting `eslint` from the root workspace `devDependencies`. Siblings explicitly declare it.
 
@@ -395,13 +411,13 @@ The allowlist only includes `dist/`. Cross-check: the `exports` map declares `.`
 
 ### 5.7 `vitest` include pattern (TC-L-1, Phase 3 finding)
 
-| Package | Pattern |
-|---------|---------|
-| `architect-core` | `tests/steps/**/*.steps.ts` |
+| Package                | Pattern                          |
+| ---------------------- | -------------------------------- |
+| `architect-core`       | `tests/steps/**/*.steps.ts`      |
 | `architect-projection` | `tests/features/**/*.feature.ts` |
-| `architect-guard` | (not specified) |
-| `architect-cli` | (not specified) |
-| `architect-mcp` | (not specified) |
+| `architect-guard`      | (not specified)                  |
+| `architect-cli`        | (not specified)                  |
+| `architect-mcp`        | (not specified)                  |
 
 **Issue:** Drift in naming — core uses `steps`, projection uses `features`. Minor; both work. For consistency, pick one family convention and document it.
 
@@ -430,6 +446,7 @@ The `architect-mcp` package runs a file-watcher loop and reacts to changes by re
 **Risk for MCP:** In a CLI process, the heap is freed on exit. In the MCP server, the process runs indefinitely; the Map grows with every unique package resolved and is never cleared. Over hours/days, this is a slow leak.
 
 **Mitigation recipe from Phase 2:**
+
 1. Add `clear(): void` method to the resolver interface.
 2. Have the MCP file-watcher call it on workspace-change events.
 3. Or: Swap for a bounded LRU cache (1,000-entry covers realistic graphs).
@@ -453,6 +470,7 @@ The `architect-mcp` package runs a file-watcher loop and reacts to changes by re
 ### 6.2 `sideEffects: false` correctness
 
 `packages/architect-core/package.json:21`
+
 ```json
   "sideEffects": false,
 ```
@@ -505,12 +523,14 @@ Phase 1 M-CORE-12 and Phase 2 CL-CORE-13 flagged `console.warn` calls in `dual-s
 **Current state:** No `pnpm` config enforces version matching.
 
 **Recommendation:** Add to workspace `pnpmfile.cjs` or `package.json`:
+
 ```json
   "pnpm": {
     "overrides": {},
     "strictPeerDependencies": false
   }
 ```
+
 And consider setting `engine-strict=true` in CI workflows to fail if a dependency declares a Node requirement incompatible with the matrix.
 
 ---
@@ -541,42 +561,42 @@ And consider setting `engine-strict=true` in CI workflows to fail if a dependenc
 
 ### Critical (P0 — fix immediately)
 
-| ID | Title | Action | File:Line | Impact |
-|----|-------|--------|-----------|--------|
-| **CL-CORE-1** | `prepack` at JSON root — blocks publish | Move into `scripts`; align to siblings. | `package.json:66` | **Publish risk.** Stale dist shipped if manual `pnpm build` is forgotten. |
-| **CL-CORE-2** | Broken `./roles` export | Delete export block (zero callers); keep roles in root export. | `package.json:34-37` | **Install time.** Any consumer importing `@libar-dev/architect-core/roles` gets 404. |
+| ID            | Title                                   | Action                                                         | File:Line            | Impact                                                                               |
+| ------------- | --------------------------------------- | -------------------------------------------------------------- | -------------------- | ------------------------------------------------------------------------------------ |
+| **CL-CORE-1** | `prepack` at JSON root — blocks publish | Move into `scripts`; align to siblings.                        | `package.json:66`    | **Publish risk.** Stale dist shipped if manual `pnpm build` is forgotten.            |
+| **CL-CORE-2** | Broken `./roles` export                 | Delete export block (zero callers); keep roles in root export. | `package.json:34-37` | **Install time.** Any consumer importing `@libar-dev/architect-core/roles` gets 404. |
 
 ---
 
 ### High (P1 — fix before next release)
 
-| ID | Title | Action | File:Line | Impact |
-|----|-------|--------|-----------|--------|
-| **CL-CORE-3** | Tarball is 50% `.map` files; `pattern-graph.d.ts` is 509 KB | Disable `sourceMap`/`declarationMap` in `tsconfig.architect-base.json`. | `tsconfig.base.json:13-15` | **Install footprint.** Halves tarball size; cumulative across all consumers. |
-| **CL-CORE-8** | Unbounded Map cache in package-resolver (MCP leak vector) | Add `clear()` method; call on file-watcher changes or swap for bounded LRU. | `src/package/package-resolver.ts:34-49` | **MCP server stability.** Memory leak in long-running process. |
-| **CL-CORE-11** | `typecheck` only covers `tsconfig.test.json`, skips main config | Align: `tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.test.json`. | `package.json:42` | **Undetected TS errors in src/.** Breaks go unnoticed until test execution. |
-| **CL-CORE-10** | `lint` glob excludes `tests/` (51 step files); family inconsistency | Change to `"lint": "eslint src tests"`. | `package.json:43` | **Test debt undetected.** Soft suppressions and dead imports in tests go uncaught. |
-| **CL-CORE-4** | Module-load side effect in `self-hosting.ts` (MCP load-time cost) | Delete file (addressed by Phase 1 H-CORE-10). | `src/config/self-hosting.ts:93` | **MCP server startup cost.** Workspace config parsed on every transitive import. |
+| ID             | Title                                                               | Action                                                                        | File:Line                               | Impact                                                                             |
+| -------------- | ------------------------------------------------------------------- | ----------------------------------------------------------------------------- | --------------------------------------- | ---------------------------------------------------------------------------------- |
+| **CL-CORE-3**  | Tarball is 50% `.map` files; `pattern-graph.d.ts` is 509 KB         | Disable `sourceMap`/`declarationMap` in `tsconfig.architect-base.json`.       | `tsconfig.base.json:13-15`              | **Install footprint.** Halves tarball size; cumulative across all consumers.       |
+| **CL-CORE-8**  | Unbounded Map cache in package-resolver (MCP leak vector)           | Add `clear()` method; call on file-watcher changes or swap for bounded LRU.   | `src/package/package-resolver.ts:34-49` | **MCP server stability.** Memory leak in long-running process.                     |
+| **CL-CORE-11** | `typecheck` only covers `tsconfig.test.json`, skips main config     | Align: `tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.test.json`. | `package.json:42`                       | **Undetected TS errors in src/.** Breaks go unnoticed until test execution.        |
+| **CL-CORE-10** | `lint` glob excludes `tests/` (51 step files); family inconsistency | Change to `"lint": "eslint src tests"`.                                       | `package.json:43`                       | **Test debt undetected.** Soft suppressions and dead imports in tests go uncaught. |
+| **CL-CORE-4**  | Module-load side effect in `self-hosting.ts` (MCP load-time cost)   | Delete file (addressed by Phase 1 H-CORE-10).                                 | `src/config/self-hosting.ts:93`         | **MCP server startup cost.** Workspace config parsed on every transitive import.   |
 
 ---
 
 ### Medium (P2 — plan for next sprint)
 
-| ID | Title | Action | Impact |
-|----|-------|--------|--------|
-| **CI-1** | No CI/CD pipeline (manual publish gate) | Add `.github/workflows/ci.yml` (lint, typecheck, test on PR/push) and `.github/workflows/publish.yml` (provenance-enabled publish). | **Quality assurance.** Manual gates are honored by discipline, not automation. Provenance cannot be issued without automated workflow. |
-| **CI-2** | No Node version matrix (only 22 tested locally) | CI matrix should include `[20, 22]` to catch incompatibilities early. | **Compatibility.** `engines` declares `>=20`, but pre-release on Node 22 can break node-20 users. |
-| **CL-CORE-14** | Family-wide script and config drift | Audit and normalize: `test` typecheck guard, `typecheck` scope, vitest include pattern, eslint as explicit devDep. | **Maintainability.** Four years from now, new team members need fewer "but why is core different?" questions. |
-| **CL-CORE-6** | Third `void X` soft-suppression (added in Phase 2) | Delete after Phase 2 CL-CORE-6 lands. | **Doctrine compliance.** No-BC forbids suppressions. |
+| ID             | Title                                              | Action                                                                                                                              | Impact                                                                                                                                 |
+| -------------- | -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| **CI-1**       | No CI/CD pipeline (manual publish gate)            | Add `.github/workflows/ci.yml` (lint, typecheck, test on PR/push) and `.github/workflows/publish.yml` (provenance-enabled publish). | **Quality assurance.** Manual gates are honored by discipline, not automation. Provenance cannot be issued without automated workflow. |
+| **CI-2**       | No Node version matrix (only 22 tested locally)    | CI matrix should include `[20, 22]` to catch incompatibilities early.                                                               | **Compatibility.** `engines` declares `>=20`, but pre-release on Node 22 can break node-20 users.                                      |
+| **CL-CORE-14** | Family-wide script and config drift                | Audit and normalize: `test` typecheck guard, `typecheck` scope, vitest include pattern, eslint as explicit devDep.                  | **Maintainability.** Four years from now, new team members need fewer "but why is core different?" questions.                          |
+| **CL-CORE-6**  | Third `void X` soft-suppression (added in Phase 2) | Delete after Phase 2 CL-CORE-6 lands.                                                                                               | **Doctrine compliance.** No-BC forbids suppressions.                                                                                   |
 
 ---
 
 ### Low (P3 — backlog)
 
-| ID | Title | Action | Impact |
-|----|-------|--------|--------|
-| **CL-CORE-9** | README points to nonexistent trust-boundary primitives; missing entry points | Rewrite (addresses Phase 2 CL-CORE-7, Phase 3 TD-CORE-2). | **Consumer onboarding.** README is the first artifact a new user reads; currently broken. |
-| **DOC-L-3** | `.changeset/config.json` ignores `architect-self-host-example` (removed package) | Delete stale ignore entry. | **Config hygiene.** Cosmetic but worth cleaning up. |
+| ID            | Title                                                                            | Action                                                    | Impact                                                                                    |
+| ------------- | -------------------------------------------------------------------------------- | --------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| **CL-CORE-9** | README points to nonexistent trust-boundary primitives; missing entry points     | Rewrite (addresses Phase 2 CL-CORE-7, Phase 3 TD-CORE-2). | **Consumer onboarding.** README is the first artifact a new user reads; currently broken. |
+| **DOC-L-3**   | `.changeset/config.json` ignores `architect-self-host-example` (removed package) | Delete stale ignore entry.                                | **Config hygiene.** Cosmetic but worth cleaning up.                                       |
 
 ---
 
@@ -592,7 +612,7 @@ pnpm:
   overrides: {}
 
 catalog:
-  "@changesets/cli": "^0.28.2"
+  '@changesets/cli': '^0.28.2'
   # ... shared dev deps
 ```
 

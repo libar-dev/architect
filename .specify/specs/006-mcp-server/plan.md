@@ -12,7 +12,7 @@ Resolve the two MCP-tool-count documentation-drift items (tech-debt #2 + #12) by
 - `CLAUDE.md` (symlink to `AGENTS.md`) §"Package family" correctly cites 21 tools — no edit needed on this file for this plan.
 - The MCP server (`packages/architect-mcp/src/cli/mcp-server.ts`) registers exactly the registry's tool set; transport is stdio-only, no network surface.
 - `--watch` mode debounces filesystem changes at 500 ms and rebuilds the in-memory `PatternGraph`; `architect_rebuild` is exposed as a manual trigger.
-- `docs/MCP-SETUP.md` wiring section (the `mcpServers` config snippet) is correct — the *wiring* docs work; only the *tool list* enumeration is stale.
+- `docs/MCP-SETUP.md` wiring section (the `mcpServers` config snippet) is correct — the _wiring_ docs work; only the _tool list_ enumeration is stale.
 
 ### What is drifted (the gap closed by this plan)
 

@@ -28,26 +28,26 @@ Four Critical findings:
 
 ### Critical (P0)
 
-| ID | Title | Location |
-|----|-------|----------|
+| ID      | Title                                                                         | Location                                     |
+| ------- | ----------------------------------------------------------------------------- | -------------------------------------------- |
 | C-MCP-1 | `runtime-bridge.js:6` Windows-breaking bug; duplicate of cli's runtime-bridge | `packages/architect-mcp/runtime-bridge.js:6` |
-| C-MCP-2 | `package.json:4` claims "18 tools"; 21 actually registered | `packages/architect-mcp/package.json:4` |
-| C-MCP-3 | No package README | `packages/architect-mcp/README.md` (absent) |
-| C-MCP-4 | `process.chdir()` in `withWorkingDirectory` not signal-safe | `src/pipeline-session.ts:259-271` |
+| C-MCP-2 | `package.json:4` claims "18 tools"; 21 actually registered                    | `packages/architect-mcp/package.json:4`      |
+| C-MCP-3 | No package README                                                             | `packages/architect-mcp/README.md` (absent)  |
+| C-MCP-4 | `process.chdir()` in `withWorkingDirectory` not signal-safe                   | `src/pipeline-session.ts:259-271`            |
 
 ### High (P1)
 
-| ID | Title | Location |
-|----|-------|----------|
-| H-MCP-1 | `getProjectionContext()` rebuilt 19× per MCP tool call — amplifies core H-CORE-8 cost. **Recipe:** cache context on `PipelineSession`. | `src/tool-registry.ts` (handler dispatch) |
-| H-MCP-2 | Tool registry uniformity — 21 tool definitions hand-typed (no schema-derived registry) | `src/tool-registry.ts` |
-| H-MCP-3 | `Reflect.set(globalThis.console, 'log', ...)` monkey-patch — band-aid for upstream doctrine breach. **Family `no-console-log` ESLint rule fixes root cause.** | `src/server.ts:203-205` |
-| H-MCP-4 | `pipeline-session.ts` graceful-shutdown gap | `src/pipeline-session.ts` |
-| H-MCP-5 | `chokidar` config lacks `awaitWriteFinish` — bursty atomic-write IDEs trigger one wasted rebuild cycle per save | `src/file-watcher.ts` |
-| H-MCP-6 | `architect_open_questions` MCP tool exposes raw `ZodError` (C-PROJ-2 downstream) | `src/tool-registry.ts` (via projection's outlier) |
-| H-MCP-7 | `server.close()` aborts in-flight tool calls mid-projection | `src/server.ts` shutdown handler |
-| H-MCP-8 | Shutdown handler does not await in-flight tool calls | `src/server.ts:H-MCP-8` |
-| **CL-MCP-1** (family-wide) | `tsconfig.architect-base.json` sourceMap/declarationMap disable — same CL-CORE-3 | family-wide |
+| ID                         | Title                                                                                                                                                         | Location                                          |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| H-MCP-1                    | `getProjectionContext()` rebuilt 19× per MCP tool call — amplifies core H-CORE-8 cost. **Recipe:** cache context on `PipelineSession`.                        | `src/tool-registry.ts` (handler dispatch)         |
+| H-MCP-2                    | Tool registry uniformity — 21 tool definitions hand-typed (no schema-derived registry)                                                                        | `src/tool-registry.ts`                            |
+| H-MCP-3                    | `Reflect.set(globalThis.console, 'log', ...)` monkey-patch — band-aid for upstream doctrine breach. **Family `no-console-log` ESLint rule fixes root cause.** | `src/server.ts:203-205`                           |
+| H-MCP-4                    | `pipeline-session.ts` graceful-shutdown gap                                                                                                                   | `src/pipeline-session.ts`                         |
+| H-MCP-5                    | `chokidar` config lacks `awaitWriteFinish` — bursty atomic-write IDEs trigger one wasted rebuild cycle per save                                               | `src/file-watcher.ts`                             |
+| H-MCP-6                    | `architect_open_questions` MCP tool exposes raw `ZodError` (C-PROJ-2 downstream)                                                                              | `src/tool-registry.ts` (via projection's outlier) |
+| H-MCP-7                    | `server.close()` aborts in-flight tool calls mid-projection                                                                                                   | `src/server.ts` shutdown handler                  |
+| H-MCP-8                    | Shutdown handler does not await in-flight tool calls                                                                                                          | `src/server.ts:H-MCP-8`                           |
+| **CL-MCP-1** (family-wide) | `tsconfig.architect-base.json` sourceMap/declarationMap disable — same CL-CORE-3                                                                              | family-wide                                       |
 
 ### Medium (P2)
 
@@ -68,48 +68,48 @@ Four Critical findings:
 
 ## Operational risk surface (MCP-specific)
 
-| Concern | Status |
-|---------|--------|
-| **CL-CORE-4 (self-hosting IIFE)** | **Confirmed materializes** — every mcp boot pays the cost. Resolved when core H-CORE-10 lands. |
-| **CL-CORE-8 (package-resolver Map cache)** | **Re-framed** — bounded by source-file count; reset on rebuild. Less severe than family report implied. Down-rank to memory-utilization observation. |
-| **H-CORE-8 (27× `structuredClone`)** | **Confirmed + amplified** — 19× per non-cached MCP tool call. Cache projection context on session (H-MCP-1) for additional 19× reduction beyond core's `deepFreeze` fix. |
-| **C-PROJ-2 (raw `ZodError` outlier)** | **Confirmed user-visible** — `architect_open_questions` returns inconsistent error shape to MCP clients. |
-| `process.chdir` signal-safety | **Defect** — C-MCP-4. SIGINT during await leaves cwd corrupted. |
-| Chokidar `awaitWriteFinish` | **Missing** — H-MCP-5. Bursty atomic-write IDEs trigger wasted rebuilds. |
-| `server.close()` in-flight handling | **Defect** — H-MCP-7/H-MCP-8. Aborts mid-projection. |
-| Single-flight rebuild coalescing | **Healthy** — file-watcher coalesces correctly. |
-| Error isolation | **Healthy** — per-tool errors don't poison the server. |
-| stdio correctness | **Healthy** — MCP SDK contract respected. |
+| Concern                                    | Status                                                                                                                                                                   |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **CL-CORE-4 (self-hosting IIFE)**          | **Confirmed materializes** — every mcp boot pays the cost. Resolved when core H-CORE-10 lands.                                                                           |
+| **CL-CORE-8 (package-resolver Map cache)** | **Re-framed** — bounded by source-file count; reset on rebuild. Less severe than family report implied. Down-rank to memory-utilization observation.                     |
+| **H-CORE-8 (27× `structuredClone`)**       | **Confirmed + amplified** — 19× per non-cached MCP tool call. Cache projection context on session (H-MCP-1) for additional 19× reduction beyond core's `deepFreeze` fix. |
+| **C-PROJ-2 (raw `ZodError` outlier)**      | **Confirmed user-visible** — `architect_open_questions` returns inconsistent error shape to MCP clients.                                                                 |
+| `process.chdir` signal-safety              | **Defect** — C-MCP-4. SIGINT during await leaves cwd corrupted.                                                                                                          |
+| Chokidar `awaitWriteFinish`                | **Missing** — H-MCP-5. Bursty atomic-write IDEs trigger wasted rebuilds.                                                                                                 |
+| `server.close()` in-flight handling        | **Defect** — H-MCP-7/H-MCP-8. Aborts mid-projection.                                                                                                                     |
+| Single-flight rebuild coalescing           | **Healthy** — file-watcher coalesces correctly.                                                                                                                          |
+| Error isolation                            | **Healthy** — per-tool errors don't poison the server.                                                                                                                   |
+| stdio correctness                          | **Healthy** — MCP SDK contract respected.                                                                                                                                |
 
 ## Zod 4 + TS strictness audit (compact)
 
-| Concern | Status |
-|---------|--------|
-| `z.object` count | **0** |
-| `z.strictObject` count | All schemas |
-| `.extend()/.omit()/.pick()/.partial()/.required()` chains | **0** |
-| `z.function()` | **0** |
-| `.brand<>()` declarations | **0** (family-wide gap) |
-| `parseAtBoundary` adoption | **1 universal site** at MCP request boundary — correct |
-| `any` / `as unknown as` / `@ts-ignore` | **0** |
-| Unprefixed legacy `node:` imports | Confirm — sweep if any |
-| `void main()` sites | **1** at `src/cli/mcp-server.ts` (family hazard) |
-| `Set.has` narrowing exposure | TBC — likely 0 |
+| Concern                                                   | Status                                                 |
+| --------------------------------------------------------- | ------------------------------------------------------ |
+| `z.object` count                                          | **0**                                                  |
+| `z.strictObject` count                                    | All schemas                                            |
+| `.extend()/.omit()/.pick()/.partial()/.required()` chains | **0**                                                  |
+| `z.function()`                                            | **0**                                                  |
+| `.brand<>()` declarations                                 | **0** (family-wide gap)                                |
+| `parseAtBoundary` adoption                                | **1 universal site** at MCP request boundary — correct |
+| `any` / `as unknown as` / `@ts-ignore`                    | **0**                                                  |
+| Unprefixed legacy `node:` imports                         | Confirm — sweep if any                                 |
+| `void main()` sites                                       | **1** at `src/cli/mcp-server.ts` (family hazard)       |
+| `Set.has` narrowing exposure                              | TBC — likely 0                                         |
 
 ## Configuration audit vs family
 
-| Setting | MCP | Verdict |
-|---------|-----|---------|
-| `prepack` placement | scripts ✓ | Aligned. |
-| `prepack` command | `pnpm clean && pnpm build` (from earlier audit) | Aligned. |
-| `lint` glob | `eslint src tests` | Aligned. |
-| `typecheck` scope | only `tsconfig.test.json` | **Drift — same as core/projection (CL-CORE-11)**. |
-| `test` chain | `pnpm typecheck && vitest run --config vitest.config.ts` | Aligned with discipline. |
-| `eslint` in devDeps | Explicit (from package.json) | Aligned. |
-| `package.json#exports` | `.` + `./bin/architect-mcp` + `./package.json` | Subpaths correct. |
-| `runtime-bridge.js` | Duplicate of cli's | C-MCP-1; promote to workspace template. |
-| Custom audit scripts | **None** (projection has 2; guard has 1) | Family promotion opportunity. |
-| Pack-smoke test | **None** | Family promotion opportunity (guard's `pack-smoke.mjs` + cli's `run-cli.ts`). |
+| Setting                | MCP                                                      | Verdict                                                                       |
+| ---------------------- | -------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| `prepack` placement    | scripts ✓                                                | Aligned.                                                                      |
+| `prepack` command      | `pnpm clean && pnpm build` (from earlier audit)          | Aligned.                                                                      |
+| `lint` glob            | `eslint src tests`                                       | Aligned.                                                                      |
+| `typecheck` scope      | only `tsconfig.test.json`                                | **Drift — same as core/projection (CL-CORE-11)**.                             |
+| `test` chain           | `pnpm typecheck && vitest run --config vitest.config.ts` | Aligned with discipline.                                                      |
+| `eslint` in devDeps    | Explicit (from package.json)                             | Aligned.                                                                      |
+| `package.json#exports` | `.` + `./bin/architect-mcp` + `./package.json`           | Subpaths correct.                                                             |
+| `runtime-bridge.js`    | Duplicate of cli's                                       | C-MCP-1; promote to workspace template.                                       |
+| Custom audit scripts   | **None** (projection has 2; guard has 1)                 | Family promotion opportunity.                                                 |
+| Pack-smoke test        | **None**                                                 | Family promotion opportunity (guard's `pack-smoke.mjs` + cli's `run-cli.ts`). |
 
 ## What's healthy (preserve)
 

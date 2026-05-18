@@ -27,6 +27,7 @@ Cross-package implications: **`validateCompletionMetadata` deletion in core will
 `decider.ts:300` consumes core's lying `validateTransition`. `detect-changes.ts:414, 440, 452` adds three more `as ProcessStatusValue` casts on raw regex captures from git diff text. Zero FSM-transition tests in guard. The result: garbage status values flow from git diff → cast at detect-changes → consumed by decider → reach core's `validateTransition` → return `{ valid: false, from: garbage as ProcessStatusValue }` → `getValidTransitionsFrom(garbage as ProcessStatusValue)` returns `undefined` → `.join(', ')` throws `TypeError`.
 
 **Recipe (closes core C-CORE-5 + this finding in one move):**
+
 - Core exports `isValidProcessStatus(value: unknown): value is ProcessStatusValue` type-guard.
 - Guard's `detect-changes.ts` uses `parseAtBoundary(StatusValueSchema, captured)` at all three sites; the casts disappear.
 - `decider.ts` uses the discriminated `TransitionValidationResult` (already core's C-CORE-5 recipe); narrowing works correctly.
@@ -54,22 +55,22 @@ CLI argv, git diff text, `dangling-baseline.json`. Same architectural defect as 
 
 ### Architecture (14 — from 1B) + 9 from 1A
 
-| # | Title | Location |
-|---|-------|----------|
-| H-GUARD-1 | `src/index.ts` 12 `export *` wildcards — public contract is unidentifiable | `src/index.ts` |
-| H-GUARD-2 | `validate-patterns.ts` 935 LOC mixing 8 concerns | `src/lint/validate-patterns.ts` |
-| H-GUARD-3 | `git/` module annotated `@architect-bounded-context:generator` but lives in guard; **actually consumed by core** | `src/git/` directory |
-| H-GUARD-4 | Two different config-loading APIs (`loadConfig` and `loadProjectConfig`) consumed by sibling CLIs — drift bait | `src/cli/`, `src/validation/` |
-| H-GUARD-5 | `getDeliverableWorkflowPatterns` belongs in core's `PatternGraphAPI`, not guard's validation | `src/validation/...` |
-| H-GUARD-6 | `dangling-baseline.ts` dual-write logic can silently corrupt consumer `node_modules` | `src/lint/dangling-baseline.ts` |
-| H-GUARD-7 | `process-guard-rules.feature:43-48` defers FSM-validity testing to a nonexistent feature suite | `tests/features/process-guard-rules.feature` |
-| H-GUARD-8 | Phantom PDR-005 reference throughout source | multiple files in `src/lint/process-guard/` |
-| H-GUARD-9 | `validateCompletionMetadata` core CL-CORE-5 deletion creates DoD gap; guard has no equivalent | (guard absence; flag for sweep) |
-| H-GUARD-10 | `package.json#exports` declares only `.` and `./package.json` — no curated subpaths for the 6 bins | `package.json` |
-| H-GUARD-11 | `tier-a-baseline.ts` family-wide structural lock — projection can't land splitting refactors without coordinating with guard | cross-package |
-| H-GUARD-12 | Dual `console.*` paths + raw `Error` throws vs typed | multiple files |
-| H-GUARD-13 | `dangling-baseline.json` build-time copy fragile | `scripts/copy-dangling-baseline.mjs` |
-| H-GUARD-14 | `lint/` has no shared error/diagnostic type across the three sub-modules | `src/lint/*/` |
+| #          | Title                                                                                                                        | Location                                     |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| H-GUARD-1  | `src/index.ts` 12 `export *` wildcards — public contract is unidentifiable                                                   | `src/index.ts`                               |
+| H-GUARD-2  | `validate-patterns.ts` 935 LOC mixing 8 concerns                                                                             | `src/lint/validate-patterns.ts`              |
+| H-GUARD-3  | `git/` module annotated `@architect-bounded-context:generator` but lives in guard; **actually consumed by core**             | `src/git/` directory                         |
+| H-GUARD-4  | Two different config-loading APIs (`loadConfig` and `loadProjectConfig`) consumed by sibling CLIs — drift bait               | `src/cli/`, `src/validation/`                |
+| H-GUARD-5  | `getDeliverableWorkflowPatterns` belongs in core's `PatternGraphAPI`, not guard's validation                                 | `src/validation/...`                         |
+| H-GUARD-6  | `dangling-baseline.ts` dual-write logic can silently corrupt consumer `node_modules`                                         | `src/lint/dangling-baseline.ts`              |
+| H-GUARD-7  | `process-guard-rules.feature:43-48` defers FSM-validity testing to a nonexistent feature suite                               | `tests/features/process-guard-rules.feature` |
+| H-GUARD-8  | Phantom PDR-005 reference throughout source                                                                                  | multiple files in `src/lint/process-guard/`  |
+| H-GUARD-9  | `validateCompletionMetadata` core CL-CORE-5 deletion creates DoD gap; guard has no equivalent                                | (guard absence; flag for sweep)              |
+| H-GUARD-10 | `package.json#exports` declares only `.` and `./package.json` — no curated subpaths for the 6 bins                           | `package.json`                               |
+| H-GUARD-11 | `tier-a-baseline.ts` family-wide structural lock — projection can't land splitting refactors without coordinating with guard | cross-package                                |
+| H-GUARD-12 | Dual `console.*` paths + raw `Error` throws vs typed                                                                         | multiple files                               |
+| H-GUARD-13 | `dangling-baseline.json` build-time copy fragile                                                                             | `scripts/copy-dangling-baseline.mjs`         |
+| H-GUARD-14 | `lint/` has no shared error/diagnostic type across the three sub-modules                                                     | `src/lint/*/`                                |
 
 (9 additional 1A High items overlap heavily with the above — covered in raw.)
 
@@ -92,11 +93,11 @@ Phase 1 found ~23 medium items across 1A and 1B. Key themes:
 
 ## ADR Conformance
 
-| ADR | Status | Notes |
-|-----|--------|-------|
-| ADR-009 Projection Trust Boundary | **Violated by omission** | `parseAtBoundary` not used at any of 3 trust boundaries. |
-| Phantom "PDR-005 FSM" | **Does not exist** | Cited in guard source but no file in `architect/decisions/`. Either create the PDR or remove the references. |
-| PDR-001 Session Workflow Commands | **N/A** | Governs `scope-validate`/`handoff` in `architect-cli`, not guard. |
+| ADR                               | Status                   | Notes                                                                                                        |
+| --------------------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------ |
+| ADR-009 Projection Trust Boundary | **Violated by omission** | `parseAtBoundary` not used at any of 3 trust boundaries.                                                     |
+| Phantom "PDR-005 FSM"             | **Does not exist**       | Cited in guard source but no file in `architect/decisions/`. Either create the PDR or remove the references. |
+| PDR-001 Session Workflow Commands | **N/A**                  | Governs `scope-validate`/`handoff` in `architect-cli`, not guard.                                            |
 
 ## What's healthy (preserve)
 
@@ -126,6 +127,7 @@ Phase 1 found ~23 medium items across 1A and 1B. Key themes:
 ## Critical context for Phase 2
 
 The Phase 2 simplification + cleanup agents should focus on:
+
 - The `tier-a-baseline.ts` deletion → JSON+override refactor (single highest-leverage recipe).
 - The `process-guard/types.ts` Zod-first sweep (14 interfaces → schemas + `z.infer`).
 - The `git/` module re-homing decision.

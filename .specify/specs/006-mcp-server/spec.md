@@ -1,6 +1,7 @@
 # Feature: MCP Server
 
 ## Status
+
 ⚠️ PARTIAL — Server ships 21 tools at the registry; **documentation drift** in two places lists 18 (Tech-debt #2, #12). Code is correct; docs need patching.
 
 ## Overview
@@ -30,7 +31,7 @@ The `--watch` mode subscribes to filesystem changes with a 500 ms debounce and r
 - [x] `--watch` debounces filesystem changes at 500 ms.
 - [x] `architect_rebuild` triggers a manual rebuild without `--watch`.
 - [x] Server transport is **stdio** only — no network exposure.
-- [x] Server instructions string (`tool-metadata.ts:85-86`) advises: *"Use architect_overview first. Then use architect_scope_validate and architect_context for focused delivery work."*
+- [x] Server instructions string (`tool-metadata.ts:85-86`) advises: _"Use architect_overview first. Then use architect_scope_validate and architect_context for focused delivery work."_
 - [x] Every MCP tool has a CLI parity verb (with two registry-only utilities: `architect_coverage`, `architect_config`).
 - [ ] **Drift fix**: meta-package `description` in `packages/architect/package.json` updated to "21 tools" (Tech-debt #2).
 - [ ] **Drift fix**: `docs/MCP-SETUP.md:88-106` enumerates all 21 tools (Tech-debt #12).
@@ -46,15 +47,17 @@ The `--watch` mode subscribes to filesystem changes with a 500 ms debounce and r
 ## Implementation Status
 
 **Completed:**
+
 - ✅ MCP server entry: `packages/architect-mcp/src/cli/mcp-server.ts`.
 - ✅ 21 tools registered in `ARCHITECT_MCP_TOOLS` (`tool-metadata.ts:1-71`).
 - ✅ `z.strictObject(...).readonly()` discipline on every input schema.
 - ✅ `--watch` mode with 500 ms debounce.
 - ✅ `architect_rebuild` manual refresh tool.
 - ✅ Server-instructions string in `tool-metadata.ts:85-86`.
-- ✅ Wiring snippet documented in `docs/MCP-SETUP.md` (the *wiring* section is correct; only the tool *list* is stale).
+- ✅ Wiring snippet documented in `docs/MCP-SETUP.md` (the _wiring_ section is correct; only the tool _list_ is stale).
 
 **Missing / Drift:**
+
 - ⚠️ Tech-debt #2 — `packages/architect/package.json` meta description says "18 tools"; should say 21.
 - ⚠️ Tech-debt #12 — `docs/MCP-SETUP.md:88-106` lists 18 tools; should enumerate all 21 and match the registry.
 - Both fixes are scheduled for the Phase A doc-patch PR (≈1–2 hours combined; see `technical-debt-analysis.md` §"Suggested Migration Phases").

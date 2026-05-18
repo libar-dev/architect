@@ -103,4 +103,4 @@ If you are integrating `@libar-dev/architect-*` into your own project and readin
 
 ---
 
-> *This document is a placeholder shape that the StackShift template expects. The underlying truth — that the architect platform has no visual surface — is captured here so future automation does not re-attempt extraction. If a UI is ever added (e.g., a web dashboard for the PatternGraph), this document should be rewritten from scratch.*
+> _This document is a placeholder shape that the StackShift template expects. The underlying truth — that the architect platform has no visual surface — is captured here so future automation does not re-attempt extraction. If a UI is ever added (e.g., a web dashboard for the PatternGraph), this document should be rewritten from scratch._

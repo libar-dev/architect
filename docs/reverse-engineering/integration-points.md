@@ -11,16 +11,16 @@ Single source of truth for the **consumption surfaces** of `@libar-dev/architect
 
 The package family has **no runtime external service dependencies.** No HTTP clients, no SDKs for third-party APIs, no payment processors, no email providers, no analytics. Build-time and registry-time dependencies only:
 
-| Surface                       | Service                  | Purpose                                                                                                            |
-| ----------------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------ |
-| Distribution                  | **npm registry**         | All six publishable packages are published via `@changesets/cli` to `npmjs.com` (`.changeset/config.json: access: public`). |
-| MCP transport                 | **stdio** (local process) | The MCP server runs as a child process of the agent (Claude Code, etc.). No network. No remote endpoint.          |
-| Spec parsing (architect state) | `@cucumber/gherkin`      | Parses `architect/specs/`, `architect/decisions/`, `formal-spec/` at doc-gen + PatternGraph build time.            |
-| Spec parsing (executable)     | `@amiceli/vitest-cucumber` | Parses `tests/features/`, `packages/*/tests/features/` at test time via vitest.                                  |
-| Schema validation             | `zod` `^4.1.11`          | Cross-package contracts; every CLI/MCP input is a `z.strictObject`.                                                |
-| MCP SDK                       | `@modelcontextprotocol/sdk` | MCP server framework. Used by `@libar-dev/architect-mcp` only.                                                  |
-| Test runner                   | `vitest` `^4.1.4`        | All test execution (executable Gherkin runs via `@amiceli/vitest-cucumber` plugin).                                |
-| Release tooling               | `@changesets/cli` `^2.27.0` | Versioning and publishing (`fixed` group across the 6 publishable packages).                                    |
+| Surface                        | Service                     | Purpose                                                                                                                     |
+| ------------------------------ | --------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Distribution                   | **npm registry**            | All six publishable packages are published via `@changesets/cli` to `npmjs.com` (`.changeset/config.json: access: public`). |
+| MCP transport                  | **stdio** (local process)   | The MCP server runs as a child process of the agent (Claude Code, etc.). No network. No remote endpoint.                    |
+| Spec parsing (architect state) | `@cucumber/gherkin`         | Parses `architect/specs/`, `architect/decisions/`, `formal-spec/` at doc-gen + PatternGraph build time.                     |
+| Spec parsing (executable)      | `@amiceli/vitest-cucumber`  | Parses `tests/features/`, `packages/*/tests/features/` at test time via vitest.                                             |
+| Schema validation              | `zod` `^4.1.11`             | Cross-package contracts; every CLI/MCP input is a `z.strictObject`.                                                         |
+| MCP SDK                        | `@modelcontextprotocol/sdk` | MCP server framework. Used by `@libar-dev/architect-mcp` only.                                                              |
+| Test runner                    | `vitest` `^4.1.4`           | All test execution (executable Gherkin runs via `@amiceli/vitest-cucumber` plugin).                                         |
+| Release tooling                | `@changesets/cli` `^2.27.0` | Versioning and publishing (`fixed` group across the 6 publishable packages).                                                |
 
 There is no rate-limit / quota story to document; nothing the platform calls has one.
 
@@ -71,15 +71,15 @@ Pinned to commit `b875ff1`. Source of truth: `packages/architect-cli/src/cli/pat
 
 ### Bin → JS module map
 
-| Bin                       | Entry file                                                                            | Purpose                                                            |
-| ------------------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
-| `architect`               | `packages/architect-cli/src/cli/pattern-graph-cli.ts:1`                               | Main query / context / lifecycle dispatcher. 24 subcommands below. |
-| `architect-generate`      | `packages/architect-cli/src/cli/generate-docs.ts`                                     | Run doc generators (`pnpm docs:all`).                              |
+| Bin                       | Entry file                                                                             | Purpose                                                            |
+| ------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| `architect`               | `packages/architect-cli/src/cli/pattern-graph-cli.ts:1`                                | Main query / context / lifecycle dispatcher. 24 subcommands below. |
+| `architect-generate`      | `packages/architect-cli/src/cli/generate-docs.ts`                                      | Run doc generators (`pnpm docs:all`).                              |
 | `architect-guard`         | `packages/architect-guard/src/cli/lint-process.ts:391` (via `architect-cli` re-export) | Pre-commit / CI process-guard FSM enforcement.                     |
-| `architect-lint-patterns` | `packages/architect-cli/src/cli/lint-patterns.ts`                                     | Lint `@architect-*` JSDoc annotations on `.ts`.                    |
-| `architect-lint-steps`    | `packages/architect-cli/src/cli/lint-steps.ts`                                        | Lint Gherkin step definitions.                                     |
-| `architect-validate`      | `packages/architect-cli/src/cli/validate-patterns.ts`                                 | DoD + anti-pattern detection against the PatternGraph.             |
-| `architect-mcp`           | `packages/architect-mcp/src/cli/mcp-server.ts`                                        | MCP server (stdio).                                                |
+| `architect-lint-patterns` | `packages/architect-cli/src/cli/lint-patterns.ts`                                      | Lint `@architect-*` JSDoc annotations on `.ts`.                    |
+| `architect-lint-steps`    | `packages/architect-cli/src/cli/lint-steps.ts`                                         | Lint Gherkin step definitions.                                     |
+| `architect-validate`      | `packages/architect-cli/src/cli/validate-patterns.ts`                                  | DoD + anti-pattern detection against the PatternGraph.             |
+| `architect-mcp`           | `packages/architect-mcp/src/cli/mcp-server.ts`                                         | MCP server (stdio).                                                |
 
 ### `architect` global flags
 
@@ -89,32 +89,32 @@ Pinned to commit `b875ff1`. Source of truth: `packages/architect-cli/src/cli/pat
 
 ### `architect` subcommands → projection mapping
 
-| Subcommand        | Signature                                                                                                        | Underlying projection                          |
-| ----------------- | ---------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
-| `overview`        | `overview`                                                                                                       | `projectOverviewDigest(ctx)`                   |
-| `status`          | `status`                                                                                                         | `projectStatusDistribution(ctx)`               |
-| `context`         | `context <pattern> [--session planning\|design\|implement]`                                                      | `projectSessionContextBundle(ctx, …)`          |
-| `dep-tree`        | `dep-tree <pattern> [--depth <n>]`                                                                               | `projectDependencyTree(ctx, …)`                |
-| `files`           | `files <pattern> [--related]`                                                                                    | `projectFileReadingList(ctx, …)`               |
-| `scope-validate`  | `scope-validate <pattern> <design\|implement> [--type …] [--strict]`                                             | `projectScopeReadinessReport(projection, …)`   |
-| `handoff`         | `handoff --pattern <p> [--session planning\|design\|implement\|review] [--modified-file <path>]…`                | `requireProjectedHandoff(ctx, …)`              |
-| `query`           | `query <method> [args...]`                                                                                       | Whitelisted `PatternGraphAPI` method invocation |
-| `pattern`         | `pattern <name>`                                                                                                 | `projectPatternDetail(ctx, name)`              |
-| `documentation`   | `documentation <document-type> [--disclosure <level>] [--filter <status=csv>]…`                                  | `projectDocumentationBundle(ctx, …)`           |
-| `bundle`          | `bundle <pattern> [--mode plan\|design\|implement\|review] [--include rules,scenarios,deps,open-questions,docstring] [--estimate-tokens]` | `projectPatternBundle(projection, …)` |
-| `list`            | `list [--status <v>] [--role <tag>] [--parent <P>] [--count] [--names-only]`                                     | `projectPatternCatalog(projection, …)`         |
-| `open-questions`  | `open-questions [--parent <P>] [--format compact\|json]`                                                         | `projectOpenQuestionList(ctx, …)`              |
-| `search`          | `search <query>`                                                                                                 | Fuzzy match over `projectPatternCatalog().root.names` |
-| `arch`            | `arch roles\|bounded-context [name]\|neighborhood <p>\|compare <a> <b>\|coverage\|dangling [--baseline <p>] [--write-baseline] [--strict]\|orphans\|blocking` | Dispatched via `writeStructuredResponse(ctx,'arch',…)` |
-| `rules`           | `rules [--product-area <n>] [--pattern <n>] [--package <ws>] [--feature <glob>] [--only-invariants] [--count] [--names-only]` | `projectBusinessRuleSet(ctx, …)` |
-| `diagnostics`     | `diagnostics`                                                                                                    | Extraction diagnostics dump                    |
-| `tags`            | `tags`                                                                                                           | Tag catalogue                                  |
-| `taxonomy`        | `taxonomy [--count]`                                                                                             | `projectTaxonomyDigest(ctx)`                   |
-| `sources`         | `sources`                                                                                                        | Source-file inventory                          |
-| `unannotated`     | `unannotated`                                                                                                    | Patterns with missing/incomplete annotations   |
-| `repl`            | `repl`                                                                                                           | Interactive REPL (`runRepl` in `pattern-graph-cli.ts:166`) |
-| `help`            | `help`                                                                                                           | Per-command help                               |
-| `version`         | `version`                                                                                                        | Print version                                  |
+| Subcommand       | Signature                                                                                                                                                     | Underlying projection                                      |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| `overview`       | `overview`                                                                                                                                                    | `projectOverviewDigest(ctx)`                               |
+| `status`         | `status`                                                                                                                                                      | `projectStatusDistribution(ctx)`                           |
+| `context`        | `context <pattern> [--session planning\|design\|implement]`                                                                                                   | `projectSessionContextBundle(ctx, …)`                      |
+| `dep-tree`       | `dep-tree <pattern> [--depth <n>]`                                                                                                                            | `projectDependencyTree(ctx, …)`                            |
+| `files`          | `files <pattern> [--related]`                                                                                                                                 | `projectFileReadingList(ctx, …)`                           |
+| `scope-validate` | `scope-validate <pattern> <design\|implement> [--type …] [--strict]`                                                                                          | `projectScopeReadinessReport(projection, …)`               |
+| `handoff`        | `handoff --pattern <p> [--session planning\|design\|implement\|review] [--modified-file <path>]…`                                                             | `requireProjectedHandoff(ctx, …)`                          |
+| `query`          | `query <method> [args...]`                                                                                                                                    | Whitelisted `PatternGraphAPI` method invocation            |
+| `pattern`        | `pattern <name>`                                                                                                                                              | `projectPatternDetail(ctx, name)`                          |
+| `documentation`  | `documentation <document-type> [--disclosure <level>] [--filter <status=csv>]…`                                                                               | `projectDocumentationBundle(ctx, …)`                       |
+| `bundle`         | `bundle <pattern> [--mode plan\|design\|implement\|review] [--include rules,scenarios,deps,open-questions,docstring] [--estimate-tokens]`                     | `projectPatternBundle(projection, …)`                      |
+| `list`           | `list [--status <v>] [--role <tag>] [--parent <P>] [--count] [--names-only]`                                                                                  | `projectPatternCatalog(projection, …)`                     |
+| `open-questions` | `open-questions [--parent <P>] [--format compact\|json]`                                                                                                      | `projectOpenQuestionList(ctx, …)`                          |
+| `search`         | `search <query>`                                                                                                                                              | Fuzzy match over `projectPatternCatalog().root.names`      |
+| `arch`           | `arch roles\|bounded-context [name]\|neighborhood <p>\|compare <a> <b>\|coverage\|dangling [--baseline <p>] [--write-baseline] [--strict]\|orphans\|blocking` | Dispatched via `writeStructuredResponse(ctx,'arch',…)`     |
+| `rules`          | `rules [--product-area <n>] [--pattern <n>] [--package <ws>] [--feature <glob>] [--only-invariants] [--count] [--names-only]`                                 | `projectBusinessRuleSet(ctx, …)`                           |
+| `diagnostics`    | `diagnostics`                                                                                                                                                 | Extraction diagnostics dump                                |
+| `tags`           | `tags`                                                                                                                                                        | Tag catalogue                                              |
+| `taxonomy`       | `taxonomy [--count]`                                                                                                                                          | `projectTaxonomyDigest(ctx)`                               |
+| `sources`        | `sources`                                                                                                                                                     | Source-file inventory                                      |
+| `unannotated`    | `unannotated`                                                                                                                                                 | Patterns with missing/incomplete annotations               |
+| `repl`           | `repl`                                                                                                                                                        | Interactive REPL (`runRepl` in `pattern-graph-cli.ts:166`) |
+| `help`           | `help`                                                                                                                                                        | Per-command help                                           |
+| `version`        | `version`                                                                                                                                                     | Print version                                              |
 
 ### `architect-guard` flags
 
@@ -142,33 +142,33 @@ Source of truth: `ARCHITECT_MCP_TOOLS` (`packages/architect-mcp/src/tool-metadat
 
 MCP-name convention: underscores end-to-end (`architect_scope_validate`, not `architect_scope-validate`).
 
-| MCP tool                      | Input Zod keys                                                                                         | CLI verb parity                  |
-| ----------------------------- | ------------------------------------------------------------------------------------------------------ | -------------------------------- |
-| `architect_overview`          | `{}`                                                                                                   | `overview`                       |
-| `architect_coverage`          | `{}`                                                                                                   | (no CLI verb — see `unannotated`) |
-| `architect_context`           | `{ name: string, session?: 'planning'\|'design'\|'implement' }`                                        | `context`                        |
-| `architect_files`             | `{ name: string, related?: boolean }`                                                                  | `files`                          |
-| `architect_dep_tree`          | `{ name: string, maxDepth?: int 1..50 }`                                                               | `dep-tree`                       |
-| `architect_scope_validate`    | `{ name: string, session: 'design'\|'implement', strict?: boolean }`                                   | `scope-validate`                 |
-| `architect_handoff`           | `{ name: string, session?: HandoffSessionType, modifiedFiles?: string[] (max 200) }`                   | `handoff`                        |
-| `architect_status`            | `{}`                                                                                                   | `status`                         |
-| `architect_pattern`           | `{ name: string }`                                                                                     | `pattern`                        |
-| `architect_bundle`            | `{ name: string, mode?, include?, estimateTokens?: boolean }`                                          | `bundle`                         |
-| `architect_list`              | `{ status?, role?, namesOnly?, count? }`                                                               | `list`                           |
-| `architect_open_questions`    | `{ parent? }` (`OpenQuestionsFilterShape`)                                                             | `open-questions`                 |
-| `architect_search`            | `{ query: string }`                                                                                    | `search`                         |
-| `architect_rules`             | `{ pattern?, productArea?, onlyInvariants?: boolean }` — `pattern` & `productArea` mutually exclusive  | `rules`                          |
-| `architect_taxonomy`          | `{ exampleOverrides? }` (`TaxonomyDigestOptionsSchema`)                                                | `taxonomy`                       |
-| `architect_arch_neighborhood` | `{ name: string }`                                                                                     | `arch neighborhood`              |
-| `architect_arch_blocking`     | `{}`                                                                                                   | `arch blocking`                  |
-| `architect_rebuild`           | `{}`                                                                                                   | (no CLI verb — `--no-cache` flag) |
-| `architect_config`            | `{}`                                                                                                   | (no CLI verb — `dry-run` prints it) |
-| `architect_documentation`     | `{ documentType: …, disclosure?, filter?: { status?: AcceptedStatus[] } }`                             | `documentation` / `architect-generate` |
-| `architect_help`              | `{}`                                                                                                   | (lists tools)                    |
+| MCP tool                      | Input Zod keys                                                                                        | CLI verb parity                        |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| `architect_overview`          | `{}`                                                                                                  | `overview`                             |
+| `architect_coverage`          | `{}`                                                                                                  | (no CLI verb — see `unannotated`)      |
+| `architect_context`           | `{ name: string, session?: 'planning'\|'design'\|'implement' }`                                       | `context`                              |
+| `architect_files`             | `{ name: string, related?: boolean }`                                                                 | `files`                                |
+| `architect_dep_tree`          | `{ name: string, maxDepth?: int 1..50 }`                                                              | `dep-tree`                             |
+| `architect_scope_validate`    | `{ name: string, session: 'design'\|'implement', strict?: boolean }`                                  | `scope-validate`                       |
+| `architect_handoff`           | `{ name: string, session?: HandoffSessionType, modifiedFiles?: string[] (max 200) }`                  | `handoff`                              |
+| `architect_status`            | `{}`                                                                                                  | `status`                               |
+| `architect_pattern`           | `{ name: string }`                                                                                    | `pattern`                              |
+| `architect_bundle`            | `{ name: string, mode?, include?, estimateTokens?: boolean }`                                         | `bundle`                               |
+| `architect_list`              | `{ status?, role?, namesOnly?, count? }`                                                              | `list`                                 |
+| `architect_open_questions`    | `{ parent? }` (`OpenQuestionsFilterShape`)                                                            | `open-questions`                       |
+| `architect_search`            | `{ query: string }`                                                                                   | `search`                               |
+| `architect_rules`             | `{ pattern?, productArea?, onlyInvariants?: boolean }` — `pattern` & `productArea` mutually exclusive | `rules`                                |
+| `architect_taxonomy`          | `{ exampleOverrides? }` (`TaxonomyDigestOptionsSchema`)                                               | `taxonomy`                             |
+| `architect_arch_neighborhood` | `{ name: string }`                                                                                    | `arch neighborhood`                    |
+| `architect_arch_blocking`     | `{}`                                                                                                  | `arch blocking`                        |
+| `architect_rebuild`           | `{}`                                                                                                  | (no CLI verb — `--no-cache` flag)      |
+| `architect_config`            | `{}`                                                                                                  | (no CLI verb — `dry-run` prints it)    |
+| `architect_documentation`     | `{ documentType: …, disclosure?, filter?: { status?: AcceptedStatus[] } }`                            | `documentation` / `architect-generate` |
+| `architect_help`              | `{}`                                                                                                  | (lists tools)                          |
 
 Server instructions string (`tool-metadata.ts:85-86`):
 
-> *"Use architect_overview first. Then use architect_scope_validate and architect_context for focused delivery work."*
+> _"Use architect_overview first. Then use architect_scope_validate and architect_context for focused delivery work."_
 
 ### MCP client wiring
 
@@ -303,15 +303,15 @@ Not applicable. There is no user authentication, no API key, no OAuth, no permis
 
 Strictly minimal. No payment, no email, no analytics, no auth provider.
 
-| Domain                       | SDK / Library              | Pinned version | Update strategy                                                    |
-| ---------------------------- | -------------------------- | -------------- | ------------------------------------------------------------------ |
-| Validation                   | `zod`                      | `^4.1.11`      | Caret range; majors require coordinated audit of all `strictObject` boundaries. |
-| MCP server                   | `@modelcontextprotocol/sdk` | (transitive in `architect-mcp`) | Pinned by the MCP server package. |
-| Gherkin parsing (state)      | `@cucumber/gherkin`        | (transitive)   | Caret range via `architect-core`.                                  |
-| Gherkin parsing (executable) | `@amiceli/vitest-cucumber` | `^6.3.0`       | Caret range; pinned alongside vitest.                              |
-| Test runner                  | `vitest`                   | `^4.1.4`       | Caret; perf-regression gate guards drift.                          |
-| Build / TS execution         | `tsx`                      | `^4.7.0`       | Caret.                                                             |
-| Release tooling              | `@changesets/cli`          | `^2.27.0`      | Caret.                                                             |
+| Domain                       | SDK / Library               | Pinned version                  | Update strategy                                                                 |
+| ---------------------------- | --------------------------- | ------------------------------- | ------------------------------------------------------------------------------- |
+| Validation                   | `zod`                       | `^4.1.11`                       | Caret range; majors require coordinated audit of all `strictObject` boundaries. |
+| MCP server                   | `@modelcontextprotocol/sdk` | (transitive in `architect-mcp`) | Pinned by the MCP server package.                                               |
+| Gherkin parsing (state)      | `@cucumber/gherkin`         | (transitive)                    | Caret range via `architect-core`.                                               |
+| Gherkin parsing (executable) | `@amiceli/vitest-cucumber`  | `^6.3.0`                        | Caret range; pinned alongside vitest.                                           |
+| Test runner                  | `vitest`                    | `^4.1.4`                        | Caret; perf-regression gate guards drift.                                       |
+| Build / TS execution         | `tsx`                       | `^4.7.0`                        | Caret.                                                                          |
+| Release tooling              | `@changesets/cli`           | `^2.27.0`                       | Caret.                                                                          |
 
 ---
 

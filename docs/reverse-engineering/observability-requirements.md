@@ -17,42 +17,42 @@ The platform has three signal sources. They are emitted on demand, not continuou
 
 ### 1. CLI verbs that print diagnostic state
 
-| Verb                             | What it surfaces                                                                                              |
-| -------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| `architect overview`             | Progress + active phases + blocking patterns. JSON: `OverviewDigest`.                                          |
-| `architect status`               | FSM state counts (`candidate` / `roadmap` / `active` / `completed` / `deferred`). JSON: `StatusDistribution`. |
-| `architect diagnostics`          | Extraction-pipeline diagnostics dump (failed parses, unresolved references, schema-rejected nodes).            |
-| `architect arch dangling [--strict]` | Patterns referencing IDs that don't resolve. `--strict` exits non-zero on any dangling reference.         |
-| `architect arch blocking`        | Patterns currently blocking progress (their dependencies are not yet completed).                              |
-| `architect arch orphans`         | Patterns with no edges.                                                                                       |
-| `architect arch coverage`        | Annotation coverage across the source.                                                                        |
-| `architect tags`                 | Tag-registry catalogue.                                                                                       |
-| `architect sources`              | Source-file inventory (what got scanned).                                                                     |
-| `architect unannotated`          | Patterns with missing/incomplete annotations.                                                                  |
+| Verb                                 | What it surfaces                                                                                              |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
+| `architect overview`                 | Progress + active phases + blocking patterns. JSON: `OverviewDigest`.                                         |
+| `architect status`                   | FSM state counts (`candidate` / `roadmap` / `active` / `completed` / `deferred`). JSON: `StatusDistribution`. |
+| `architect diagnostics`              | Extraction-pipeline diagnostics dump (failed parses, unresolved references, schema-rejected nodes).           |
+| `architect arch dangling [--strict]` | Patterns referencing IDs that don't resolve. `--strict` exits non-zero on any dangling reference.             |
+| `architect arch blocking`            | Patterns currently blocking progress (their dependencies are not yet completed).                              |
+| `architect arch orphans`             | Patterns with no edges.                                                                                       |
+| `architect arch coverage`            | Annotation coverage across the source.                                                                        |
+| `architect tags`                     | Tag-registry catalogue.                                                                                       |
+| `architect sources`                  | Source-file inventory (what got scanned).                                                                     |
+| `architect unannotated`              | Patterns with missing/incomplete annotations.                                                                 |
 
 `architect_diagnostics`-equivalent MCP tool: there isn't a single tool; the related MCP tools are `architect_overview`, `architect_status`, `architect_arch_blocking`, `architect_coverage`.
 
 ### 2. Validation reports
 
-| Command                                                    | Output                                                                                                                                                                |
-| ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `pnpm exec architect-validate --dod --anti-patterns`       | `ValidatePatternsOutput` (`validation-schemas/output-schemas.ts:65-72`): `{ summary: { issues[], stats }, diagnostics[] }`. The all-in-one "is everything okay" check. |
-| `pnpm exec architect-lint-patterns`                        | Pattern annotation lint output (`LintOutput`).                                                                                                                        |
-| `pnpm exec architect-lint-steps`                           | Step-definition lint output (Gherkin steps in `tests/steps/`).                                                                                                        |
-| `pnpm exec architect-guard --staged \| --all`              | ProcessGuard FSM enforcement (six rules; see below).                                                                                                                  |
+| Command                                              | Output                                                                                                                                                                 |
+| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm exec architect-validate --dod --anti-patterns` | `ValidatePatternsOutput` (`validation-schemas/output-schemas.ts:65-72`): `{ summary: { issues[], stats }, diagnostics[] }`. The all-in-one "is everything okay" check. |
+| `pnpm exec architect-lint-patterns`                  | Pattern annotation lint output (`LintOutput`).                                                                                                                         |
+| `pnpm exec architect-lint-steps`                     | Step-definition lint output (Gherkin steps in `tests/steps/`).                                                                                                         |
+| `pnpm exec architect-guard --staged \| --all`        | ProcessGuard FSM enforcement (six rules; see below).                                                                                                                   |
 
 ### 3. ProcessGuard rule outputs
 
 (`packages/architect-guard/src/lint/process-guard/types.ts:210-216`)
 
-| Rule                          | Severity | Triggers when…                                                                                                  |
-| ----------------------------- | -------- | --------------------------------------------------------------------------------------------------------------- |
-| `completed-protection`        | error    | A `completed` pattern is modified without `@architect-unlock-reason`.                                            |
-| `invalid-status-transition`   | error    | A status edit attempts a transition not in the FSM table (e.g., `roadmap → completed` skipping `active`).        |
-| `scope-creep`                 | error    | An `active` pattern grows beyond its declared scope.                                                            |
-| `session-excluded`            | error    | A staged file belongs to a session-excluded path.                                                               |
-| `session-scope`               | warning  | A staged file is outside the current session's scope.                                                           |
-| `deliverable-removed`         | warning  | A previously declared deliverable disappeared without a recorded reason.                                        |
+| Rule                        | Severity | Triggers when…                                                                                            |
+| --------------------------- | -------- | --------------------------------------------------------------------------------------------------------- |
+| `completed-protection`      | error    | A `completed` pattern is modified without `@architect-unlock-reason`.                                     |
+| `invalid-status-transition` | error    | A status edit attempts a transition not in the FSM table (e.g., `roadmap → completed` skipping `active`). |
+| `scope-creep`               | error    | An `active` pattern grows beyond its declared scope.                                                      |
+| `session-excluded`          | error    | A staged file belongs to a session-excluded path.                                                         |
+| `session-scope`             | warning  | A staged file is outside the current session's scope.                                                     |
+| `deliverable-removed`       | warning  | A previously declared deliverable disappeared without a recorded reason.                                  |
 
 `--strict` flag (matches PDR-001 DD-4) promotes all warnings → errors.
 
@@ -62,14 +62,14 @@ The platform has three signal sources. They are emitted on demand, not continuou
 
 Translated from "uptime / latency / errors" to the developer-tool context:
 
-| Concern                          | What to watch                                                                                                                            | Where                                                                                                              |
-| -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| **Cold-start latency**           | Time for the MCP server / CLI to load the PatternGraph. Today ~1–2s for the dogfood (329 files).                                          | `time pnpm architect:overview` on a representative consumer project.                                              |
-| **Build-graph correctness**      | Dangling references, malformed patterns, parse failures.                                                                                  | `architect arch dangling --strict`, `architect diagnostics`, `featureParseFailures` field on the PatternGraph.    |
-| **FSM discipline**               | Patterns drifting into invalid states.                                                                                                    | `architect-guard --all --strict` in CI.                                                                            |
-| **Doctrine drift**               | New suppression comments, BC aliases, deprecated annotations.                                                                             | `pnpm guard:no-suppressions` + the `architect-local/no-suppression-comments` ESLint rule.                          |
-| **Projection performance**       | Latency of the projection pipeline against the canonical fixture.                                                                         | The perf-regression gate (`baseline × 1.5`) in `@libar-dev/architect-projection`.                                  |
-| **Test suite health**            | Pass rate of the ~2828 tests across the five publishable packages.                                                                       | `pnpm test` exit code in CI.                                                                                       |
+| Concern                     | What to watch                                                                                    | Where                                                                                                          |
+| --------------------------- | ------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
+| **Cold-start latency**      | Time for the MCP server / CLI to load the PatternGraph. Today ~1–2s for the dogfood (329 files). | `time pnpm architect:overview` on a representative consumer project.                                           |
+| **Build-graph correctness** | Dangling references, malformed patterns, parse failures.                                         | `architect arch dangling --strict`, `architect diagnostics`, `featureParseFailures` field on the PatternGraph. |
+| **FSM discipline**          | Patterns drifting into invalid states.                                                           | `architect-guard --all --strict` in CI.                                                                        |
+| **Doctrine drift**          | New suppression comments, BC aliases, deprecated annotations.                                    | `pnpm guard:no-suppressions` + the `architect-local/no-suppression-comments` ESLint rule.                      |
+| **Projection performance**  | Latency of the projection pipeline against the canonical fixture.                                | The perf-regression gate (`baseline × 1.5`) in `@libar-dev/architect-projection`.                              |
+| **Test suite health**       | Pass rate of the ~2828 tests across the five publishable packages.                               | `pnpm test` exit code in CI.                                                                                   |
 
 There is no concept of uptime SLO because there is no service running. The closest analogue is **release health**: does the latest `2.0.0-pre.N` install cleanly, pass tests against the dogfood, and not regress the perf gate?
 
@@ -79,16 +79,16 @@ There is no concept of uptime SLO because there is no service running. The close
 
 These are CI-gate behaviors, not pager alerts:
 
-| Rule                                                                          | Threshold                                          | Action                                                |
-| ----------------------------------------------------------------------------- | -------------------------------------------------- | ----------------------------------------------------- |
-| `pnpm test` failure                                                           | Any test fails                                     | Block the merge.                                      |
-| `pnpm validate:all` finds an issue                                            | Any DoD or anti-pattern violation                  | Block the merge.                                      |
-| `pnpm exec architect-guard --staged` rule fires at `error` severity           | Any error-severity rule                            | Block the commit (pre-commit hook).                   |
-| `pnpm exec architect-guard --all --strict` warns                              | Any warning, in `--strict` mode                    | Block the merge.                                      |
-| Projection perf regression                                                    | Median latency > `baseline × 1.5`                  | Block the merge; require profile + fix or new baseline. |
-| `pnpm guard:no-suppressions` finds a forbidden comment                        | Any match in `packages/*/src`                      | Block the merge.                                      |
-| `architect arch dangling --strict` finds an unresolved reference              | Any dangling ref                                   | Block the merge.                                      |
-| Format / lint failure                                                         | Any                                                | Block the merge.                                      |
+| Rule                                                                | Threshold                         | Action                                                  |
+| ------------------------------------------------------------------- | --------------------------------- | ------------------------------------------------------- |
+| `pnpm test` failure                                                 | Any test fails                    | Block the merge.                                        |
+| `pnpm validate:all` finds an issue                                  | Any DoD or anti-pattern violation | Block the merge.                                        |
+| `pnpm exec architect-guard --staged` rule fires at `error` severity | Any error-severity rule           | Block the commit (pre-commit hook).                     |
+| `pnpm exec architect-guard --all --strict` warns                    | Any warning, in `--strict` mode   | Block the merge.                                        |
+| Projection perf regression                                          | Median latency > `baseline × 1.5` | Block the merge; require profile + fix or new baseline. |
+| `pnpm guard:no-suppressions` finds a forbidden comment              | Any match in `packages/*/src`     | Block the merge.                                        |
+| `architect arch dangling --strict` finds an unresolved reference    | Any dangling ref                  | Block the merge.                                        |
+| Format / lint failure                                               | Any                               | Block the merge.                                        |
 
 For a consumer project, these gates are the closest thing the platform offers to alerting. Wire them into CI (see `operations-guide.md` §Build / Test / Release Pipeline).
 

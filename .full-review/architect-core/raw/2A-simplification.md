@@ -16,7 +16,7 @@ Three highest-leverage simplifications, each removing 100+ LOC without losing fu
 
 Two angles Phase 1 documented but didn't push hard enough on:
 
-- **`extractPatternTags` returns a `Record<string, unknown>` then post-processes via 35× `assignIfDefined` in `buildGherkinRawPattern`** (H-CORE-15 + H-CORE-16). The right shape is a **typed metadata bag built directly into a `z.input<typeof ExtractedPatternSchema>` partial**, which eliminates both the index-signature smell *and* the 35 quoted-key assignments in one pass. Phase 1 names them as separate findings; they share one fix.
+- **`extractPatternTags` returns a `Record<string, unknown>` then post-processes via 35× `assignIfDefined` in `buildGherkinRawPattern`** (H-CORE-15 + H-CORE-16). The right shape is a **typed metadata bag built directly into a `z.input<typeof ExtractedPatternSchema>` partial**, which eliminates both the index-signature smell _and_ the 35 quoted-key assignments in one pass. Phase 1 names them as separate findings; they share one fix.
 - **`config-loader.ts` runs three validation passes for one config value** (`isProjectConfig` hand guard → IIFE strip → `safeParse`). Phase 1 (C-CORE-4 / H-CORE-4) treats these as separate doctrine issues; the simplified shape is **a single `safeParse` call, full stop** — same recipe addresses both.
 
 ## High-leverage simplifications
@@ -29,14 +29,24 @@ Two angles Phase 1 documented but didn't push hard enough on:
 **Current shape.** Two functions, identical except (1) sync `fileExistsSync`/async `Promise.all` for behavior-file verification and (2) sync handles `unrecognizedEnums`, async silently doesn't:
 
 ```ts
-export function extractPatternsFromGherkin(scannedFiles, config): GherkinExtractionResult { /* 140 lines */ }
-export async function extractPatternsFromGherkinAsync(scannedFiles, config): Promise<GherkinExtractionResult> { /* 135 lines */ }
+export function extractPatternsFromGherkin(scannedFiles, config): GherkinExtractionResult {
+  /* 140 lines */
+}
+export async function extractPatternsFromGherkinAsync(
+  scannedFiles,
+  config,
+): Promise<GherkinExtractionResult> {
+  /* 135 lines */
+}
 ```
 
 **Simplified shape.** One private `extractOnePattern` builder + a single async public entry. Behavior-file verification is `await`'d inline (each call is one `fs.access`); the rare sync caller (if any remains) wraps with `await` at the call site:
 
 ```ts
-async function extractOnePattern(file: ScannedGherkinFile, ctx: ExtractCtx): Promise<PatternResult> {
+async function extractOnePattern(
+  file: ScannedGherkinFile,
+  ctx: ExtractCtx,
+): Promise<PatternResult> {
   // shared body — emits unrecognizedEnums always, handles deprecated tags, builds pattern.
 }
 
@@ -44,7 +54,9 @@ export async function extractPatternsFromGherkin(
   scannedFiles: readonly ScannedGherkinFile[],
   config: GherkinExtractorConfig,
 ): Promise<GherkinExtractionResult> {
-  const ctx = { /* baseDir, registry, scenariosAsUseCases */ };
+  const ctx = {
+    /* baseDir, registry, scenariosAsUseCases */
+  };
   const results = await Promise.all(scannedFiles.map((f) => extractOnePattern(f, ctx)));
   return aggregate(results);
 }
@@ -166,7 +178,10 @@ Sweep the other 27 `z.object(` sites identified in H-CORE-7 by a single search-a
 
 ```ts
 // src/utils/role-lookup.ts (new file)
-export interface RoleLike { readonly tag: string; readonly aliases?: readonly string[]; }
+export interface RoleLike {
+  readonly tag: string;
+  readonly aliases?: readonly string[];
+}
 export interface RoleLookup {
   readonly canonical: ReadonlyMap<string, string>;
   readonly aliases: ReadonlyMap<string, string>;
@@ -182,7 +197,9 @@ export function buildRoleLookup(roles: readonly RoleLike[]): RoleLookup {
   }
   const all = new Set<string>([...canonical.keys(), ...aliases.keys()]);
   return {
-    canonical, aliases, all,
+    canonical,
+    aliases,
+    all,
     resolve: (v) => canonical.get(v) ?? aliases.get(v),
   };
 }
@@ -211,7 +228,9 @@ type RawPattern = z.input<typeof ExtractedPatternSchema>;
 const rawPattern: RawPattern = {
   id: patternId,
   name: patternName,
-  directive: { /* … */ },
+  directive: {
+    /* … */
+  },
   code: '',
   source: { file: asSourceFilePath(relativePath), lines: [feature.line, feature.line] as const },
   exports: [],
@@ -246,7 +265,10 @@ Pre-condition: H-SIMP-3 (TagRegistrySchema + ExtractedPatternSchema already stri
 
 ```ts
 // src/taxonomy/tag-parsing.ts
-export interface TagToken { readonly tagName: string; readonly rawValue: string | undefined; }
+export interface TagToken {
+  readonly tagName: string;
+  readonly rawValue: string | undefined;
+}
 export interface AppliedTags {
   readonly metadata: Record<string, unknown>; // typed by H-SIMP-5's RawPattern
   readonly diagnostics: TagDiagnostic[];
@@ -297,8 +319,14 @@ Three layers of validation: a hand-coded guard, a string-concat strip, and final
 ```ts
 const parseResult = ArchitectProjectConfigSchema.safeParse(exported);
 if (!parseResult.success) {
-  return { ok: false, error: { type: 'config-load-error', path: configPath,
-    message: `Invalid project config: ${formatZodIssues(parseResult.error)}` } };
+  return {
+    ok: false,
+    error: {
+      type: 'config-load-error',
+      path: configPath,
+      message: `Invalid project config: ${formatZodIssues(parseResult.error)}`,
+    },
+  };
 }
 const resolved = resolveProjectConfig(parseResult.data, { configPath });
 return { ok: true, value: resolved };
@@ -395,12 +423,25 @@ const workflow = tags.find((tag) => tag.startsWith('workflow:'))?.replace('workf
 **Simplified shape.** One pass plus a Map:
 
 ```ts
-const TAG_KEYS = ['quarter','effort','team','workflow','completed','effort-actual',
-                  'risk','product-area','user-role','business-value'] as const;
+const TAG_KEYS = [
+  'quarter',
+  'effort',
+  'team',
+  'workflow',
+  'completed',
+  'effort-actual',
+  'risk',
+  'product-area',
+  'user-role',
+  'business-value',
+] as const;
 const values = new Map<string, string>();
 for (const tag of tags) {
   for (const key of TAG_KEYS) {
-    if (tag.startsWith(`${key}:`)) { values.set(key, tag.slice(key.length + 1)); break; }
+    if (tag.startsWith(`${key}:`)) {
+      values.set(key, tag.slice(key.length + 1));
+      break;
+    }
   }
 }
 const businessValue = values.get('business-value')?.replace(/^["']|["']$/g, '');
@@ -432,13 +473,27 @@ if (!isValidStatusValue(from)) {
 ```ts
 export type TransitionValidationResult =
   | { valid: true; from: ProcessStatusValue; to: ProcessStatusValue }
-  | { valid: false; from: string; to: string; error: string; validAlternatives?: readonly ProcessStatusValue[] };
+  | {
+      valid: false;
+      from: string;
+      to: string;
+      error: string;
+      validAlternatives?: readonly ProcessStatusValue[];
+    };
 
 export function validateTransition(from: string, to: string): TransitionValidationResult {
-  if (!isValidStatusValue(from)) return { valid: false, from, to, error: `Invalid source status '${from}'. …` };
-  if (!isValidStatusValue(to))   return { valid: false, from, to, error: `Invalid target status '${to}'. …` };
+  if (!isValidStatusValue(from))
+    return { valid: false, from, to, error: `Invalid source status '${from}'. …` };
+  if (!isValidStatusValue(to))
+    return { valid: false, from, to, error: `Invalid target status '${to}'. …` };
   if (VALID_TRANSITIONS[from].includes(to)) return { valid: true, from, to };
-  return { valid: false, from, to, error: getTransitionErrorMessage(from, to), validAlternatives: getValidTransitionsFrom(from) };
+  return {
+    valid: false,
+    from,
+    to,
+    error: getTransitionErrorMessage(from, to),
+    validAlternatives: getValidTransitionsFrom(from),
+  };
 }
 ```
 
@@ -549,8 +604,11 @@ Throws `TypeError: Converting circular structure to JSON` on circular errors —
 
 ```ts
 function safeStringify(value: unknown): string {
-  try { return JSON.stringify(value); }
-  catch { return String(value); }
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return String(value);
+  }
 }
 ```
 
@@ -584,13 +642,18 @@ export const PackageConfigSchema = z.strictObject({
 **Current shape.** One function with `isPatternArray` guard switching between `dataset.nameIndex` map and a linear `find`:
 
 ```ts
-function isPatternArray(source: PatternGraph | readonly ExtractedPattern[]): source is readonly ExtractedPattern[] {
+function isPatternArray(
+  source: PatternGraph | readonly ExtractedPattern[],
+): source is readonly ExtractedPattern[] {
   return Array.isArray(source);
 }
 export function findPatternByName(source, name): ExtractedPattern | undefined {
   const lower = name.toLowerCase();
   if (isPatternArray(source)) return source.find((p) => getPatternName(p).toLowerCase() === lower);
-  return source.nameIndex?.get(lower) ?? source.patterns.find((p) => getPatternName(p).toLowerCase() === lower);
+  return (
+    source.nameIndex?.get(lower) ??
+    source.patterns.find((p) => getPatternName(p).toLowerCase() === lower)
+  );
 }
 ```
 
@@ -599,11 +662,17 @@ Mixed-mode signature; the `find` fallback path runs even when `nameIndex` is set
 **Simplified shape.** Split into two functions; callers pick:
 
 ```ts
-export function findPatternByNameInArray(patterns: readonly ExtractedPattern[], name: string): ExtractedPattern | undefined {
+export function findPatternByNameInArray(
+  patterns: readonly ExtractedPattern[],
+  name: string,
+): ExtractedPattern | undefined {
   const lower = name.toLowerCase();
   return patterns.find((p) => getPatternName(p).toLowerCase() === lower);
 }
-export function findPatternInGraph(dataset: PatternGraph, name: string): ExtractedPattern | undefined {
+export function findPatternInGraph(
+  dataset: PatternGraph,
+  name: string,
+): ExtractedPattern | undefined {
   const lower = name.toLowerCase();
   return dataset.nameIndex?.get(lower) ?? findPatternByNameInArray(dataset.patterns, name);
 }
@@ -628,7 +697,9 @@ Both clone `RoleDefinition[]`. They've already drifted: `factory.ts` preserves `
 // src/taxonomy/registry-builder.ts (or a new utils/clone-roles.ts)
 export function cloneRoleDefinitions(roles: readonly RoleDefinition[]): RoleDefinition[] {
   return roles.map((role) => ({
-    tag: role.tag, domain: role.domain, priority: role.priority,
+    tag: role.tag,
+    domain: role.domain,
+    priority: role.priority,
     ...(role.description !== undefined && { description: role.description }),
     ...(role.diagramShape !== undefined && { diagramShape: role.diagramShape }),
     ...(role.aliases !== undefined && { aliases: [...role.aliases] }),
@@ -658,7 +729,9 @@ function mapRows(
 ): GherkinDataTableRow[] {
   return rows.map((row) => {
     const obj: Record<string, string> = {};
-    headers.forEach((header, i) => { obj[header] = row.cells[i]?.value ?? ''; });
+    headers.forEach((header, i) => {
+      obj[header] = row.cells[i]?.value ?? '';
+    });
     return obj;
   });
 }
@@ -678,7 +751,9 @@ function mapRows(
 **Current shape.**
 
 ```ts
-export function asModuleId(id: string): ModuleId { return id as ModuleId; }
+export function asModuleId(id: string): ModuleId {
+  return id as ModuleId;
+}
 ```
 
 Every other branded constructor calls `Schema.parse(id)`. Either delete (grep shows no consumers in `src/`) or make it `return asPatternId(id);` since `ModuleId = PatternId`.
@@ -746,8 +821,14 @@ Removes ~160 regex allocations per call.
 
 ```ts
 const TAG_KEY_FOR_PATTERN: Record<string, keyof ExtractedPattern> = {
-  status: 'status', role: 'role', 'bounded-context': 'boundedContext',
-  phase: 'phase', priority: 'priority', quarter: 'quarter', team: 'team', effort: 'effort',
+  status: 'status',
+  role: 'role',
+  'bounded-context': 'boundedContext',
+  phase: 'phase',
+  priority: 'priority',
+  quarter: 'quarter',
+  team: 'team',
+  effort: 'effort',
 };
 for (const pattern of dataset.patterns) {
   for (const tag of dataset.tagRegistry.metadataTags) {
@@ -790,7 +871,14 @@ for (const pattern of dataset.patterns) {
 function parseTestsValue(value: string): number {
   const trimmed = value.trim().toLowerCase();
   if (trimmed === 'yes' || trimmed === 'true' || trimmed === '✓' || trimmed === '✅') return 1;
-  if (trimmed === 'no' || trimmed === 'false' || trimmed === '✗' || trimmed === '' || trimmed === '-') return 0;
+  if (
+    trimmed === 'no' ||
+    trimmed === 'false' ||
+    trimmed === '✗' ||
+    trimmed === '' ||
+    trimmed === '-'
+  )
+    return 0;
   const parsed = parseInt(trimmed, 10);
   return isNaN(parsed) ? 0 : parsed;
 }
@@ -966,7 +1054,9 @@ These appear in many places; each fix is small but the aggregate is meaningful.
 Used in `gherkin-extractor.ts`, `doc-extractor.ts`, `dual-source-extractor.ts`, `factory.ts`, `pattern-graph-api.ts`, error factories in `errors.ts`. Recipe (add to `utils/object-utils.ts`):
 
 ```ts
-export function omitUndefined<T extends object>(obj: T): { [K in keyof T]: Exclude<T[K], undefined> } {
+export function omitUndefined<T extends object>(
+  obj: T,
+): { [K in keyof T]: Exclude<T[K], undefined> } {
   const result: Record<string, unknown> = {};
   for (const [k, v] of Object.entries(obj)) if (v !== undefined) result[k] = v;
   return result as { [K in keyof T]: Exclude<T[K], undefined> };
@@ -1034,7 +1124,9 @@ export function pushToRecord<V>(rec: Record<string, V[]>, key: string, value: V)
 Multiple call sites repeat:
 
 ```ts
-const validationErrors = validation.error.issues.map((issue) => `${issue.path.join('.')}: ${issue.message}`);
+const validationErrors = validation.error.issues.map(
+  (issue) => `${issue.path.join('.')}: ${issue.message}`,
+);
 ```
 
 (`gherkin-extractor.ts:475, 630`, `doc-extractor.ts:301`, `scanner/ast-parser.ts:384-389`, `transform-dataset.ts:108`, `config-loader.ts:198-200`.) Recipe:

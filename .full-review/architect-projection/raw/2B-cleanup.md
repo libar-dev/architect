@@ -13,8 +13,8 @@ Projection's cleanup posture is **noticeably stronger than core's**: zero `@ts-i
 
 The highest-impact cleanups are all **finding the gap between the doctrine the package preaches and the automation that enforces it**, not new doctrine breaches:
 
-1. **The advertised "Drift over baseline × 1.5 fails the gate" claim in `AGENTS.md:78` and `docs/PERF.md` is wired to no automation.** `tests/perf/compare-baseline.mjs` is a fully implemented ratcheted gate (`min(hard, baseline × 1.5)` over 26 metric sites including `project/renderObject/renderPretty/isBundleP50Micros` + 8 projection hot paths + 3 markdown bundle types). It loads `tests/perf/baselines/business-rule-set.baseline.json` (a real committed baseline). But `package.json#scripts.test` never invokes it; only `docs/PERF.md:16` mentions the two-command sequence. There is no CI workflow (`.github/workflows/` does not exist family-wide — see core `CI-1`). This sharpens Phase 1's **C-PROJ-3**: the gate is *implemented* but *unwired*. A one-line `package.json` change (or a CI job) makes the rhetoric real.
-2. **`scripts/options-schema-barrel-audit.mjs` does not catch C-PROJ-2.** The audit checks that every `*OptionsSchema` exported from a subtree's `index.ts` is also re-exported by `projections/index.ts` — barrel completeness of *schemas*. It does **not** assert that every `parseAndProject*` entrypoint uses the shared `parseAndProject(...)` wrapper. The C-PROJ-2 outlier (`open-question-list.ts:38` calls `OptionsSchema.parse` directly) sits in the audit's natural scope but isn't covered. Adding ~15 lines to the audit would close C-PROJ-2 mechanically and prevent regression.
+1. **The advertised "Drift over baseline × 1.5 fails the gate" claim in `AGENTS.md:78` and `docs/PERF.md` is wired to no automation.** `tests/perf/compare-baseline.mjs` is a fully implemented ratcheted gate (`min(hard, baseline × 1.5)` over 26 metric sites including `project/renderObject/renderPretty/isBundleP50Micros` + 8 projection hot paths + 3 markdown bundle types). It loads `tests/perf/baselines/business-rule-set.baseline.json` (a real committed baseline). But `package.json#scripts.test` never invokes it; only `docs/PERF.md:16` mentions the two-command sequence. There is no CI workflow (`.github/workflows/` does not exist family-wide — see core `CI-1`). This sharpens Phase 1's **C-PROJ-3**: the gate is _implemented_ but _unwired_. A one-line `package.json` change (or a CI job) makes the rhetoric real.
+2. **`scripts/options-schema-barrel-audit.mjs` does not catch C-PROJ-2.** The audit checks that every `*OptionsSchema` exported from a subtree's `index.ts` is also re-exported by `projections/index.ts` — barrel completeness of _schemas_. It does **not** assert that every `parseAndProject*` entrypoint uses the shared `parseAndProject(...)` wrapper. The C-PROJ-2 outlier (`open-question-list.ts:38` calls `OptionsSchema.parse` directly) sits in the audit's natural scope but isn't covered. Adding ~15 lines to the audit would close C-PROJ-2 mechanically and prevent regression.
 3. **`summarizeTaxonomyDigest` is re-exported through three barrels** (`fragments/index.ts:43`, `fragments/governance/index.ts:14`, `projections/index.ts:50`) — the same runtime helper appears as a public export in two of the seven subpath modules listed in `package.json#exports` (H-PROJ-A-3, H-PROJ-A-10). Single ownership move resolves both findings.
 4. **`documentation-type-registry.ts` carries a self-described "campaign deletion target" comment at `:55-63`** and ships a 174-LOC Proxy-based lazy facade for a 12-entry static table. The "campaign" (W-DOCS-1 per `.pr-coordination/`) is identified as not-yet-landed. As long as the proxy stays, every consumer of `SUPPORTED_DOCUMENTATION_TYPE_REGISTRY` pays Proxy interception cost on every read. The simplification recipe is already in H-PROJ-A-9; cleanup angle is "this module's lifecycle should not exceed the W-DOCS-1 PR".
 5. **Tarball composition: 50% of published files are `.map`** (290 maps out of 580 dist files). Same problem as core's CL-CORE-3, fixed by the same one-line `tsconfig.base.json` edit (already in the family-wide action plan). Projection inherits the gap; no projection-specific fix is needed.
@@ -36,7 +36,7 @@ Nothing in this report contradicts Phase 1; it adds the cleanup-lens detail and 
 
 - **Source/evidence:**
   - `package.json:65` — `"test": "pnpm test:barrel-audit && pnpm test:jsdoc-boilerplate-audit && pnpm typecheck && vitest run --config vitest.config.ts"`. No call to `vitest --config vitest.perf-report.config.mjs` and no call to `node tests/perf/compare-baseline.mjs`.
-  - `vitest.config.ts:8` — `exclude: ['tests/support/**/*.ts', 'tests/fixtures/**/*.ts']` and `include: ['tests/features/**/*.steps.ts']`. This **does** run `tests/features/perf/business-rule-set-report.steps.ts` because it sits under `tests/features/`. So the report *gets written* by `pnpm test`, but the budget comparison does not.
+  - `vitest.config.ts:8` — `exclude: ['tests/support/**/*.ts', 'tests/fixtures/**/*.ts']` and `include: ['tests/features/**/*.steps.ts']`. This **does** run `tests/features/perf/business-rule-set-report.steps.ts` because it sits under `tests/features/`. So the report _gets written_ by `pnpm test`, but the budget comparison does not.
   - `tests/perf/compare-baseline.mjs:30-34, 154-170` — implements the real `min(hard, baseline × 1.5)` ratchet across `project.avgMs`, `renderObject.avgMs`, `renderPretty.avgMs`, `isBundleP50Micros`, all 8 `projectionHotPaths.*`, and 3 `renderMarkdownBundles.*`. Compiles a `failures[]` and sets `process.exitCode = 1` on any breach.
   - `tests/perf/baselines/business-rule-set.baseline.json` — committed real baseline (generated 2026-05-17T10:25 per the `generatedAt` field) covering all 26 measured metrics.
   - `docs/PERF.md:14-22` — documents the two-command sequence as the local invocation pattern.
@@ -53,7 +53,7 @@ Nothing in this report contradicts Phase 1; it adds the cleanup-lens detail and 
     ```
     Or split into `test:perf` + `test:functional` and chain both from `test`. This is the doctrine-aligned move.
   - **(b) Climb-down the claim.** If the gate is intentionally local-only (e.g., to keep CI fast pre-CI), edit `AGENTS.md:78` and `docs/PERF.md:1-22` to say "run locally before merging perf-sensitive PRs" and drop "fails the gate" / "CI gate" language.
-- **Either way:** the audit-script discipline (see § 5 below) should add a check that `package.json#scripts.test` either references `compare-baseline.mjs` OR the README does not claim a CI gate. This is *exactly* the kind of doctrine-vs-automation gap the existing barrel-audit pattern was created to enforce.
+- **Either way:** the audit-script discipline (see § 5 below) should add a check that `package.json#scripts.test` either references `compare-baseline.mjs` OR the README does not claim a CI gate. This is _exactly_ the kind of doctrine-vs-automation gap the existing barrel-audit pattern was created to enforce.
 
 This finding rectifies C-PROJ-3's framing: the gate logic is real and ratcheted; only the wiring is rhetorical.
 
@@ -104,7 +104,7 @@ This finding rectifies C-PROJ-3's framing: the gate logic is real and ratcheted;
 - **Cleanup angle:** Three issues stack here:
   1. **Module-load complexity for a constant.** A 12-entry constant table is built across 5 files with a Proxy facade because of a not-yet-started campaign.
   2. **Proxy interception in the hot path.** `SUPPORTED_DOCUMENTATION_TYPE_REGISTRY` is touched by every documentation-composition projection (`documentation-bundle.ts`, `pr-change-review.ts`, etc.) — every iteration goes through Proxy `ownKeys`/`get` traps.
-  3. **The deletion comment is doctrinally correct but operationally a smell.** If W-DOCS-1 lands this cycle, the file disappears. If not, the proxy is unnecessary complexity *now*.
+  3. **The deletion comment is doctrinally correct but operationally a smell.** If W-DOCS-1 lands this cycle, the file disappears. If not, the proxy is unnecessary complexity _now_.
 - **Delete-or-fix recipe (per Phase 1 H-PROJ-A-9, restated with cleanup-lens specifics):**
   - **Short term (no campaign assumption):** replace `createLazyReadonlyArrayFacade(...)` with:
     ```ts
@@ -135,7 +135,7 @@ This finding rectifies C-PROJ-3's framing: the gate logic is real and ratcheted;
 #### Cleanup-M-PROJ-3. `package.json#scripts.typecheck` only covers `tsconfig.test.json`
 
 - **Source/evidence:** `package.json:62` — `"typecheck": "tsc --noEmit -p tsconfig.test.json"`. Same problem as core's `CL-CORE-11`.
-- **What's covered:** `tsconfig.test.json:10` includes `src/**/*`, `tests/**/*.ts`, `vitest.config.ts`, `vitest.perf-report.config.mjs`. Because `src/**` is included, type errors in `src/` *are* caught. But the build target (`tsconfig.json`) is not re-validated; if test-only config relaxes anything (it doesn't here, since `tsconfig.test.json` extends `tsconfig.json`), the gap would matter.
+- **What's covered:** `tsconfig.test.json:10` includes `src/**/*`, `tests/**/*.ts`, `vitest.config.ts`, `vitest.perf-report.config.mjs`. Because `src/**` is included, type errors in `src/` _are_ caught. But the build target (`tsconfig.json`) is not re-validated; if test-only config relaxes anything (it doesn't here, since `tsconfig.test.json` extends `tsconfig.json`), the gap would matter.
 - **Family-wide drift verdict (from core 04-best-practices.md):** core says "DRIFT — align core + projection to both". Confirmed in projection.
 - **Recipe:** align with siblings (guard, cli, mcp all use both):
   ```json
@@ -165,15 +165,15 @@ This finding rectifies C-PROJ-3's framing: the gate logic is real and ratcheted;
 
 ### Low (P3)
 
-| ID | File:line | Issue |
-|---|---|---|
-| Cleanup-L-PROJ-1 | `.DS_Store` files | 4 stray `.DS_Store` files in the working tree (`/packages/architect-projection/.DS_Store`, `src/.DS_Store`, `tests/.DS_Store`, `node_modules/.DS_Store`). All gitignored. Local hygiene only. |
-| Cleanup-L-PROJ-2 | `tests/fixtures/fragments.ts` | Single 42 KB fixture file (see Cleanup-M-PROJ-5). |
-| Cleanup-L-PROJ-3 | `vitest.config.ts:1,12` | Uses `import path from 'path'` (legacy) + `__dirname` (legacy). Sibling files in the perf config use `node:path` + `import.meta.dirname`. Inconsistent. |
-| Cleanup-L-PROJ-4 | `eslint.config.mjs:35-43` | Test-only override disables 6 `@typescript-eslint` rules. Reasonable, but the list grew over time and could be a single shared override imported from the root. |
-| Cleanup-L-PROJ-5 | `package.json:65` | `pnpm test` command runs 4 sequential commands; if any fail mid-chain, the user sees only one failure. Common pattern in monorepos; not a defect. |
-| Cleanup-L-PROJ-6 | `package.json` | No `keywords` field for npm discoverability (siblings match — family-wide). |
-| Cleanup-L-PROJ-7 | `dist/` | Per `ls dist/`, the README and docs/ directory are not included (correct per `files: ["dist"]`). `npm pack --dry-run` confirms only `dist/` + `package.json` go out. No leakage. |
+| ID               | File:line                     | Issue                                                                                                                                                                                         |
+| ---------------- | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Cleanup-L-PROJ-1 | `.DS_Store` files             | 4 stray `.DS_Store` files in the working tree (`/packages/architect-projection/.DS_Store`, `src/.DS_Store`, `tests/.DS_Store`, `node_modules/.DS_Store`). All gitignored. Local hygiene only. |
+| Cleanup-L-PROJ-2 | `tests/fixtures/fragments.ts` | Single 42 KB fixture file (see Cleanup-M-PROJ-5).                                                                                                                                             |
+| Cleanup-L-PROJ-3 | `vitest.config.ts:1,12`       | Uses `import path from 'path'` (legacy) + `__dirname` (legacy). Sibling files in the perf config use `node:path` + `import.meta.dirname`. Inconsistent.                                       |
+| Cleanup-L-PROJ-4 | `eslint.config.mjs:35-43`     | Test-only override disables 6 `@typescript-eslint` rules. Reasonable, but the list grew over time and could be a single shared override imported from the root.                               |
+| Cleanup-L-PROJ-5 | `package.json:65`             | `pnpm test` command runs 4 sequential commands; if any fail mid-chain, the user sees only one failure. Common pattern in monorepos; not a defect.                                             |
+| Cleanup-L-PROJ-6 | `package.json`                | No `keywords` field for npm discoverability (siblings match — family-wide).                                                                                                                   |
+| Cleanup-L-PROJ-7 | `dist/`                       | Per `ls dist/`, the README and docs/ directory are not included (correct per `files: ["dist"]`). `npm pack --dry-run` confirms only `dist/` + `package.json` go out. No leakage.              |
 
 ---
 
@@ -183,52 +183,52 @@ The family base (`tsconfig.architect-base.json` + `tsconfig.base.json` at repo r
 
 ### TypeScript
 
-| Concern | `tsconfig.base.json` (family) | `tsconfig.architect-base.json` | `architect-projection/tsconfig.json` | `architect-projection/tsconfig.test.json` | Verdict |
-|---|---|---|---|---|---|
-| `strict` | `true` | (inherits) | (inherits) | (inherits) | Held. |
-| `noUncheckedIndexedAccess` | `true` | (inherits) | (inherits) | (inherits) | Held. |
-| `exactOptionalPropertyTypes` | `true` | (inherits) | (inherits) | (inherits) | Held. |
-| `verbatimModuleSyntax` | `true` | (inherits) | (inherits) | (inherits) | Held. |
-| `noPropertyAccessFromIndexSignature` | (off) | **`true` (architect-only)** | (inherits) | (inherits) | Held. |
-| `declarationMap` / `sourceMap` | `true` / `true` | (inherits) | (inherits) | (inherits) | **DRIFT** — same family-wide problem as core CL-CORE-3 (50% of tarball is `.map` files: 290/580). Family-wide one-line fix. |
-| `composite` | (off) | (off) | `true` | `true` (inherits) | Correct for project references. |
-| `incremental` | (off) | (off) | `true` | (inherits) | Correct. |
-| `tsBuildInfoFile` | (default) | (default) | `./tsconfig.tsbuildinfo` | `./tsconfig.test.tsbuildinfo` | Held — distinct names prevent collision. |
-| `disableSourceOfProjectReferenceRedirect` | (off) | (off) | `true` | (inherits) | Held — required for `tsc -b --force`. |
-| `types` | (default — auto) | (default — auto) | `["node"]` | `["node", "vitest/globals"]` | Held. |
+| Concern                                   | `tsconfig.base.json` (family) | `tsconfig.architect-base.json` | `architect-projection/tsconfig.json` | `architect-projection/tsconfig.test.json` | Verdict                                                                                                                     |
+| ----------------------------------------- | ----------------------------- | ------------------------------ | ------------------------------------ | ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `strict`                                  | `true`                        | (inherits)                     | (inherits)                           | (inherits)                                | Held.                                                                                                                       |
+| `noUncheckedIndexedAccess`                | `true`                        | (inherits)                     | (inherits)                           | (inherits)                                | Held.                                                                                                                       |
+| `exactOptionalPropertyTypes`              | `true`                        | (inherits)                     | (inherits)                           | (inherits)                                | Held.                                                                                                                       |
+| `verbatimModuleSyntax`                    | `true`                        | (inherits)                     | (inherits)                           | (inherits)                                | Held.                                                                                                                       |
+| `noPropertyAccessFromIndexSignature`      | (off)                         | **`true` (architect-only)**    | (inherits)                           | (inherits)                                | Held.                                                                                                                       |
+| `declarationMap` / `sourceMap`            | `true` / `true`               | (inherits)                     | (inherits)                           | (inherits)                                | **DRIFT** — same family-wide problem as core CL-CORE-3 (50% of tarball is `.map` files: 290/580). Family-wide one-line fix. |
+| `composite`                               | (off)                         | (off)                          | `true`                               | `true` (inherits)                         | Correct for project references.                                                                                             |
+| `incremental`                             | (off)                         | (off)                          | `true`                               | (inherits)                                | Correct.                                                                                                                    |
+| `tsBuildInfoFile`                         | (default)                     | (default)                      | `./tsconfig.tsbuildinfo`             | `./tsconfig.test.tsbuildinfo`             | Held — distinct names prevent collision.                                                                                    |
+| `disableSourceOfProjectReferenceRedirect` | (off)                         | (off)                          | `true`                               | (inherits)                                | Held — required for `tsc -b --force`.                                                                                       |
+| `types`                                   | (default — auto)              | (default — auto)               | `["node"]`                           | `["node", "vitest/globals"]`              | Held.                                                                                                                       |
 
 ### ESLint
 
-| Concern | Family root config | Projection override | Verdict |
-|---|---|---|---|
-| `architect-local/no-suppression-comments` | Active on `packages/*/src/**/*.ts` excluding tests | (inherits) | Held. |
-| `@typescript-eslint/no-unused-vars` with `^_` ignore | Active on `src/**/*.ts` | (inherits) | Held. |
-| `no-restricted-syntax` for `isPlainObject` | Not defined upstream | **Active in projection only** (`eslint.config.mjs:14-30`) | Healthy local enforcement (see Cleanup-M-PROJ-4). |
-| Four renderer boundary rules | **Defined in repo root for projection's `src/renderers/**`** | (inherits) | Held. |
-| Project parser config | `tsconfig.test.json` referenced as parser project | (extends with tsconfig path resolution) | Held. |
-| Test-file rule relaxations | Not defined upstream | **Active in projection only** (`eslint.config.mjs:33-43`) | Healthy; could be hoisted (Cleanup-L-PROJ-4). |
+| Concern                                              | Family root config                                             | Projection override                                       | Verdict                                           |
+| ---------------------------------------------------- | -------------------------------------------------------------- | --------------------------------------------------------- | ------------------------------------------------- |
+| `architect-local/no-suppression-comments`            | Active on `packages/*/src/**/*.ts` excluding tests             | (inherits)                                                | Held.                                             |
+| `@typescript-eslint/no-unused-vars` with `^_` ignore | Active on `src/**/*.ts`                                        | (inherits)                                                | Held.                                             |
+| `no-restricted-syntax` for `isPlainObject`           | Not defined upstream                                           | **Active in projection only** (`eslint.config.mjs:14-30`) | Healthy local enforcement (see Cleanup-M-PROJ-4). |
+| Four renderer boundary rules                         | **Defined in repo root for projection's `src/renderers/**`\*\* | (inherits)                                                | Held.                                             |
+| Project parser config                                | `tsconfig.test.json` referenced as parser project              | (extends with tsconfig path resolution)                   | Held.                                             |
+| Test-file rule relaxations                           | Not defined upstream                                           | **Active in projection only** (`eslint.config.mjs:33-43`) | Healthy; could be hoisted (Cleanup-L-PROJ-4).     |
 
 ### `package.json` scripts vs siblings
 
-| Setting | core | guard | cli | mcp | **projection** | Verdict |
-|---|---|---|---|---|---|---|
-| `prepack` location | top-level (broken) | scripts | scripts | scripts | **scripts** | Correct. |
-| `prepack` command | `pnpm build` | `pnpm clean && pnpm build` | `pnpm clean && pnpm build` | `pnpm clean && pnpm build` | **`pnpm clean && pnpm build`** | Correct. |
-| `lint` glob | `eslint src` (gap) | `eslint src tests` | `eslint src tests` | `eslint src tests` | **`eslint src tests`** | Correct. |
-| `typecheck` scope | `tsconfig.test.json` only | both | both | `tsconfig.test.json` only | **`tsconfig.test.json` only** | **DRIFT** — Cleanup-M-PROJ-3. |
-| `test` typecheck guard | (none) | `typecheck && vitest` | `build && vitest` | `typecheck && vitest` | **2 audits + `typecheck && vitest`** | Held (with audits added). |
-| `eslint` as devDep | missing (root hoist) | yes | yes | yes | **yes** | Correct. |
-| Test include pattern | `tests/steps/**` | `tests/features/**` | `tests/features/**` | `tests/features/**` | **`tests/features/**`** | Held — projection + 3 siblings on one convention; core is the family outlier. |
-| `compare-baseline.mjs` in `test` chain | n/a | n/a | n/a | n/a | **not invoked** | **Cleanup-C-PROJ-1 (this report).** |
+| Setting                                | core                      | guard                      | cli                        | mcp                        | **projection**                       | Verdict                                                                       |
+| -------------------------------------- | ------------------------- | -------------------------- | -------------------------- | -------------------------- | ------------------------------------ | ----------------------------------------------------------------------------- |
+| `prepack` location                     | top-level (broken)        | scripts                    | scripts                    | scripts                    | **scripts**                          | Correct.                                                                      |
+| `prepack` command                      | `pnpm build`              | `pnpm clean && pnpm build` | `pnpm clean && pnpm build` | `pnpm clean && pnpm build` | **`pnpm clean && pnpm build`**       | Correct.                                                                      |
+| `lint` glob                            | `eslint src` (gap)        | `eslint src tests`         | `eslint src tests`         | `eslint src tests`         | **`eslint src tests`**               | Correct.                                                                      |
+| `typecheck` scope                      | `tsconfig.test.json` only | both                       | both                       | `tsconfig.test.json` only  | **`tsconfig.test.json` only**        | **DRIFT** — Cleanup-M-PROJ-3.                                                 |
+| `test` typecheck guard                 | (none)                    | `typecheck && vitest`      | `build && vitest`          | `typecheck && vitest`      | **2 audits + `typecheck && vitest`** | Held (with audits added).                                                     |
+| `eslint` as devDep                     | missing (root hoist)      | yes                        | yes                        | yes                        | **yes**                              | Correct.                                                                      |
+| Test include pattern                   | `tests/steps/**`          | `tests/features/**`        | `tests/features/**`        | `tests/features/**`        | **`tests/features/**`\*\*            | Held — projection + 3 siblings on one convention; core is the family outlier. |
+| `compare-baseline.mjs` in `test` chain | n/a                       | n/a                        | n/a                        | n/a                        | **not invoked**                      | **Cleanup-C-PROJ-1 (this report).**                                           |
 
 ### Vitest
 
-| Concern | Sibling pattern | Projection | Verdict |
-|---|---|---|---|
-| Config in TS | guard, cli, mcp use `.ts` | `vitest.config.ts` + `vitest.perf-report.config.mjs` | **Two configs** — Cleanup-H-PROJ-2 (deduplicate). |
-| 30s timeout | guard, cli, mcp at 30s | 30s | Held. |
-| `globals: true` | All siblings | Both projection configs | Held. |
-| `node:` prefix on stdlib | guard, mcp consistent | `vitest.config.ts:1` uses `'path'` (legacy) | Inconsistent (Cleanup-L-PROJ-3). |
+| Concern                  | Sibling pattern           | Projection                                           | Verdict                                           |
+| ------------------------ | ------------------------- | ---------------------------------------------------- | ------------------------------------------------- |
+| Config in TS             | guard, cli, mcp use `.ts` | `vitest.config.ts` + `vitest.perf-report.config.mjs` | **Two configs** — Cleanup-H-PROJ-2 (deduplicate). |
+| 30s timeout              | guard, cli, mcp at 30s    | 30s                                                  | Held.                                             |
+| `globals: true`          | All siblings              | Both projection configs                              | Held.                                             |
+| `node:` prefix on stdlib | guard, mcp consistent     | `vitest.config.ts:1` uses `'path'` (legacy)          | Inconsistent (Cleanup-L-PROJ-3).                  |
 
 ### Tarball composition (`npm pack --dry-run`)
 
@@ -250,15 +250,15 @@ Tarball reduction available via family-wide `sourceMap: false; declarationMap: f
 
 `package.json` declares:
 
-| Kind | Name | Version | Imported in `src/`? | Imported in `tests/`? | Cross-package alignment | Verdict |
-|---|---|---|---|---|---|---|
-| dep | `@libar-dev/architect-core` | `workspace:*` | **Yes** (110 import sites in `src/`) | Yes (~20 sites) | All siblings depend on `workspace:*` | Correct. |
-| dep | `zod` | `^4.1.11` | **Yes** (extensively) | Yes | All 5 packages aligned at `^4.1.11` | Correct. |
-| devDep | `@amiceli/vitest-cucumber` | `^6.3.0` | No | **Yes** (in step files) | All 5 packages aligned | Correct. |
-| devDep | `@types/node` | `^24.12.0` | No (src has no `node:` imports) | Yes (via `node:perf_hooks`, etc.) | All 5 packages aligned at `^24.12.0` | Correct. |
-| devDep | `eslint` | `^9.17.0` | n/a | n/a | guard/cli/mcp/projection at `^9.17.0`; core **missing** (root hoist) | Correct here. |
-| devDep | `typescript` | `^5.8.2` | n/a | n/a | All 5 packages aligned at `^5.8.2` | Correct. |
-| devDep | `vitest` | `^4.1.4` | n/a | Yes (configs) | All 5 packages aligned at `^4.1.4` | Correct. |
+| Kind   | Name                        | Version       | Imported in `src/`?                  | Imported in `tests/`?             | Cross-package alignment                                              | Verdict       |
+| ------ | --------------------------- | ------------- | ------------------------------------ | --------------------------------- | -------------------------------------------------------------------- | ------------- |
+| dep    | `@libar-dev/architect-core` | `workspace:*` | **Yes** (110 import sites in `src/`) | Yes (~20 sites)                   | All siblings depend on `workspace:*`                                 | Correct.      |
+| dep    | `zod`                       | `^4.1.11`     | **Yes** (extensively)                | Yes                               | All 5 packages aligned at `^4.1.11`                                  | Correct.      |
+| devDep | `@amiceli/vitest-cucumber`  | `^6.3.0`      | No                                   | **Yes** (in step files)           | All 5 packages aligned                                               | Correct.      |
+| devDep | `@types/node`               | `^24.12.0`    | No (src has no `node:` imports)      | Yes (via `node:perf_hooks`, etc.) | All 5 packages aligned at `^24.12.0`                                 | Correct.      |
+| devDep | `eslint`                    | `^9.17.0`     | n/a                                  | n/a                               | guard/cli/mcp/projection at `^9.17.0`; core **missing** (root hoist) | Correct here. |
+| devDep | `typescript`                | `^5.8.2`      | n/a                                  | n/a                               | All 5 packages aligned at `^5.8.2`                                   | Correct.      |
+| devDep | `vitest`                    | `^4.1.4`      | n/a                                  | Yes (configs)                     | All 5 packages aligned at `^4.1.4`                                   | Correct.      |
 
 **Findings:** **None.** Projection's dependency manifest is in perfect family alignment. No phantom deps in `src/` (would be devDeps leaked), no phantom devDeps (deps declared but unused). The `src/` tree has zero `node:`/stdlib imports — confirming the README's "no filesystem, no network" claim for the data layer.
 
@@ -271,6 +271,7 @@ Tarball reduction available via family-wide `sourceMap: false; declarationMap: f
 ### `scripts/options-schema-barrel-audit.mjs` (128 LOC)
 
 **What it does:**
+
 1. Reads `src/projections/index.ts` + every `src/projections/<subdomain>/index.ts`.
 2. Collects all exported identifiers matching `*OptionsSchema` (regexes at `:12-14`).
 3. Asserts: every `*OptionsSchema` exported from any subdomain index is **also** re-exported from `src/projections/index.ts`.
@@ -278,11 +279,13 @@ Tarball reduction available via family-wide `sourceMap: false; declarationMap: f
 5. Asserts: no `*OptionsSchema` is exported by the root projections barrel that doesn't trace to a subdomain.
 
 **Strengths:**
+
 - Pure regex over file text — fast, no AST dependency, fits the family's "mechanical doctrine guard" pattern.
 - Closes the gap where a new `*OptionsSchema` could be defined in a subdomain but forgotten in the root barrel.
 - Idempotent, runnable in `pnpm test`, exits non-zero on drift with a `formatFailure` summary.
 
 **Gaps:**
+
 1. **Schema-name-only.** Only `*OptionsSchema` exports are surveyed. The `parseAndProject*` entrypoints — which share the same trust-boundary discipline — are not.
 2. **No body-shape check.** Even if a `parseAndProject*` export is found, the audit doesn't verify it goes through `parseAndProject(schema, project, name, defaults)` from `_shared/parse-and-project.internal.ts`.
 3. **Does NOT catch C-PROJ-2** at `src/projections/pattern-relations/open-question-list.ts:38` (the outlier that calls `OptionsSchema.parse` directly). The script's regex doesn't look at function bodies; the outlier is invisible.
@@ -300,6 +303,7 @@ const parseAndProjectExportFunctionPattern =
 ```
 
 For every `export function parseAndProject*` declaration (the form the outlier uses), require either:
+
 - the body to contain `parseAndProject(` (the shared helper call), OR
 - emit a failure with the file:line.
 
@@ -308,16 +312,19 @@ Net delta: ~15 LOC inserted; one extra `auditParseAndProjectShape` function in t
 ### `scripts/jsdoc-boilerplate-audit.mjs` (77 LOC)
 
 **What it does:**
+
 1. Walks every `.ts` file in `src/` recursively.
 2. Checks for the presence of 3 specific boilerplate phrases (`'As a typed contract'`, `'data shape consumed by projection or render layers'`, `'Private helpers used exclusively'`).
 3. Fails the run if any source file contains any of these phrases.
 
 **Strengths:**
+
 - Mirrors the `DOC-H-3` pattern flagged in core (boilerplate JSDoc "When to Use" text that's wrong for the file).
 - Already prevents 3 specific bad-JSDoc patterns from reentering the codebase.
 - Fast, deterministic, exits non-zero on drift.
 
 **Gaps:**
+
 1. **Phrase-fixed.** Three phrases, hardcoded at `:8-12`. Any new boilerplate that emerges from a future AI-assisted PR won't be caught until someone adds it to the list.
 2. **No `@architect-pattern` annotation completeness check.** The file does not assert that every public symbol carries an annotation, or that every file with `@architect-pattern` also has a behavioral test (the kind of thing the `core/raw/3A-test-coverage` agent surfaced).
 3. **No "no copied-without-edit JSDoc" check.** Two files with identical 5+ line JSDoc blocks would pass the current audit. The "duplicate boilerplate" mechanism the audit is named after isn't directly enforced — only specific phrase matches.
@@ -353,16 +360,19 @@ Total: 26 metric values that `compare-baseline.mjs` budgets against, plus 40 raw
 The current evidence file (generated 2026-05-17T13:34, ~3 hours later in the same day) shows `project.avgMs = 2.05 ms` and `renderPretty.avgMs = 1.88 ms`. Looking at the raw samples: iterations 1, 18, 34, 36 show anomalously high values (10.5, 30.9, 8.3, 11.3 ms). Mean is dragged up by 4-5 outliers, p50 (0.577 ms) is in line with baseline (0.526 ms).
 
 **Interpretation:**
+
 - The report is **information-rich**: 26 budgetable metrics + 40 raw samples + fixture metadata, enough to do post-hoc analysis or replot a histogram.
 - The report is **statistically fragile** by `avgMs`: 40 iterations is not enough samples to suppress GC pauses / event-loop dropouts (visible in the current report: iteration 18 is 50× the median).
 - The comparator's `min(hard, baseline × 1.5)` rule on `avgMs` would currently **fail** this evidence file (`project.avgMs = 2.05 ms` > `hard 1.5 ms`). The fact that nothing fails in `pnpm test` is a direct consequence of Cleanup-C-PROJ-1: the comparator isn't run.
 
 **Is the report useful or noise?**
+
 - Useful: yes — to a human running the gate locally with a clear before/after profile. The raw samples enable distribution analysis.
 - Noise risk: `avgMs` as the gate metric over 40 iterations is too sensitive to GC/JIT pauses. Switching budgets to `p50Ms` (already emitted) would harden the gate against false positives.
 - Storage: `.sisyphus/evidence/` is a git-ignored or git-tracked directory for evidence artifacts; the file is intended-to-be-regenerated. The samples appearing in commits would noise-up `git log`. Confirm `.sisyphus/evidence/` is `.gitignore`-d (per the `.gitignore` review earlier: `dist/`, `coverage/`, `.generated-docs-tmp/`, `docs-live/` are listed; `.sisyphus/` is **not** explicitly ignored). Worth adding `.sisyphus/evidence/` to `.gitignore` so future evidence files don't sneak into commits.
 
 **Recipe:**
+
 1. Wire `compare-baseline.mjs` into `pnpm test` (Cleanup-C-PROJ-1 (a)).
 2. Switch comparator's hard-budget field from `avgMs` to `p50Ms` for `project/renderObject/renderPretty` (already done for `isBundleP50Micros`). Avoids GC-pause false fails. ~3-line edit in `compare-baseline.mjs:13-17`.
 3. Add `.sisyphus/evidence/` to root `.gitignore` so the evidence file is not version-controlled, only the baseline is.
@@ -373,21 +383,22 @@ The current evidence file (generated 2026-05-17T13:34, ~3 hours later in the sam
 
 `npm pack --dry-run` confirms only `dist/**` ships. Within `dist/`, this is the audit:
 
-| Path | Why considered | Verdict |
-|---|---|---|
-| `dist/**/*.map` (290 files) | Source maps inflate tarball 50%. Same family-wide issue as core CL-CORE-3. | **Disable family-wide** via one-line `tsconfig.base.json` edit. Projection inherits the fix. |
-| `dist/**/*.d.ts.map` (subset of above) | Declaration maps generally unused by consumers. | **Disable family-wide.** |
-| `dist/_internal/**` | 5 files under `dist/_internal/`; corresponds to `src/_internal/` (the directory `format-utils.ts`, `slug.ts`, etc. that L-PROJ-A-6 flagged for promotion). | **Keep** — these are imported transitively from the public barrels. But the path `_internal` is a public surface convention violation; renaming to `shared/` (L-PROJ-A-6) would clarify. |
+| Path                                          | Why considered                                                                                                                                                                                                                  | Verdict                                                                                                                                                                                                                                               |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `dist/**/*.map` (290 files)                   | Source maps inflate tarball 50%. Same family-wide issue as core CL-CORE-3.                                                                                                                                                      | **Disable family-wide** via one-line `tsconfig.base.json` edit. Projection inherits the fix.                                                                                                                                                          |
+| `dist/**/*.d.ts.map` (subset of above)        | Declaration maps generally unused by consumers.                                                                                                                                                                                 | **Disable family-wide.**                                                                                                                                                                                                                              |
+| `dist/_internal/**`                           | 5 files under `dist/_internal/`; corresponds to `src/_internal/` (the directory `format-utils.ts`, `slug.ts`, etc. that L-PROJ-A-6 flagged for promotion).                                                                      | **Keep** — these are imported transitively from the public barrels. But the path `_internal` is a public surface convention violation; renaming to `shared/` (L-PROJ-A-6) would clarify.                                                              |
 | `dist/fragments/**/*.internal.d.ts` and `.js` | `.internal.ts` source files reach `dist` because TypeScript compiles all files in `tsconfig.json#include`. Per the renderer boundary lint rule, these are imports-banned from the renderer layer but still publicly resolvable. | **Keep, but document.** Phase 1 ADR-009 says "raw internal helpers hidden when validated entrypoint exists" is "Not held" (`L-PROJ-A-10`). The `.internal.ts → dist/.internal.js` chain materializes the gap. No quick fix; ADR clarification needed. |
-| `dist/shared/plain-object.{js,d.ts,...}` | The canonical `isPlainObject`. Not re-exported from the root barrel — only the local-private helpers in `src/renderers/**` use it. | **Keep.** Public via subpath unintentionally, but practically harmless. |
+| `dist/shared/plain-object.{js,d.ts,...}`      | The canonical `isPlainObject`. Not re-exported from the root barrel — only the local-private helpers in `src/renderers/**` use it.                                                                                              | **Keep.** Public via subpath unintentionally, but practically harmless.                                                                                                                                                                               |
 
 **Things absent from `dist/` that could surprise (audited):**
+
 - `scripts/options-schema-barrel-audit.mjs` and `scripts/jsdoc-boilerplate-audit.mjs` — **not in dist** (correct; these are workspace-only tools).
 - `tests/perf/compare-baseline.mjs` — **not in dist** (correct; workspace-only).
 - `tests/perf/baselines/business-rule-set.baseline.json` — **not in dist** (correct).
 - `vitest.perf-report.config.mjs` — **not in dist** (correct).
 - `docs/` — **not in dist** (correct).
-- `README.md` — **not in dist** — actually, this **is a small surprise**. `package.json#files = ["dist"]` excludes `README.md`. npm tarballs by default *do* include the README when present. With `files: ["dist"]` only, README is excluded. Siblings (core, guard, cli, mcp) have the same pattern. **Verdict:** family-wide — README is published only via the GitHub repo, not the tarball. Could be a quiet docs-discoverability gap, but it's consistent across siblings.
+- `README.md` — **not in dist** — actually, this **is a small surprise**. `package.json#files = ["dist"]` excludes `README.md`. npm tarballs by default _do_ include the README when present. With `files: ["dist"]` only, README is excluded. Siblings (core, guard, cli, mcp) have the same pattern. **Verdict:** family-wide — README is published only via the GitHub repo, not the tarball. Could be a quiet docs-discoverability gap, but it's consistent across siblings.
 
 ---
 
@@ -417,6 +428,6 @@ The current evidence file (generated 2026-05-17T13:34, ~3 hours later in the sam
 
 ## Overall verdict (cleanup lens)
 
-Projection is **the cleanest publishable package in the family** by doctrine compliance: zero suppressions, zero deprecation residue, zero legacy idioms, zero phantom deps, two custom audits already self-enforcing public-surface invariants, four eslint boundary rules guarding the renderer firewall. The package's *idioms* are not just right — they're enforced by the package's own tooling.
+Projection is **the cleanest publishable package in the family** by doctrine compliance: zero suppressions, zero deprecation residue, zero legacy idioms, zero phantom deps, two custom audits already self-enforcing public-surface invariants, four eslint boundary rules guarding the renderer firewall. The package's _idioms_ are not just right — they're enforced by the package's own tooling.
 
 The cleanup work that remains is **wiring the doctrine the package preaches to the automation that should enforce it**: hook `compare-baseline.mjs` into `pnpm test`, extend the barrel audit to cover `parseAndProject*` shape, dissolve the `summarizeTaxonomyDigest` triple re-export, deduplicate the perf vitest config, and either delete the `documentation-type-registry` Proxy facade or assume W-DOCS-1's deletion. None of these are doctrine violations; all of them are the gap between "the package promises X" and "the test suite enforces X". This is a different cleanup mode from core's "doctrine inconsistent on load-bearing surfaces" — and it's the easier mode to close.

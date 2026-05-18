@@ -12,6 +12,7 @@
 The single highest-leverage finding across the entire family review is a **one-line edit in core** discovered by Phase 4A:
 
 **`isValidStatusValue` already exists at `architect-core/src/validation/fsm/validator.ts:52` as a non-exported local function. `ProcessStatusSchema = z.enum(PROCESS_STATUS_VALUES)` exists at `domain-enums.ts:26` but isn't re-exported as `StatusValueSchema`. Adding `export` to one function + 2 re-export lines unblocks:**
+
 - Guard's 3 `as ProcessStatusValue` casts at `detect-changes.ts:414,440,452` (C-GUARD-1)
 - Projection's 3 `Set.has` narrowing sites (M-PROJ-F-4)
 - Core's own C-CORE-5 FSM trust-boundary recipe
@@ -30,63 +31,63 @@ Guard has **no `.extend()`/`.omit()`/`.pick()`/`.partial()`/`.required()` chains
 
 ### Critical (P0)
 
-| ID | Title | Locations |
-|----|-------|-----------|
-| **F4A-G-1** | **One-line core export of `isValidStatusValue` + `StatusValueSchema`** unblocks family's most critical FSM cross-package finding | `architect-core/src/validation/fsm/{validator,index}.ts` |
-| C-GUARD-1 + C-CORE-5 | FSM trust-boundary collapse — guard adds 3 fresh `as ProcessStatusValue` casts on raw regex captures; consumes core's lying `validateTransition`; zero FSM transition tests anywhere | `detect-changes.ts:414,440,452`, `decider.ts:300`, `decider.ts:314` (can throw `TypeError`) |
-| C-GUARD-2 / Cleanup-C-GUARD-2 | `tier-a-baseline.ts` 1,138 LOC dogfood leak in published barrel as `TIER_A_LINT_BASELINE` (45.8 KB / 7.8% of tarball; zero consumers can override) | `src/lint/tier-a-baseline.ts` |
-| C-GUARD-3 | Doctrine-enforcing package doesn't follow doctrine: 14 hand-written interfaces in `process-guard/types.ts`, zero `z.infer`; `AntiPatternThresholdsSchema` open `z.object` + parallel data literal | `src/lint/process-guard/types.ts`, `src/validation/types.ts:81-99` |
-| C-GUARD-4 | `parseAtBoundary` never used despite 3 trust boundaries (git diff text, CLI argv, `dangling-baseline.json`) | `detect-changes.ts`, `cli/*.ts`, `dangling-baseline.ts:102` |
-| Cleanup-C-GUARD-1 | **94% dead barrel surface** — only 9 of ~150 exports externally consumed | `src/index.ts` (12 wildcards) |
-| Cleanup-C-GUARD-3 / CI-G-C-1 | `packed-dangling-baseline-smoke.mjs` implemented but never invoked. Local-CI equivalent of projection's perf-gate wire-up. | `package.json#prepack` |
-| DOC-C-GUARD-1 | Phantom PDR-005 in user-visible `architect-guard --help` output | `cli/lint-process.ts:170` |
-| DOC-C-GUARD-2 | **No package README** — only publishable package without one | `packages/architect-guard/README.md` (absent) |
-| CI-G-C-2 / DOC-H-GUARD-1 | `@architect-bounded-context:generator` annotation on all 4 `git/` files (wrong — should be `:process-guard`) | `src/git/index.ts:6` + 3 sibling files |
+| ID                            | Title                                                                                                                                                                                             | Locations                                                                                   |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| **F4A-G-1**                   | **One-line core export of `isValidStatusValue` + `StatusValueSchema`** unblocks family's most critical FSM cross-package finding                                                                  | `architect-core/src/validation/fsm/{validator,index}.ts`                                    |
+| C-GUARD-1 + C-CORE-5          | FSM trust-boundary collapse — guard adds 3 fresh `as ProcessStatusValue` casts on raw regex captures; consumes core's lying `validateTransition`; zero FSM transition tests anywhere              | `detect-changes.ts:414,440,452`, `decider.ts:300`, `decider.ts:314` (can throw `TypeError`) |
+| C-GUARD-2 / Cleanup-C-GUARD-2 | `tier-a-baseline.ts` 1,138 LOC dogfood leak in published barrel as `TIER_A_LINT_BASELINE` (45.8 KB / 7.8% of tarball; zero consumers can override)                                                | `src/lint/tier-a-baseline.ts`                                                               |
+| C-GUARD-3                     | Doctrine-enforcing package doesn't follow doctrine: 14 hand-written interfaces in `process-guard/types.ts`, zero `z.infer`; `AntiPatternThresholdsSchema` open `z.object` + parallel data literal | `src/lint/process-guard/types.ts`, `src/validation/types.ts:81-99`                          |
+| C-GUARD-4                     | `parseAtBoundary` never used despite 3 trust boundaries (git diff text, CLI argv, `dangling-baseline.json`)                                                                                       | `detect-changes.ts`, `cli/*.ts`, `dangling-baseline.ts:102`                                 |
+| Cleanup-C-GUARD-1             | **94% dead barrel surface** — only 9 of ~150 exports externally consumed                                                                                                                          | `src/index.ts` (12 wildcards)                                                               |
+| Cleanup-C-GUARD-3 / CI-G-C-1  | `packed-dangling-baseline-smoke.mjs` implemented but never invoked. Local-CI equivalent of projection's perf-gate wire-up.                                                                        | `package.json#prepack`                                                                      |
+| DOC-C-GUARD-1                 | Phantom PDR-005 in user-visible `architect-guard --help` output                                                                                                                                   | `cli/lint-process.ts:170`                                                                   |
+| DOC-C-GUARD-2                 | **No package README** — only publishable package without one                                                                                                                                      | `packages/architect-guard/README.md` (absent)                                               |
+| CI-G-C-2 / DOC-H-GUARD-1      | `@architect-bounded-context:generator` annotation on all 4 `git/` files (wrong — should be `:process-guard`)                                                                                      | `src/git/index.ts:6` + 3 sibling files                                                      |
 
 ### High (P1) — 25 items
 
 **Architecture / Code quality (15 from Phase 1):**
 
-| ID | Title |
-|----|-------|
-| H-GUARD-1 | `src/index.ts` 12 `export *` wildcards — public contract unidentifiable |
-| H-GUARD-2 | `validate-patterns.ts` 935 LOC mixing 8 concerns |
-| H-GUARD-3 | `git/` module re-homing — **Phase 2 supersedes:** demote to `process-guard/_git/`, don't promote to core |
-| H-GUARD-4 | Two config-loading APIs (`loadConfig` and `loadProjectConfig`) — consolidate |
-| H-GUARD-5 | `getDeliverableWorkflowPatterns` belongs in core's `PatternGraphAPI` |
-| H-GUARD-6 | `dangling-baseline.ts` dual-write can silently corrupt consumer `node_modules` |
-| H-GUARD-7 | `process-guard-rules.feature:43-48` defers to nonexistent feature suite |
-| H-GUARD-8 | Phantom PDR-005 references (now 11 total — see DOC inventory below) |
-| H-GUARD-9 | `validateCompletionMetadata` core deletion creates DoD gap — guard has no equivalent |
-| H-GUARD-10 | `package.json#exports` only `.` + `./package.json` — no curated subpaths |
-| H-GUARD-11 | `tier-a-baseline.ts` family-wide structural lock |
-| H-GUARD-12 | Dual `console.*` paths + raw `Error` throws vs typed `ProjectionError`-style |
-| H-GUARD-13 | `dangling-baseline.json` build-time copy fragile to consumer-side absence |
-| H-GUARD-14 | `lint/` no shared error/diagnostic type across the 3 sub-modules |
-| Cleanup-H-GUARD-1 | Replace 12 wildcards in `src/index.ts` with 9 explicit named exports |
+| ID                | Title                                                                                                    |
+| ----------------- | -------------------------------------------------------------------------------------------------------- |
+| H-GUARD-1         | `src/index.ts` 12 `export *` wildcards — public contract unidentifiable                                  |
+| H-GUARD-2         | `validate-patterns.ts` 935 LOC mixing 8 concerns                                                         |
+| H-GUARD-3         | `git/` module re-homing — **Phase 2 supersedes:** demote to `process-guard/_git/`, don't promote to core |
+| H-GUARD-4         | Two config-loading APIs (`loadConfig` and `loadProjectConfig`) — consolidate                             |
+| H-GUARD-5         | `getDeliverableWorkflowPatterns` belongs in core's `PatternGraphAPI`                                     |
+| H-GUARD-6         | `dangling-baseline.ts` dual-write can silently corrupt consumer `node_modules`                           |
+| H-GUARD-7         | `process-guard-rules.feature:43-48` defers to nonexistent feature suite                                  |
+| H-GUARD-8         | Phantom PDR-005 references (now 11 total — see DOC inventory below)                                      |
+| H-GUARD-9         | `validateCompletionMetadata` core deletion creates DoD gap — guard has no equivalent                     |
+| H-GUARD-10        | `package.json#exports` only `.` + `./package.json` — no curated subpaths                                 |
+| H-GUARD-11        | `tier-a-baseline.ts` family-wide structural lock                                                         |
+| H-GUARD-12        | Dual `console.*` paths + raw `Error` throws vs typed `ProjectionError`-style                             |
+| H-GUARD-13        | `dangling-baseline.json` build-time copy fragile to consumer-side absence                                |
+| H-GUARD-14        | `lint/` no shared error/diagnostic type across the 3 sub-modules                                         |
+| Cleanup-H-GUARD-1 | Replace 12 wildcards in `src/index.ts` with 9 explicit named exports                                     |
 
 **Testing / Documentation (10):**
 
-| ID | Title |
-|----|-------|
-| TC-C-GUARD-1 | FSM transition tests on combined core+guard path (Scenario Outline: 4 legal + 3 illegal + 1 garbage) |
-| TC-C-GUARD-2 | `cli/validate-patterns.ts` 934 LOC zero tests |
-| TC-H-GUARD-1 | `checkScopeCreep`, `checkSessionScope` zero scenarios despite false "Verified by step bindings" claim |
-| TC-H-GUARD-2 | `dangling-baseline.ts` in-process functions zero tests |
-| TC-H-GUARD-3 | **4 of 5 anti-pattern sub-detectors NEVER REACHED** (`features: []` in tests) |
-| TC-H-GUARD-4 | `derive-state.ts` (172 LOC) zero tests |
-| TC-H-GUARD-5 | DoD failure paths zero tests |
-| TC-H-GUARD-7 | Wire `packed-dangling-baseline-smoke.mjs` to `prepack` (one line) — same as Cleanup-C-GUARD-3 |
-| DOC-H-GUARD-2 | `lint/steps/` (7 of 8 files) + `lint/idea-tier/` (4 of 4) unannotated |
-| DOC-H-GUARD-5 | `AGENTS.md:165` cites `ProcessGuard` — symbol doesn't exist in barrel |
+| ID            | Title                                                                                                 |
+| ------------- | ----------------------------------------------------------------------------------------------------- |
+| TC-C-GUARD-1  | FSM transition tests on combined core+guard path (Scenario Outline: 4 legal + 3 illegal + 1 garbage)  |
+| TC-C-GUARD-2  | `cli/validate-patterns.ts` 934 LOC zero tests                                                         |
+| TC-H-GUARD-1  | `checkScopeCreep`, `checkSessionScope` zero scenarios despite false "Verified by step bindings" claim |
+| TC-H-GUARD-2  | `dangling-baseline.ts` in-process functions zero tests                                                |
+| TC-H-GUARD-3  | **4 of 5 anti-pattern sub-detectors NEVER REACHED** (`features: []` in tests)                         |
+| TC-H-GUARD-4  | `derive-state.ts` (172 LOC) zero tests                                                                |
+| TC-H-GUARD-5  | DoD failure paths zero tests                                                                          |
+| TC-H-GUARD-7  | Wire `packed-dangling-baseline-smoke.mjs` to `prepack` (one line) — same as Cleanup-C-GUARD-3         |
+| DOC-H-GUARD-2 | `lint/steps/` (7 of 8 files) + `lint/idea-tier/` (4 of 4) unannotated                                 |
+| DOC-H-GUARD-5 | `AGENTS.md:165` cites `ProcessGuard` — symbol doesn't exist in barrel                                 |
 
 **Language / Framework (3 net-new from 4A):**
 
-| ID | Title |
-|----|-------|
-| F4A-G-H-2 | Zero `.brand<>()` declarations across 38 files; `sanitizeBranchName` should be a brand constructor (family-wide gap) |
+| ID        | Title                                                                                                                    |
+| --------- | ------------------------------------------------------------------------------------------------------------------------ |
+| F4A-G-H-2 | Zero `.brand<>()` declarations across 38 files; `sanitizeBranchName` should be a brand constructor (family-wide gap)     |
 | F4A-G-H-3 | 4 CLI bins parse argv by hand into hand-rolled interfaces (~360 LOC, zero Zod at trust boundary); `parseInt + isNaN` × 5 |
-| F4A-G-H-5 | 3 `void main()` async-call sites evade `no-suppression-comments` (same hazard as core F4A-H-9) |
+| F4A-G-H-5 | 3 `void main()` async-call sites evade `no-suppression-comments` (same hazard as core F4A-H-9)                           |
 
 ### Medium (P2) — ~25 items abbreviated
 
@@ -98,17 +99,17 @@ Regex hoisting; error-message capitalization; dead exports; W7/W1.5 stale commen
 
 ## Phantom PDR-005 inventory (11 sites)
 
-| Location | Type | Visibility |
-|----------|------|-----------|
-| `architect-guard/src/lint/process-guard/index.ts:14` | source | low |
-| `architect-guard/src/lint/process-guard/types.ts:29` | source | low |
-| `architect-guard/src/lint/process-guard/decider.ts:33,58` | source (×2) | low |
-| `architect-guard/src/cli/lint-process.ts:170` | **CLI help output** | **HIGH (user-visible)** |
-| `architect-core/src/taxonomy/registry-builder.ts:162` | source | low |
-| `architect-guard/docs/VALIDATION.md` | doc | medium |
-| `architect-guard/docs/GHERKIN-PATTERNS.md` | doc | medium |
-| `architect-guard/docs-sources/gherkin-patterns.md` | **doc source feeding generator** | **HIGH (propagates)** |
-| (3 additional low-priority sites per 3B grep) | | |
+| Location                                                  | Type                             | Visibility              |
+| --------------------------------------------------------- | -------------------------------- | ----------------------- |
+| `architect-guard/src/lint/process-guard/index.ts:14`      | source                           | low                     |
+| `architect-guard/src/lint/process-guard/types.ts:29`      | source                           | low                     |
+| `architect-guard/src/lint/process-guard/decider.ts:33,58` | source (×2)                      | low                     |
+| `architect-guard/src/cli/lint-process.ts:170`             | **CLI help output**              | **HIGH (user-visible)** |
+| `architect-core/src/taxonomy/registry-builder.ts:162`     | source                           | low                     |
+| `architect-guard/docs/VALIDATION.md`                      | doc                              | medium                  |
+| `architect-guard/docs/GHERKIN-PATTERNS.md`                | doc                              | medium                  |
+| `architect-guard/docs-sources/gherkin-patterns.md`        | **doc source feeding generator** | **HIGH (propagates)**   |
+| (3 additional low-priority sites per 3B grep)             |                                  |                         |
 
 **Decision: author PDR-005 (the FSM enforcement IS decision-worthy) or strip all 11 references in one coordinated PR.**
 

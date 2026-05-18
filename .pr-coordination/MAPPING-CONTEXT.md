@@ -19,12 +19,12 @@ This is **research**, not implementation. No substrate code lands here. No `arch
 
 ## 2. Inputs — the four docs (read these end-to-end, no skim)
 
-| # | File | Lines (approx) | Why this doc |
-|---|---|---|---|
-| 1 | `docs/ARCHITECTURE.md` | 1,627 | Long; varied content types — principle tables, pipeline diagrams, config schema rows, shape catalogues, file-reference tables. Highest content-type diversity per line. |
-| 2 | `docs/METHODOLOGY.md` | ~250 | Doctrine-heavy; table-heavy; mostly the same patterns as other docs (maintainer's own observation). Good test for "is the table problem reducible across docs". |
-| 3 | `formal-spec/04-tag-registry.md` | ~700 | Data-rich enumeration (12 tag groups × per-tag rows). The purest "this is derivable from the registry" test case. |
-| 4 | `.agents/skills/_shared/four-tier-ladder.md` | ~130 | Kernel doctrine; small; tier-by-tier promotion rules; tables. Tests whether `_shared/` content has natural source aggregates or genuinely belongs as the canonical site (per `docgen-mapping/00-synthesis.md` § 3 — `_shared/` owns 5 of 11 cross-corpus fragments). |
+| #   | File                                         | Lines (approx) | Why this doc                                                                                                                                                                                                                                                         |
+| --- | -------------------------------------------- | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | `docs/ARCHITECTURE.md`                       | 1,627          | Long; varied content types — principle tables, pipeline diagrams, config schema rows, shape catalogues, file-reference tables. Highest content-type diversity per line.                                                                                              |
+| 2   | `docs/METHODOLOGY.md`                        | ~250           | Doctrine-heavy; table-heavy; mostly the same patterns as other docs (maintainer's own observation). Good test for "is the table problem reducible across docs".                                                                                                      |
+| 3   | `formal-spec/04-tag-registry.md`             | ~700           | Data-rich enumeration (12 tag groups × per-tag rows). The purest "this is derivable from the registry" test case.                                                                                                                                                    |
+| 4   | `.agents/skills/_shared/four-tier-ladder.md` | ~130           | Kernel doctrine; small; tier-by-tier promotion rules; tables. Tests whether `_shared/` content has natural source aggregates or genuinely belongs as the canonical site (per `docgen-mapping/00-synthesis.md` § 3 — `_shared/` owns 5 of 11 cross-corpus fragments). |
 
 These four span: long-form architecture, doctrine, formal-spec, kernel. If the same 8-12 content types cover all four, the substrate's job stays bounded.
 
@@ -82,20 +82,23 @@ Path: `.pr-coordination/proto-output/mapping/SUMMARY.md`
 
 ## Content types observed across all four docs
 
-| Type | Count | Existing extractor | Sites needing new extractor work |
-|---|---|---|---|
-| principle-table | N | partial (extractDecisions) | <list> |
-| ... | | | |
+| Type            | Count | Existing extractor         | Sites needing new extractor work |
+| --------------- | ----- | -------------------------- | -------------------------------- |
+| principle-table | N     | partial (extractDecisions) | <list>                           |
+| ...             |       |                            |                                  |
 
 ## Extractor verdicts
 
 ### Already covered (ship as-is)
+
 - ...
 
 ### Needs work (W-DOCS-2 priority)
+
 - ...
 
 ### No source aggregate today (carve-out candidates)
+
 - ...
 
 ## Doc-category coverage
@@ -121,23 +124,23 @@ List every CP across all docs that has no clear source aggregate. Group by edito
 
 Walk each doc looking for these distinct content shapes. Each shape has a typical source candidate; the mapping confirms or refines.
 
-| Type | Typical shape | Typical source candidate(s) |
-|---|---|---|
-| `principle-table` | Named principles with one-line descriptions (e.g., ARCHITECTURE.md "Key Design Principles") | Per-ADR Feature title + first-line description; or hand-curated kernel doc |
-| `pipeline-table` | Stage × input × effect rows (e.g., scanner/extractor/transformer) | Zod schema fields + per-stage JSDoc on the canonical module |
-| `field-table` | Field × type × description (e.g., config schema documentation) | Zod schema introspection (`extractZodSchemaFields` — currently missing) |
-| `xref-table` | Tag × purpose, file × purpose, command × purpose, related-doc table | Tag registry; file metadata; command registry; declared cross-references |
-| `shape-snippet` | TypeScript interface / type / enum block | `extractShapes()` — already exists; preserves JSDoc |
-| `gherkin-snippet` | `Feature:` / `Rule:` / `Scenario:` example block | `extractBehaviors()` — already exists; or sample from real feature file |
-| `json-snippet` | Example JSON output block | Zod schema → JSON schema; or live CLI/MCP output capture |
-| `mermaid` | Graph TD/LR, sequenceDiagram, classDiagram, stateDiagram, C4Context | `extractGraphDiagram` (partial); other diagram types missing |
-| `section-prose` | Multi-paragraph explanatory prose at a section head | JSDoc on a canonical module via `parseMarkdownToBlocks` — already exists |
-| `editorial-framing` | Positioning ("this doc is for…"), narrative intros, "why this exists" | No source aggregate today — carve-out candidate |
-| `bullet-list` | Bulleted enumeration of features, capabilities, dos/don'ts | Tag enumeration; pattern-name list; or hand-authored |
-| `file-reference-list` | "Key files" tables, "See `path/to/file.ts`" inline links | File metadata on the symbol; package metadata |
-| `cli-invocation` | `pnpm architect:query …` blocks with explanations | CLI command registry (`COMMANDS` Zod object in `architect-cli`) — D8 prototype source |
-| `tag-enum` | Per-tag-group tables, per-status enum tables | `projectTaxonomyDigest` — already exists |
-| `other:<name>` | Anything that doesn't fit | Note it; this becomes a novel-type observation |
+| Type                  | Typical shape                                                                               | Typical source candidate(s)                                                           |
+| --------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| `principle-table`     | Named principles with one-line descriptions (e.g., ARCHITECTURE.md "Key Design Principles") | Per-ADR Feature title + first-line description; or hand-curated kernel doc            |
+| `pipeline-table`      | Stage × input × effect rows (e.g., scanner/extractor/transformer)                           | Zod schema fields + per-stage JSDoc on the canonical module                           |
+| `field-table`         | Field × type × description (e.g., config schema documentation)                              | Zod schema introspection (`extractZodSchemaFields` — currently missing)               |
+| `xref-table`          | Tag × purpose, file × purpose, command × purpose, related-doc table                         | Tag registry; file metadata; command registry; declared cross-references              |
+| `shape-snippet`       | TypeScript interface / type / enum block                                                    | `extractShapes()` — already exists; preserves JSDoc                                   |
+| `gherkin-snippet`     | `Feature:` / `Rule:` / `Scenario:` example block                                            | `extractBehaviors()` — already exists; or sample from real feature file               |
+| `json-snippet`        | Example JSON output block                                                                   | Zod schema → JSON schema; or live CLI/MCP output capture                              |
+| `mermaid`             | Graph TD/LR, sequenceDiagram, classDiagram, stateDiagram, C4Context                         | `extractGraphDiagram` (partial); other diagram types missing                          |
+| `section-prose`       | Multi-paragraph explanatory prose at a section head                                         | JSDoc on a canonical module via `parseMarkdownToBlocks` — already exists              |
+| `editorial-framing`   | Positioning ("this doc is for…"), narrative intros, "why this exists"                       | No source aggregate today — carve-out candidate                                       |
+| `bullet-list`         | Bulleted enumeration of features, capabilities, dos/don'ts                                  | Tag enumeration; pattern-name list; or hand-authored                                  |
+| `file-reference-list` | "Key files" tables, "See `path/to/file.ts`" inline links                                    | File metadata on the symbol; package metadata                                         |
+| `cli-invocation`      | `pnpm architect:query …` blocks with explanations                                           | CLI command registry (`COMMANDS` Zod object in `architect-cli`) — D8 prototype source |
+| `tag-enum`            | Per-tag-group tables, per-status enum tables                                                | `projectTaxonomyDigest` — already exists                                              |
+| `other:<name>`        | Anything that doesn't fit                                                                   | Note it; this becomes a novel-type observation                                        |
 
 Add to the taxonomy only when something genuinely new shows up; mark it `other:<name>` and capture in the aggregate summary's "Content types observed" table.
 
@@ -145,38 +148,38 @@ Add to the taxonomy only when something genuinely new shows up; mark it `other:<
 
 Reference this when deciding extractor status. Source: `DEEP-DIVE.md` Q1 + FINDINGS § 2 + `PROJECTION-MAPPING.md` § 4.
 
-| Extractor | Status | Coverage |
-|---|---|---|
-| `extractShapes()` + `discoverTaggedShapes()` | ships | TS interfaces / types / enums / consts; preserves JSDoc as raw source text |
-| `extractBehaviors()` (via `projectBusinessRuleSet`) | ships | Gherkin `Rule:` blocks with rationale + verified-by |
-| `extractDecisions()` (via `projectDecisionCatalog`) | ships | Decision feature files; per-ADR Context/Decision/Consequences |
-| `parseMarkdownToBlocks()` | ships | JSDoc / markdown prose → SectionBlock[] (6 of 9 block types) |
-| `projectTaxonomyDigest` | ships | Tag registry with group/value tables |
-| `projectDependencyEdges` / `projectDependencyTree` | ships | `uses`/`implements`/`extends`/`see-also` graphs |
-| `extractGraphDiagram` | partial | `graph TD` only today; `graph LR`, sequenceDiagram, classDiagram, stateDiagram-v2, C4Context not present |
-| `extractZodSchemaFields` | **missing** | Would parse `z.strictObject({...}).describe(...)` into rows |
-| `extractFunctionSignature` (structured) | **missing** | Today returns raw source text; structured `{name, params, returns, examples}` not available |
-| `extractCliCommands` | **missing** | D8 prototype hand-rolled this; the real extractor reads `COMMANDS` in `architect-cli/src/cli/cli-schema.ts` |
-| `extractMcpTools` | **missing** | Reads `ARCHITECT_MCP_TOOLS` in `architect-mcp/src/tool-metadata.ts` |
-| `extractLintRules` | **missing** | Would need new `@architect-lint-rule:<id>` JSDoc carrier (contradicts D3''; needs explicit decision) |
-| `extractFSMTransitionMatrix` / `extractProcessGuardRules` | **missing** | Sources: `validation/fsm/transitions.ts`, `architect-guard/src/lint/process-guard/decider.ts` |
-| `extractAggregations(tag)` | partial in registry | Aggregation tags with `targetDoc:` exist in registry (`decision`, `overview`, `intro`); projection-layer consumer for the push model is the unused piece |
+| Extractor                                                 | Status              | Coverage                                                                                                                                                 |
+| --------------------------------------------------------- | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `extractShapes()` + `discoverTaggedShapes()`              | ships               | TS interfaces / types / enums / consts; preserves JSDoc as raw source text                                                                               |
+| `extractBehaviors()` (via `projectBusinessRuleSet`)       | ships               | Gherkin `Rule:` blocks with rationale + verified-by                                                                                                      |
+| `extractDecisions()` (via `projectDecisionCatalog`)       | ships               | Decision feature files; per-ADR Context/Decision/Consequences                                                                                            |
+| `parseMarkdownToBlocks()`                                 | ships               | JSDoc / markdown prose → SectionBlock[] (6 of 9 block types)                                                                                             |
+| `projectTaxonomyDigest`                                   | ships               | Tag registry with group/value tables                                                                                                                     |
+| `projectDependencyEdges` / `projectDependencyTree`        | ships               | `uses`/`implements`/`extends`/`see-also` graphs                                                                                                          |
+| `extractGraphDiagram`                                     | partial             | `graph TD` only today; `graph LR`, sequenceDiagram, classDiagram, stateDiagram-v2, C4Context not present                                                 |
+| `extractZodSchemaFields`                                  | **missing**         | Would parse `z.strictObject({...}).describe(...)` into rows                                                                                              |
+| `extractFunctionSignature` (structured)                   | **missing**         | Today returns raw source text; structured `{name, params, returns, examples}` not available                                                              |
+| `extractCliCommands`                                      | **missing**         | D8 prototype hand-rolled this; the real extractor reads `COMMANDS` in `architect-cli/src/cli/cli-schema.ts`                                              |
+| `extractMcpTools`                                         | **missing**         | Reads `ARCHITECT_MCP_TOOLS` in `architect-mcp/src/tool-metadata.ts`                                                                                      |
+| `extractLintRules`                                        | **missing**         | Would need new `@architect-lint-rule:<id>` JSDoc carrier (contradicts D3''; needs explicit decision)                                                     |
+| `extractFSMTransitionMatrix` / `extractProcessGuardRules` | **missing**         | Sources: `validation/fsm/transitions.ts`, `architect-guard/src/lint/process-guard/decider.ts`                                                            |
+| `extractAggregations(tag)`                                | partial in registry | Aggregation tags with `targetDoc:` exist in registry (`decision`, `overview`, `intro`); projection-layer consumer for the push model is the unused piece |
 
 ## 6. Selector palette (the "selector option" column)
 
 Brief reference; full table in `MATRIX-FRAMEWORK.md` § 3.
 
-| # | Option | Use when |
-|---|---|---|
-| 1 | Tag predicate (`@architect-role:codec`, `@architect-bounded-context:X`) | Content is defined by semantic identity already on the source |
-| 2 | `@architect-pattern` enumeration (whole graph or filtered) | Content is exhaustive over a level (per-package, per-bounded-context) |
-| 3 | Aggregation tag with `targetDoc:` (push model) | Source declares the destination — `@architect-decision`, `@architect-overview`, `@architect-intro` (already in registry, unused at projection layer) |
-| 4 | `@architect-doc-inclusion:<enum>` membership tag (NEW carrier) | **Forbidden by D3''** unless the mapping finds a content case the other options provably cannot cover. Flag any such case in the aggregate summary. |
-| 5 | Shape selectors (by group, source path + names) | TS AST query over existing JSDoc + path globs |
-| 6 | Path-based filters (package, file glob, exclusions) | Content scoped to a package or file path |
-| 7 | Decision-feature filters (path + `@architect-adr-category`) | Content is ADR-driven |
-| 8 | Registry-direct selectors (taxonomy, FSM tables, CLI/MCP registries) | The registry IS the truth — no graph predicate needed |
-| 9 | Diagram-scope objects (`{ archContext, archLayer, patterns, include, direction, type, source }`) | Diagram body distinct from doc body |
+| #   | Option                                                                                           | Use when                                                                                                                                             |
+| --- | ------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Tag predicate (`@architect-role:codec`, `@architect-bounded-context:X`)                          | Content is defined by semantic identity already on the source                                                                                        |
+| 2   | `@architect-pattern` enumeration (whole graph or filtered)                                       | Content is exhaustive over a level (per-package, per-bounded-context)                                                                                |
+| 3   | Aggregation tag with `targetDoc:` (push model)                                                   | Source declares the destination — `@architect-decision`, `@architect-overview`, `@architect-intro` (already in registry, unused at projection layer) |
+| 4   | `@architect-doc-inclusion:<enum>` membership tag (NEW carrier)                                   | **Forbidden by D3''** unless the mapping finds a content case the other options provably cannot cover. Flag any such case in the aggregate summary.  |
+| 5   | Shape selectors (by group, source path + names)                                                  | TS AST query over existing JSDoc + path globs                                                                                                        |
+| 6   | Path-based filters (package, file glob, exclusions)                                              | Content scoped to a package or file path                                                                                                             |
+| 7   | Decision-feature filters (path + `@architect-adr-category`)                                      | Content is ADR-driven                                                                                                                                |
+| 8   | Registry-direct selectors (taxonomy, FSM tables, CLI/MCP registries)                             | The registry IS the truth — no graph predicate needed                                                                                                |
+| 9   | Diagram-scope objects (`{ archContext, archLayer, patterns, include, direction, type, source }`) | Diagram body distinct from doc body                                                                                                                  |
 
 ## 7. Worked example — using the maintainer's own ARCHITECTURE.md notes
 

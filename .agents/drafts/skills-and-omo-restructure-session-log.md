@@ -2,13 +2,13 @@
 
 ## What this session produced
 
-| Artifact | Path | Purpose |
-| --- | --- | --- |
-| New mandatory skill | `.agents/skills/architect-base/SKILL.md` | Single load-first context covering identity, delivery process, PatternGraph, annotations, tiers, FSM, value transfer, ADRs, Data API basics. Replaces the broken `architect-session-router` + `architect-data-api` mandatory pair. |
-| Symlinks | `.claude/skills/architect-base`, `.opencode/skills/architect-base` | Harness discovery (Claude Code description-based activation + OpenCode skill source glob). |
-| OmO config swap | `.opencode/oh-my-openagent.jsonc` | All agent `skills` arrays and the enable list now point at `architect-base` only. Old broken pair no longer injected. |
-| OmO category bootstrap | `.opencode/prompts/architect-kernel-bootstrap.md` | Rewritten to reference `architect-base` + load-verification convention. Still wired into all 8 categories via `prompt_append`. |
-| Two draft skills (this folder) | `.agents/drafts/architect-skills-management-DRAFT.md`, `.agents/drafts/omo-setup-management-DRAFT.md` | Stubs for the two maintainer-facing skills to be promoted next. |
+| Artifact                       | Path                                                                                                  | Purpose                                                                                                                                                                                                                            |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| New mandatory skill            | `.agents/skills/architect-base/SKILL.md`                                                              | Single load-first context covering identity, delivery process, PatternGraph, annotations, tiers, FSM, value transfer, ADRs, Data API basics. Replaces the broken `architect-session-router` + `architect-data-api` mandatory pair. |
+| Symlinks                       | `.claude/skills/architect-base`, `.opencode/skills/architect-base`                                    | Harness discovery (Claude Code description-based activation + OpenCode skill source glob).                                                                                                                                         |
+| OmO config swap                | `.opencode/oh-my-openagent.jsonc`                                                                     | All agent `skills` arrays and the enable list now point at `architect-base` only. Old broken pair no longer injected.                                                                                                              |
+| OmO category bootstrap         | `.opencode/prompts/architect-kernel-bootstrap.md`                                                     | Rewritten to reference `architect-base` + load-verification convention. Still wired into all 8 categories via `prompt_append`.                                                                                                     |
+| Two draft skills (this folder) | `.agents/drafts/architect-skills-management-DRAFT.md`, `.agents/drafts/omo-setup-management-DRAFT.md` | Stubs for the two maintainer-facing skills to be promoted next.                                                                                                                                                                    |
 
 ## Load verification — how to confirm `architect-base` activates
 
@@ -37,20 +37,20 @@ Validated against `oh-my-openagent` source at `/Users/darkomijic/dev-projects/pi
 
 ## Current `.agents/skills/` inventory
 
-| Skill | Symlinked to harnesses? | Role |
-| --- | --- | --- |
-| `_shared/` (9 files) | yes (both) | Doctrine fragments referenced by session skills via relative links |
-| `architect-base` | **NEW, both** | Mandatory baseline (this session) |
-| `architect-session-router` | yes (both) | Intent detection + routing (broken description; superseded as mandatory) |
-| `architect-data-api` | yes (both) | Verb reference (too verbose for mandatory; useful as opt-in) |
-| `architect-plan-session` | yes (both) | Idea / candidate authoring |
-| `architect-design-session` | yes (both) | Design-tier promotion |
-| `architect-implement-spec` | yes (both) | Build a design spec end-to-end + value transfer |
-| `architect-review-spec` | yes (both) | Pre-implementation gap review |
-| `architect-review-implementation` | yes (both) | Post-merge value-transfer review + batched deletion |
-| `architect-refactor-session` | yes (both) | Refactor shipped code without a spec (bundles refactor + multi-session coordination — split candidate) |
-| `architect-verify-handoff` | yes (both) | End-of-session handoff capture |
-| `architect-cli-overview` | **NO** | Prototype output from `scripts/proto/cli-catalog.ts`; not a production skill |
+| Skill                             | Symlinked to harnesses? | Role                                                                                                   |
+| --------------------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------ |
+| `_shared/` (9 files)              | yes (both)              | Doctrine fragments referenced by session skills via relative links                                     |
+| `architect-base`                  | **NEW, both**           | Mandatory baseline (this session)                                                                      |
+| `architect-session-router`        | yes (both)              | Intent detection + routing (broken description; superseded as mandatory)                               |
+| `architect-data-api`              | yes (both)              | Verb reference (too verbose for mandatory; useful as opt-in)                                           |
+| `architect-plan-session`          | yes (both)              | Idea / candidate authoring                                                                             |
+| `architect-design-session`        | yes (both)              | Design-tier promotion                                                                                  |
+| `architect-implement-spec`        | yes (both)              | Build a design spec end-to-end + value transfer                                                        |
+| `architect-review-spec`           | yes (both)              | Pre-implementation gap review                                                                          |
+| `architect-review-implementation` | yes (both)              | Post-merge value-transfer review + batched deletion                                                    |
+| `architect-refactor-session`      | yes (both)              | Refactor shipped code without a spec (bundles refactor + multi-session coordination — split candidate) |
+| `architect-verify-handoff`        | yes (both)              | End-of-session handoff capture                                                                         |
+| `architect-cli-overview`          | **NO**                  | Prototype output from `scripts/proto/cli-catalog.ts`; not a production skill                           |
 
 `_shared/` fragments:
 
@@ -136,15 +136,15 @@ Explicit non-goals (per user direction): no refactor carve-out execution detail;
 
 ## Open items for the next iteration
 
-| # | Item |
-| --- | --- |
-| 1 | Decide fate of `architect-session-router` + `architect-data-api` (deprecate, demote to opt-in, or refactor) |
-| 2 | Split `architect-refactor-session` into refactor + (harness-aware) coordination |
-| 3 | Auto-generation pipeline (typed source → per-harness bundles) |
-| 4 | Sanity-check `_shared/` for terminology drift (kernel / doctrine / anti-anecdote / provenance / self-contained) — inline or rename |
-| 5 | Decide fate of `architect-cli-overview` (delete / promote / move) |
-| 6 | Diagnose OmO skill-loading runtime bug separately (config is clean per this session) |
-| 7 | Promote the two draft management skills in `.agents/drafts/` to live skills under `.agents/skills/` |
+| #   | Item                                                                                                                               |
+| --- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Decide fate of `architect-session-router` + `architect-data-api` (deprecate, demote to opt-in, or refactor)                        |
+| 2   | Split `architect-refactor-session` into refactor + (harness-aware) coordination                                                    |
+| 3   | Auto-generation pipeline (typed source → per-harness bundles)                                                                      |
+| 4   | Sanity-check `_shared/` for terminology drift (kernel / doctrine / anti-anecdote / provenance / self-contained) — inline or rename |
+| 5   | Decide fate of `architect-cli-overview` (delete / promote / move)                                                                  |
+| 6   | Diagnose OmO skill-loading runtime bug separately (config is clean per this session)                                               |
+| 7   | Promote the two draft management skills in `.agents/drafts/` to live skills under `.agents/skills/`                                |
 
 ## Bottom-line state at session end
 

@@ -1,13 +1,14 @@
 # Feature: Session Handoff (`handoff`)
 
 ## Status
+
 ✅ COMPLETE — CLI `architect handoff --pattern <p> [--session <…>] [--modified-file <path>]…`; MCP `architect_handoff` with `{ name, session?, modifiedFiles? }`; emits a `HandoffRecord` Fragment for the next agent session.
 
 ## Overview
 
 A typical Architect session — design, implementation, refactor — runs across multiple agent turns and may span multiple model conversations. When a session ends (intentionally or because context fills), the platform must hand off enough state to the next session that work resumes without ambiguity: which pattern was the focus, what session type, what FSM state, which files changed, what blockers remain, and what the recommended next steps are.
 
-`handoff` is the verb that emits that record. It is the symmetric counterpart to `scope-validate`: scope-validate gates the *opening* of a session, handoff captures the *closing* state. The result is a `HandoffRecord` Fragment — a typed, Zod-validated structure that the next agent (or the next human) can re-ingest deterministically. Like scope-validate, handoff's domain is pure: it reads `PatternGraph` and (optionally, via `--git`) the modified-files list, and emits the record. No shell calls live in the domain layer.
+`handoff` is the verb that emits that record. It is the symmetric counterpart to `scope-validate`: scope-validate gates the _opening_ of a session, handoff captures the _closing_ state. The result is a `HandoffRecord` Fragment — a typed, Zod-validated structure that the next agent (or the next human) can re-ingest deterministically. Like scope-validate, handoff's domain is pure: it reads `PatternGraph` and (optionally, via `--git`) the modified-files list, and emits the record. No shell calls live in the domain layer.
 
 The handoff record's `session` field carries the four-valued `HandoffSessionType` (`SessionType + 'review'`), reflecting that a review pass can also produce a handoff at its conclusion. The `modifiedFiles` argument is capped at 200 entries — a deliberate, schema-enforced bound to keep records compact and the next session's bootstrap fast.
 
@@ -49,6 +50,7 @@ Reference: `functional-specification.md` FR-011; `data-architecture.md` §3 Exec
 ## Implementation Status
 
 **Completed:**
+
 - ✅ `HandoffSessionType` enum: `packages/architect-core/src/domain-enums.ts:13-23`.
 - ✅ Fragment schema: `packages/architect-projection/src/fragments/execution-context/handoff-record.ts`.
 - ✅ Domain builder: `projectHandoffRecord` + `requireProjectedHandoff`.

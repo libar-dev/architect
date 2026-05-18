@@ -1,6 +1,7 @@
 # Feature: Trust Boundary Validation
 
 ## Status
+
 ✅ COMPLETE — Every CLI / MCP / cross-package input is validated against a Zod `strictObject` schema at exactly one boundary. Internal code assumes typed inputs.
 
 ## Overview
@@ -41,6 +42,7 @@ The platform exposes a single validation primitive — `parseAtBoundary` in `@li
 ## Implementation Status
 
 **Completed:**
+
 - ✅ `parseAtBoundary` + `BoundaryParseError` in `packages/architect-core/src/index.ts`.
 - ✅ `formatZodError` produces structured error output for CLI / MCP responses.
 - ✅ All 21 MCP tool input schemas are `z.strictObject(...).readonly()` (`packages/architect-mcp/src/tool-input-schemas.ts`).

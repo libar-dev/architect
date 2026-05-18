@@ -1,6 +1,7 @@
 # Feature: Pattern Graph Construction
 
 ## Status
+
 ✅ COMPLETE — Build pipeline scans annotated TypeScript + Gherkin sources and produces a typed in-memory `PatternGraph`. Fully implemented in `@libar-dev/architect-core`.
 
 ## Overview
@@ -40,6 +41,7 @@ Construction is tolerant of malformed input: parse failures land in `featurePars
 ## Implementation Status
 
 **Completed:**
+
 - ✅ `buildPatternGraph` and `transformToPatternGraph(WithValidation)` in `packages/architect-core/src/index.ts`.
 - ✅ Scanner + extractor modules under `packages/architect-core/src/scanner/` and `/extractor/`.
 - ✅ `PatternIdentifier` regex in `pattern-contract.ts:3,12-16`.

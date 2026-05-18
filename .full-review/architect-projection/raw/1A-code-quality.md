@@ -4,11 +4,11 @@
 
 ## Executive Summary
 
-The package's *idioms* are strong: zero `@ts-ignore`/`eslint-disable`/`TODO`/`FIXME`, doctrine-correct `z.strictObject` use across all 107 schema sites, `parseAtBoundary` actually wired in via a shared `parseAndProject` helper (closing the gap CORE has open), discriminated-union `Fragment` schema, and a real module-private `TRUSTED_MARKDOWN` symbol that stays inside `render-markdown.ts`. The architecture-level lint rules are honored — renderers do not import documentation-composition or `.internal.js` files, do not construct route IDs, and the trust symbol does not leak.
+The package's _idioms_ are strong: zero `@ts-ignore`/`eslint-disable`/`TODO`/`FIXME`, doctrine-correct `z.strictObject` use across all 107 schema sites, `parseAtBoundary` actually wired in via a shared `parseAndProject` helper (closing the gap CORE has open), discriminated-union `Fragment` schema, and a real module-private `TRUSTED_MARKDOWN` symbol that stays inside `render-markdown.ts`. The architecture-level lint rules are honored — renderers do not import documentation-composition or `.internal.js` files, do not construct route IDs, and the trust symbol does not leak.
 
-The *application* of those idioms is uneven on the load-bearing files. `render-markdown.ts` is 2,227 lines; `projections/operational-insights/index.ts` is 1,200 lines (build-helpers + 8 projections + 7 JSDoc walls + a 4-bucket dispatch glued together by `createBucketedRequirementDigest`); `business-rules.internal.ts` is 602 lines and reimplements `parseBusinessRuleAnnotations` + `deduplicateScenarioNames` already living in `_shared/pattern-helpers.internal.ts`. `getPatternName`, `createStatusCounts`, `isPrimitiveLike`, `toTabularRows`, `getTabularColumns`, and `isBlockArray` each exist in 2-3 sites within this package — a low-effort consolidation pass dissolves ~200 LOC. Two error styles coexist (16 raw `Error` vs 9 `ProjectionError` with discriminated codes), `PatternDetailSchema` ships the Zod 4 `.extend()`-drops-strict bug from core (F4A-H-6), and `filterPatterns` does an unconditional defensive copy at all 14 hot call sites even when no filter is active.
+The _application_ of those idioms is uneven on the load-bearing files. `render-markdown.ts` is 2,227 lines; `projections/operational-insights/index.ts` is 1,200 lines (build-helpers + 8 projections + 7 JSDoc walls + a 4-bucket dispatch glued together by `createBucketedRequirementDigest`); `business-rules.internal.ts` is 602 lines and reimplements `parseBusinessRuleAnnotations` + `deduplicateScenarioNames` already living in `_shared/pattern-helpers.internal.ts`. `getPatternName`, `createStatusCounts`, `isPrimitiveLike`, `toTabularRows`, `getTabularColumns`, and `isBlockArray` each exist in 2-3 sites within this package — a low-effort consolidation pass dissolves ~200 LOC. Two error styles coexist (16 raw `Error` vs 9 `ProjectionError` with discriminated codes), `PatternDetailSchema` ships the Zod 4 `.extend()`-drops-strict bug from core (F4A-H-6), and `filterPatterns` does an unconditional defensive copy at all 14 hot call sites even when no filter is active.
 
-Two CL-CORE-* findings are confirmed in place: `fuzzy-match` (Levenshtein + scoring) at `pattern-helpers.internal.ts:432-514` and `extractFirstSentenceRaw` at lines 274-286 — both duplicated from `architect-core/src/utils/`. The architect-core deletion plan (CL-CORE-16/17) calls for removing the projection copies; flagged here and confirmed grep-able.
+Two CL-CORE-\* findings are confirmed in place: `fuzzy-match` (Levenshtein + scoring) at `pattern-helpers.internal.ts:432-514` and `extractFirstSentenceRaw` at lines 274-286 — both duplicated from `architect-core/src/utils/`. The architect-core deletion plan (CL-CORE-16/17) calls for removing the projection copies; flagged here and confirmed grep-able.
 
 No critical-severity defects, but four High items materially affect the perf-gate downstream of H-CORE-8 and the schema doctrine.
 
@@ -57,7 +57,7 @@ export const PatternDetailSchema = z.strictObject({
 });
 ```
 
-#### H-PROJ-2 — `parseBusinessRuleAnnotations` + `deduplicateScenarioNames` duplicated (governance vs _shared)
+#### H-PROJ-2 — `parseBusinessRuleAnnotations` + `deduplicateScenarioNames` duplicated (governance vs \_shared)
 
 `src/projections/_shared/pattern-helpers.internal.ts:349-425` AND `src/projections/governance/business-rules.internal.ts:535-602`.
 
@@ -75,13 +75,14 @@ export function deduplicateScenarioNames(...): string[] { ... }
 #### H-PROJ-3 — `getPatternName` exists three times across this package
 
 Sites:
+
 - `src/projections/_shared/pattern-helpers.internal.ts:77-79`
 - `src/projections/governance/governance-shared.internal.ts:33-35`
 - (implicit via inline `pattern.patternName ?? pattern.name` elsewhere — grep confirms the two helper sites)
 
 Identical bodies. The governance copy was created so governance files wouldn't import from `_shared/pattern-helpers.internal.ts`, but the governance projection already imports `requirePattern` and the bundle code already crosses this boundary, so the separation is not load-bearing.
 
-**Recommendation:** Delete `governance-shared.internal.ts#getPatternName` and import from `_shared/pattern-helpers.internal.ts`. While there, audit `slugify` (the governance copy at `governance-shared.internal.ts:50-56` is *different* from `slugForFilename` at `_internal/slug.ts:11-18` because it does not camelCase-split; the architect-core `slugify` is the third variant). Pick one canonical slug function and document the camelCase-handling decision in its JSDoc.
+**Recommendation:** Delete `governance-shared.internal.ts#getPatternName` and import from `_shared/pattern-helpers.internal.ts`. While there, audit `slugify` (the governance copy at `governance-shared.internal.ts:50-56` is _different_ from `slugForFilename` at `_internal/slug.ts:11-18` because it does not camelCase-split; the architect-core `slugify` is the third variant). Pick one canonical slug function and document the camelCase-handling decision in its JSDoc.
 
 #### H-PROJ-4 — `createStatusCounts` duplicated between two large projections
 
@@ -93,11 +94,18 @@ Both are identical 5-line `filter`-based folds over `isPatternComplete`/`isPatte
 
 ```ts
 export interface StatusCounts {
-  completed: number; active: number; planned: number; candidate: number; total: number;
+  completed: number;
+  active: number;
+  planned: number;
+  candidate: number;
+  total: number;
 }
 
 export function createStatusCounts(patterns: readonly ExtractedPattern[]): StatusCounts {
-  let completed = 0, active = 0, planned = 0, candidate = 0;
+  let completed = 0,
+    active = 0,
+    planned = 0,
+    candidate = 0;
   for (const p of patterns) {
     if (isPatternComplete(p.status)) completed++;
     else if (isPatternActive(p.status)) active++;
@@ -213,7 +221,7 @@ This converts the cost to O(1) per frame. Default `maxDepth` is unbounded in `De
 
 #### M-PROJ-4 — `BundleRouting` is a hand-written interface parallel to its Zod-validated peers
 
-`src/fragments/base.ts:6-25`. Every other contract in `fragments/**` is `z.infer<typeof XSchema>`. `BundleRouting` is the only structural type that ships *only* as a TS interface — and there's even a hand-written validator (`isRoutingLike` at lines 64-77) implementing what `z.strictObject(...).safeParse(...)` would do for free. The validator already references `DisclosureSpecSchema.safeParse` and `isLogicalRouteId`, so the Zod machinery is in scope.
+`src/fragments/base.ts:6-25`. Every other contract in `fragments/**` is `z.infer<typeof XSchema>`. `BundleRouting` is the only structural type that ships _only_ as a TS interface — and there's even a hand-written validator (`isRoutingLike` at lines 64-77) implementing what `z.strictObject(...).safeParse(...)` would do for free. The validator already references `DisclosureSpecSchema.safeParse` and `isLogicalRouteId`, so the Zod machinery is in scope.
 
 **Recommendation:** Define `BundleRoutingSchema` and infer the type. `isRoutingLike`, `isOptionalString`, `isOptionalEntityPathLayout`, `isChildPathStrategy`, `isAnchorStrategy` all collapse into `BundleRoutingSchema.safeParse(value).success`.
 
@@ -238,6 +246,7 @@ This is two-stage validation hidden behind two schemas. Documentation-bundle is 
 #### M-PROJ-6 — `pattern-helpers.internal.ts:432-514` and `:274-286` duplicate architect-core utils (CL-CORE-16/17)
 
 Confirmed:
+
 - `findBestMatch` + `scoreMatch` + `levenshteinDistance` at lines 432-514
 - `extractFirstSentenceRaw` at lines 274-286
 
@@ -294,7 +303,7 @@ Doctrine requires strict cross-package option schemas (Zod-first, `z.strictObjec
 export function parseAndProject<Options extends z.core.SomeType, Output>(
   schema: z.ZodObject<Options> & { _zod: { def: { catchall: z.ZodNever } } },
   // or simpler — pin via the helper's own runtime check that schema is strict
-)
+);
 ```
 
 Practical Zod 4 typing here is awkward; the simpler safety net is a runtime assertion inside the helper that throws if `schema instanceof z.ZodObject` and `schema._def.catchall` is not `ZodNever`. (Zod 4 internals; pin a small test.)
@@ -422,4 +431,4 @@ Five recurring shapes are each cheap to fix once and recur many times:
 - **F4A-H-6 (Zod 4 `.extend()` drops strict)** — confirmed in `pattern-detail.ts:24` and `supporting.ts:54-58`. H-PROJ-1.
 - **H-CORE-8 (27× `structuredClone` per `PatternGraphAPI` read)** — projection consumes the read API heavily; perf gate sits downstream. H-PROJ-6 (defensive copy in `filterPatterns`) is the projection-side analogue. Both should land before re-baselining the perf budget (per the cross-package recommendations §4).
 - **C-CORE-5 (`validateTransition` casts strings to `ProcessStatusValue`)** — same pattern recurs at `session-context.internal.ts:264` and `scope-readiness.internal.ts:164` (M-PROJ-1). Both projection sites depend on architect-core exporting `isValidProcessStatus` first.
-- **TD-CORE-1 (`parseAtBoundary` unused in core)** — projection actually uses it via `parseAndProject` helper. Projection is the consumer that gives the helper its real-world test coverage; sweep 26 of the core action plan lands the trust-boundary use *back* in core so both sides match.
+- **TD-CORE-1 (`parseAtBoundary` unused in core)** — projection actually uses it via `parseAndProject` helper. Projection is the consumer that gives the helper its real-world test coverage; sweep 26 of the core action plan lands the trust-boundary use _back_ in core so both sides match.

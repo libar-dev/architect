@@ -1,6 +1,6 @@
 # `@libar-dev/architect` Family — Root-Cause Analysis & Systematic Cleanup Plan
 
-**Purpose:** Final pre-1.0 cleanup plan, root-cause-centric. This document supersedes the symptom-class enumeration in `CLEANUP-MANDATE.md` (which remains valid as a per-class taxonomy reference). The mandate captures *what* is wrong across 15 symptom classes; this document captures *why* the symptoms recur after 27 refactoring PRs and defines the systematic fix.
+**Purpose:** Final pre-1.0 cleanup plan, root-cause-centric. This document supersedes the symptom-class enumeration in `CLEANUP-MANDATE.md` (which remains valid as a per-class taxonomy reference). The mandate captures _what_ is wrong across 15 symptom classes; this document captures _why_ the symptoms recur after 27 refactoring PRs and defines the systematic fix.
 
 **Validated by:** four parallel deep-investigation agents auditing the four layer seams in current `main` (2026-05-18), each carrying a falsifiable hypothesis. All four hypotheses were confirmed with file-level evidence.
 
@@ -8,40 +8,45 @@
 
 ---
 
-## 1. The validated root cause *(one sentence + the causal chain)*
+## 1. The validated root cause _(one sentence + the causal chain)_
 
-> **After 27 refactoring PRs the family's *boxes* are correct (packages split, taxonomy halved, projection pipeline shaped, ADRs documented), but the *seams between boxes* were never contractualized — every layer has a Zod schema that exists alongside a hand-written interface, the interface wins because it adds runtime fields the schema can't express, and the doctrine's trust-boundary helpers are exported but used once or zero times inside the packages that export them. Cleanup PRs add new names; nothing in CI subtracts old ones. So every wave leaves residue, and the residue accumulates faster than the next wave can delete it.**
+> **After 27 refactoring PRs the family's _boxes_ are correct (packages split, taxonomy halved, projection pipeline shaped, ADRs documented), but the _seams between boxes_ were never contractualized — every layer has a Zod schema that exists alongside a hand-written interface, the interface wins because it adds runtime fields the schema can't express, and the doctrine's trust-boundary helpers are exported but used once or zero times inside the packages that export them. Cleanup PRs add new names; nothing in CI subtracts old ones. So every wave leaves residue, and the residue accumulates faster than the next wave can delete it.**
 
 The causal chain runs through five mechanical observations, each independently confirmed:
 
 **M1 — The Zod schemas are decorative at every cross-package contract.**
+
 - `PatternGraphSchema` (ADR-006's single read model) is `z.object`, not `z.strictObject`. Every nested schema in the same file is also open.
-- The hand-written `interface PatternGraph` *adds* `nameIndex: ReadonlyMap<...>` (line 177) — a runtime-only field Zod cannot express.
+- The hand-written `interface PatternGraph` _adds_ `nameIndex: ReadonlyMap<...>` (line 177) — a runtime-only field Zod cannot express.
 - **`PatternGraphSchema.parse` is never called on real pipeline output anywhere in `src/`** (one call exists, on a synthetic empty fallback graph in cli runtime).
 - **`TagRegistrySchema.parse/safeParse` is never called in core's `src/` either** — the schema is pure decoration.
 - The same pattern repeats at every seam: `BundleRouting`, `ProjectionBundle<T>`, `ProjectionContext`, `RoleDefinition`, `TagRegistry`, `RuntimePatternGraph`, the five `Parsed*` BC alias schemas, plus the type aliases in `dual-source.ts`/`errors.ts`/`branded.ts`. **In every case the interface is the load-bearing contract; the schema is theatre.**
 
 **M2 — The doctrine's central primitive is unused by its owner.**
+
 - `parseAtBoundary` is exported from `architect-core/src/validation/boundary.ts`.
 - `grep parseAtBoundary( packages/architect-core/src/` returns **exactly one** call site (inside a util in `utils/errors.ts:21`).
 - The four real extraction sites in core (`transform-dataset.ts:103`, `doc-extractor.ts:294`, `gherkin-extractor.ts:455` and `:606`) call `.safeParse` directly, bypassing the helper.
 - Guard has zero `parseAtBoundary` call sites despite three explicit trust boundaries (git diff capture, CLI argv, baseline JSON read).
 
 **M3 — Doctrine breaches in one schema cascade into adapters in every consumer.**
+
 - `tag-registry.ts:32` declares `transform: z.function().optional()`.
 - `structuredClone` cannot copy functions, so the read API needs `cloneTagRegistry` (`pattern-graph-api.ts:81-100`) to escape the function by reference.
 - `cloneTagRegistry` plus 23 other `cloneValue/structuredClone` calls in `pattern-graph-api.ts` (24 total) are defensive copying around a contract that should be immutable.
 - The schema can't be `parse`d at the read-API entry because the schema doesn't match the runtime shape (open + missing `nameIndex` + can't express the function).
-- The whole `27× structuredClone per read` performance regression flagged across reviews is downstream of *one* `z.function()` in *one* schema. **One doctrine breach forced four adapters downstream.**
+- The whole `27× structuredClone per read` performance regression flagged across reviews is downstream of _one_ `z.function()` in _one_ schema. **One doctrine breach forced four adapters downstream.**
 
 **M4 — Multiple parse points exist where one should.**
+
 - `ExtractedPatternSchema.safeParse` is called twice in production code per pattern: once in each extractor (doc + gherkin sync + gherkin async = three sites, two paths) and **again defensively** at `transform-dataset.ts:103`.
-- The defensive re-parse exists because the pipeline does not trust the prior layer to have produced a valid `ExtractedPattern`. The prior layer is *typed* as `ExtractedPattern` but the type system permits whatever the writer chose to assert.
-- Sync/async pairs have already drifted: the async Gherkin extractor *silently drops* the `_unrecognizedEnums` diagnostic loop the sync variant carries.
+- The defensive re-parse exists because the pipeline does not trust the prior layer to have produced a valid `ExtractedPattern`. The prior layer is _typed_ as `ExtractedPattern` but the type system permits whatever the writer chose to assert.
+- Sync/async pairs have already drifted: the async Gherkin extractor _silently drops_ the `_unrecognizedEnums` diagnostic loop the sync variant carries.
 
 **M5 — No subtractive CI gate.**
-- Every "No-BC" PR enforces *additive* discipline (new schemas, new tags, new types). Nothing fails when an old name continues to be exported after its replacement ships.
-- The smoking-gun is `config-loader.ts:188-196`: `'codec' + 'Options'` and `'referenceDoc' + 'Configs'` — string-concatenation runtime evasion proving the author *knew* a static check would catch the BC shim and chose to hide it rather than delete it.
+
+- Every "No-BC" PR enforces _additive_ discipline (new schemas, new tags, new types). Nothing fails when an old name continues to be exported after its replacement ships.
+- The smoking-gun is `config-loader.ts:188-196`: `'codec' + 'Options'` and `'referenceDoc' + 'Configs'` — string-concatenation runtime evasion proving the author _knew_ a static check would catch the BC shim and chose to hide it rather than delete it.
 - The repo has type-checking, ESLint, Zod boundary lint, a perf gate, and `arch dangling --strict`. It has no **workspace-consumer audit**. So every alias and every dead export survives every cleanup.
 
 This is why **the same set of symptoms shows up in every review** despite massive deletion work: the seams aren't formal, the doctrine primitives aren't enforced, and CI doesn't catch what survives.
@@ -50,18 +55,20 @@ This is why **the same set of symptoms shows up in every review** despite massiv
 
 ## 2. What that means for the four layer seams
 
-The system is a chain: **annotation → ExtractedPattern → PatternGraph → ProjectionContext + Fragment → renderer output**. Each arrow is a *seam*. None of the four arrows is currently a formal, parse-once, schema-as-only-source contract. The fix is to make each seam exactly that.
+The system is a chain: **annotation → ExtractedPattern → PatternGraph → ProjectionContext + Fragment → renderer output**. Each arrow is a _seam_. None of the four arrows is currently a formal, parse-once, schema-as-only-source contract. The fix is to make each seam exactly that.
 
 ### Seam S1 — Extraction → ExtractedPattern
 
 **Current state (validated):**
+
 - Two extractors (`DocExtractor` for TypeScript JSDoc, `GherkinExtractor` for `.feature` files) plus shape/dual-source plumbing.
 - Both extractors write through informal accumulators: `Record<string, unknown>` (45 `assignIfDefined` calls + 3 quoted-key writes in `buildGherkinRawPattern`), `Map<string, unknown>` consumed by 16 `as` casts in `parseDirective`, and `extractPatternTags`'s 42-field interface with `[key: string]: unknown` escape hatch.
-- Four `buildRoleLookup` implementations + four `resolveCanonicalRole` implementations (one of them on the *read* side at `read-api/pattern-helpers.ts:137`) because no layer trusts the upstream to have done canonicalization.
+- Four `buildRoleLookup` implementations + four `resolveCanonicalRole` implementations (one of them on the _read_ side at `read-api/pattern-helpers.ts:137`) because no layer trusts the upstream to have done canonicalization.
 - `TagRegistry` is a hand-written interface in three files; the Zod schema is decorative.
 - Sync/async Gherkin extractors are ~135 LOC near-clones, already drifted on diagnostics.
 
 **The contract S1 needs:**
+
 - One Zod schema `ExtractedPatternDraftSchema` (strict, with `_diagnostics` field) consumed at the extractor exit point.
 - Both extractors emit only `ExtractedPatternDraft`; the consumer parses once via `parseAtBoundary(ExtractedPatternDraftSchema, raw, ctx)`.
 - One `TagRegistry` type-of-record — `type TagRegistry = z.infer<typeof TagRegistrySchema>`. Delete the parallel interfaces in `config/tag-registry-contract.ts` and `config/role-constants.ts`. The schema becomes the only source, parsed once at registry construction, frozen thereafter.
@@ -69,6 +76,7 @@ The system is a chain: **annotation → ExtractedPattern → PatternGraph → Pr
 - Delete the sync Gherkin extractor; keep only async. The `existsSync` it was built around is itself an anti-pattern.
 
 **Validation criterion:**
+
 - `grep "Record<string, unknown>" packages/architect-core/src/extractor packages/architect-core/src/scanner` → zero results.
 - `grep "as \(SourceFilePath\|ProcessStatusValue\|AcceptedStatusValue\|RoleId\)" packages/architect-core/src/extractor packages/architect-core/src/scanner` → zero results.
 - `grep "\[key: string\]: unknown" packages/architect-core/src/scanner` → zero results.
@@ -78,6 +86,7 @@ The system is a chain: **annotation → ExtractedPattern → PatternGraph → Pr
 ### Seam S2 — ExtractedPattern → PatternGraph
 
 **Current state (validated):**
+
 - `PatternGraphSchema` is open `z.object`; `interface PatternGraph` adds `nameIndex: ReadonlyMap` and `RuntimePatternGraph` adds `workflow?`; both are runtime-only fields outside the schema.
 - `transformToPatternGraph` produces the runtime shape; **`PatternGraphSchema.parse` is never called on it** (only on a synthetic empty graph as a fallback in cli runtime).
 - `pattern-graph-api.ts` runs `structuredClone` 24 times per read and maintains `cloneTagRegistry` because the registry schema carries a `z.function()` field.
@@ -86,10 +95,11 @@ The system is a chain: **annotation → ExtractedPattern → PatternGraph → Pr
 - `package.json` declares an `./roles` export to nonexistent files (install-time 404).
 
 **The contract S2 needs:**
+
 - `PatternGraphSchema` becomes `z.strictObject` everywhere in the file (along with every nested schema).
 - Decision on runtime fields: either (a) lift `nameIndex` and `workflow` into the schema (as `z.map` and a sub-schema), or (b) introduce `GraphRuntime { graph: PatternGraph; nameIndex: ...; workflow?: ... }` that the pipeline returns and the read API unwraps at its boundary. **(b) is recommended** — keeps the schema honest about what's transferable.
 - Delete the parallel `interface PatternGraph`. Every consumer's import switches to `type PatternGraph = z.infer<typeof PatternGraphSchema>`. Same for `StatusGroups`, `SourceViews`, `ArchIndex`, `RelationshipEntry`.
-- Replace `transform: z.function()` with `transform: z.enum(KNOWN_TRANSFORM_NAMES).optional()`. Resolution of names → functions happens inside the registry builder; the registry's *transferable* shape is fully clonable.
+- Replace `transform: z.function()` with `transform: z.enum(KNOWN_TRANSFORM_NAMES).optional()`. Resolution of names → functions happens inside the registry builder; the registry's _transferable_ shape is fully clonable.
 - `cloneTagRegistry` deletes. `clonePatternGraph` becomes `Object.freeze` plus `freeze` on the views — 27× `structuredClone` becomes 0×.
 - `buildPatternGraph` ends with one `parseAtBoundary(PatternGraphSchema, runtime.graph, 'pattern-graph-build')`. This is the load-bearing change: the read-API becomes a real trust boundary.
 - Export `isValidStatusValue` + `StatusValueSchema` from core. `validateTransition` returns a discriminated `TransitionValidationResult`; drop the three `as ProcessStatusValue` casts. Guard's three regex captures parse via `parseAtBoundary(StatusValueSchema, ...)`.
@@ -97,6 +107,7 @@ The system is a chain: **annotation → ExtractedPattern → PatternGraph → Pr
 - Delete the broken `./roles` export from `package.json`.
 
 **Validation criterion:**
+
 - `grep "z\.object(" packages/architect-core/src/validation-schemas` → zero results.
 - `grep "interface PatternGraph\b" packages/architect-core/src/` → zero results.
 - `grep "structuredClone\|cloneValue\|cloneTagRegistry" packages/architect-core/src/read-api/` → zero results.
@@ -107,6 +118,7 @@ The system is a chain: **annotation → ExtractedPattern → PatternGraph → Pr
 ### Seam S3 — PatternGraph → ProjectionContext → Fragment
 
 **Current state (validated):**
+
 - 15 `parseAndProject*` exports; 14 route through the shared `parseAndProject` wrapper; **one bypasses it** (`parseAndProjectOpenQuestionList` calls `OpenQuestionListOptionsSchema.parse` directly and throws raw `ZodError`).
 - Many `project*` functions have no `parseAndProject*` wrapper — pattern-summary, pattern-detail, orphan-pattern-list, dependency-edges, architecture-context/comparison/neighborhood. **The trust boundary is optional, not enforced.**
 - `ProjectionContext` is a hand-written interface. **131 functions consume it; zero validate it.** Two separate `createProjectionContext` factories live in the CLI (no shared factory).
@@ -116,7 +128,8 @@ The system is a chain: **annotation → ExtractedPattern → PatternGraph → Pr
 - 10 of 43 fragments have bespoke normalizers in the renderer; the other 33 fall through to a renderer-owned generic dispatcher.
 
 **The contract S3 needs:**
-- One `ProjectionContextSchema` (strict). Two factories collapse to one. Every projection entry parses via `parseAndProject` (the wrapper becomes the *only* public way to invoke projections; direct `project*` calls become package-internal).
+
+- One `ProjectionContextSchema` (strict). Two factories collapse to one. Every projection entry parses via `parseAndProject` (the wrapper becomes the _only_ public way to invoke projections; direct `project*` calls become package-internal).
 - Delete `parseAndProjectOpenQuestionList`'s direct `.parse` call; route through the shared wrapper.
 - Fix the `PatternDetailSchema` chain with `z.strictObject({ ...Base.shape, ...newFields })` spread. Add a regression test that calls `parseAtBoundary(PatternDetailSchema, { ...valid, extraField })` and asserts rejection.
 - Move `summarizeTaxonomyDigest` into `projections/`; delete from `fragments/`. Add a workspace ESLint rule banning runtime imports from `fragments/` (which is contract-only).
@@ -125,6 +138,7 @@ The system is a chain: **annotation → ExtractedPattern → PatternGraph → Pr
 - `MarkdownNormalizerKind` becomes exhaustive over the 43 fragment kinds via `StrictKindTable` (existing pattern); compile-time exhaustiveness instead of silent fallback.
 
 **Validation criterion:**
+
 - `grep "OptionsSchema.parse\|\.parse(.*Options)" packages/architect-projection/src/projections/` → zero non-wrapper sites.
 - Exactly one `createProjectionContext` factory.
 - `parseAndProject` is the only export consumers use to invoke a projection (the raw `project*` exports become file-private).
@@ -136,6 +150,7 @@ The system is a chain: **annotation → ExtractedPattern → PatternGraph → Pr
 ### Seam S4 — Fragment → renderer output
 
 **Current state (validated):**
+
 - Four renderers: `renderCompactText`, `renderJson`, `renderMarkdown`, `renderUi`.
 - `renderJson` is the family reference for defensive validation; preserve.
 - `renderMarkdown` (2,227 LOC) mixes 8 concerns plus the 10 fragment-aware normalizers + the runtime import flagged in S3 + the disclosure-override path.
@@ -143,11 +158,13 @@ The system is a chain: **annotation → ExtractedPattern → PatternGraph → Pr
 - The 33 fragments without bespoke normalizers fall through to a renderer-owned generic dispatcher — meaning the renderer owns shape for 23% of fragments explicitly and the other 77% by default.
 
 **The contract S4 needs:**
+
 - Renderers receive `Fragment[]` plus `RendererOptions` (strict schema); they emit serialized output. They do not import from `fragments/` runtime; they do not call back into projections; they do not own disclosure decisions.
 - One canonical `slugify` in `_shared/slugify.ts` used by every renderer. Cross-renderer slug parity becomes a property test: same fragment → same slug everywhere.
 - `render-markdown.ts` splits along the 8 concerns (target ~9 files, mechanical, no semantic change). Per-fragment presentation lives in fragment-kind metadata or in the projection layer, not in the renderer.
 
 **Validation criterion:**
+
 - `renderMarkdown` ≤ 500 LOC per file across the split.
 - One `slugify` function in the package.
 - `grep "from '\.\./fragments" packages/architect-projection/src/renderers/` → zero results (mirror of S3 check).
@@ -167,7 +184,7 @@ The audit runs on every PR. For every symbol reachable from each publishable pac
 
 3. **Runtime evasion strip.** A `.ts` file contains string concatenation whose result is later passed to `Reflect.deleteProperty` or compared to a property key. This catches the `'codec' + 'Options'` strip.
 
-4. **Stale deletion-target marker.** A JSDoc/comment contains `deletion target` / `kept for compat` / `legacy` / `TODO remove` / `// removed` *and* the symbol has shipped in at least one release. This catches the `documentation-type-registry.ts` and `documentation-bundle.internal.ts` markers.
+4. **Stale deletion-target marker.** A JSDoc/comment contains `deletion target` / `kept for compat` / `legacy` / `TODO remove` / `// removed` _and_ the symbol has shipped in at least one release. This catches the `documentation-type-registry.ts` and `documentation-bundle.internal.ts` markers.
 
 5. **Dogfood file in published surface.** A file matching `*self-hosting*`, `*tier-*-baseline*`, or whose top-of-file JSDoc declares `@architect-bounded-context:dogfood` is transitively reachable from a published `exports` entry. This catches `cli-schema.ts`, `presentation-contracts.ts`, `self-hosting.ts`, `tier-a-baseline.ts`, and the hardcoded `/orders/`/`/inventory/` in `layer-inference.ts`.
 
@@ -187,9 +204,9 @@ The `arch blocking` view shows ~22 patterns deadlocked. The largest cluster is `
 
 **These specs target deleted file paths.** They reference `src/api/pattern-graph-api.ts`, `src/generators/pipeline/transform-dataset.ts`, `src/renderable/codecs/{patterns,session,timeline,planning,...}.ts`, `src/mcp/tool-registry.ts`, and `src/lint/process-guard/`. None of these paths exist anymore — they were deleted across PRs #15/#17/#22/#28/#31. The specs are pre-W1.5 plan-tier work that nobody re-targeted to the new package layout. `scope-validate` is blocked because the listed deliverables don't exist.
 
-**Worse, what they propose adds policy at the wrong seam.** "Perspective filtering at codec defaults" puts a new policy axis at the consumer boundary — exactly the layer that S3/S4 are removing policy *from*. If the work landed, it would be a fifth source of doc-gen presentation decisions on top of the four that already conflict.
+**Worse, what they propose adds policy at the wrong seam.** "Perspective filtering at codec defaults" puts a new policy axis at the consumer boundary — exactly the layer that S3/S4 are removing policy _from_. If the work landed, it would be a fifth source of doc-gen presentation decisions on top of the four that already conflict.
 
-**Recipe:** the kernel PR (§5) deletes the `Perspective*` and `EnforcementConfiguration` design specs. If a perspective-filtering capability is genuinely wanted later, it gets re-authored at idea/candidate tier *after* S3 contractualizes the projection boundary — as a perspective registry consumed by `parseAndProject`, not as a renderer-side filter.
+**Recipe:** the kernel PR (§5) deletes the `Perspective*` and `EnforcementConfiguration` design specs. If a perspective-filtering capability is genuinely wanted later, it gets re-authored at idea/candidate tier _after_ S3 contractualizes the projection boundary — as a perspective registry consumed by `parseAndProject`, not as a renderer-side filter.
 
 Deleting these specs unblocks ~5 patterns immediately, breaks no consumer (the specs ship nothing), and removes a stale planning artifact that would otherwise pollute future planning sessions.
 
@@ -296,13 +313,13 @@ The user has prepared a 10×-smaller-scope rewrite as a fallback. The question: 
 
 **The cleanup wins if and only if:**
 
-1. **The doctrine is correct and the patterns to copy from exist in the codebase.** Both are true. `parseAndProject + parseAtBoundary` is the right shape; `StrictKindTable` + `dispatchByKind` is the right shape; `Result<T,E>` is the right shape; branded types are the right shape; `renderJson`'s defensive validation is the right shape; the `Fragment` discriminated union over 43 kinds is the right shape. The cleanup applies these *existing* patterns to the seams that don't yet use them. **The cleanup is not a redesign; it is finishing a design already in flight.**
+1. **The doctrine is correct and the patterns to copy from exist in the codebase.** Both are true. `parseAndProject + parseAtBoundary` is the right shape; `StrictKindTable` + `dispatchByKind` is the right shape; `Result<T,E>` is the right shape; branded types are the right shape; `renderJson`'s defensive validation is the right shape; the `Fragment` discriminated union over 43 kinds is the right shape. The cleanup applies these _existing_ patterns to the seams that don't yet use them. **The cleanup is not a redesign; it is finishing a design already in flight.**
 
 2. **The downstream consumers (Architect Studio desktop/web/CI) can absorb 2.0 breaking changes.** The user has said yes (No-BC posture is policy). The operational surface (CLI verbs + MCP tools + projection outputs) is stable; only the JS API on `@libar-dev/architect-core` and siblings breaks. Most downstream code consumes the operational surface.
 
 3. **The dogfood patterns (262 delivery patterns + 116 completed) carry valuable history.** The PatternGraph itself is the institutional memory of the project. Throwing it away to rewrite the surrounding code is throwing away the dogfood. The cleanup preserves it; the rewrite re-extracts everything from current source.
 
-4. **The 27 PRs of cleanup work were not wasted.** They removed real cruft, established the projection pipeline shape, halved the taxonomy, split the package. The 4 seam contracts are the *next* PR-set's worth of work, not the *replacement* for what was done.
+4. **The 27 PRs of cleanup work were not wasted.** They removed real cruft, established the projection pipeline shape, halved the taxonomy, split the package. The 4 seam contracts are the _next_ PR-set's worth of work, not the _replacement_ for what was done.
 
 **The rewrite wins if:**
 
@@ -317,7 +334,7 @@ The user has prepared a 10×-smaller-scope rewrite as a fallback. The question: 
 
 ---
 
-## 7. What to preserve *(don't break during cleanup)*
+## 7. What to preserve _(don't break during cleanup)_
 
 The cleanup is finishing a design already in the codebase. These patterns are the reference shapes the seams must adopt:
 
@@ -344,7 +361,7 @@ The cleanup is finishing a design already in the codebase. These patterns are th
 
 ---
 
-## 8. Validation pointers *(how to verify the root cause against current code)*
+## 8. Validation pointers _(how to verify the root cause against current code)_
 
 Anyone who wants to verify the analysis above should reproduce the four agent findings:
 
@@ -364,7 +381,7 @@ Anyone who wants to verify the analysis above should reproduce the four agent fi
 
 8. **Validate the doc-gen split policy:** `grep -n "disclosureSpec" packages/architect-projection/src/renderers/render-markdown.ts` — see lines 240-453, especially `:448-453` (the override path).
 
-The Data API (`pnpm architect:query ...`) is the canonical source for pattern/graph state. Use it for everything except investigating the *implementation* (where Read/Grep on `packages/*/src/` is correct, because you're auditing the code behind the data API).
+The Data API (`pnpm architect:query ...`) is the canonical source for pattern/graph state. Use it for everything except investigating the _implementation_ (where Read/Grep on `packages/*/src/` is correct, because you're auditing the code behind the data API).
 
 ---
 

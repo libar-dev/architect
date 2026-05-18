@@ -91,6 +91,7 @@ All four CLIs expose their help via `--help` / `-h`. Help text is delivered by t
 **Help text source:** `lint-process.ts:142–189`
 
 **Accurate items:**
+
 - Mode flags (`--staged`, `--all`, `--files`, `--file`, `--format`, `--strict`, `--ignore-session`, `--show-state`, `--base-dir`) are all implemented and match the `parseArgs` logic.
 - Exit code table (0 / 1) is accurate.
 - Examples are valid invocations.
@@ -98,6 +99,7 @@ All four CLIs expose their help via `--help` / `-h`. Help text is delivered by t
 **Documentation defect (P1 — phantom reference):**
 
 Line 170:
+
 ```
 error    invalid-status-transition  Status transition must follow PDR-005 FSM
 ```
@@ -105,7 +107,7 @@ error    invalid-status-transition  Status transition must follow PDR-005 FSM
 This is the one load-bearing instance Phase 2 flagged as `cli/lint-process.ts:170`. PDR-005 does not exist in `architect/decisions/`. A consumer reading the help text who tries to look up PDR-005 will find nothing. This is a **defect in user-visible help output** — not just an internal comment.
 
 **Missing flag documentation — Phase 2 plan gap:**
-The `--baseline` override for the tier-A baseline (Phase 2 Sweep 4 / H-SIMP-6) is not present. This is correct for *current* state — the flag does not yet exist in the implementation. Once Sweep 4 lands, the help text must be updated. There is no placeholder or TODO comment noting this, so the gap will not be caught by inspection.
+The `--baseline` override for the tier-A baseline (Phase 2 Sweep 4 / H-SIMP-6) is not present. This is correct for _current_ state — the flag does not yet exist in the implementation. Once Sweep 4 lands, the help text must be updated. There is no placeholder or TODO comment noting this, so the gap will not be caught by inspection.
 
 **`--all` branch hardcodes `main`:**
 `lint-process.ts:322`: `detectBranchChanges(config.baseDir, 'main', ...)`. The help text says `--all: Validate all changes compared to main branch` — accurate but the hardcoded branch name is not documented as a limitation. A consumer on a repo whose default branch is `master` or `trunk` will get silent wrong behavior. Phase 2 did not flag this; it is a doc + implementation gap.
@@ -115,6 +117,7 @@ The `--baseline` override for the tier-A baseline (Phase 2 Sweep 4 / H-SIMP-6) i
 **Help text source:** `validate-patterns.ts:276–348`
 
 **Accurate items:**
+
 - All flags are implemented and match parseArgs.
 - Exit code table (0 / 1 / 2) is accurate and correctly differentiates from `architect-guard`'s (0 / 1) table.
 - `--update-baseline` is documented and implemented (`validate-patterns.ts:263`, `enforceDanglingBaseline`).
@@ -133,6 +136,7 @@ The `--baseline` override for the tier-A baseline (Phase 2 Sweep 4 / H-SIMP-6) i
 **Help text source:** `lint-steps.ts:113–175`
 
 **Accurate items:**
+
 - All flags implemented and documented.
 - 12 rules table is accurate per the lint engine.
 - Scan scope defaults (`tests/features/**/*.feature` / `tests/steps/**/*.steps.ts`) are correct.
@@ -148,6 +152,7 @@ The file-level JSDoc block (lines 3–12) does not carry any `@architect-pattern
 **Help text source:** `lint-patterns.ts:149–193`
 
 **Accurate items:**
+
 - All flags implemented and match parseArgs.
 - Rules table is accurate.
 - `--strict` note ("Tier-A errors always fail") is correct and useful.
@@ -164,38 +169,38 @@ The file-level JSDoc block (lines 3–12) does not carry any `@architect-pattern
 
 ### 4.1 Quantitative summary
 
-| Metric | Value |
-|--------|-------|
-| Total `.ts` source files | 38 |
-| Files with `@architect-pattern` | 21 |
-| Annotation rate | **55%** |
-| Projection's rate | 60% |
-| Core's rate | 26% |
+| Metric                          | Value   |
+| ------------------------------- | ------- |
+| Total `.ts` source files        | 38      |
+| Files with `@architect-pattern` | 21      |
+| Annotation rate                 | **55%** |
+| Projection's rate               | 60%     |
+| Core's rate                     | 26%     |
 
 ### 4.2 Annotated files (preserve)
 
-| File | Pattern name | Bounded-context | Status |
-|------|-------------|-----------------|--------|
-| `src/git/index.ts` | GitModule | **generator** (WRONG — see §5) | active |
-| `src/git/branch-diff.ts` | GitBranchDiff | **generator** (WRONG) | active |
-| `src/git/name-status.ts` | GitNameStatus | **generator** (WRONG) | active |
-| `src/git/helpers.ts` | GitHelpers | **generator** (WRONG) | active |
-| `src/cli/lint-process.ts` | LintProcessCLI | process-guard | active |
-| `src/cli/validate-patterns.ts` | ValidatePatternsCLI | validation | completed |
-| `src/cli/lint-patterns.ts` | LintPatternsCLI | cli | completed |
-| `src/lint/process-guard/index.ts` | ProcessGuardLinter | process-guard | active |
-| `src/lint/process-guard/types.ts` | ProcessGuardTypes | process-guard | active |
-| `src/lint/process-guard/decider.ts` | ProcessGuardDecider | process-guard | active |
-| `src/lint/process-guard/derive-state.ts` | DeriveProcessState | process-guard | active |
-| `src/lint/process-guard/detect-changes.ts` | DetectChanges | process-guard | active |
-| `src/lint/process-guard/session-state-reader.ts` | SessionStateReader | process-guard | active |
-| `src/lint/engine.ts` | LintEngine | lint | active |
-| `src/lint/rules.ts` | LintRules | lint | active |
-| `src/validation/anti-patterns.ts` | AntiPatternDetector | validation | completed |
-| `src/validation/dod-validator.ts` | DoDValidator | validation | completed |
-| `src/validation/types.ts` | DoDValidationTypes | validation | completed |
-| `src/validation/index.ts` | ValidationModule | validation | completed |
-| `src/lint/index.ts` | LintModule | lint | active |
+| File                                             | Pattern name        | Bounded-context                | Status    |
+| ------------------------------------------------ | ------------------- | ------------------------------ | --------- |
+| `src/git/index.ts`                               | GitModule           | **generator** (WRONG — see §5) | active    |
+| `src/git/branch-diff.ts`                         | GitBranchDiff       | **generator** (WRONG)          | active    |
+| `src/git/name-status.ts`                         | GitNameStatus       | **generator** (WRONG)          | active    |
+| `src/git/helpers.ts`                             | GitHelpers          | **generator** (WRONG)          | active    |
+| `src/cli/lint-process.ts`                        | LintProcessCLI      | process-guard                  | active    |
+| `src/cli/validate-patterns.ts`                   | ValidatePatternsCLI | validation                     | completed |
+| `src/cli/lint-patterns.ts`                       | LintPatternsCLI     | cli                            | completed |
+| `src/lint/process-guard/index.ts`                | ProcessGuardLinter  | process-guard                  | active    |
+| `src/lint/process-guard/types.ts`                | ProcessGuardTypes   | process-guard                  | active    |
+| `src/lint/process-guard/decider.ts`              | ProcessGuardDecider | process-guard                  | active    |
+| `src/lint/process-guard/derive-state.ts`         | DeriveProcessState  | process-guard                  | active    |
+| `src/lint/process-guard/detect-changes.ts`       | DetectChanges       | process-guard                  | active    |
+| `src/lint/process-guard/session-state-reader.ts` | SessionStateReader  | process-guard                  | active    |
+| `src/lint/engine.ts`                             | LintEngine          | lint                           | active    |
+| `src/lint/rules.ts`                              | LintRules           | lint                           | active    |
+| `src/validation/anti-patterns.ts`                | AntiPatternDetector | validation                     | completed |
+| `src/validation/dod-validator.ts`                | DoDValidator        | validation                     | completed |
+| `src/validation/types.ts`                        | DoDValidationTypes  | validation                     | completed |
+| `src/validation/index.ts`                        | ValidationModule    | validation                     | completed |
+| `src/lint/index.ts`                              | LintModule          | lint                           | active    |
 
 (Note: `src/lint/steps/runner.ts` carries `@architect-pattern StepLintRunner` — counted in the 21; full list not enumerated above)
 
@@ -203,27 +208,28 @@ The file-level JSDoc block (lines 3–12) does not carry any `@architect-pattern
 
 17 files (45%) have no `@architect-pattern` annotation:
 
-| File | Significance | Proposed annotation |
-|------|-------------|-------------------|
-| `src/index.ts` | Package barrel — public contract | `@architect-pattern GuardBarrel` / `@architect-role:barrel` |
-| `src/cli/index.ts` | CLI re-export barrel | `@architect-pattern CLIBarrel` / `@architect-role:barrel` |
-| `src/cli/shared.ts` | Shared CLI helpers (`printVersionAndExit`, `handleCliError`, `isDirectCliEntrypoint`, `DEBUG`) | `@architect-pattern CLIShared` / `@architect-role:utility` |
-| `src/cli/lint-steps.ts` | **HIGH VALUE** — one of 4 externally-consumed CLI entry-points | `@architect-pattern LintStepsCLI` / `@architect-bounded-context:lint` |
-| `src/lint/dangling-baseline.ts` | **HIGH VALUE** — externally consumed by `architect-cli`; `compareDanglingBaseline` + `writeDanglingBaseline` are in the 9-symbol public surface | `@architect-pattern DanglingBaselineManager` / `@architect-bounded-context:lint` |
-| `src/lint/steps/index.ts` | Steps linter barrel | `@architect-pattern StepLintBarrel` / `@architect-role:barrel` |
-| `src/lint/steps/types.ts` | Step lint types | `@architect-pattern StepLintTypes` / `@architect-role:contract` |
-| `src/lint/steps/cross-checks.ts` | Cross-file rule engine | `@architect-pattern StepCrossChecks` / `@architect-bounded-context:lint` |
-| `src/lint/steps/feature-checks.ts` | Feature-file-only rules | `@architect-pattern StepFeatureChecks` / `@architect-bounded-context:lint` |
-| `src/lint/steps/step-checks.ts` | Step-file-only rules | `@architect-pattern StepStepChecks` / `@architect-bounded-context:lint` |
-| `src/lint/steps/pair-resolver.ts` | Feature+step pairing logic | `@architect-pattern StepPairResolver` / `@architect-bounded-context:lint` |
-| `src/lint/steps/runner.ts` | *Actually annotated* (StepLintRunner) | already annotated |
-| `src/lint/steps/utils.ts` | Shared utilities | `@architect-pattern StepLintUtils` / `@architect-role:utility` |
-| `src/lint/idea-tier/index.ts` | Idea-tier linter barrel | `@architect-pattern IdeaTierBarrel` / `@architect-role:barrel` |
-| `src/lint/idea-tier/types.ts` | Idea-tier types | `@architect-pattern IdeaTierTypes` / `@architect-role:contract` |
-| `src/lint/idea-tier/idea-tier-checks.ts` | Idea-tier check rules | `@architect-pattern IdeaTierChecks` / `@architect-bounded-context:lint` |
-| `src/lint/idea-tier/runner.ts` | Idea-tier runner | `@architect-pattern IdeaTierRunner` / `@architect-bounded-context:lint` |
+| File                                     | Significance                                                                                                                                    | Proposed annotation                                                              |
+| ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| `src/index.ts`                           | Package barrel — public contract                                                                                                                | `@architect-pattern GuardBarrel` / `@architect-role:barrel`                      |
+| `src/cli/index.ts`                       | CLI re-export barrel                                                                                                                            | `@architect-pattern CLIBarrel` / `@architect-role:barrel`                        |
+| `src/cli/shared.ts`                      | Shared CLI helpers (`printVersionAndExit`, `handleCliError`, `isDirectCliEntrypoint`, `DEBUG`)                                                  | `@architect-pattern CLIShared` / `@architect-role:utility`                       |
+| `src/cli/lint-steps.ts`                  | **HIGH VALUE** — one of 4 externally-consumed CLI entry-points                                                                                  | `@architect-pattern LintStepsCLI` / `@architect-bounded-context:lint`            |
+| `src/lint/dangling-baseline.ts`          | **HIGH VALUE** — externally consumed by `architect-cli`; `compareDanglingBaseline` + `writeDanglingBaseline` are in the 9-symbol public surface | `@architect-pattern DanglingBaselineManager` / `@architect-bounded-context:lint` |
+| `src/lint/steps/index.ts`                | Steps linter barrel                                                                                                                             | `@architect-pattern StepLintBarrel` / `@architect-role:barrel`                   |
+| `src/lint/steps/types.ts`                | Step lint types                                                                                                                                 | `@architect-pattern StepLintTypes` / `@architect-role:contract`                  |
+| `src/lint/steps/cross-checks.ts`         | Cross-file rule engine                                                                                                                          | `@architect-pattern StepCrossChecks` / `@architect-bounded-context:lint`         |
+| `src/lint/steps/feature-checks.ts`       | Feature-file-only rules                                                                                                                         | `@architect-pattern StepFeatureChecks` / `@architect-bounded-context:lint`       |
+| `src/lint/steps/step-checks.ts`          | Step-file-only rules                                                                                                                            | `@architect-pattern StepStepChecks` / `@architect-bounded-context:lint`          |
+| `src/lint/steps/pair-resolver.ts`        | Feature+step pairing logic                                                                                                                      | `@architect-pattern StepPairResolver` / `@architect-bounded-context:lint`        |
+| `src/lint/steps/runner.ts`               | _Actually annotated_ (StepLintRunner)                                                                                                           | already annotated                                                                |
+| `src/lint/steps/utils.ts`                | Shared utilities                                                                                                                                | `@architect-pattern StepLintUtils` / `@architect-role:utility`                   |
+| `src/lint/idea-tier/index.ts`            | Idea-tier linter barrel                                                                                                                         | `@architect-pattern IdeaTierBarrel` / `@architect-role:barrel`                   |
+| `src/lint/idea-tier/types.ts`            | Idea-tier types                                                                                                                                 | `@architect-pattern IdeaTierTypes` / `@architect-role:contract`                  |
+| `src/lint/idea-tier/idea-tier-checks.ts` | Idea-tier check rules                                                                                                                           | `@architect-pattern IdeaTierChecks` / `@architect-bounded-context:lint`          |
+| `src/lint/idea-tier/runner.ts`           | Idea-tier runner                                                                                                                                | `@architect-pattern IdeaTierRunner` / `@architect-bounded-context:lint`          |
 
 **High-value gaps** (i.e., in the externally-consumed or architecturally significant surface):
+
 - `src/cli/lint-steps.ts` — published entry-point, invisible to PatternGraph
 - `src/lint/dangling-baseline.ts` — contains the two symbols consumed by `architect-cli` plus the one constant, yet is not annotated
 - `src/index.ts` — the package barrel has no header comment and no annotation (H-GUARD-1 / TD-CORE-4 analogue)
@@ -265,6 +271,7 @@ The file-level JSDoc block (lines 3–12) does not carry any `@architect-pattern
 #### DOC-GUARD-H2. Phantom PDR-005 in load-bearing user-visible help output
 
 **File:** `src/cli/lint-process.ts:170`
+
 ```
 error    invalid-status-transition  Status transition must follow PDR-005 FSM
 ```
@@ -284,6 +291,7 @@ This is the one site Phase 2 (H-SIMP-3) identified as "load-bearing in CLI help 
 #### DOC-GUARD-H5. AGENTS.md cites `ProcessGuard` as a key export but no such symbol exists in the barrel
 
 `AGENTS.md:165`:
+
 ```
 Key exports from `@libar-dev/architect-guard`:
 - `ProcessGuard` — FSM enforcement for the delivery lifecycle.
@@ -298,6 +306,7 @@ Key exports from `@libar-dev/architect-guard`:
 #### DOC-GUARD-H7. `docs/VALIDATION.md` and `docs/PROCESS-GUARD.md` are marked "Deprecated" and point to a gitignored tree
 
 Both files carry a banner:
+
 > **Deprecated:** This document is superseded by the auto-generated [...] This file is preserved for reference only.
 
 The referenced auto-generated file lives under `docs-live/`, which is gitignored (`AGENTS.md:13`). Any consumer or contributor navigating to `docs/` sees the deprecation banner and no link to anything they can actually open. This effectively makes the docs surface **display as deprecated** while no non-gitignored replacement exists. Phase 2 did not flag this; it is a documentation-workflow defect, not a code defect, but it degrades discoverability of the most useful consumer-facing content in the repo.
@@ -329,6 +338,7 @@ Phase 2 (H-SIMP-3) inventoried 5 guard-source references and 1 core reference. T
 #### DOC-GUARD-M3. `process-guard-rules.feature:38–49` cites nonexistent `phase-state-machine` feature suite
 
 `tests/features/process-guard-rules.feature:38–49` (the "Status Transitions" rule block):
+
 ```
 The FSM-validity rejection path is covered by the upstream
 `phase-state-machine` feature suite.
@@ -343,6 +353,7 @@ No file matching `phase-state-machine` exists anywhere in the repo (confirmed by
 #### DOC-GUARD-M5. `docs/VALIDATION.md` programmatic API section cites wrong import paths
 
 `docs/VALIDATION.md:400–414`:
+
 ```typescript
 import { lintFiles, hasFailures } from '@libar-dev/architect/lint';
 import { runStepLint, STEP_LINT_RULES } from '@libar-dev/architect/lint';
@@ -367,6 +378,7 @@ These paths reference `@libar-dev/architect` subpaths (e.g., `/lint`, `/validati
 #### DOC-GUARD-L1. `cli/lint-patterns.ts` help example uses non-existent package path
 
 `lint-patterns.ts:182`:
+
 ```
 architect-lint-patterns -i "packages/@libar-dev/platform-*/src/**/*.ts"
 ```
@@ -387,28 +399,28 @@ Both files are marked deprecated yet are the only non-gitignored consumer docume
 
 Complete inventory across all non-generated files (node_modules and dist excluded):
 
-| File | Line | Content | Severity |
-|------|------|---------|----------|
-| `src/cli/lint-process.ts` | 170 | `error    invalid-status-transition  Status transition must follow PDR-005 FSM` | **P1 — user-visible CLI help output** |
-| `src/lint/process-guard/index.ts` | 14 | `* - Status transitions (must follow PDR-005 FSM)` | P2 — JSDoc |
-| `src/lint/process-guard/types.ts` | 29 | `* - Protection levels from PDR-005 FSM` | P2 — JSDoc |
-| `src/lint/process-guard/decider.ts` | 33 | `* 2. **Status Transition** - Transitions must follow PDR-005 FSM` | P2 — JSDoc |
-| `src/lint/process-guard/decider.ts` | 58 | `* **Invariant:** Status transitions must follow the PDR-005 FSM path.` | P2 — JSDoc |
-| `packages/architect-core/src/taxonomy/registry-builder.ts` | 162 | `purpose: 'Work item lifecycle status (per PDR-005 FSM)'` | P2 — runtime string |
-| `docs/VALIDATION.md` | 239 | `FSM validation for delivery workflow (PDR-005).` | **P1 — consumer-facing doc** |
-| `docs/GHERKIN-PATTERNS.md` | 29 | `Enforces file protection levels per PDR-005` | P1 — consumer-facing doc |
-| `docs/GHERKIN-PATTERNS.md` | 51 | `Rule: Status transitions must follow PDR-005 FSM` | P1 — consumer-facing doc |
-| `docs-sources/gherkin-patterns.md` | 22 | `Enforces file protection levels per PDR-005` | P1 — doc generator input |
-| `docs-sources/gherkin-patterns.md` | 47 | `Rule: Status transitions must follow PDR-005 FSM` | P1 — doc generator input |
+| File                                                       | Line | Content                                                                         | Severity                              |
+| ---------------------------------------------------------- | ---- | ------------------------------------------------------------------------------- | ------------------------------------- |
+| `src/cli/lint-process.ts`                                  | 170  | `error    invalid-status-transition  Status transition must follow PDR-005 FSM` | **P1 — user-visible CLI help output** |
+| `src/lint/process-guard/index.ts`                          | 14   | `* - Status transitions (must follow PDR-005 FSM)`                              | P2 — JSDoc                            |
+| `src/lint/process-guard/types.ts`                          | 29   | `* - Protection levels from PDR-005 FSM`                                        | P2 — JSDoc                            |
+| `src/lint/process-guard/decider.ts`                        | 33   | `* 2. **Status Transition** - Transitions must follow PDR-005 FSM`              | P2 — JSDoc                            |
+| `src/lint/process-guard/decider.ts`                        | 58   | `* **Invariant:** Status transitions must follow the PDR-005 FSM path.`         | P2 — JSDoc                            |
+| `packages/architect-core/src/taxonomy/registry-builder.ts` | 162  | `purpose: 'Work item lifecycle status (per PDR-005 FSM)'`                       | P2 — runtime string                   |
+| `docs/VALIDATION.md`                                       | 239  | `FSM validation for delivery workflow (PDR-005).`                               | **P1 — consumer-facing doc**          |
+| `docs/GHERKIN-PATTERNS.md`                                 | 29   | `Enforces file protection levels per PDR-005`                                   | P1 — consumer-facing doc              |
+| `docs/GHERKIN-PATTERNS.md`                                 | 51   | `Rule: Status transitions must follow PDR-005 FSM`                              | P1 — consumer-facing doc              |
+| `docs-sources/gherkin-patterns.md`                         | 22   | `Enforces file protection levels per PDR-005`                                   | P1 — doc generator input              |
+| `docs-sources/gherkin-patterns.md`                         | 47   | `Rule: Status transitions must follow PDR-005 FSM`                              | P1 — doc generator input              |
 
 **Total: 11 references** (Phase 2 inventoried 6; this audit finds 5 additional sites in `docs/` and `docs-sources/`).
 
 **Decision table (per Phase 2 H-SIMP-3 options):**
 
-| Option | Action | Work estimate |
-|--------|--------|---------------|
-| A — Author PDR-005 | Create `architect/decisions/PDR-005-process-status-fsm.feature` documenting the FSM transition table (already in `architect-core/src/validation/fsm/transitions.ts`). All 11 references become valid citations. | ~1 hour |
-| B — Strip all references | Replace the user-visible line 170 with a self-describing string; replace all other references with concrete descriptions of the FSM rule. Also sweep `docs/` and `docs-sources/`. | ~2 hours |
+| Option                   | Action                                                                                                                                                                                                          | Work estimate |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
+| A — Author PDR-005       | Create `architect/decisions/PDR-005-process-status-fsm.feature` documenting the FSM transition table (already in `architect-core/src/validation/fsm/transitions.ts`). All 11 references become valid citations. | ~1 hour       |
+| B — Strip all references | Replace the user-visible line 170 with a self-describing string; replace all other references with concrete descriptions of the FSM rule. Also sweep `docs/` and `docs-sources/`.                               | ~2 hours      |
 
 Option A is recommended: the FSM enforcement is a genuine architectural decision, the transition table is already canonical in code, and the existing references in error messages and docs are valuable if the PDR exists.
 
@@ -418,15 +430,15 @@ Option A is recommended: the FSM enforcement is a genuine architectural decision
 
 This table maps each relevant ADR to guard's relationship with it, per the annotations in source and any documentation cross-references.
 
-| ADR | Title | Guard relationship | Documented? | Gap |
-|-----|-------|--------------------|-------------|-----|
-| **ADR-003** | Source-First Pattern Architecture | Guard's `validatePatterns` cross-source validator directly enforces this: it flags patterns present in TS but absent from Gherkin. | No link in guard source or docs | `validate-patterns.ts` has no `@architect-see-also` or `@architect-decision` annotation for ADR-003, though it is the primary enforcement point. |
-| **ADR-005** | Codec/Renderer Separation | Not directly relevant to guard. | N/A | None. |
-| **ADR-006** | Single Read Model | Guard consumes `RuntimePatternGraph` from core's single read model. `validate-patterns.ts:418` documents this: "DD-2: Consumes RuntimePatternGraph instead of raw scanner/extractor output." | Inline comment only | The inline comment documents the *what* but does not link to ADR-006. |
-| **ADR-007** | Coordinated Taxonomy Redesign | Guard's anti-pattern detector references ADR-001 Rule 6 at `anti-patterns.ts:51` but not ADR-007, which governs the taxonomy that determines which tags are feature-only. | Partial (wrong ADR cited) | `anti-patterns.ts:51` cites ADR-001 for the feature-only tag suffixes. ADR-007 is the correct citation for the coordinated taxonomy design. |
-| **ADR-009** | Projection Trust Boundary | Guard is supposed to use `parseAtBoundary` at its three trust boundaries (C-GUARD-4). It does not. | Not documented | No annotation, no source comment acknowledging the non-compliance. The gap is invisible until you know to look for it. |
-| **PDR-001** | Session Workflow Commands | Governs `scope-validate`/`handoff` in `architect-cli`, not guard. Guard's session-scope rules are distinct. | Mentioned in Phase 1 ADR conformance table | AGENTS.md lists PDR-001 as load-bearing but does not clarify that it governs `architect-cli`, not guard. A contributor new to guard could incorrectly assume PDR-001 is the governing PDR for guard's session-scope rules. |
-| **PDR-005** | Process Status FSM | **Does not exist** in `architect/decisions/`. Cited 11 times. | Phantom — no file | As inventoried in §6. |
+| ADR         | Title                             | Guard relationship                                                                                                                                                                           | Documented?                                | Gap                                                                                                                                                                                                                        |
+| ----------- | --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **ADR-003** | Source-First Pattern Architecture | Guard's `validatePatterns` cross-source validator directly enforces this: it flags patterns present in TS but absent from Gherkin.                                                           | No link in guard source or docs            | `validate-patterns.ts` has no `@architect-see-also` or `@architect-decision` annotation for ADR-003, though it is the primary enforcement point.                                                                           |
+| **ADR-005** | Codec/Renderer Separation         | Not directly relevant to guard.                                                                                                                                                              | N/A                                        | None.                                                                                                                                                                                                                      |
+| **ADR-006** | Single Read Model                 | Guard consumes `RuntimePatternGraph` from core's single read model. `validate-patterns.ts:418` documents this: "DD-2: Consumes RuntimePatternGraph instead of raw scanner/extractor output." | Inline comment only                        | The inline comment documents the _what_ but does not link to ADR-006.                                                                                                                                                      |
+| **ADR-007** | Coordinated Taxonomy Redesign     | Guard's anti-pattern detector references ADR-001 Rule 6 at `anti-patterns.ts:51` but not ADR-007, which governs the taxonomy that determines which tags are feature-only.                    | Partial (wrong ADR cited)                  | `anti-patterns.ts:51` cites ADR-001 for the feature-only tag suffixes. ADR-007 is the correct citation for the coordinated taxonomy design.                                                                                |
+| **ADR-009** | Projection Trust Boundary         | Guard is supposed to use `parseAtBoundary` at its three trust boundaries (C-GUARD-4). It does not.                                                                                           | Not documented                             | No annotation, no source comment acknowledging the non-compliance. The gap is invisible until you know to look for it.                                                                                                     |
+| **PDR-001** | Session Workflow Commands         | Governs `scope-validate`/`handoff` in `architect-cli`, not guard. Guard's session-scope rules are distinct.                                                                                  | Mentioned in Phase 1 ADR conformance table | AGENTS.md lists PDR-001 as load-bearing but does not clarify that it governs `architect-cli`, not guard. A contributor new to guard could incorrectly assume PDR-001 is the governing PDR for guard's session-scope rules. |
+| **PDR-005** | Process Status FSM                | **Does not exist** in `architect/decisions/`. Cited 11 times.                                                                                                                                | Phantom — no file                          | As inventoried in §6.                                                                                                                                                                                                      |
 
 ### Summary of ADR linkage gaps
 
@@ -445,11 +457,13 @@ This table maps each relevant ADR to guard's relationship with it, per the annot
 The following dogfood invocations are documented and accurate:
 
 **In `AGENTS.md:199–202`:**
+
 ```bash
 pnpm architect:guard --staged     # pre-commit gate
 ```
 
 **In `package.json` scripts (discoverable, not documented in prose):**
+
 ```json
 "architect:guard":     "pnpm exec architect-guard --base-dir . --staged",
 "architect:guard:all": "pnpm exec architect-guard --base-dir . --all",
@@ -471,14 +485,14 @@ pnpm architect:guard --staged     # pre-commit gate
 
 ## 9. Cross-references to prior findings
 
-| This finding | Prior finding | Relationship |
-|-------------|--------------|--------------|
-| DOC-GUARD-C1 (wrong @bounded-context on git/) | Phase 2 Cleanup-H-GUARD-3 + Cleanup-M-GUARD-6 | This audit confirms the wrong annotation is live and identifies it as Architect State misinformation (doctrine: "Architect State is Code"), elevating to Critical |
-| DOC-GUARD-H1 (no README) | Not flagged in Phases 1 or 2 | New finding in Phase 3B |
-| DOC-GUARD-H2 (PDR-005 in CLI help) | Phase 2 H-SIMP-3 | Confirms the specific user-visible line; adds docs/ sites to the inventory |
-| DOC-GUARD-H5 (AGENTS.md ProcessGuard symbol mismatch) | Not flagged in Phases 1 or 2 | New finding in Phase 3B |
-| DOC-GUARD-H6 (MIGRATION.md ignores JS API) | Not flagged in Phases 1 or 2 | New finding in Phase 3B |
-| DOC-GUARD-H7 (deprecated docs point to gitignored tree) | Not flagged in Phases 1 or 2 | New finding in Phase 3B |
-| DOC-GUARD-M1 (PDR-005 in docs/ and docs-sources/) | Phase 2 H-SIMP-3 inventoried only src/ | This audit extends the inventory by 5 additional sites |
-| DOC-GUARD-M3 (phantom phase-state-machine reference) | Phase 1 H-GUARD-7, Phase 2 M-SIMP-4 | Confirmed; framed here as a documentation defect that suppresses future test authorship |
-| DOC-GUARD-M5 (wrong import paths in VALIDATION.md) | Not flagged in Phases 1 or 2 | New finding in Phase 3B |
+| This finding                                            | Prior finding                                 | Relationship                                                                                                                                                      |
+| ------------------------------------------------------- | --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| DOC-GUARD-C1 (wrong @bounded-context on git/)           | Phase 2 Cleanup-H-GUARD-3 + Cleanup-M-GUARD-6 | This audit confirms the wrong annotation is live and identifies it as Architect State misinformation (doctrine: "Architect State is Code"), elevating to Critical |
+| DOC-GUARD-H1 (no README)                                | Not flagged in Phases 1 or 2                  | New finding in Phase 3B                                                                                                                                           |
+| DOC-GUARD-H2 (PDR-005 in CLI help)                      | Phase 2 H-SIMP-3                              | Confirms the specific user-visible line; adds docs/ sites to the inventory                                                                                        |
+| DOC-GUARD-H5 (AGENTS.md ProcessGuard symbol mismatch)   | Not flagged in Phases 1 or 2                  | New finding in Phase 3B                                                                                                                                           |
+| DOC-GUARD-H6 (MIGRATION.md ignores JS API)              | Not flagged in Phases 1 or 2                  | New finding in Phase 3B                                                                                                                                           |
+| DOC-GUARD-H7 (deprecated docs point to gitignored tree) | Not flagged in Phases 1 or 2                  | New finding in Phase 3B                                                                                                                                           |
+| DOC-GUARD-M1 (PDR-005 in docs/ and docs-sources/)       | Phase 2 H-SIMP-3 inventoried only src/        | This audit extends the inventory by 5 additional sites                                                                                                            |
+| DOC-GUARD-M3 (phantom phase-state-machine reference)    | Phase 1 H-GUARD-7, Phase 2 M-SIMP-4           | Confirmed; framed here as a documentation defect that suppresses future test authorship                                                                           |
+| DOC-GUARD-M5 (wrong import paths in VALIDATION.md)      | Not flagged in Phases 1 or 2                  | New finding in Phase 3B                                                                                                                                           |

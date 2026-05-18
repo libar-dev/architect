@@ -4,11 +4,11 @@
 
 ## Purpose
 
-A maintainer-facing skill for restructuring, editing, validating, and (eventually) generating the architect-* skill family in this repo. Not for end-user work — for the human + agent shaping the skill layer.
+A maintainer-facing skill for restructuring, editing, validating, and (eventually) generating the architect-\* skill family in this repo. Not for end-user work — for the human + agent shaping the skill layer.
 
 ## Trigger surface (description draft)
 
-> MANDATORY when restructuring, auditing, or generating Architect skills in this repo. Triggers on "restructure architect skills", "fix architect skill descriptions", "audit `_shared/` fragments", "add a new architect session skill", "promote a draft skill", mentions of `.agents/skills/`, `.claude/skills/`, `.opencode/skills/`, the architect-* skill family by name, SKILL.md frontmatter validity, description-based skill activation, or the architect skill auto-generation pipeline. Do NOT use for: generic skill creation outside the architect family (route to `skill-creator`), OpenCode / OmO configuration (route to `omo-setup-management`), or actual architect product code (`packages/architect-*/src/**`). Invoke BEFORE editing any skill file or generator script in the architect skill stack.
+> MANDATORY when restructuring, auditing, or generating Architect skills in this repo. Triggers on "restructure architect skills", "fix architect skill descriptions", "audit `_shared/` fragments", "add a new architect session skill", "promote a draft skill", mentions of `.agents/skills/`, `.claude/skills/`, `.opencode/skills/`, the architect-_ skill family by name, SKILL.md frontmatter validity, description-based skill activation, or the architect skill auto-generation pipeline. Do NOT use for: generic skill creation outside the architect family (route to `skill-creator`), OpenCode / OmO configuration (route to `omo-setup-management`), or actual architect product code (`packages/architect-_/src/\*\*`). Invoke BEFORE editing any skill file or generator script in the architect skill stack.
 
 ## Operational scope
 

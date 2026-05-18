@@ -69,20 +69,20 @@ Meta ships **only** 7 bin files (each 2 lines) plus README + `package.json`. **N
 
 ## Configuration audit vs family
 
-| Setting | Meta | Verdict |
-|---------|------|---------|
-| Has `src/` directory | **No** — bin-only meta | Correct by design. |
-| Has `dist/` directory | **No** — bin shims are direct `.js` files in `bin/` | Correct by design. |
-| `prepack` | **Absent** | Correct — no build step. |
-| `package.json#exports` | Only `./package.json` | Correct — no JS API surface intentional per README. |
-| `package.json#bin` | 7 entries | Matches README's "all 7 CLI bins" claim. |
-| `files` allowlist | `["bin", "README.md"]` | Tight, correct. |
-| `engines.node` | `>=20.0.0` | Aligned with family. |
-| `publishConfig.access` | `public` | Aligned. |
-| `publishConfig.provenance` | `true` | Aligned; unimplemented family-wide. |
-| Workspace dependencies | 5 splits at `workspace:*` | Correct; changesets fixed-group handles lockstep. |
-| Tests | **None** | Correct — nothing to test that isn't tested in the splits. |
-| `.gitignore` for `.DS_Store` | Present at the package level? **Verify** | Add to repo-level `.gitignore` if missing. |
+| Setting                      | Meta                                                | Verdict                                                    |
+| ---------------------------- | --------------------------------------------------- | ---------------------------------------------------------- |
+| Has `src/` directory         | **No** — bin-only meta                              | Correct by design.                                         |
+| Has `dist/` directory        | **No** — bin shims are direct `.js` files in `bin/` | Correct by design.                                         |
+| `prepack`                    | **Absent**                                          | Correct — no build step.                                   |
+| `package.json#exports`       | Only `./package.json`                               | Correct — no JS API surface intentional per README.        |
+| `package.json#bin`           | 7 entries                                           | Matches README's "all 7 CLI bins" claim.                   |
+| `files` allowlist            | `["bin", "README.md"]`                              | Tight, correct.                                            |
+| `engines.node`               | `>=20.0.0`                                          | Aligned with family.                                       |
+| `publishConfig.access`       | `public`                                            | Aligned.                                                   |
+| `publishConfig.provenance`   | `true`                                              | Aligned; unimplemented family-wide.                        |
+| Workspace dependencies       | 5 splits at `workspace:*`                           | Correct; changesets fixed-group handles lockstep.          |
+| Tests                        | **None**                                            | Correct — nothing to test that isn't tested in the splits. |
+| `.gitignore` for `.DS_Store` | Present at the package level? **Verify**            | Add to repo-level `.gitignore` if missing.                 |
 
 ## What's healthy (preserve)
 

@@ -45,25 +45,25 @@ The release-readiness ordering across the family:
 
 ### Critical findings per package (28 total)
 
-| Package | Count | Examples |
-|---------|-------|----------|
-| architect-core | 7 | `./roles` broken export; `PatternGraphSchema` open + drifted hand-typed interface; duplicate `TagRegistry` type-of-record; `isProjectConfig` triple-validation; `validateTransition` casts after type-guard rejection; `prepack` misplaced; `z.function().optional()` |
-| architect-projection | 5 | `.omit()/.extend()` chain feeds `PatternDetailSchema`; `parseAndProjectOpenQuestionList` outlier; perf gate unwired; README quickstart doesn't compile; documentation falsehoods |
-| architect-guard | 10 | FSM trust-boundary collapse; `tier-a-baseline.ts` 1,138-LOC dogfood leak; doctrine-enforcing package isn't doctrine-compliant; `parseAtBoundary` unused; 94% dead barrel surface; smoke test unwired; phantom PDR-005 in user-visible CLI help; no README; `git/` wrong bounded-context annotation |
-| architect-cli | 6+ | `CLI_SCHEMA` should be deleted (supersedes core H-CORE-5); 100-LOC hand-rolled argv; `src/index.ts` dead; 22 of 24 commands untested; no README; `runtime-bridge.js` Windows bug |
-| architect-mcp | 4 | `runtime-bridge.js` same Windows bug; "18 tools" vs 21 registered; no README; `process.chdir` not signal-safe |
-| architect (meta) | 0 | Only `.DS_Store` cleanup and inherited family items |
+| Package              | Count | Examples                                                                                                                                                                                                                                                                                           |
+| -------------------- | ----- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| architect-core       | 7     | `./roles` broken export; `PatternGraphSchema` open + drifted hand-typed interface; duplicate `TagRegistry` type-of-record; `isProjectConfig` triple-validation; `validateTransition` casts after type-guard rejection; `prepack` misplaced; `z.function().optional()`                              |
+| architect-projection | 5     | `.omit()/.extend()` chain feeds `PatternDetailSchema`; `parseAndProjectOpenQuestionList` outlier; perf gate unwired; README quickstart doesn't compile; documentation falsehoods                                                                                                                   |
+| architect-guard      | 10    | FSM trust-boundary collapse; `tier-a-baseline.ts` 1,138-LOC dogfood leak; doctrine-enforcing package isn't doctrine-compliant; `parseAtBoundary` unused; 94% dead barrel surface; smoke test unwired; phantom PDR-005 in user-visible CLI help; no README; `git/` wrong bounded-context annotation |
+| architect-cli        | 6+    | `CLI_SCHEMA` should be deleted (supersedes core H-CORE-5); 100-LOC hand-rolled argv; `src/index.ts` dead; 22 of 24 commands untested; no README; `runtime-bridge.js` Windows bug                                                                                                                   |
+| architect-mcp        | 4     | `runtime-bridge.js` same Windows bug; "18 tools" vs 21 registered; no README; `process.chdir` not signal-safe                                                                                                                                                                                      |
+| architect (meta)     | 0     | Only `.DS_Store` cleanup and inherited family items                                                                                                                                                                                                                                                |
 
 ### High findings per package (~100 total)
 
-| Package | Count |
-|---------|-------|
-| architect-core | 37 (16 quality+arch + 8 testing+docs + 8 language + 5 CI) |
-| architect-projection | 22 (10 arch + 8 quality + 4 cleanup/test/lang) |
-| architect-guard | 25+ (14 arch + 9 quality + 10 test+doc + 3 language) |
-| architect-cli | 18+ from Phase 1 |
-| architect-mcp | 8 |
-| architect (meta) | 2 |
+| Package              | Count                                                     |
+| -------------------- | --------------------------------------------------------- |
+| architect-core       | 37 (16 quality+arch + 8 testing+docs + 8 language + 5 CI) |
+| architect-projection | 22 (10 arch + 8 quality + 4 cleanup/test/lang)            |
+| architect-guard      | 25+ (14 arch + 9 quality + 10 test+doc + 3 language)      |
+| architect-cli        | 18+ from Phase 1                                          |
+| architect-mcp        | 8                                                         |
+| architect (meta)     | 2                                                         |
 
 ### Medium + Low
 
@@ -141,14 +141,14 @@ No `.github/workflows/` exists at the repo level. Family-wide gap (core CI-1, CI
 
 `tsconfig.architect-base.json` currently sets `sourceMap: true, declarationMap: true`. Disabling cuts each package's tarball ~46-50%:
 
-| Package | Before | Projected after |
-|---------|--------|-----------------|
-| architect-core | 426 files / 195.8 KB packed / 1.5 MB unpacked | ~170-180 files / under 100 KB packed / ~600 KB unpacked |
-| architect-projection | 582 files / ~250 KB packed | ~290 files / ~125 KB packed |
-| architect-guard | 583 KB unpacked / 155 files | ~315 KB / ~80 files |
-| architect-cli | 52.1 KB packed / 253.7 KB unpacked / 112 files | ~37 KB packed |
-| architect-mcp | (per family pattern) | (same ~50% reduction) |
-| architect (meta) | N/A (no dist) | N/A |
+| Package              | Before                                         | Projected after                                         |
+| -------------------- | ---------------------------------------------- | ------------------------------------------------------- |
+| architect-core       | 426 files / 195.8 KB packed / 1.5 MB unpacked  | ~170-180 files / under 100 KB packed / ~600 KB unpacked |
+| architect-projection | 582 files / ~250 KB packed                     | ~290 files / ~125 KB packed                             |
+| architect-guard      | 583 KB unpacked / 155 files                    | ~315 KB / ~80 files                                     |
+| architect-cli        | 52.1 KB packed / 253.7 KB unpacked / 112 files | ~37 KB packed                                           |
+| architect-mcp        | (per family pattern)                           | (same ~50% reduction)                                   |
+| architect (meta)     | N/A (no dist)                                  | N/A                                                     |
 
 **One line in the family base tsconfig. Halves the install footprint family-wide.**
 
@@ -169,49 +169,49 @@ Single PR aligns across all 5 publishable packages:
 
 Phantom PDR-005 referenced **11 times** across 3 packages:
 
-| Location | Type | Visibility |
-|----------|------|-----------|
-| `architect-guard/src/lint/process-guard/{index,types,decider,decider}.ts` | source | low |
-| `architect-guard/src/cli/lint-process.ts:170` | **CLI help output** | **HIGH (user-visible)** |
-| `architect-core/src/taxonomy/registry-builder.ts:162` | source | low |
-| `architect-guard/docs/VALIDATION.md` + `docs/GHERKIN-PATTERNS.md` | doc | medium |
-| `architect-guard/docs-sources/gherkin-patterns.md` | **doc source feeding generator** | **HIGH (propagates)** |
-| (3+ low-priority sites) | | |
+| Location                                                                  | Type                             | Visibility              |
+| ------------------------------------------------------------------------- | -------------------------------- | ----------------------- |
+| `architect-guard/src/lint/process-guard/{index,types,decider,decider}.ts` | source                           | low                     |
+| `architect-guard/src/cli/lint-process.ts:170`                             | **CLI help output**              | **HIGH (user-visible)** |
+| `architect-core/src/taxonomy/registry-builder.ts:162`                     | source                           | low                     |
+| `architect-guard/docs/VALIDATION.md` + `docs/GHERKIN-PATTERNS.md`         | doc                              | medium                  |
+| `architect-guard/docs-sources/gherkin-patterns.md`                        | **doc source feeding generator** | **HIGH (propagates)**   |
+| (3+ low-priority sites)                                                   |                                  |                         |
 
 **Decision: author PDR-005 (process-guard FSM enforcement IS decision-worthy) or strip all 11 references in one coordinated PR.**
 
 ## Per-package summary table
 
-| Package | SLOC | Tests | Critical | High | Annotation | strictObject sites | Doctrine grade |
-|---------|------|-------|----------|------|------------|-------------------|----------------|
-| architect-core | 12,360 | 51 step files | 7 | 37 | 26% | 28 mixed (28 z.object drift) | **B-** doctrine-aligned in principle, uneven in application |
-| architect-projection | 15,238 | 83 step files | 5 | 22 | 60% | 107 / 0 (Zod 4 strict-chain issues at 3 sites) | **A-** family reference for Zod 4 + ESM + TS strictness |
-| architect-guard | 9,135 | 5 step files | 10 | 25+ | 55% | 1 / 1 (one open `z.object`) | **C** doctrine-enforcing package least doctrine-compliant |
-| architect-cli | 3,870 | 9 files | 6+ | 18+ | 15% | 13 / 0 | **B** family reference for CLI trust boundaries; worst test coverage |
-| architect-mcp | 1,630 | 5 files | 4 | 8 | 55% | All strict | **A** cleanest by SLOC-adjusted ratio; closest to release |
-| architect (meta) | ~14 | 0 | 0 | 2 | N/A | N/A | **A+** smallest possible package shape |
+| Package              | SLOC   | Tests         | Critical | High | Annotation | strictObject sites                             | Doctrine grade                                                       |
+| -------------------- | ------ | ------------- | -------- | ---- | ---------- | ---------------------------------------------- | -------------------------------------------------------------------- |
+| architect-core       | 12,360 | 51 step files | 7        | 37   | 26%        | 28 mixed (28 z.object drift)                   | **B-** doctrine-aligned in principle, uneven in application          |
+| architect-projection | 15,238 | 83 step files | 5        | 22   | 60%        | 107 / 0 (Zod 4 strict-chain issues at 3 sites) | **A-** family reference for Zod 4 + ESM + TS strictness              |
+| architect-guard      | 9,135  | 5 step files  | 10       | 25+  | 55%        | 1 / 1 (one open `z.object`)                    | **C** doctrine-enforcing package least doctrine-compliant            |
+| architect-cli        | 3,870  | 9 files       | 6+       | 18+  | 15%        | 13 / 0                                         | **B** family reference for CLI trust boundaries; worst test coverage |
+| architect-mcp        | 1,630  | 5 files       | 4        | 8    | 55%        | All strict                                     | **A** cleanest by SLOC-adjusted ratio; closest to release            |
+| architect (meta)     | ~14    | 0             | 0        | 2    | N/A        | N/A                                            | **A+** smallest possible package shape                               |
 
 ## Family numbers
 
-| Metric | Value |
-|--------|-------|
-| Total source files (publishable) | 333 |
-| Total SLOC | ~42,233 |
-| Total test files | 153 |
-| `parseAtBoundary` call sites across family | 13 + 1 (cli + mcp); core 0; guard 0; projection N (via `parseAndProject`) |
-| `z.strictObject` sites total | ~250 |
-| `z.object` sites total | ~30 (28 in core + 1 in guard + 1 in projection's L-PROJ-A; rest zero) |
-| `.extend()/.omit()/.pick()/.partial()/.required()` chains | 4 confirmed problem sites (1 core + 3 projection) |
-| `.brand<>()` declarations | 6 (all in core); 0 in guard/cli/mcp/projection consumers |
-| Suppressions (`@ts-ignore`/`eslint-disable`/`void X`) | 6 total — all in core (3 `void X` + 3 dead suppressions; rest of family is clean) |
-| Phantom PDR/ADR references | 11 (phantom PDR-005 across guard + core + projection docs) |
-| Packages without README | 3 (guard, cli, mcp) |
-| Packages with `prepack` correctly placed | 5 of 6 (core was broken; now fixable) |
-| Packages with `typecheck` covering both configs | 2 of 6 (guard + cli) |
-| Custom audit scripts | 3 (2 in projection + 1 in guard) |
-| Tests for the FSM | 0 (across core + guard combined) |
-| CI workflows | **0** (none at repo level) |
-| `publishConfig.provenance: true` declarations | 5 (one per publishable package) — none active |
+| Metric                                                    | Value                                                                             |
+| --------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| Total source files (publishable)                          | 333                                                                               |
+| Total SLOC                                                | ~42,233                                                                           |
+| Total test files                                          | 153                                                                               |
+| `parseAtBoundary` call sites across family                | 13 + 1 (cli + mcp); core 0; guard 0; projection N (via `parseAndProject`)         |
+| `z.strictObject` sites total                              | ~250                                                                              |
+| `z.object` sites total                                    | ~30 (28 in core + 1 in guard + 1 in projection's L-PROJ-A; rest zero)             |
+| `.extend()/.omit()/.pick()/.partial()/.required()` chains | 4 confirmed problem sites (1 core + 3 projection)                                 |
+| `.brand<>()` declarations                                 | 6 (all in core); 0 in guard/cli/mcp/projection consumers                          |
+| Suppressions (`@ts-ignore`/`eslint-disable`/`void X`)     | 6 total — all in core (3 `void X` + 3 dead suppressions; rest of family is clean) |
+| Phantom PDR/ADR references                                | 11 (phantom PDR-005 across guard + core + projection docs)                        |
+| Packages without README                                   | 3 (guard, cli, mcp)                                                               |
+| Packages with `prepack` correctly placed                  | 5 of 6 (core was broken; now fixable)                                             |
+| Packages with `typecheck` covering both configs           | 2 of 6 (guard + cli)                                                              |
+| Custom audit scripts                                      | 3 (2 in projection + 1 in guard)                                                  |
+| Tests for the FSM                                         | 0 (across core + guard combined)                                                  |
+| CI workflows                                              | **0** (none at repo level)                                                        |
+| `publishConfig.provenance: true` declarations             | 5 (one per publishable package) — none active                                     |
 
 ## Recommended landing order (master)
 

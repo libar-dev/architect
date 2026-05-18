@@ -5,9 +5,9 @@
 
 ## Test Strategy
 
-**Gherkin-only, end-to-end.** The doctrine is fixed by ADR-002 (*"Gherkin-only testing policy"*). All tests are `.feature` files with vitest-cucumber step definitions. No `.test.ts` files. Edge cases use `Scenario Outline` + `Examples` tables.
+**Gherkin-only, end-to-end.** The doctrine is fixed by ADR-002 (_"Gherkin-only testing policy"_). All tests are `.feature` files with vitest-cucumber step definitions. No `.test.ts` files. Edge cases use `Scenario Outline` + `Examples` tables.
 
-> ADR-002 verbatim rationale: *"Parallel `.test.ts` files create a hidden test layer invisible to the documentation pipeline, undermining the single source of truth principle this package enforces."*
+> ADR-002 verbatim rationale: _"Parallel `.test.ts` files create a hidden test layer invisible to the documentation pipeline, undermining the single source of truth principle this package enforces."_
 
 The same `.feature` file serves two audiences: it is the test for the implementation **and** the documentation of the behavior. The platform "practices what it preaches."
 
@@ -23,23 +23,23 @@ The same `.feature` file serves two audiences: it is the test for the implementa
 
 ## Frameworks
 
-| Concern                | Library                                 | Version (caret-pinned) |
-| ---------------------- | --------------------------------------- | ---------------------- |
-| Test runner            | `vitest`                                | `^4.1.4`               |
-| Gherkin execution      | `@amiceli/vitest-cucumber`              | `^6.3.0`               |
-| Coverage instrumentation | `@vitest/coverage-v8`                 | `^4.1.4`               |
-| Gherkin parser (architect state) | `@cucumber/gherkin`           | (transitive)           |
+| Concern                          | Library                    | Version (caret-pinned) |
+| -------------------------------- | -------------------------- | ---------------------- |
+| Test runner                      | `vitest`                   | `^4.1.4`               |
+| Gherkin execution                | `@amiceli/vitest-cucumber` | `^6.3.0`               |
+| Coverage instrumentation         | `@vitest/coverage-v8`      | `^4.1.4`               |
+| Gherkin parser (architect state) | `@cucumber/gherkin`        | (transitive)           |
 
 ---
 
 ## The Two Gherkin Parsers — read this once
 
-AGENTS.md calls this *"the most painful 'why doesn't my spec work?' debugging in this repo."* Internalize it before writing any spec.
+AGENTS.md calls this _"the most painful 'why doesn't my spec work?' debugging in this repo."_ Internalize it before writing any spec.
 
-| Parser                     | What it reads                                                                | When it runs                          |
-| -------------------------- | ---------------------------------------------------------------------------- | ------------------------------------- |
-| `@cucumber/gherkin`        | `architect/specs/`, `architect/decisions/`, `formal-spec/`                   | At doc-gen + PatternGraph build time  |
-| `@amiceli/vitest-cucumber` | `tests/features/`, `packages/*/tests/features/`                              | At test time via vitest               |
+| Parser                     | What it reads                                              | When it runs                         |
+| -------------------------- | ---------------------------------------------------------- | ------------------------------------ |
+| `@cucumber/gherkin`        | `architect/specs/`, `architect/decisions/`, `formal-spec/` | At doc-gen + PatternGraph build time |
+| `@amiceli/vitest-cucumber` | `tests/features/`, `packages/*/tests/features/`            | At test time via vitest              |
 
 **Implications:**
 
@@ -116,13 +116,13 @@ If a consumer project wants a strict statement-coverage threshold, configure it 
 
 Gherkin tags drive both extraction and execution:
 
-| Tag pattern                          | Purpose                                                                                                                       |
-| ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
-| `@architect-pattern:PatternName`     | On a `Feature:` or `Scenario:` — declares the pattern this spec describes. Used by the architect-state parser only.            |
-| `@architect-implements:Pattern1,…`   | On the executable-side step definition file — declares which patterns the test realizes. The reverse-link per ADR-003.        |
-| `@architect-target:path`             | On a stub — declares the implementation path the stub will move to.                                                            |
-| `@architect-status:active`           | On a spec — places it on the FSM axis (per ADR-001 / ADR-007).                                                                 |
-| `@process-workflow:…`                | Included as an exception in ADR-002 (the include-tag the policy was unlocked to add).                                          |
+| Tag pattern                        | Purpose                                                                                                                |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `@architect-pattern:PatternName`   | On a `Feature:` or `Scenario:` — declares the pattern this spec describes. Used by the architect-state parser only.    |
+| `@architect-implements:Pattern1,…` | On the executable-side step definition file — declares which patterns the test realizes. The reverse-link per ADR-003. |
+| `@architect-target:path`           | On a stub — declares the implementation path the stub will move to.                                                    |
+| `@architect-status:active`         | On a spec — places it on the FSM axis (per ADR-001 / ADR-007).                                                         |
+| `@process-workflow:…`              | Included as an exception in ADR-002 (the include-tag the policy was unlocked to add).                                  |
 
 ### Rule blocks
 

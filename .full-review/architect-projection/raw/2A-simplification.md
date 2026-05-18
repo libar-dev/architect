@@ -7,6 +7,7 @@
 The package has **two structurally outsized files** (`render-markdown.ts` 2,227 LOC, `operational-insights/index.ts` 1,200 LOC) and one mid-sized one (`delivery-reporting/index.ts` 742 LOC) that all break the sibling convention of "one file per `project*` function" used in `pattern-relations/` and `execution-context/`. Their decomposition is the highest-leverage simplification in the package — `render-markdown.ts` alone splits into 9 files of which 5 are pure renderer-block code that ports verbatim. The package also carries roughly **120 LOC of in-package duplication** across 8 helper pairs (Phase 1 H-PROJ-Q-2..5, H-PROJ-A-6, M-PROJ-5..6 and slug-trio H-PROJ-A-7) where one consolidated `_shared/` module per pair, behind unchanged call sites, closes the drift surface. Three small algorithmic wins are also concentrated on the perf-gate path: `createStatusCounts` 4-pass filter → single-pass tally (H-PROJ-Q-4), `filterPatterns` no-filter copy elimination (H-PROJ-Q-6), and `dependency-tree` Set-clone → mutate+backtrack (M-PROJ-3). The schema-derivation recipe for `ProjectionBundle<T>` (H-PROJ-A-4) is the only recipe that introduces a new abstraction worth introducing — it dissolves a 100-LOC hand-coded `isBundle`/`isRoutingLike` and aligns the most-crossed contract with the package's Zod-first doctrine.
 
 **Top three highest-leverage recipes:**
+
 1. **Split `render-markdown.ts`** (H-PROJ-A-5 / H-PROJ-Q-8) — 4-way mechanical split (`routed-paths.ts`, `splitting.ts`, `normalizers/*.ts`, `block-rendering.ts`) with `TRUSTED_MARKDOWN` staying renderer-private.
 2. **`projectionBundleSchema<T>(fragmentSchema)` factory** (H-PROJ-A-4 / M-PROJ-4 / M-PROJ-A-2) — replaces `BundleRouting` + `ProjectionBundle<T>` + `isBundle` + `isRoutingLike` (~100 LOC) with one `z.infer`'d schema; `isBundle` becomes a thin `safeParse` wrapper.
 3. **Single-pass `createStatusCounts`** (H-PROJ-Q-4) — collapses 4 sequential `Array.filter` passes into one accumulator-loop on a perf-gate hot path that runs across `buildOverviewDigest`, `buildPhaseProgress`, `buildStatusDistribution`, and every quarter/release bucket.
@@ -79,13 +80,13 @@ src/renderers/
 
 **Import map (key entries):**
 
-| New file | Re-exports needed | Imports from |
-|----------|-------------------|--------------|
-| `render-markdown.ts` | `renderMarkdown` (public) | `markdown/routed-paths.ts`, `markdown/splitting.ts`, `markdown/document-types.ts`, `markdown/normalizers/index.ts`, `markdown/generic-fragment.ts`, `markdown/block-rendering.ts` |
-| `markdown/normalizers/index.ts` | `MARKDOWN_NORMALIZERS`, `normalizeFragment` | per-kind files + `markdown/document-types.ts` + `_shared/dispatch.ts` |
-| `markdown/normalizers/<kind>.ts` | one `normalize<Kind>` each | `markdown/document-types.ts`, `markdown/trusted-markdown.ts`, `markdown/generic-fragment.ts` (for `resolveFragmentMetadata`/`createMarkdownDocument`), `fragments/<domain>/index.ts`, `blocks/schema.js` |
-| `markdown/trusted-markdown.ts` | all trusted helpers + `MarkdownRenderableBlock` type | module-private `TRUSTED_MARKDOWN` symbol stays internal to this file, exported only via the `trustedMarkdown*` factories — keeps the ADR-009 firewall identical |
-| `markdown/block-rendering.ts` | `renderDocument` | `markdown/trusted-markdown.ts`, `markdown/document-types.ts` |
+| New file                         | Re-exports needed                                    | Imports from                                                                                                                                                                                             |
+| -------------------------------- | ---------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `render-markdown.ts`             | `renderMarkdown` (public)                            | `markdown/routed-paths.ts`, `markdown/splitting.ts`, `markdown/document-types.ts`, `markdown/normalizers/index.ts`, `markdown/generic-fragment.ts`, `markdown/block-rendering.ts`                        |
+| `markdown/normalizers/index.ts`  | `MARKDOWN_NORMALIZERS`, `normalizeFragment`          | per-kind files + `markdown/document-types.ts` + `_shared/dispatch.ts`                                                                                                                                    |
+| `markdown/normalizers/<kind>.ts` | one `normalize<Kind>` each                           | `markdown/document-types.ts`, `markdown/trusted-markdown.ts`, `markdown/generic-fragment.ts` (for `resolveFragmentMetadata`/`createMarkdownDocument`), `fragments/<domain>/index.ts`, `blocks/schema.js` |
+| `markdown/trusted-markdown.ts`   | all trusted helpers + `MarkdownRenderableBlock` type | module-private `TRUSTED_MARKDOWN` symbol stays internal to this file, exported only via the `trustedMarkdown*` factories — keeps the ADR-009 firewall identical                                          |
+| `markdown/block-rendering.ts`    | `renderDocument`                                     | `markdown/trusted-markdown.ts`, `markdown/document-types.ts`                                                                                                                                             |
 
 **Firewall preservation (load-bearing):** the `TRUSTED_MARKDOWN` symbol moves to `markdown/trusted-markdown.ts` but stays **module-private** — only the constructor helpers (`trustedMarkdown`, `trustedMarkdownParagraph`, `trustedMarkdownHeading`, `trustedMarkdownList`, `markdownTable`) are exported. The 5-AST-selector lint rule needs its target glob extended to `src/renderers/markdown/trusted-markdown.ts` and continues to ban exports of the symbol itself. No widening of the firewall.
 
@@ -125,7 +126,9 @@ export function parseBusinessRuleAnnotations(description: string): BusinessRuleA
 
   const annotations: { invariant?: string; rationale?: string; verifiedBy?: string[] } = {};
 
-  for (const match of normalizeLineEndings(description).matchAll(BUSINESS_RULE_ANNOTATION_PATTERN)) {
+  for (const match of normalizeLineEndings(description).matchAll(
+    BUSINESS_RULE_ANNOTATION_PATTERN,
+  )) {
     const label = match[1]?.toLowerCase();
     const rawValue = match[2] ?? '';
     if (label === undefined) continue;
@@ -238,6 +241,7 @@ Cross-package duplicate of core. **Wait for core's CL-CORE-16/17** to land canon
 #### 2.2.6 Slug-trio (H-PROJ-A-7) — cross-renderer parity defect
 
 Three slug functions with different behaviour:
+
 - `_internal/slug.ts#slugForFilename` — camelCase-aware (splits `BusinessRuleSet` → `business-rule-set`)
 - `governance/governance-shared.internal.ts#slugify` — non-splitting (`BusinessRuleSet` → `businessruleset`)
 - `architect-core#slugify` — third variant
@@ -245,6 +249,7 @@ Three slug functions with different behaviour:
 `render-markdown.ts` uses `slugForFilename`; `render-ui.ts` uses something else. **Real defect:** same pattern produces different anchors in markdown vs UI.
 
 **Recipe:**
+
 1. Canonicalize on `_internal/slug.ts#slugForFilename`.
 2. Delete `governance-shared.internal.ts:50-56#slugify`; replace its 2 governance call sites with `slugForFilename`.
 3. Audit `architect-core#slugify` separately (cross-package — flag in core).
@@ -394,7 +399,10 @@ export type BundleRouting = z.infer<typeof BundleRoutingSchema>;
 export function projectionBundleSchema<S extends z.ZodTypeAny>(fragmentSchema: S) {
   return z.strictObject({
     root: fragmentSchema,
-    children: z.record(z.string(), z.lazy(() => FragmentSchema)),
+    children: z.record(
+      z.string(),
+      z.lazy(() => FragmentSchema),
+    ),
     routing: BundleRoutingSchema.optional(),
   });
 }
@@ -489,13 +497,15 @@ try {
 ```ts
 type TagAccessor = (context: ProjectionContext, pattern: ExtractedPattern) => boolean;
 
-const stringTagAccessor = (field: keyof ExtractedPattern): TagAccessor =>
+const stringTagAccessor =
+  (field: keyof ExtractedPattern): TagAccessor =>
   (_, pattern) => {
     const value = pattern[field];
     return typeof value === 'string' && value.trim().length > 0;
   };
 
-const arrayTagAccessor = (field: keyof ExtractedPattern): TagAccessor =>
+const arrayTagAccessor =
+  (field: keyof ExtractedPattern): TagAccessor =>
   (_, pattern) => {
     const value = pattern[field];
     return Array.isArray(value) && value.length > 0;
@@ -509,33 +519,33 @@ const relationshipTagAccessor =
   };
 
 const PATTERN_TAG_ACCESSORS: ReadonlyMap<string, TagAccessor> = new Map([
-  ['status',         (_, p) => p.status.length > 0],
-  ['role',           stringTagAccessor('role')],
-  ['arch-context',   stringTagAccessor('boundedContext')],
-  ['arch-layer',     stringTagAccessor('adrLayer')],
-  ['layer',          stringTagAccessor('adrLayer')],
-  ['phase',          (_, p) => p.phase !== undefined],
-  ['priority',       stringTagAccessor('priority')],
-  ['quarter',        stringTagAccessor('quarter')],
-  ['team',           stringTagAccessor('team')],
-  ['effort',         stringTagAccessor('effort')],
-  ['effort-actual',  stringTagAccessor('effortActual')],
-  ['product-area',   stringTagAccessor('productArea')],
-  ['user-role',      stringTagAccessor('userRole')],
+  ['status', (_, p) => p.status.length > 0],
+  ['role', stringTagAccessor('role')],
+  ['arch-context', stringTagAccessor('boundedContext')],
+  ['arch-layer', stringTagAccessor('adrLayer')],
+  ['layer', stringTagAccessor('adrLayer')],
+  ['phase', (_, p) => p.phase !== undefined],
+  ['priority', stringTagAccessor('priority')],
+  ['quarter', stringTagAccessor('quarter')],
+  ['team', stringTagAccessor('team')],
+  ['effort', stringTagAccessor('effort')],
+  ['effort-actual', stringTagAccessor('effortActual')],
+  ['product-area', stringTagAccessor('productArea')],
+  ['user-role', stringTagAccessor('userRole')],
   ['business-value', stringTagAccessor('businessValue')],
-  ['workflow',       stringTagAccessor('workflow')],
-  ['risk',           stringTagAccessor('risk')],
-  ['release',        stringTagAccessor('release')],
-  ['completed',      stringTagAccessor('completed')],
-  ['target-path',    stringTagAccessor('targetPath')],
-  ['since',          stringTagAccessor('since')],
-  ['depends-on',     relationshipTagAccessor((r, p) => r.dependsOn.length || (p.uses?.length ?? 0))],
-  ['enables',        relationshipTagAccessor((r) => r.enables.length)],
-  ['uses',           arrayTagAccessor('uses')],
-  ['used-by',        relationshipTagAccessor((r) => r.usedBy.length)],
-  ['implements',     arrayTagAccessor('implementsPatterns')],
-  ['see-also',       arrayTagAccessor('seeAlso')],
-  ['api-ref',        arrayTagAccessor('apiRef')],
+  ['workflow', stringTagAccessor('workflow')],
+  ['risk', stringTagAccessor('risk')],
+  ['release', stringTagAccessor('release')],
+  ['completed', stringTagAccessor('completed')],
+  ['target-path', stringTagAccessor('targetPath')],
+  ['since', stringTagAccessor('since')],
+  ['depends-on', relationshipTagAccessor((r, p) => r.dependsOn.length || (p.uses?.length ?? 0))],
+  ['enables', relationshipTagAccessor((r) => r.enables.length)],
+  ['uses', arrayTagAccessor('uses')],
+  ['used-by', relationshipTagAccessor((r) => r.usedBy.length)],
+  ['implements', arrayTagAccessor('implementsPatterns')],
+  ['see-also', arrayTagAccessor('seeAlso')],
+  ['api-ref', arrayTagAccessor('apiRef')],
 ]);
 
 function patternSatisfiesTag(
@@ -650,12 +660,12 @@ src/projections/delivery-reporting/
 
 After §2.2.1, §2.2.5, and §2.2.6 land, the remaining concerns are:
 
-| Concern | Functions | Destination |
-|---------|-----------|-------------|
-| Pattern lookup + identity | `getPatternName`, `requirePattern`, `getRelationships`, `resolveIndexedEntry` | `projections/_shared/pattern-lookup.internal.ts` |
-| Pattern → fragment normalization | `createPatternSummaryFragment`, `normalizePatternRelationships`, `normalizeDeliverables`, `buildPatternHierarchy`, `normalizeRules`, `resolveStubRefs`, `normalizeImplementationRef`, `resolveTestRefs`, `deriveSource` | `projections/_shared/pattern-normalize.internal.ts` |
-| Description-text parsing | `extractDescription`, `extractOpenQuestions` (+ `extractFirstSentenceRaw` if core doesn't yet expose it) | `projections/_shared/description-text.internal.ts` |
-| Misc | `uniqueSortedStrings`, `isDefined` | `projections/_shared/collection-utils.internal.ts` (or absorb into core's utils as L-CORE-3 sibling) |
+| Concern                          | Functions                                                                                                                                                                                                               | Destination                                                                                          |
+| -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Pattern lookup + identity        | `getPatternName`, `requirePattern`, `getRelationships`, `resolveIndexedEntry`                                                                                                                                           | `projections/_shared/pattern-lookup.internal.ts`                                                     |
+| Pattern → fragment normalization | `createPatternSummaryFragment`, `normalizePatternRelationships`, `normalizeDeliverables`, `buildPatternHierarchy`, `normalizeRules`, `resolveStubRefs`, `normalizeImplementationRef`, `resolveTestRefs`, `deriveSource` | `projections/_shared/pattern-normalize.internal.ts`                                                  |
+| Description-text parsing         | `extractDescription`, `extractOpenQuestions` (+ `extractFirstSentenceRaw` if core doesn't yet expose it)                                                                                                                | `projections/_shared/description-text.internal.ts`                                                   |
+| Misc                             | `uniqueSortedStrings`, `isDefined`                                                                                                                                                                                      | `projections/_shared/collection-utils.internal.ts` (or absorb into core's utils as L-CORE-3 sibling) |
 
 Business-rule annotations live in `_shared/business-rule-annotations.internal.ts` (§2.2.1).
 
@@ -665,18 +675,18 @@ Business-rule annotations live in `_shared/business-rule-annotations.internal.ts
 
 ## 4. Sweep patterns (recurring shapes worth fixing in batch)
 
-| # | Pattern | Where | Recipe |
-|---|---------|-------|--------|
-| SW-1 | **Regex hoisted into module scope** (L-PROJ-4, L-PROJ-6) | `pattern-helpers.internal.ts:219-220, 236, 279, 363-364`; `render-markdown.ts:1972-1985` (`escapePlainMarkdownLine`); `routing/route-id.ts:26` (already hoisted — exemplar) | Promote all `RegExp` literals declared inside hot-path functions to `const FOO_RE = /…/` at module scope. Engines cache, but the explicit pattern documents stability and trims hot-path setup. |
-| SW-2 | **`humanizeKey` / `stableStringify` consolidation** | Currently in `_internal/format-utils.ts`; used cross-module by `render-markdown.ts:19`, `render-ui.ts:22` | Move `_internal/format-utils.ts` → `shared/format-utils.ts` (matches L-PROJ-A-6 recommendation). `_internal/` should be reserved for module-local primitives, not cross-module shared utils. |
-| SW-3 | **Slug canonicalization** (H-PROJ-A-7) | See §2.2.6 | Canonicalize on `slugForFilename`; delete `governance/governance-shared.internal.ts#slugify`; promote `_internal/slug.ts` → `shared/slug.ts`. |
-| SW-4 | **Set-clone DFS pattern** | `dependency-tree.internal.ts:113` (M-PROJ-3, see §3.1); audit other recursive traversals for the same shape | The mutate+backtrack form (try/finally) is correct everywhere DFS visits unique nodes. Search `new Set(visited)` and `new Set(seen)` family-wide. |
-| SW-5 | **`(?: pattern.<field>?.length ?? 0) > 0`** repeated | All over `operational-insights/index.ts` `patternSatisfiesTag` and `dependency-tree.internal.ts:120-121` (`relationships.enables.length > 0 \|\| (… && relationships.usedBy.length > 0)`) | Add `hasItems(arr: readonly T[] \| undefined): boolean` to `_shared/collection-utils.internal.ts`; one inline reads `hasItems(pattern.uses)`. |
-| SW-6 | **`as keyof typeof FOO` after `Set.has` narrowing** (C-CORE-5 pattern, M-PROJ-1) | `session-context.internal.ts:264`, `scope-readiness.internal.ts:164` | After core exports `isValidProcessStatus` as a type predicate, replace both casts with the predicate. No projection-local work required first. |
-| SW-7 | **`Array.from({ length: n }, …)` allocator** (L-PROJ-5) | `pattern-helpers.internal.ts:496` (Levenshtein) — moves away when CL-CORE-16/17 lands | Pre-allocate with `new Array<number>(n+1)` and a `for` init loop. Only matters at hot-path scale; deprioritized vs. §2.3/§2.4. |
-| SW-8 | **`projectionBundleSchema` factory adoption** | Per-fragment schemas can use `projectionBundleSchema(MyFragmentSchema)` to derive their own bundle shape | Optional follow-up: every `project*` entrypoint with a per-fragment bundle gets a `MyFragmentBundleSchema` typed as `projectionBundleSchema(MyFragmentSchema)`. Useful at MCP boundary for stricter parse-at-boundary checks but not load-bearing. |
-| SW-9 | **`parseAndProject` sentinel value** | `_shared/parse-and-project.internal.ts:9, 26, 32-34` | Drop the `NO_DEFAULT_RAW_OPTIONS` symbol; accept the default as an options object `{ default?: unknown }` or split into `parseAndProject` and `parseAndProjectWithDefault`. Cleaner public contract; ~5 LOC drop. |
-| SW-10 | **`open-question-list.ts:38` ZodError bypass** (C-PROJ-2) | Single site; recipe in Phase 1 (§Critical). Mentioned here because it's a sweep target for `options-schema-barrel-audit.mjs` extension: enforce that every `parseAndProject*` calls the shared helper. |
+| #     | Pattern                                                                          | Where                                                                                                                                                                                                  | Recipe                                                                                                                                                                                                                                             |
+| ----- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| SW-1  | **Regex hoisted into module scope** (L-PROJ-4, L-PROJ-6)                         | `pattern-helpers.internal.ts:219-220, 236, 279, 363-364`; `render-markdown.ts:1972-1985` (`escapePlainMarkdownLine`); `routing/route-id.ts:26` (already hoisted — exemplar)                            | Promote all `RegExp` literals declared inside hot-path functions to `const FOO_RE = /…/` at module scope. Engines cache, but the explicit pattern documents stability and trims hot-path setup.                                                    |
+| SW-2  | **`humanizeKey` / `stableStringify` consolidation**                              | Currently in `_internal/format-utils.ts`; used cross-module by `render-markdown.ts:19`, `render-ui.ts:22`                                                                                              | Move `_internal/format-utils.ts` → `shared/format-utils.ts` (matches L-PROJ-A-6 recommendation). `_internal/` should be reserved for module-local primitives, not cross-module shared utils.                                                       |
+| SW-3  | **Slug canonicalization** (H-PROJ-A-7)                                           | See §2.2.6                                                                                                                                                                                             | Canonicalize on `slugForFilename`; delete `governance/governance-shared.internal.ts#slugify`; promote `_internal/slug.ts` → `shared/slug.ts`.                                                                                                      |
+| SW-4  | **Set-clone DFS pattern**                                                        | `dependency-tree.internal.ts:113` (M-PROJ-3, see §3.1); audit other recursive traversals for the same shape                                                                                            | The mutate+backtrack form (try/finally) is correct everywhere DFS visits unique nodes. Search `new Set(visited)` and `new Set(seen)` family-wide.                                                                                                  |
+| SW-5  | **`(?: pattern.<field>?.length ?? 0) > 0`** repeated                             | All over `operational-insights/index.ts` `patternSatisfiesTag` and `dependency-tree.internal.ts:120-121` (`relationships.enables.length > 0 \|\| (… && relationships.usedBy.length > 0)`)              | Add `hasItems(arr: readonly T[] \| undefined): boolean` to `_shared/collection-utils.internal.ts`; one inline reads `hasItems(pattern.uses)`.                                                                                                      |
+| SW-6  | **`as keyof typeof FOO` after `Set.has` narrowing** (C-CORE-5 pattern, M-PROJ-1) | `session-context.internal.ts:264`, `scope-readiness.internal.ts:164`                                                                                                                                   | After core exports `isValidProcessStatus` as a type predicate, replace both casts with the predicate. No projection-local work required first.                                                                                                     |
+| SW-7  | **`Array.from({ length: n }, …)` allocator** (L-PROJ-5)                          | `pattern-helpers.internal.ts:496` (Levenshtein) — moves away when CL-CORE-16/17 lands                                                                                                                  | Pre-allocate with `new Array<number>(n+1)` and a `for` init loop. Only matters at hot-path scale; deprioritized vs. §2.3/§2.4.                                                                                                                     |
+| SW-8  | **`projectionBundleSchema` factory adoption**                                    | Per-fragment schemas can use `projectionBundleSchema(MyFragmentSchema)` to derive their own bundle shape                                                                                               | Optional follow-up: every `project*` entrypoint with a per-fragment bundle gets a `MyFragmentBundleSchema` typed as `projectionBundleSchema(MyFragmentSchema)`. Useful at MCP boundary for stricter parse-at-boundary checks but not load-bearing. |
+| SW-9  | **`parseAndProject` sentinel value**                                             | `_shared/parse-and-project.internal.ts:9, 26, 32-34`                                                                                                                                                   | Drop the `NO_DEFAULT_RAW_OPTIONS` symbol; accept the default as an options object `{ default?: unknown }` or split into `parseAndProject` and `parseAndProjectWithDefault`. Cleaner public contract; ~5 LOC drop.                                  |
+| SW-10 | **`open-question-list.ts:38` ZodError bypass** (C-PROJ-2)                        | Single site; recipe in Phase 1 (§Critical). Mentioned here because it's a sweep target for `options-schema-barrel-audit.mjs` extension: enforce that every `parseAndProject*` calls the shared helper. |
 
 ---
 

@@ -10,7 +10,7 @@ Six high-leverage simplification recipes net **~-250 LOC**, take cli from 12 →
 
 1. **C-CLI-1** — rewrite `generate-docs.ts:214-315` (112-LOC hand-rolled argv) as `GenerateArgsSchema` + 10-entry `FLAGS` table + `assertHasValue`. Replaces 6 inline `if (next === undefined || next.startsWith('-'))` checks. Routes assembled args through `parseAtBoundary` like the `architect` bin already does. **Template for guard's F4A-G-H-3 too.**
 2. **C-CLI-2** — extract `parseDisclosureLevel`/`parseFilterValue`/`mergeProjectionFilter` to `commands/_shared/projection-filter.ts`. Unifies the two drifted call paths on `parseAtBoundary` directly (drops lossy `parseSchemaValue` wrapper for this path, side-closes H-CLI-Q-7).
-3. **C-CLI-3** — confirmed via grep: `CLI_SCHEMA`/`showHelp`/`CliReferenceGenerator` have **zero workspace src consumers**. cli has nothing to migrate. **Deletion is a core-side change; core's H-CORE-5 *move* recommendation is WRONG.**
+3. **C-CLI-3** — confirmed via grep: `CLI_SCHEMA`/`showHelp`/`CliReferenceGenerator` have **zero workspace src consumers**. cli has nothing to migrate. **Deletion is a core-side change; core's H-CORE-5 _move_ recommendation is WRONG.**
 4. **H-CLI-2** — `error-handler.ts` `knownTypes` array drifts silently from core's `DocError` discriminator. Export `DocErrorTypeSchema = z.enum(DOC_ERROR_TYPES)` from core; tie `BaseDocError.type` to it.
 5. **H-CLI-Q-1** — 13 `as` casts in command `execute()` flag-narrowing. Parametrize `CommandDef<TFlags>` over the per-command flags schema's `z.infer`. Removes ~75 LOC of hand-written witness types; aligns runtime parser with type narrowing by construction.
 6. **H-CLI-Q-4** — three exit-code strategies (`process.exit(1)`, `process.exit(2 if BoundaryParseError else 1)`, `process.exitCode = 1`). Unify on `runCliEntrypoint(main)` helper with documented exit-code contract (0/1/2; preserves the deferred path).
@@ -25,12 +25,12 @@ Six high-leverage simplification recipes net **~-250 LOC**, take cli from 12 →
 
 ## `@skip` scenarios (4 audited)
 
-| # | Status | Fate |
-|---|--------|------|
-| 1 | `--format invalid` rejection blocked by H-CLI-Q-7 (`parseSchemaValue` swallows `BoundaryParseError.cause`) | Fix the swallowing; unblock. |
-| 2 | `rules conflicting filters` — scenario expects camelCase; CLI emits hyphenated. **1-line fix in step file.** | Unblockable today with no code change. |
-| 3 | `--format markdown` — `markdown` renderer not wired to `architect` bin. Aspirational placeholder. | Delete or promote to design spec. |
-| 4 | `deprecation warnings` — no current invocation triggers it. Untriggerable. | Delete or promote to design spec. |
+| #   | Status                                                                                                       | Fate                                   |
+| --- | ------------------------------------------------------------------------------------------------------------ | -------------------------------------- |
+| 1   | `--format invalid` rejection blocked by H-CLI-Q-7 (`parseSchemaValue` swallows `BoundaryParseError.cause`)   | Fix the swallowing; unblock.           |
+| 2   | `rules conflicting filters` — scenario expects camelCase; CLI emits hyphenated. **1-line fix in step file.** | Unblockable today with no code change. |
+| 3   | `--format markdown` — `markdown` renderer not wired to `architect` bin. Aspirational placeholder.            | Delete or promote to design spec.      |
+| 4   | `deprecation warnings` — no current invocation triggers it. Untriggerable.                                   | Delete or promote to design spec.      |
 
 ## Landing order (from raw, 11-step dependency-aware)
 

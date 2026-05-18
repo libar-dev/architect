@@ -1,6 +1,7 @@
 # Feature: Formal Spec Package (`@libar-dev/architect-spec`)
 
 ## Status
+
 ⚠️ PARTIAL — `formal-spec/` (v0.2 draft) lives in-tree but is private, unpublished, and not yet graduated to a citable v1.0 standalone package.
 
 ## Overview
@@ -50,6 +51,7 @@ The gap to "PARTIAL → COMPLETE": cut `v1.0`, publish to npm with `access: publ
 ## Implementation Status
 
 **Completed:**
+
 - ✅ `formal-spec/` directory exists in the monorepo tree.
 - ✅ `v0.2 draft` text checked in (per `business-context.md` §"Product Vision" and `functional-specification.md` §"Architect Spec").
 - ✅ Renamed from `spec/` to `formal-spec/` in W1.5.5 (npm name unchanged).
@@ -57,6 +59,7 @@ The gap to "PARTIAL → COMPLETE": cut `v1.0`, publish to npm with `access: publ
 - ✅ Cross-references from generated docs point readers at the spec.
 
 **Missing / Drift:**
+
 - ⚠️ `formal-spec/package.json` is marked `private: true` — package is not on npm yet.
 - ⚠️ `v1.0` not cut. The maintainer's stated trajectory is "finish W1.5 lift, then graduate the spec" (tech-debt #7, Phase C in `technical-debt-analysis.md`).
 - ⚠️ `docs/METHODOLOGY.md` is still draft per the maintainer's self-assessment in `docs/DOCS-GAP-ANALYSIS.md`.

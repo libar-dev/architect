@@ -1,6 +1,7 @@
 # Feature: Pattern Graph Read API
 
 ## Status
+
 ✅ COMPLETE — `createPatternGraphAPI` is the single read model. Every read-side consumer goes through it.
 
 ## Overview
@@ -42,6 +43,7 @@ This API is **read-only**. Mutations to the graph happen only by rebuilding from
 ## Implementation Status
 
 **Completed:**
+
 - ✅ `createPatternGraphAPI` + `PatternGraphAPI` type in `packages/architect-core/src/index.ts`.
 - ✅ Full set of helpers exposed at the module level (see `integration-points.md` §"Read API").
 - ✅ Used by every CLI bin in `packages/architect-cli` and every MCP tool in `packages/architect-mcp`.

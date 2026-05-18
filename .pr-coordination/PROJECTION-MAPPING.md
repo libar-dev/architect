@@ -50,14 +50,14 @@ Zod schemas / registries  ─┘                                                
 
 `MATRIX-FRAMEWORK.md` § 2.3 listed six first-class categories. They line up with subdomain folders that already exist:
 
-| Matrix category         | Subdomain folder                                                | Notes                                                                                  |
-| ----------------------- | --------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| `reference-spec`        | new sibling under `documentation-composition/` or `governance/` | No existing home; this is genuinely new substrate                                      |
-| `architecture-document` | `pattern-relations/`                                            | Edges + bounded-context views already live here                                        |
-| `feature-spec`          | `execution-context/` (per-pattern bundle)                       | `bundle <Pattern> --mode <session>` already returns this shape                         |
-| `decision-log`          | `governance/`                                                   | The `@architect-decision` aggregation tag already targets `DECISIONS.md`               |
+| Matrix category         | Subdomain folder                                                | Notes                                                                                   |
+| ----------------------- | --------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `reference-spec`        | new sibling under `documentation-composition/` or `governance/` | No existing home; this is genuinely new substrate                                       |
+| `architecture-document` | `pattern-relations/`                                            | Edges + bounded-context views already live here                                         |
+| `feature-spec`          | `execution-context/` (per-pattern bundle)                       | `bundle <Pattern> --mode <session>` already returns this shape                          |
+| `decision-log`          | `governance/`                                                   | The `@architect-decision` aggregation tag already targets `DECISIONS.md`                |
 | `rule-catalog`          | `operational-insights/`                                         | `rules` verb already filters by `--product-area`, `--package`, `--feature`, `--pattern` |
-| `roadmap-view`          | `delivery-reporting/`                                           | Status/role/level pivots already exist                                                 |
+| `roadmap-view`          | `delivery-reporting/`                                           | Status/role/level pivots already exist                                                  |
 
 **One genuinely new mart** — `reference-spec` (the D8 prototype's subject matter). The other five are extensions of existing subdomain coverage, not new categories.
 
@@ -67,17 +67,17 @@ Zod schemas / registries  ─┘                                                
 
 The matrix listed nine selector options. Here is the same list, marked against the stack:
 
-| # | Option                                                | Status today                                                                          |
-| - | ----------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| 1 | Tag predicate (`@architect-role:x`, `…bounded-context:y`) | Available — `arch roles`, `arch bounded-context`, `list --role`, `rules --pattern` |
-| 2 | `@architect-pattern` enumeration                      | Available — `list --names-only`, `list --parent`                                      |
-| 3 | Aggregation tag with `targetDoc:`                     | **Already in registry, unused at projection layer.** `decision`, `overview`, `intro` |
-| 4 | `@architect-doc-inclusion:<enum>` membership tag      | Not in taxonomy; would require a Wave-5 taxonomy decision                              |
-| 5 | Shape selectors (group, source path + names)          | Available — extractor reads JSDoc + path metadata                                     |
-| 6 | Path-based filters (package, file glob)               | Available — `rules --package`, `rules --feature`                                      |
-| 7 | Decision-feature filters                              | Available — `architect/decisions/**` + `@architect-adr-category`                       |
-| 8 | Registry-direct selectors (taxonomy, FSM, CLI/MCP)    | Available — `taxonomy`, `query isValidTransition`, `tool-registry.ts`                  |
-| 9 | Diagram-scope objects (`DiagramScope[]`)              | Not present today; was load-bearing pre-refactor                                       |
+| #   | Option                                                    | Status today                                                                         |
+| --- | --------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| 1   | Tag predicate (`@architect-role:x`, `…bounded-context:y`) | Available — `arch roles`, `arch bounded-context`, `list --role`, `rules --pattern`   |
+| 2   | `@architect-pattern` enumeration                          | Available — `list --names-only`, `list --parent`                                     |
+| 3   | Aggregation tag with `targetDoc:`                         | **Already in registry, unused at projection layer.** `decision`, `overview`, `intro` |
+| 4   | `@architect-doc-inclusion:<enum>` membership tag          | Not in taxonomy; would require a Wave-5 taxonomy decision                            |
+| 5   | Shape selectors (group, source path + names)              | Available — extractor reads JSDoc + path metadata                                    |
+| 6   | Path-based filters (package, file glob)                   | Available — `rules --package`, `rules --feature`                                     |
+| 7   | Decision-feature filters                                  | Available — `architect/decisions/**` + `@architect-adr-category`                     |
+| 8   | Registry-direct selectors (taxonomy, FSM, CLI/MCP)        | Available — `taxonomy`, `query isValidTransition`, `tool-registry.ts`                |
+| 9   | Diagram-scope objects (`DiagramScope[]`)                  | Not present today; was load-bearing pre-refactor                                     |
 
 **Two genuine gaps:** option 9 (`DiagramScope[]` substrate) and the question of whether option 4 ships at all.
 

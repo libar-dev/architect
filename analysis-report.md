@@ -73,17 +73,17 @@ The repo is unusual for StackShift in that **it is itself a meta-tool for spec-d
 
 ### Key Dependencies
 
-| Category              | Library                  | Version       | Purpose                                                 |
-| --------------------- | ------------------------ | ------------- | ------------------------------------------------------- |
-| Schemas/Validation    | `zod`                    | `^4.1.11`     | Cross-package contracts, CLI/MCP boundary validation    |
-| Test runner           | `vitest`                 | `^4.1.4`      | All test execution                                      |
-| Test framework        | `@amiceli/vitest-cucumber` | `^6.3.0`    | Executable Gherkin (`tests/features/`)                  |
-| Spec parser           | `@cucumber/gherkin`      | (transitive) | Parses `architect/specs/` for doc-gen + PatternGraph    |
-| Coverage              | `@vitest/coverage-v8`    | `^4.1.4`      | Coverage instrumentation                                |
-| Linter                | `eslint` + `typescript-eslint` | `^9.17.0` / `^8.18.2` | Linting (no-suppressions doctrine enforced via custom script `scripts/guard-no-suppressions.mjs`) |
-| Formatter             | `prettier`               | `^3.8.1`      | Code formatting                                         |
-| Build/runtime         | `tsx`                    | `^4.7.0`      | TS execution for CLI bins and dogfood scripts           |
-| Release tooling       | `@changesets/cli`        | `^2.27.0`     | Versioning & publishing                                 |
+| Category           | Library                        | Version               | Purpose                                                                                           |
+| ------------------ | ------------------------------ | --------------------- | ------------------------------------------------------------------------------------------------- |
+| Schemas/Validation | `zod`                          | `^4.1.11`             | Cross-package contracts, CLI/MCP boundary validation                                              |
+| Test runner        | `vitest`                       | `^4.1.4`              | All test execution                                                                                |
+| Test framework     | `@amiceli/vitest-cucumber`     | `^6.3.0`              | Executable Gherkin (`tests/features/`)                                                            |
+| Spec parser        | `@cucumber/gherkin`            | (transitive)          | Parses `architect/specs/` for doc-gen + PatternGraph                                              |
+| Coverage           | `@vitest/coverage-v8`          | `^4.1.4`              | Coverage instrumentation                                                                          |
+| Linter             | `eslint` + `typescript-eslint` | `^9.17.0` / `^8.18.2` | Linting (no-suppressions doctrine enforced via custom script `scripts/guard-no-suppressions.mjs`) |
+| Formatter          | `prettier`                     | `^3.8.1`              | Code formatting                                                                                   |
+| Build/runtime      | `tsx`                          | `^4.7.0`              | TS execution for CLI bins and dogfood scripts                                                     |
+| Release tooling    | `@changesets/cli`              | `^2.27.0`             | Versioning & publishing                                                                           |
 
 ---
 
@@ -142,14 +142,14 @@ architect/
 
 #### Backend: Not applicable in the HTTP sense. The packages themselves are the "components":
 
-| Package                           | Internal deps                                            | Role                                                            |
-| --------------------------------- | -------------------------------------------------------- | --------------------------------------------------------------- |
-| `@libar-dev/architect-core`       | (none)                                                   | Canonical model, ingestion, graph build, PatternGraphAPI       |
-| `@libar-dev/architect-projection` | core                                                     | Fragment-based projection pipeline (Zod-validated)              |
-| `@libar-dev/architect-guard`      | core                                                     | Policy, ProcessGuard FSM, anti-pattern detection                |
-| `@libar-dev/architect-cli`        | core, projection, guard                                  | Thin composition root for 6 CLI bins                            |
-| `@libar-dev/architect-mcp`        | core, projection                                         | MCP server (≈18–21 tools)                                       |
-| `@libar-dev/architect` (meta)     | cli, core, guard, mcp, projection                        | Bin-only re-export — no JS API. The "kitchen-sink" install.    |
+| Package                           | Internal deps                     | Role                                                        |
+| --------------------------------- | --------------------------------- | ----------------------------------------------------------- |
+| `@libar-dev/architect-core`       | (none)                            | Canonical model, ingestion, graph build, PatternGraphAPI    |
+| `@libar-dev/architect-projection` | core                              | Fragment-based projection pipeline (Zod-validated)          |
+| `@libar-dev/architect-guard`      | core                              | Policy, ProcessGuard FSM, anti-pattern detection            |
+| `@libar-dev/architect-cli`        | core, projection, guard           | Thin composition root for 6 CLI bins                        |
+| `@libar-dev/architect-mcp`        | core, projection                  | MCP server (≈18–21 tools)                                   |
+| `@libar-dev/architect` (meta)     | cli, core, guard, mcp, projection | Bin-only re-export — no JS API. The "kitchen-sink" install. |
 
 Dependency direction is acyclic and documented as load-bearing: `core ← projection`, `core ← guard ← cli`, `core, projection ← mcp`.
 
@@ -187,23 +187,23 @@ Dependency direction is acyclic and documented as load-bearing: `core ← projec
 
 ### `docs/` — Manual Documentation
 
-| File                                 | Purpose                                                          |
-| ------------------------------------ | ---------------------------------------------------------------- |
-| `INDEX.md`                           | Doc map / table of contents                                      |
-| `ARCHITECTURE.md`                    | System architecture overview                                     |
-| `CLI.md`                             | CLI bin reference                                                |
-| `CONFIGURATION.md`                   | `architect.config.ts` reference                                  |
-| `METHODOLOGY.md`                     | Methodology (four-tier ladder, FSM, value transfer)              |
-| `TAXONOMY.md`                        | Canonical taxonomy                                               |
-| `GHERKIN-PATTERNS.md`                | Gherkin authoring patterns                                       |
-| `ANNOTATION-GUIDE.md`                | `@architect-*` annotation reference                              |
-| `MCP-SETUP.md`                       | MCP server setup                                                 |
-| `PROCESS-GUARD.md`                   | ProcessGuard FSM rules                                           |
-| `VALIDATION.md`                      | Validation & anti-pattern detection                              |
-| `SESSION-GUIDES.md`                  | Per-session skill workflows                                      |
-| `CROSS-INSTANCE-CONVENTIONS.md`      | Conventions when architect manages another project               |
-| `DOCS-GAP-ANALYSIS.md`               | Self-assessment of documentation completeness                    |
-| `PR-NOTE-TAXONOMY-CAMPAIGN.md`       | Campaign note for taxonomy redesign                              |
+| File                            | Purpose                                             |
+| ------------------------------- | --------------------------------------------------- |
+| `INDEX.md`                      | Doc map / table of contents                         |
+| `ARCHITECTURE.md`               | System architecture overview                        |
+| `CLI.md`                        | CLI bin reference                                   |
+| `CONFIGURATION.md`              | `architect.config.ts` reference                     |
+| `METHODOLOGY.md`                | Methodology (four-tier ladder, FSM, value transfer) |
+| `TAXONOMY.md`                   | Canonical taxonomy                                  |
+| `GHERKIN-PATTERNS.md`           | Gherkin authoring patterns                          |
+| `ANNOTATION-GUIDE.md`           | `@architect-*` annotation reference                 |
+| `MCP-SETUP.md`                  | MCP server setup                                    |
+| `PROCESS-GUARD.md`              | ProcessGuard FSM rules                              |
+| `VALIDATION.md`                 | Validation & anti-pattern detection                 |
+| `SESSION-GUIDES.md`             | Per-session skill workflows                         |
+| `CROSS-INSTANCE-CONVENTIONS.md` | Conventions when architect manages another project  |
+| `DOCS-GAP-ANALYSIS.md`          | Self-assessment of documentation completeness       |
+| `PR-NOTE-TAXONOMY-CAMPAIGN.md`  | Campaign note for taxonomy redesign                 |
 
 - **Status:** Yes — comprehensive (15 manual `.md` files + 50 generated artifacts under `architect/`)
 - **Quality:** Good. There is also a self-authored `DOCS-GAP-ANALYSIS.md`.
@@ -250,14 +250,14 @@ This is a **pre-1.0 shipped package family with active polish work**. The split 
 
 ### Component Breakdown
 
-| Component              | Completion | Evidence                                                                                  |
-| ---------------------- | ---------- | ----------------------------------------------------------------------------------------- |
-| Core packages          | ~95%       | All 6 packages at `2.0.0-pre.1`, 329 source TS files, recent commits are polish/refactor  |
-| Tests                  | ~90%       | 128 `.feature` files, ~2828 tests, perf regression gate in place                          |
-| Documentation          | ~90%       | 15 manual `.md` + 9 ADRs + 8 doc generators + `DOCS-GAP-ANALYSIS.md` actively maintained  |
+| Component              | Completion | Evidence                                                                                   |
+| ---------------------- | ---------- | ------------------------------------------------------------------------------------------ |
+| Core packages          | ~95%       | All 6 packages at `2.0.0-pre.1`, 329 source TS files, recent commits are polish/refactor   |
+| Tests                  | ~90%       | 128 `.feature` files, ~2828 tests, perf regression gate in place                           |
+| Documentation          | ~90%       | 15 manual `.md` + 9 ADRs + 8 doc generators + `DOCS-GAP-ANALYSIS.md` actively maintained   |
 | CI / Release tooling   | ~60%       | `.changeset/` set up, but no `.github/workflows/` checked in (may be configured elsewhere) |
-| Migration completeness | ~80%       | `MIGRATION.md` published, `REMAINING-WORK.md` (57KB) tracks W1.5 backlog                  |
-| Public API stability   | Pre-1.0    | All packages `2.0.0-pre.1`; v1→v2 collision map exists                                    |
+| Migration completeness | ~80%       | `MIGRATION.md` published, `REMAINING-WORK.md` (57KB) tracks W1.5 backlog                   |
+| Public API stability   | Pre-1.0    | All packages `2.0.0-pre.1`; v1→v2 collision map exists                                     |
 
 ### Detailed Evidence
 
@@ -298,21 +298,25 @@ This is a **pre-1.0 shipped package family with active polish work**. The split 
 
 ### Placeholder Files & TODOs
 
-The maintainer's "no-BC" doctrine (AGENTS.md §Engineering doctrine) explicitly forbids `// eslint-disable*`, `@ts-ignore`, `@ts-expect-error`, `@deprecated` markers, and BC aliases in new code. A `scripts/guard-no-suppressions.mjs` enforces this. So traditional placeholder/TODO smells are deliberately *absent* by policy — not because the code is finished, but because the doctrine forces delete-don't-defer.
+The maintainer's "no-BC" doctrine (AGENTS.md §Engineering doctrine) explicitly forbids `// eslint-disable*`, `@ts-ignore`, `@ts-expect-error`, `@deprecated` markers, and BC aliases in new code. A `scripts/guard-no-suppressions.mjs` enforces this. So traditional placeholder/TODO smells are deliberately _absent_ by policy — not because the code is finished, but because the doctrine forces delete-don't-defer.
 
 Visible workspace state:
+
 - `.full-review/` and `.pi/` directories exist (untracked) — likely transient agent / review artifacts.
 - `1abd4b1 WIP` in recent commits — a real WIP marker in main history.
 
 ### Missing Components
 
 **Not started:**
+
 - `.github/workflows/` for CI — likely needed before `1.0`.
 
 **Partially implemented (per `REMAINING-WORK.md` cross-reference):**
+
 - W1.5 lift not fully landed. Specifics live in `REMAINING-WORK.md` (not enumerated here to avoid duplicating an active working document).
 
 **Needs improvement:**
+
 - The maintainer-authored `docs/DOCS-GAP-ANALYSIS.md` is the canonical answer here — defer to it rather than this report inventing a parallel list.
 
 ---
@@ -329,13 +333,13 @@ Visible workspace state:
 
 ### File Type Breakdown
 
-| Type                          | Count | Purpose                                                            |
-| ----------------------------- | ----- | ------------------------------------------------------------------ |
-| TypeScript (`.ts`)            | 329   | Library code, CLI bins, MCP tools, scanner, projection, guard      |
-| Gherkin features (`.feature`) | 128   | Executable specs + design specs + ADRs                             |
-| Markdown (`.md`) in `docs/`   | 15    | Manual documentation                                               |
-| Config (root)                 | ~10   | `tsconfig.*`, `eslint.config.mjs`, `.prettierrc`, `pnpm-workspace.yaml`, `architect.config.ts`, `lint-staged.config.mjs`, `package.json` |
-| Scripts (`scripts/`)          | dozens | Dogfood smoke, glue, guard-no-suppressions                         |
+| Type                          | Count  | Purpose                                                                                                                                  |
+| ----------------------------- | ------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| TypeScript (`.ts`)            | 329    | Library code, CLI bins, MCP tools, scanner, projection, guard                                                                            |
+| Gherkin features (`.feature`) | 128    | Executable specs + design specs + ADRs                                                                                                   |
+| Markdown (`.md`) in `docs/`   | 15     | Manual documentation                                                                                                                     |
+| Config (root)                 | ~10    | `tsconfig.*`, `eslint.config.mjs`, `.prettierrc`, `pnpm-workspace.yaml`, `architect.config.ts`, `lint-staged.config.mjs`, `package.json` |
+| Scripts (`scripts/`)          | dozens | Dogfood smoke, glue, guard-no-suppressions                                                                                               |
 
 ---
 
@@ -375,7 +379,7 @@ This is the **critical decision point** for Gear 2. The standard 6-gear StackShi
 
 ### Three viable paths forward
 
-**Path A — External-consumer documentation (recommended for Gear 2).** Run Gear 2 with the framing: *"document this for an external developer who wants to install and use `@libar-dev/architect-*` in their own project."* Skip business-logic extraction (no business logic — it's a meta-tool) and focus the 11 reverse-eng docs on **integration points, configuration, the MCP/CLI contract, and decision rationale**. Output complements rather than duplicates `architect/specs/`.
+**Path A — External-consumer documentation (recommended for Gear 2).** Run Gear 2 with the framing: _"document this for an external developer who wants to install and use `@libar-dev/architect-_`in their own project."* Skip business-logic extraction (no business logic — it's a meta-tool) and focus the 11 reverse-eng docs on **integration points, configuration, the MCP/CLI contract, and decision rationale**. Output complements rather than duplicates`architect/specs/`.
 
 **Path B — Skip Gear 2 entirely.** The existing `docs/` + `architect/decisions/` + generated `docs-live/` already covers what Gear 2 would produce, and at higher quality. Use the StackShift skills only when working on a **consumer project**, not on the platform itself.
 
@@ -410,7 +414,7 @@ This is the **critical decision point** for Gear 2. The standard 6-gear StackShi
 - **This repo is a meta-tool.** It IS a reverse-engineering / spec-driven platform. Running another reverse-engineering pipeline against it produces interesting circularity. The CLAUDE.md kernel-skill bootstrap is specifically designed to prevent agents from "scanning files" instead of using `pnpm architect:query` — running StackShift here intentionally bypasses that.
 - **Recent commit history shows WIP work.** The `1abd4b1 WIP` commit and `revert: remove operational decision records` suggest active in-progress changes. Re-run analysis after the current campaign lands.
 - **The `formal-spec/` package is private (`v0.2 draft`).** It will graduate to a standalone published package at `1.0`. Gear 2 docs should not reference internals of `formal-spec/` as if they are stable.
-- **Architect-managed downstream consumers** would benefit more from the StackShift pipeline than this repo does. The skills under `.agents/skills/` already provide a coherent agent UX for working *with* architect-managed projects.
+- **Architect-managed downstream consumers** would benefit more from the StackShift pipeline than this repo does. The skills under `.agents/skills/` already provide a coherent agent UX for working _with_ architect-managed projects.
 - **Two CLAUDE.md files** are actually one: `CLAUDE.md` is a symlink to `AGENTS.md`. Harnesses look for either name.
 
 ---
@@ -467,4 +471,4 @@ Not applicable. The "data store" is the **PatternGraph**, which is computed in-m
 
 **Report Generated:** 2026-05-17
 **Toolkit Version:** StackShift 2.5.1
-**Ready for Gear 2:** ⚠️  Conditional — see "Recommended Next Steps". The user should pick Path A (focused external-consumer docs), Path B (skip Gear 2), or Path C (full pipeline with duplication) before proceeding.
+**Ready for Gear 2:** ⚠️ Conditional — see "Recommended Next Steps". The user should pick Path A (focused external-consumer docs), Path B (skip Gear 2), or Path C (full pipeline with duplication) before proceeding.

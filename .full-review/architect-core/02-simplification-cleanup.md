@@ -17,10 +17,10 @@ Highlights you act on first:
 
 The simplification agent also identified **two angles Phase 1 underplayed**:
 
-- **`extractPatternTags` + `buildGherkinRawPattern` share one fix.** Phase 1 H-CORE-15 (index signature defeating `noPropertyAccessFromIndexSignature`) and H-CORE-16 (35× quoted-key assignments) are the same recipe: build a typed `z.input<typeof ExtractedPatternSchema>` partial directly, eliminating both the index signature *and* the quoted-key assignments in one pass.
+- **`extractPatternTags` + `buildGherkinRawPattern` share one fix.** Phase 1 H-CORE-15 (index signature defeating `noPropertyAccessFromIndexSignature`) and H-CORE-16 (35× quoted-key assignments) are the same recipe: build a typed `z.input<typeof ExtractedPatternSchema>` partial directly, eliminating both the index signature _and_ the quoted-key assignments in one pass.
 - **`config-loader.ts` runs three validation passes for one config value.** Phase 1 (C-CORE-4 / H-CORE-4) treats these as separate doctrine issues; the simplified shape is **a single `safeParse`** — same recipe addresses both.
 
-Additionally, the cleanup agent found a **defect masquerading as duplication**: the four duplicated `buildRoleLookup` copies (H-CORE-13) are called *inside per-tag loops* in `gherkin-extractor.ts:123` and `doc-extractor.ts:76` — rebuilding the role map on every tag instead of once per extraction. So H-CORE-13 isn't just DRY; it's a real allocation-per-tag-resolved bug that the consolidated helper eliminates.
+Additionally, the cleanup agent found a **defect masquerading as duplication**: the four duplicated `buildRoleLookup` copies (H-CORE-13) are called _inside per-tag loops_ in `gherkin-extractor.ts:123` and `doc-extractor.ts:76` — rebuilding the role map on every tag instead of once per extraction. So H-CORE-13 isn't just DRY; it's a real allocation-per-tag-resolved bug that the consolidated helper eliminates.
 
 ## Critical — fix immediately
 
@@ -44,14 +44,14 @@ Additionally, the cleanup agent found a **defect masquerading as duplication**: 
 
 ### CL-CORE-5. 10 additional dead exports through the barrel **[2B]**
 
-| # | Symbol | File | Recipe |
-|---|--------|------|--------|
-| 1 | `parseMarkdownToBlocks` | `src/utils/markdown-parser.ts:84` | Delete whole 216-line file + barrel entry. |
-| 2 | `formatUserZodError` | `src/utils/session-helpers.ts:22` | Delete function + barrel re-export. |
-| 3 | `FEATURE_LAYERS` (constant) | `src/extractor/layer-inference.ts:14` | Delete the constant; keep the `FeatureLayer` type (used internally). |
-| 4-6 | `validateStatus`/`validateCompletionMetadata`/`validatePatternStatus` | `src/validation/fsm/validator.ts:60,121,146` | Delete; over-engineered surface nobody uses. |
-| 7-8 | `isFullyEditable`/`isScopeLocked` | `src/validation/fsm/states.ts:33,37` | Delete; `getProtectionLevel` covers the same three-way decision. |
-| 9-10 | `createFileLoader`/`formatCodecError` | `src/validation-schemas/codec-utils.ts:148,171` | Delete; only test callers. |
+| #    | Symbol                                                                | File                                            | Recipe                                                               |
+| ---- | --------------------------------------------------------------------- | ----------------------------------------------- | -------------------------------------------------------------------- |
+| 1    | `parseMarkdownToBlocks`                                               | `src/utils/markdown-parser.ts:84`               | Delete whole 216-line file + barrel entry.                           |
+| 2    | `formatUserZodError`                                                  | `src/utils/session-helpers.ts:22`               | Delete function + barrel re-export.                                  |
+| 3    | `FEATURE_LAYERS` (constant)                                           | `src/extractor/layer-inference.ts:14`           | Delete the constant; keep the `FeatureLayer` type (used internally). |
+| 4-6  | `validateStatus`/`validateCompletionMetadata`/`validatePatternStatus` | `src/validation/fsm/validator.ts:60,121,146`    | Delete; over-engineered surface nobody uses.                         |
+| 7-8  | `isFullyEditable`/`isScopeLocked`                                     | `src/validation/fsm/states.ts:33,37`            | Delete; `getProtectionLevel` covers the same three-way decision.     |
+| 9-10 | `createFileLoader`/`formatCodecError`                                 | `src/validation-schemas/codec-utils.ts:148,171` | Delete; only test callers.                                           |
 
 Shrinks the public barrel by ~15 names. Directly compounds Phase 1 H-CORE-1 (barrel curation).
 
@@ -71,39 +71,39 @@ Shrinks the public barrel by ~15 names. Directly compounds Phase 1 H-CORE-1 (bar
 
 The simplification agent's deliverable is **after-shapes** for Phase 1's findings. Each entry below cross-references the Phase 1 ID and a short recipe header; full code recipes are in `raw/2A-simplification.md`.
 
-| # | Ref (Phase 1) | Recipe header | After-shape |
-|---|--------------|---------------|-------------|
-| H-SIMP-1 | H-CORE-6 | Collapse sync/async Gherkin extractor | Private `extractOnePattern` + single async public entry; behavior-file verification `await`'d inline. Removes ~135 LOC. |
-| H-SIMP-2 | H-CORE-8, M-CORE-14, M-CORE-8 | Replace 27× `structuredClone` with one `deepFreeze` at construction | `createPatternGraphAPI` shrinks from 348 to ~210 lines. `cloneTagRegistry` dissolves. Mutations through the API throw in dev. Directly benefits projection's perf gate. |
-| H-SIMP-3 | C-CORE-2, H-CORE-7, L-CORE-13, M-CORE-10 | Strict schemas + `z.infer` for `PatternGraph` + siblings | Schema is the type-of-record; `nameIndex` moves to `RuntimePatternGraph` (already exists for `workflow`). Sweep ~28 `z.object` → `z.strictObject` in one PR. |
-| H-SIMP-4 | H-CORE-13 | One `buildRoleLookup` in `utils/role-lookup.ts` | Removes ~80 LOC AND eliminates per-tag-iteration rebuilds. Real bug fix, not just DRY. |
-| H-SIMP-5 | H-CORE-15, H-CORE-16 | Typed `z.input<typeof ExtractedPatternSchema>` partial | Eliminates the index signature AND the 35 quoted-key assignments in `buildGherkinRawPattern`. Pre-condition: H-SIMP-3. |
-| H-SIMP-6 | H-CORE-14, M-CORE-11 | One `applyTagValue` applier in `taxonomy/tag-parsing.ts` | `parseDirective` shrinks to ~40 LOC glue; `extractPatternTags` becomes a Gherkin tokenizer + applier call. Drift impossible. |
-| H-SIMP-7 | C-CORE-4, H-CORE-4 | Single `safeParse` in config-loader, delete `isProjectConfig` + presentation-contracts | One-pass validation. Z.strictObject names the legacy keys in its error message. |
-| H-SIMP-8 | H-CORE-12 | Delete 6 BC alias schemas in `feature.ts` | Pure deletion. |
-| H-SIMP-9 | M-CORE-2, CL-CORE-6 | Delete `void extractionWarnings`, `void inferMaturity`, `void metadata.status` | Either surface the warnings via diagnostics channel (preferred) or delete the accumulator entirely. |
+| #        | Ref (Phase 1)                            | Recipe header                                                                          | After-shape                                                                                                                                                             |
+| -------- | ---------------------------------------- | -------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| H-SIMP-1 | H-CORE-6                                 | Collapse sync/async Gherkin extractor                                                  | Private `extractOnePattern` + single async public entry; behavior-file verification `await`'d inline. Removes ~135 LOC.                                                 |
+| H-SIMP-2 | H-CORE-8, M-CORE-14, M-CORE-8            | Replace 27× `structuredClone` with one `deepFreeze` at construction                    | `createPatternGraphAPI` shrinks from 348 to ~210 lines. `cloneTagRegistry` dissolves. Mutations through the API throw in dev. Directly benefits projection's perf gate. |
+| H-SIMP-3 | C-CORE-2, H-CORE-7, L-CORE-13, M-CORE-10 | Strict schemas + `z.infer` for `PatternGraph` + siblings                               | Schema is the type-of-record; `nameIndex` moves to `RuntimePatternGraph` (already exists for `workflow`). Sweep ~28 `z.object` → `z.strictObject` in one PR.            |
+| H-SIMP-4 | H-CORE-13                                | One `buildRoleLookup` in `utils/role-lookup.ts`                                        | Removes ~80 LOC AND eliminates per-tag-iteration rebuilds. Real bug fix, not just DRY.                                                                                  |
+| H-SIMP-5 | H-CORE-15, H-CORE-16                     | Typed `z.input<typeof ExtractedPatternSchema>` partial                                 | Eliminates the index signature AND the 35 quoted-key assignments in `buildGherkinRawPattern`. Pre-condition: H-SIMP-3.                                                  |
+| H-SIMP-6 | H-CORE-14, M-CORE-11                     | One `applyTagValue` applier in `taxonomy/tag-parsing.ts`                               | `parseDirective` shrinks to ~40 LOC glue; `extractPatternTags` becomes a Gherkin tokenizer + applier call. Drift impossible.                                            |
+| H-SIMP-7 | C-CORE-4, H-CORE-4                       | Single `safeParse` in config-loader, delete `isProjectConfig` + presentation-contracts | One-pass validation. Z.strictObject names the legacy keys in its error message.                                                                                         |
+| H-SIMP-8 | H-CORE-12                                | Delete 6 BC alias schemas in `feature.ts`                                              | Pure deletion.                                                                                                                                                          |
+| H-SIMP-9 | M-CORE-2, CL-CORE-6                      | Delete `void extractionWarnings`, `void inferMaturity`, `void metadata.status`         | Either surface the warnings via diagnostics channel (preferred) or delete the accumulator entirely.                                                                     |
 
 ### Phase 2A — Medium simplification recipes (defect-grade or substantial clarity wins)
 
-| # | Ref | Recipe header |
-|---|-----|---------------|
-| M-SIMP-1 | (new) | `dual-source-extractor.extractProcessMetadata`: replace 13× `tags.find(...).replace(...)` with one pass + Map lookup. |
-| M-SIMP-2 | C-CORE-5 | `validateTransition`: discriminated union — `{ valid: false; from: string; to: string }` so `as ProcessStatusValue` casts disappear. |
-| M-SIMP-3 | L-CORE-5 | `compareContexts`: snapshot relationships once, pass map to helpers. |
-| M-SIMP-4 | (new) | `populateByRoleView`: initialize buckets in canonical order = output order; eliminate the second sort pass. |
-| M-SIMP-5 | (new) | `mergeTagRegistries`: drop nested closure; use Map-from-tuple iterator. |
-| M-SIMP-6 | L-CORE-10 | `Result.unwrap`: `safeStringify` wrapper around `JSON.stringify` for circular refs. **Defect-grade for a shipped helper.** |
-| M-SIMP-7 | L-CORE-11 | `package-config.ts`: re-declare `PackageConfigSchema = z.strictObject({ ...PackageSchema.shape, … })` — Zod v4 `.extend` doesn't propagate strict. |
-| M-SIMP-8 | (new) | `findPatternByName`: split into `findPatternByNameInArray` + `findPatternInGraph`. Requires H-SIMP-3 to be airtight. |
-| M-SIMP-9 | M-CORE-9 | One `cloneRoleDefinitions` in `taxonomy/registry-builder.ts`; delete `cloneRoles` from `factory.ts`. (After H-SIMP-2 lands, both may go entirely.) |
-| M-SIMP-10 | (new) | `extractDataTable`/`extractExamples`: share a `mapRows(headers, rows)` helper. |
-| M-SIMP-11 | M-CORE-13 | `asModuleId`: call `asPatternId` or delete. |
-| M-SIMP-12 | L-CORE-4 | `camelCaseToTitleCase`: precompute acronym regex table at module scope. **Also fixes a latent 26-acronym ceiling bug** in the placeholder char encoding. |
-| M-SIMP-13 | L-CORE-8 | `inferPatternName`: return `undefined` + emit diagnostic instead of `"unknown-pattern"`. |
-| M-SIMP-14 | L-CORE-6 | `aggregateTagUsage`: drive from `dataset.tagRegistry.metadataTags`. **Also fixes a latent defect** (`'arch-context'` lookup vs `boundedContext` field mismatch). |
-| M-SIMP-15 | M-CORE-1 | Move `getPatternName` to `validation-schemas/extracted-pattern.ts`; both pipeline and read-api import from there. Resolves H-CORE-2 from one direction. |
-| M-SIMP-16 | (new) | `parseTestsValue`: use `Set` membership for truthy/falsy keyword lookup. |
-| M-SIMP-17 | Sweep | Defensive copies of readonly arrays become pure overhead once H-SIMP-2 + H-SIMP-3 land. Sweep last. |
+| #         | Ref       | Recipe header                                                                                                                                                    |
+| --------- | --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| M-SIMP-1  | (new)     | `dual-source-extractor.extractProcessMetadata`: replace 13× `tags.find(...).replace(...)` with one pass + Map lookup.                                            |
+| M-SIMP-2  | C-CORE-5  | `validateTransition`: discriminated union — `{ valid: false; from: string; to: string }` so `as ProcessStatusValue` casts disappear.                             |
+| M-SIMP-3  | L-CORE-5  | `compareContexts`: snapshot relationships once, pass map to helpers.                                                                                             |
+| M-SIMP-4  | (new)     | `populateByRoleView`: initialize buckets in canonical order = output order; eliminate the second sort pass.                                                      |
+| M-SIMP-5  | (new)     | `mergeTagRegistries`: drop nested closure; use Map-from-tuple iterator.                                                                                          |
+| M-SIMP-6  | L-CORE-10 | `Result.unwrap`: `safeStringify` wrapper around `JSON.stringify` for circular refs. **Defect-grade for a shipped helper.**                                       |
+| M-SIMP-7  | L-CORE-11 | `package-config.ts`: re-declare `PackageConfigSchema = z.strictObject({ ...PackageSchema.shape, … })` — Zod v4 `.extend` doesn't propagate strict.               |
+| M-SIMP-8  | (new)     | `findPatternByName`: split into `findPatternByNameInArray` + `findPatternInGraph`. Requires H-SIMP-3 to be airtight.                                             |
+| M-SIMP-9  | M-CORE-9  | One `cloneRoleDefinitions` in `taxonomy/registry-builder.ts`; delete `cloneRoles` from `factory.ts`. (After H-SIMP-2 lands, both may go entirely.)               |
+| M-SIMP-10 | (new)     | `extractDataTable`/`extractExamples`: share a `mapRows(headers, rows)` helper.                                                                                   |
+| M-SIMP-11 | M-CORE-13 | `asModuleId`: call `asPatternId` or delete.                                                                                                                      |
+| M-SIMP-12 | L-CORE-4  | `camelCaseToTitleCase`: precompute acronym regex table at module scope. **Also fixes a latent 26-acronym ceiling bug** in the placeholder char encoding.         |
+| M-SIMP-13 | L-CORE-8  | `inferPatternName`: return `undefined` + emit diagnostic instead of `"unknown-pattern"`.                                                                         |
+| M-SIMP-14 | L-CORE-6  | `aggregateTagUsage`: drive from `dataset.tagRegistry.metadataTags`. **Also fixes a latent defect** (`'arch-context'` lookup vs `boundedContext` field mismatch). |
+| M-SIMP-15 | M-CORE-1  | Move `getPatternName` to `validation-schemas/extracted-pattern.ts`; both pipeline and read-api import from there. Resolves H-CORE-2 from one direction.          |
+| M-SIMP-16 | (new)     | `parseTestsValue`: use `Set` membership for truthy/falsy keyword lookup.                                                                                         |
+| M-SIMP-17 | Sweep     | Defensive copies of readonly arrays become pure overhead once H-SIMP-2 + H-SIMP-3 land. Sweep last.                                                              |
 
 ### Sweep patterns (small individually; large in aggregate)
 
@@ -150,35 +150,35 @@ Both `console.warn` sites already have a diagnostic channel in scope. **Recipe:*
 
 ## Low — backlog
 
-| # | Ref | Issue |
-|---|-----|-------|
-| CL-CORE-18 | (cosmetic) | `tsconfig.tsbuildinfo` is gitignored but projection explicitly sets `tsBuildInfoFile`; cosmetic drift either direction. |
+| #          | Ref              | Issue                                                                                                                                       |
+| ---------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| CL-CORE-18 | (cosmetic)       | `tsconfig.tsbuildinfo` is gitignored but projection explicitly sets `tsBuildInfoFile`; cosmetic drift either direction.                     |
 | CL-CORE-19 | (with CL-CORE-1) | When fixing CL-CORE-1, write `"prepack": "pnpm clean && pnpm build"` to match siblings — without `clean`, stale type artifacts can survive. |
-| L-SIMP-1 | L-CORE-1 | `discoverTaggedShapes` — build JSDoc index once via `prepareJsDocComments`, not per declaration. |
-| L-SIMP-2 | L-CORE-2 | Hoist `extractShapeTag`/`extractIncludeTag` regexes to module scope. |
-| L-SIMP-3 | L-CORE-3 | `extractFirstSentenceRaw` regex misses `?!`/`.)` combos. |
-| L-SIMP-4 | L-CORE-7 | In-place `.push(...)` instead of spread in metadata accumulators. |
-| L-SIMP-5 | L-CORE-14 | Validate `getPatternsByQuarter(string)` against `QUARTER_PATTERN` or use branded `Quarter`. |
-| L-SIMP-6 | L-CORE-12 | Consolidate tiny `utils/` files. |
-| L-SIMP-7 | (new) | `loadConfig` 14-line adapter — inline at the one call site or delete. |
-| L-SIMP-8 | M-CORE-11 | Split `parseDirective` state-machine loop into separate `extractDescription`/`extractExamples` passes. |
-| L-SIMP-9 | (new) | `extractCsvValue` returns `undefined` for no-match but `[]` for empty post-split — pick one. |
-| L-SIMP-10 | (new) | `findIntegrationPoints` — single pass over `[['uses', …], ['dependsOn', …]]` config instead of two inner loops. |
+| L-SIMP-1   | L-CORE-1         | `discoverTaggedShapes` — build JSDoc index once via `prepareJsDocComments`, not per declaration.                                            |
+| L-SIMP-2   | L-CORE-2         | Hoist `extractShapeTag`/`extractIncludeTag` regexes to module scope.                                                                        |
+| L-SIMP-3   | L-CORE-3         | `extractFirstSentenceRaw` regex misses `?!`/`.)` combos.                                                                                    |
+| L-SIMP-4   | L-CORE-7         | In-place `.push(...)` instead of spread in metadata accumulators.                                                                           |
+| L-SIMP-5   | L-CORE-14        | Validate `getPatternsByQuarter(string)` against `QUARTER_PATTERN` or use branded `Quarter`.                                                 |
+| L-SIMP-6   | L-CORE-12        | Consolidate tiny `utils/` files.                                                                                                            |
+| L-SIMP-7   | (new)            | `loadConfig` 14-line adapter — inline at the one call site or delete.                                                                       |
+| L-SIMP-8   | M-CORE-11        | Split `parseDirective` state-machine loop into separate `extractDescription`/`extractExamples` passes.                                      |
+| L-SIMP-9   | (new)            | `extractCsvValue` returns `undefined` for no-match but `[]` for empty post-split — pick one.                                                |
+| L-SIMP-10  | (new)            | `findIntegrationPoints` — single pass over `[['uses', …], ['dependsOn', …]]` config instead of two inner loops.                             |
 
 ## Configuration audit (from 2B, condensed)
 
-| Setting | Verdict |
-|---------|---------|
-| `prepack` location | **CRITICAL DRIFT** — top-level in core, scripts in 4 siblings (CL-CORE-1). |
-| `prepack` command | Drift — `pnpm build` in core, `pnpm clean && pnpm build` in siblings. |
-| `scripts.lint` | Drift — core misses `tests` glob. |
-| `scripts.typecheck` | Mixed — core matches projection/mcp; differs from guard/cli. |
-| `scripts.test` shape | Core lacks the `pnpm typecheck && vitest run` guard siblings have. |
-| `package.json:exports` | **Broken `./roles` subpath** (CL-CORE-2). |
-| `main` + `module` | Family-wide cosmetic redundancy (CL-CORE-14). |
-| `tsconfig.json:types` | Projection pins `["node"]` explicitly; others rely on base config — worth confirming. |
-| `vitest:include` | Drift — core uses `tests/steps/**`, projection uses `tests/features/**`. Pick one family convention. |
-| `eslint` in devDeps | Drift — core relies on root hoist; siblings declare explicitly. |
+| Setting                | Verdict                                                                                              |
+| ---------------------- | ---------------------------------------------------------------------------------------------------- |
+| `prepack` location     | **CRITICAL DRIFT** — top-level in core, scripts in 4 siblings (CL-CORE-1).                           |
+| `prepack` command      | Drift — `pnpm build` in core, `pnpm clean && pnpm build` in siblings.                                |
+| `scripts.lint`         | Drift — core misses `tests` glob.                                                                    |
+| `scripts.typecheck`    | Mixed — core matches projection/mcp; differs from guard/cli.                                         |
+| `scripts.test` shape   | Core lacks the `pnpm typecheck && vitest run` guard siblings have.                                   |
+| `package.json:exports` | **Broken `./roles` subpath** (CL-CORE-2).                                                            |
+| `main` + `module`      | Family-wide cosmetic redundancy (CL-CORE-14).                                                        |
+| `tsconfig.json:types`  | Projection pins `["node"]` explicitly; others rely on base config — worth confirming.                |
+| `vitest:include`       | Drift — core uses `tests/steps/**`, projection uses `tests/features/**`. Pick one family convention. |
+| `eslint` in devDeps    | Drift — core relies on root hoist; siblings declare explicitly.                                      |
 
 ## Dependency audit verdict (from 2B)
 
@@ -188,16 +188,16 @@ One small action: **add `"eslint": "^9.17.0"` to `architect-core/devDependencies
 
 ## Files that should not be in `dist/`
 
-| Path pattern | Count | Recipe |
-|---|---|---|
-| `dist/**/*.{js,d.ts}.map` | 212 of 426 published files | CL-CORE-3 — disable in base config. |
-| `dist/config/self-hosting.{js,d.ts}` | 2 | Delete the file (H-CORE-10). |
-| `dist/config/presentation-contracts.{js,d.ts}` | 2 | Delete the file (H-CORE-4). |
-| `dist/config/cli-schema.{js,d.ts}` | 2 (24.5KB JS) | Move to `architect-cli` (H-CORE-5). |
-| `dist/config/tag-registry-contract.{js,d.ts}` | 2 | Delete after C-CORE-3 consolidation. |
-| `dist/extractor/layer-inference.{js,d.ts}` | 2 | Delete hardcoded path heuristics (H-CORE-11). |
-| `dist/utils/markdown-parser.{js,d.ts}` | 2 | Delete the file (CL-CORE-5 #1). |
-| `dist/validation-schemas/pattern-graph.d.ts` | 1 file, 509 KB | Measure after C-CORE-2 + H-CORE-7; consider intermediate type aliases. |
+| Path pattern                                   | Count                      | Recipe                                                                 |
+| ---------------------------------------------- | -------------------------- | ---------------------------------------------------------------------- |
+| `dist/**/*.{js,d.ts}.map`                      | 212 of 426 published files | CL-CORE-3 — disable in base config.                                    |
+| `dist/config/self-hosting.{js,d.ts}`           | 2                          | Delete the file (H-CORE-10).                                           |
+| `dist/config/presentation-contracts.{js,d.ts}` | 2                          | Delete the file (H-CORE-4).                                            |
+| `dist/config/cli-schema.{js,d.ts}`             | 2 (24.5KB JS)              | Move to `architect-cli` (H-CORE-5).                                    |
+| `dist/config/tag-registry-contract.{js,d.ts}`  | 2                          | Delete after C-CORE-3 consolidation.                                   |
+| `dist/extractor/layer-inference.{js,d.ts}`     | 2                          | Delete hardcoded path heuristics (H-CORE-11).                          |
+| `dist/utils/markdown-parser.{js,d.ts}`         | 2                          | Delete the file (CL-CORE-5 #1).                                        |
+| `dist/validation-schemas/pattern-graph.d.ts`   | 1 file, 509 KB             | Measure after C-CORE-2 + H-CORE-7; consider intermediate type aliases. |
 
 Estimated impact of full Phase-1+Phase-2 cleanup: **426 files / 195.8 KB packed / 1.5 MB unpacked → ~170-180 files / under 100 KB packed / ~600 KB unpacked.** 2× reduction without losing a consumer-visible API.
 

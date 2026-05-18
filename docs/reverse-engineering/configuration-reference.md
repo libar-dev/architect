@@ -11,38 +11,38 @@ Complete inventory of every configurable knob in `@libar-dev/architect-*`. Sourc
 
 ### What loads it
 
-| Concern               | Source                                                                                                                       |
-| --------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| **Zod schema**        | `packages/architect-core/src/config/project-config-schema.ts:102-116`                                                        |
-| **TypeScript type**   | `packages/architect-core/src/config/project-config.ts:48-64`                                                                 |
+| Concern                | Source                                                                                                                                                                  |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Zod schema**         | `packages/architect-core/src/config/project-config-schema.ts:102-116`                                                                                                   |
+| **TypeScript type**    | `packages/architect-core/src/config/project-config.ts:48-64`                                                                                                            |
 | **Loader / discovery** | `packages/architect-core/src/config/config-loader.ts:67-86,148-236` — walks parents from `baseDir` looking for `architect.config.ts` (then `.js`), stops at `.git` root |
-| **Default resolution** | `packages/architect-core/src/config/resolve-config.ts:13-54` — applies defaults when fields are omitted                    |
-| **Type-helper**       | `packages/architect-core/src/config/define-config.ts:20-22` — `defineConfig<T>()` for autocomplete                            |
+| **Default resolution** | `packages/architect-core/src/config/resolve-config.ts:13-54` — applies defaults when fields are omitted                                                                 |
+| **Type-helper**        | `packages/architect-core/src/config/define-config.ts:20-22` — `defineConfig<T>()` for autocomplete                                                                      |
 
 If no config file is found, `createDefaultResolvedConfig()` (`resolve-config.ts:56-77`) returns a valid resolved config with `isDefault: true` and empty source lists.
 
 ### Schema fields
 
-| Field                              | Type                                                | Required?                  | Default                                                | Controls                                                                                                                                  |
-| ---------------------------------- | --------------------------------------------------- | -------------------------- | ------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| `tagPrefix`                        | `string`                                            | no                         | `@architect-` (`defaults.ts:4`)                        | Prefix the JSDoc annotation scanner expects.                                                                                              |
-| `fileOptInTag`                     | `string`                                            | no                         | `@architect` (`defaults.ts:6`)                         | Marker tag a file must carry to be scanned.                                                                                               |
-| `roles`                            | `readonly RoleDefinition[]`                         | no                         | falls back to `ARCHITECT_PACKAGE_ROLES` if omitted     | Canonical role list. Each `RoleDefinition` is itself a `strictObject` (`schema:93-100`): tag, domain, priority, description, aliases, diagramShape. |
-| `productAreas`                     | `readonly string[]`                                 | no                         | none — validation only runs when present              | Canonical product-area whitelist (ADR-001 Rule 10).                                                                                       |
-| `sources.typescript`               | `readonly string[]` (min 1)                         | **yes** if `sources` is set | `[]` (`resolve-config.ts:60-64`)                       | TS globs to scan. Cannot be empty or contain `..` (`schema.ts:8-17`).                                                                     |
-| `sources.features`                 | `readonly string[]`                                 | no                         | `[]`                                                   | Gherkin feature globs.                                                                                                                    |
-| `sources.stubs`                    | `readonly string[]`                                 | no                         | merged into `sources.typescript` at resolve time (`resolve-config.ts:25`) | Design-tier stub TS globs.                                                                            |
-| `sources.exclude`                  | `readonly string[]`                                 | no                         | `[]`                                                   | Glob exclusions.                                                                                                                          |
-| `output.directory`                 | `string` (min 1)                                    | no                         | `docs-generated` (`defaults.ts:13`)                    | Where generators write.                                                                                                                   |
-| `output.overwrite`                 | `boolean`                                           | no                         | `false` (`resolve-config.ts:34`)                       | Whether `architect-generate` overwrites existing files.                                                                                   |
-| `generators`                       | `readonly string[]`                                 | no                         | `['patterns']` (`resolve-config.ts:36`)                | Generator names to include in `docs:all`. Eight defaults exported as `DEFAULT_GENERATORS`.                                                |
-| `generatorOverrides`               | `Record<string, GeneratorSourceOverride>`           | no                         | `{}`                                                   | Per-generator additional/replace globs + outputDirectory. `replaceFeatures` and `additionalFeatures` are mutually exclusive (`schema:47-59`). |
-| `project.name` / `purpose` / `license` / `version` | `string` (min 1)                       | no                         | undefined                                              | Optional metadata surfaced in generated docs.                                                                                             |
-| `project.regeneration`             | `{ commands: RegenerationCommand[], note?: string }` | no                       | undefined                                              | "How to regenerate me" hint embedded in docs.                                                                                             |
-| `tagExampleOverrides`              | `Partial<Record<FormatType, {description?,example?}>>` | no                       | undefined                                              | Per-format-type doc-example overrides.                                                                                                    |
-| `contextInferenceRules`            | `{ pattern, context }[]`                            | no                         | concatenated with `DEFAULT_CONTEXT_INFERENCE_RULES` (14 default rules in `defaults.ts:17-31`) | Path-to-context mapping for file classification. |
-| `workflowPath`                     | `string` (min 1)                                    | no                         | `null`                                                 | Path to a custom workflow file.                                                                                                           |
-| `packages`                         | `readonly PackageConfig[]`                          | no                         | `[]`                                                   | Monorepo package mapping for multi-package projection. Schema in `packages/architect-core/src/package/index.ts`.                          |
+| Field                                              | Type                                                   | Required?                   | Default                                                                                       | Controls                                                                                                                                            |
+| -------------------------------------------------- | ------------------------------------------------------ | --------------------------- | --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `tagPrefix`                                        | `string`                                               | no                          | `@architect-` (`defaults.ts:4`)                                                               | Prefix the JSDoc annotation scanner expects.                                                                                                        |
+| `fileOptInTag`                                     | `string`                                               | no                          | `@architect` (`defaults.ts:6`)                                                                | Marker tag a file must carry to be scanned.                                                                                                         |
+| `roles`                                            | `readonly RoleDefinition[]`                            | no                          | falls back to `ARCHITECT_PACKAGE_ROLES` if omitted                                            | Canonical role list. Each `RoleDefinition` is itself a `strictObject` (`schema:93-100`): tag, domain, priority, description, aliases, diagramShape. |
+| `productAreas`                                     | `readonly string[]`                                    | no                          | none — validation only runs when present                                                      | Canonical product-area whitelist (ADR-001 Rule 10).                                                                                                 |
+| `sources.typescript`                               | `readonly string[]` (min 1)                            | **yes** if `sources` is set | `[]` (`resolve-config.ts:60-64`)                                                              | TS globs to scan. Cannot be empty or contain `..` (`schema.ts:8-17`).                                                                               |
+| `sources.features`                                 | `readonly string[]`                                    | no                          | `[]`                                                                                          | Gherkin feature globs.                                                                                                                              |
+| `sources.stubs`                                    | `readonly string[]`                                    | no                          | merged into `sources.typescript` at resolve time (`resolve-config.ts:25`)                     | Design-tier stub TS globs.                                                                                                                          |
+| `sources.exclude`                                  | `readonly string[]`                                    | no                          | `[]`                                                                                          | Glob exclusions.                                                                                                                                    |
+| `output.directory`                                 | `string` (min 1)                                       | no                          | `docs-generated` (`defaults.ts:13`)                                                           | Where generators write.                                                                                                                             |
+| `output.overwrite`                                 | `boolean`                                              | no                          | `false` (`resolve-config.ts:34`)                                                              | Whether `architect-generate` overwrites existing files.                                                                                             |
+| `generators`                                       | `readonly string[]`                                    | no                          | `['patterns']` (`resolve-config.ts:36`)                                                       | Generator names to include in `docs:all`. Eight defaults exported as `DEFAULT_GENERATORS`.                                                          |
+| `generatorOverrides`                               | `Record<string, GeneratorSourceOverride>`              | no                          | `{}`                                                                                          | Per-generator additional/replace globs + outputDirectory. `replaceFeatures` and `additionalFeatures` are mutually exclusive (`schema:47-59`).       |
+| `project.name` / `purpose` / `license` / `version` | `string` (min 1)                                       | no                          | undefined                                                                                     | Optional metadata surfaced in generated docs.                                                                                                       |
+| `project.regeneration`                             | `{ commands: RegenerationCommand[], note?: string }`   | no                          | undefined                                                                                     | "How to regenerate me" hint embedded in docs.                                                                                                       |
+| `tagExampleOverrides`                              | `Partial<Record<FormatType, {description?,example?}>>` | no                          | undefined                                                                                     | Per-format-type doc-example overrides.                                                                                                              |
+| `contextInferenceRules`                            | `{ pattern, context }[]`                               | no                          | concatenated with `DEFAULT_CONTEXT_INFERENCE_RULES` (14 default rules in `defaults.ts:17-31`) | Path-to-context mapping for file classification.                                                                                                    |
+| `workflowPath`                                     | `string` (min 1)                                       | no                          | `null`                                                                                        | Path to a custom workflow file.                                                                                                                     |
+| `packages`                                         | `readonly PackageConfig[]`                             | no                          | `[]`                                                                                          | Monorepo package mapping for multi-package projection. Schema in `packages/architect-core/src/package/index.ts`.                                    |
 
 ### Validation quirks
 
@@ -53,15 +53,15 @@ If no config file is found, `createDefaultResolvedConfig()` (`resolve-config.ts:
 
 `architect.config.ts:19-49` (root). Useful as a reference for setting up your own:
 
-| Field                                   | Value                                                                                                              |
-| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `roles`                                 | `ARCHITECT_PACKAGE_ROLES` (8 roles, from `packages/architect-core/src/config/self-hosting.ts`)                     |
-| `productAreas`                          | `ARCHITECT_PACKAGE_PRODUCT_AREAS` (same source)                                                                    |
-| `sources.typescript` / `stubs` / `features` | spread from `PACKAGE_SELF_HOSTING_SOURCES`                                                                      |
-| `output.directory`                      | `docs-live`                                                                                                        |
-| `output.overwrite`                      | `true`                                                                                                             |
-| `generators`                            | `DEFAULT_GENERATORS` (all 8)                                                                                       |
-| `packages`                              | 7 entries — 5 publishable packages + `architect-dev` (`tests/features/`) + `architect-pkg-content` (`architect/`) |
+| Field                                       | Value                                                                                                             |
+| ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `roles`                                     | `ARCHITECT_PACKAGE_ROLES` (8 roles, from `packages/architect-core/src/config/self-hosting.ts`)                    |
+| `productAreas`                              | `ARCHITECT_PACKAGE_PRODUCT_AREAS` (same source)                                                                   |
+| `sources.typescript` / `stubs` / `features` | spread from `PACKAGE_SELF_HOSTING_SOURCES`                                                                        |
+| `output.directory`                          | `docs-live`                                                                                                       |
+| `output.overwrite`                          | `true`                                                                                                            |
+| `generators`                                | `DEFAULT_GENERATORS` (all 8)                                                                                      |
+| `packages`                                  | 7 entries — 5 publishable packages + `architect-dev` (`tests/features/`) + `architect-pkg-content` (`architect/`) |
 
 > **Don't import `self-hosting.ts` constants** as a consumer. They are tuned for the dogfood instance only. Author your own `roles` / `productAreas` / `sources` lists.
 
@@ -71,11 +71,11 @@ If no config file is found, `createDefaultResolvedConfig()` (`resolve-config.ts:
 
 The runtime is intentionally near-env-free. Full grep against `packages/*/src`:
 
-| Env var      | Read by                                                                                                                   | Behavior                                                                                                  |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| `DEBUG`      | `packages/architect-cli/src/cli/error-handler.ts:223`, `packages/architect-guard/src/cli/shared.ts:27`                    | If truthy, prints stack trace on CLI error. No structured log level — pure on/off.                        |
-| `INIT_CWD`   | `packages/architect-cli/src/cli/runtime-helpers.ts:47`, `packages/architect-mcp/src/runtime-helpers.ts:27`                | **Fallback only** — used to resolve invocation directory if `process.cwd()` throws.                        |
-| `PWD`        | `packages/architect-cli/src/cli/runtime-helpers.ts:51`, `packages/architect-mcp/src/runtime-helpers.ts:31`                | **Fallback only** — last-resort fallback if `cwd()` throws and `INIT_CWD` is empty.                        |
+| Env var    | Read by                                                                                                    | Behavior                                                                            |
+| ---------- | ---------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `DEBUG`    | `packages/architect-cli/src/cli/error-handler.ts:223`, `packages/architect-guard/src/cli/shared.ts:27`     | If truthy, prints stack trace on CLI error. No structured log level — pure on/off.  |
+| `INIT_CWD` | `packages/architect-cli/src/cli/runtime-helpers.ts:47`, `packages/architect-mcp/src/runtime-helpers.ts:27` | **Fallback only** — used to resolve invocation directory if `process.cwd()` throws. |
+| `PWD`      | `packages/architect-cli/src/cli/runtime-helpers.ts:51`, `packages/architect-mcp/src/runtime-helpers.ts:31` | **Fallback only** — last-resort fallback if `cwd()` throws and `INIT_CWD` is empty. |
 
 No other env vars are read in product code. There are **no `ARCHITECT_*` env knobs**. All other configuration lives in `architect.config.ts` or on the command line.
 
@@ -85,7 +85,7 @@ AGENTS.md (line ≈ "Operational notes") states:
 
 > The `architect-cli` resolves config via `process.env.PWD` before `process.cwd()`. This is fragile when embedding the CLI in subprocesses — strip `PWD` and `INIT_CWD` from the child env if you want the child to honour the `cwd:` you set.
 
-The shipped code in `runtime-helpers.ts:36-56` (both `architect-cli` and `architect-mcp`) does the **opposite**: `process.cwd()` is tried first; `INIT_CWD` and `PWD` are only fallbacks if `cwd()` throws. The in-source comment is explicit: *"process.cwd() is canonical so execFile({ cwd }) embedding is respected."*
+The shipped code in `runtime-helpers.ts:36-56` (both `architect-cli` and `architect-mcp`) does the **opposite**: `process.cwd()` is tried first; `INIT_CWD` and `PWD` are only fallbacks if `cwd()` throws. The in-source comment is explicit: _"process.cwd() is canonical so execFile({ cwd }) embedding is respected."_
 
 **Practical guidance for consumers:** the AGENTS.md note is outdated. Subprocess embedders **do not** need to strip `PWD`/`INIT_CWD` to honour their explicit `cwd:` field — the runtime already prefers `cwd()`. Tracked in `technical-debt-analysis.md`.
 
@@ -97,59 +97,59 @@ The shipped code in `runtime-helpers.ts:36-56` (both `architect-cli` and `archit
 
 ### Workspace lifecycle
 
-| Script           | What it runs                                                       | Purpose                                       |
-| ---------------- | ------------------------------------------------------------------ | --------------------------------------------- |
-| `build`          | `pnpm -r --filter './packages/**' build`                           | Build every publishable package.              |
-| `typecheck`      | `pnpm -r --filter './packages/**' typecheck`                       | TS typecheck across the publishable packages. |
-| `lint`           | `pnpm -r --filter './packages/**' lint`                            | ESLint each publishable package.              |
-| `test`           | `pnpm -r --filter './packages/**' test`                            | Run each package's test suite.                |
-| `test:dogfood`   | `vitest run`                                                       | Root-level vitest config (the `tests/` directory). |
-| `smoke`          | `tsx scripts/workspace-smoke.ts`                                   | Workspace smoke test.                         |
-| `clean`          | `pnpm -r clean`                                                    | Delegate clean to each package.               |
+| Script         | What it runs                                 | Purpose                                            |
+| -------------- | -------------------------------------------- | -------------------------------------------------- |
+| `build`        | `pnpm -r --filter './packages/**' build`     | Build every publishable package.                   |
+| `typecheck`    | `pnpm -r --filter './packages/**' typecheck` | TS typecheck across the publishable packages.      |
+| `lint`         | `pnpm -r --filter './packages/**' lint`      | ESLint each publishable package.                   |
+| `test`         | `pnpm -r --filter './packages/**' test`      | Run each package's test suite.                     |
+| `test:dogfood` | `vitest run`                                 | Root-level vitest config (the `tests/` directory). |
+| `smoke`        | `tsx scripts/workspace-smoke.ts`             | Workspace smoke test.                              |
+| `clean`        | `pnpm -r clean`                              | Delegate clean to each package.                    |
 
 ### Formatting / hygiene
 
-| Script                  | What it runs                                                                  | Purpose                                                       |
-| ----------------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------- |
-| `format`                | `prettier --write "**/*.{ts,tsx,json,md,yml,yaml}"`                           | Apply Prettier.                                               |
-| `format:check`          | `prettier --check ...`                                                        | CI-style format check.                                        |
-| `guard:no-suppressions` | `node ./scripts/guard-no-suppressions.mjs`                                    | Out-of-band guard against `eslint-disable`, `@ts-ignore`, `@ts-expect-error`, `@ts-nocheck`, `@deprecated`-as-shim. Pairs with the ESLint rule in `eslint.config.mjs:9`. |
+| Script                  | What it runs                                        | Purpose                                                                                                                                                                  |
+| ----------------------- | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `format`                | `prettier --write "**/*.{ts,tsx,json,md,yml,yaml}"` | Apply Prettier.                                                                                                                                                          |
+| `format:check`          | `prettier --check ...`                              | CI-style format check.                                                                                                                                                   |
+| `guard:no-suppressions` | `node ./scripts/guard-no-suppressions.mjs`          | Out-of-band guard against `eslint-disable`, `@ts-ignore`, `@ts-expect-error`, `@ts-nocheck`, `@deprecated`-as-shim. Pairs with the ESLint rule in `eslint.config.mjs:9`. |
 
 ### Consumer-facing CLI shortcuts (the canonical `architect:*` namespace)
 
 All point at the dogfood directory (`--base-dir .`). **External consumers conventionally mirror this naming** — `pnpm architect:query` is the script name the agent skills assume exists.
 
-| Script                | Invokes                                                                                                  | Purpose                                                                                                                                            |
-| --------------------- | -------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `architect:query`     | `tsx ./packages/architect-cli/src/cli/pattern-graph-cli.ts --base-dir .`                                 | Generic CLI entry — accepts subcommands `overview`, `status`, `context`, `dep-tree`, `files`, `scope-validate`, `handoff`, `rules`, etc. |
-| `architect:overview`  | same CLI + `overview`                                                                                    | Progress + blockers summary.                                                                                                                       |
-| `architect:status`    | same CLI + `status`                                                                                      | FSM state counts.                                                                                                                                  |
-| `architect:guard`     | `pnpm exec architect-guard --base-dir . --staged`                                                        | Pre-commit gate (staged files only).                                                                                                               |
-| `architect:guard:all` | `pnpm exec architect-guard --base-dir . --all`                                                           | Full-tree guard.                                                                                                                                   |
-| `architect:lint-steps` | `pnpm exec architect-lint-steps --base-dir .`                                                           | Lint Gherkin step definitions.                                                                                                                     |
-| `validate:patterns`   | `pnpm exec architect-validate --base-dir .`                                                              | Pattern validation.                                                                                                                                |
-| `validate:all`        | `pnpm exec architect-validate --base-dir . --dod --anti-patterns`                                        | DoD + anti-pattern detection (the canonical "is everything okay" check).                                                                            |
+| Script                 | Invokes                                                                  | Purpose                                                                                                                                  |
+| ---------------------- | ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `architect:query`      | `tsx ./packages/architect-cli/src/cli/pattern-graph-cli.ts --base-dir .` | Generic CLI entry — accepts subcommands `overview`, `status`, `context`, `dep-tree`, `files`, `scope-validate`, `handoff`, `rules`, etc. |
+| `architect:overview`   | same CLI + `overview`                                                    | Progress + blockers summary.                                                                                                             |
+| `architect:status`     | same CLI + `status`                                                      | FSM state counts.                                                                                                                        |
+| `architect:guard`      | `pnpm exec architect-guard --base-dir . --staged`                        | Pre-commit gate (staged files only).                                                                                                     |
+| `architect:guard:all`  | `pnpm exec architect-guard --base-dir . --all`                           | Full-tree guard.                                                                                                                         |
+| `architect:lint-steps` | `pnpm exec architect-lint-steps --base-dir .`                            | Lint Gherkin step definitions.                                                                                                           |
+| `validate:patterns`    | `pnpm exec architect-validate --base-dir .`                              | Pattern validation.                                                                                                                      |
+| `validate:all`         | `pnpm exec architect-validate --base-dir . --dod --anti-patterns`        | DoD + anti-pattern detection (the canonical "is everything okay" check).                                                                 |
 
 ### Doc generation (`docs:*`)
 
 All run `pnpm exec architect-generate --base-dir . -g <generator> -f` (force overwrite).
 
-| Script              | Generators included                                                                                                                          |
-| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| `docs:patterns`     | `patterns`                                                                                                                                   |
-| `docs:architecture` | `architecture`                                                                                                                               |
-| `docs:roadmap`      | `roadmap`                                                                                                                                    |
-| `docs:taxonomy`     | `taxonomy`                                                                                                                                   |
+| Script              | Generators included                                                                                                                           |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `docs:patterns`     | `patterns`                                                                                                                                    |
+| `docs:architecture` | `architecture`                                                                                                                                |
+| `docs:roadmap`      | `roadmap`                                                                                                                                     |
+| `docs:taxonomy`     | `taxonomy`                                                                                                                                    |
 | `docs:all`          | `patterns`, `architecture`, `roadmap`, `changelog`, `requirements-executable`, `requirements-specs`, `decisions`, `taxonomy` (the 8 defaults) |
 
 ### Release pipeline
 
-| Script                | What it runs                          |
-| --------------------- | ------------------------------------- |
-| `changeset`           | `changeset` (interactive)             |
-| `changeset:version`   | `changeset version`                   |
-| `changeset:publish`   | `changeset publish`                   |
-| `release`             | `pnpm build && pnpm changeset:publish` |
+| Script              | What it runs                           |
+| ------------------- | -------------------------------------- |
+| `changeset`         | `changeset` (interactive)              |
+| `changeset:version` | `changeset version`                    |
+| `changeset:publish` | `changeset publish`                    |
+| `release`           | `pnpm build && pnpm changeset:publish` |
 
 ### Universal bin invocation
 
@@ -163,47 +163,47 @@ The meta package re-exports 7 bins: `architect`, `architect-generate`, `architec
 
 (`tsconfig.base.json:1-28`)
 
-| Setting                              | Value           | Note                                                             |
-| ------------------------------------ | --------------- | ---------------------------------------------------------------- |
-| `target` / `lib`                     | `ES2022`        |                                                                  |
-| `module` / `moduleResolution`        | `ESNext` / `bundler` | ESM-only stack.                                             |
-| `strict`                             | `true`          |                                                                  |
-| **`verbatimModuleSyntax`**           | **`true`**      | Every type-only import must use `import type`. CLAUDE.md doctrine. |
-| **`noUncheckedIndexedAccess`**       | **`true`**      | Index access returns `T \| undefined`.                            |
-| **`exactOptionalPropertyTypes`**     | **`true`**      | Optional properties don't silently accept `undefined`.            |
-| `noImplicitOverride` / `noImplicitReturns` / `noFallthroughCasesInSwitch` | `true` |                                          |
-| `isolatedModules`                    | `true`          |                                                                  |
-| `declaration` / `declarationMap` / `sourceMap` | `true` | Published packages ship `.d.ts` + maps.                          |
-| `useUnknownInCatchVariables`         | `true`          |                                                                  |
-| `esModuleInterop`                    | `true`          |                                                                  |
-| `skipLibCheck`                       | `true`          |                                                                  |
-| `forceConsistentCasingInFileNames`   | `true`          |                                                                  |
-| `resolveJsonModule`                  | `true`          |                                                                  |
+| Setting                                                                   | Value                | Note                                                               |
+| ------------------------------------------------------------------------- | -------------------- | ------------------------------------------------------------------ |
+| `target` / `lib`                                                          | `ES2022`             |                                                                    |
+| `module` / `moduleResolution`                                             | `ESNext` / `bundler` | ESM-only stack.                                                    |
+| `strict`                                                                  | `true`               |                                                                    |
+| **`verbatimModuleSyntax`**                                                | **`true`**           | Every type-only import must use `import type`. CLAUDE.md doctrine. |
+| **`noUncheckedIndexedAccess`**                                            | **`true`**           | Index access returns `T \| undefined`.                             |
+| **`exactOptionalPropertyTypes`**                                          | **`true`**           | Optional properties don't silently accept `undefined`.             |
+| `noImplicitOverride` / `noImplicitReturns` / `noFallthroughCasesInSwitch` | `true`               |                                                                    |
+| `isolatedModules`                                                         | `true`               |                                                                    |
+| `declaration` / `declarationMap` / `sourceMap`                            | `true`               | Published packages ship `.d.ts` + maps.                            |
+| `useUnknownInCatchVariables`                                              | `true`               |                                                                    |
+| `esModuleInterop`                                                         | `true`               |                                                                    |
+| `skipLibCheck`                                                            | `true`               |                                                                    |
+| `forceConsistentCasingInFileNames`                                        | `true`               |                                                                    |
+| `resolveJsonModule`                                                       | `true`               |                                                                    |
 
 ### `tsconfig.architect-base.json`
 
 (`tsconfig.architect-base.json:1-8`) — extends `tsconfig.base.json` and adds:
 
-| Setting                              | Value      | Note                                                                  |
-| ------------------------------------ | ---------- | --------------------------------------------------------------------- |
+| Setting                                  | Value      | Note                                                                                           |
+| ---------------------------------------- | ---------- | ---------------------------------------------------------------------------------------------- |
 | **`noPropertyAccessFromIndexSignature`** | **`true`** | Forces `obj['key']` for index-signature lookups. The 4th of CLAUDE.md's four strictness flags. |
 
 All four CLAUDE.md-flagged strictness flags (`verbatimModuleSyntax`, `noUncheckedIndexedAccess`, `noPropertyAccessFromIndexSignature`, `exactOptionalPropertyTypes`) are present and enforced.
 
 ### `eslint.config.mjs` (root, 434 lines)
 
-| Layer                                              | Key configuration                                                                                                                                                   |
-| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Ignores (line 47)                                  | `**/node_modules/**`, `**/dist/**`, `**/*.js`, `**/*.mjs`                                                                                                            |
-| Base configs (lines 51-52)                         | `tseslint.configs.strictTypeChecked`, `tseslint.configs.stylisticTypeChecked`                                                                                       |
-| **Custom rule** `architect-local/no-suppression-comments` (lines 9-42, 65-69) | Forbids `eslint-disable`, `@ts-ignore`, `@ts-expect-error`, `@ts-nocheck`. Applied to `packages/*/src/**/*.ts` only (tests retain freedom). Pairs with `scripts/guard-no-suppressions.mjs`. |
-| **Architectural boundary rules** (lines 91-173)    | `[arch-boundary:renderer-no-doc-composition]`, `[arch-boundary:renderer-no-route-construction]`, `[arch-boundary:renderer-no-cross-layer-internal]`, `[trust-boundary:trusted-markdown-firewall]` — enforced via `no-restricted-imports` / `no-restricted-syntax`. Each tag is greppable. |
-| Strict type-safety (lines 197-239)                 | `explicit-function-return-type`, `no-explicit-any`, `no-unsafe-*`, `no-non-null-assertion`, `strict-boolean-expressions`, `no-floating-promises`, `no-misused-promises`, `await-thenable` — all `error`. |
-| Code quality (lines 246-269)                       | `no-unused-vars` (`_` opt-out), `no-console` (warn, allow `warn`/`error`), `prefer-const`, `no-var`, `eqeqeq`, `no-eval`.                                            |
-| Style consistency (lines 276-294)                  | `consistent-type-imports`, `consistent-type-exports`, `import/no-cycle`, `array-type`, `prefer-nullish-coalescing`, `prefer-optional-chain`.                         |
-| Relaxed exceptions (lines 301-334)                 | `no-empty-function` off, `no-require-imports` off, `no-confusing-void-expression` off, `prefer-readonly` off, `no-unsafe-enum-comparison` off, `consistent-type-definitions` off, `only-throw-error` off, `no-deprecated` warn-only. |
-| Test files (lines 339-430)                         | `no-console`, `no-explicit-any`, all `no-unsafe-*` relaxed to warn; many strictness rules disabled in `tests/`, `**/*.test.ts`, `**/*.steps.ts`.                     |
-| Prettier last (line 433)                           | `eslintConfigPrettier` disables stylistic conflicts.                                                                                                                |
+| Layer                                                                         | Key configuration                                                                                                                                                                                                                                                                         |
+| ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Ignores (line 47)                                                             | `**/node_modules/**`, `**/dist/**`, `**/*.js`, `**/*.mjs`                                                                                                                                                                                                                                 |
+| Base configs (lines 51-52)                                                    | `tseslint.configs.strictTypeChecked`, `tseslint.configs.stylisticTypeChecked`                                                                                                                                                                                                             |
+| **Custom rule** `architect-local/no-suppression-comments` (lines 9-42, 65-69) | Forbids `eslint-disable`, `@ts-ignore`, `@ts-expect-error`, `@ts-nocheck`. Applied to `packages/*/src/**/*.ts` only (tests retain freedom). Pairs with `scripts/guard-no-suppressions.mjs`.                                                                                               |
+| **Architectural boundary rules** (lines 91-173)                               | `[arch-boundary:renderer-no-doc-composition]`, `[arch-boundary:renderer-no-route-construction]`, `[arch-boundary:renderer-no-cross-layer-internal]`, `[trust-boundary:trusted-markdown-firewall]` — enforced via `no-restricted-imports` / `no-restricted-syntax`. Each tag is greppable. |
+| Strict type-safety (lines 197-239)                                            | `explicit-function-return-type`, `no-explicit-any`, `no-unsafe-*`, `no-non-null-assertion`, `strict-boolean-expressions`, `no-floating-promises`, `no-misused-promises`, `await-thenable` — all `error`.                                                                                  |
+| Code quality (lines 246-269)                                                  | `no-unused-vars` (`_` opt-out), `no-console` (warn, allow `warn`/`error`), `prefer-const`, `no-var`, `eqeqeq`, `no-eval`.                                                                                                                                                                 |
+| Style consistency (lines 276-294)                                             | `consistent-type-imports`, `consistent-type-exports`, `import/no-cycle`, `array-type`, `prefer-nullish-coalescing`, `prefer-optional-chain`.                                                                                                                                              |
+| Relaxed exceptions (lines 301-334)                                            | `no-empty-function` off, `no-require-imports` off, `no-confusing-void-expression` off, `prefer-readonly` off, `no-unsafe-enum-comparison` off, `consistent-type-definitions` off, `only-throw-error` off, `no-deprecated` warn-only.                                                      |
+| Test files (lines 339-430)                                                    | `no-console`, `no-explicit-any`, all `no-unsafe-*` relaxed to warn; many strictness rules disabled in `tests/`, `**/*.test.ts`, `**/*.steps.ts`.                                                                                                                                          |
+| Prettier last (line 433)                                                      | `eslintConfigPrettier` disables stylistic conflicts.                                                                                                                                                                                                                                      |
 
 The custom plugin requires `tsconfig.eslint.json` (`eslint.config.mjs:180`) — that file exists alongside the others.
 
@@ -237,16 +237,16 @@ packages:
 
 (`.changeset/config.json:1-20`)
 
-| Field                          | Value                                                                                                          | Meaning                                                                                            |
-| ------------------------------ | -------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| `changelog`                    | `@changesets/cli/changelog`                                                                                    | Default changelog renderer.                                                                        |
-| `commit`                       | `false`                                                                                                        | Changesets don't auto-commit.                                                                      |
-| `fixed`                        | `[[architect, architect-core, architect-projection, architect-guard, architect-cli, architect-mcp]]`           | **All 6 publishable packages version in lockstep.** Bumping one bumps all.                          |
-| `linked`                       | `[]`                                                                                                           | No linked-but-not-fixed groups.                                                                    |
-| `access`                       | `public`                                                                                                       | npm registry publishing access.                                                                    |
-| `baseBranch`                   | `main`                                                                                                         |                                                                                                    |
-| `updateInternalDependencies`   | `patch`                                                                                                        | `workspace:*` dep updates emit a patch bump.                                                       |
-| `ignore`                       | `["@libar-dev/architect-spec", "architect-self-host-example"]`                                                 | `formal-spec` and any example workspace are excluded from versioning.                              |
+| Field                        | Value                                                                                                | Meaning                                                                    |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| `changelog`                  | `@changesets/cli/changelog`                                                                          | Default changelog renderer.                                                |
+| `commit`                     | `false`                                                                                              | Changesets don't auto-commit.                                              |
+| `fixed`                      | `[[architect, architect-core, architect-projection, architect-guard, architect-cli, architect-mcp]]` | **All 6 publishable packages version in lockstep.** Bumping one bumps all. |
+| `linked`                     | `[]`                                                                                                 | No linked-but-not-fixed groups.                                            |
+| `access`                     | `public`                                                                                             | npm registry publishing access.                                            |
+| `baseBranch`                 | `main`                                                                                               |                                                                            |
+| `updateInternalDependencies` | `patch`                                                                                              | `workspace:*` dep updates emit a patch bump.                               |
+| `ignore`                     | `["@libar-dev/architect-spec", "architect-self-host-example"]`                                       | `formal-spec` and any example workspace are excluded from versioning.      |
 
 The fixed-group policy is the load-bearing decision here: **consumers should pin to the same version across all six publishable packages.** Mixing versions across the family is unsupported.
 
@@ -258,23 +258,23 @@ Source: `docs/MCP-SETUP.md`, `packages/architect-mcp/src/runtime-helpers.ts`.
 
 ### Client wiring
 
-| Surface             | File                                  | Snippet                                                                                                                                                            |
-| ------------------- | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Claude Code         | `.mcp.json` in project root           | `{ "mcpServers": { "architect": { "command": "npx", "args": ["architect-mcp"], "cwd": "${workspaceFolder}" } } }`                                                  |
-| Claude Desktop      | `claude_desktop_config.json`          | Same shape; `cwd` is an absolute project path.                                                                                                                     |
-| With watch          | Append `"--watch"` to `args`          | Auto-rebuild on source change (500ms debounce).                                                                                                                    |
-| Monorepo override   | Pass `--input`, `--features`, `--base-dir` explicitly | See MCP-SETUP.md:57-74.                                                                                                                            |
+| Surface           | File                                                  | Snippet                                                                                                           |
+| ----------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Claude Code       | `.mcp.json` in project root                           | `{ "mcpServers": { "architect": { "command": "npx", "args": ["architect-mcp"], "cwd": "${workspaceFolder}" } } }` |
+| Claude Desktop    | `claude_desktop_config.json`                          | Same shape; `cwd` is an absolute project path.                                                                    |
+| With watch        | Append `"--watch"` to `args`                          | Auto-rebuild on source change (500ms debounce).                                                                   |
+| Monorepo override | Pass `--input`, `--features`, `--base-dir` explicitly | See MCP-SETUP.md:57-74.                                                                                           |
 
 ### Server CLI options
 
-| Flag                  | Aliases | Default                                            | Purpose                                                          |
-| --------------------- | ------- | -------------------------------------------------- | ---------------------------------------------------------------- |
-| `--input <glob>`      | `-i`    | (from `architect.config.ts` `sources.typescript`)  | TS source globs, repeatable.                                     |
-| `--features <glob>`   | `-f`    | (from config `sources.features`)                   | Gherkin globs, repeatable.                                       |
-| `--base-dir <dir>`    | `-b`    | `cwd`                                              | Base directory the server treats as project root.                |
-| `--watch`             | `-w`    | off                                                | File watcher.                                                    |
-| `--help`              | `-h`    | —                                                  |                                                                  |
-| `--version`           | `-v`    | —                                                  |                                                                  |
+| Flag                | Aliases | Default                                           | Purpose                                           |
+| ------------------- | ------- | ------------------------------------------------- | ------------------------------------------------- |
+| `--input <glob>`    | `-i`    | (from `architect.config.ts` `sources.typescript`) | TS source globs, repeatable.                      |
+| `--features <glob>` | `-f`    | (from config `sources.features`)                  | Gherkin globs, repeatable.                        |
+| `--base-dir <dir>`  | `-b`    | `cwd`                                             | Base directory the server treats as project root. |
+| `--watch`           | `-w`    | off                                               | File watcher.                                     |
+| `--help`            | `-h`    | —                                                 |                                                   |
+| `--version`         | `-v`    | —                                                 |                                                   |
 
 ### Runtime cwd resolution
 

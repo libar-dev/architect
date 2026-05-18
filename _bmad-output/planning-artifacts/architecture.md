@@ -1,8 +1,8 @@
 ---
 workflowType: architecture
-project_name: "@libar-dev/architect-* (architect package family)"
-date: "2026-05-17"
-synthesize_mode: "yolo"
+project_name: '@libar-dev/architect-* (architect package family)'
+date: '2026-05-17'
+synthesize_mode: 'yolo'
 inputDocuments:
   - docs/reverse-engineering/data-architecture.md
   - docs/reverse-engineering/integration-points.md
@@ -142,14 +142,14 @@ ESM-only (`"type": "module"`). No CommonJS dual-export complexity.
 
 The codebase is organized into bounded contexts visible in the package split:
 
-| Bounded Context | Package | Aggregates / Entities |
-| --- | --- | --- |
-| **Canonical Model** | `@libar-dev/architect-core` | `PatternGraph` (root aggregate), `ExtractedPattern`, `TagRegistry`, `WorkflowConfig`, FSM state machine |
-| **Projection / Rendering** | `@libar-dev/architect-projection` | `Fragment` (per-kind), `RenderableDocument` (codec output), `Renderer` (markdown / json / compact) |
-| **Process Enforcement** | `@libar-dev/architect-guard` | `ProcessState`, `SessionState`, `ProcessViolation`, lint engine |
-| **Surface Composition** | `@libar-dev/architect-cli` | CLI dispatch only — no domain types |
-| **Surface Composition** | `@libar-dev/architect-mcp` | MCP tool registry, pipeline session, file watcher |
-| **Methodology** | `@libar-dev/architect-spec` (`formal-spec/`, private) | The Architect Spec — defines the *language* the other packages parse |
+| Bounded Context            | Package                                               | Aggregates / Entities                                                                                   |
+| -------------------------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| **Canonical Model**        | `@libar-dev/architect-core`                           | `PatternGraph` (root aggregate), `ExtractedPattern`, `TagRegistry`, `WorkflowConfig`, FSM state machine |
+| **Projection / Rendering** | `@libar-dev/architect-projection`                     | `Fragment` (per-kind), `RenderableDocument` (codec output), `Renderer` (markdown / json / compact)      |
+| **Process Enforcement**    | `@libar-dev/architect-guard`                          | `ProcessState`, `SessionState`, `ProcessViolation`, lint engine                                         |
+| **Surface Composition**    | `@libar-dev/architect-cli`                            | CLI dispatch only — no domain types                                                                     |
+| **Surface Composition**    | `@libar-dev/architect-mcp`                            | MCP tool registry, pipeline session, file watcher                                                       |
+| **Methodology**            | `@libar-dev/architect-spec` (`formal-spec/`, private) | The Architect Spec — defines the _language_ the other packages parse                                    |
 
 **Cross-domain relationships:**
 
@@ -168,18 +168,18 @@ There is no database. The "data layer" is the typed in-memory `PatternGraph` com
 
 (`packages/architect-core/src/validation-schemas/pattern-graph.ts:106-123`)
 
-| Field | Type | Notes |
-| --- | --- | --- |
-| `patterns` | `ExtractedPattern[]` | All discovered patterns. |
-| `tagRegistry` | `TagRegistry` | Tag prefix + metadata-tag definitions. |
-| `byStatus` | `ExactStatusGroups` | 5 buckets: `candidate` / `roadmap` / `active` / `completed` / `deferred`. |
-| `byNormalizedStatus` | `StatusGroups` | 4 buckets: `completed` / `active` / `planned` / `candidate`. |
-| `byMaturity` | `Record<string, ExtractedPattern[]>` | `idea` / `plan` / `design` / `executable`. |
-| `byPhase`, `byQuarter`, `byRole`, `bySourceType`, `byProductArea` | indexes | Additional grouping views. |
-| `counts` | `StatusCounts` | `{ completed, active, planned, candidate, total }`. |
-| `relationshipIndex` | `Record<string, RelationshipEntry>` (optional) | Edge index keyed by pattern name. |
-| `archIndex` | `ArchIndex` (optional) | `byRole` / `byContext` / `byLayer` / `byView`. |
-| `featureParseFailures` | `PatternParseFailure[]` (optional) | Tolerant-ingestion artifact. |
+| Field                                                             | Type                                           | Notes                                                                     |
+| ----------------------------------------------------------------- | ---------------------------------------------- | ------------------------------------------------------------------------- |
+| `patterns`                                                        | `ExtractedPattern[]`                           | All discovered patterns.                                                  |
+| `tagRegistry`                                                     | `TagRegistry`                                  | Tag prefix + metadata-tag definitions.                                    |
+| `byStatus`                                                        | `ExactStatusGroups`                            | 5 buckets: `candidate` / `roadmap` / `active` / `completed` / `deferred`. |
+| `byNormalizedStatus`                                              | `StatusGroups`                                 | 4 buckets: `completed` / `active` / `planned` / `candidate`.              |
+| `byMaturity`                                                      | `Record<string, ExtractedPattern[]>`           | `idea` / `plan` / `design` / `executable`.                                |
+| `byPhase`, `byQuarter`, `byRole`, `bySourceType`, `byProductArea` | indexes                                        | Additional grouping views.                                                |
+| `counts`                                                          | `StatusCounts`                                 | `{ completed, active, planned, candidate, total }`.                       |
+| `relationshipIndex`                                               | `Record<string, RelationshipEntry>` (optional) | Edge index keyed by pattern name.                                         |
+| `archIndex`                                                       | `ArchIndex` (optional)                         | `byRole` / `byContext` / `byLayer` / `byView`.                            |
+| `featureParseFailures`                                            | `PatternParseFailure[]` (optional)             | Tolerant-ingestion artifact.                                              |
 
 ### `ExtractedPattern` — the node (PascalCase only)
 
@@ -202,18 +202,18 @@ The projection layer models **seven** relation kinds (CLAUDE.md frames it as fou
 ### Four-tier **maturity** taxonomy (the "ladder")
 
 ```ts
-MATURITY_VALUES = ['idea', 'plan', 'design', 'executable']
+MATURITY_VALUES = ['idea', 'plan', 'design', 'executable'];
 ```
 
 Default mapping from `status` → `maturity`:
 
-| status | default maturity |
-| --- | --- |
-| `candidate` | `idea` |
-| `roadmap` | `plan` |
-| `active` | `design` |
-| `completed` | `executable` |
-| `deferred` | `plan` |
+| status      | default maturity |
+| ----------- | ---------------- |
+| `candidate` | `idea`           |
+| `roadmap`   | `plan`           |
+| `active`    | `design`         |
+| `completed` | `executable`     |
+| `deferred`  | `plan`           |
 
 ### FSM (ProcessGuard)
 
@@ -238,15 +238,15 @@ There are **no HTTP endpoints**. The "API contracts" are the CLI subcommand surf
 
 ### CLI Surface (7 bins, 24 subcommands on `architect`)
 
-| Bin | Purpose |
-| --- | --- |
-| `architect` | Main query / context / lifecycle dispatcher (24 subcommands). |
-| `architect-generate` | Run doc generators (`pnpm docs:all`). |
-| `architect-guard` | Pre-commit / CI process-guard FSM enforcement. |
-| `architect-lint-patterns` | Lint `@architect-*` JSDoc annotations on `.ts`. |
-| `architect-lint-steps` | Lint Gherkin step definitions. |
-| `architect-validate` | DoD + anti-pattern detection. |
-| `architect-mcp` | MCP server (stdio). |
+| Bin                       | Purpose                                                       |
+| ------------------------- | ------------------------------------------------------------- |
+| `architect`               | Main query / context / lifecycle dispatcher (24 subcommands). |
+| `architect-generate`      | Run doc generators (`pnpm docs:all`).                         |
+| `architect-guard`         | Pre-commit / CI process-guard FSM enforcement.                |
+| `architect-lint-patterns` | Lint `@architect-*` JSDoc annotations on `.ts`.               |
+| `architect-lint-steps`    | Lint Gherkin step definitions.                                |
+| `architect-validate`      | DoD + anti-pattern detection.                                 |
+| `architect-mcp`           | MCP server (stdio).                                           |
 
 `architect` subcommands group into: query/context (`overview`, `status`, `context`, `dep-tree`, `files`, `pattern`, `list`, `search`), lifecycle (`scope-validate`, `handoff`), generation (`documentation`, `bundle`), architecture (`arch roles|bounded-context|neighborhood|compare|coverage|dangling|orphans|blocking`), introspection (`rules`, `diagnostics`, `tags`, `taxonomy`, `sources`, `unannotated`), and meta (`query`, `repl`, `help`, `version`).
 
@@ -254,29 +254,29 @@ There are **no HTTP endpoints**. The "API contracts" are the CLI subcommand surf
 
 Every input schema is `z.strictObject(...).readonly()`. MCP-name convention: underscores end-to-end.
 
-| MCP tool | Input Zod keys | CLI verb parity |
-| --- | --- | --- |
-| `architect_overview` | `{}` | `overview` |
-| `architect_coverage` | `{}` | (no CLI verb) |
-| `architect_context` | `{ name, session? }` | `context` |
-| `architect_files` | `{ name, related? }` | `files` |
-| `architect_dep_tree` | `{ name, maxDepth? }` | `dep-tree` |
-| `architect_scope_validate` | `{ name, session, strict? }` | `scope-validate` |
-| `architect_handoff` | `{ name, session?, modifiedFiles? (max 200) }` | `handoff` |
-| `architect_status` | `{}` | `status` |
-| `architect_pattern` | `{ name }` | `pattern` |
-| `architect_bundle` | `{ name, mode?, include?, estimateTokens? }` | `bundle` |
-| `architect_list` | `{ status?, role?, namesOnly?, count? }` | `list` |
-| `architect_open_questions` | `{ parent? }` | `open-questions` |
-| `architect_search` | `{ query }` | `search` |
-| `architect_rules` | `{ pattern?, productArea?, onlyInvariants? }` (`pattern` & `productArea` mutually exclusive) | `rules` |
-| `architect_taxonomy` | `{ exampleOverrides? }` | `taxonomy` |
-| `architect_arch_neighborhood` | `{ name }` | `arch neighborhood` |
-| `architect_arch_blocking` | `{}` | `arch blocking` |
-| `architect_rebuild` | `{}` | (no CLI verb) |
-| `architect_config` | `{}` | (no CLI verb) |
-| `architect_documentation` | `{ documentType, disclosure?, filter? }` | `documentation` |
-| `architect_help` | `{}` | (lists tools) |
+| MCP tool                      | Input Zod keys                                                                               | CLI verb parity     |
+| ----------------------------- | -------------------------------------------------------------------------------------------- | ------------------- |
+| `architect_overview`          | `{}`                                                                                         | `overview`          |
+| `architect_coverage`          | `{}`                                                                                         | (no CLI verb)       |
+| `architect_context`           | `{ name, session? }`                                                                         | `context`           |
+| `architect_files`             | `{ name, related? }`                                                                         | `files`             |
+| `architect_dep_tree`          | `{ name, maxDepth? }`                                                                        | `dep-tree`          |
+| `architect_scope_validate`    | `{ name, session, strict? }`                                                                 | `scope-validate`    |
+| `architect_handoff`           | `{ name, session?, modifiedFiles? (max 200) }`                                               | `handoff`           |
+| `architect_status`            | `{}`                                                                                         | `status`            |
+| `architect_pattern`           | `{ name }`                                                                                   | `pattern`           |
+| `architect_bundle`            | `{ name, mode?, include?, estimateTokens? }`                                                 | `bundle`            |
+| `architect_list`              | `{ status?, role?, namesOnly?, count? }`                                                     | `list`              |
+| `architect_open_questions`    | `{ parent? }`                                                                                | `open-questions`    |
+| `architect_search`            | `{ query }`                                                                                  | `search`            |
+| `architect_rules`             | `{ pattern?, productArea?, onlyInvariants? }` (`pattern` & `productArea` mutually exclusive) | `rules`             |
+| `architect_taxonomy`          | `{ exampleOverrides? }`                                                                      | `taxonomy`          |
+| `architect_arch_neighborhood` | `{ name }`                                                                                   | `arch neighborhood` |
+| `architect_arch_blocking`     | `{}`                                                                                         | `arch blocking`     |
+| `architect_rebuild`           | `{}`                                                                                         | (no CLI verb)       |
+| `architect_config`            | `{}`                                                                                         | (no CLI verb)       |
+| `architect_documentation`     | `{ documentType, disclosure?, filter? }`                                                     | `documentation`     |
+| `architect_help`              | `{}`                                                                                         | (lists tools)       |
 
 ### Canonical JSON output shapes
 
@@ -313,7 +313,7 @@ Nine decisions on disk: `adr-001`, `-002`, `-003`, `-005`, `-006`, `-007`, `-008
 - **Status:** accepted / completed (unlocked once to add process-workflow include tag) · **Category:** testing
 - **Context:** 97 legacy `.test.ts` files alongside Gherkin features undermined the "Gherkin IS sufficient" thesis.
 - **Decision:** All tests are `.feature` files with step definitions; no new `.test.ts` files; edge cases use Scenario Outline + Examples.
-- **Rationale (verbatim):** *"Parallel `.test.ts` files create a hidden test layer invisible to the documentation pipeline, undermining the single source of truth principle this package enforces."*
+- **Rationale (verbatim):** _"Parallel `.test.ts` files create a hidden test layer invisible to the documentation pipeline, undermining the single source of truth principle this package enforces."_
 - **Consequences:** Single source of truth for tests AND docs; living documentation always matches test coverage; Scenario Outline more verbose than parameterized tests.
 
 ### ADR-003 — Source-first pattern architecture
@@ -321,8 +321,8 @@ Nine decisions on disk: `adr-001`, `-002`, `-003`, `-005`, `-006`, `-007`, `-008
 - **Status:** accepted / completed · **Category:** process
 - **Context:** Tier-1 specs went stale after implementation (only 39% of 44 specs had traceability), retroactive annotation triggered merge conflicts, tier-1 specs duplicated 200–400 lines from executable specs.
 - **Decision:** Invert ownership. TS source code is the canonical pattern definition. Tier-1 specs become ephemeral planning documents. The three durable artifacts are annotated source, executable specs, and decision specs.
-- **Rationale (verbatim):** *"If pattern identity lives in tier 1 specs, it becomes stale after implementation and diverges from the code that actually realizes the pattern."*
-- **Key rule:** `@architect-pattern` *defines* (exactly one file per pattern); `@architect-implements` is UML *realization* (many-to-one).
+- **Rationale (verbatim):** _"If pattern identity lives in tier 1 specs, it becomes stale after implementation and diverges from the code that actually realizes the pattern."_
+- **Key rule:** `@architect-pattern` _defines_ (exactly one file per pattern); `@architect-implements` is UML _realization_ (many-to-one).
 
 ### PDR-001 (= ADR-004) — Session-workflow-command design decisions
 
@@ -339,34 +339,34 @@ Nine decisions on disk: `adr-001`, `-002`, `-003`, `-005`, `-006`, `-007`, `-008
 
 - **Status:** accepted / completed (retroactive unlock during rebrand) · **Category:** architecture
 - **Decision:** Adopt a codec architecture. Each document type has a **codec** that decodes a PatternGraph into a `RenderableDocument` (IR with sections, headings, tables, paragraphs, code blocks). A separate **renderer** turns IR into markdown.
-- **Rationale (verbatim):** *"Pure functions are deterministic and trivially testable. For the same PatternGraph, a codec always produces the same RenderableDocument."*
+- **Rationale (verbatim):** _"Pure functions are deterministic and trivially testable. For the same PatternGraph, a codec always produces the same RenderableDocument."_
 - **Consequences:** Codecs are pure functions; IR is inspectable; composable via `CompositeCodec`; same dataset → multiple outputs. Cost: extra abstraction; IR vocabulary must cover every needed output pattern.
 
 ### ADR-006 — Single read-model architecture
 
 - **Status:** accepted / completed (unlocked to add Verified-by sections and acceptance criteria) · **Category:** architecture · **Uses ADR-005.**
 - **Decision:** The PatternGraph is the **single** read model for all consumers. Validators, codecs, and query APIs consume the same pre-computed model.
-- **Rationale (verbatim):** *"Bypassing the read model forces consumers to re-derive data that the PatternGraph already computes, creating duplicate logic and divergent behavior when the pipeline evolves."*
-- **Negative space:** Stage-1 exceptions (`lint-patterns.ts`, `AntiPatternDetector`, `CoverageAnalyzer`, `SessionStateReader`) exist only for consumers that need data the PatternGraph *intentionally doesn't model*.
+- **Rationale (verbatim):** _"Bypassing the read model forces consumers to re-derive data that the PatternGraph already computes, creating duplicate logic and divergent behavior when the pipeline evolves."_
+- **Negative space:** Stage-1 exceptions (`lint-patterns.ts`, `AntiPatternDetector`, `CoverageAnalyzer`, `SessionStateReader`) exist only for consumers that need data the PatternGraph _intentionally doesn't model_.
 
 ### ADR-007 — Coordinated taxonomy redesign (currently active)
 
 - **Status:** accepted / **active** (the only currently-active ADR) · **Category:** architecture · **Uses:** ADR-001, EnforcementConfiguration, PerspectiveAwareProjections.
 - **Decision:** Replace the binary track tag with a maturity axis (`idea`/`plan`/`design`/`executable`); replace categories+presets with a unified role system; add `EnforcementConfiguration` for ProcessGuard; add `PerspectiveAwareProjections`; migrate `derive-state.ts` and `DoDValidator` to the PatternGraph; add Zod output schemas for MCP tools.
-- **Key constraint:** *"All seven changes ship as ONE coordinated breaking change. Three internal consumers, no public users, pre-release only. All consumers update simultaneously."*
+- **Key constraint:** _"All seven changes ship as ONE coordinated breaking change. Three internal consumers, no public users, pre-release only. All consumers update simultaneously."_
 
 ### ADR-008 — Step-definition stubs live in the architect-state folder
 
 - **Status:** accepted / completed · **Category:** process · **Uses:** ADR-003, ADR-002.
 - **Decision:** Step stubs live in `architect/step-stubs/{pattern-name}/` as TypeScript files with real vitest-cucumber structure and `throw new Error` bodies. They move to `tests/steps/` during implementation and are deleted from `step-stubs/` when complete.
-- **Rationale (verbatim):** *"Code stubs proved that design artifacts must live outside compiled/linted/executed paths. The same principle applies to test skeletons."*
+- **Rationale (verbatim):** _"Code stubs proved that design artifacts must live outside compiled/linted/executed paths. The same principle applies to test skeletons."_
 
 ### ADR-009 — Projection trust boundary & W7 naming
 
 - **Status:** accepted / completed · **Category:** architecture (refinement) · **See-also:** ADR-005, ADR-006.
 - **Decision:** **`parseAndProject*` functions are the raw-input trust boundary for external consumers.** They parse options once, then call typed `project*` helpers. Projection builders construct typed fragments directly and do not re-parse their own outputs on hot paths.
 - **Markdown sub-boundary:** Fragment text fields are plain text unless a renderer-owned block explicitly marks inline Markdown as trusted. Markdown renderers escape labels, validate URL schemes, reject protocol-relative targets.
-- **Rationale (verbatim):** *"Re-parsing projection outputs contradicts the trust-boundary contract and makes CLI/MCP hot paths pay for duplicate full-object walks."*
+- **Rationale (verbatim):** _"Re-parsing projection outputs contradicts the trust-boundary contract and makes CLI/MCP hot paths pay for duplicate full-object walks."_
 
 ---
 
@@ -374,15 +374,15 @@ Nine decisions on disk: `adr-001`, `-002`, `-003`, `-005`, `-006`, `-007`, `-008
 
 The codebase makes the same opinionated choice in many places — together they form a coherent value system.
 
-| Principle | Evidence |
-| --- | --- |
-| **Type safety over convenience** | Four CLAUDE.md strictness flags, no-`any` rule, custom `architect-local/no-suppression-comments` ESLint plugin + `scripts/guard-no-suppressions.mjs`. |
-| **Parse once at the trust boundary** | ADR-009; every cross-package contract is a Zod `strictObject`; consumer-facing entrypoints are `parseAndProject*`. |
-| **Single source of truth** | ADR-003 (source-first), ADR-006 (single read model), ADR-002 (Gherkin-only — tests and docs share one source). |
-| **Deletion over deprecation** | AGENTS.md §No-BC: no `@deprecated`, no BC aliases, no `_var` renames; the no-suppressions guard enforces this on CI. |
-| **Determinism over flexibility** | Codec/renderer split (ADR-005); pure-function projections; deterministic verdict words; perf-regression gate on projection. |
-| **Acyclic, declared dependencies** | `core ← projection`, `core ← guard ← cli`, `core, projection ← mcp` — load-bearing in AGENTS.md; no circular imports enforced by lint. |
-| **Architecture-as-fitness-function** | `scope-validate`, `arch dangling --strict`, `arch blocking`, the ProcessGuard FSM — all enforce architectural invariants in CI rather than reviews. |
+| Principle                            | Evidence                                                                                                                                              |
+| ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Type safety over convenience**     | Four CLAUDE.md strictness flags, no-`any` rule, custom `architect-local/no-suppression-comments` ESLint plugin + `scripts/guard-no-suppressions.mjs`. |
+| **Parse once at the trust boundary** | ADR-009; every cross-package contract is a Zod `strictObject`; consumer-facing entrypoints are `parseAndProject*`.                                    |
+| **Single source of truth**           | ADR-003 (source-first), ADR-006 (single read model), ADR-002 (Gherkin-only — tests and docs share one source).                                        |
+| **Deletion over deprecation**        | AGENTS.md §No-BC: no `@deprecated`, no BC aliases, no `_var` renames; the no-suppressions guard enforces this on CI.                                  |
+| **Determinism over flexibility**     | Codec/renderer split (ADR-005); pure-function projections; deterministic verdict words; perf-regression gate on projection.                           |
+| **Acyclic, declared dependencies**   | `core ← projection`, `core ← guard ← cli`, `core, projection ← mcp` — load-bearing in AGENTS.md; no circular imports enforced by lint.                |
+| **Architecture-as-fitness-function** | `scope-validate`, `arch dangling --strict`, `arch blocking`, the ProcessGuard FSM — all enforce architectural invariants in CI rather than reviews.   |
 
 ---
 
@@ -425,11 +425,11 @@ Top-level schema fields (all `z.strictObject`, see `project-config-schema.ts:102
 
 The runtime is intentionally near-env-free:
 
-| Env var | Read by | Behavior |
-| --- | --- | --- |
-| `DEBUG` | `error-handler.ts:223`, `shared.ts:27` | If truthy, prints stack trace on CLI error. On/off only. |
-| `INIT_CWD` | `runtime-helpers.ts` | **Fallback only** — used if `process.cwd()` throws. |
-| `PWD` | `runtime-helpers.ts` | **Fallback only** — last-resort if `cwd()` throws and `INIT_CWD` is empty. |
+| Env var    | Read by                                | Behavior                                                                   |
+| ---------- | -------------------------------------- | -------------------------------------------------------------------------- |
+| `DEBUG`    | `error-handler.ts:223`, `shared.ts:27` | If truthy, prints stack trace on CLI error. On/off only.                   |
+| `INIT_CWD` | `runtime-helpers.ts`                   | **Fallback only** — used if `process.cwd()` throws.                        |
+| `PWD`      | `runtime-helpers.ts`                   | **Fallback only** — last-resort if `cwd()` throws and `INIT_CWD` is empty. |
 
 No `ARCHITECT_*` env knobs. All other configuration lives in `architect.config.ts` or on the command line.
 
@@ -516,25 +516,25 @@ Build-time / developer-time toolchain — no long-lived process serving traffic.
 
 ### Diagnostic verbs (CLI / MCP)
 
-| Verb | Surfaces |
-| --- | --- |
-| `architect overview` | Progress + active phases + blocking patterns. JSON: `OverviewDigest`. |
-| `architect status` | FSM state counts. JSON: `StatusDistribution`. |
-| `architect diagnostics` | Extraction-pipeline diagnostics dump (failed parses, unresolved references, schema-rejected nodes). |
-| `architect arch dangling [--strict]` | Patterns referencing IDs that don't resolve. `--strict` exits non-zero on any. |
-| `architect arch blocking` | Patterns currently blocking progress. |
-| `architect arch orphans` | Patterns with no edges. |
-| `architect arch coverage` | Annotation coverage across the source. |
-| `architect unannotated` | Patterns with missing/incomplete annotations. |
+| Verb                                 | Surfaces                                                                                            |
+| ------------------------------------ | --------------------------------------------------------------------------------------------------- |
+| `architect overview`                 | Progress + active phases + blocking patterns. JSON: `OverviewDigest`.                               |
+| `architect status`                   | FSM state counts. JSON: `StatusDistribution`.                                                       |
+| `architect diagnostics`              | Extraction-pipeline diagnostics dump (failed parses, unresolved references, schema-rejected nodes). |
+| `architect arch dangling [--strict]` | Patterns referencing IDs that don't resolve. `--strict` exits non-zero on any.                      |
+| `architect arch blocking`            | Patterns currently blocking progress.                                                               |
+| `architect arch orphans`             | Patterns with no edges.                                                                             |
+| `architect arch coverage`            | Annotation coverage across the source.                                                              |
+| `architect unannotated`              | Patterns with missing/incomplete annotations.                                                       |
 
 ### Validation reports
 
-| Command | Output |
-| --- | --- |
+| Command                                              | Output                                                                                                                  |
+| ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
 | `pnpm exec architect-validate --dod --anti-patterns` | `ValidatePatternsOutput`: `{ summary: { issues[], stats }, diagnostics[] }`. The all-in-one "is everything okay" check. |
-| `pnpm exec architect-lint-patterns` | Annotation-lint output (`LintOutput`). |
-| `pnpm exec architect-lint-steps` | Step-definition lint output. |
-| `pnpm exec architect-guard --staged \| --all` | ProcessGuard FSM enforcement (six rules). |
+| `pnpm exec architect-lint-patterns`                  | Annotation-lint output (`LintOutput`).                                                                                  |
+| `pnpm exec architect-lint-steps`                     | Step-definition lint output.                                                                                            |
+| `pnpm exec architect-guard --staged \| --all`        | ProcessGuard FSM enforcement (six rules).                                                                               |
 
 ### Debugging capabilities
 
@@ -549,16 +549,16 @@ Build-time / developer-time toolchain — no long-lived process serving traffic.
 
 CI-gate behaviors, not pager alerts:
 
-| Rule | Threshold | Action |
-| --- | --- | --- |
-| `pnpm test` failure | Any test fails | Block merge. |
-| `pnpm validate:all` finds an issue | Any DoD or anti-pattern violation | Block merge. |
-| `pnpm exec architect-guard --staged` rule fires at `error` severity | Any error-severity rule | Block commit (pre-commit hook). |
-| `pnpm exec architect-guard --all --strict` warns | Any warning, in `--strict` mode | Block merge. |
-| Projection perf regression | Median latency > `baseline × 1.5` | Block merge; require profile + fix or new baseline. |
-| `pnpm guard:no-suppressions` finds a forbidden comment | Any match in `packages/*/src` | Block merge. |
-| `architect arch dangling --strict` finds an unresolved reference | Any dangling ref | Block merge. |
-| Format / lint failure | Any | Block merge. |
+| Rule                                                                | Threshold                         | Action                                              |
+| ------------------------------------------------------------------- | --------------------------------- | --------------------------------------------------- |
+| `pnpm test` failure                                                 | Any test fails                    | Block merge.                                        |
+| `pnpm validate:all` finds an issue                                  | Any DoD or anti-pattern violation | Block merge.                                        |
+| `pnpm exec architect-guard --staged` rule fires at `error` severity | Any error-severity rule           | Block commit (pre-commit hook).                     |
+| `pnpm exec architect-guard --all --strict` warns                    | Any warning, in `--strict` mode   | Block merge.                                        |
+| Projection perf regression                                          | Median latency > `baseline × 1.5` | Block merge; require profile + fix or new baseline. |
+| `pnpm guard:no-suppressions` finds a forbidden comment              | Any match in `packages/*/src`     | Block merge.                                        |
+| `architect arch dangling --strict` finds an unresolved reference    | Any dangling ref                  | Block merge.                                        |
+| Format / lint failure                                               | Any                               | Block merge.                                        |
 
 ---
 

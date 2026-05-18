@@ -1,6 +1,7 @@
 # Feature: Scope-Creep Detection
 
 ## Status
+
 ✅ COMPLETE — ProcessGuard rule `scope-creep` (`packages/architect-guard/src/lint/process-guard/types.ts:210-216`) detects expansion beyond accepted scope on `active` patterns; tied to `ProtectionLevel = 'scope'` for the `active` state (`states.ts:18-23`).
 
 ## Overview
@@ -47,6 +48,7 @@ Reference: `functional-specification.md` FR-009; `data-architecture.md` §1e Pro
 ## Implementation Status
 
 **Completed:**
+
 - ✅ Rule definition: `packages/architect-guard/src/lint/process-guard/types.ts:210-216`.
 - ✅ Protection-level mapping: `packages/architect-core/src/validation/fsm/states.ts:18-23`.
 - ✅ Wired into `architect-guard --staged` and `architect-guard --all`.

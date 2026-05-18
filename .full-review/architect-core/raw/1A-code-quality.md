@@ -57,6 +57,7 @@ export const PatternGraphSchema = z.strictObject({
 ### C3. Hand-written `ArchitectProjectConfig` parallel to `ArchitectProjectConfigSchema`
 
 **Files:**
+
 - `/Users/darkomijic/dev-projects/architect/packages/architect-core/src/config/project-config.ts` (lines 48-64 and the surrounding hand-written interfaces)
 - `/Users/darkomijic/dev-projects/architect/packages/architect-core/src/config/project-config-schema.ts` (lines 102-116)
 
@@ -77,17 +78,21 @@ Then `config-loader.ts:212` no longer needs the `as ArchitectProjectConfig` cast
 
 **File:** `/Users/darkomijic/dev-projects/architect/packages/architect-core/src/config/project-config-schema.ts` (lines 118-141)
 
-`isProjectConfig` reimplements a brittle key-existence check, then `config-loader.ts:188-196` does **both** `isProjectConfig(exported)` **and** `ArchitectProjectConfigSchema.safeParse(...)`. The hand-coded key list (lines 124-138) duplicates the schema's fields — when somebody adds a field to the schema, this guard silently drifts. This violates the "parse once at the trust boundary" rule and is provably the wrong tool: Zod's `safeParse` is *the* validated guard.
+`isProjectConfig` reimplements a brittle key-existence check, then `config-loader.ts:188-196` does **both** `isProjectConfig(exported)` **and** `ArchitectProjectConfigSchema.safeParse(...)`. The hand-coded key list (lines 124-138) duplicates the schema's fields — when somebody adds a field to the schema, this guard silently drifts. This violates the "parse once at the trust boundary" rule and is provably the wrong tool: Zod's `safeParse` is _the_ validated guard.
 
 **Fix:** delete `isProjectConfig`. At the only call site (`config-loader.ts:188`), drop the guard and parse unconditionally:
 
 ```ts
 // config-loader.ts
 const exported = module.default;
-if (exported === undefined || exported === null) { /* keep error */ }
+if (exported === undefined || exported === null) {
+  /* keep error */
+}
 
 const parseResult = ArchitectProjectConfigSchema.safeParse(exported);
-if (!parseResult.success) { /* return zod error */ }
+if (!parseResult.success) {
+  /* return zod error */
+}
 // parseResult.data is fully typed; no second cast needed
 ```
 
@@ -97,13 +102,13 @@ Also delete the bizarre `configForValidation` IIFE / Reflect.deleteProperty bloc
 
 **File:** `/Users/darkomijic/dev-projects/architect/packages/architect-core/src/validation/fsm/validator.ts` (lines 88-105)
 
-When the function detects an invalid status, it still returns it inside a typed result by *casting* a string to `ProcessStatusValue`:
+When the function detects an invalid status, it still returns it inside a typed result by _casting_ a string to `ProcessStatusValue`:
 
 ```ts
 if (!isValidStatusValue(from)) {
   return {
     valid: false,
-    from: from as ProcessStatusValue,    // <-- lying
+    from: from as ProcessStatusValue, // <-- lying
     to: to as ProcessStatusValue,
     error: `Invalid source status ...`,
   };
@@ -119,7 +124,7 @@ export type TransitionValidationResult =
   | { valid: true; from: ProcessStatusValue; to: ProcessStatusValue }
   | {
       valid: false;
-      from: ProcessStatusValue | string;     // explicitly mixed
+      from: ProcessStatusValue | string; // explicitly mixed
       to: ProcessStatusValue | string;
       error: string;
       validAlternatives?: readonly ProcessStatusValue[];
@@ -165,6 +170,7 @@ export async function extractPatternsFromGherkinAsync(...) {
 ### H2. `buildRoleLookup` / `resolveCanonicalRole` duplicated four times
 
 **Files (all are the same function body):**
+
 - `/Users/darkomijic/dev-projects/architect/packages/architect-core/src/extractor/doc-extractor.ts` (lines 58-79)
 - `/Users/darkomijic/dev-projects/architect/packages/architect-core/src/extractor/gherkin-extractor.ts` (lines 105-126)
 - `/Users/darkomijic/dev-projects/architect/packages/architect-core/src/scanner/gherkin-ast-parser.ts` (lines 54-74)
@@ -176,7 +182,10 @@ The first three are byte-for-byte the same logic with a `RoleLike` shape. The fo
 
 ```ts
 // src/utils/role-lookup.ts
-export interface RoleLike { readonly tag: string; readonly aliases?: readonly string[]; }
+export interface RoleLike {
+  readonly tag: string;
+  readonly aliases?: readonly string[];
+}
 
 export interface RoleLookup {
   readonly canonical: ReadonlyMap<string, string>;
@@ -184,8 +193,15 @@ export interface RoleLookup {
   readonly all: ReadonlySet<string>;
 }
 
-export function buildRoleLookup(roles: readonly RoleLike[]): RoleLookup { /* … */ }
-export function resolveCanonicalRole(rawValue: string | undefined, roles: readonly RoleLike[]): string | undefined { /* … */ }
+export function buildRoleLookup(roles: readonly RoleLike[]): RoleLookup {
+  /* … */
+}
+export function resolveCanonicalRole(
+  rawValue: string | undefined,
+  roles: readonly RoleLike[],
+): string | undefined {
+  /* … */
+}
 ```
 
 Then delete the three private copies and have `pattern-helpers.resolveCanonicalRole` call `resolveCanonicalRole(role, dataset.tagRegistry.roles)`.
@@ -193,6 +209,7 @@ Then delete the three private copies and have `pattern-helpers.resolveCanonicalR
 ### H3. Two parallel `@architect-*` tag parsers (JSDoc and Gherkin)
 
 **Files:**
+
 - `/Users/darkomijic/dev-projects/architect/packages/architect-core/src/scanner/ast-parser.ts` — `extractMetadataTag` / `extractSingleValue` / `extractEnumValue` / `extractQuotedValue` / `extractCsvValue` / `extractNumberValue` / `checkFlagPresent` (lines 61-110), then a 170-line `parseDirective` (lines 225-401) that handles the format dispatch and pulls 25 metadata keys out by name.
 - `/Users/darkomijic/dev-projects/architect/packages/architect-core/src/scanner/gherkin-ast-parser.ts` — `extractPatternTags` (lines 364-551) does the same job but for Gherkin tag arrays, with its own `Record<string, unknown>` accumulator and its own per-format switch (lines 484-541).
 
@@ -204,12 +221,14 @@ Both functions enumerate the same registry's `format: 'value' | 'enum' | 'csv' |
 // src/taxonomy/tag-parsing.ts
 export interface TagApplyContext {
   readonly metadata: Record<string, unknown>;
-  readonly tagName: string;     // 'status', 'phase', …
+  readonly tagName: string; // 'status', 'phase', …
   readonly rawValue: string;
   readonly definition: MetadataTagDefinition;
 }
 
-export function applyTagValue(ctx: TagApplyContext): void { /* shared format switch */ }
+export function applyTagValue(ctx: TagApplyContext): void {
+  /* shared format switch */
+}
 ```
 
 Both `ast-parser.ts:parseDirective` and `gherkin-ast-parser.ts:extractPatternTags` shrink to a thin source-specific tokenizer + a call to the shared applier.
@@ -218,9 +237,9 @@ Both `ast-parser.ts:parseDirective` and `gherkin-ast-parser.ts:extractPatternTag
 
 **File:** `/Users/darkomijic/dev-projects/architect/packages/architect-core/src/scanner/gherkin-ast-parser.ts` (lines 364-419)
 
-The return type is a 42-property inline interface ending in `readonly [key: string]: unknown` (line 418). The body builds a `Record<string, unknown>` (line 436) and the consumer (`gherkin-extractor.ts:367`) accesses it like `metadata.pattern`, `metadata.status`, `metadata.level` — i.e. via property access that completely bypasses the index signature's `unknown`. With `noPropertyAccessFromIndexSignature` enabled (per AGENTS.md) this *should* fail; the inline interface defeats the rule by listing every key explicitly.
+The return type is a 42-property inline interface ending in `readonly [key: string]: unknown` (line 418). The body builds a `Record<string, unknown>` (line 436) and the consumer (`gherkin-extractor.ts:367`) accesses it like `metadata.pattern`, `metadata.status`, `metadata.level` — i.e. via property access that completely bypasses the index signature's `unknown`. With `noPropertyAccessFromIndexSignature` enabled (per AGENTS.md) this _should_ fail; the inline interface defeats the rule by listing every key explicitly.
 
-Worse, downstream the `metadata` is consumed twice with hand-rolled `as` casts: `metadata['_unrecognizedEnums'] as UnrecognizedEnumEntry[] | undefined` appears at `gherkin-ast-parser.ts:494` and `:525`. The `_unrecognizedEnums`, `_roleTagValues`, `_unrecognizedRoleValues`, `_deprecatedTags` keys are clearly *internal* signaling, not pattern metadata, but they share the same bag.
+Worse, downstream the `metadata` is consumed twice with hand-rolled `as` casts: `metadata['_unrecognizedEnums'] as UnrecognizedEnumEntry[] | undefined` appears at `gherkin-ast-parser.ts:494` and `:525`. The `_unrecognizedEnums`, `_roleTagValues`, `_unrecognizedRoleValues`, `_deprecatedTags` keys are clearly _internal_ signaling, not pattern metadata, but they share the same bag.
 
 **Fix:** split the return into two explicit types — the parsed pattern fields and an "extractor diagnostics" companion:
 
@@ -239,7 +258,9 @@ interface FeatureMetadataDiagnostics {
 export function extractPatternTags(
   tags: readonly string[],
   registry?: TagRegistry,
-): { metadata: ParsedFeatureMetadata; diagnostics: FeatureMetadataDiagnostics } { /* … */ }
+): { metadata: ParsedFeatureMetadata; diagnostics: FeatureMetadataDiagnostics } {
+  /* … */
+}
 ```
 
 This kills the `_*` prefix smell and the `as` casts simultaneously.
@@ -250,19 +271,21 @@ This kills the `_*` prefix smell and the `as` casts simultaneously.
 
 `createPatternGraphAPI` (`PatternGraphAPI` is the central read surface used by CLI, MCP, and projection) wraps **every single returned value** in `cloneValue` (= `structuredClone`). 27 call sites in 264 lines. Three observations:
 
-1. The `RelationshipEntry`, `PatternGraph`, etc. shapes are already declared `readonly` in their TS types. Cloning is the runtime enforcement, fine — but `structuredClone` walks the entire object graph each call. For `getPatternGraph()` (line 344), that's a deep copy of the *entire* read model on every call; for `getRecentlyCompleted()` it copies every completed pattern.
+1. The `RelationshipEntry`, `PatternGraph`, etc. shapes are already declared `readonly` in their TS types. Cloning is the runtime enforcement, fine — but `structuredClone` walks the entire object graph each call. For `getPatternGraph()` (line 344), that's a deep copy of the _entire_ read model on every call; for `getRecentlyCompleted()` it copies every completed pattern.
 2. `cloneTagRegistry` (lines 85-100) hand-rebuilds a `tagRegistry` so it can preserve the `transform` function reference (which `structuredClone` would reject as not-cloneable). This is correct, but it's an early-warning sign: the model contains non-cloneable values.
 3. Calls like `cloneValue(dataset.byStatus[status])` are wasteful when the caller is going to map/filter it anyway. Callers can't avoid the clone because the API forces it.
 
 **Fix:** give the API two surfaces — one returns frozen-shallow views (cheap, mutability-safe via `Object.freeze` at construction time), one returns mutable deep clones for callers that need to mutate. Or simply: deep-freeze the entire dataset once at construction time and return references. `structuredClone` should be reserved for cross-realm boundaries (worker messaging, IPC), not in-process reads.
 
 ```ts
-function deepFreeze<T>(obj: T): T { /* recursive Object.freeze */ }
+function deepFreeze<T>(obj: T): T {
+  /* recursive Object.freeze */
+}
 
 export function createPatternGraphAPI(dataset: PatternGraph): PatternGraphAPI {
   const frozen = deepFreeze({ ...dataset, tagRegistry: cloneTagRegistry(dataset.tagRegistry) });
   return {
-    getPatternsByNormalizedStatus: (s) => frozen.byNormalizedStatus[s],   // no clone
+    getPatternsByNormalizedStatus: (s) => frozen.byNormalizedStatus[s], // no clone
     // …
   };
 }
@@ -273,6 +296,7 @@ If any current test depends on mutating a returned array, it's wrong and will su
 ### H6. Validation schemas use `z.object` instead of `z.strictObject` across 28 sites
 
 **Files:**
+
 - `/Users/darkomijic/dev-projects/architect/packages/architect-core/src/validation-schemas/output-schemas.ts` (lines 10, 17, 22, 30, 40, 48, 56, 63, 71, 78) — 10 schemas, all of them the output boundary for CLI/MCP commands
 - `/Users/darkomijic/dev-projects/architect/packages/architect-core/src/validation-schemas/pattern-graph.ts` (lines 42, 49, 57, 65, 72, 79, 85, 98, 106) — 9 schemas, the canonical read model (also flagged as C2)
 - `/Users/darkomijic/dev-projects/architect/packages/architect-core/src/validation-schemas/extracted-shape.ts` (lines 7, 14, 22, 29, 36, 56, 64, 74) — 8 schemas
@@ -285,6 +309,7 @@ The output schemas are particularly bad: they are the surface that downstream to
 ### H7. Double-parsing `ExtractedPatternSchema` — extraction then transform
 
 **Files:**
+
 - `/Users/darkomijic/dev-projects/architect/packages/architect-core/src/extractor/doc-extractor.ts` (line 294) — `ExtractedPatternSchema.safeParse(pattern)` at extraction time
 - `/Users/darkomijic/dev-projects/architect/packages/architect-core/src/extractor/gherkin-extractor.ts` (lines 455 and 606) — same parse for each Gherkin pattern, in both sync and async paths
 - `/Users/darkomijic/dev-projects/architect/packages/architect-core/src/generators/pipeline/transform-dataset.ts` (line 103) — `ExtractedPatternSchema.safeParse(pattern)` **again**, on already-typed `ExtractedPattern[]`
@@ -365,7 +390,7 @@ function getPatternName(pattern: ExtractedPattern): string {
 }
 ```
 
-…while `src/read-api/pattern-helpers.ts:58` exports the same function. The two implementations are identical *today*; if either evolves, the relationship-resolver's view of "which name is canonical" will diverge from the rest of the read API.
+…while `src/read-api/pattern-helpers.ts:58` exports the same function. The two implementations are identical _today_; if either evolves, the relationship-resolver's view of "which name is canonical" will diverge from the rest of the read API.
 
 **Fix:** import the canonical one. `relationship-resolver.ts` already lives under `generators/pipeline/`, so the import path is `../../read-api/pattern-helpers.js`.
 
@@ -397,16 +422,17 @@ const configForValidation = Object.fromEntries(
 ### M3. `void x;` dead-code suppressions
 
 **Files:**
+
 - `/Users/darkomijic/dev-projects/architect/packages/architect-core/src/extractor/doc-extractor.ts` lines 249, 252
 - `/Users/darkomijic/dev-projects/architect/packages/architect-core/src/extractor/gherkin-extractor.ts` line 604
 
 ```ts
 // doc-extractor.ts:249-252
-void extractionWarnings;           // ← silences unused-var warning
-void inferMaturity(status);        // ← computes and throws away the result
+void extractionWarnings; // ← silences unused-var warning
+void inferMaturity(status); // ← computes and throws away the result
 
 // gherkin-extractor.ts:604
-void metadata.status;              // ← reads a property for no reason
+void metadata.status; // ← reads a property for no reason
 ```
 
 These are precisely the kind of "soft suppression" the No-BC doctrine forbids. `extractionWarnings` is populated (lines 232-236) but never emitted; if the warnings matter, surface them; if they don't, stop accumulating them. `void inferMaturity(status)` either calls a side-effectful function (it isn't) or is dead — delete it.
@@ -461,6 +487,7 @@ export function asModuleId(id: string): ModuleId {
 Every other `as*` constructor in the file goes through `ZodSchema.parse(...)`. This one quietly skips validation. Either delete `asModuleId` (the comment says `ModuleId = PatternId` already), or make it call `asPatternId`.
 
 **Fix:**
+
 ```ts
 export function asModuleId(id: string): ModuleId {
   return asPatternId(id);
@@ -496,13 +523,14 @@ These casts are the inverse of the doctrine's Zod-first stance: the registry kno
 
 **File:** `/Users/darkomijic/dev-projects/architect/packages/architect-core/src/read-api/pattern-graph-api.ts` (lines 85-100)
 
-The function exists because `structuredClone` can't clone a function reference. This is *correct* defensive coding, but it's the side effect of trying to clone a registry that contains live functions in the first place. Combined with H5 (no need for clone-on-read), this whole helper goes away.
+The function exists because `structuredClone` can't clone a function reference. This is _correct_ defensive coding, but it's the side effect of trying to clone a registry that contains live functions in the first place. Combined with H5 (no need for clone-on-read), this whole helper goes away.
 
 **Fix:** drop after addressing H5.
 
 ### M9. Local `cloneRoles` in `factory.ts` overlaps `cloneRoleDefinitions` in `registry-builder.ts`
 
 **Files:**
+
 - `/Users/darkomijic/dev-projects/architect/packages/architect-core/src/config/factory.ts` (lines 9-18)
 - `/Users/darkomijic/dev-projects/architect/packages/architect-core/src/taxonomy/registry-builder.ts` (lines 34-39)
 
@@ -516,7 +544,7 @@ Two near-identical helpers for "clone an array of role definitions". The `factor
 
 Zod's `z.function()` does not validate runtime function shape. Any function passes. A wrong-arity transform makes it through the registry parse and blows up at extraction time.
 
-**Fix:** if `transform` is part of the cross-package contract, declare it explicitly as `z.custom<(value: string) => string>(v => typeof v === 'function')` so the *contract* is clear, and tighten the call site to coerce:
+**Fix:** if `transform` is part of the cross-package contract, declare it explicitly as `z.custom<(value: string) => string>(v => typeof v === 'function')` so the _contract_ is clear, and tighten the call site to coerce:
 
 ```ts
 transform: z.custom<(value: string) => unknown>(v => typeof v === 'function').optional(),
@@ -529,13 +557,16 @@ transform: z.custom<(value: string) => unknown>(v => typeof v === 'function').op
 **File:** `/Users/darkomijic/dev-projects/architect/packages/architect-core/src/validation-schemas/tag-registry.ts` (line 20)
 
 ```ts
-export const RoleDefinitionSchema = z.strictObject({ /* fields */ });
-export type RoleDefinition = ConfigRoleDefinition;     // ← not z.infer<typeof RoleDefinitionSchema>
+export const RoleDefinitionSchema = z.strictObject({
+  /* fields */
+});
+export type RoleDefinition = ConfigRoleDefinition; // ← not z.infer<typeof RoleDefinitionSchema>
 ```
 
-`RoleDefinition` is exported with the *config-side* TS type, not the Zod-inferred one. The two are *almost* the same but their `aliases` differs (`z.array(...).default([])` infers `string[]` after default; the config one is `readonly string[] | undefined`). Subtle drift.
+`RoleDefinition` is exported with the _config-side_ TS type, not the Zod-inferred one. The two are _almost_ the same but their `aliases` differs (`z.array(...).default([])` infers `string[]` after default; the config one is `readonly string[] | undefined`). Subtle drift.
 
 **Fix:**
+
 ```ts
 export type RoleDefinition = z.infer<typeof RoleDefinitionSchema>;
 ```
@@ -558,7 +589,7 @@ If anything in `config/role-constants.ts` depends on the looser shape, fix that 
 
 **File:** `/Users/darkomijic/dev-projects/architect/packages/architect-core/src/extractor/shape-extractor.ts` (lines 629-678)
 
-`discoverTaggedShapes` runs `findDeclarations` on the AST (line 650), then for each declaration runs `extractPrecedingJsDoc` (line 657) which iterates the *full comment list* per declaration. For a 600-line file with 30 declarations and 50 comments, that's 1,500 comment iterations. A sorted index over comment-end lines (already implemented in `prepareJsDocComments`/`findCommentEndingAtLine` for the property-doc path) would make this O(n log n) instead of O(n²).
+`discoverTaggedShapes` runs `findDeclarations` on the AST (line 650), then for each declaration runs `extractPrecedingJsDoc` (line 657) which iterates the _full comment list_ per declaration. For a 600-line file with 30 declarations and 50 comments, that's 1,500 comment iterations. A sorted index over comment-end lines (already implemented in `prepareJsDocComments`/`findCommentEndingAtLine` for the property-doc path) would make this O(n log n) instead of O(n²).
 
 **Fix:** build `prepareJsDocComments(comments)` once outside the loop, then binary-search per declaration. Same pattern used at lines 421-462 of the same file.
 
@@ -629,7 +660,7 @@ shapes.push(
 );
 ```
 
-`extractShape` is annotated to return a fresh `ExtractedShape`, but inside `discoverTaggedShapes` (line 670), `{ ...shape, group: tagResult.group, ...(includeValues !== undefined && { includes: includeValues }) }` is *re-creating* the shape just to add two fields. This is fine but minor: the `extractShape` could accept an optional `{ group?, includes? }` instead.
+`extractShape` is annotated to return a fresh `ExtractedShape`, but inside `discoverTaggedShapes` (line 670), `{ ...shape, group: tagResult.group, ...(includeValues !== undefined && { includes: includeValues }) }` is _re-creating_ the shape just to add two fields. This is fine but minor: the `extractShape` could accept an optional `{ group?, includes? }` instead.
 
 ### L9. `Result.unwrap` JSON.stringifies non-Error errors
 
@@ -675,7 +706,9 @@ These are repeated micro-patterns visible across the codebase. They are individu
 2. **`...(x !== undefined && { x })` spread pattern.** This is used everywhere (`gherkin-extractor.ts:225-294`, `doc-extractor.ts:265-291`, `factory.ts:33-50`, …) and is the right thing to do under `exactOptionalPropertyTypes`. No fix; just observe that it makes object literals very long. Consider a `omitUndefined()` helper:
 
    ```ts
-   function omitUndefined<T extends object>(obj: T): { [K in keyof T]-?: Exclude<T[K], undefined> } {
+   function omitUndefined<T extends object>(
+     obj: T,
+   ): { [K in keyof T]-?: Exclude<T[K], undefined> } {
      return Object.fromEntries(Object.entries(obj).filter(([, v]) => v !== undefined)) as any;
    }
    ```
@@ -690,7 +723,7 @@ These are repeated micro-patterns visible across the codebase. They are individu
 
 To balance the above, several patterns in `architect-core` are exemplary:
 
-- **`parseAtBoundary` and `BoundaryParseError`** (`src/validation/boundary.ts`) are exactly the right shape for "parse once at the trust boundary." The doctrine is correctly *implemented* here — what's needed is to make every call site use it.
+- **`parseAtBoundary` and `BoundaryParseError`** (`src/validation/boundary.ts`) are exactly the right shape for "parse once at the trust boundary." The doctrine is correctly _implemented_ here — what's needed is to make every call site use it.
 - **The `Result<T, E>` monad** (`src/types/result.ts`) and the discriminated `DocError` union (`src/types/errors.ts`) are clean, exhaustive, well-documented.
 - **The FSM transition table** (`src/validation/fsm/transitions.ts`) is small, readable, and produces good error messages.
 - **No suppressions.** Zero `@ts-ignore`, `@ts-expect-error`, or `eslint-disable` comments in `src/`. Zero `TODO`/`FIXME`/`HACK` markers. That's discipline.
