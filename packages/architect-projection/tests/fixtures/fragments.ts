@@ -457,7 +457,7 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
       },
     ],
     relatedDecisions: ['ADR-003', 'ADR-005'],
-    affectedPatterns: ['PerspectiveAwareProjections', 'McpOutputSchemaValidation'],
+    affectedPatterns: ['ProjectionFragmentContracts', 'McpOutputSchemaValidation'],
   },
   DecisionCatalog: {
     kind: 'DecisionCatalog',
@@ -488,7 +488,7 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
           },
         ],
         relatedDecisions: ['ADR-003'],
-        affectedPatterns: ['PerspectiveAwareProjections'],
+        affectedPatterns: ['ProjectionFragmentContracts'],
       },
     ],
   },

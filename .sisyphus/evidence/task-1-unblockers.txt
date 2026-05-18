@@ -1,5 +1,13 @@
 # Task 1 — Cluster 1 unblockers evidence
 
+## Verification repair scope
+- Fixed leftover stale references in `packages/architect-projection/tests/fixtures/fragments.ts`:
+  - `affectedPatterns: ['PerspectiveAwareProjections', 'McpOutputSchemaValidation']` -> `['ProjectionFragmentContracts', 'McpOutputSchemaValidation']`
+  - `affectedPatterns: ['PerspectiveAwareProjections']` -> `['ProjectionFragmentContracts']`
+- Fixed stale current-tree claim in `docs/reverse-engineering/decision-rationale.md`:
+  - removed the false statement that `.github/workflows/` is absent
+  - replaced it with the current-tree truth that `ci.yml` and `publish.yml` exist and that the real issue is doc drift
+
 ## Commands run
 - pnpm --filter @libar-dev/architect-projection test
 - pnpm build
@@ -25,13 +33,9 @@
 6. dogfoodFilesReachableFromPublicExports (count: 0)
 7. handwrittenInterfacesShadowingZodInfer (count: 0)
 
-## Cluster 1 file updates
+## Files changed in this repair
 - docs/reverse-engineering/decision-rationale.md
-- packages/architect-projection/tests/features/renderers/render-ui.steps.ts
 - packages/architect-projection/tests/fixtures/fragments.ts
 - .sisyphus/notepads/cleanup-root-cause-campaign/learnings.md
-- .sisyphus/notepads/cleanup-root-cause-campaign/issues.md
-
-## Notes
-- Current-tree verification confirmed the kernel substrate already existed: root audit script, CI workflows, FSM/StatusValueSchema export bridges, no `./roles` export, and the previously-dead `cli-schema.ts` / `architect-cli/src/index.ts` surfaces were already absent.
-- This task cleaned the remaining stale `PerspectiveAwareProjections` / `EnforcementConfiguration` references in projection fixtures and reverse-engineering docs by retargeting them to current execution-context patterns and ADR-007/PDR-005 reality.
+- .sisyphus/evidence/task-1-unblockers.txt
+- .sisyphus/evidence/task-1-unblockers-no-bc.txt

@@ -1,15 +1,18 @@
 # Task 1 — No-BC verification
 
 ## Commands and checks
-- lsp_diagnostics on all touched files: PASS (0 diagnostics)
-- GIT_MASTER=1 git diff --check -- <cluster files>: PASS
-- grep for `@deprecated|kept for compat|eslint-disable|@ts-ignore|@ts-expect-error` in touched projection test files: no matches
-- inspected patch via `GIT_MASTER=1 git diff --unified=0 -- <cluster files>`
+- lsp_diagnostics on touched files: PASS (0 diagnostics)
+- pnpm --filter @libar-dev/architect-projection test: PASS
+- pnpm build: PASS
+- pnpm lint: PASS
+- pnpm typecheck: PASS
+- pnpm test: PASS
+- pnpm audit:subtractive: PASS
 
-## Findings
-- No compatibility shims, wrapper aliases, suppression comments, or deprecation markers were added in the Cluster 1 diff.
-- The only `@deprecated` grep hit in `docs/reverse-engineering/decision-rationale.md` is an existing doctrine table entry explaining the policy; it was not introduced by this change.
-- No whitespace or merge-marker issues exist in the Cluster 1 patch.
+## Repair-specific findings
+- No compatibility shims, wrapper aliases, suppression comments, or deprecation markers were added in the repair.
+- The stale `PerspectiveAwareProjections` survivors in the touched fixture were replaced with the current fragment-contract owner `ProjectionFragmentContracts`.
+- The stale workflow-absence claim in `decision-rationale.md` was corrected to the live repo truth instead of being left as historical current-state prose.
 
 ## Scope guard
-- `AGENTS.md` is independently modified in the worktree and has a pre-existing trailing-whitespace diff. It is outside Cluster 1 scope and is excluded from the commit.
+- Unrelated `AGENTS.md` worktree changes remain outside this Cluster 1 repair and are excluded from the commit.

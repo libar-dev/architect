@@ -56,3 +56,8 @@
 - Current-tree verification showed the Cluster 1 kernel substrate was already present: root `audit:subtractive`, both GitHub workflows, the FSM/`StatusValueSchema` bridges, removal of `./roles`, and deletion of `packages/architect-core/src/config/cli-schema.ts` plus `packages/architect-cli/src/index.ts`.
 - `pnpm audit:subtractive` already runs from the workspace root and emits all seven required rule families; Cluster 1 work only needed to preserve that scaffold, not reinvent it.
 - The remaining live Cluster 1 residue was stale `PerspectiveAwareProjections` / `EnforcementConfiguration` references in projection fixtures and reverse-engineering docs, so those were retargeted to current execution-context patterns (`SessionContextProjection`, `ScopeReadinessProjection`, `HandoffProjection`, `FileReadingListProjection`) and the real ADR-007/PDR-005 state.
+
+
+## 2026-05-18 — Cluster 1 verification repair
+- The projection fixture still had two `affectedPatterns` survivors for `PerspectiveAwareProjections` inside `DecisionRecord`/`DecisionCatalog`; the clean replacement at that ADR-006 fixture site is `ProjectionFragmentContracts`, which matches the current fragment-contract seam instead of the deleted perspective cluster.
+- `docs/reverse-engineering/decision-rationale.md` also carried a stale infrastructure claim about missing GitHub workflows; the current-tree truth is that `.github/workflows/ci.yml` and `publish.yml` exist, so the durable takeaway is reverse-engineering docs can drift behind the live repository.
