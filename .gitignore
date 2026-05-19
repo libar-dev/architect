@@ -12,9 +12,6 @@ build/
 coverage/
 .generated-docs-tmp/
 
-# Generated docs (dogfood doc-gen output)
-docs-live/
-
 # Editor/OS
 .DS_Store
 .vscode/

@@ -7,73 +7,87 @@
             }
         ],
         "enable": [
-            "architect-base"
+            "architect-base",
+            "architect-data-api"
         ]
     },
     "agents": {
         "build": {
             "skills": [
-                "architect-base"
+                "architect-base",
+                "architect-data-api"
             ]
         },
         "hephaestus": {
             "skills": [
-                "architect-base"
+                "architect-base",
+                "architect-data-api"
             ]
         },
         "oracle": {
             "skills": [
-                "architect-base"
+                "architect-base",
+                "architect-data-api"
             ]
         },
         "librarian": {
             "skills": [
-                "architect-base"
+                "architect-base",
+                "architect-data-api"
             ]
         },
         "explore": {
             "skills": [
-                "architect-base"
+                "architect-base",
+                "architect-data-api"
             ]
         },
         "multimodal-looker": {
             "skills": [
-                "architect-base"
+                "architect-base",
+                "architect-data-api"
             ]
         },
         "atlas": {
             "skills": [
-                "architect-base"
+                "architect-base",
+                "architect-data-api"
             ]
         },
         "prometheus": {
             "skills": [
-                "architect-base"
+                "architect-base",
+                "architect-data-api"
             ]
         },
         "sisyphus": {
             "skills": [
-                "architect-base"
+                "architect-base",
+                "architect-data-api"
             ]
         },
         "sisyphus-junior": {
             "skills": [
-                "architect-base"
+                "architect-base",
+                "architect-data-api"
             ]
         },
         "metis": {
             "skills": [
-                "architect-base"
+                "architect-base",
+                "architect-data-api"
             ]
         },
         "momus": {
             "skills": [
-                "architect-base"
+                "architect-base",
+                "architect-data-api"
             ]
         },
         "plan": {
             "skills": [
-                "architect-base"
+                "architect-base",
+                "architect-data-api"
             ]
         }
     },

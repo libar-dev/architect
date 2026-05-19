@@ -1,0 +1,307 @@
+# Changelog
+
+**Purpose:** Project changelog in Keep a Changelog format
+
+---
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
+
+## [Unreleased]
+
+### Added
+
+- **StatusMaturityExtraction spec**: architect/specs/status-maturity-extraction.feature
+- **UnifiedRoleSystem spec**: architect/specs/unified-role-system.feature
+- **ProcessGuardPatternGraphMigration spec**: architect/specs/process-guard-patterngraph-migration.feature
+- **ValidatePatternsPipelineConsolidation spec**: architect/specs/validate-patterns-pipeline-consolidation.feature
+- **McpOutputSchemaValidation spec**: architect/specs/mcp-output-schema-validation.feature
+- ADR007CoordinatedTaxonomyRedesign
+- AnnotationCoverage
+- ArchitectPublicContract
+- ArchitectureComparison
+- ArchitectureDiagram
+- ArchitectureInspection
+- ArchitectureNeighborhood
+- AstParser
+- BoundedContextFragmentContract
+- BusinessRule
+- BusinessRuleReference
+- BusinessRuleSet
+- CanonicalValuesSync
+- ChildAlpha
+- ChildBeta
+- CodecUtils
+- CodecUtilsValidation
+- CompactTextRendererTests
+- ConfigLoader
+- CrossPackageEdgeClassification
+- DecisionCatalog
+- DecisionRecord
+- DefineConfig
+- Deliverable
+- DeliverableManifest
+- DeliveryReportingFragmentContracts
+- DeliveryReportingSupporting
+- DependencyEdge
+- DependencyEdgeSet
+- DependencyTree
+- DeriveProcessState
+- DetectChanges
+- DocExtractor
+- DocumentationCommandParityBoundaryTests
+- DocumentationCompositionSupporting
+- DualSourceExtractor
+- EmptyEpic
+- ExecutionContextSupporting
+- ExtractionDiagnostics
+- FileReadingList
+- FSMStates
+- FSMTransitions
+- FSMValidator
+- GherkinAstParser
+- GherkinExternalRelationshipTagPropagation
+- GherkinExtractor
+- GherkinScanner
+- GitBranchDiff
+- GitHelpers
+- GitModule
+- GitNameStatusParser
+- GovernanceSupporting
+- GraphInventory
+- HandoffRecord
+- LayerInference
+- LintProcessCLI
+- LoadPreambleParser
+- MCPRuntimeHardeningExecutableTests
+- MCPServerLifecycleExecutableTests
+- MCPToolInputValidationExecutableTests
+- MCPToolRegistryBoundaryTests
+- MCPToolRegistryIntegrationTests
+- OpenQuestionListProjection
+- OpenQuestionListProjectionExecutableTests
+- OperationalInsightsSupporting
+- OrphanPatternList
+- OverviewDigest
+- PackageResolver
+- PackageResolverExecutableTests
+- ParentEpic
+- PatternBundleProjection
+- PatternBundleProjectionExecutableTests
+- PatternCatalog
+- PatternClassification
+- PatternDetail
+- PatternGraph
+- PatternGraphApi
+- PatternGraphApiReverseLookup
+- PatternGraphCLI
+- PatternGraphCliCache
+- PatternGraphCliDryRun
+- PatternGraphCliMetadata
+- PatternGraphCliRepl
+- PatternHelpers
+- PatternReferenceValidation
+- PatternRelationsFragmentContracts
+- PatternRelationsSupporting
+- PatternScanner
+- PatternSummary
+- PhaseProgress
+- PrChangeReview
+- ProcessGuardDecider
+- ProcessGuardLinter
+- ProcessGuardRulesExecutableTests
+- ProcessGuardTypes
+- ProjectConfigSnapshot
+- ProjectionFragmentContracts
+- ProjectionFragmentSchema
+- ReleaseNotesDigest
+- ReleaseVNEXT
+- RequirementDigest
+- RoadmapTimeline
+- RoleProfile
+- RoleProfileCollection
+- ScopeReadinessCheck
+- ScopeReadinessReport
+- SessionContextBundle
+- SessionStateReader
+- ShapeExtractor
+- SourceInventoryDigest
+- SourceInventoryEntry
+- StatusDistribution
+- StubTaxonomyTagTests
+- TagRegistrySchemasValidation
+- TagUsageEntry
+- TagUsageMatrix
+- TaxonomyDigest
+- TraceabilityMatrix
+- ValidationRuleDigest
+- ValueFormatCanonicalValuesDispatch
+- WorkflowConfigSchemasValidation
+
+## [Earlier] - 2026-01-07
+
+### Added
+
+- **Decision spec**: architect/decisions/adr-001
+- **Migrate executable spec product-area tags**: tests/features/\*\*/\*.feature
+- **Migrate tier 1 spec product-area tags**: architect/specs/\*.feature
+- **Fix adr-category on existing decisions**: architect/decisions/\*.feature
+- **Policy definition in CLAUDE.md**: CLAUDE.md
+- **Decision spec**: architect/decisions/adr-003
+- **Update CLAUDE.md annotation ownership**: CLAUDE.md
+- **Update monorepo source-annotations.md**: monorepo \_claude-md/
+- **Reframe tag-duplication anti-pattern**: src/validation/anti-patterns.ts
+- **RenderableDocument schema**: src/renderable/renderable-document.ts
+- **Section block types \(heading, table, paragraph, code, list\)**: src/renderable/renderable-document.ts
+- **Markdown renderer**: src/renderable/markdown-renderer.ts
+- **PatternCodec \(pattern detail pages\)**: src/renderable/codecs/pattern.ts
+- **RoadmapCodec \(phase-grouped roadmap\)**: src/renderable/codecs/roadmap.ts
+- **ReferenceCodec \(composite reference docs\)**: src/renderable/codecs/reference.ts
+- **CompositeCodec \(codec composition\)**: src/renderable/codecs/composite.ts
+- **ADR codec \(decision records\)**: src/renderable/codecs/adr.ts
+- **Decision spec**: architect/decisions/adr-008
+- **Decision spec**: architect/decisions/adr-009-projection-trust-boundary.feature
+- **Executable test feature**: packages/architect-projection/tests/features/projections/pattern-relations/architecture-neighborhood.feature
+- **Executable test feature**: packages/architect-projection/tests/features/projections/governance/business-rules.feature
+- **Per-subcommand help contract**: packages/architect-cli/src/cli/pattern-graph-cli.ts
+- **Public command and flag inventory**: packages/architect/tests/features/cli/data-api-help.feature
+- **Structured JSON format compatibility**: packages/architect/tests/steps/cli/data-api-help.steps.ts
+- **Output modifier pipeline**: packages/architect-core/src/read-api/output-pipeline.ts
+- **Output modifier CLI behavior**: packages/architect/tests/features/api/output-shaping/output-pipeline.feature
+- **Output shaping step coverage**: packages/architect/tests/steps/api/output-shaping/output-pipeline.steps.ts
+- **Executable test feature**: packages/architect-projection/tests/features/projections/governance/decision-records.feature
+- **Executable test feature**: packages/architect-projection/tests/features/projections/delivery-reporting/phase-progress-status.feature
+- **Executable test feature**: packages/architect-projection/tests/features/projections/delivery-reporting/roadmap-timeline.feature
+- **Executable test feature**: packages/architect-projection/tests/features/projections/pattern-relations/dependency-edges.feature
+- **Executable test feature**: packages/architect-projection/tests/features/projections/pattern-relations/dependency-tree.feature
+- **Executable test feature**: packages/architect-projection/tests/features/projections/documentation-composition/config-documentation.feature
+- **Executable test feature**: packages/architect-projection/tests/features/projections/execution-context/context-session.feature
+- **Executable test feature**: packages/architect-projection/tests/features/projections/governance/validation-taxonomy.feature
+- **Executable test feature**: packages/architect-projection/tests/features/projections/operational-insights/reporting.feature
+- **Executable test feature**: packages/architect-projection/tests/features/projections/pattern-relations/pattern-detail.feature
+- **PatternGraph CLI core routing**: packages/architect-cli/src/cli/pattern-graph-cli.ts
+- **CLI core behavior specification**: packages/architect/tests/features/cli/pattern-graph-cli-core.feature
+- **CLI core step coverage**: packages/architect/tests/steps/cli/pattern-graph-cli-core.steps.ts
+- **Executable test feature**: packages/architect-projection/tests/features/projections/pattern-relations/pattern-summary.feature
+- **Executable test feature**: packages/architect-projection/tests/features/projections/delivery-reporting/release-notes.feature
+- **Executable test feature**: packages/architect-projection/tests/features/projections/delivery-reporting/traceability-matrix.feature
+- **PatternGraph-backed validation read model**: packages/architect-guard/src/cli/validate-patterns.ts
+- **DoD validation integration**: packages/architect-guard/src/validation/dod-validator.ts
+- **validate-patterns CLI behavior**: packages/architect/tests/features/cli/validate-patterns.feature
+- ADR001TaxonomyCanonicalValues
+- ADR002GherkinOnlyTesting
+- ADR003SourceFirstPatternArchitecture
+- ADR005CodecBasedMarkdownRendering
+- ADR006SingleReadModelArchitecture
+- ADR008StepDefinitionStubsConvention
+- ADR009ProjectionTrustBoundary
+- AnnotationCoverageProjection
+- AntiPatternDetector
+- ArchitectureComparisonProjection
+- ArchitectureDiagramProjection
+- ArchitectureNavigationProjectionExecutableTests
+- ArchitectureNeighborhoodProjection
+- BoundedContextProjection
+- BuildPipeline
+- BusinessRulesProjection
+- BusinessRulesProjectionExecutableTests
+- CLIErrorHandler
+- CLIRuntimePaths
+- CLIVersionHelper
+- CompactTextRenderer
+- ConfigBasedWorkflowDefinition
+- ConfigResolution
+- ConfigurationAPI
+- DataAPICLIErgonomics
+- DataAPIOutputShaping
+- DecisionCatalogProjection
+- DecisionCatalogProjectionExecutableTests
+- DefineConfigExecutableTests
+- DeliverableProjection
+- DeliveryProgressProjectionExecutableTests
+- DeliveryReportingProjectionSupport
+- DeliveryReportingProjectionSupportExecutableTests
+- DependencyEdgeProjection
+- DependencyEdgeProjectionExecutableTests
+- DependencyTreeProjection
+- DependencyTreeProjectionExecutableTests
+- DocStringMediaType
+- DocumentationBundle
+- DocumentationCompositionProjectionExecutableTests
+- DocumentationCompositionProjectionSupport
+- DoDValidationTypes
+- DoDValidator
+- DualSourceMergeIntegration
+- ErrorFactories
+- ErrorFactoryTypes
+- ExecutionContextProjectionExecutableTests
+- ExecutionContextProjectionSupport
+- FileDiscovery
+- FileReadingListProjection
+- FragmentRendererDispatch
+- GenerateDocsCli
+- GherkinRulesSupport
+- GovernanceProjectionSupport
+- GovernanceValidationTaxonomyProjectionExecutableTests
+- HandoffProjection
+- JsonRenderer
+- LintEngine
+- LintModule
+- LintPatternsCLI
+- LintPatternsCliBehavior
+- LintProcessCliBehavior
+- LintRules
+- MarkdownRenderer
+- MCPFileWatcher
+- MCPPipelineSession
+- MCPServer
+- MCPServerBin
+- MCPToolRegistry
+- OperationalInsightsProjectionExecutableTests
+- OperationalInsightsProjectionSupport
+- OrphanPatternListProjection
+- OverviewProjection
+- PatternCatalogProjection
+- PatternDetailProjection
+- PatternDetailProjectionExecutableTests
+- PatternGraphAPICLI
+- PatternGraphCliArchHealth
+- PatternGraphCliOutputModifiers
+- PatternGraphCliRulesSubcommand
+- PatternGraphCliSubcommands
+- PatternRelationsProjectionSupport
+- PatternSummaryCatalogProjectionExecutableTests
+- PatternSummaryProjection
+- PDR005ProcessGuardFSM
+- PhaseProgressProjection
+- PrChangeReviewProjection
+- ProjectConfigLoader
+- ProjectConfigProjection
+- ReleaseNotesProjection
+- ReleaseNotesProjectionExecutableTests
+- ReleaseV100
+- RequirementDigestProjection
+- RequirementExecutableDigestProjection
+- RequirementSpecsDigestProjection
+- ResultMonad
+- ResultMonadTypes
+- RoadmapTimelineProjection
+- RoleProfileProjection
+- ScannerCore
+- ScopeReadinessProjection
+- SessionContextProjection
+- ShapeExtraction
+- SourceInventoryProjection
+- SourceMerging
+- StatusDistributionProjection
+- TagUsageProjection
+- TaxonomyDigestProjection
+- TraceabilityMatrixProjection
+- TraceabilityMatrixProjectionExecutableTests
+- TypeScriptTaxonomyImplementation
+- UiRenderer
+- ValidatePatternsCLI
+- ValidationModule
+- ValidationRuleDigestProjection
+- ValidatorReadModelConsolidation

@@ -1,0 +1,181 @@
+{
+  "version": 1,
+  "updatedAt": "2026-05-18T18:09:52.745Z",
+  "generators": {
+    "patterns": {
+      "generatorName": "patterns",
+      "kind": "projection",
+      "rootPath": "PATTERNS.md",
+      "entries": [
+        {
+          "path": "PATTERNS.md",
+          "role": "root",
+          "audience": "published",
+          "tracking": "commit"
+        }
+      ],
+      "documentType": "patterns"
+    },
+    "architecture": {
+      "generatorName": "architecture",
+      "kind": "projection",
+      "rootPath": "ARCHITECTURE.md",
+      "entries": [
+        {
+          "path": "ARCHITECTURE.md",
+          "role": "root",
+          "audience": "published",
+          "tracking": "commit"
+        }
+      ],
+      "documentType": "architecture"
+    },
+    "roadmap": {
+      "generatorName": "roadmap",
+      "kind": "projection",
+      "rootPath": "ROADMAP.md",
+      "entries": [
+        {
+          "path": "ROADMAP.md",
+          "role": "root",
+          "audience": "published",
+          "tracking": "commit"
+        }
+      ],
+      "documentType": "roadmap"
+    },
+    "changelog": {
+      "generatorName": "changelog",
+      "kind": "projection",
+      "rootPath": "CHANGELOG.md",
+      "entries": [
+        {
+          "path": "CHANGELOG.md",
+          "role": "root",
+          "audience": "published",
+          "tracking": "commit"
+        }
+      ],
+      "documentType": "changelog"
+    },
+    "requirements-executable": {
+      "generatorName": "requirements-executable",
+      "kind": "projection",
+      "rootPath": "REQUIREMENTS-EXECUTABLE.md",
+      "entries": [
+        {
+          "path": "REQUIREMENTS-EXECUTABLE.md",
+          "role": "root",
+          "audience": "published",
+          "tracking": "commit"
+        }
+      ],
+      "documentType": "requirements-executable"
+    },
+    "requirements-specs": {
+      "generatorName": "requirements-specs",
+      "kind": "projection",
+      "rootPath": "REQUIREMENTS-SPECS.md",
+      "entries": [
+        {
+          "path": "REQUIREMENTS-SPECS.md",
+          "role": "root",
+          "audience": "published",
+          "tracking": "commit"
+        }
+      ],
+      "documentType": "requirements-specs"
+    },
+    "decisions": {
+      "generatorName": "decisions",
+      "kind": "projection",
+      "rootPath": "DECISIONS.md",
+      "entries": [
+        {
+          "path": "DECISIONS.md",
+          "role": "root",
+          "audience": "published",
+          "tracking": "commit"
+        },
+        {
+          "path": "decisions/adr-001.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "DECISIONS.md"
+        },
+        {
+          "path": "decisions/adr-002.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "DECISIONS.md"
+        },
+        {
+          "path": "decisions/adr-003.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "DECISIONS.md"
+        },
+        {
+          "path": "decisions/adr-005.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "DECISIONS.md"
+        },
+        {
+          "path": "decisions/adr-006.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "DECISIONS.md"
+        },
+        {
+          "path": "decisions/adr-007.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "DECISIONS.md"
+        },
+        {
+          "path": "decisions/adr-008.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "DECISIONS.md"
+        },
+        {
+          "path": "decisions/adr-009.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "DECISIONS.md"
+        },
+        {
+          "path": "decisions/pdr-005.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "DECISIONS.md"
+        }
+      ],
+      "documentType": "decisions"
+    },
+    "taxonomy": {
+      "generatorName": "taxonomy",
+      "kind": "projection",
+      "rootPath": "TAXONOMY.md",
+      "entries": [
+        {
+          "path": "TAXONOMY.md",
+          "role": "root",
+          "audience": "published",
+          "tracking": "commit"
+        }
+      ],
+      "documentType": "taxonomy"
+    }
+  }
+}

@@ -1,10 +1,7 @@
-Every session in this Architect repository runs against a shared operational baseline. Before any architect-scoped `Read` / `Glob` / `Grep`, before any `pnpm architect:query` or `architect_*` MCP call, and before any work on `@architect-*` annotated code or `architect/specs/`, the **`architect-base`** skill is the canonical context.
+This is the Architect repository. Two skills carry the operational substance, and both must be loaded for every session.
 
-Discipline:
+**`architect-base`** — the vocabulary of the repo. PatternGraph + tag taxonomy, the four authored detail tiers plus executable + maintenance levels, FSM lifecycle, value-transfer / spec-deletion doctrine, key ADRs, validation layers. The conceptual model that makes every other surface in this repo legible.
 
-- The Architect Data API (CLI: `pnpm architect:query`, MCP: `architect_*`) is the canonical source of pattern, spec, and FSM state. File scanning is not.
-- Default to the CLI. Reach for MCP only when bursting ≥5 verbs in close sequence.
-- When a pattern name is in scope, `pnpm architect:query bundle <Pattern> --mode <plan|design|implement|review> --format json` is the default pre-flight.
-- When you load the `architect-base` skill, briefly state that the architect-base context is loaded so the user can confirm activation. This is a load-verification convention while the OmO skill-loading bug is being diagnosed.
+**`architect-data-api`** — the canonical query surface for the PatternGraph. `pnpm architect:query <verb>` (CLI) and `architect_*` MCP twins give deterministic, structured answers to "what is the state of X?", "what does X depend on?", "is this transition legal?". File scanning to learn about a pattern is a smell — this API is faster, structurally typed, and never stale.
 
-If `architect-base` is not present in your skill set, treat that as a load failure — surface it to the user before continuing.
+When you load either skill, briefly say so in your reply. Load verification is a temporary convention while the OmO skill-loading bug is diagnosed. If either skill is missing from your skill set, treat that as a load failure and surface it before continuing.
