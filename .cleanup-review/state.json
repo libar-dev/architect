@@ -1,0 +1,51 @@
+{
+  "target": "Five-package suite review of the @libar-dev/architect-* family — sequential per-package runs with root-cause synthesis + cross-package suite final report.",
+  "status": "complete",
+  "flags": {
+    "strict_mode": false,
+    "scope_override": "per-package subdirectories under .cleanup-review/<pkg>/"
+  },
+  "packages_order": [
+    "architect-core",
+    "architect-projection",
+    "architect-guard",
+    "architect-cli",
+    "architect-mcp"
+  ],
+  "current_step": "complete",
+  "current_phase": "suite-final",
+  "completed_steps": [
+    "00-scope.md",
+    "architect-core/*",
+    "architect-projection/*",
+    "architect-guard/*",
+    "architect-cli/*",
+    "architect-mcp/*",
+    "00-suite-final-report.md"
+  ],
+  "files_created": [
+    "00-scope.md",
+    "00-suite-final-report.md",
+    "state.json",
+    "architect-core/{00-scope.md,01a-code-quality.md,01b-architecture.md,01c-simplification.md,01-cleanup-findings.md,02-final-report.md,state.json}",
+    "architect-projection/{00-scope.md,01a-code-quality.md,01b-architecture.md,01c-simplification.md,01-cleanup-findings.md,02-final-report.md,state.json}",
+    "architect-guard/{00-scope.md,01a-code-quality.md,01b-architecture.md,01c-simplification.md,01-cleanup-findings.md,02-final-report.md,state.json}",
+    "architect-cli/{00-scope.md,01a-code-quality.md,01b-architecture.md,01c-simplification.md,01-cleanup-findings.md,02-final-report.md,state.json}",
+    "architect-mcp/{00-scope.md,01a-code-quality.md,01b-architecture.md,01c-simplification.md,01-cleanup-findings.md,02-final-report.md,state.json}"
+  ],
+  "started_at": "2026-05-19T00:00:00Z",
+  "last_updated": "2026-05-19T00:00:00Z",
+  "summary": {
+    "total_quality_arch_findings": 294,
+    "critical": 24,
+    "high": 60,
+    "medium": 72,
+    "low": 50,
+    "simplification": 88,
+    "simplification_high": 32,
+    "simplification_medium": 45,
+    "simplification_low": 36,
+    "cross_package_root_causes": 8,
+    "package_local_load_bearing": 5
+  }
+}
