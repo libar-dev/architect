@@ -116,7 +116,6 @@ These records carry _decisions_ and the rationale for them. They do not carry op
 - **ADR-006** — Single Read Model
 - **ADR-007** — Coordinated Taxonomy Redesign
 - **ADR-009** — Projection Trust Boundary
-- **PDR-001** — Session Workflow Commands
 
 Decisions are amended via a new ADR, never by editing the old one.
 
