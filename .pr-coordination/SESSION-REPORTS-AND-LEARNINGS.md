@@ -585,6 +585,20 @@ typecheck (pkg+dogfood), lint, format:check, validate:all, perf 3/3, audit:subtr
    (§3/§7). Excluding ADRs from the _view_ is this session's scope; cleaning the _records_ is deferred
    (amend via a new ADR, never edit durable records inline — PREAMBLE rule 4).
 
+**Codex stop-time fix (same session, commit `51111b0`).** The component-view filter's
+"show something rather than nothing" fallbacks **bypassed the test/decision exclusion when the
+input was entirely excludable**: `filterArchitecturallyInterestingPatterns` fell back to the
+unfiltered set when no production patterns remained, and `collectArchitectureNodes` fell back to
+`withFallback` when the filter emptied — so a decision-only (or test-only) component context
+re-rendered the excluded patterns. Fix: the test/decision exclusion is now **unconditional** (no
+fallback to the unfiltered set); graceful degradation is kept **only** for the classification filter
+(production-but-unclassified → show ungrouped); `collectArchitectureNodes` treats the component
+filter result as authoritative, including when empty → an empty component view. Regression scenario
+added (decision-only context renders no patterns). Mixed fixtures could not catch it — production
+patterns kept the set non-empty. Dogfood docs byte-identical (production patterns unaffected).
+**Lesson: a "never render nothing" fallback silently defeats a hard exclusion when the excluded set
+is the whole input — exclusion must be unconditional; only the softer filter degrades gracefully.**
+
 ### Rules for next session
 
 1. **Read-surface verbosity is a render-time parameter now.** To make another verb terse, add
