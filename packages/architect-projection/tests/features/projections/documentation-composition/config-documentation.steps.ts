@@ -806,6 +806,53 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
     },
   );
 
+  Rule('Per-group detail diagrams draw only forward dependency edges', ({ RuleScenario }) => {
+    RuleScenario(
+      'a detail diagram collapses co-directional edges and drops the reverse enablement',
+      ({ Given, When, Then, And }) => {
+        Given(
+          'a Documentation Composition architecture context with same-group dependency and enablement edges',
+          () => {
+            state!.context = createIntraGroupEdgeContext();
+          },
+        );
+
+        When('I project the component architecture diagram for the intra-group context', () => {
+          state!.architectureDiagrams['component'] = parseAndProjectArchitectureDiagram(
+            state!.context!,
+            { scope: 'component' },
+          );
+        });
+
+        // A single group yields no context map, so the lone detail diagram is section[0].
+        Then(
+          'the detail diagram should contain one forward dependency arrow between the pair',
+          () => {
+            const detail = state!.architectureDiagrams['component']!.root.sections[0];
+            const content = detail!.diagram.content;
+            const matches = content.match(/intradependant -->\|depends-on\| intradependency/gu);
+            expect(matches).toHaveLength(1);
+          },
+        );
+
+        And('the detail diagram should omit the dotted usage arrow', () => {
+          const detail = state!.architectureDiagrams['component']!.root.sections[0];
+          expect(detail!.diagram.content).not.toContain('-.->');
+        });
+
+        And('the detail diagram should omit the bold enablement arrow', () => {
+          const detail = state!.architectureDiagrams['component']!.root.sections[0];
+          expect(detail!.diagram.content).not.toContain('==>');
+        });
+
+        And('the detail diagram should omit the reverse arrow', () => {
+          const detail = state!.architectureDiagrams['component']!.root.sections[0];
+          expect(detail!.diagram.content).not.toContain('intradependency -->');
+        });
+      },
+    );
+  });
+
   Rule(
     'The component view shows production components, not test-feature patterns',
     ({ RuleScenario }) => {
@@ -1231,6 +1278,37 @@ function createCrossGroupEdgeContext(): ProjectionContext {
       // drop the latter.
       CrossGroupDependant: createRelationshipEntry({ uses: ['CrossGroupDependency'] }),
       CrossGroupDependency: createRelationshipEntry({ enables: ['CrossGroupDependant'] }),
+    },
+  });
+}
+
+function createIntraGroupEdgeContext(): ProjectionContext {
+  return createProjectionContext({
+    patterns: [
+      createPattern('IntraDependant', {
+        status: 'active',
+        role: 'service',
+        archContext: 'intra',
+        file: 'packages/architect-projection/src/projections/intra/a.ts',
+      }),
+      createPattern('IntraDependency', {
+        status: 'active',
+        role: 'service',
+        archContext: 'intra',
+        file: 'packages/architect-projection/src/projections/intra/b.ts',
+      }),
+    ],
+    relationshipIndex: {
+      // Same group (context `intra`). The dependant both depends-on and uses the
+      // dependency (co-directional forward edges from one `@architect-uses`), and
+      // the dependency enables the dependant (derived reverse). The detail
+      // diagram must collapse the forward pair to ONE solid arrow and drop the
+      // reverse enablement.
+      IntraDependant: createRelationshipEntry({
+        dependsOn: ['IntraDependency'],
+        uses: ['IntraDependency'],
+      }),
+      IntraDependency: createRelationshipEntry({ enables: ['IntraDependant'] }),
     },
   });
 }

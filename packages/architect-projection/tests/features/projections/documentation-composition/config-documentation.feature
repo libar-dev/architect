@@ -140,9 +140,10 @@ Feature: Documentation Composition projection bodies
     **Invariant:** The context map collapses each ordered group pair to one solid
     arrow and the legend reads a solid arrow as a dependency, so the map
     aggregates only forward structural edges (`depends-on` / `uses`, dependant →
-    dependency). Derived reverse edges (`enables`) and non-directional `see-also`
-    edges are excluded from the map (they remain in the per-group detail
-    diagrams).
+    dependency). Non-directional `see-also` edges are excluded from the map but
+    remain in the per-group detail diagrams; derived reverse `enables` edges are
+    excluded from the map and the per-group detail diagrams alike (see the
+    forward-only detail-diagram rule below).
 
     **Rationale:** Rendering a derived reverse `enables` edge as a forward arrow
     draws a back-arrow for a relationship the forward edge already captures,
@@ -158,6 +159,34 @@ Feature: Documentation Composition projection bodies
       When I project the component architecture diagram for the cross-group context
       Then the context map should contain the forward cross-group dependency arrow
       And the context map should omit the derived reverse enablement arrow
+
+  Rule: Per-group detail diagrams draw only forward dependency edges
+
+    **Invariant:** A per-group detail diagram collapses the `depends-on` and
+    `uses` edges between an ordered pair of same-group nodes to one solid forward
+    arrow, drops the derived reverse `enables` edge entirely, and keeps
+    `see-also` as a distinct dotted reference line. A genuine mutual dependency
+    survives as two arrows (one each direction).
+
+    **Rationale:** A single `@architect-uses` edge yields co-directional
+    `depends-on` and `uses` relationships, and `enables` is the derived inverse
+    of a forward edge already shown — so drawing all three turns each
+    relationship into three arrows (one of them a contradictory back-arrow) and a
+    small group into a hairball. Generalizes the context map's forward-only rule
+    to the detail diagrams. See DECISIONS D-19.
+
+    **Verified by:** projecting a single-group context whose two nodes carry a
+    forward `depends-on`/`uses` edge and an opposing derived `enables` edge, then
+    asserting the detail diagram has exactly one forward arrow and no bold/reverse
+    arrow.
+
+    Scenario: a detail diagram collapses co-directional edges and drops the reverse enablement
+      Given a Documentation Composition architecture context with same-group dependency and enablement edges
+      When I project the component architecture diagram for the intra-group context
+      Then the detail diagram should contain one forward dependency arrow between the pair
+      And the detail diagram should omit the dotted usage arrow
+      And the detail diagram should omit the bold enablement arrow
+      And the detail diagram should omit the reverse arrow
 
   Rule: The component view shows production components, not test-feature patterns
 

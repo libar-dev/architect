@@ -85,26 +85,12 @@ graph TD
   mcpserver["MCPServer<br/>(service)"]
   mcptoolregistry["MCPToolRegistry<br/>(service)"]
   mcpfilewatcher -->|depends-on| mcppipelinesession
-  mcpfilewatcher ==>|enables| mcppipelinesession
-  mcpfilewatcher -.->|uses| mcppipelinesession
-  mcpfilewatcher ==>|enables| mcpserver
   mcppipelinesession -->|depends-on| mcpfilewatcher
-  mcppipelinesession ==>|enables| mcpfilewatcher
-  mcppipelinesession -.->|uses| mcpfilewatcher
-  mcppipelinesession ==>|enables| mcpserver
   mcppipelinesession -->|depends-on| mcptoolregistry
-  mcppipelinesession ==>|enables| mcptoolregistry
-  mcppipelinesession -.->|uses| mcptoolregistry
   mcpserver -->|depends-on| mcpfilewatcher
-  mcpserver -.->|uses| mcpfilewatcher
   mcpserver -->|depends-on| mcppipelinesession
-  mcpserver -.->|uses| mcppipelinesession
   mcpserver -->|depends-on| mcptoolregistry
-  mcpserver -.->|uses| mcptoolregistry
   mcptoolregistry -->|depends-on| mcppipelinesession
-  mcptoolregistry ==>|enables| mcppipelinesession
-  mcptoolregistry -.->|uses| mcppipelinesession
-  mcptoolregistry ==>|enables| mcpserver
 ```
 
 ### Bounded context: cli \(6 patterns\)
@@ -117,15 +103,9 @@ graph TD
   lintpatternscli["LintPatternsCLI<br/>(service)"]
   mcpserverbin["MCPServerBin<br/>(utility)"]
   patterngraphcli["PatternGraphCLI<br/>(service)"]
-  cliruntimepaths ==>|enables| cliversionhelper
-  cliruntimepaths ==>|enables| patterngraphcli
   cliversionhelper -->|depends-on| cliruntimepaths
-  cliversionhelper -.->|uses| cliruntimepaths
-  cliversionhelper ==>|enables| patterngraphcli
   patterngraphcli -->|depends-on| cliruntimepaths
-  patterngraphcli -.->|uses| cliruntimepaths
   patterngraphcli -->|depends-on| cliversionhelper
-  patterngraphcli -.->|uses| cliversionhelper
 ```
 
 ### Bounded context: configuration \(4 patterns\)
@@ -180,18 +160,10 @@ graph TD
   scopereadinesscheck["ScopeReadinessCheck<br/>(contract)"]
   scopereadinessreport["ScopeReadinessReport<br/>(contract)"]
   sessioncontextbundle["SessionContextBundle<br/>(contract)"]
-  executioncontextsupporting ==>|enables| handoffrecord
-  executioncontextsupporting ==>|enables| scopereadinesscheck
-  executioncontextsupporting ==>|enables| scopereadinessreport
-  executioncontextsupporting ==>|enables| sessioncontextbundle
   handoffrecord -->|depends-on| executioncontextsupporting
-  handoffrecord -.->|uses| executioncontextsupporting
   scopereadinesscheck -->|depends-on| executioncontextsupporting
-  scopereadinesscheck -.->|uses| executioncontextsupporting
   scopereadinessreport -->|depends-on| executioncontextsupporting
-  scopereadinessreport -.->|uses| executioncontextsupporting
   sessioncontextbundle -->|depends-on| executioncontextsupporting
-  sessioncontextbundle -.->|uses| executioncontextsupporting
 ```
 
 ### Bounded context: extractor \(6 patterns\)
@@ -205,11 +177,7 @@ graph TD
   layerinference["LayerInference<br/>(service)"]
   shapeextractor["ShapeExtractor<br/>(service)"]
   docextractor -->|depends-on| shapeextractor
-  docextractor -.->|uses| shapeextractor
   gherkinextractor -->|depends-on| layerinference
-  gherkinextractor -.->|uses| layerinference
-  layerinference ==>|enables| gherkinextractor
-  shapeextractor ==>|enables| docextractor
 ```
 
 ### Bounded context: generator \(4 patterns\)
@@ -220,15 +188,9 @@ graph TD
   githelpers["GitHelpers<br/>(utility)"]
   gitmodule["GitModule<br/>(barrel)"]
   gitnamestatusparser["GitNameStatusParser<br/>(utility)"]
-  gitbranchdiff ==>|enables| gitmodule
   gitbranchdiff -->|depends-on| gitnamestatusparser
-  gitbranchdiff -.->|uses| gitnamestatusparser
-  githelpers ==>|enables| gitmodule
   gitmodule -->|depends-on| gitbranchdiff
-  gitmodule -.->|uses| gitbranchdiff
   gitmodule -->|depends-on| githelpers
-  gitmodule -.->|uses| githelpers
-  gitnamestatusparser ==>|enables| gitbranchdiff
 ```
 
 ### Bounded context: governance \(8 patterns\)
@@ -253,15 +215,9 @@ graph TD
   lintmodule["LintModule<br/>(barrel)"]
   lintrules["LintRules<br/>(service)"]
   processguarddecider["ProcessGuardDecider<br/>(decider)"]
-  lintengine ==>|enables| lintmodule
   lintengine -->|depends-on| lintrules
-  lintengine -.->|uses| lintrules
   lintmodule -->|depends-on| lintengine
-  lintmodule -.->|uses| lintengine
   lintmodule -->|depends-on| lintrules
-  lintmodule -.->|uses| lintrules
-  lintrules ==>|enables| lintengine
-  lintrules ==>|enables| lintmodule
 ```
 
 ### Bounded context: operational-insights \(10 patterns\)
@@ -279,11 +235,7 @@ graph TD
   tagusageentry["TagUsageEntry<br/>(contract)"]
   tagusagematrix["TagUsageMatrix<br/>(contract)"]
   sourceinventorydigest -->|depends-on| sourceinventoryentry
-  sourceinventorydigest -.->|uses| sourceinventoryentry
-  sourceinventoryentry ==>|enables| sourceinventorydigest
-  tagusageentry ==>|enables| tagusagematrix
   tagusagematrix -->|depends-on| tagusageentry
-  tagusagematrix -.->|uses| tagusageentry
 ```
 
 ### Bounded context: pattern-relations \(12 patterns\)
@@ -321,21 +273,11 @@ graph TD
   processguardlinter["ProcessGuardLinter<br/>(barrel)"]
   processguardtypes["ProcessGuardTypes<br/>(contract)"]
   sessionstatereader["SessionStateReader<br/>(service)"]
-  deriveprocessstate ==>|enables| detectchanges
-  deriveprocessstate ==>|enables| processguardlinter
   deriveprocessstate -->|depends-on| sessionstatereader
-  deriveprocessstate -.->|uses| sessionstatereader
   detectchanges -->|depends-on| deriveprocessstate
-  detectchanges -.->|uses| deriveprocessstate
-  detectchanges ==>|enables| processguardlinter
   lintprocesscli -->|depends-on| processguardlinter
-  lintprocesscli -.->|uses| processguardlinter
   processguardlinter -->|depends-on| deriveprocessstate
-  processguardlinter -.->|uses| deriveprocessstate
   processguardlinter -->|depends-on| detectchanges
-  processguardlinter -.->|uses| detectchanges
-  processguardlinter ==>|enables| lintprocesscli
-  sessionstatereader ==>|enables| deriveprocessstate
 ```
 
 ### Bounded context: projection \(43 patterns\)
@@ -386,116 +328,42 @@ graph TD
   traceabilitymatrixprojection["TraceabilityMatrixProjection<br/>(projection)"]
   validationruledigestprojection["ValidationRuleDigestProjection<br/>(projection)"]
   annotationcoverageprojection -->|depends-on| operationalinsightsprojectionsupport
-  annotationcoverageprojection -.->|uses| operationalinsightsprojectionsupport
   architecturecomparisonprojection -->|depends-on| patternrelationsprojectionsupport
-  architecturecomparisonprojection -.->|uses| patternrelationsprojectionsupport
   architecturediagramprojection -->|depends-on| documentationcompositionprojectionsupport
-  architecturediagramprojection -.->|uses| documentationcompositionprojectionsupport
   architectureneighborhoodprojection -->|depends-on| patternrelationsprojectionsupport
-  architectureneighborhoodprojection -.->|uses| patternrelationsprojectionsupport
   boundedcontextprojection -->|depends-on| patternrelationsprojectionsupport
-  boundedcontextprojection -.->|uses| patternrelationsprojectionsupport
   businessrulesprojection -->|depends-on| governanceprojectionsupport
-  businessrulesprojection -.->|uses| governanceprojectionsupport
   decisioncatalogprojection -->|depends-on| governanceprojectionsupport
-  decisioncatalogprojection -.->|uses| governanceprojectionsupport
   deliverableprojection -->|depends-on| executioncontextprojectionsupport
-  deliverableprojection -.->|uses| executioncontextprojectionsupport
-  deliveryreportingprojectionsupport ==>|enables| phaseprogressprojection
-  deliveryreportingprojectionsupport ==>|enables| releasenotesprojection
-  deliveryreportingprojectionsupport ==>|enables| roadmaptimelineprojection
-  deliveryreportingprojectionsupport ==>|enables| statusdistributionprojection
-  deliveryreportingprojectionsupport ==>|enables| traceabilitymatrixprojection
   dependencyedgeprojection -->|depends-on| patternrelationsprojectionsupport
-  dependencyedgeprojection -.->|uses| patternrelationsprojectionsupport
   dependencytreeprojection -->|depends-on| patternrelationsprojectionsupport
-  dependencytreeprojection -.->|uses| patternrelationsprojectionsupport
   documentationbundle -->|depends-on| documentationcompositionprojectionsupport
-  documentationbundle -.->|uses| documentationcompositionprojectionsupport
-  documentationcompositionprojectionsupport ==>|enables| architecturediagramprojection
-  documentationcompositionprojectionsupport ==>|enables| documentationbundle
-  documentationcompositionprojectionsupport ==>|enables| prchangereviewprojection
-  documentationcompositionprojectionsupport ==>|enables| projectconfigprojection
-  executioncontextprojectionsupport ==>|enables| deliverableprojection
-  executioncontextprojectionsupport ==>|enables| filereadinglistprojection
-  executioncontextprojectionsupport ==>|enables| handoffprojection
-  executioncontextprojectionsupport ==>|enables| scopereadinessprojection
-  executioncontextprojectionsupport ==>|enables| sessioncontextprojection
   filereadinglistprojection -->|depends-on| executioncontextprojectionsupport
-  filereadinglistprojection -.->|uses| executioncontextprojectionsupport
-  governanceprojectionsupport ==>|enables| businessrulesprojection
-  governanceprojectionsupport ==>|enables| decisioncatalogprojection
-  governanceprojectionsupport ==>|enables| taxonomydigestprojection
-  governanceprojectionsupport ==>|enables| validationruledigestprojection
   handoffprojection -->|depends-on| executioncontextprojectionsupport
-  handoffprojection -.->|uses| executioncontextprojectionsupport
   openquestionlistprojection -->|depends-on| patternrelationsprojectionsupport
-  openquestionlistprojection -.->|uses| patternrelationsprojectionsupport
-  operationalinsightsprojectionsupport ==>|enables| annotationcoverageprojection
-  operationalinsightsprojectionsupport ==>|enables| overviewprojection
-  operationalinsightsprojectionsupport ==>|enables| requirementdigestprojection
-  operationalinsightsprojectionsupport ==>|enables| requirementexecutabledigestprojection
-  operationalinsightsprojectionsupport ==>|enables| requirementspecsdigestprojection
-  operationalinsightsprojectionsupport ==>|enables| roleprofileprojection
-  operationalinsightsprojectionsupport ==>|enables| sourceinventoryprojection
-  operationalinsightsprojectionsupport ==>|enables| tagusageprojection
   orphanpatternlistprojection -->|depends-on| patternrelationsprojectionsupport
-  orphanpatternlistprojection -.->|uses| patternrelationsprojectionsupport
   overviewprojection -->|depends-on| operationalinsightsprojectionsupport
-  overviewprojection -.->|uses| operationalinsightsprojectionsupport
   patternbundleprojection -->|depends-on| patternrelationsprojectionsupport
-  patternbundleprojection -.->|uses| patternrelationsprojectionsupport
   patterncatalogprojection -->|depends-on| patternrelationsprojectionsupport
-  patterncatalogprojection -.->|uses| patternrelationsprojectionsupport
   patterndetailprojection -->|depends-on| patternrelationsprojectionsupport
-  patterndetailprojection -.->|uses| patternrelationsprojectionsupport
-  patternrelationsprojectionsupport ==>|enables| architecturecomparisonprojection
-  patternrelationsprojectionsupport ==>|enables| architectureneighborhoodprojection
-  patternrelationsprojectionsupport ==>|enables| boundedcontextprojection
-  patternrelationsprojectionsupport ==>|enables| dependencyedgeprojection
-  patternrelationsprojectionsupport ==>|enables| dependencytreeprojection
-  patternrelationsprojectionsupport ==>|enables| openquestionlistprojection
-  patternrelationsprojectionsupport ==>|enables| orphanpatternlistprojection
-  patternrelationsprojectionsupport ==>|enables| patternbundleprojection
-  patternrelationsprojectionsupport ==>|enables| patterncatalogprojection
-  patternrelationsprojectionsupport ==>|enables| patterndetailprojection
-  patternrelationsprojectionsupport ==>|enables| patternsummaryprojection
   patternsummaryprojection -->|depends-on| patternrelationsprojectionsupport
-  patternsummaryprojection -.->|uses| patternrelationsprojectionsupport
   phaseprogressprojection -->|depends-on| deliveryreportingprojectionsupport
-  phaseprogressprojection -.->|uses| deliveryreportingprojectionsupport
   prchangereviewprojection -->|depends-on| documentationcompositionprojectionsupport
-  prchangereviewprojection -.->|uses| documentationcompositionprojectionsupport
   projectconfigprojection -->|depends-on| documentationcompositionprojectionsupport
-  projectconfigprojection -.->|uses| documentationcompositionprojectionsupport
   releasenotesprojection -->|depends-on| deliveryreportingprojectionsupport
-  releasenotesprojection -.->|uses| deliveryreportingprojectionsupport
   requirementdigestprojection -->|depends-on| operationalinsightsprojectionsupport
-  requirementdigestprojection -.->|uses| operationalinsightsprojectionsupport
   requirementexecutabledigestprojection -->|depends-on| operationalinsightsprojectionsupport
-  requirementexecutabledigestprojection -.->|uses| operationalinsightsprojectionsupport
   requirementspecsdigestprojection -->|depends-on| operationalinsightsprojectionsupport
-  requirementspecsdigestprojection -.->|uses| operationalinsightsprojectionsupport
   roadmaptimelineprojection -->|depends-on| deliveryreportingprojectionsupport
-  roadmaptimelineprojection -.->|uses| deliveryreportingprojectionsupport
   roleprofileprojection -->|depends-on| operationalinsightsprojectionsupport
-  roleprofileprojection -.->|uses| operationalinsightsprojectionsupport
   scopereadinessprojection -->|depends-on| executioncontextprojectionsupport
-  scopereadinessprojection -.->|uses| executioncontextprojectionsupport
   sessioncontextprojection -->|depends-on| executioncontextprojectionsupport
-  sessioncontextprojection -.->|uses| executioncontextprojectionsupport
   sourceinventoryprojection -->|depends-on| operationalinsightsprojectionsupport
-  sourceinventoryprojection -.->|uses| operationalinsightsprojectionsupport
   statusdistributionprojection -->|depends-on| deliveryreportingprojectionsupport
-  statusdistributionprojection -.->|uses| deliveryreportingprojectionsupport
   tagusageprojection -->|depends-on| operationalinsightsprojectionsupport
-  tagusageprojection -.->|uses| operationalinsightsprojectionsupport
   taxonomydigestprojection -->|depends-on| governanceprojectionsupport
-  taxonomydigestprojection -.->|uses| governanceprojectionsupport
   traceabilitymatrixprojection -->|depends-on| deliveryreportingprojectionsupport
-  traceabilitymatrixprojection -.->|uses| deliveryreportingprojectionsupport
   validationruledigestprojection -->|depends-on| governanceprojectionsupport
-  validationruledigestprojection -.->|uses| governanceprojectionsupport
 ```
 
 ### Bounded context: read-api \(5 patterns\)
@@ -508,14 +376,8 @@ graph TD
   patterngraphapi["PatternGraphApi<br/>(utility)"]
   patternhelpers["PatternHelpers<br/>(utility)"]
   architectureinspection -->|depends-on| patternhelpers
-  architectureinspection -.->|uses| patternhelpers
   graphinventory -->|depends-on| patternhelpers
-  graphinventory -.->|uses| patternhelpers
   patterngraphapi -->|depends-on| patternhelpers
-  patterngraphapi -.->|uses| patternhelpers
-  patternhelpers ==>|enables| architectureinspection
-  patternhelpers ==>|enables| graphinventory
-  patternhelpers ==>|enables| patterngraphapi
 ```
 
 ### Bounded context: rendering \(7 patterns\)
@@ -529,21 +391,11 @@ graph TD
   markdownblockparser["MarkdownBlockParser<br/>(codec)"]
   markdownrenderer["MarkdownRenderer<br/>(codec)"]
   uirenderer["UiRenderer<br/>(codec)"]
-  blockschema ==>|enables| markdownrenderer
-  blockschema ==>|enables| uirenderer
   compacttextrenderer -->|depends-on| fragmentrendererdispatch
-  compacttextrenderer -.->|uses| fragmentrendererdispatch
-  fragmentrendererdispatch ==>|enables| compacttextrenderer
-  fragmentrendererdispatch ==>|enables| markdownrenderer
-  fragmentrendererdispatch ==>|enables| uirenderer
   markdownrenderer -->|depends-on| blockschema
-  markdownrenderer -.->|uses| blockschema
   markdownrenderer -->|depends-on| fragmentrendererdispatch
-  markdownrenderer -.->|uses| fragmentrendererdispatch
   uirenderer -->|depends-on| blockschema
-  uirenderer -.->|uses| blockschema
   uirenderer -->|depends-on| fragmentrendererdispatch
-  uirenderer -.->|uses| fragmentrendererdispatch
 ```
 
 ### Bounded context: scanner \(4 patterns\)
@@ -569,26 +421,12 @@ graph TD
   validatepatternscli["ValidatePatternsCLI<br/>(service)"]
   validationmodule["ValidationModule<br/>(barrel)"]
   antipatterndetector -->|depends-on| dodvalidationtypes
-  antipatterndetector -.->|uses| dodvalidationtypes
-  antipatterndetector ==>|enables| validationmodule
-  dodvalidationtypes ==>|enables| antipatterndetector
-  dodvalidationtypes ==>|enables| dodvalidator
-  dodvalidationtypes ==>|enables| validationmodule
   dodvalidator -->|depends-on| dodvalidationtypes
-  dodvalidator -.->|uses| dodvalidationtypes
-  dodvalidator ==>|enables| validationmodule
-  fsmstates ==>|enables| fsmvalidator
-  fsmtransitions ==>|enables| fsmvalidator
   fsmvalidator -->|depends-on| fsmstates
-  fsmvalidator -.->|uses| fsmstates
   fsmvalidator -->|depends-on| fsmtransitions
-  fsmvalidator -.->|uses| fsmtransitions
   validationmodule -->|depends-on| antipatterndetector
-  validationmodule -.->|uses| antipatterndetector
   validationmodule -->|depends-on| dodvalidationtypes
-  validationmodule -.->|uses| dodvalidationtypes
   validationmodule -->|depends-on| dodvalidator
-  validationmodule -.->|uses| dodvalidator
 ```
 
 ### Bounded context: validation-schemas \(4 patterns\)
@@ -599,9 +437,7 @@ graph TD
   extractedpattern["ExtractedPattern<br/>(contract)"]
   patterngraph["PatternGraph<br/>(contract)"]
   tagregistryschemas["TagRegistrySchemas<br/>(contract)"]
-  extractedpattern ==>|enables| patterngraph
   patterngraph -->|depends-on| extractedpattern
-  patterngraph -.->|uses| extractedpattern
 ```
 
 ### Uncontextualized · role: contract \(4 patterns\)
@@ -618,10 +454,8 @@ graph TD
 
 ### Legend
 
-- Solid arrow = dependency
-- Dashed arrow = usage
-- Bold arrow = enablement
-- Dotted line = reference
+- Solid arrow = dependency \(depends-on / uses\)
+- Dotted line = reference \(see-also\)
 
 ## Patterns
 

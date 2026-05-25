@@ -90,12 +90,7 @@ export function buildArchitectureDiagram(
     sections: buildArchitectureSections(nodes, edges, resolvedOptions),
     legend: [
       heading(3, 'Legend'),
-      list([
-        'Solid arrow = dependency',
-        'Dashed arrow = usage',
-        'Bold arrow = enablement',
-        'Dotted line = reference',
-      ]),
+      list(['Solid arrow = dependency (depends-on / uses)', 'Dotted line = reference (see-also)']),
     ],
     patterns,
   };
@@ -145,8 +140,8 @@ function buildArchitectureSections(
 
   for (const group of groups) {
     const groupNodeIds = new Set(group.nodes.map((node) => node.nodeId));
-    const intraEdges = edges.filter(
-      (edge) => groupNodeIds.has(edge.from) && groupNodeIds.has(edge.to),
+    const intraEdges = normalizeDetailEdges(
+      edges.filter((edge) => groupNodeIds.has(edge.from) && groupNodeIds.has(edge.to)),
     );
     const patterns = group.nodes.map((node) => node.name);
     sections.push({
@@ -164,6 +159,44 @@ function buildEmptyMermaid(options: ProjectArchitectureDiagramOptions): string {
     'graph TD',
     `  empty["No patterns found for ${ARCHITECTURE_SCOPE_TITLES[options.scope]}${hasText(options.scopeValue) ? `: ${options.scopeValue.trim()}` : ''}"]`,
   ].join('\n');
+}
+
+/**
+ * Collapses a group's intra-group edges to the legible forward-dependency shape
+ * for a detail diagram (generalizes D-15's context-map rule to the per-group
+ * diagrams):
+ *
+ * - `enables` is a derived REVERSE edge (B enables A ⇔ A depends-on / uses B).
+ *   Within a group its forward counterpart is already present, so a forward
+ *   `enables` arrow is a contradictory back-arrow — dropped.
+ * - `depends-on` and `uses` share the same forward direction (a single
+ *   `@architect-uses` edge yields both), so they collapse to ONE solid
+ *   dependency arrow per ordered pair. A genuine mutual dependency survives as
+ *   two arrows (one each way), since each direction is its own ordered pair.
+ * - `see-also` is a distinct non-directional reference and is preserved.
+ */
+function normalizeDetailEdges(edges: readonly EdgeShape[]): EdgeShape[] {
+  const dependency = new Map<string, EdgeShape>();
+  const seeAlso = new Map<string, EdgeShape>();
+
+  for (const edge of edges) {
+    const key = `${edge.from}->${edge.to}`;
+    if (edge.label === 'depends-on' || edge.label === 'uses') {
+      if (!dependency.has(key)) {
+        dependency.set(key, { from: edge.from, to: edge.to, label: 'depends-on', operator: '-->' });
+      }
+    } else if (edge.label === 'see-also' && !seeAlso.has(key)) {
+      seeAlso.set(key, edge);
+    }
+    // `enables` (derived reverse) is intentionally dropped.
+  }
+
+  return [...dependency.values(), ...seeAlso.values()].sort(
+    (left, right) =>
+      left.from.localeCompare(right.from) ||
+      left.to.localeCompare(right.to) ||
+      left.label.localeCompare(right.label),
+  );
 }
 
 function buildGroupMermaid(nodes: readonly NodeShape[], edges: readonly EdgeShape[]): string {
