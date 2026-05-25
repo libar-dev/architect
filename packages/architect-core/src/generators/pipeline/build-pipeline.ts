@@ -4,7 +4,7 @@
  * @architect-status completed
  * @architect-role:service
  * @architect-bounded-context:pipeline
- * @architect-uses PatternScanner, GherkinScanner, DocExtractor, GherkinExtractor, PatternGraph, ExtractionDiagnostics
+ * @architect-uses PatternScanner, GherkinScanner, DocExtractor, GherkinExtractor, PatternGraph, ExtractionDiagnostics, AstParser
  * @architect-decision core-deps
  *
  * ## Shared Pipeline Factory Responsibilities

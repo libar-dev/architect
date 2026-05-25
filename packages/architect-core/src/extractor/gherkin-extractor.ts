@@ -4,6 +4,7 @@
  * @architect-status active
  * @architect-role:service
  * @architect-bounded-context:extractor
+ * @architect-uses GherkinAstParser, LayerInference
  *
  * ## GherkinExtractor - Feature File Directive Extraction
  *

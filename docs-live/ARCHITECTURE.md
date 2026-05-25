@@ -7,7 +7,7 @@
 
 ## Overview
 
-This diagram captures 232 patterns in the Component architecture view.
+This diagram captures 233 patterns in the Component architecture view.
 
 ## Diagram
 
@@ -225,6 +225,7 @@ graph TD
   end
   subgraph validation_schemas["validation-schemas"]
     codecutils["CodecUtils<br/>(codec)"]
+    extractedpattern["ExtractedPattern<br/>(contract)"]
     patterngraph["PatternGraph<br/>(contract)"]
   end
   subgraph configuration["configuration"]
@@ -332,6 +333,12 @@ graph TD
   architecturediagramprojection -.->|uses| documentationcompositionprojectionsupport
   architecturediagramprojection -->|depends-on| projectionfragmentcontracts
   architecturediagramprojection -.->|uses| projectionfragmentcontracts
+  architectureinspection -->|depends-on| extractedpattern
+  architectureinspection -.->|uses| extractedpattern
+  architectureinspection -->|depends-on| patterngraph
+  architectureinspection -.->|uses| patterngraph
+  architectureinspection -->|depends-on| patternhelpers
+  architectureinspection -.->|uses| patternhelpers
   architectureneighborhood ==>|enables| architectureneighborhoodprojection
   architectureneighborhoodprojection -->|depends-on| architectureneighborhood
   architectureneighborhoodprojection -.->|uses| architectureneighborhood
@@ -339,6 +346,7 @@ graph TD
   architectureneighborhoodprojection -.->|uses| patternrelationsfragmentcontracts
   architectureneighborhoodprojection -->|depends-on| patternrelationsprojectionsupport
   architectureneighborhoodprojection -.->|uses| patternrelationsprojectionsupport
+  astparser ==>|enables| buildpipeline
   blockschema ==>|enables| architecturediagram
   blockschema ==>|enables| decisionrecord
   blockschema ==>|enables| documentationcompositionsupporting
@@ -351,6 +359,8 @@ graph TD
   boundedcontextprojection -.->|uses| boundedcontextfragmentcontract
   boundedcontextprojection -->|depends-on| patternrelationsprojectionsupport
   boundedcontextprojection -.->|uses| patternrelationsprojectionsupport
+  buildpipeline -->|depends-on| astparser
+  buildpipeline -.->|uses| astparser
   buildpipeline -->|depends-on| docextractor
   buildpipeline -.->|uses| docextractor
   buildpipeline -->|depends-on| extractiondiagnostics
@@ -456,6 +466,8 @@ graph TD
   detectchanges ==>|enables| processguarddecider
   detectchanges ==>|enables| processguardlinter
   docextractor ==>|enables| buildpipeline
+  docextractor -->|depends-on| shapeextractor
+  docextractor -.->|uses| shapeextractor
   docextractor ==>|enables| validatepatternscli
   documentationbundle -->|depends-on| documentationcompositionprojectionsupport
   documentationbundle -.->|uses| documentationcompositionprojectionsupport
@@ -479,6 +491,10 @@ graph TD
   dodvalidator -.->|uses| dodvalidationtypes
   dodvalidator -->|depends-on| patterngraph
   dodvalidator -.->|uses| patterngraph
+  dualsourceextractor -->|depends-on| extractedpattern
+  dualsourceextractor -.->|uses| extractedpattern
+  dualsourceextractor -->|depends-on| patternhelpers
+  dualsourceextractor -.->|uses| patternhelpers
   errorfactorytypes ==>|enables| clierrorhandler
   executioncontextprojectionsupport ==>|enables| deliverableprojection
   executioncontextprojectionsupport ==>|enables| filereadinglistprojection
@@ -491,6 +507,13 @@ graph TD
   executioncontextsupporting ==>|enables| scopereadinesscheck
   executioncontextsupporting ==>|enables| scopereadinessreport
   executioncontextsupporting ==>|enables| sessioncontextbundle
+  extractedpattern ==>|enables| architectureinspection
+  extractedpattern ==>|enables| dualsourceextractor
+  extractedpattern ==>|enables| graphinventory
+  extractedpattern ==>|enables| patternclassification
+  extractedpattern ==>|enables| patterngraph
+  extractedpattern ==>|enables| patterngraphapi
+  extractedpattern ==>|enables| patternhelpers
   extractiondiagnostics ==>|enables| buildpipeline
   filereadinglist ==>|enables| filereadinglistprojection
   filereadinglistprojection -->|depends-on| executioncontextprojectionsupport
@@ -514,8 +537,13 @@ graph TD
   fsmvalidator ==>|enables| processguarddecider
   fsmvalidator ==>|enables| processguardlinter
   fsmvalidator ==>|enables| processguardtypes
+  gherkinastparser ==>|enables| gherkinextractor
   gherkinexternalrelationshiptagpropagation -. see-also .- gherkinrulessupport
   gherkinextractor ==>|enables| buildpipeline
+  gherkinextractor -->|depends-on| gherkinastparser
+  gherkinextractor -.->|uses| gherkinastparser
+  gherkinextractor -->|depends-on| layerinference
+  gherkinextractor -.->|uses| layerinference
   gherkinextractor ==>|enables| validatepatternscli
   gherkinscanner ==>|enables| buildpipeline
   gherkinscanner ==>|enables| sessionstatereader
@@ -534,6 +562,12 @@ graph TD
   governanceprojectionsupport ==>|enables| validationruledigestprojection
   governancesupporting ==>|enables| businessrulesprojection
   governancesupporting ==>|enables| taxonomydigestprojection
+  graphinventory -->|depends-on| extractedpattern
+  graphinventory -.->|uses| extractedpattern
+  graphinventory -->|depends-on| patterngraph
+  graphinventory -.->|uses| patterngraph
+  graphinventory -->|depends-on| patternhelpers
+  graphinventory -.->|uses| patternhelpers
   handoffprojection -->|depends-on| executioncontextprojectionsupport
   handoffprojection -.->|uses| executioncontextprojectionsupport
   handoffprojection -->|depends-on| handoffrecord
@@ -545,6 +579,7 @@ graph TD
   handoffrecord ==>|enables| handoffprojection
   jsonrenderer -->|depends-on| projectionfragmentschema
   jsonrenderer -.->|uses| projectionfragmentschema
+  layerinference ==>|enables| gherkinextractor
   lintengine -->|depends-on| codecutils
   lintengine -.->|uses| codecutils
   lintengine ==>|enables| lintmodule
@@ -637,6 +672,10 @@ graph TD
   patterncatalogprojection -.->|uses| patternrelationsfragmentcontracts
   patterncatalogprojection -->|depends-on| patternrelationsprojectionsupport
   patterncatalogprojection -.->|uses| patternrelationsprojectionsupport
+  patternclassification -->|depends-on| extractedpattern
+  patternclassification -.->|uses| extractedpattern
+  patternclassification -->|depends-on| patterngraph
+  patternclassification -.->|uses| patterngraph
   patterndetail ==>|enables| patterndetailprojection
   patterndetailprojection -->|depends-on| patterndetail
   patterndetailprojection -.->|uses| patterndetail
@@ -644,13 +683,34 @@ graph TD
   patterndetailprojection -.->|uses| patternrelationsfragmentcontracts
   patterndetailprojection -->|depends-on| patternrelationsprojectionsupport
   patterndetailprojection -.->|uses| patternrelationsprojectionsupport
+  patterngraph ==>|enables| architectureinspection
   patterngraph ==>|enables| buildpipeline
   patterngraph ==>|enables| dodvalidator
+  patterngraph -->|depends-on| extractedpattern
+  patterngraph -.->|uses| extractedpattern
+  patterngraph ==>|enables| graphinventory
+  patterngraph ==>|enables| patternclassification
+  patterngraph ==>|enables| patterngraphapi
+  patterngraph ==>|enables| patternhelpers
   patterngraph ==>|enables| validatepatternscli
+  patterngraphapi -->|depends-on| extractedpattern
+  patterngraphapi -.->|uses| extractedpattern
+  patterngraphapi -->|depends-on| patterngraph
+  patterngraphapi -.->|uses| patterngraph
+  patterngraphapi -->|depends-on| patternhelpers
+  patterngraphapi -.->|uses| patternhelpers
   patterngraphcli -->|depends-on| cliruntimepaths
   patterngraphcli -.->|uses| cliruntimepaths
   patterngraphcli -->|depends-on| cliversionhelper
   patterngraphcli -.->|uses| cliversionhelper
+  patternhelpers ==>|enables| architectureinspection
+  patternhelpers ==>|enables| dualsourceextractor
+  patternhelpers -->|depends-on| extractedpattern
+  patternhelpers -.->|uses| extractedpattern
+  patternhelpers ==>|enables| graphinventory
+  patternhelpers -->|depends-on| patterngraph
+  patternhelpers -.->|uses| patterngraph
+  patternhelpers ==>|enables| patterngraphapi
   patternrelationsfragmentcontracts ==>|enables| architecturecomparisonprojection
   patternrelationsfragmentcontracts ==>|enables| architectureneighborhoodprojection
   patternrelationsfragmentcontracts ==>|enables| dependencyedgeprojection
@@ -808,6 +868,7 @@ graph TD
   sessionstatereader ==>|enables| deriveprocessstate
   sessionstatereader -->|depends-on| gherkinscanner
   sessionstatereader -.->|uses| gherkinscanner
+  shapeextractor ==>|enables| docextractor
   sourceinventorydigest -->|depends-on| sourceinventoryentry
   sourceinventorydigest -.->|uses| sourceinventoryentry
   sourceinventorydigest ==>|enables| sourceinventoryprojection
@@ -968,6 +1029,7 @@ graph TD
 - ExecutionContextProjectionExecutableTests
 - ExecutionContextProjectionSupport
 - ExecutionContextSupporting
+- ExtractedPattern
 - ExtractionDiagnostics
 - FileDiscovery
 - FileReadingList

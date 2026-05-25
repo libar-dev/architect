@@ -4,7 +4,7 @@
 
 | Field | Value |
 | ----- | ----- |
-| Count | 238   |
+| Count | 239   |
 
 ## Filters
 
@@ -104,6 +104,7 @@
 - ExecutionContextProjectionExecutableTests
 - ExecutionContextProjectionSupport
 - ExecutionContextSupporting
+- ExtractedPattern
 - ExtractionDiagnostics
 - FileDiscovery
 - FileReadingList
@@ -347,6 +348,7 @@
 | packages/architect-projection/tests/features/projections/execution-context/context-session.feature                   | executable | ExecutionContextProjectionExecutableTests             | projection | gherkin    | completed |
 | packages/architect-projection/src/projections/execution-context/execution-context-shared.internal.ts                 | executable | ExecutionContextProjectionSupport                     | utility    | typescript | completed |
 | packages/architect-projection/src/fragments/execution-context/supporting.ts                                          | design     | ExecutionContextSupporting                            | contract   | typescript | active    |
+| packages/architect-core/src/validation-schemas/extracted-pattern.ts                                                  | design     | ExtractedPattern                                      | contract   | typescript | active    |
 | packages/architect-core/src/extractor/extraction-diagnostics.ts                                                      | design     | ExtractionDiagnostics                                 | contract   | typescript | active    |
 | packages/architect-core/tests/features/scanner/file-discovery.feature                                                | executable | FileDiscovery                                         |            | gherkin    | completed |
 | packages/architect-projection/src/fragments/execution-context/file-reading-list.ts                                   | design     | FileReadingList                                       | contract   | typescript | active    |

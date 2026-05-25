@@ -4,6 +4,7 @@
  * @architect-status active
  * @architect-role:contract
  * @architect-bounded-context:validation-schemas
+ * @architect-uses ExtractedPattern
  *
  * ## PatternGraph - Read Model Schema
  *

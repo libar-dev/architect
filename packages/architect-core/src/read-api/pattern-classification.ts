@@ -4,6 +4,7 @@
  * @architect-status active
  * @architect-role:utility
  * @architect-bounded-context:read-api
+ * @architect-uses ExtractedPattern, PatternGraph
  *
  * ### When to Use
  *

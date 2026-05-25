@@ -1,3 +1,23 @@
+/**
+ * @architect
+ * @architect-pattern ExtractedPattern
+ * @architect-status active
+ * @architect-role:contract
+ * @architect-bounded-context:validation-schemas
+ *
+ * ## ExtractedPattern - Canonical Per-Pattern Record Contract
+ *
+ * Zod schema for the ~60-field canonical record the PatternGraph read model
+ * is built from. One `ExtractedPattern` per architectural pattern, carrying
+ * identity, status, source provenance, relationships, deliverables, rules,
+ * and shapes. The PatternGraph (the read model per ADR-006) composes these
+ * records into status-grouped views and a relationship index.
+ *
+ * ### When to Use
+ *
+ * - As the per-pattern record contract when constructing or consuming the graph
+ * - Tests: validate that extractor output conforms to the schema
+ */
 import { z } from 'zod';
 
 import { ADR_CATEGORY_VALUES, ADR_STATUS_VALUES, QUARTER_PATTERN } from '../taxonomy/index.js';
