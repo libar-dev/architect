@@ -204,7 +204,11 @@ function buildOverviewArchitecture(context: ProjectionContext): OverviewArchitec
     try {
       return collectComponentGraph(context);
     } catch (error) {
-      if (error instanceof ProjectionError && error.code === 'UNMAPPED_PACKAGE') {
+      // The core `ProjectionError` is raised only for `UNMAPPED_PACKAGE` (its
+      // sole code), thrown by the package resolver — the architecture projection
+      // uses a *different* `ProjectionError` class, so this `instanceof` is
+      // precise. Any other error is a real bug and propagates.
+      if (error instanceof ProjectionError) {
         return undefined;
       }
       throw error;

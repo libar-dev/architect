@@ -163,8 +163,14 @@ function isTestFeaturePattern(pattern: ExtractedPattern): boolean {
  * the architecture. A *component* view omits them all — decisions surface in the
  * generated `decisions` doc; specs/roadmap surface in roadmap/requirements docs.
  *
- * Mirrors `isTestFeaturePattern`: keys on the source path (production code lives
- * under `packages/<pkg>/src/`, never `architect/`), not on classification tags.
+ * Keys on the source path (production code lives under `packages/<pkg>/src/`,
+ * never the repo-root `architect/` working-state tree), not on classification
+ * tags. Anchored at the START of the path — UNLIKE `isTestFeaturePattern`, which
+ * uses `(?:^|\/)` because executable specs legitimately nest under
+ * `packages/<pkg>/tests/features/`. Working state is root-only, so anchoring is
+ * required to avoid matching the bin-only meta package `packages/architect/`
+ * (and any other `…/architect/…` segment) as working state. Mirrors the config's
+ * own pkg-content matcher (`startsWith('architect/')`).
  *
  * Generalizes the original decision-record exclusion (D-16, `architect/decisions/`)
  * to all working state (D-18): the doc-generation graph only ever held decision
@@ -174,7 +180,7 @@ function isTestFeaturePattern(pattern: ExtractedPattern): boolean {
  * bucket into the `overview` architecture glimpse.
  */
 function isWorkingStatePattern(pattern: ExtractedPattern): boolean {
-  return /(?:^|\/)architect\//u.test(pattern.source.file);
+  return pattern.source.file.startsWith('architect/');
 }
 
 function filterArchitecturallyInterestingPatterns(
