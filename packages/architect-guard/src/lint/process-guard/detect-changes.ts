@@ -6,7 +6,7 @@
  * @architect-role:service
  * @architect-bounded-context:process-guard
  * @architect-implements ProcessGuardLinter
- * @architect-uses DeriveProcessState
+ * @architect-uses DeriveProcessState, GitNameStatusParser
  *
  * ## DetectChanges - Git Diff Change Detection
  *

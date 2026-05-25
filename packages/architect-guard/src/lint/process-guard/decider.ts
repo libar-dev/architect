@@ -7,7 +7,6 @@
  * @architect-bounded-context:lint
  * @architect-implements ProcessGuardLinter
  * @architect-uses FSMValidator, DeriveProcessState, DetectChanges
- * @architect-uses:FSMValidator,DeriveProcessState,DetectChanges
  *
  * ## ProcessGuardDecider - Pure Validation Logic
  *

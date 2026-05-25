@@ -319,6 +319,7 @@ graph TD
   annotationcoverageprojection -.->|uses| operationalinsightsprojectionsupport
   antipatterndetector -->|depends-on| dodvalidationtypes
   antipatterndetector -.->|uses| dodvalidationtypes
+  antipatterndetector ==>|enables| validationmodule
   architecturecomparison ==>|enables| architecturecomparisonprojection
   architecturecomparisonprojection -->|depends-on| architecturecomparison
   architecturecomparisonprojection -.->|uses| architecturecomparison
@@ -463,6 +464,8 @@ graph TD
   deriveprocessstate -.->|uses| sessionstatereader
   detectchanges -->|depends-on| deriveprocessstate
   detectchanges -.->|uses| deriveprocessstate
+  detectchanges -->|depends-on| gitnamestatusparser
+  detectchanges -.->|uses| gitnamestatusparser
   detectchanges ==>|enables| processguarddecider
   detectchanges ==>|enables| processguardlinter
   docextractor ==>|enables| buildpipeline
@@ -487,10 +490,12 @@ graph TD
   documentationcompositionsupporting -.->|uses| blockschema
   dodvalidationtypes ==>|enables| antipatterndetector
   dodvalidationtypes ==>|enables| dodvalidator
+  dodvalidationtypes ==>|enables| validationmodule
   dodvalidator -->|depends-on| dodvalidationtypes
   dodvalidator -.->|uses| dodvalidationtypes
   dodvalidator -->|depends-on| patterngraph
   dodvalidator -.->|uses| patterngraph
+  dodvalidator ==>|enables| validationmodule
   dualsourceextractor -->|depends-on| extractedpattern
   dualsourceextractor -.->|uses| extractedpattern
   dualsourceextractor -->|depends-on| patternhelpers
@@ -549,11 +554,15 @@ graph TD
   gherkinscanner ==>|enables| sessionstatereader
   gherkinscanner ==>|enables| validatepatternscli
   gitbranchdiff ==>|enables| gitmodule
+  gitbranchdiff -->|depends-on| gitnamestatusparser
+  gitbranchdiff -.->|uses| gitnamestatusparser
   githelpers ==>|enables| gitmodule
   gitmodule -->|depends-on| gitbranchdiff
   gitmodule -.->|uses| gitbranchdiff
   gitmodule -->|depends-on| githelpers
   gitmodule -.->|uses| githelpers
+  gitnamestatusparser ==>|enables| detectchanges
+  gitnamestatusparser ==>|enables| gitbranchdiff
   governanceprojectionsupport ==>|enables| businessrulesprojection
   governanceprojectionsupport ==>|enables| decisioncatalogprojection
   governanceprojectionsupport -->|depends-on| projectionfragmentcontracts
@@ -922,6 +931,12 @@ graph TD
   validatepatternscli -.->|uses| patterngraph
   validatepatternscli -->|depends-on| patternscanner
   validatepatternscli -.->|uses| patternscanner
+  validationmodule -->|depends-on| antipatterndetector
+  validationmodule -.->|uses| antipatterndetector
+  validationmodule -->|depends-on| dodvalidationtypes
+  validationmodule -.->|uses| dodvalidationtypes
+  validationmodule -->|depends-on| dodvalidator
+  validationmodule -.->|uses| dodvalidator
   validationruledigest ==>|enables| validationruledigestprojection
   validationruledigestprojection -->|depends-on| governanceprojectionsupport
   validationruledigestprojection -.->|uses| governanceprojectionsupport

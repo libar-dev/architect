@@ -7,7 +7,6 @@
  * @architect-bounded-context:process-guard
  * @architect-implements ProcessGuardLinter
  * @architect-uses SessionStateReader, FSMValidator
- * @architect-uses:SessionStateReader,FSMValidator
  *
  * ## DeriveProcessState - Extract Process State from File Annotations
  *

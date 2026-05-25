@@ -4,6 +4,7 @@
  * @architect-status active
  * @architect-role:utility
  * @architect-bounded-context:generator
+ * @architect-uses GitNameStatusParser
  *
  * ## GitBranchDiff - Pure Git Change Detection
  *

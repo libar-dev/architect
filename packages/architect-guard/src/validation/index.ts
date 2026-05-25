@@ -5,6 +5,7 @@
  * @architect-status completed
  * @architect-role:barrel
  * @architect-bounded-context:validation
+ * @architect-uses DoDValidator, AntiPatternDetector, DoDValidationTypes
  *
  * ## ValidationModule - DoD Validation and Anti-Pattern Detection
  *
