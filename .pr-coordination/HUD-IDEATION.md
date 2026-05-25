@@ -1,9 +1,20 @@
 # HUD ideation — progressive disclosure for the Data API
 
-> Ideation only (WS-3, D-15 sibling). No production code yet. Captured so we can
-> align on disclosure defaults before touching the session-bootstrap output.
 > Maintainer steer: "use progressive-disclosure features to reuse the same
 > projections and drastically reduce verbosity for API output."
+>
+> **Build status (WS-3 Session 14, D-16/D-17):** steps **1 + 2 are BUILT** —
+> `--disclosure <ContentRichness>` on `overview` (default `summary`) with a
+> disclosure-gated generated-views index; CLI + MCP parity. Steps **3 + 4 remain
+> sequenced ideation.**
+>
+> **Vocabulary clarification (load-bearing, resolved in D-17):** the read surface
+> uses `ContentRichnessSchema` (`name-only · summary · summary-with-references ·
+full`), NOT `ProgressiveDisclosureLevelSchema` (`essential…advanced`). The
+> progressive level only resolves through a per-doc-type `disclosureMatrix`
+> (`generate-docs`); read verbs have no doc-type, so richness is the right knob.
+> Also: `render-compact-text.ts` was NOT disclosure-aware — step 1 added the
+> branching, it was not a free reuse.
 
 ## Thesis
 
@@ -25,8 +36,10 @@ turning a wall of text into a heads-up display.
 
 ## First steps (smallest blast radius first)
 
-1. **`--disclosure <name-only|summary|full>` on the high-traffic read verbs**
-   (`overview`, `bundle`, `pattern`, `arch blocking`), default `summary`.
+1. **[BUILT — Session 14] `--disclosure <ContentRichness>` on the read surface.**
+   Shipped on `overview` (default `summary`); `bundle` / `pattern` / `arch blocking`
+   are the documented fast-follow (the renderer plumbing + flag pattern are now in
+   place — each just needs per-fragment richness branching).
    - Reuse `ContentRichnessSchema` verbatim — no new vocabulary.
    - `overview` at `summary` = progress line + top-N blockers + a one-line "more:
      …"; `full` = today's output. Directly delivers "drastically reduce verbosity."
@@ -38,8 +51,10 @@ turning a wall of text into a heads-up display.
      `renderCompactText` (`packages/architect-mcp/src/tool-registry.ts`), so the
      flag reaches both surfaces at once.
 
-2. **A compact "projections / generated-docs index" `overview` section**
-   (the "context that these shapes exist" ask) — disclosure-gated so it ships terse.
+2. **[BUILT — Session 14] A compact "generated-views index" `overview` section**
+   (the "context that these shapes exist" ask) — disclosure-gated so it ships terse
+   (one line at `summary`, itemized at `full`). Implemented as a structured
+   `generatedViews` field on `OverviewDigest`, rendered per richness.
    - One line per generated surface (`architecture`, `decisions`,
      `requirements-*`, `roadmap`, `changelog`, `taxonomy`) + the verb to fetch it.
    - Clean insertion point already mapped: add a structured field to
@@ -82,6 +97,9 @@ turning a wall of text into a heads-up display.
 
 ## Capture status
 
-Ideation parked here (campaign working state — intentionally NOT a PatternGraph
-pattern, so it does not perturb the orphan floor). Promote to a candidate-tier spec
-in `architect/specs/candidates/` when the disclosure defaults above are agreed.
+Steps 1 + 2 built in WS-3 Session 14 (D-16/D-17). Steps 3 (token-budget signal —
+generalize `bundle --estimate-tokens` `chars/4` into the shared output path with
+heuristic overflow/underflow auto-flagging) and 4 (composite `hud`/`brief` verb,
+aligns with `ArchitectBriefDeterministicBundle`) remain the next-up sequence.
+Promote to a candidate-tier spec in `architect/specs/candidates/` if steps 3-4 grow
+beyond a single session.

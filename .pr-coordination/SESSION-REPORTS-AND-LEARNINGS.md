@@ -534,3 +534,62 @@ pass), test:dogfood **1061**, docs:all byte-deterministic (md5-stable across two
 3. WS-3 remaining: other generated-doc reviews (PATTERNS/ROADMAP/CHANGELOG/requirements) for the same
    "is this readable + correctly scoped" lens; the HUD/progressive-disclosure ideation (D-15 sibling,
    captured separately) is ideation-only until disclosure defaults are agreed.
+
+---
+
+### WS-3 Session 14 — Finalize ARCHITECTURE.md (exclude ADRs) + ship HUD disclosure step 1+2
+
+Prior commit = `a7b7b5b` (Session 13). Decisions **D-16** (exclude decision records from the
+component view) + **D-17** (HUD `--disclosure` reuses `ContentRichness`, default `summary`).
+
+**Part A — ARCHITECTURE.md finalization.** Added `isDecisionRecordPattern` (source under
+`architect/decisions/`) to `filterArchitecturallyInterestingPatterns`, mirroring the test-feature
+filter. The component view no longer renders the 9 ADR/PDR records: **169→160 patterns, 24→23
+diagrams**; the misleading `Unclassified · Architect Package Content` bucket + its context-map node
+are gone; only the intentional `role: contract (4)` fallback remains. New executable Rule
+("component view omits decision-record patterns") + mixed production/decision fixture in
+`config-documentation.feature`. **Annotation audit (the "bring back annotations" lever) found
+nothing to do:** `arch coverage` confirms every `role`/`bounded-context` gap is a working-state
+artifact (`architect/{decisions,specs,releases}/`), not production — production component
+classification is already complete (WS-1). No mass-tagging (D-15 doctrine).
+
+**Parts B+C — overview HUD.** `OverviewDigest` gains a structured `generatedViews` index (8
+`docs:all` surfaces, each with its `documentation <type>` verb). `RenderCompactOptions` gains
+`richness`; `renderOverviewDigest` branches: `name-only` = progress line only, `summary` (default)
+= progress + active phases + top-5 blockers + "… and N more" + one-line views + cliHints, `full` =
+all blockers + itemized views. CLI: per-command `--disclosure` flagParser on `overview` (default
+`summary`) — collision-free with the `documentation` verb's progressive-level `--disclosure`. MCP:
+`architect_overview` takes an optional `disclosure` input, defaults `summary`, parity via the shared
+renderer. The 40-line blocking wall the bootstrap call used to dump is now 5 lines + a pointer.
+
+**Gates:** all §6 green — pkg tests proj **1601** / cli **27** / mcp **172**, test:dogfood **1061**,
+typecheck (pkg+dogfood), lint, format:check, validate:all, perf 3/3, audit:subtractive 0,
+`docs:all` md5-deterministic (only ARCHITECTURE.md changed), dangling `--strict` exit 0.
+
+**Key learnings**
+
+1. **Two disclosure vocabularies, do not conflate (D-17).** `ProgressiveDisclosureLevel`
+   (`essential…advanced`) only means something via a per-doc-type `disclosureMatrix` (`generate-docs`);
+   the read surface has no doc-type, so it uses `ContentRichness` (`name-only…full`) directly. And
+   `render-compact-text.ts` was NOT disclosure-aware — only `render-markdown.ts` branched (and only
+   for `BusinessRuleSet`). Disclosure on the read surface is real renderer plumbing, not a free reuse.
+2. **Keep the renderer's `undefined` richness = full.** Defaulting to `summary` _at the surface_
+   (CLI command + MCP handler), not in the renderer core, kept every internal caller, fixture, and
+   non-branching fragment byte-identical — the blast radius was just `overview`. A renderer-core
+   default would have churned every compact verb + many tests.
+3. **`--disclosure` had to be per-command, not global** — the `documentation` verb already owns a
+   `--disclosure <progressive-level>`; a global flag would have shadowed it. Same flag name, different
+   value vocabulary per command, no collision.
+4. **The maintainer's ADR observation was correct and is its own workstream.** ADR-006's prose carries
+   transient problem-state + a specific-files exception table — execution context an ADR must not hold
+   (§3/§7). Excluding ADRs from the _view_ is this session's scope; cleaning the _records_ is deferred
+   (amend via a new ADR, never edit durable records inline — PREAMBLE rule 4).
+
+### Rules for next session
+
+1. **Read-surface verbosity is a render-time parameter now.** To make another verb terse, add
+   per-fragment richness branching in `render-compact-text.ts` + a `--disclosure` flagParser; default
+   `summary` at the command, never in the renderer core.
+2. **`overview`'s default output is now `summary`.** `--disclosure full` reproduces the prior wall;
+   skills/docs that quoted the full bootstrap output should note the flag.
+3. ADR-content hygiene (D-16) is a separate workstream — do not edit `architect/decisions/*` inline.
