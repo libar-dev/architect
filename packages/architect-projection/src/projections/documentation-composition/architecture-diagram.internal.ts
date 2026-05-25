@@ -191,17 +191,31 @@ function resolvePackageLabel(context: ProjectionContext, sourceFile: string): st
  * Keys on the source path, NOT on `implementsPatterns`: production sub-modules
  * legitimately carry `@architect-implements` to a barrel pattern (e.g.
  * `DeriveProcessState` → `ProcessGuardLinter`), so an implements edge alone does
- * not mark a test pattern. ADRs (under `architect/decisions/`) are not under
- * `tests/features/`, so they are retained.
+ * not mark a test pattern. ADRs (under `architect/decisions/`) are excluded by
+ * the separate `isDecisionRecordPattern` filter, not this one.
  */
 function isTestFeaturePattern(pattern: ExtractedPattern): boolean {
   return /(?:^|\/)tests\/features\//u.test(pattern.source.file);
 }
 
+/**
+ * A decision-record pattern is an ADR/PDR Gherkin feature under
+ * `architect/decisions/`. These are durable architectural *decisions*, not
+ * production components, so a *component* view omits them — they are covered by
+ * the generated `decisions` doc (`docs-live/DECISIONS.md`). Mirrors
+ * `isTestFeaturePattern`: keys on the source path (the canonical home of
+ * decision records), not on classification tags. See DECISIONS D-16.
+ */
+function isDecisionRecordPattern(pattern: ExtractedPattern): boolean {
+  return /(?:^|\/)architect\/decisions\//u.test(pattern.source.file);
+}
+
 function filterArchitecturallyInterestingPatterns(
   patterns: readonly ExtractedPattern[],
 ): readonly ExtractedPattern[] {
-  const productionPatterns = patterns.filter((pattern) => !isTestFeaturePattern(pattern));
+  const productionPatterns = patterns.filter(
+    (pattern) => !isTestFeaturePattern(pattern) && !isDecisionRecordPattern(pattern),
+  );
   const scoped = productionPatterns.length > 0 ? productionPatterns : patterns;
 
   const filtered = scoped.filter(

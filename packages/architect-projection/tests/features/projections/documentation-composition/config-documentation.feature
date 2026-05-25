@@ -183,6 +183,27 @@ Feature: Documentation Composition projection bodies
       Then the component diagram should include the production pattern
       And the component diagram should omit the test-feature pattern
 
+  Rule: The component view omits decision-record patterns
+
+    **Invariant:** The component architecture diagram excludes patterns whose
+    identity is an ADR/PDR Gherkin feature under `architect/decisions/`. These
+    are durable architectural decisions, not production components, and are
+    projected by the dedicated `decisions` document.
+
+    **Rationale:** A component view answers "what are the production components
+    and how do they relate". Decision records are a different artifact class —
+    they carry execution/temporal context the component view should not surface
+    and have their own generated doc. See DECISIONS D-16.
+
+    **Verified by:** projecting a component diagram from a context mixing a
+    production pattern with a decision-record pattern and asserting the partition.
+
+    Scenario: the component view omits patterns defined by decision-record files
+      Given a Documentation Composition architecture context mixing a production pattern and a decision-record pattern
+      When I project the component architecture diagram for the decision-mixed context
+      Then the component diagram should include the production pattern
+      And the component diagram should omit the decision-record pattern
+
   Rule: PR change review projections derive affected patterns from explicit options
 
     **Invariant:** `projectPrChangeReview` preserves the explicit `branch` and

@@ -7,7 +7,7 @@
 
 ## Overview
 
-This view captures 169 patterns across 24 diagrams in the Component architecture view.
+This view captures 160 patterns across 23 diagrams in the Component architecture view.
 
 ## Diagrams
 
@@ -39,7 +39,6 @@ graph LR
   validation["validation (8)"]
   validation_schemas["validation-schemas (4)"]
   role_contract["role: contract (4)"]
-  pkg_architect_package_content["Architect Package Content (9)"]
   cli --> api
   cli --> lint
   cli --> role_contract
@@ -615,45 +614,6 @@ graph TD
   resultmonadtypes["ResultMonadTypes<br/>(contract)"]
 ```
 
-### Unclassified · Architect Package Content \(9 patterns\)
-
-```mermaid
-graph TD
-  adr001taxonomycanonicalvalues["ADR001TaxonomyCanonicalValues"]
-  adr002gherkinonlytesting["ADR002GherkinOnlyTesting"]
-  adr003sourcefirstpatternarchitecture["ADR003SourceFirstPatternArchitecture"]
-  adr005codecbasedmarkdownrendering["ADR005CodecBasedMarkdownRendering"]
-  adr006singlereadmodelarchitecture["ADR006SingleReadModelArchitecture"]
-  adr007coordinatedtaxonomyredesign["ADR007CoordinatedTaxonomyRedesign"]
-  adr008stepdefinitionstubsconvention["ADR008StepDefinitionStubsConvention"]
-  adr009projectiontrustboundary["ADR009ProjectionTrustBoundary"]
-  pdr005processguardfsm["PDR005ProcessGuardFSM"]
-  adr001taxonomycanonicalvalues ==>|enables| adr003sourcefirstpatternarchitecture
-  adr001taxonomycanonicalvalues ==>|enables| adr007coordinatedtaxonomyredesign
-  adr001taxonomycanonicalvalues -. see-also .- adr007coordinatedtaxonomyredesign
-  adr001taxonomycanonicalvalues ==>|enables| pdr005processguardfsm
-  adr002gherkinonlytesting ==>|enables| adr008stepdefinitionstubsconvention
-  adr003sourcefirstpatternarchitecture -->|depends-on| adr001taxonomycanonicalvalues
-  adr003sourcefirstpatternarchitecture -.->|uses| adr001taxonomycanonicalvalues
-  adr003sourcefirstpatternarchitecture ==>|enables| adr008stepdefinitionstubsconvention
-  adr005codecbasedmarkdownrendering ==>|enables| adr006singlereadmodelarchitecture
-  adr006singlereadmodelarchitecture -->|depends-on| adr005codecbasedmarkdownrendering
-  adr006singlereadmodelarchitecture -.->|uses| adr005codecbasedmarkdownrendering
-  adr007coordinatedtaxonomyredesign -->|depends-on| adr001taxonomycanonicalvalues
-  adr007coordinatedtaxonomyredesign -.->|uses| adr001taxonomycanonicalvalues
-  adr007coordinatedtaxonomyredesign -->|depends-on| pdr005processguardfsm
-  adr007coordinatedtaxonomyredesign -.->|uses| pdr005processguardfsm
-  adr008stepdefinitionstubsconvention -->|depends-on| adr002gherkinonlytesting
-  adr008stepdefinitionstubsconvention -.->|uses| adr002gherkinonlytesting
-  adr008stepdefinitionstubsconvention -->|depends-on| adr003sourcefirstpatternarchitecture
-  adr008stepdefinitionstubsconvention -.->|uses| adr003sourcefirstpatternarchitecture
-  adr009projectiontrustboundary -. see-also .- adr005codecbasedmarkdownrendering
-  adr009projectiontrustboundary -. see-also .- adr006singlereadmodelarchitecture
-  pdr005processguardfsm -->|depends-on| adr001taxonomycanonicalvalues
-  pdr005processguardfsm -.->|uses| adr001taxonomycanonicalvalues
-  pdr005processguardfsm ==>|enables| adr007coordinatedtaxonomyredesign
-```
-
 ## Legend
 
 ### Legend
@@ -665,14 +625,6 @@ graph TD
 
 ## Patterns
 
-- ADR001TaxonomyCanonicalValues
-- ADR002GherkinOnlyTesting
-- ADR003SourceFirstPatternArchitecture
-- ADR005CodecBasedMarkdownRendering
-- ADR006SingleReadModelArchitecture
-- ADR007CoordinatedTaxonomyRedesign
-- ADR008StepDefinitionStubsConvention
-- ADR009ProjectionTrustBoundary
 - AnnotationCoverage
 - AnnotationCoverageProjection
 - AntiPatternDetector
@@ -783,7 +735,6 @@ graph TD
 - PatternScanner
 - PatternSummary
 - PatternSummaryProjection
-- PDR005ProcessGuardFSM
 - PhaseProgress
 - PhaseProgressProjection
 - PrChangeReview

@@ -843,6 +843,40 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
     },
   );
 
+  Rule('The component view omits decision-record patterns', ({ RuleScenario }) => {
+    RuleScenario(
+      'the component view omits patterns defined by decision-record files',
+      ({ Given, When, Then, And }) => {
+        Given(
+          'a Documentation Composition architecture context mixing a production pattern and a decision-record pattern',
+          () => {
+            state!.context = createMixedProductionAndDecisionRecordContext();
+          },
+        );
+
+        When('I project the component architecture diagram for the decision-mixed context', () => {
+          state!.architectureDiagrams['component'] = parseAndProjectArchitectureDiagram(
+            state!.context!,
+            { scope: 'component' },
+          );
+        });
+
+        Then('the component diagram should include the production pattern', () => {
+          const root = state!.architectureDiagrams['component']!.root;
+          expect(root.patterns).toContain('RenderMarkdownComponent');
+        });
+
+        And('the component diagram should omit the decision-record pattern', () => {
+          const root = state!.architectureDiagrams['component']!.root;
+          expect(root.patterns).not.toContain('ADR006SingleReadModelArchitecture');
+          for (const section of root.sections) {
+            expect(section.patterns).not.toContain('ADR006SingleReadModelArchitecture');
+          }
+        });
+      },
+    );
+  });
+
   Rule(
     'PR change review projections derive affected patterns from explicit options',
     ({ RuleScenario }) => {
@@ -1192,6 +1226,29 @@ function createMixedProductionAndTestFeatureContext(): ProjectionContext {
         archContext: 'rendering',
         implementsPatterns: ['RenderMarkdownComponent'],
         file: 'packages/architect-projection/tests/features/renderers/render-markdown.feature',
+      }),
+    ],
+  });
+}
+
+function createMixedProductionAndDecisionRecordContext(): ProjectionContext {
+  return createProjectionContext({
+    patterns: [
+      createPattern('RenderMarkdownComponent', {
+        status: 'active',
+        role: 'codec',
+        archContext: 'rendering',
+        file: 'packages/architect-projection/src/renderers/render-markdown.ts',
+      }),
+      // A decision-record pattern: identity is an ADR feature under
+      // architect/decisions/. The component view must omit it — it is a durable
+      // decision, not a production component, and is projected by the decisions
+      // doc. It carries a product-area but no role/bounded-context, exactly the
+      // shape that previously fell into the package-fallback bucket. See D-16.
+      createPattern('ADR006SingleReadModelArchitecture', {
+        status: 'completed',
+        productArea: 'Generation',
+        file: 'architect/decisions/adr-006-single-read-model-architecture.feature',
       }),
     ],
   });
