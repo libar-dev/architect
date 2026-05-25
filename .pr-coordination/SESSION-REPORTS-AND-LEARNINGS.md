@@ -145,3 +145,36 @@ All edges registered first-try (orphans 79→70). 13 gates green.
 3. Next context = **delivery-reporting** (`PhaseProgress`, `StatusDistribution`,
    `RoadmapTimeline`, `ReleaseNotesDigest`, `TraceabilityMatrix`, + `DeliveryReportingSupporting`
    which imports `PatternSummarySchema`/`EmbeddedDeliverableSchema` — outgoing import-edge).
+
+## Session 05 — Connect delivery-reporting fragments to producers (uncommitted in tree)
+
+Committed prior session = `96194aa`. De-orphaned all 6 delivery-reporting orphans. Same
+split topology as op-insights: 5 producer wrappers got producer→fragment edges
+(`PhaseProgressProjection`→`PhaseProgress`, `StatusDistributionProjection`→
+`StatusDistribution`, `RoadmapTimelineProjection`→`RoadmapTimeline`, `ReleaseNotesProjection`→
+`ReleaseNotesDigest`, `TraceabilityMatrixProjection`→`TraceabilityMatrix`).
+`DeliveryReportingSupporting` got an **outgoing** import edge. All registered first-try
+(orphans 70→64). 13 gates green.
+
+**Additional scope discovered (inline-fixed):**
+
+1. **Recon's `EmbeddedDeliverable` target was a phantom.** `DeliveryReportingSupporting`
+   imports `EmbeddedDeliverableSchema`, but `EmbeddedDeliverable` is NOT a graph pattern
+   (`search` → empty); it's `DeliverableSchema.omit({kind:true})`. Authored
+   `@architect-uses PatternSummary, Deliverable` (the real source pattern) — authoring the
+   phantom would have tripped `arch dangling --strict`. Import edges follow the symbol's
+   pattern, falling back to the source when the symbol is a derived alias.
+2. **D-8 "6 lines" confirmed stale.** `DeliveryReportingProjectionSupport` has ONE
+   `@architect-uses` line at HEAD. The D-8 latent multi-line breakage is NOT present in any
+   projection ProjectionSupport pattern — likely already fixed in the refactors that
+   followed D-8's authoring.
+
+### Rules for upcoming sessions
+
+1. **Resolve every import-edge target against the graph** (`search <Name>`) before
+   authoring — a derived alias (`Schema.omit`/`.pick`) is not its own pattern; edge to the
+   source pattern it derives from.
+2. Final context = **execution-context** (`FileReadingList`, `HandoffRecord`,
+   `ScopeReadinessReport`, `SessionContextBundle`, + `ExecutionContextSupporting`). Note
+   `ScopeReadinessCheck` may be embedded (no standalone producer) and `Deliverable`/
+   `DeliverableManifest` are already connected (Session 02) — verify via `arch orphans`.

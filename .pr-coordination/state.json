@@ -4,15 +4,15 @@
   "updated": "2026-05-25",
   "workstreams": {
     "WS-0-finalize-hygiene": "done (committed 6f2fc6c)",
-    "WS-1-annotation-reenablement": "in-progress (Session 04 done)",
+    "WS-1-annotation-reenablement": "in-progress (Session 05 done)",
     "WS-2-skills": "scoped",
     "WS-3-docs": "scoped"
   },
   "ws1": {
     "phase": "1-projection-pilot",
-    "currentSession": "05-delivery-reporting-producers (next)",
-    "lastCompletedSession": "04-operational-insights-producers",
-    "lastCommit": "0ec6441",
+    "currentSession": "06-execution-context-producers (next)",
+    "lastCompletedSession": "05-delivery-reporting-producers",
+    "lastCommit": "96194aa",
     "lastCommitNote": "trailing pointer — names the prior committed session; advanced one step per session (a commit cannot store its own sha)",
     "baselineMetrics": {
       "patterns": 270,
@@ -22,12 +22,12 @@
       "boundedContextCoverage": "157/270"
     },
     "currentMetrics": {
-      "orphansTotal": 70,
-      "orphansProjection": 12,
+      "orphansTotal": 64,
+      "orphansProjection": 6,
       "orphansProjectionByArea": {
         "operational-insights": 0,
         "governance": 0,
-        "delivery-reporting": 6,
+        "delivery-reporting": 0,
         "execution-context": 6,
         "pattern-relations": 0
       },

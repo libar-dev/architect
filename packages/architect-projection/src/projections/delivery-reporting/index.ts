@@ -539,7 +539,7 @@ function parseQuarterLabel(value: string): { year: number; quarter: number } | u
  * @architect-pattern PhaseProgressProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses DeliveryReportingProjectionSupport
+ * @architect-uses DeliveryReportingProjectionSupport, PhaseProgress
  * @architect-bounded-context:projection
  *
  * ## Phase progress projection
@@ -577,7 +577,7 @@ export function projectPhaseProgress(
  * @architect-pattern StatusDistributionProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses DeliveryReportingProjectionSupport
+ * @architect-uses DeliveryReportingProjectionSupport, StatusDistribution
  * @architect-bounded-context:projection
  *
  * ## Status distribution projection
@@ -616,7 +616,7 @@ export function projectStatusDistribution(
  * @architect-pattern RoadmapTimelineProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses DeliveryReportingProjectionSupport
+ * @architect-uses DeliveryReportingProjectionSupport, RoadmapTimeline
  * @architect-bounded-context:projection
  *
  * ## Roadmap timeline projection
@@ -667,7 +667,7 @@ export function projectCurrentWork(context: ProjectionContext): ProjectionBundle
  * @architect-pattern ReleaseNotesProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses DeliveryReportingProjectionSupport
+ * @architect-uses DeliveryReportingProjectionSupport, ReleaseNotesDigest
  * @architect-bounded-context:projection
  *
  * ## Release notes projection
@@ -706,7 +706,7 @@ export function projectReleaseNotesDigest(
  * @architect-pattern TraceabilityMatrixProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses DeliveryReportingProjectionSupport
+ * @architect-uses DeliveryReportingProjectionSupport, TraceabilityMatrix
  * @architect-bounded-context:projection
  *
  * ## Traceability matrix projection

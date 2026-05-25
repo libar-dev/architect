@@ -402,6 +402,7 @@ graph TD
   decisionrecord -->|depends-on| blockschema
   decisionrecord -.->|uses| blockschema
   decisionrecord ==>|enables| decisioncatalogprojection
+  deliverable ==>|enables| deliveryreportingsupporting
   deliverable ==>|enables| patternrelationssupporting
   deliverablemanifest ==>|enables| patternrelationssupporting
   deliverableprojection -->|depends-on| executioncontextprojectionsupport
@@ -416,6 +417,10 @@ graph TD
   deliveryreportingprojectionsupport ==>|enables| roadmaptimelineprojection
   deliveryreportingprojectionsupport ==>|enables| statusdistributionprojection
   deliveryreportingprojectionsupport ==>|enables| traceabilitymatrixprojection
+  deliveryreportingsupporting -->|depends-on| deliverable
+  deliveryreportingsupporting -.->|uses| deliverable
+  deliveryreportingsupporting -->|depends-on| patternsummary
+  deliveryreportingsupporting -.->|uses| patternsummary
   dependencyedge ==>|enables| dependencyedgeprojection
   dependencyedgeprojection -->|depends-on| dependencyedge
   dependencyedgeprojection -.->|uses| dependencyedge
@@ -659,6 +664,7 @@ graph TD
   patternscanner ==>|enables| buildpipeline
   patternscanner ==>|enables| lintpatternscli
   patternscanner ==>|enables| validatepatternscli
+  patternsummary ==>|enables| deliveryreportingsupporting
   patternsummary ==>|enables| patternsummaryprojection
   patternsummaryprojection -->|depends-on| patternrelationsfragmentcontracts
   patternsummaryprojection -.->|uses| patternrelationsfragmentcontracts
@@ -669,8 +675,11 @@ graph TD
   pdr005processguardfsm -->|depends-on| adr001taxonomycanonicalvalues
   pdr005processguardfsm -.->|uses| adr001taxonomycanonicalvalues
   pdr005processguardfsm ==>|enables| adr007coordinatedtaxonomyredesign
+  phaseprogress ==>|enables| phaseprogressprojection
   phaseprogressprojection -->|depends-on| deliveryreportingprojectionsupport
   phaseprogressprojection -.->|uses| deliveryreportingprojectionsupport
+  phaseprogressprojection -->|depends-on| phaseprogress
+  phaseprogressprojection -.->|uses| phaseprogress
   prchangereview -->|depends-on| blockschema
   prchangereview -.->|uses| blockschema
   prchangereview ==>|enables| documentationcompositionprojectionsupport
@@ -722,8 +731,11 @@ graph TD
   projectionfragmentschema ==>|enables| jsonrenderer
   projectionfragmentschema ==>|enables| markdownrenderer
   projectionfragmentschema ==>|enables| uirenderer
+  releasenotesdigest ==>|enables| releasenotesprojection
   releasenotesprojection -->|depends-on| deliveryreportingprojectionsupport
   releasenotesprojection -.->|uses| deliveryreportingprojectionsupport
+  releasenotesprojection -->|depends-on| releasenotesdigest
+  releasenotesprojection -.->|uses| releasenotesdigest
   requirementdigest ==>|enables| requirementdigestprojection
   requirementdigest ==>|enables| requirementexecutabledigestprojection
   requirementdigest ==>|enables| requirementspecsdigestprojection
@@ -739,8 +751,11 @@ graph TD
   requirementspecsdigestprojection -.->|uses| operationalinsightsprojectionsupport
   requirementspecsdigestprojection -->|depends-on| requirementdigest
   requirementspecsdigestprojection -.->|uses| requirementdigest
+  roadmaptimeline ==>|enables| roadmaptimelineprojection
   roadmaptimelineprojection -->|depends-on| deliveryreportingprojectionsupport
   roadmaptimelineprojection -.->|uses| deliveryreportingprojectionsupport
+  roadmaptimelineprojection -->|depends-on| roadmaptimeline
+  roadmaptimelineprojection -.->|uses| roadmaptimeline
   roleprofile ==>|enables| roleprofileprojection
   roleprofilecollection ==>|enables| roleprofileprojection
   roleprofileprojection -->|depends-on| operationalinsightsprojectionsupport
@@ -768,8 +783,11 @@ graph TD
   sourceinventoryprojection -.->|uses| operationalinsightsprojectionsupport
   sourceinventoryprojection -->|depends-on| sourceinventorydigest
   sourceinventoryprojection -.->|uses| sourceinventorydigest
+  statusdistribution ==>|enables| statusdistributionprojection
   statusdistributionprojection -->|depends-on| deliveryreportingprojectionsupport
   statusdistributionprojection -.->|uses| deliveryreportingprojectionsupport
+  statusdistributionprojection -->|depends-on| statusdistribution
+  statusdistributionprojection -.->|uses| statusdistribution
   tagusageentry ==>|enables| tagusagematrix
   tagusagematrix -->|depends-on| tagusageentry
   tagusagematrix -.->|uses| tagusageentry
@@ -787,8 +805,11 @@ graph TD
   taxonomydigestprojection -.->|uses| projectionfragmentcontracts
   taxonomydigestprojection -->|depends-on| taxonomydigest
   taxonomydigestprojection -.->|uses| taxonomydigest
+  traceabilitymatrix ==>|enables| traceabilitymatrixprojection
   traceabilitymatrixprojection -->|depends-on| deliveryreportingprojectionsupport
   traceabilitymatrixprojection -.->|uses| deliveryreportingprojectionsupport
+  traceabilitymatrixprojection -->|depends-on| traceabilitymatrix
+  traceabilitymatrixprojection -.->|uses| traceabilitymatrix
   uirenderer -->|depends-on| blockschema
   uirenderer -.->|uses| blockschema
   uirenderer -->|depends-on| fragmentrendererdispatch

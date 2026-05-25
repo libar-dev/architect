@@ -3,6 +3,7 @@
  * @architect-pattern DeliveryReportingSupporting
  * @architect-status active
  * @architect-role:contract
+ * @architect-uses PatternSummary, Deliverable
  * @architect-bounded-context:delivery-reporting
  *
  * ### When to Use
