@@ -13,7 +13,7 @@ This view captures 160 patterns across 23 diagrams in the Component architecture
 
 ### Context Map
 
-Each node is a group; each arrow is a cross-group dependency \(\`depends-on\` / \`uses\`, pointing from dependant to dependency\). Usage, enablement, and see-also relationships appear in the per-group diagrams below.
+Each node is a group; each arrow is a cross-group dependency \(\`depends-on\` / \`uses\`, pointing from dependant to dependency\). The per-group diagrams below detail each group’s internal dependencies and any see-also references.
 
 ```mermaid
 graph LR

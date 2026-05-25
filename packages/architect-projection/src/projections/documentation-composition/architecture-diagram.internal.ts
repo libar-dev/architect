@@ -132,7 +132,7 @@ function buildArchitectureSections(
     sections.push({
       title: ARCHITECTURE_MAP_TITLES[options.scope],
       description:
-        'Each node is a group; each arrow is a cross-group dependency (`depends-on` / `uses`, pointing from dependant to dependency). Usage, enablement, and see-also relationships appear in the per-group diagrams below.',
+        'Each node is a group; each arrow is a cross-group dependency (`depends-on` / `uses`, pointing from dependant to dependency). The per-group diagrams below detail each group’s internal dependencies and any see-also references.',
       diagram: mermaid(buildMapMermaid(groups, mapEdges)),
       patterns: [],
     });

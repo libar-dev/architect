@@ -19,10 +19,13 @@
  * **Behavior:**
  * - Collects patterns from the graph, filters them by the requested scope,
  *   and assigns unique Mermaid-safe node ids.
- * - Builds directed edges from `dependsOn`, `uses`, `enables`, and `seeAlso`
- *   relationships with distinct arrow operators per label.
- * - Groups nodes into Mermaid subgraphs by context/layer/product-area and
- *   emits a stable legend describing the arrow semantics.
+ * - Collects `dependsOn`, `uses`, `enables`, and `seeAlso` relationships, then
+ *   renders forward dependencies only: the context map aggregates one solid
+ *   arrow per cross-group `depends-on`/`uses` pair, and each per-group detail
+ *   diagram collapses `depends-on`/`uses` to one solid dependency arrow, drops
+ *   the derived reverse `enables`, and keeps `see-also` as a dotted reference.
+ * - Splits the view into a context map plus one detail diagram per group and
+ *   emits a stable legend (dependency / reference) describing the arrows.
  *
  * ### When to Use
  *
