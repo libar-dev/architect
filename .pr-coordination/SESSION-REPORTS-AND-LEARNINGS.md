@@ -369,3 +369,51 @@ fixtures, no step implementation). These stay orphans by design.
    `SourceMerging` before staging.
 4. After Session 11 the campaign hits its terminal floor (~27): ~22 forward-looking
    working-state specs + 5 untargetable integration/fixture features. Document, don't force.
+
+## Session 11 — New code-originated identities (committed 8a32d4e)
+
+Prior session commit = `ef91844`. Created **4 code-originated `@architect-pattern`
+identities** (D-13) + **5 `@architect-implements` edges**, de-orphaning 5 test features
+incl. all 3 D-9 deferrals. Total orphans **32 → 27** (patterns 272 → 276). Identities:
+`RegistryBuilder` (taxonomy/registry-builder.ts, utility/configuration), `SourceMerge`
+(config/merge-sources.ts, utility/configuration), `TagRegistrySchemas`
+(validation-schemas/tag-registry.ts, contract/validation-schemas — mirrors ExtractedPattern),
+`MarkdownBlockParser` (utils/markdown-parser.ts, codec/rendering). Realized:
+`StubTaxonomyTagTests`+`TypeScriptTaxonomyImplementation`→RegistryBuilder (one identity, two
+tests), `SourceMerging`→SourceMerge, `TagRegistrySchemasValidation`→TagRegistrySchemas,
+`LoadPreambleParser`→MarkdownBlockParser. All registered first-try; **no new identity is an
+orphan** (read-back confirmed). All 12 §6 gates green (pkg test 1769, test:dogfood 1057, perf
+3/3, dangling --strict 0, audit:subtractive 0). guard `--staged`: 12 modified, **0 status
+transitions** (D-10: both completed features already carried an unlock-reason). docs:all →
+ARCHITECTURE/CHANGELOG/PATTERNS regenerated (276 patterns), committed with code.
+
+**Key learning — `implementedBy` clears orphan status.** `findOrphanPatterns`
+(`read-api/graph-inventory.ts:154-155`) counts `implementsPatterns` + `implementedBy` as
+relationships. So a new code-originated identity is non-orphan the instant a test feature
+`@architect-implements` it — **no `@architect-uses` edge required**. This is why Session 11
+authored zero use-edges and still de-orphaned all 4 new nodes, sidestepping the genuine
+circular import between `registry-builder.ts` (imports tag-registry types) and
+`tag-registry.ts` (imports `buildRegistry`). Roles/contexts: 2 mirrored exact siblings
+(SourceMerge→ConfigLoader's `configuration`, TagRegistrySchemas→ExtractedPattern's
+`validation-schemas`); 2 reasoned reuse of existing contexts (RegistryBuilder→`configuration`
+since `taxonomy` is not a context and its neighbors are config/\*; MarkdownBlockParser→`codec`/
+`rendering` matching CodecUtils + BlockSchema). No new bounded-context spawned.
+
+### WS-1 expansion — COMPLETE (Sessions 07–11)
+
+Orphans **58 → 27** across the expansion (core spine + test features S07-08, guard S09,
+connectable test features S10, new identities S11); campaign total **107 → 27**. Projection,
+core/src, guard/src, and all connectable core/cli test features are at **0 orphans**. The D-9
+deferrals are closed. **Terminal floor = 27**: ~22 forward-looking working-state
+roadmap/candidate specs in `architect/` (parent edges already present don't clear orphan
+status — they're genuinely un-wired future work) + 5 untargetable integration/fixture test
+features (`ArchitectPublicContract`, `DocumentationCommandParityBoundaryTests`,
+`GenerateDocsCli`, `EmptyEpic`, `ParentEpic`). These are out of WS-1 scope (shipped-code
+connectivity). **Next workstreams: WS-2 (skills) / WS-3 (docs)**, now unblocked — the graph
+is connected enough through core+projection to drive doc generation.
+
+**Coordination-model note (Sessions 09-11):** ran agent-per-session for the scoped edits +
+Data-API read-back; main thread owned the full §6 gate sequence + commits + bookkeeping per
+the maintainer's instruction. Each session = 2 commits (code + bookkeeping). format:check
+flags `.pr-coordination/*` md/json each time — `prettier --write` the coordination files
+before the gate. All three sessions: guard `--staged` 0 status transitions (D-6 + D-10 held).

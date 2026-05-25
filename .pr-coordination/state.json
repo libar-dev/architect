@@ -4,16 +4,16 @@
   "updated": "2026-05-25",
   "workstreams": {
     "WS-0-finalize-hygiene": "done (committed 6f2fc6c)",
-    "WS-1-annotation-reenablement": "phase-1 projection pilot COMPLETE (Sessions 01-06); expansion in progress (core done Sessions 07-08; guard done Session 09; connectable test features done Session 10; new code-originated identities pending Session 11)",
-    "WS-2-skills": "scoped",
-    "WS-3-docs": "scoped"
+    "WS-1-annotation-reenablement": "phase-1 projection pilot COMPLETE (Sessions 01-06); expansion COMPLETE (core Sessions 07-08; guard Session 09; connectable test features Session 10; new code-originated identities Session 11). Shipped-code connectivity at terminal floor (~27 orphans = working-state specs + untargetable integration/fixture features).",
+    "WS-2-skills": "scoped — next workstream (now unblocked)",
+    "WS-3-docs": "scoped — next workstream (now unblocked)"
   },
   "ws1": {
-    "phase": "1-projection-pilot-COMPLETE; 2-core+guard+test-features-expansion-in-progress",
-    "currentSession": "WS-1 expansion: Session 11 (new code-originated identities, D-13) next — RegistryBuilder/SourceMerge/TagRegistrySchemas/MarkdownBlockParser",
-    "lastCompletedSession": "10-connectable-test-features",
-    "lastCommit": "38a3e72",
-    "lastCommitNote": "Session 10 commit (3 test features de-orphaned via @architect-implements: CompactTextRendererTests->CompactTextRenderer; LintProcessCliBehavior->LintProcessCLI + LintPatternsCliBehavior->LintPatternsCLI per D-12 CLI-test rule). Orphans 35 -> 32.",
+    "phase": "1-projection-pilot-COMPLETE; 2-expansion-COMPLETE (core+guard+test-features+new-identities)",
+    "currentSession": "WS-1 expansion COMPLETE through Session 11. Next: WS-2 (skills) or WS-3 (docs). Terminal-floor orphans (~22 working-state specs + 5 untargetable integration/fixture features) documented, out of WS-1 scope.",
+    "lastCompletedSession": "11-new-code-originated-identities",
+    "lastCommit": "8a32d4e",
+    "lastCommitNote": "Session 11 commit (4 code-originated identities RegistryBuilder/SourceMerge/TagRegistrySchemas/MarkdownBlockParser + 5 @architect-implements edges; closes D-9 deferrals via D-13). Orphans 32 -> 27.",
     "baselineMetrics": {
       "patterns": 270,
       "orphansTotal": 107,
@@ -22,16 +22,14 @@
       "boundedContextCoverage": "157/270"
     },
     "currentMetrics": {
-      "orphansTotal": 32,
+      "patterns": 276,
+      "orphansTotal": 27,
       "orphansProjection": 0,
       "orphansCoreSrc": 0,
       "orphansGuardSrc": 0,
-      "orphansCoreTests": 3,
-      "orphansCoreTestsDeferred": [
-        "SourceMerging",
-        "TagRegistrySchemasValidation",
-        "TypeScriptTaxonomyImplementation"
-      ],
+      "orphansCoreTests": 0,
+      "orphansCoreTestsDeferred": [],
+      "d9Resolved": "Sessions 11 — SourceMerging/TagRegistrySchemasValidation/TypeScriptTaxonomyImplementation realized via new identities (D-13)",
       "orphansProjectionByArea": {
         "operational-insights": 0,
         "governance": 0,
@@ -39,7 +37,25 @@
         "execution-context": 0,
         "pattern-relations": 0
       },
-      "newPatterns": ["BlockSchema", "ExtractedPattern"]
+      "terminalFloor": {
+        "total": 27,
+        "workingStateSpecs": "~22 forward-looking roadmap/candidate specs in architect/ (incl. doc-projection cluster, releases, PDR-001) — out of WS-1 scope",
+        "untargetableTestFeatures": [
+          "ArchitectPublicContract",
+          "DocumentationCommandParityBoundaryTests",
+          "GenerateDocsCli",
+          "EmptyEpic",
+          "ParentEpic"
+        ]
+      },
+      "newPatterns": [
+        "BlockSchema",
+        "ExtractedPattern",
+        "RegistryBuilder",
+        "SourceMerge",
+        "TagRegistrySchemas",
+        "MarkdownBlockParser"
+      ]
     }
   }
 }
