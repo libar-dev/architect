@@ -3,6 +3,7 @@
  * @architect-pattern TagUsageMatrix
  * @architect-status active
  * @architect-role:contract
+ * @architect-uses TagUsageEntry
  * @architect-bounded-context:operational-insights
  *
  * Defines the `TagUsageMatrix` fragment shape for tag usage counts across the pattern graph.

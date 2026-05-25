@@ -725,7 +725,7 @@ function resolveRequirementTestFiles(pattern: ExtractedPattern): string[] {
  * @architect-pattern AnnotationCoverageProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses OperationalInsightsProjectionSupport
+ * @architect-uses OperationalInsightsProjectionSupport, AnnotationCoverage
  * @architect-bounded-context:projection
  *
  * ## Annotation coverage projection
@@ -765,7 +765,7 @@ export function projectAnnotationCoverage(
  * @architect-pattern OverviewProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses OperationalInsightsProjectionSupport
+ * @architect-uses OperationalInsightsProjectionSupport, OverviewDigest
  * @architect-bounded-context:projection
  *
  * ## Overview projection
@@ -803,7 +803,7 @@ export function projectOverviewDigest(
  * @architect-pattern RequirementDigestProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses OperationalInsightsProjectionSupport
+ * @architect-uses OperationalInsightsProjectionSupport, RequirementDigest
  * @architect-bounded-context:projection
  *
  * ## Requirement digest projection
@@ -850,7 +850,7 @@ export function projectRequirementDigest(
  * @architect-pattern RequirementExecutableDigestProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses OperationalInsightsProjectionSupport
+ * @architect-uses OperationalInsightsProjectionSupport, RequirementDigest
  * @architect-bounded-context:projection
  *
  * ## Executable requirement digest projection
@@ -889,7 +889,7 @@ export function projectRequirementExecutableDigest(
  * @architect-pattern RequirementSpecsDigestProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses OperationalInsightsProjectionSupport
+ * @architect-uses OperationalInsightsProjectionSupport, RequirementDigest
  * @architect-bounded-context:projection
  *
  * ## Spec-tier requirement digest projection
@@ -1072,7 +1072,7 @@ function createRequirementChildRouteIdForBucket(
  * @architect-pattern RoleProfileProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses OperationalInsightsProjectionSupport
+ * @architect-uses OperationalInsightsProjectionSupport, RoleProfile, RoleProfileCollection
  * @architect-bounded-context:projection
  *
  * ## Role profile projection
@@ -1123,7 +1123,7 @@ export function projectRoleProfiles(
  * @architect-pattern SourceInventoryProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses OperationalInsightsProjectionSupport
+ * @architect-uses OperationalInsightsProjectionSupport, SourceInventoryDigest
  * @architect-bounded-context:projection
  *
  * ## Source inventory projection
@@ -1166,7 +1166,7 @@ export function projectSourceInventoryDigest(
  * @architect-pattern TagUsageProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses OperationalInsightsProjectionSupport
+ * @architect-uses OperationalInsightsProjectionSupport, TagUsageMatrix
  * @architect-bounded-context:projection
  *
  * ## Tag usage projection

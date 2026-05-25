@@ -111,3 +111,37 @@ Session 02's outgoing-import Supporting model. All edges extended the existing s
    `RequirementDigest` ×3 producers, `RoleProfile`/`RoleProfileCollection`,
    `SourceInventoryDigest`/`Entry`, `TagUsageMatrix`/`Entry`). Re-verify the D-8 state of
    `OperationalInsightsProjectionSupport` before editing.
+
+## Session 04 — Connect operational-insights fragments to producers (uncommitted in tree)
+
+Committed prior session = `0ec6441`. De-orphaned all 9 operational-insights orphans.
+**New topology** vs governance: all producers in one `index.ts`, each its own
+`@architect-pattern`; `kind:` literals built in `build*` helpers (under
+`OperationalInsightsProjectionSupport`) while public `project*` wrappers return
+`ProjectionBundle<X>`. Used the **wrapper** as producer (8 edges:
+`AnnotationCoverageProjection`→`AnnotationCoverage`, `OverviewProjection`→`OverviewDigest`,
+3× Requirement\*→`RequirementDigest`, `RoleProfileProjection`→`RoleProfile,RoleProfileCollection`,
+`SourceInventoryProjection`→`SourceInventoryDigest`, `TagUsageProjection`→`TagUsageMatrix`).
+All edges registered first-try (orphans 79→70). 13 gates green.
+
+**Additional scope discovered (inline-fixed):**
+
+1. **Embedded sub-fragments need composition edges, not producer edges.** `TagUsageEntry`
+   - `SourceInventoryEntry` have no `ProjectionBundle` wrapper — built in helpers, embedded
+     in a parent. Connected via verified schema composition on the parent fragment
+     (`TagUsageMatrix`→`TagUsageEntry`, `SourceInventoryDigest`→`SourceInventoryEntry`; both
+     parents do `z.array(<Entry>Schema)`). First `@architect-uses` line on those fragments.
+2. **D-8 "9 lines" confirmed stale.** `OperationalInsightsProjectionSupport` has ONE
+   `@architect-uses` line at HEAD, not 9 — no collapse needed (delivery-reporting's
+   `DeliveryReportingProjectionSupport` likely the same; still re-verify in Session 05).
+
+### Rules for upcoming sessions
+
+1. **Three edge shapes now proven:** producer→fragment (wrapper returns `ProjectionBundle<X>`),
+   Supporting import-edge (Session 02) / incoming-edge (Session 03), and **fragment→sub-fragment
+   composition** (parent schema `z.array(childSchema)`). Pick by what the code actually does.
+2. When `kind:` literals sit in helper functions, the producer edge still follows the **public
+   `<X>Projection` wrapper's `ProjectionBundle<X>` return type**, not the helper.
+3. Next context = **delivery-reporting** (`PhaseProgress`, `StatusDistribution`,
+   `RoadmapTimeline`, `ReleaseNotesDigest`, `TraceabilityMatrix`, + `DeliveryReportingSupporting`
+   which imports `PatternSummarySchema`/`EmbeddedDeliverableSchema` — outgoing import-edge).

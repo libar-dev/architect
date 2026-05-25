@@ -3,6 +3,7 @@
  * @architect-pattern SourceInventoryDigest
  * @architect-status active
  * @architect-role:contract
+ * @architect-uses SourceInventoryEntry
  * @architect-bounded-context:operational-insights
  *
  * Defines the `SourceInventoryDigest` fragment shape for grouped source-file inventory summaries.

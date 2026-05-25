@@ -11,14 +11,14 @@ This PR re-enables core functionality (annotations + skills + docs together).
 
 ## Start here
 
-| File                               | Purpose                                                                   |
-| ---------------------------------- | ------------------------------------------------------------------------- |
-| `PREAMBLE.md`                      | **Read first every session** — mandatory skills + API-first discipline    |
-| `EXECUTION-PLAN.md`                | Scope, diagnosis, workstreams, grounded phase-1 worklist, gates, metrics  |
-| `DECISIONS.md`                     | Locked decisions (D-1..D-7)                                               |
-| `sessions/NN-slug.md`              | Paste-ready worker prompts (next: `04-operational-insights-producers.md`) |
-| `SESSION-REPORTS-AND-LEARNINGS.md` | Append-only per-session log                                               |
-| `state.json`                       | Phase + baseline metrics                                                  |
+| File                               | Purpose                                                                  |
+| ---------------------------------- | ------------------------------------------------------------------------ |
+| `PREAMBLE.md`                      | **Read first every session** — mandatory skills + API-first discipline   |
+| `EXECUTION-PLAN.md`                | Scope, diagnosis, workstreams, grounded phase-1 worklist, gates, metrics |
+| `DECISIONS.md`                     | Locked decisions (D-1..D-7)                                              |
+| `sessions/NN-slug.md`              | Paste-ready worker prompts (next: `05-delivery-reporting-producers.md`)  |
+| `SESSION-REPORTS-AND-LEARNINGS.md` | Append-only per-session log                                              |
+| `state.json`                       | Phase + baseline metrics                                                 |
 
 ## Workstreams
 

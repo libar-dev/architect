@@ -311,6 +311,9 @@ graph TD
   adr008stepdefinitionstubsconvention -.->|uses| adr003sourcefirstpatternarchitecture
   adr009projectiontrustboundary -. see-also .- adr005codecbasedmarkdownrendering
   adr009projectiontrustboundary -. see-also .- adr006singlereadmodelarchitecture
+  annotationcoverage ==>|enables| annotationcoverageprojection
+  annotationcoverageprojection -->|depends-on| annotationcoverage
+  annotationcoverageprojection -.->|uses| annotationcoverage
   annotationcoverageprojection -->|depends-on| operationalinsightsprojectionsupport
   annotationcoverageprojection -.->|uses| operationalinsightsprojectionsupport
   antipatterndetector -->|depends-on| dodvalidationtypes
@@ -595,8 +598,11 @@ graph TD
   orphanpatternlistprojection -.->|uses| patternrelationsfragmentcontracts
   orphanpatternlistprojection -->|depends-on| patternrelationsprojectionsupport
   orphanpatternlistprojection -.->|uses| patternrelationsprojectionsupport
+  overviewdigest ==>|enables| overviewprojection
   overviewprojection -->|depends-on| operationalinsightsprojectionsupport
   overviewprojection -.->|uses| operationalinsightsprojectionsupport
+  overviewprojection -->|depends-on| overviewdigest
+  overviewprojection -.->|uses| overviewdigest
   patternbundleprojection -->|depends-on| patternrelationsfragmentcontracts
   patternbundleprojection -.->|uses| patternrelationsfragmentcontracts
   patternbundleprojection -->|depends-on| patternrelationsprojectionsupport
@@ -718,16 +724,31 @@ graph TD
   projectionfragmentschema ==>|enables| uirenderer
   releasenotesprojection -->|depends-on| deliveryreportingprojectionsupport
   releasenotesprojection -.->|uses| deliveryreportingprojectionsupport
+  requirementdigest ==>|enables| requirementdigestprojection
+  requirementdigest ==>|enables| requirementexecutabledigestprojection
+  requirementdigest ==>|enables| requirementspecsdigestprojection
   requirementdigestprojection -->|depends-on| operationalinsightsprojectionsupport
   requirementdigestprojection -.->|uses| operationalinsightsprojectionsupport
+  requirementdigestprojection -->|depends-on| requirementdigest
+  requirementdigestprojection -.->|uses| requirementdigest
   requirementexecutabledigestprojection -->|depends-on| operationalinsightsprojectionsupport
   requirementexecutabledigestprojection -.->|uses| operationalinsightsprojectionsupport
+  requirementexecutabledigestprojection -->|depends-on| requirementdigest
+  requirementexecutabledigestprojection -.->|uses| requirementdigest
   requirementspecsdigestprojection -->|depends-on| operationalinsightsprojectionsupport
   requirementspecsdigestprojection -.->|uses| operationalinsightsprojectionsupport
+  requirementspecsdigestprojection -->|depends-on| requirementdigest
+  requirementspecsdigestprojection -.->|uses| requirementdigest
   roadmaptimelineprojection -->|depends-on| deliveryreportingprojectionsupport
   roadmaptimelineprojection -.->|uses| deliveryreportingprojectionsupport
+  roleprofile ==>|enables| roleprofileprojection
+  roleprofilecollection ==>|enables| roleprofileprojection
   roleprofileprojection -->|depends-on| operationalinsightsprojectionsupport
   roleprofileprojection -.->|uses| operationalinsightsprojectionsupport
+  roleprofileprojection -->|depends-on| roleprofile
+  roleprofileprojection -.->|uses| roleprofile
+  roleprofileprojection -->|depends-on| roleprofilecollection
+  roleprofileprojection -.->|uses| roleprofilecollection
   scopereadinessprojection -->|depends-on| executioncontextprojectionsupport
   scopereadinessprojection -.->|uses| executioncontextprojectionsupport
   scopereadinessprojection -->|depends-on| projectionfragmentcontracts
@@ -739,12 +760,24 @@ graph TD
   sessionstatereader ==>|enables| deriveprocessstate
   sessionstatereader -->|depends-on| gherkinscanner
   sessionstatereader -.->|uses| gherkinscanner
+  sourceinventorydigest -->|depends-on| sourceinventoryentry
+  sourceinventorydigest -.->|uses| sourceinventoryentry
+  sourceinventorydigest ==>|enables| sourceinventoryprojection
+  sourceinventoryentry ==>|enables| sourceinventorydigest
   sourceinventoryprojection -->|depends-on| operationalinsightsprojectionsupport
   sourceinventoryprojection -.->|uses| operationalinsightsprojectionsupport
+  sourceinventoryprojection -->|depends-on| sourceinventorydigest
+  sourceinventoryprojection -.->|uses| sourceinventorydigest
   statusdistributionprojection -->|depends-on| deliveryreportingprojectionsupport
   statusdistributionprojection -.->|uses| deliveryreportingprojectionsupport
+  tagusageentry ==>|enables| tagusagematrix
+  tagusagematrix -->|depends-on| tagusageentry
+  tagusagematrix -.->|uses| tagusageentry
+  tagusagematrix ==>|enables| tagusageprojection
   tagusageprojection -->|depends-on| operationalinsightsprojectionsupport
   tagusageprojection -.->|uses| operationalinsightsprojectionsupport
+  tagusageprojection -->|depends-on| tagusagematrix
+  tagusageprojection -.->|uses| tagusagematrix
   taxonomydigest ==>|enables| taxonomydigestprojection
   taxonomydigestprojection -->|depends-on| governanceprojectionsupport
   taxonomydigestprojection -.->|uses| governanceprojectionsupport
