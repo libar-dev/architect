@@ -1,5 +1,6 @@
 @architect
 @architect-pattern:PatternReferenceValidation
+@architect-implements:ExtractionDiagnostics,PatternClassification
 @architect-status:active
 @architect-product-area:Annotation
 @behavior @taxonomy

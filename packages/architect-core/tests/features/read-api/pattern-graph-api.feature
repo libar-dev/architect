@@ -1,5 +1,6 @@
 @architect
 @architect-pattern:PatternGraphApiReverseLookup
+@architect-implements:PatternGraphApi
 @architect-status:active
 @architect-product-area:Annotation
 @behavior @read-api

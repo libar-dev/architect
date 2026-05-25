@@ -1,6 +1,8 @@
 @architect
 @architect-pattern:DualSourceMergeIntegration
+@architect-implements:DualSourceExtractor
 @architect-status:completed
+@architect-unlock-reason:De-orphan-implements-edge-WS1-session-08
 @architect-product-area:Annotation
 @behavior @extractor
 Feature: Dual-source merge integration

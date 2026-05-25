@@ -1,5 +1,6 @@
 @architect
 @architect-pattern:DocStringMediaType
+@architect-implements:GherkinAstParser
 @architect-status:completed
 @architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Annotation

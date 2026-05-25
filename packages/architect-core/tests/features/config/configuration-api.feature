@@ -1,5 +1,6 @@
 @architect
 @architect-pattern:ConfigurationAPI
+@architect-implements:ConfigLoader
 @architect-status:completed
 @architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Configuration

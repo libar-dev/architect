@@ -72,3 +72,23 @@
 - **Verification rule (load-bearing):** "the annotation is in the file" ≠ "the edge is in the graph." After authoring edges, **always read back via the Data API** (`pattern <X>` → `uses`/`usedBy`, or `arch orphans`) before running the gates. The file content alone does not prove registration.
 - **Consumed by:** all remaining WS-1 sessions (every context after pattern-relations, plus guard).
 - **Status:** resolved (verified against parser + API, 2026-05-25) → single comma-separated `@architect-uses` line; Data-API read-back is mandatory post-edit.
+
+## D-9 — Session 08 deferrals: 3 core test-features have no clean production-pattern target
+
+- **Question:** Three `architect-core/tests` orphans exercise production functions that carry **no `@architect-pattern`** and are not reachable from any pattern that does. What's the de-orphaning edge?
+- **Discovered (Session 08, verified against step imports + source):**
+  - `SourceMerging` → `mergeSourcesForGenerator` (`config/merge-sources.ts`) — file has no `@architect-pattern`; only re-exported by `src/index.ts` + `config/index.ts` barrels; **not** reachable from `ConfigLoader` (config-loader.ts does not import merge-sources). No owning pattern.
+  - `TagRegistrySchemasValidation` → `createDefaultTagRegistry`/`mergeTagRegistries` (`validation-schemas/tag-registry.ts`) — file has no `@architect-pattern` (only `pattern-graph.ts`, `codec-utils.ts`, `extracted-pattern.ts` carry one in that dir). No owning pattern.
+  - `TypeScriptTaxonomyImplementation` → `buildRegistry` (`taxonomy/registry-builder.ts`) — file has no `@architect-pattern` (sole hit is an example string in source). No owning pattern in `taxonomy/`.
+- **Chosen:** **DEFER all three** — record as "no clean target". Authoring `@architect-implements` against a non-existent pattern trips `arch dangling --strict`; mapping to a transitively-reachable-but-unrelated pattern (e.g. `ConfigLoader` for merge-sources, which it never calls) would be a false edge that lies to every future query. Per PREAMBLE Rule 4/5 + brief discipline, a missing edge beats a plausible-but-false one.
+- **Resolution path (next session input):** these need a **new code-originated `@architect-pattern`** on the owning production file (D-3 pattern — `merge-sources.ts`/`tag-registry.ts`/`registry-builder.ts` are data/config contracts), authored under maintainer approval, before the implements edge can land. Out of Session 08 edge-only scope.
+- **Consumed by:** sessions/08; the future core-identity session that adds the 3 missing production identities.
+- **Status:** resolved (verified against code + step imports, 2026-05-25) → defer; do not author phantom targets.
+
+## D-10 — `completed` test spec without a pre-existing unlock-reason needs one to add `@architect-implements`
+
+- **Question:** Adding `@architect-implements` to a `completed` test `.feature` tripped the process guard's `completed-protection` rule on exactly ONE file (`dual-source-merge.feature`, `DualSourceMergeIntegration`). The other 6 completed features I edited passed. How to resolve in-doctrine?
+- **Discovered (Session 08):** guard `--staged` reported **Status transitions: 0, Deliverable changes: 0** (D-6 holds — no FSM transition), but raised `[completed-protection] ... Cannot modify completed spec ... without unlock reason`. Verified the discriminator: `dual-source-merge.feature` is the **only** completed feature I touched that lacks an `@architect-unlock-reason` tag — the other 6 already carry `@architect-unlock-reason:Retroactive-completion-during-rebrand`, which satisfies the guard's spec-file protection. The guard's `completed-protection` rule guards *spec-file modification*, distinct from D-6 (which covers additive JSDoc on production `.ts` — those don't trip this rule).
+- **Chosen:** add `@architect-unlock-reason:De-orphan-implements-edge-WS1-session-08` to `dual-source-merge.feature` only. This is the guard's own documented `Fix:` and the architect-base §11 sanctioned mechanism for legitimately modifying a completed spec — NOT a No-BC violation (no `@deprecated`/eslint-disable/compat alias; not softening a removal). The status stays `completed`; only the implements edge + the required unlock-reason are added.
+- **Consumed by:** sessions/08. Rule for future sessions: when adding `@architect-implements` to a **completed test feature**, check for a pre-existing `@architect-unlock-reason`; if absent, the guard's `completed-protection` requires one (≥10 meaningful chars) — add the campaign reason. This is orthogonal to D-6's FSM/transition concern.
+- **Status:** resolved (process guard is the arbiter, 2026-05-25) → add unlock-reason on the one unprotected completed spec.
