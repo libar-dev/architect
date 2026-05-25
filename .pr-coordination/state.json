@@ -12,8 +12,8 @@
     "phase": "1-projection-pilot-COMPLETE",
     "currentSession": "WS-1 expansion (core/guard/cli/mcp) or WS-2 skills / WS-3 docs",
     "lastCompletedSession": "06-execution-context-producers",
-    "lastCommit": "2641a6b",
-    "lastCommitNote": "trailing pointer — names the prior committed session; advanced one step per session (a commit cannot store its own sha)",
+    "lastCommit": "d1dcd45",
+    "lastCommitNote": "last campaign commit (Session 06, pilot finale). This finalize bookkeeping commit advances the pointer to it; a session commit cannot store its own sha.",
     "baselineMetrics": {
       "patterns": 270,
       "orphansTotal": 107,
