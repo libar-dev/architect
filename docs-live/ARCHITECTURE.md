@@ -7,7 +7,7 @@
 
 ## Overview
 
-This diagram captures 233 patterns in the Component architecture view.
+This diagram captures 237 patterns in the Component architecture view.
 
 ## Diagram
 
@@ -199,6 +199,7 @@ graph TD
     compacttextrenderer["CompactTextRenderer<br/>(codec)"]
     fragmentrendererdispatch["FragmentRendererDispatch<br/>(codec)"]
     jsonrenderer["JsonRenderer<br/>(codec)"]
+    markdownblockparser["MarkdownBlockParser<br/>(codec)"]
     markdownrenderer["MarkdownRenderer<br/>(codec)"]
     uirenderer["UiRenderer<br/>(codec)"]
   end
@@ -227,10 +228,13 @@ graph TD
     codecutils["CodecUtils<br/>(codec)"]
     extractedpattern["ExtractedPattern<br/>(contract)"]
     patterngraph["PatternGraph<br/>(contract)"]
+    tagregistryschemas["TagRegistrySchemas<br/>(contract)"]
   end
   subgraph configuration["configuration"]
     configloader["ConfigLoader<br/>(service)"]
     defineconfig["DefineConfig<br/>(utility)"]
+    registrybuilder["RegistryBuilder<br/>(utility)"]
+    sourcemerge["SourceMerge<br/>(utility)"]
   end
   subgraph execution_context["execution-context"]
     deliverable["Deliverable<br/>(contract)"]
@@ -1079,6 +1083,7 @@ graph TD
 - LintProcessCliBehavior
 - LintRules
 - LoadPreambleParser
+- MarkdownBlockParser
 - MarkdownRenderer
 - MCPFileWatcher
 - MCPPipelineSession
@@ -1145,6 +1150,7 @@ graph TD
 - ProjectConfigSnapshot
 - ProjectionFragmentContracts
 - ProjectionFragmentSchema
+- RegistryBuilder
 - ReleaseNotesDigest
 - ReleaseNotesProjection
 - ReleaseNotesProjectionExecutableTests
@@ -1171,10 +1177,12 @@ graph TD
 - SourceInventoryDigest
 - SourceInventoryEntry
 - SourceInventoryProjection
+- SourceMerge
 - SourceMerging
 - StatusDistribution
 - StatusDistributionProjection
 - StubTaxonomyTagTests
+- TagRegistrySchemas
 - TagRegistrySchemasValidation
 - TagUsageEntry
 - TagUsageMatrix

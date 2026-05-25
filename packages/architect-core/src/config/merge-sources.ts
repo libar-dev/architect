@@ -1,3 +1,17 @@
+/**
+ * @architect
+ * @architect-pattern SourceMerge
+ * @architect-status active
+ * @architect-role:utility
+ * @architect-bounded-context:configuration
+ *
+ * ## SourceMerge - Per-Generator Source Override Merging
+ *
+ * Merges per-generator source overrides into the resolved sources config.
+ * Exports `mergeSourcesForGenerator`, which layers a named generator's
+ * additional TypeScript inputs, additional features, or wholesale feature
+ * replacement onto the base resolved sources, preserving the shared exclude set.
+ */
 import type { GeneratorSourceOverride, ResolvedSourcesConfig } from './project-config.js';
 
 export function mergeSourcesForGenerator(

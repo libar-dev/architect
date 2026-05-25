@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:LoadPreambleParser
 @architect-status:active
+@architect-implements:MarkdownBlockParser
 @architect-product-area:Generation
 @behavior @load-preamble
 Feature: Markdown-to-SectionBlock Parser

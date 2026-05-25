@@ -110,3 +110,17 @@
 - **Boundary:** defer when the command does **not** map 1:1 to a single named pattern — e.g. `generate-docs.feature` invokes a doc-gen command with **no** production `GenerateDocs*` pattern (search → only the test feature itself); `public-contract`/`cli-mcp-documentation-parity` are multi-surface boundary/freeze tests. No 1:1 target → defer (don't invent one).
 - **Consumed by:** sessions/10 (+ any future CLI/MCP test-feature session).
 - **Status:** resolved (maintainer, 2026-05-25) → accept; runCommand command string is the verified fact, 1:1 mapping only.
+
+## D-13 — Four new code-originated identities for shipped-but-un-patterned utilities (supersedes the D-9 deferrals)
+
+- **Question:** The D-9 deferrals + two test features (`load-preamble`, `taxonomy-tags`) exercise shipped production utilities that carry **no** `@architect-pattern`, so their executable tests can't realize anything and stay orphaned. Create code-originated identities (D-3 pattern)?
+- **Approved (maintainer, 2026-05-25):** create four identities. Each de-orphans its executable test feature(s) via the test's `@architect-implements` edge. **Verified-load-bearing fact:** `findOrphanPatterns` (graph-inventory.ts:149-158) counts `implementedBy` as a relationship, so a new identity is non-orphan the moment a test feature implements it — **no `@architect-uses` edge required** (avoids the real circular import between `registry-builder.ts` and `tag-registry.ts`).
+- **The four (role/bounded-context verified against siblings + the live bounded-context inventory; all reuse EXISTING contexts — no new-context noise):**
+  - `RegistryBuilder` — `taxonomy/registry-builder.ts` (`buildRegistry`) — `role:utility`, `bc:configuration` (no sibling in `taxonomy/`; nearest neighbors are `config/role-constants` + `config/defaults` which it imports; `taxonomy` is not an existing context, so reuse `configuration` rather than spawn a one-pattern context). Realized by **two** tests: `StubTaxonomyTagTests` + `TypeScriptTaxonomyImplementation` (the latter a D-9 deferral).
+  - `SourceMerge` — `config/merge-sources.ts` (`mergeSourcesForGenerator`) — `role:utility`, `bc:configuration` (mirrors `ConfigLoader`, same dir). Realized by `SourceMerging` (D-9).
+  - `TagRegistrySchemas` — `validation-schemas/tag-registry.ts` (`createDefaultTagRegistry`/`mergeTagRegistries` + the Zod schemas) — `role:contract`, `bc:validation-schemas` (mirrors `ExtractedPattern`, same dir). Realized by `TagRegistrySchemasValidation`.
+  - `MarkdownBlockParser` — `utils/markdown-parser.ts` (`parseMarkdownToBlocks`) — `role:codec`, `bc:rendering` (a text→blocks parse = codec, consistent with `CodecUtils`=role:codec and `BlockSchema`=bc:rendering; its product defines its domain). Realized by `LoadPreambleParser`.
+- **D-10:** the two `completed` test features already carry an `@architect-unlock-reason` (`TypeScriptTaxonomyImplementation`=`Value-transfer-from-spec`, `SourceMerging`=`Retroactive-completion-during-rebrand`) — no new reason needed; the other three features are `active`.
+- **Identity + implements edges land in the SAME commit** (else `dangling --strict` trips on the not-yet-existing target).
+- **Consumed by:** sessions/11. Closes D-9 (its three deferrals are now realized).
+- **Status:** resolved (maintainer, 2026-05-25) → create the four; minimal de-orphaning via `implementedBy`.

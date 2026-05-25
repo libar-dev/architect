@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:TypeScriptTaxonomyImplementation
 @architect-status:completed
+@architect-implements:RegistryBuilder
 @architect-unlock-reason:Value-transfer-from-spec
 @architect-product-area:CoreTypes
 @taxonomy @registry

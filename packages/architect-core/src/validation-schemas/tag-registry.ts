@@ -1,3 +1,18 @@
+/**
+ * @architect
+ * @architect-pattern TagRegistrySchemas
+ * @architect-status active
+ * @architect-role:contract
+ * @architect-bounded-context:validation-schemas
+ *
+ * ## TagRegistrySchemas - Zod Contracts for the Tag Registry
+ *
+ * Defines the Zod schemas for the tag registry — `RoleDefinitionSchema`,
+ * `MetadataTagDefinitionSchema`, `AggregationTagDefinitionSchema`, and the
+ * composing `TagRegistrySchema` — plus the inferred types and the
+ * `createDefaultTagRegistry` / `mergeTagRegistries` helpers that build and
+ * combine registries from these contracts.
+ */
 import { z } from 'zod';
 
 import { DIAGRAM_SHAPE_VALUES, FORMAT_TYPES, buildRegistry } from '../taxonomy/index.js';

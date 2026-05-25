@@ -1,3 +1,17 @@
+/**
+ * @architect
+ * @architect-pattern MarkdownBlockParser
+ * @architect-status active
+ * @architect-role:codec
+ * @architect-bounded-context:rendering
+ *
+ * ## MarkdownBlockParser - Markdown to Structured Blocks
+ *
+ * Parses markdown text into structured Section/Block content. Exports
+ * `parseMarkdownToBlocks`, a line-driven state machine that recognizes
+ * headings, code fences, tables, ordered/unordered lists, separators, and
+ * paragraphs, emitting typed `SectionBlock` values for the rendering pipeline.
+ */
 import type { SectionBlock } from '../config/section-block.js';
 
 type ParserState = 'idle' | 'in-code-fence' | 'in-table' | 'in-paragraph' | 'in-list';

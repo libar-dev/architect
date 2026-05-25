@@ -4,7 +4,7 @@
 
 | Field | Value |
 | ----- | ----- |
-| Count | 239   |
+| Count | 243   |
 
 ## Filters
 
@@ -139,6 +139,7 @@
 - LintProcessCliBehavior
 - LintRules
 - LoadPreambleParser
+- MarkdownBlockParser
 - MarkdownRenderer
 - MCPFileWatcher
 - MCPPipelineSession
@@ -206,6 +207,7 @@
 - ProjectConfigSnapshot
 - ProjectionFragmentContracts
 - ProjectionFragmentSchema
+- RegistryBuilder
 - ReleaseNotesDigest
 - ReleaseNotesProjection
 - ReleaseNotesProjectionExecutableTests
@@ -234,10 +236,12 @@
 - SourceInventoryDigest
 - SourceInventoryEntry
 - SourceInventoryProjection
+- SourceMerge
 - SourceMerging
 - StatusDistribution
 - StatusDistributionProjection
 - StubTaxonomyTagTests
+- TagRegistrySchemas
 - TagRegistrySchemasValidation
 - TagUsageEntry
 - TagUsageMatrix
@@ -383,6 +387,7 @@
 | tests/features/cli/lint-process.feature                                                                              | executable | LintProcessCliBehavior                                |            | gherkin    | completed |
 | packages/architect-guard/src/lint/rules.ts                                                                           | executable | LintRules                                             | service    | typescript | completed |
 | tests/features/generation/load-preamble.feature                                                                      | design     | LoadPreambleParser                                    |            | gherkin    | active    |
+| packages/architect-core/src/utils/markdown-parser.ts                                                                 | design     | MarkdownBlockParser                                   | codec      | typescript | active    |
 | packages/architect-projection/src/renderers/render-markdown.ts                                                       | executable | MarkdownRenderer                                      | codec      | typescript | completed |
 | packages/architect-mcp/src/file-watcher.ts                                                                           | executable | MCPFileWatcher                                        | utility    | typescript | completed |
 | packages/architect-mcp/src/pipeline-session.ts                                                                       | executable | MCPPipelineSession                                    | service    | typescript | completed |
@@ -450,6 +455,7 @@
 | packages/architect-projection/src/fragments/documentation-composition/project-config-snapshot.ts                     | design     | ProjectConfigSnapshot                                 | contract   | typescript | active    |
 | packages/architect-projection/src/fragments/index.ts                                                                 | design     | ProjectionFragmentContracts                           | contract   | typescript | active    |
 | packages/architect-projection/src/fragments/fragment-schema.internal.ts                                              | design     | ProjectionFragmentSchema                              | contract   | typescript | active    |
+| packages/architect-core/src/taxonomy/registry-builder.ts                                                             | design     | RegistryBuilder                                       | utility    | typescript | active    |
 | packages/architect-projection/src/fragments/delivery-reporting/release-notes-digest.ts                               | design     | ReleaseNotesDigest                                    | contract   | typescript | active    |
 | packages/architect-projection/src/projections/delivery-reporting/index.ts                                            | executable | ReleaseNotesProjection                                | projection | typescript | completed |
 | packages/architect-projection/tests/features/projections/delivery-reporting/release-notes.feature                    | executable | ReleaseNotesProjectionExecutableTests                 | projection | gherkin    | completed |
@@ -478,10 +484,12 @@
 | packages/architect-projection/src/fragments/operational-insights/source-inventory-digest.ts                          | design     | SourceInventoryDigest                                 | contract   | typescript | active    |
 | packages/architect-projection/src/fragments/operational-insights/source-inventory-entry.ts                           | design     | SourceInventoryEntry                                  | contract   | typescript | active    |
 | packages/architect-projection/src/projections/operational-insights/index.ts                                          | executable | SourceInventoryProjection                             | projection | typescript | completed |
+| packages/architect-core/src/config/merge-sources.ts                                                                  | design     | SourceMerge                                           | utility    | typescript | active    |
 | packages/architect-core/tests/features/config/source-merging.feature                                                 | executable | SourceMerging                                         |            | gherkin    | completed |
 | packages/architect-projection/src/fragments/delivery-reporting/status-distribution.ts                                | design     | StatusDistribution                                    | contract   | typescript | active    |
 | packages/architect-projection/src/projections/delivery-reporting/index.ts                                            | executable | StatusDistributionProjection                          | projection | typescript | completed |
 | tests/features/api/stub-integration/taxonomy-tags.feature                                                            | design     | StubTaxonomyTagTests                                  |            | gherkin    | active    |
+| packages/architect-core/src/validation-schemas/tag-registry.ts                                                       | design     | TagRegistrySchemas                                    | contract   | typescript | active    |
 | packages/architect-core/tests/features/validation/tag-registry-schemas.feature                                       | design     | TagRegistrySchemasValidation                          |            | gherkin    | active    |
 | packages/architect-projection/src/fragments/operational-insights/tag-usage-entry.ts                                  | design     | TagUsageEntry                                         | contract   | typescript | active    |
 | packages/architect-projection/src/fragments/operational-insights/tag-usage-matrix.ts                                 | design     | TagUsageMatrix                                        | contract   | typescript | active    |

@@ -1,3 +1,17 @@
+/**
+ * @architect
+ * @architect-pattern RegistryBuilder
+ * @architect-status active
+ * @architect-role:utility
+ * @architect-bounded-context:configuration
+ *
+ * ## RegistryBuilder - Canonical TagRegistry Assembly
+ *
+ * Assembles the canonical `TagRegistry` from the repo's built-in role, metadata,
+ * and aggregation tag definitions. Exports `buildRegistry`, which composes role
+ * constants, status/hierarchy values, and format options into the immutable
+ * registry that drives tag classification and validation across the toolchain.
+ */
 import type {
   AggregationTagDefinition,
   MetadataTagDefinition,

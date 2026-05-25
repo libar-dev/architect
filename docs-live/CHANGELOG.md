@@ -76,6 +76,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - LayerInference
 - LintProcessCLI
 - LoadPreambleParser
+- MarkdownBlockParser
 - MCPRuntimeHardeningExecutableTests
 - MCPServerLifecycleExecutableTests
 - MCPToolInputValidationExecutableTests
@@ -117,6 +118,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - ProjectConfigSnapshot
 - ProjectionFragmentContracts
 - ProjectionFragmentSchema
+- RegistryBuilder
 - ReleaseNotesDigest
 - ReleaseVNEXT
 - RequirementDigest
@@ -130,8 +132,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - ShapeExtractor
 - SourceInventoryDigest
 - SourceInventoryEntry
+- SourceMerge
 - StatusDistribution
 - StubTaxonomyTagTests
+- TagRegistrySchemas
 - TagRegistrySchemasValidation
 - TagUsageEntry
 - TagUsageMatrix
