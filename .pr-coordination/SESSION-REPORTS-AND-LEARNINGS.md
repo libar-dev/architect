@@ -291,3 +291,42 @@ registry-builder.ts un-patterned). Each needs a new code-originated `@architect-
 3. `format:check` is now green repo-wide (the WS-2 dirtiness Session 07 flagged is resolved).
 4. Next core orphans = the guard/cli/mcp packages + the 3 D-9 deferrals (need new
    production identities first).
+
+## Session 09 — Connect architect-guard production spine + D-8 hygiene (committed 4f775fc)
+
+Prior session commit = `e5de206`. De-orphaned both `architect-guard/src` orphans →
+**zero guard-src orphans remain**. Total orphans **37 → 35**. `GitNameStatusParser`
+connected via incoming edges from `GitBranchDiff` (direct importer of `parseGitNameStatus`,
+branch-diff.ts:30) + `DetectChanges` (imports via `git/index` barrel; extended its existing
+line per D-8). `ValidationModule` (pure re-export barrel, `completed`) connected via
+`@architect-uses DoDValidator, AntiPatternDetector, DoDValidationTypes` — **D-11**: mirrors
+the in-package `GitModule` precedent (barrel→submodule for a producerless grouping barrel,
+distinct from D-7's fragment-barrel-with-producer rule). All edges registered first-try
+(read-back: `GitNameStatusParser.usedBy=[DetectChanges,GitBranchDiff]`,
+`ValidationModule.uses`=3 submodules). All 12 §6 gates green (test:dogfood 1057, perf 3/3,
+dangling --strict 0, audit:subtractive 0). guard `--staged`: 6 modified, **0 status
+transitions** (D-6 holds on `completed` ValidationModule `.ts` — no unlock-reason).
+docs:all → ARCHITECTURE.md regenerated, committed with code.
+
+**D-8 colon-duplicate hygiene CLEARED (the debt was real, not stale):** `derive-state.ts`
+
+- `decider.ts` each carried a redundant malformed `@architect-uses:` colon-form line (line 10)
+  duplicating the correct space-form (line 9). Same targets, so no edges were lost — but
+  illegal colon-on-uses + violates one-line rule. Deleted both line-10 duplicates; graph
+  `uses` unchanged (verified via read-back). `LintPatternsCLI` had only ONE line (D-8's
+  "2 lines" note for it was stale — like the projection ProjectionSupport notes in S03-05).
+
+### Rules for next session (10 — connectable test-feature implements edges)
+
+1. **D-12 (new):** a `runCommand`-driven CLI integration test `@architect-implements` the
+   production CLI pattern for the command it invokes, when the command maps 1:1 to a named
+   pattern (verify the command string first). E.g. `lint-process.feature → LintProcessCLI`,
+   `lint-patterns.feature → LintPatternsCLI`. Both production patterns confirmed to exist.
+2. Only `CompactTextRendererTests → CompactTextRenderer` has a TS-import target (verified).
+   `generate-docs`, `public-contract`, `cli-mcp-documentation-parity`, `list-parent-*` have
+   NO clean target — defer (record, don't author phantom edges).
+3. **D-10 check** on the `completed` features `lint-process`/`lint-patterns`: add
+   `@architect-unlock-reason` if absent before staging (guard `completed-protection`).
+4. Coordination model: agent does the scoped edits + Data-API read-back; main thread runs
+   the §6 gates + commit + bookkeeping. format:check flags `.pr-coordination/*` md/json —
+   run `prettier --write` on the session's coordination files before the gate.
