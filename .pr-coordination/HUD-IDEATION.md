@@ -8,6 +8,15 @@
 > disclosure-gated generated-views index; CLI + MCP parity. Steps **3 + 4 remain
 > sequenced ideation.**
 >
+> **Build status (WS-3 Session 15, D-18):** the `overview` HUD now also carries a
+> disclosure-gated **architecture glimpse** — a coarse package-level context map
+> at `summary` (+ an "explore via the API, not grep" pointer) and the full
+> bounded-context Context Map at `full`. Reuses one shared context-map builder
+> (`_shared/architecture-graph.internal.ts`) with the architecture doc; the
+> component view is now production-only (working-state under `architect/`
+> excluded, generalizing D-16). This is the "glimpse of architecture + API
+> capability" half of the maintainer ask, complementing the step-2 views index.
+>
 > **Vocabulary clarification (load-bearing, resolved in D-17):** the read surface
 > uses `ContentRichnessSchema` (`name-only · summary · summary-with-references ·
 full`), NOT `ProgressiveDisclosureLevelSchema` (`essential…advanced`). The
