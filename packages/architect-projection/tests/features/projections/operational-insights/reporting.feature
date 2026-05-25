@@ -2,7 +2,7 @@
 @architect-pattern:OperationalInsightsProjectionExecutableTests
 @architect-implements:OperationalInsightsProjectionSupport,OverviewProjection,AnnotationCoverageProjection,TagUsageProjection,SourceInventoryProjection,RoleProfileProjection,RequirementDigestProjection
 @architect-status:completed
-@architect-unlock-reason:Add-overview-disclosure-rendering-coverage-WS3-S14
+@architect-unlock-reason:Add-overview-architecture-glimpse-rendering-WS3-S15
 @architect-phase:49
 @architect-product-area:Projection
 @architect-role:projection
@@ -35,9 +35,11 @@ Feature: Operational Insights reporting projections
     **Invariant:** `OverviewDigest` always carries a `progress` block
     (delivery-total counts and a percentage that excludes candidates),
     `activePhases` limited to phases with active work, a `blocking` array of
-    incomplete patterns whose `dependsOn` targets are incomplete, a
-    `generatedViews` index of the fetchable documentation surfaces, and the
-    embedded CLI-hints list for session bootstrap.
+    incomplete patterns whose `dependsOn` targets are incomplete, an
+    `architecture` glimpse (a coarse package-level context map plus the
+    bounded-context map, both pre-rendered Mermaid, derived from a
+    production-only component graph), a `generatedViews` index of the fetchable
+    documentation surfaces, and the embedded CLI-hints list for session bootstrap.
 
     **Rationale:** These fields are the canonical session-start payload;
     omitting any of them forces consumers back into raw graph queries.
@@ -54,18 +56,23 @@ Feature: Operational Insights reporting projections
   Rule: Overview compact rendering honors disclosure richness
 
     **Invariant:** Rendering the overview digest at `name-only` emits the
-    progress section alone; at `summary` it truncates the blocking list to the
-    first few entries with a "more" pointer and collapses the generated-views
-    index to a single line; at `full` it emits every blocking entry and the
-    itemized generated-views index. Disclosure shapes how much is rendered,
-    never what the digest contains.
+    progress section alone (no architecture glimpse); at `summary` it truncates
+    the blocking list to the first few entries with a "more" pointer, collapses
+    the generated-views index to a single line, and shows the coarse
+    package-level architecture chart (one Mermaid block) with an
+    API-promoting pointer; at `full` it emits every blocking entry, the itemized
+    generated-views index, and both architecture charts (package chart plus the
+    bounded-context map). Disclosure shapes how much is rendered, never what the
+    digest contains.
 
     **Rationale:** The overview is the session-bootstrap call; a terse default
-    keeps it a heads-up display while `full` preserves the complete payload.
-    See DECISIONS D-17.
+    keeps it a heads-up display while `full` preserves the complete payload. The
+    architecture glimpse promotes the app architecture + Data API so agents
+    query the graph instead of grepping. See DECISIONS D-17 and D-18.
 
     **Verified by:** rendering one overview digest at each richness level and
-    asserting blocking truncation plus the generated-views shape.
+    asserting blocking truncation, the generated-views shape, and the
+    disclosure-gated architecture charts (none / package / package + context).
 
     Scenario: rendering the overview digest at each disclosure level
       Given an Operational Insights overview context with six blocking dependencies

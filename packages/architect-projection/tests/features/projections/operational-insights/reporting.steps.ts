@@ -159,7 +159,11 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           Then(
             'the overview digest should expose delivery progress active phases and blocking entries',
             () => {
-              expect(state!.overview).toEqual({
+              // The architecture glimpse derives from a separate component-scope
+              // graph walk; its exact Mermaid is exercised in the disclosure rule
+              // below, so split it off and assert the stable fields exactly.
+              const { architecture, ...root } = state!.overview!.root;
+              expect({ root, children: state!.overview!.children }).toEqual({
                 root: {
                   kind: 'OverviewDigest',
                   progress: {
@@ -264,6 +268,11 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 },
                 children: {},
               });
+
+              expect(architecture).toBeDefined();
+              expect(architecture?.packageChart.type).toBe('mermaid');
+              expect(architecture?.contextMap?.type).toBe('mermaid');
+              expect(architecture?.pointer).toContain('not grep');
             },
           );
 
@@ -337,6 +346,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           expect(output).toContain('=== PROGRESS ===');
           expect(output).not.toContain('=== BLOCKING ===');
           expect(output).not.toContain('=== GENERATED VIEWS ===');
+          // name-only omits the architecture glimpse too — the bare progress signal.
+          expect(output).not.toContain('=== ARCHITECTURE ===');
+          expect(output).not.toContain('```mermaid');
         });
 
         And(
@@ -348,6 +360,11 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             expect(output).toContain('... and 1 more — run `arch blocking`');
             expect(output).toContain('docs via `documentation <type>`:');
             expect(output).not.toContain('— `documentation architecture`');
+            // summary shows the coarse package chart (one Mermaid block) + the
+            // API-promoting pointer, but NOT the richer bounded-context map.
+            expect(output).toContain('=== ARCHITECTURE ===');
+            expect(output.match(/```mermaid/g) ?? []).toHaveLength(1);
+            expect(output).toContain('Explore via the API, not grep');
           },
         );
 
@@ -359,6 +376,10 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             expect(blockingLines).toHaveLength(6);
             expect(output).not.toContain('more — run `arch blocking`');
             expect(output).toContain('— `documentation architecture`');
+            // full adds the bounded-context map below the package chart — two
+            // Mermaid blocks in the architecture section.
+            expect(output).toContain('=== ARCHITECTURE ===');
+            expect(output.match(/```mermaid/g) ?? []).toHaveLength(2);
           },
         );
       },

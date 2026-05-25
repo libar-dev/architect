@@ -42,9 +42,10 @@ import {
   isPatternComplete,
   isPatternPlanned,
   normalizeStatus,
+  ProjectionError,
 } from '@libar-dev/architect-core';
 
-import { heading, list, paragraph, type Block } from '../../blocks/schema.js';
+import { heading, list, mermaid, paragraph, type Block } from '../../blocks/schema.js';
 import type { ProjectionContext } from '../../context/projection-context.js';
 import type { BusinessRuleReference } from '../../fragments/governance/index.js';
 import { projectSingle, type ProjectionBundle } from '../../fragments/base.js';
@@ -62,7 +63,14 @@ import {
   type SourceInventoryEntry,
   type TagUsageMatrix,
 } from '../../fragments/operational-insights/index.js';
-import type { RequirementEntry } from '../../fragments/operational-insights/supporting.js';
+import type {
+  OverviewArchitecture,
+  RequirementEntry,
+} from '../../fragments/operational-insights/supporting.js';
+import {
+  assembleContextMap,
+  collectComponentGraph,
+} from '../_shared/architecture-graph.internal.js';
 import { filterPatterns } from '../_shared/filter.js';
 import { getPatternName, getRelationships } from '../_shared/pattern-helpers.internal.js';
 import {
@@ -167,10 +175,63 @@ const OVERVIEW_GENERATED_VIEWS: readonly { docType: string; verb: string; summar
   },
 ];
 
+/**
+ * The one-line "explore via the API, not grep" pointer rendered under the
+ * architecture glimpse — names the verbs that drill from the chart into the
+ * PatternGraph so agents reach for the Data API instead of file scanning.
+ */
+const OVERVIEW_ARCHITECTURE_POINTER =
+  'Explore via the API, not grep: `documentation architecture` (full map) · `arch neighborhood <Pattern>` · `dep-tree <Pattern>`';
+
+/**
+ * Builds the high-level architecture glimpse for the overview: a coarse
+ * package-level context map (always) plus the richer bounded-context map
+ * (identical grouping to `docs-live/ARCHITECTURE.md`). Both derive from ONE
+ * component-scope node/edge collection so the most-called verb pays a single
+ * graph walk; the renderer decides which chart each disclosure level shows.
+ *
+ * Best-effort: the glimpse needs every component node's source file to resolve
+ * to a configured workspace package. In a fully-configured repo it always does.
+ * In a consumer repo (or test fixture) that has not declared `packages`
+ * matchers, the shared resolver raises `UNMAPPED_PACKAGE` by design — so we omit
+ * the glimpse (returning `undefined`) rather than crash this resilience-critical
+ * health verb. The same config gap still fails LOUDLY in `docs:all` /
+ * `validate:all`, which share the resolver's hard-error contract, so omitting
+ * here hides nothing. Any other error is a real bug and propagates.
+ */
+function buildOverviewArchitecture(context: ProjectionContext): OverviewArchitecture | undefined {
+  const componentGraph = ((): ReturnType<typeof collectComponentGraph> | undefined => {
+    try {
+      return collectComponentGraph(context);
+    } catch (error) {
+      if (error instanceof ProjectionError && error.code === 'UNMAPPED_PACKAGE') {
+        return undefined;
+      }
+      throw error;
+    }
+  })();
+  if (componentGraph === undefined) {
+    return undefined;
+  }
+
+  const { nodes, edges } = componentGraph;
+  const packageChart = assembleContextMap(nodes, edges, 'package');
+  const contextMap = assembleContextMap(nodes, edges, 'component');
+
+  return {
+    packageChart: mermaid(packageChart.mermaid),
+    packageCount: packageChart.groupCount,
+    contextMap: mermaid(contextMap.mermaid),
+    contextNodeCount: contextMap.groupCount,
+    pointer: OVERVIEW_ARCHITECTURE_POINTER,
+  };
+}
+
 export function buildOverviewDigest(context: ProjectionContext): OverviewDigest {
   const patterns = filterPatterns(context.graph.patterns, context.projectionFilter);
   const counts = createStatusCounts(patterns);
   const total = counts.total - counts.candidate;
+  const architecture = buildOverviewArchitecture(context);
 
   return {
     kind: 'OverviewDigest',
@@ -224,6 +285,7 @@ export function buildOverviewDigest(context: ProjectionContext): OverviewDigest 
             },
           ];
     }),
+    ...(architecture !== undefined ? { architecture } : {}),
     generatedViews: OVERVIEW_GENERATED_VIEWS.map((view) => ({ ...view })),
     cliHints: [...OVERVIEW_CLI_HINTS],
   };
@@ -815,19 +877,22 @@ export function projectAnnotationCoverage(
  * @architect-pattern OverviewProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses OperationalInsightsProjectionSupport, OverviewDigest
+ * @architect-uses OperationalInsightsProjectionSupport, OverviewDigest, ArchitectureDiagram
  * @architect-bounded-context:projection
  *
  * ## Overview projection
  *
  * **Value:** Assembles the canonical `architect_overview` payload — delivery
- * progress, active phases, blocked patterns, and the CLI-hints block — as an
- * `OverviewDigest` fragment that session-start workflows consume directly.
+ * progress, active phases, blocked patterns, a high-level architecture glimpse,
+ * and the CLI-hints block — as an `OverviewDigest` fragment that session-start
+ * workflows consume directly.
  *
  * **Invariant:** `progress` always excludes candidates from the total;
  * `activePhases` only lists phases with `active > 0`; `blocking` only lists
  * non-complete patterns whose `dependsOn` targets are themselves not
- * complete; `cliHints` is a copy of the shared bootstrap list.
+ * complete; the `architecture` glimpse derives from one component-scope graph
+ * walk (test-features + decision-records excluded); `cliHints` is a copy of the
+ * shared bootstrap list.
  *
  * **Behavior:**
  * - Pulls `graph.counts` for the delivery-total progress block, rounding the
@@ -835,6 +900,9 @@ export function projectAnnotationCoverage(
  * - Walks each incomplete pattern's relationships via `getRelationships`,
  *   filtering `dependsOn` for dependencies that are not complete, and emits
  *   a `{pattern, status, blockedBy}` entry when any exist.
+ * - Builds a coarse package-level context map plus the bounded-context map
+ *   (mirroring `docs-live/ARCHITECTURE.md`) via the shared architecture-graph
+ *   helpers, so the renderer can show the architecture shape at a glance.
  * - Copies `OVERVIEW_CLI_HINTS` into the fragment so consumers do not need
  *   to re-derive the bootstrap command list.
  *

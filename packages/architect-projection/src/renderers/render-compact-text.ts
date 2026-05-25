@@ -114,6 +114,10 @@ function renderOverviewDigest(
     return sections.join('\n\n') + '\n';
   }
 
+  if (overview.architecture !== undefined) {
+    sections.push(renderOverviewArchitecture(overview.architecture, richness, options));
+  }
+
   if (overview.activePhases.length > 0) {
     const lines = overview.activePhases.map((phase) => {
       const name = phase.name !== undefined ? `: ${phase.name}` : '';
@@ -146,6 +150,31 @@ function renderOverviewDigest(
   }
 
   return sections.join('\n\n') + '\n';
+}
+
+/** Wraps Mermaid source in a fenced ```mermaid block so markdown/MCP surfaces
+ * render it and CLI consumers still read it as plain text. */
+function fenceMermaid(content: string): string {
+  return '```mermaid\n' + content + '\n```';
+}
+
+/**
+ * The high-level architecture glimpse. `name-only` never reaches here (the
+ * caller returns early). `summary` / `summary-with-references` show the coarse
+ * package chart + the API-promoting pointer; `full` adds the richer
+ * bounded-context map below it.
+ */
+function renderOverviewArchitecture(
+  architecture: NonNullable<OverviewDigest['architecture']>,
+  richness: ContentRichness,
+  options: RenderCompactOptions | undefined,
+): string {
+  const blocks = [fenceMermaid(architecture.packageChart.content)];
+  if (richness === 'full' && architecture.contextMap !== undefined) {
+    blocks.push(fenceMermaid(architecture.contextMap.content));
+  }
+  blocks.push(architecture.pointer);
+  return renderMarker('ARCHITECTURE', options) + '\n' + blocks.join('\n\n');
 }
 
 function renderGeneratedViews(
