@@ -718,6 +718,60 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   );
 
   Rule(
+    'The architecture view splits into a context map plus per-group detail diagrams',
+    ({ RuleScenario }) => {
+      RuleScenario(
+        'the component view splits into a context map and per-group detail diagrams',
+        ({ Given, When, Then, And }) => {
+          Given(
+            'a Documentation Composition architecture context with bounded contexts layers and product areas',
+            () => {
+              state!.context = createBoundedContextScopeContext();
+            },
+          );
+
+          When('I project the component architecture diagram', () => {
+            state!.architectureDiagrams['component'] = parseAndProjectArchitectureDiagram(
+              state!.context!,
+              { scope: 'component' },
+            );
+          });
+
+          Then('the component diagram should lead with a context map section', () => {
+            const diagram = state!.architectureDiagrams['component'];
+            expect(diagram).toBeDefined();
+            const sections = diagram!.root.sections;
+            expect(sections.length).toBeGreaterThanOrEqual(2);
+            const first = sections[0];
+            expect(first?.title).toMatch(/^Context Map/u);
+            expect(first?.diagram.content.startsWith('graph LR')).toBe(true);
+          });
+
+          And(
+            'the remaining sections should partition the patterns into per-group detail diagrams',
+            () => {
+              const root = state!.architectureDiagrams['component']!.root;
+              const detailSections = root.sections.slice(1);
+
+              for (const section of detailSections) {
+                expect(section.diagram.content.startsWith('graph TD')).toBe(true);
+                // No single detail diagram holds every pattern.
+                expect(section.patterns.length).toBeLessThan(root.patterns.length);
+              }
+
+              const seen = detailSections.flatMap((section) => section.patterns);
+              // Disjoint: each pattern lands in exactly one detail diagram.
+              expect(new Set(seen).size).toBe(seen.length);
+              // Complete: the detail diagrams cover the whole pattern set.
+              expect([...seen].sort()).toEqual([...root.patterns].sort());
+            },
+          );
+        },
+      );
+    },
+  );
+
+  Rule(
     'PR change review projections derive affected patterns from explicit options',
     ({ RuleScenario }) => {
       RuleScenario(

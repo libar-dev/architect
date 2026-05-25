@@ -417,3 +417,60 @@ Data-API read-back; main thread owned the full §6 gate sequence + commits + boo
 the maintainer's instruction. Each session = 2 commits (code + bookkeeping). format:check
 flags `.pr-coordination/*` md/json each time — `prettier --write` the coordination files
 before the gate. All three sessions: guard `--staged` 0 status transitions (D-6 + D-10 held).
+
+---
+
+### WS-3 Session 12 — ARCHITECTURE.md diagram restructure (+ executable-spec ingestion verified)
+
+Scope: the generated `docs-live/ARCHITECTURE.md` was a single Mermaid `graph TD` of 237 nodes
+/ 217 edges / 23 subgraphs (~60 KB) — past Mermaid's 50 000-char `maxTextSize`, so it failed to
+render ("Maximum text size in diagram exceeded") and was an unreadable hairball. Fixed at the
+**generator** (it's a projection, never hand-edited). Decision **D-14**.
+
+**Verified first (user question):** PatternGraph aggregation ingests executable specs, not just
+`architect/specs/`. `PACKAGE_SELF_HOSTING_SOURCES.features` (`self-hosting.ts:79-90`) globs
+`tests/features/**` + every `packages/*/tests/features/**`; live graph has 35 executable-test
+patterns with working `implementsPatterns` edges (e.g. `ArchitectureNavigationProjectionExecutableTests`).
+No gap — report-only.
+
+**Change (No-BC, refactor carve-out):** `ArchitectureDiagramSchema.diagram: MermaidBlock` →
+`sections: {title, description?, diagram, patterns}[]` (kept `scope`/`scopeValue`/`patterns`).
+Builder (`architecture-diagram.internal.ts`) now emits a **Context Map** (`graph LR`,
+inter-group edges, when ≥2 groups) + one detail diagram per group (`graph TD`, intra-group
+edges). Grouping = bounded-context → role fallback → **source-area/package fallback** (via
+`context.packageResolver`; resolver error **propagated, not swallowed** — see Codex-fix note
+below). Normalizer renders one `## Overview`, then `### <section>` per diagram. Result: **1 → 29
+bounded diagrams, largest 11 754 chars** (was ~60 KB); the would-be 57-node "Uncategorized" dump
+split into 4 labeled source-area buckets.
+
+**Codex stop-time fix — no silent downgrade of package-resolution failures.** First pass wrapped
+`resolvePackageLabel` in `try/catch → undefined`, silently bucketing resolver failures as
+"Uncategorized" — subverting `PackageResolver`'s hard-error-on-miss contract
+(`package-resolver.ts:16-21`: "actionable feedback over silent fallback"). Fixed: propagate the
+`UNMAPPED_PACKAGE` error; `packageLabel` is now a required string and the dead "Uncategorized"
+branch was removed. Removing the catch left the generated doc **byte-identical** (every dogfood
+file maps), proving the catch-all was unreachable dead code.
+
+**Coverage:** structural invariant added to `config-documentation.feature`
+(`DocumentationCompositionProjectionExecutableTests`, the executable home — ≥2 sections, pattern
+partition, context-map present); a dogfood render-budget guard
+(`tests/features/generation/architecture-doc-render-budget.feature`, intentionally **not** an
+@architect pattern — tooling guard) asserts every ```mermaid block in the generated doc < 50 000
+chars. Generalized root `vitest.config.ts`generation glob to`tests/steps/generation/\*\*`.
+
+All 12 §6 gates green: pkg test (proj 1576), test:dogfood 1061, perf 3/3, dangling --strict 0,
+audit:subtractive 0, docs:all deterministic (only ARCHITECTURE.md changed, byte-stable across
+two regens). guard `--staged`: **0 status transitions / 0 deliverable changes**; one
+`completed-protection` hit on `config-documentation.feature` (a completed spec) → added
+`@architect-unlock-reason` per **D-10** precedent.
+
+**Key learning — readability degrades gracefully along the taxonomy.** No single grouping axis
+covers the graph (bounded-context 157/276, role 173/276). A fallback chain
+(bounded-context → role → package) turns "un-classifiable" into "classified by the best axis
+available," and `packageResolver` (file → workspace package) is the always-present floor. The
+residual large buckets (Core 22, Host/Dev 22) are an annotation-coverage signal, not a diagram
+defect — a WS-1-style follow-up could add role/bc to those patterns to shrink them.
+
+**Incidental:** AGENTS.md/CLAUDE.md say "docs-live/ is generated and gitignored" — it is in fact
+**git-tracked** (`git ls-files docs-live` returns it), which is why `docs:all && git diff
+--exit-code docs-live` is a live gate. Wording is stale; flagged in D-14, separate fix.

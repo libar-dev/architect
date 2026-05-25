@@ -6,7 +6,17 @@
     "WS-0-finalize-hygiene": "done (committed 6f2fc6c)",
     "WS-1-annotation-reenablement": "phase-1 projection pilot COMPLETE (Sessions 01-06); expansion COMPLETE (core Sessions 07-08; guard Session 09; connectable test features Session 10; new code-originated identities Session 11). Shipped-code connectivity at terminal floor (~27 orphans = working-state specs + untargetable integration/fixture features).",
     "WS-2-skills": "scoped — next workstream (now unblocked)",
-    "WS-3-docs": "scoped — next workstream (now unblocked)"
+    "WS-3-docs": "IN PROGRESS — Session 12 restructured ARCHITECTURE.md generation (single 237-node graph TD → context map + 29 per-group diagrams; D-14). Remaining: skill/doc-wording updates (incl. stale 'docs-live gitignored' wording), other generated-doc reviews."
+  },
+  "ws3": {
+    "lastCompletedSession": "12-architecture-diagram-restructure",
+    "lastCommitNote": "WS-3 Session 12: ArchitectureDiagram fragment diagram->sections[] (No-BC, D-14); context-map + per-group split (bounded-context->role->package fallback); 1->29 bounded mermaid blocks, largest 11754 chars (<50000). Executable invariant in config-documentation.feature + dogfood render-budget guard. Verified executable specs ARE ingested (self-hosting.ts:79-90 + 35 live executable-test patterns).",
+    "decision": "D-14",
+    "gates": "all 12 §6 green; guard --staged 0 status transitions (added @architect-unlock-reason to config-documentation.feature per D-10); docs:all deterministic (only ARCHITECTURE.md changed)",
+    "followUps": [
+      "Annotation coverage: residual 'Unclassified · <package>' buckets (Core 22, Host/Dev 22) shrink if those patterns gain role/bounded-context (WS-1-style).",
+      "Fix stale 'docs-live/ is generated and gitignored' wording in AGENTS.md/CLAUDE.md — it is git-tracked (D-14 incidental note)."
+    ]
   },
   "ws1": {
     "phase": "1-projection-pilot-COMPLETE; 2-expansion-COMPLETE (core+guard+test-features+new-identities)",

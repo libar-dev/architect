@@ -13,7 +13,10 @@ import { z } from 'zod';
 import { heading, list, mermaid } from '../../blocks/schema.js';
 import type { ProjectionContext } from '../../context/projection-context.js';
 import { ProjectionError } from '../errors.js';
-import type { ArchitectureDiagram } from '../../fragments/documentation-composition/index.js';
+import type {
+  ArchitectureDiagram,
+  ArchitectureDiagramSection,
+} from '../../fragments/documentation-composition/index.js';
 import {
   ArchitectureDiagramScopeSchema,
   type ArchitectureDiagramScope,
@@ -29,6 +32,23 @@ interface NodeShape {
   readonly label: string;
   readonly archContext?: string;
   readonly archLayer?: string;
+  readonly role?: string;
+  readonly packageLabel: string;
+}
+
+/**
+ * A bucket of nodes rendered as one detail diagram. `key` is the stable group
+ * id, `title` the detail-section heading, `mapLabel` the (short) label used for
+ * this group's node in the context map, and `rank` orders the sections
+ * (bounded-contexts, then role-fallback buckets, then source-area/package
+ * buckets).
+ */
+interface DiagramGroup {
+  readonly key: string;
+  readonly title: string;
+  readonly mapLabel: string;
+  readonly rank: number;
+  readonly nodes: NodeShape[];
 }
 
 interface EdgeShape {
@@ -45,6 +65,13 @@ const ARCHITECTURE_SCOPE_TITLES: Record<ArchitectureDiagramScope, string> = {
   layered: 'Layered View',
   'bounded-context': 'Bounded Context View',
   'product-area': 'Product Area View',
+};
+
+const ARCHITECTURE_MAP_TITLES: Record<ArchitectureDiagramScope, string> = {
+  component: 'Context Map',
+  layered: 'Layer Map',
+  'bounded-context': 'Context Map',
+  'product-area': 'Product-area Map',
 };
 
 export const ProjectArchitectureDiagramOptionsSchema = z
@@ -77,14 +104,13 @@ export function buildArchitectureDiagram(
     Pick<ProjectArchitectureDiagramOptions, 'scopeValue'>;
   const nodes = collectArchitectureNodes(context, resolvedOptions);
   const patterns = nodes.map((node) => node.name);
+  const edges = collectArchitectureEdges(context, nodes);
 
   return {
     kind: 'ArchitectureDiagram',
     scope,
     ...(hasText(options.scopeValue) ? { scopeValue: options.scopeValue.trim() } : {}),
-    diagram: mermaid(
-      buildArchitectureMermaid(nodes, collectArchitectureEdges(context, nodes), resolvedOptions),
-    ),
+    sections: buildArchitectureSections(nodes, edges, resolvedOptions),
     legend: [
       heading(3, 'Legend'),
       list([
@@ -118,9 +144,11 @@ function collectArchitectureNodes(
     const name = getPatternName(pattern);
     const baseId = slugify(name).replace(/-/g, '_') || `node_${String(index + 1)}`;
     const nodeId = ensureUniqueNodeId(seenNodeIds, baseId);
-    const roleSuffix = hasText(pattern.role) ? `<br/>(${pattern.role.trim()})` : '';
+    const role = hasText(pattern.role) ? pattern.role.trim() : undefined;
+    const roleSuffix = role !== undefined ? `<br/>(${role})` : '';
     const archContext = hasText(pattern.boundedContext) ? pattern.boundedContext.trim() : undefined;
     const archLayer = hasText(pattern.adrLayer) ? pattern.adrLayer.trim() : undefined;
+    const packageLabel = resolvePackageLabel(context, pattern.source.file);
 
     return {
       nodeId,
@@ -128,8 +156,26 @@ function collectArchitectureNodes(
       label: `${name}${roleSuffix}`,
       ...(archContext !== undefined ? { archContext } : {}),
       ...(archLayer !== undefined ? { archLayer } : {}),
+      ...(role !== undefined ? { role } : {}),
+      packageLabel,
     } satisfies NodeShape;
   });
+}
+
+/**
+ * Source-area label for a pattern — its workspace package's display name. Used
+ * as the final grouping fallback when a pattern carries neither a
+ * bounded-context nor a role (e.g. ADRs, working-state specs, un-classified
+ * test features).
+ *
+ * Propagates the resolver's `UNMAPPED_PACKAGE` error rather than swallowing it:
+ * `PackageResolver` is deliberately a hard-error-on-miss contract (no silent
+ * `_other` bucket — actionable feedback over silent fallback). A file outside
+ * the configured `packages` matchers is a real config gap; failing the
+ * projection loud surfaces it instead of hiding it in a catch-all group.
+ */
+function resolvePackageLabel(context: ProjectionContext, sourceFile: string): string {
+  return context.packageResolver(sourceFile).displayName;
 }
 
 function filterArchitecturallyInterestingPatterns(
@@ -243,80 +289,232 @@ function appendEdges(
   }
 }
 
-function buildArchitectureMermaid(
+/**
+ * Splits the architecture view into many bounded diagram sections: an optional
+ * context map (inter-group edges, only when there are ≥2 groups) followed by one
+ * detail diagram per group (intra-group edges). This is what keeps every Mermaid
+ * block renderable — no single block ever contains all patterns.
+ */
+function buildArchitectureSections(
   nodes: readonly NodeShape[],
   edges: readonly EdgeShape[],
   options: ProjectArchitectureDiagramOptions,
-): string {
+): ArchitectureDiagramSection[] {
   if (nodes.length === 0) {
     return [
-      'graph TD',
-      `  empty["No patterns found for ${ARCHITECTURE_SCOPE_TITLES[options.scope]}${hasText(options.scopeValue) ? `: ${options.scopeValue.trim()}` : ''}"]`,
-    ].join('\n');
+      {
+        title: ARCHITECTURE_SCOPE_TITLES[options.scope],
+        diagram: mermaid(buildEmptyMermaid(options)),
+        patterns: [],
+      },
+    ];
   }
 
+  const groups = buildGroups(nodes, options.scope);
+  const groupKeyByNodeId = new Map<string, string>();
+  for (const group of groups) {
+    for (const node of group.nodes) {
+      groupKeyByNodeId.set(node.nodeId, group.key);
+    }
+  }
+
+  const sections: ArchitectureDiagramSection[] = [];
+
+  if (groups.length >= 2) {
+    const mapEdges = aggregateInterGroupEdges(edges, groupKeyByNodeId);
+    sections.push({
+      title: ARCHITECTURE_MAP_TITLES[options.scope],
+      description:
+        'Each node is a group; arrows are cross-group relationships. See the per-group diagrams below for detail.',
+      diagram: mermaid(buildMapMermaid(groups, mapEdges)),
+      patterns: [],
+    });
+  }
+
+  for (const group of groups) {
+    const groupNodeIds = new Set(group.nodes.map((node) => node.nodeId));
+    const intraEdges = edges.filter(
+      (edge) => groupNodeIds.has(edge.from) && groupNodeIds.has(edge.to),
+    );
+    const patterns = group.nodes.map((node) => node.name);
+    sections.push({
+      title: `${group.title} (${String(patterns.length)} ${patterns.length === 1 ? 'pattern' : 'patterns'})`,
+      diagram: mermaid(buildGroupMermaid(group.nodes, intraEdges)),
+      patterns,
+    });
+  }
+
+  return sections;
+}
+
+function buildEmptyMermaid(options: ProjectArchitectureDiagramOptions): string {
+  return [
+    'graph TD',
+    `  empty["No patterns found for ${ARCHITECTURE_SCOPE_TITLES[options.scope]}${hasText(options.scopeValue) ? `: ${options.scopeValue.trim()}` : ''}"]`,
+  ].join('\n');
+}
+
+function buildGroupMermaid(nodes: readonly NodeShape[], edges: readonly EdgeShape[]): string {
   const lines = ['graph TD'];
-  const groups = groupNodesForScope(nodes, options.scope);
+  for (const node of nodes) {
+    lines.push(`  ${node.nodeId}["${node.label}"]`);
+  }
+  for (const edge of edges) {
+    pushEdgeLine(lines, edge);
+  }
+  return lines.join('\n');
+}
 
-  for (const [groupName, groupNodes] of groups) {
-    if (groupName === '') {
-      for (const node of groupNodes) {
-        lines.push(`  ${node.nodeId}["${node.label}"]`);
-      }
-      continue;
-    }
+function buildMapMermaid(
+  groups: readonly DiagramGroup[],
+  mapEdges: readonly { readonly from: string; readonly to: string }[],
+): string {
+  const lines = ['graph LR'];
+  const seenNodeIds = new Set<string>();
+  const idByGroupKey = new Map<string, string>();
 
-    const groupId = slugify(groupName).replace(/-/g, '_') || 'group';
-    lines.push(`  subgraph ${groupId}["${groupName}"]`);
-    for (const node of groupNodes) {
-      lines.push(`    ${node.nodeId}["${node.label}"]`);
-    }
-    lines.push('  end');
+  for (const group of groups) {
+    const baseId = slugify(group.key).replace(/-/g, '_') || 'group';
+    const id = ensureUniqueNodeId(seenNodeIds, baseId);
+    idByGroupKey.set(group.key, id);
+    lines.push(`  ${id}["${group.mapLabel} (${String(group.nodes.length)})"]`);
   }
 
-  for (const edge of edges) {
-    if (edge.operator === '-.-') {
-      lines.push(`  ${edge.from} -. ${edge.label} .- ${edge.to}`);
-      continue;
+  for (const edge of mapEdges) {
+    const from = idByGroupKey.get(edge.from);
+    const to = idByGroupKey.get(edge.to);
+    if (from !== undefined && to !== undefined) {
+      lines.push(`  ${from} --> ${to}`);
     }
-
-    lines.push(`  ${edge.from} ${edge.operator}|${edge.label}| ${edge.to}`);
   }
 
   return lines.join('\n');
 }
 
-function groupNodesForScope(
-  nodes: readonly NodeShape[],
-  scope: ArchitectureDiagramScope,
-): (readonly [string, NodeShape[]])[] {
-  const grouped = new Map<string, NodeShape[]>();
+function pushEdgeLine(lines: string[], edge: EdgeShape): void {
+  if (edge.operator === '-.-') {
+    lines.push(`  ${edge.from} -. ${edge.label} .- ${edge.to}`);
+    return;
+  }
+  lines.push(`  ${edge.from} ${edge.operator}|${edge.label}| ${edge.to}`);
+}
 
-  for (const node of nodes) {
-    const groupName = resolveNodeGroup(node, scope);
-    const bucket = grouped.get(groupName) ?? [];
-    bucket.push(node);
-    grouped.set(groupName, bucket);
+function aggregateInterGroupEdges(
+  edges: readonly EdgeShape[],
+  groupKeyByNodeId: Map<string, string>,
+): { readonly from: string; readonly to: string }[] {
+  const seen = new Set<string>();
+  const out: { from: string; to: string }[] = [];
+
+  for (const edge of edges) {
+    const from = groupKeyByNodeId.get(edge.from);
+    const to = groupKeyByNodeId.get(edge.to);
+    if (from === undefined || to === undefined || from === to) {
+      continue;
+    }
+    const key = `${from} ${to}`;
+    if (seen.has(key)) {
+      continue;
+    }
+    seen.add(key);
+    out.push({ from, to });
   }
 
-  return [...grouped.entries()].map(
-    ([groupName, groupNodes]) =>
-      [
-        groupName,
-        [...groupNodes].sort((left, right) => left.name.localeCompare(right.name)),
-      ] as const,
+  return out.sort(
+    (left, right) => left.from.localeCompare(right.from) || left.to.localeCompare(right.to),
   );
 }
 
-function resolveNodeGroup(node: NodeShape, scope: ArchitectureDiagramScope): string {
+function buildGroups(nodes: readonly NodeShape[], scope: ArchitectureDiagramScope): DiagramGroup[] {
+  const grouped = new Map<
+    string,
+    { title: string; mapLabel: string; rank: number; nodes: NodeShape[] }
+  >();
+
+  for (const node of nodes) {
+    const resolved = resolveNodeGroup(node, scope);
+    const bucket = grouped.get(resolved.key) ?? {
+      title: resolved.title,
+      mapLabel: resolved.mapLabel,
+      rank: resolved.rank,
+      nodes: [],
+    };
+    bucket.nodes.push(node);
+    grouped.set(resolved.key, bucket);
+  }
+
+  return [...grouped.entries()]
+    .map(([key, value]) => ({
+      key,
+      title: value.title,
+      mapLabel: value.mapLabel,
+      rank: value.rank,
+      nodes: [...value.nodes].sort((left, right) => left.name.localeCompare(right.name)),
+    }))
+    .sort((left, right) => left.rank - right.rank || left.key.localeCompare(right.key));
+}
+
+interface ResolvedGroup {
+  readonly key: string;
+  readonly title: string;
+  readonly mapLabel: string;
+  readonly rank: number;
+}
+
+function resolveNodeGroup(node: NodeShape, scope: ArchitectureDiagramScope): ResolvedGroup {
   switch (scope) {
     case 'component':
-      return node.archContext ?? '';
+      if (node.archContext !== undefined) {
+        return {
+          key: node.archContext,
+          title: `Bounded context: ${node.archContext}`,
+          mapLabel: node.archContext,
+          rank: 0,
+        };
+      }
+      if (node.role !== undefined) {
+        return {
+          key: `role:${node.role}`,
+          title: `Uncontextualized · role: ${node.role}`,
+          mapLabel: `role: ${node.role}`,
+          rank: 1,
+        };
+      }
+      // Final fallback: group by source area (workspace package). `packageLabel`
+      // is always resolved — resolvePackageLabel throws on an unmapped file
+      // rather than returning a sentinel — so there is no silent catch-all here.
+      return {
+        key: `pkg:${node.packageLabel}`,
+        title: `Unclassified · ${node.packageLabel}`,
+        mapLabel: node.packageLabel,
+        rank: 2,
+      };
     case 'layered':
-      return node.archLayer ?? 'Unlayered';
+      return node.archLayer !== undefined
+        ? {
+            key: node.archLayer,
+            title: `Layer: ${node.archLayer}`,
+            mapLabel: node.archLayer,
+            rank: 0,
+          }
+        : { key: 'Unlayered', title: 'Unlayered', mapLabel: 'Unlayered', rank: 1 };
     case 'bounded-context':
-      return node.archLayer ?? 'Context Components';
+      return node.archLayer !== undefined
+        ? { key: node.archLayer, title: node.archLayer, mapLabel: node.archLayer, rank: 0 }
+        : {
+            key: 'Context Components',
+            title: 'Context Components',
+            mapLabel: 'Context Components',
+            rank: 1,
+          };
     case 'product-area':
-      return node.archContext ?? 'Product Area Components';
+      return node.archContext !== undefined
+        ? { key: node.archContext, title: node.archContext, mapLabel: node.archContext, rank: 0 }
+        : {
+            key: 'Product Area Components',
+            title: 'Product Area Components',
+            mapLabel: 'Product Area Components',
+            rank: 1,
+          };
   }
 }

@@ -570,24 +570,32 @@ function normalizeArchitectureDiagram(fragment: ArchitectureDiagram): MarkdownDo
       ? `${scopeLabel} scoped to ${fragment.scopeValue}.`
       : `${scopeLabel} architecture view.`;
 
-  const sections: MarkdownRenderableBlock[] = [
+  const diagramCount = fragment.sections.length;
+  const blocks: MarkdownRenderableBlock[] = [
     heading(2, 'Overview'),
     paragraph(
-      `This diagram captures ${String(fragment.patterns.length)} ${fragment.patterns.length === 1 ? 'pattern' : 'patterns'} in the ${scopeDescription}`,
+      `This view captures ${String(fragment.patterns.length)} ${fragment.patterns.length === 1 ? 'pattern' : 'patterns'} across ${String(diagramCount)} ${diagramCount === 1 ? 'diagram' : 'diagrams'} in the ${scopeDescription}`,
     ),
-    heading(2, 'Diagram'),
-    fragment.diagram,
+    heading(2, 'Diagrams'),
   ];
 
+  for (const section of fragment.sections) {
+    blocks.push(heading(3, section.title));
+    if (section.description !== undefined) {
+      blocks.push(paragraph(section.description));
+    }
+    blocks.push(section.diagram);
+  }
+
   if (fragment.legend !== undefined && fragment.legend.length > 0) {
-    sections.push(heading(2, 'Legend'), ...fragment.legend);
+    blocks.push(heading(2, 'Legend'), ...fragment.legend);
   }
 
   if (fragment.patterns.length > 0) {
-    sections.push(heading(2, 'Patterns'), list(fragment.patterns));
+    blocks.push(heading(2, 'Patterns'), list(fragment.patterns));
   }
 
-  return createMarkdownDocument(metadata, sections);
+  return createMarkdownDocument(metadata, blocks);
 }
 
 function normalizeBusinessRuleSet(
@@ -1228,8 +1236,8 @@ function resolveFragmentMetadata(fragment: Fragment): MarkdownMetadata {
     case 'ArchitectureDiagram':
       return {
         title: 'Architecture',
-        purpose: 'Auto-generated architecture diagram from source annotations',
-        detailLevel: 'Component diagram with bounded context subgraphs',
+        purpose: 'Auto-generated architecture diagrams from source annotations',
+        detailLevel: 'Context map plus per-group component diagrams',
       };
     case 'BusinessRuleSet': {
       switch (fragment.scope) {

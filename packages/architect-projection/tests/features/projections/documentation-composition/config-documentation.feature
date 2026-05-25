@@ -2,6 +2,7 @@
 @architect-pattern:DocumentationCompositionProjectionExecutableTests
 @architect-implements:DocumentationCompositionProjectionSupport,ProjectConfigProjection,DocumentationBundle,ArchitectureDiagramProjection,PrChangeReviewProjection
 @architect-status:completed
+@architect-unlock-reason:Evolve-architecture-diagram-invariant-for-WS3-restructure-D14
 @architect-phase:49
 @architect-product-area:Projection
 @architect-role:projection
@@ -112,6 +113,27 @@ Feature: Documentation Composition projection bodies
       When I project architecture diagrams for each supported scope
       Then each architecture diagram should preserve the requested scope
       And the bounded-context and product-area diagrams should filter patterns by the explicit scope value
+
+  Rule: The architecture view splits into a context map plus per-group detail diagrams
+
+    **Invariant:** A component architecture projection emits an ordered set of
+    diagram sections — a context map first, then one detail diagram per group —
+    and never a single diagram containing every pattern. The detail sections
+    partition the pattern set: each pattern appears in exactly one detail diagram.
+
+    **Rationale:** A single all-pattern Mermaid graph exceeds the renderer's
+    maximum text size and is unreadable; splitting by bounded-context (with a
+    role fallback for un-contextualized patterns) keeps every block renderable
+    and navigable. See DECISIONS D-14.
+
+    **Verified by:** projecting the component diagram and asserting the section
+    structure and the pattern partition.
+
+    Scenario: the component view splits into a context map and per-group detail diagrams
+      Given a Documentation Composition architecture context with bounded contexts layers and product areas
+      When I project the component architecture diagram
+      Then the component diagram should lead with a context map section
+      And the remaining sections should partition the patterns into per-group detail diagrams
 
   Rule: PR change review projections derive affected patterns from explicit options
 

@@ -8,7 +8,7 @@ export default defineConfig({
     include: [
       'tests/steps/api/**/*.steps.ts',
       'tests/steps/cli/**/*.steps.ts',
-      'tests/steps/generation/load-preamble.steps.ts',
+      'tests/steps/generation/**/*.steps.ts',
     ],
     exclude: ['tests/support/**/*.ts', 'tests/fixtures/**/*.ts'],
     globals: true,

@@ -147,10 +147,16 @@ const validArchitectureDiagramFixture: Fragment = {
   kind: 'ArchitectureDiagram',
   scope: 'bounded-context',
   scopeValue: 'projection',
-  diagram: {
-    type: 'mermaid',
-    content: 'graph TD; A[PatternGraph] --> B[ProjectionContext]; B --> C[ArchitectureDiagram]',
-  },
+  sections: [
+    {
+      title: 'Bounded context: projection (3 patterns)',
+      diagram: {
+        type: 'mermaid',
+        content: 'graph TD; A[PatternGraph] --> B[ProjectionContext]; B --> C[ArchitectureDiagram]',
+      },
+      patterns: ['PatternGraphAPI', 'ProjectionContext', 'ArchitectureDiagramProjection'],
+    },
+  ],
   legend: [
     {
       type: 'heading',
@@ -1098,10 +1104,16 @@ export const FRAGMENT_INVALID_FIXTURES: Record<PublicFragmentKind, unknown> = {
   ArchitectureDiagram: {
     kind: 'ArchitectureDiagram',
     scope: 'component',
-    diagram: {
-      type: 'paragraph',
-      text: 'This must be a mermaid block.',
-    },
+    sections: [
+      {
+        title: 'Context Map',
+        diagram: {
+          type: 'paragraph',
+          text: 'This must be a mermaid block.',
+        },
+        patterns: ['PatternGraphAPI'],
+      },
+    ],
     patterns: ['PatternGraphAPI'],
   },
   PrChangeReview: {
