@@ -4,15 +4,15 @@
   "updated": "2026-05-25",
   "workstreams": {
     "WS-0-finalize-hygiene": "done (committed 6f2fc6c)",
-    "WS-1-annotation-reenablement": "in-progress (Session 05 done)",
+    "WS-1-annotation-reenablement": "phase-1 projection pilot COMPLETE (Sessions 01-06); expansion (core/guard/cli/mcp) pending",
     "WS-2-skills": "scoped",
     "WS-3-docs": "scoped"
   },
   "ws1": {
-    "phase": "1-projection-pilot",
-    "currentSession": "06-execution-context-producers (next)",
-    "lastCompletedSession": "05-delivery-reporting-producers",
-    "lastCommit": "96194aa",
+    "phase": "1-projection-pilot-COMPLETE",
+    "currentSession": "WS-1 expansion (core/guard/cli/mcp) or WS-2 skills / WS-3 docs",
+    "lastCompletedSession": "06-execution-context-producers",
+    "lastCommit": "2641a6b",
     "lastCommitNote": "trailing pointer — names the prior committed session; advanced one step per session (a commit cannot store its own sha)",
     "baselineMetrics": {
       "patterns": 270,
@@ -22,13 +22,13 @@
       "boundedContextCoverage": "157/270"
     },
     "currentMetrics": {
-      "orphansTotal": 64,
-      "orphansProjection": 6,
+      "orphansTotal": 58,
+      "orphansProjection": 0,
       "orphansProjectionByArea": {
         "operational-insights": 0,
         "governance": 0,
         "delivery-reporting": 0,
-        "execution-context": 6,
+        "execution-context": 0,
         "pattern-relations": 0
       },
       "newPatterns": ["BlockSchema"]

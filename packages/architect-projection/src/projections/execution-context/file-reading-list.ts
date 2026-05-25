@@ -3,7 +3,7 @@
  * @architect-pattern FileReadingListProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses ExecutionContextProjectionSupport, ProjectionFragmentContracts
+ * @architect-uses ExecutionContextProjectionSupport, ProjectionFragmentContracts, FileReadingList
  * @architect-bounded-context:projection
  *
  * **Value:** Assembles the canonical `FileReadingList` for a pattern —

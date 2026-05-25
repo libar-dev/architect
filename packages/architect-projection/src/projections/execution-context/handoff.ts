@@ -3,7 +3,7 @@
  * @architect-pattern HandoffProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses ExecutionContextProjectionSupport, ProjectionFragmentContracts
+ * @architect-uses ExecutionContextProjectionSupport, ProjectionFragmentContracts, HandoffRecord
  * @architect-bounded-context:projection
  *
  * **Value:** Projects a flat `HandoffRecord` per pattern + session type so

@@ -3,7 +3,7 @@
  * @architect-pattern SessionContextProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses ExecutionContextProjectionSupport, ProjectionFragmentContracts
+ * @architect-uses ExecutionContextProjectionSupport, ProjectionFragmentContracts, SessionContextBundle
  * @architect-bounded-context:projection
  *
  * **Value:** Assembles the `SessionContextBundle` that CLI, MCP, and UI

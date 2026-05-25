@@ -3,7 +3,7 @@
  * @architect-pattern ScopeReadinessProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses ExecutionContextProjectionSupport, ProjectionFragmentContracts
+ * @architect-uses ExecutionContextProjectionSupport, ProjectionFragmentContracts, ScopeReadinessReport, ScopeReadinessCheck
  * @architect-bounded-context:projection
  *
  * **Value:** Projects a `ScopeReadinessReport` per pattern + session type so

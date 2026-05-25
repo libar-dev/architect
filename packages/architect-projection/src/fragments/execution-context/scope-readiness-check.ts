@@ -3,6 +3,7 @@
  * @architect-pattern ScopeReadinessCheck
  * @architect-status active
  * @architect-role:contract
+ * @architect-uses ExecutionContextSupporting
  * @architect-bounded-context:execution-context
  *
  * Defines the `ScopeReadinessCheck` fragment shape for one readiness criterion and its result.

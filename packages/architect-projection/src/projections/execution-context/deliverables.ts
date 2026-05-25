@@ -3,7 +3,7 @@
  * @architect-pattern DeliverableProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses ExecutionContextProjectionSupport, ProjectionFragmentContracts
+ * @architect-uses ExecutionContextProjectionSupport, ProjectionFragmentContracts, Deliverable, DeliverableManifest
  * @architect-bounded-context:projection
  *
  * **Value:** Lets consumers render a pattern's full `DeliverableManifest` or

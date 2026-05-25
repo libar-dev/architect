@@ -3,6 +3,7 @@
  * @architect-pattern ScopeReadinessReport
  * @architect-status active
  * @architect-role:contract
+ * @architect-uses ExecutionContextSupporting
  * @architect-bounded-context:execution-context
  *
  * Defines the `ScopeReadinessReport` fragment shape for session readiness checks and verdicts.

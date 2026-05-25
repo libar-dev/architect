@@ -402,9 +402,15 @@ graph TD
   decisionrecord -->|depends-on| blockschema
   decisionrecord -.->|uses| blockschema
   decisionrecord ==>|enables| decisioncatalogprojection
+  deliverable ==>|enables| deliverableprojection
   deliverable ==>|enables| deliveryreportingsupporting
   deliverable ==>|enables| patternrelationssupporting
+  deliverablemanifest ==>|enables| deliverableprojection
   deliverablemanifest ==>|enables| patternrelationssupporting
+  deliverableprojection -->|depends-on| deliverable
+  deliverableprojection -.->|uses| deliverable
+  deliverableprojection -->|depends-on| deliverablemanifest
+  deliverableprojection -.->|uses| deliverablemanifest
   deliverableprojection -->|depends-on| executioncontextprojectionsupport
   deliverableprojection -.->|uses| executioncontextprojectionsupport
   deliverableprojection -->|depends-on| projectionfragmentcontracts
@@ -481,9 +487,16 @@ graph TD
   executioncontextprojectionsupport -.->|uses| projectionfragmentcontracts
   executioncontextprojectionsupport ==>|enables| scopereadinessprojection
   executioncontextprojectionsupport ==>|enables| sessioncontextprojection
+  executioncontextsupporting ==>|enables| handoffrecord
+  executioncontextsupporting ==>|enables| scopereadinesscheck
+  executioncontextsupporting ==>|enables| scopereadinessreport
+  executioncontextsupporting ==>|enables| sessioncontextbundle
   extractiondiagnostics ==>|enables| buildpipeline
+  filereadinglist ==>|enables| filereadinglistprojection
   filereadinglistprojection -->|depends-on| executioncontextprojectionsupport
   filereadinglistprojection -.->|uses| executioncontextprojectionsupport
+  filereadinglistprojection -->|depends-on| filereadinglist
+  filereadinglistprojection -.->|uses| filereadinglist
   filereadinglistprojection -->|depends-on| projectionfragmentcontracts
   filereadinglistprojection -.->|uses| projectionfragmentcontracts
   fragmentrendererdispatch ==>|enables| compacttextrenderer
@@ -523,8 +536,13 @@ graph TD
   governancesupporting ==>|enables| taxonomydigestprojection
   handoffprojection -->|depends-on| executioncontextprojectionsupport
   handoffprojection -.->|uses| executioncontextprojectionsupport
+  handoffprojection -->|depends-on| handoffrecord
+  handoffprojection -.->|uses| handoffrecord
   handoffprojection -->|depends-on| projectionfragmentcontracts
   handoffprojection -.->|uses| projectionfragmentcontracts
+  handoffrecord -->|depends-on| executioncontextsupporting
+  handoffrecord -.->|uses| executioncontextsupporting
+  handoffrecord ==>|enables| handoffprojection
   jsonrenderer -->|depends-on| projectionfragmentschema
   jsonrenderer -.->|uses| projectionfragmentschema
   lintengine -->|depends-on| codecutils
@@ -764,14 +782,29 @@ graph TD
   roleprofileprojection -.->|uses| roleprofile
   roleprofileprojection -->|depends-on| roleprofilecollection
   roleprofileprojection -.->|uses| roleprofilecollection
+  scopereadinesscheck -->|depends-on| executioncontextsupporting
+  scopereadinesscheck -.->|uses| executioncontextsupporting
+  scopereadinesscheck ==>|enables| scopereadinessprojection
   scopereadinessprojection -->|depends-on| executioncontextprojectionsupport
   scopereadinessprojection -.->|uses| executioncontextprojectionsupport
   scopereadinessprojection -->|depends-on| projectionfragmentcontracts
   scopereadinessprojection -.->|uses| projectionfragmentcontracts
+  scopereadinessprojection -->|depends-on| scopereadinesscheck
+  scopereadinessprojection -.->|uses| scopereadinesscheck
+  scopereadinessprojection -->|depends-on| scopereadinessreport
+  scopereadinessprojection -.->|uses| scopereadinessreport
+  scopereadinessreport -->|depends-on| executioncontextsupporting
+  scopereadinessreport -.->|uses| executioncontextsupporting
+  scopereadinessreport ==>|enables| scopereadinessprojection
+  sessioncontextbundle -->|depends-on| executioncontextsupporting
+  sessioncontextbundle -.->|uses| executioncontextsupporting
+  sessioncontextbundle ==>|enables| sessioncontextprojection
   sessioncontextprojection -->|depends-on| executioncontextprojectionsupport
   sessioncontextprojection -.->|uses| executioncontextprojectionsupport
   sessioncontextprojection -->|depends-on| projectionfragmentcontracts
   sessioncontextprojection -.->|uses| projectionfragmentcontracts
+  sessioncontextprojection -->|depends-on| sessioncontextbundle
+  sessioncontextprojection -.->|uses| sessioncontextbundle
   sessionstatereader ==>|enables| deriveprocessstate
   sessionstatereader -->|depends-on| gherkinscanner
   sessionstatereader -.->|uses| gherkinscanner

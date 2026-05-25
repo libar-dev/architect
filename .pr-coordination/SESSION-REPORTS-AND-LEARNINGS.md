@@ -178,3 +178,35 @@ split topology as op-insights: 5 producer wrappers got producer→fragment edges
    `ScopeReadinessReport`, `SessionContextBundle`, + `ExecutionContextSupporting`). Note
    `ScopeReadinessCheck` may be embedded (no standalone producer) and `Deliverable`/
    `DeliverableManifest` are already connected (Session 02) — verify via `arch orphans`.
+
+## Session 06 — Connect execution-context fragments to producers (PILOT FINALE, uncommitted in tree)
+
+Committed prior session = `2641a6b`. De-orphaned all 6 execution-context orphans →
+**projection orphans now 0** (baseline 49; Phase-1 target was <5). Total 64→58. 5 producer
+edges (`FileReadingListProjection`→`FileReadingList`, `HandoffProjection`→`HandoffRecord`,
+`ScopeReadinessProjection`→`ScopeReadinessReport,ScopeReadinessCheck`,
+`SessionContextProjection`→`SessionContextBundle`, `DeliverableProjection`→
+`Deliverable,DeliverableManifest`) + 4 incoming composition edges into
+`ExecutionContextSupporting`. All registered first-try. 13 gates green.
+
+**Scope notes (resolved inline):**
+
+1. **`ScopeReadinessCheck` is produced, not embedded.** `ScopeReadinessProjection` builds
+   its own `kind:'ScopeReadinessCheck'` (scope-readiness.internal.ts:302) — the plan's
+   "may be embedded" caveat was wrong; it's a true produced fragment.
+2. **`ExecutionContextSupporting` = third Supporting topology.** Outgoing imports are
+   cross-package (`@libar-dev/architect-core`, not graph patterns), so it de-orphans only via
+   incoming composition edges from the 4 fragments embedding its schemas. Across all 5
+   contexts the `*Supporting` bundle needed 3 distinct strategies (outgoing-import S02,
+   incoming-from-producers S03, incoming-from-fragments S06) — never assume symmetry.
+
+### WS-1 Phase 1 (projection pilot) — COMPLETE
+
+Projection orphans **49 → 0** across Sessions 01–06 (renderer spine + BlockSchema →
+pattern-relations → governance → operational-insights → delivery-reporting →
+execution-context). Total orphans **107 → 58**. Next phase: WS-1 expansion
+(core → guard → cli → mcp) or WS-2 (skills) / WS-3 (docs), now unblocked.
+
+**Three proven edge shapes** for the expansion sessions: producer→fragment
+(`ProjectionBundle<X>` return), fragment→sub-fragment composition (`z.array(childSchema)`),
+and Supporting-bundle (direction follows real imports — outgoing OR incoming).

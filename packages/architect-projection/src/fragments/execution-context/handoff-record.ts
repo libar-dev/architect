@@ -3,6 +3,7 @@
  * @architect-pattern HandoffRecord
  * @architect-status active
  * @architect-role:contract
+ * @architect-uses ExecutionContextSupporting
  * @architect-bounded-context:execution-context
  *
  * Defines the `HandoffRecord` fragment shape for one pattern's session handoff summary.

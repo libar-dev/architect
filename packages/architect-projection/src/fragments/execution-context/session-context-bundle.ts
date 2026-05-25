@@ -3,6 +3,7 @@
  * @architect-pattern SessionContextBundle
  * @architect-status active
  * @architect-role:contract
+ * @architect-uses ExecutionContextSupporting
  * @architect-bounded-context:execution-context
  *
  * Defines the `SessionContextBundle` fragment shape for the session-opening context across patterns, dependencies, stubs, deliverables, and FSM data.
