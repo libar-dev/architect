@@ -33,6 +33,15 @@ The package family powers **Libar Studio** (Desktop / Web / CI-CD) surfaces cove
 
 `architect/` (specs, stubs, step-stubs, decisions, releases, design-reviews, ideations) holds **working state**, not the source of truth. It is parsed by Gherkin for projection but excluded from TS compile, ESLint, and vitest. Lifetime + per-folder roles: `architect-base` §3.
 
+### ADR grounding
+
+The load-bearing architectural decisions are `.feature` records in `architect/decisions/` — read them through the Data API (`pnpm architect:query documentation decisions`, or `pattern ADR006SingleReadModelArchitecture`), never paraphrase from memory. `architect-base` §7 lists the full key-ADR set; the decisions most often gotten wrong:
+
+- **ADR-006 (Single Read Model)** — the read model is the **`PatternGraph`** (the assembled graph + `relationshipIndex` + pre-computed views from `transformToPatternGraph()`), **not** `ExtractedPattern`, which is the canonical per-pattern **record contract** the graph is built from. Feature consumers (codecs, validators, query APIs) depend on the `PatternGraph`; direct `scanner/` or `extractor/` imports are sanctioned **only** in pipeline-orchestration code that builds the graph.
+- **ADR-001 / ADR-007 (taxonomy)** — `@architect-role` draws from 8 canonical values (`projection · service · decider · read-model · codec · contract · barrel · utility`); classification has three orthogonal axes — role (what kind), bounded-context (which context), layer (which arch layer). `@architect-uses` is a TypeScript-owned **csv** tag (space/comma-separated, no colon); `@architect-role:` / `@architect-bounded-context:` take a colon.
+- **ADR-003 / ADR-002 (source-first, Gherkin-only)** — TypeScript source owns pattern identity; `@architect-implements` (authored on the test `.feature`) is the **primary** reverse-traceability edge: UML realization, many-to-one. It is distinct from derived reverse edges (`usedBy` / `enables`), which the graph computes and you never hand-author.
+- **ADR-005 / ADR-009 (projection)** — the `PatternGraph` is the sole codec/renderer input (ADR-005); `parseAndProject*` is the raw-input trust boundary for external projection callers, parsed once (ADR-009).
+
 ## Engineering doctrine
 
 CI-enforced. Treat as load-bearing.
