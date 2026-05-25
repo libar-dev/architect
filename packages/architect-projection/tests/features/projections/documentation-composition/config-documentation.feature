@@ -204,6 +204,11 @@ Feature: Documentation Composition projection bodies
       Then the component diagram should include the production pattern
       And the component diagram should omit the decision-record pattern
 
+    Scenario: the component view is empty when every pattern is a decision record
+      Given a Documentation Composition architecture context of only decision-record patterns
+      When I project the component architecture diagram for the decision-only context
+      Then the component diagram should contain no patterns
+
   Rule: PR change review projections derive affected patterns from explicit options
 
     **Invariant:** `projectPrChangeReview` preserves the explicit `branch` and

@@ -875,6 +875,33 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         });
       },
     );
+
+    RuleScenario(
+      'the component view is empty when every pattern is a decision record',
+      ({ Given, When, Then }) => {
+        Given(
+          'a Documentation Composition architecture context of only decision-record patterns',
+          () => {
+            state!.context = createDecisionOnlyContext();
+          },
+        );
+
+        When('I project the component architecture diagram for the decision-only context', () => {
+          state!.architectureDiagrams['component'] = parseAndProjectArchitectureDiagram(
+            state!.context!,
+            { scope: 'component' },
+          );
+        });
+
+        Then('the component diagram should contain no patterns', () => {
+          const root = state!.architectureDiagrams['component']!.root;
+          expect(root.patterns).toHaveLength(0);
+          for (const section of root.sections) {
+            expect(section.patterns).toHaveLength(0);
+          }
+        });
+      },
+    );
   });
 
   Rule(
@@ -1249,6 +1276,24 @@ function createMixedProductionAndDecisionRecordContext(): ProjectionContext {
         status: 'completed',
         productArea: 'Generation',
         file: 'architect/decisions/adr-006-single-read-model-architecture.feature',
+      }),
+    ],
+  });
+}
+
+function createDecisionOnlyContext(): ProjectionContext {
+  // Every pattern is a decision record. The component view must render empty —
+  // it must NOT fall back to re-including the excluded decision records. See D-16.
+  return createProjectionContext({
+    patterns: [
+      createPattern('ADR006SingleReadModelArchitecture', {
+        status: 'completed',
+        productArea: 'Generation',
+        file: 'architect/decisions/adr-006-single-read-model-architecture.feature',
+      }),
+      createPattern('ADR005CodecBasedMarkdownRendering', {
+        status: 'completed',
+        file: 'architect/decisions/adr-005-codec-based-markdown-rendering.feature',
       }),
     ],
   });

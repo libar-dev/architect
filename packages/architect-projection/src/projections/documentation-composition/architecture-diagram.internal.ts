@@ -131,12 +131,17 @@ function collectArchitectureNodes(
   const filteredPatterns = filterPatterns(context.graph.patterns, context.projectionFilter);
   const scopedPatterns = filterPatternsForArchitecture(filteredPatterns, options);
   const withFallback = scopedPatterns.length > 0 ? [...scopedPatterns] : filteredPatterns;
+  // For the component scope the architectural filter hard-excludes test
+  // features and decision records, so its result is authoritative — INCLUDING
+  // when it is empty. A decision-only or test-only component context must render
+  // an empty component view, never fall back to `withFallback` (which still
+  // holds the excluded patterns). Other scopes keep `withFallback` as-is.
   const selectedPatterns =
     options.scope === 'component'
       ? filterArchitecturallyInterestingPatterns(withFallback)
       : withFallback;
-  const patterns = [...(selectedPatterns.length > 0 ? selectedPatterns : withFallback)].sort(
-    (left, right) => getPatternName(left).localeCompare(getPatternName(right)),
+  const patterns = [...selectedPatterns].sort((left, right) =>
+    getPatternName(left).localeCompare(getPatternName(right)),
   );
 
   const seenNodeIds = new Set<string>();
@@ -213,12 +218,18 @@ function isDecisionRecordPattern(pattern: ExtractedPattern): boolean {
 function filterArchitecturallyInterestingPatterns(
   patterns: readonly ExtractedPattern[],
 ): readonly ExtractedPattern[] {
-  const productionPatterns = patterns.filter(
+  // Hard exclusion — test features and decision records are never components,
+  // even when they are the ONLY patterns in the input. This must NOT fall back
+  // to the unfiltered set: a decision-only or test-only context yields an empty
+  // component set (an empty view), not the excluded patterns re-included.
+  const componentPatterns = patterns.filter(
     (pattern) => !isTestFeaturePattern(pattern) && !isDecisionRecordPattern(pattern),
   );
-  const scoped = productionPatterns.length > 0 ? productionPatterns : patterns;
 
-  const filtered = scoped.filter(
+  // Graceful degradation applies ONLY to the classification filter: when
+  // production components exist but none carry a classification tag, show them
+  // ungrouped rather than nothing.
+  const classified = componentPatterns.filter(
     (pattern) =>
       hasText(pattern.role) ||
       hasText(pattern.boundedContext) ||
@@ -226,7 +237,7 @@ function filterArchitecturallyInterestingPatterns(
       hasText(pattern.productArea),
   );
 
-  return filtered.length > 0 ? filtered : scoped;
+  return classified.length > 0 ? classified : componentPatterns;
 }
 
 function filterPatternsForArchitecture(
