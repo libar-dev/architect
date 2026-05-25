@@ -474,3 +474,53 @@ defect — a WS-1-style follow-up could add role/bc to those patterns to shrink 
 **Incidental:** AGENTS.md/CLAUDE.md say "docs-live/ is generated and gitignored" — it is in fact
 **git-tracked** (`git ls-files docs-live` returns it), which is why `docs:all && git diff
 --exit-code docs-live` is a live gate. Wording is stale; flagged in D-14, separate fix.
+
+---
+
+### WS-3 Session 13 — Shrink ARCHITECTURE.md catch-all buckets (filter test features) + production annotation fixes
+
+Prior commit = `5b7ab6e` (Session 12). Decision **D-15**. D-14 left large catch-all buckets that were
+almost entirely executable-test features. Grounded the fix in value-transfer doctrine
+(`role`/`bounded-context` are implementation-classification tags owned by **production** code; test
+features own identity + invariants + the `@architect-implements` edge), so the move is to **filter
+test-feature patterns out of the component view**, not mass-tag them.
+
+**Change (`architecture-diagram.internal.ts`):** `filterArchitecturallyInterestingPatterns` now
+excludes `isTestFeaturePattern` — patterns whose `source.file` is under `tests/features/` (the
+canonical executable-spec home). Result: **237→169 patterns, 29→24 diagrams**; `role: projection`
+(17) / `Architect Core` (22) / `Host (Dev)` (22) / `MCP` (4) buckets all vanish; residual
+`role: contract (4)` = genuine cross-cutting production contracts; 9-ADR bucket retained. Largest
+mermaid block 11 753 chars (render-budget guard green).
+
+**Load-bearing learning — `implementsPatterns` is NOT a test discriminator.** First attempt filtered
+on non-empty `implementsPatterns` and over-filtered real components (`process-guard` 6→2, `lint`
+4→3): **production sub-modules legitimately `@architect-implements` a barrel** (verified
+`DeriveProcessState`/`DetectChanges`/`SessionStateReader`/`ProcessGuardTypes` →`ProcessGuardLinter`).
+Corrected to key on the source path. Also re-confirmed: `docs:all` runs the **compiled** bin
+(`node_modules/.bin/architect-generate`), so a projection-code change needs `pnpm build` before
+`docs:all` reflects it (annotation/data changes flow through without a rebuild).
+
+**Production annotation fixes (D-15):** `process-guard-rules.feature` `:guard`→`:process-guard`
+(phantom 1-pattern `guard` context removed; contexts 22→21; test feature is `active`, no unlock
+needed); added `@architect-bounded-context` to `BoundedContextFragmentContract` +
+`PatternRelationsFragmentContracts` (`pattern-relations`) and `DeliveryReportingFragmentContracts`
+(`delivery-reporting`); left the cross-context union barrels + core types untagged. Fixed the stale
+"docs-live gitignored" wording in `AGENTS.md` (closes D-14 incidental / followUp #2).
+
+**Coverage:** new executable Rule in `config-documentation.feature` ("component view shows production
+components, not test-feature patterns") with its own mixed production+test fixture.
+
+All §6 gates green: typecheck, format:check, proj test (69 in config-documentation; full suite pass),
+test:dogfood **1061**, docs:all byte-deterministic (md5-stable across two regens), guard `--staged`
+**0 status transitions / 0 deliverable changes** (config-documentation's existing
+`@architect-unlock-reason` satisfies completed-protection), dangling `--strict` 0.
+
+### Rules for next session
+
+1. **Never use `implementsPatterns` to decide test-vs-production.** Production sub-modules implement
+   barrels. Key on the source path (`tests/features/`) or the `.feature` extension.
+2. **`docs:all` reads the compiled bin** — run `pnpm build` before `docs:all` when you change
+   projection/renderer **code** (annotation/graph data changes don't need it).
+3. WS-3 remaining: other generated-doc reviews (PATTERNS/ROADMAP/CHANGELOG/requirements) for the same
+   "is this readable + correctly scoped" lens; the HUD/progressive-disclosure ideation (D-15 sibling,
+   captured separately) is ideation-only until disclosure defaults are agreed.

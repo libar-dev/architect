@@ -178,10 +178,33 @@ function resolvePackageLabel(context: ProjectionContext, sourceFile: string): st
   return context.packageResolver(sourceFile).displayName;
 }
 
+/**
+ * A test / executable-spec pattern is identified by a Gherkin feature under a
+ * `tests/features/` tree (the canonical home of executable specs — see the
+ * self-hosting source globs). These are the verification surface: they
+ * `@architect-implements` production patterns and own invariants + scenarios,
+ * but not the implementation classification a *component* view renders. A
+ * component architecture view shows production components defined in source, so
+ * test-feature patterns are excluded; their test→production traceability lives
+ * in the traceability / requirements-executable docs.
+ *
+ * Keys on the source path, NOT on `implementsPatterns`: production sub-modules
+ * legitimately carry `@architect-implements` to a barrel pattern (e.g.
+ * `DeriveProcessState` → `ProcessGuardLinter`), so an implements edge alone does
+ * not mark a test pattern. ADRs (under `architect/decisions/`) are not under
+ * `tests/features/`, so they are retained.
+ */
+function isTestFeaturePattern(pattern: ExtractedPattern): boolean {
+  return /(?:^|\/)tests\/features\//u.test(pattern.source.file);
+}
+
 function filterArchitecturallyInterestingPatterns(
   patterns: readonly ExtractedPattern[],
 ): readonly ExtractedPattern[] {
-  const filtered = patterns.filter(
+  const productionPatterns = patterns.filter((pattern) => !isTestFeaturePattern(pattern));
+  const scoped = productionPatterns.length > 0 ? productionPatterns : patterns;
+
+  const filtered = scoped.filter(
     (pattern) =>
       hasText(pattern.role) ||
       hasText(pattern.boundedContext) ||
@@ -189,7 +212,7 @@ function filterArchitecturallyInterestingPatterns(
       hasText(pattern.productArea),
   );
 
-  return filtered.length > 0 ? filtered : patterns;
+  return filtered.length > 0 ? filtered : scoped;
 }
 
 function filterPatternsForArchitecture(

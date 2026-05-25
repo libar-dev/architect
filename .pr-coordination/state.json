@@ -6,16 +6,21 @@
     "WS-0-finalize-hygiene": "done (committed 6f2fc6c)",
     "WS-1-annotation-reenablement": "phase-1 projection pilot COMPLETE (Sessions 01-06); expansion COMPLETE (core Sessions 07-08; guard Session 09; connectable test features Session 10; new code-originated identities Session 11). Shipped-code connectivity at terminal floor (~27 orphans = working-state specs + untargetable integration/fixture features).",
     "WS-2-skills": "scoped — next workstream (now unblocked)",
-    "WS-3-docs": "IN PROGRESS — Session 12 restructured ARCHITECTURE.md generation (single 237-node graph TD → context map + 29 per-group diagrams; D-14). Remaining: skill/doc-wording updates (incl. stale 'docs-live gitignored' wording), other generated-doc reviews."
+    "WS-3-docs": "IN PROGRESS — Session 12 restructured ARCHITECTURE.md (237-node graph TD → context map + 29 per-group diagrams; D-14, committed 5b7ab6e). Session 13 shrank the catch-all buckets by filtering test-feature patterns from the component view + production annotation fixes (D-15; 237->169 patterns, 29->24 diagrams). Remaining: other generated-doc reviews (PATTERNS/ROADMAP/CHANGELOG/requirements); HUD/progressive-disclosure ideation captured (ideation-only)."
   },
   "ws3": {
-    "lastCompletedSession": "12-architecture-diagram-restructure",
-    "lastCommitNote": "WS-3 Session 12: ArchitectureDiagram fragment diagram->sections[] (No-BC, D-14); context-map + per-group split (bounded-context->role->package fallback); 1->29 bounded mermaid blocks, largest 11754 chars (<50000). Executable invariant in config-documentation.feature + dogfood render-budget guard. Verified executable specs ARE ingested (self-hosting.ts:79-90 + 35 live executable-test patterns).",
-    "decision": "D-14",
-    "gates": "all 12 §6 green; guard --staged 0 status transitions (added @architect-unlock-reason to config-documentation.feature per D-10); docs:all deterministic (only ARCHITECTURE.md changed)",
+    "lastCompletedSession": "13-architecture-diagram-test-feature-filter",
+    "lastCommitNote": "WS-3 Session 13: filter test-feature patterns (source under tests/features/) out of the component architecture view (D-15); 237->169 patterns, 29->24 diagrams, role:projection/Core/Host/MCP buckets gone, residual role:contract=4 genuine cross-cutting contracts + 9 ADRs. Production fixes: :guard->:process-guard (phantom context removed, contexts 22->21); +bounded-context on BoundedContextFragmentContract/PatternRelationsFragmentContracts/DeliveryReportingFragmentContracts; AGENTS.md docs-live wording. New executable Rule in config-documentation.feature. Learning: implementsPatterns is NOT a test discriminator (production sub-modules implement barrels); docs:all reads the compiled bin (build before regen).",
+    "decision": "D-15",
+    "priorDecision": "D-14 (Session 12, committed 5b7ab6e)",
+    "gates": "all §6 green; guard --staged 0 status transitions / 0 deliverable changes; docs:all md5-deterministic; dangling --strict 0; test:dogfood 1061; render-budget guard green (largest block 11753 chars)",
     "followUps": [
-      "Annotation coverage: residual 'Unclassified · <package>' buckets (Core 22, Host/Dev 22) shrink if those patterns gain role/bounded-context (WS-1-style).",
-      "Fix stale 'docs-live/ is generated and gitignored' wording in AGENTS.md/CLAUDE.md — it is git-tracked (D-14 incidental note)."
+      "Other generated docs (PATTERNS/ROADMAP/CHANGELOG/requirements-*) deserve the same readability + correct-scoping review lens applied to ARCHITECTURE.md.",
+      "HUD / progressive-disclosure: reuse DisclosureSpec (richness x grouping x rootShape) on the CLI/MCP read surface (overview/bundle/pattern/arch blocking) to cut verbosity — ideation captured (D-15 sibling), build deferred until disclosure defaults agreed."
+    ],
+    "resolvedFollowUps": [
+      "(D-14 #1) Unclassified bucket coverage — resolved by D-15 via test-feature filter + targeted production tags, not WS-1-style mass tagging.",
+      "(D-14 #2) Stale 'docs-live gitignored' wording — fixed in AGENTS.md (Session 13)."
     ]
   },
   "ws1": {

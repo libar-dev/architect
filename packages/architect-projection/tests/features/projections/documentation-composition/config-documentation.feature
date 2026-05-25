@@ -135,6 +135,30 @@ Feature: Documentation Composition projection bodies
       Then the component diagram should lead with a context map section
       And the remaining sections should partition the patterns into per-group detail diagrams
 
+  Rule: The component view shows production components, not test-feature patterns
+
+    **Invariant:** The component architecture diagram excludes patterns whose
+    identity is an executable Gherkin feature under `tests/features/` — that
+    verification surface realizes production patterns but is not itself a
+    component. Production patterns are retained, including sub-modules that
+    `@architect-implements` a barrel pattern (an implements edge alone does not
+    mark a pattern as a test).
+
+    **Rationale:** A component view answers "what are the production components
+    and how do they relate"; including test-feature patterns buried the real
+    components under dozens of `*ExecutableTests` nodes. Test→production
+    traceability lives in the traceability / requirements-executable docs. See
+    DECISIONS D-15.
+
+    **Verified by:** projecting a component diagram from a context mixing a
+    production pattern with a test-feature pattern and asserting the partition.
+
+    Scenario: the component view omits patterns defined by test feature files
+      Given a Documentation Composition architecture context mixing a production pattern and a test-feature pattern
+      When I project the component architecture diagram for the mixed context
+      Then the component diagram should include the production pattern
+      And the component diagram should omit the test-feature pattern
+
   Rule: PR change review projections derive affected patterns from explicit options
 
     **Invariant:** `projectPrChangeReview` preserves the explicit `branch` and

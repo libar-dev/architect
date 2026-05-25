@@ -7,7 +7,7 @@
 
 ## Overview
 
-This view captures 237 patterns across 29 diagrams in the Component architecture view.
+This view captures 169 patterns across 24 diagrams in the Component architecture view.
 
 ## Diagrams
 
@@ -20,17 +20,16 @@ graph LR
   api["api (4)"]
   cli["cli (6)"]
   configuration["configuration (4)"]
-  delivery_reporting["delivery-reporting (6)"]
+  delivery_reporting["delivery-reporting (7)"]
   documentation_composition["documentation-composition (4)"]
   domain["domain (1)"]
   execution_context["execution-context (8)"]
   extractor["extractor (6)"]
   generator["generator (4)"]
   governance["governance (8)"]
-  guard["guard (1)"]
   lint["lint (4)"]
   operational_insights["operational-insights (10)"]
-  pattern_relations["pattern-relations (10)"]
+  pattern_relations["pattern-relations (12)"]
   pipeline["pipeline (1)"]
   process_guard["process-guard (6)"]
   projection["projection (43)"]
@@ -39,11 +38,7 @@ graph LR
   scanner["scanner (4)"]
   validation["validation (8)"]
   validation_schemas["validation-schemas (4)"]
-  role_contract["role: contract (9)"]
-  role_projection["role: projection (17)"]
-  pkg_architect_core["Architect Core (22)"]
-  pkg_architect_host_dev["Architect Host (Dev) (22)"]
-  pkg_architect_mcp["Architect MCP (4)"]
+  role_contract["role: contract (4)"]
   pkg_architect_package_content["Architect Package Content (9)"]
   api --> cli
   cli --> api
@@ -78,9 +73,6 @@ graph LR
   pipeline --> extractor
   pipeline --> scanner
   pipeline --> validation_schemas
-  pkg_architect_core --> pkg_architect_host_dev
-  pkg_architect_host_dev --> pkg_architect_package_content
-  pkg_architect_package_content --> pkg_architect_host_dev
   process_guard --> generator
   process_guard --> lint
   process_guard --> scanner
@@ -180,10 +172,11 @@ graph TD
   sourcemerge["SourceMerge<br/>(utility)"]
 ```
 
-### Bounded context: delivery-reporting \(6 patterns\)
+### Bounded context: delivery-reporting \(7 patterns\)
 
 ```mermaid
 graph TD
+  deliveryreportingfragmentcontracts["DeliveryReportingFragmentContracts<br/>(contract)"]
   deliveryreportingsupporting["DeliveryReportingSupporting<br/>(contract)"]
   phaseprogress["PhaseProgress<br/>(contract)"]
   releasenotesdigest["ReleaseNotesDigest<br/>(contract)"]
@@ -286,13 +279,6 @@ graph TD
   validationruledigest["ValidationRuleDigest<br/>(contract)"]
 ```
 
-### Bounded context: guard \(1 pattern\)
-
-```mermaid
-graph TD
-  processguardrulesexecutabletests["ProcessGuardRulesExecutableTests"]
-```
-
 ### Bounded context: lint \(4 patterns\)
 
 ```mermaid
@@ -334,18 +320,20 @@ graph TD
   tagusagematrix -.->|uses| tagusageentry
 ```
 
-### Bounded context: pattern-relations \(10 patterns\)
+### Bounded context: pattern-relations \(12 patterns\)
 
 ```mermaid
 graph TD
   architecturecomparison["ArchitectureComparison<br/>(contract)"]
   architectureneighborhood["ArchitectureNeighborhood<br/>(contract)"]
+  boundedcontextfragmentcontract["BoundedContextFragmentContract<br/>(contract)"]
   dependencyedge["DependencyEdge<br/>(contract)"]
   dependencyedgeset["DependencyEdgeSet<br/>(contract)"]
   dependencytree["DependencyTree<br/>(contract)"]
   orphanpatternlist["OrphanPatternList<br/>(contract)"]
   patterncatalog["PatternCatalog<br/>(contract)"]
   patterndetail["PatternDetail<br/>(contract)"]
+  patternrelationsfragmentcontracts["PatternRelationsFragmentContracts<br/>(contract)"]
   patternrelationssupporting["PatternRelationsSupporting<br/>(contract)"]
   patternsummary["PatternSummary<br/>(contract)"]
 ```
@@ -650,109 +638,14 @@ graph TD
   patterngraph -.->|uses| extractedpattern
 ```
 
-### Uncontextualized · role: contract \(9 patterns\)
+### Uncontextualized · role: contract \(4 patterns\)
 
 ```mermaid
 graph TD
-  boundedcontextfragmentcontract["BoundedContextFragmentContract<br/>(contract)"]
-  deliveryreportingfragmentcontracts["DeliveryReportingFragmentContracts<br/>(contract)"]
-  errorfactories["ErrorFactories<br/>(contract)"]
   errorfactorytypes["ErrorFactoryTypes<br/>(contract)"]
-  patternrelationsfragmentcontracts["PatternRelationsFragmentContracts<br/>(contract)"]
   projectionfragmentcontracts["ProjectionFragmentContracts<br/>(contract)"]
   projectionfragmentschema["ProjectionFragmentSchema<br/>(contract)"]
-  resultmonad["ResultMonad<br/>(contract)"]
   resultmonadtypes["ResultMonadTypes<br/>(contract)"]
-```
-
-### Uncontextualized · role: projection \(17 patterns\)
-
-```mermaid
-graph TD
-  architecturenavigationprojectionexecutabletests["ArchitectureNavigationProjectionExecutableTests<br/>(projection)"]
-  businessrulesprojectionexecutabletests["BusinessRulesProjectionExecutableTests<br/>(projection)"]
-  decisioncatalogprojectionexecutabletests["DecisionCatalogProjectionExecutableTests<br/>(projection)"]
-  deliveryprogressprojectionexecutabletests["DeliveryProgressProjectionExecutableTests<br/>(projection)"]
-  deliveryreportingprojectionsupportexecutabletests["DeliveryReportingProjectionSupportExecutableTests<br/>(projection)"]
-  dependencyedgeprojectionexecutabletests["DependencyEdgeProjectionExecutableTests<br/>(projection)"]
-  dependencytreeprojectionexecutabletests["DependencyTreeProjectionExecutableTests<br/>(projection)"]
-  documentationcompositionprojectionexecutabletests["DocumentationCompositionProjectionExecutableTests<br/>(projection)"]
-  executioncontextprojectionexecutabletests["ExecutionContextProjectionExecutableTests<br/>(projection)"]
-  governancevalidationtaxonomyprojectionexecutabletests["GovernanceValidationTaxonomyProjectionExecutableTests<br/>(projection)"]
-  openquestionlistprojectionexecutabletests["OpenQuestionListProjectionExecutableTests<br/>(projection)"]
-  operationalinsightsprojectionexecutabletests["OperationalInsightsProjectionExecutableTests<br/>(projection)"]
-  patternbundleprojectionexecutabletests["PatternBundleProjectionExecutableTests<br/>(projection)"]
-  patterndetailprojectionexecutabletests["PatternDetailProjectionExecutableTests<br/>(projection)"]
-  patternsummarycatalogprojectionexecutabletests["PatternSummaryCatalogProjectionExecutableTests<br/>(projection)"]
-  releasenotesprojectionexecutabletests["ReleaseNotesProjectionExecutableTests<br/>(projection)"]
-  traceabilitymatrixprojectionexecutabletests["TraceabilityMatrixProjectionExecutableTests<br/>(projection)"]
-```
-
-### Unclassified · Architect Core \(22 patterns\)
-
-```mermaid
-graph TD
-  codecutilsvalidation["CodecUtilsValidation"]
-  configbasedworkflowdefinition["ConfigBasedWorkflowDefinition"]
-  configresolution["ConfigResolution"]
-  configurationapi["ConfigurationAPI"]
-  crosspackageedgeclassification["CrossPackageEdgeClassification"]
-  defineconfigexecutabletests["DefineConfigExecutableTests"]
-  docstringmediatype["DocStringMediaType"]
-  dualsourcemergeintegration["DualSourceMergeIntegration"]
-  filediscovery["FileDiscovery"]
-  gherkinexternalrelationshiptagpropagation["GherkinExternalRelationshipTagPropagation"]
-  gherkinrulessupport["GherkinRulesSupport"]
-  packageresolverexecutabletests["PackageResolverExecutableTests"]
-  patterngraphapireverselookup["PatternGraphApiReverseLookup"]
-  patternreferencevalidation["PatternReferenceValidation"]
-  projectconfigloader["ProjectConfigLoader"]
-  scannercore["ScannerCore"]
-  shapeextraction["ShapeExtraction"]
-  sourcemerging["SourceMerging"]
-  tagregistryschemasvalidation["TagRegistrySchemasValidation"]
-  typescripttaxonomyimplementation["TypeScriptTaxonomyImplementation"]
-  valueformatcanonicalvaluesdispatch["ValueFormatCanonicalValuesDispatch"]
-  workflowconfigschemasvalidation["WorkflowConfigSchemasValidation"]
-  gherkinexternalrelationshiptagpropagation -. see-also .- gherkinrulessupport
-```
-
-### Unclassified · Architect Host \(Dev\) \(22 patterns\)
-
-```mermaid
-graph TD
-  architectpubliccontract["ArchitectPublicContract"]
-  canonicalvaluessync["CanonicalValuesSync"]
-  compacttextrenderertests["CompactTextRendererTests"]
-  dataapicliergonomics["DataAPICLIErgonomics"]
-  dataapioutputshaping["DataAPIOutputShaping"]
-  documentationcommandparityboundarytests["DocumentationCommandParityBoundaryTests"]
-  generatedocscli["GenerateDocsCli"]
-  lintpatternsclibehavior["LintPatternsCliBehavior"]
-  lintprocessclibehavior["LintProcessCliBehavior"]
-  loadpreambleparser["LoadPreambleParser"]
-  mcptoolregistryboundarytests["MCPToolRegistryBoundaryTests"]
-  patterngraphapicli["PatternGraphAPICLI"]
-  patterngraphcliarchhealth["PatternGraphCliArchHealth"]
-  patterngraphclicache["PatternGraphCliCache"]
-  patterngraphclidryrun["PatternGraphCliDryRun"]
-  patterngraphclimetadata["PatternGraphCliMetadata"]
-  patterngraphclioutputmodifiers["PatternGraphCliOutputModifiers"]
-  patterngraphclirepl["PatternGraphCliRepl"]
-  patterngraphclirulessubcommand["PatternGraphCliRulesSubcommand"]
-  patterngraphclisubcommands["PatternGraphCliSubcommands"]
-  stubtaxonomytagtests["StubTaxonomyTagTests"]
-  validatorreadmodelconsolidation["ValidatorReadModelConsolidation"]
-```
-
-### Unclassified · Architect MCP \(4 patterns\)
-
-```mermaid
-graph TD
-  mcpruntimehardeningexecutabletests["MCPRuntimeHardeningExecutableTests"]
-  mcpserverlifecycleexecutabletests["MCPServerLifecycleExecutableTests"]
-  mcptoolinputvalidationexecutabletests["MCPToolInputValidationExecutableTests"]
-  mcptoolregistryintegrationtests["MCPToolRegistryIntegrationTests"]
 ```
 
 ### Unclassified · Architect Package Content \(9 patterns\)
@@ -816,13 +709,11 @@ graph TD
 - AnnotationCoverage
 - AnnotationCoverageProjection
 - AntiPatternDetector
-- ArchitectPublicContract
 - ArchitectureComparison
 - ArchitectureComparisonProjection
 - ArchitectureDiagram
 - ArchitectureDiagramProjection
 - ArchitectureInspection
-- ArchitectureNavigationProjectionExecutableTests
 - ArchitectureNeighborhood
 - ArchitectureNeighborhoodProjection
 - AstParser
@@ -834,75 +725,49 @@ graph TD
 - BusinessRuleReference
 - BusinessRuleSet
 - BusinessRulesProjection
-- BusinessRulesProjectionExecutableTests
-- CanonicalValuesSync
 - CLIErrorHandler
 - CLIRuntimePaths
 - CLIVersionHelper
 - CodecUtils
-- CodecUtilsValidation
 - CompactTextRenderer
-- CompactTextRendererTests
-- ConfigBasedWorkflowDefinition
 - ConfigLoader
-- ConfigResolution
-- ConfigurationAPI
-- CrossPackageEdgeClassification
-- DataAPICLIErgonomics
-- DataAPIOutputShaping
 - DecisionCatalog
 - DecisionCatalogProjection
-- DecisionCatalogProjectionExecutableTests
 - DecisionRecord
 - DefineConfig
-- DefineConfigExecutableTests
 - Deliverable
 - DeliverableManifest
 - DeliverableProjection
-- DeliveryProgressProjectionExecutableTests
 - DeliveryReportingFragmentContracts
 - DeliveryReportingProjectionSupport
-- DeliveryReportingProjectionSupportExecutableTests
 - DeliveryReportingSupporting
 - DependencyEdge
 - DependencyEdgeProjection
-- DependencyEdgeProjectionExecutableTests
 - DependencyEdgeSet
 - DependencyTree
 - DependencyTreeProjection
-- DependencyTreeProjectionExecutableTests
 - DeriveProcessState
 - DetectChanges
 - DocExtractor
-- DocStringMediaType
 - DocumentationBundle
-- DocumentationCommandParityBoundaryTests
-- DocumentationCompositionProjectionExecutableTests
 - DocumentationCompositionProjectionSupport
 - DocumentationCompositionSupporting
 - DoDValidationTypes
 - DoDValidator
 - DualSourceExtractor
-- DualSourceMergeIntegration
-- ErrorFactories
 - ErrorFactoryTypes
-- ExecutionContextProjectionExecutableTests
 - ExecutionContextProjectionSupport
 - ExecutionContextSupporting
 - ExtractedPattern
 - ExtractionDiagnostics
-- FileDiscovery
 - FileReadingList
 - FileReadingListProjection
 - FragmentRendererDispatch
 - FSMStates
 - FSMTransitions
 - FSMValidator
-- GenerateDocsCli
 - GherkinAstParser
-- GherkinExternalRelationshipTagPropagation
 - GherkinExtractor
-- GherkinRulesSupport
 - GherkinScanner
 - GitBranchDiff
 - GitHelpers
@@ -910,7 +775,6 @@ graph TD
 - GitNameStatusParser
 - GovernanceProjectionSupport
 - GovernanceSupporting
-- GovernanceValidationTaxonomyProjectionExecutableTests
 - GraphInventory
 - HandoffProjection
 - HandoffRecord
@@ -919,26 +783,16 @@ graph TD
 - LintEngine
 - LintModule
 - LintPatternsCLI
-- LintPatternsCliBehavior
 - LintProcessCLI
-- LintProcessCliBehavior
 - LintRules
-- LoadPreambleParser
 - MarkdownBlockParser
 - MarkdownRenderer
 - MCPFileWatcher
 - MCPPipelineSession
-- MCPRuntimeHardeningExecutableTests
 - MCPServer
 - MCPServerBin
-- MCPServerLifecycleExecutableTests
-- MCPToolInputValidationExecutableTests
 - MCPToolRegistry
-- MCPToolRegistryBoundaryTests
-- MCPToolRegistryIntegrationTests
 - OpenQuestionListProjection
-- OpenQuestionListProjectionExecutableTests
-- OperationalInsightsProjectionExecutableTests
 - OperationalInsightsProjectionSupport
 - OperationalInsightsSupporting
 - OrphanPatternList
@@ -946,36 +800,21 @@ graph TD
 - OverviewDigest
 - OverviewProjection
 - PackageResolver
-- PackageResolverExecutableTests
 - PatternBundleProjection
-- PatternBundleProjectionExecutableTests
 - PatternCatalog
 - PatternCatalogProjection
 - PatternClassification
 - PatternDetail
 - PatternDetailProjection
-- PatternDetailProjectionExecutableTests
 - PatternGraph
 - PatternGraphApi
-- PatternGraphAPICLI
-- PatternGraphApiReverseLookup
 - PatternGraphCLI
-- PatternGraphCliArchHealth
-- PatternGraphCliCache
-- PatternGraphCliDryRun
-- PatternGraphCliMetadata
-- PatternGraphCliOutputModifiers
-- PatternGraphCliRepl
-- PatternGraphCliRulesSubcommand
-- PatternGraphCliSubcommands
 - PatternHelpers
-- PatternReferenceValidation
 - PatternRelationsFragmentContracts
 - PatternRelationsProjectionSupport
 - PatternRelationsSupporting
 - PatternScanner
 - PatternSummary
-- PatternSummaryCatalogProjectionExecutableTests
 - PatternSummaryProjection
 - PDR005ProcessGuardFSM
 - PhaseProgress
@@ -984,9 +823,7 @@ graph TD
 - PrChangeReviewProjection
 - ProcessGuardDecider
 - ProcessGuardLinter
-- ProcessGuardRulesExecutableTests
 - ProcessGuardTypes
-- ProjectConfigLoader
 - ProjectConfigProjection
 - ProjectConfigSnapshot
 - ProjectionFragmentContracts
@@ -994,37 +831,30 @@ graph TD
 - RegistryBuilder
 - ReleaseNotesDigest
 - ReleaseNotesProjection
-- ReleaseNotesProjectionExecutableTests
 - RequirementDigest
 - RequirementDigestProjection
 - RequirementExecutableDigestProjection
 - RequirementSpecsDigestProjection
-- ResultMonad
 - ResultMonadTypes
 - RoadmapTimeline
 - RoadmapTimelineProjection
 - RoleProfile
 - RoleProfileCollection
 - RoleProfileProjection
-- ScannerCore
 - ScopeReadinessCheck
 - ScopeReadinessProjection
 - ScopeReadinessReport
 - SessionContextBundle
 - SessionContextProjection
 - SessionStateReader
-- ShapeExtraction
 - ShapeExtractor
 - SourceInventoryDigest
 - SourceInventoryEntry
 - SourceInventoryProjection
 - SourceMerge
-- SourceMerging
 - StatusDistribution
 - StatusDistributionProjection
-- StubTaxonomyTagTests
 - TagRegistrySchemas
-- TagRegistrySchemasValidation
 - TagUsageEntry
 - TagUsageMatrix
 - TagUsageProjection
@@ -1032,13 +862,8 @@ graph TD
 - TaxonomyDigestProjection
 - TraceabilityMatrix
 - TraceabilityMatrixProjection
-- TraceabilityMatrixProjectionExecutableTests
-- TypeScriptTaxonomyImplementation
 - UiRenderer
 - ValidatePatternsCLI
 - ValidationModule
 - ValidationRuleDigest
 - ValidationRuleDigestProjection
-- ValidatorReadModelConsolidation
-- ValueFormatCanonicalValuesDispatch
-- WorkflowConfigSchemasValidation

@@ -772,6 +772,43 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   );
 
   Rule(
+    'The component view shows production components, not test-feature patterns',
+    ({ RuleScenario }) => {
+      RuleScenario(
+        'the component view omits patterns defined by test feature files',
+        ({ Given, When, Then, And }) => {
+          Given(
+            'a Documentation Composition architecture context mixing a production pattern and a test-feature pattern',
+            () => {
+              state!.context = createMixedProductionAndTestFeatureContext();
+            },
+          );
+
+          When('I project the component architecture diagram for the mixed context', () => {
+            state!.architectureDiagrams['component'] = parseAndProjectArchitectureDiagram(
+              state!.context!,
+              { scope: 'component' },
+            );
+          });
+
+          Then('the component diagram should include the production pattern', () => {
+            const root = state!.architectureDiagrams['component']!.root;
+            expect(root.patterns).toContain('RenderMarkdownComponent');
+          });
+
+          And('the component diagram should omit the test-feature pattern', () => {
+            const root = state!.architectureDiagrams['component']!.root;
+            expect(root.patterns).not.toContain('RenderMarkdownComponentExecutableTests');
+            for (const section of root.sections) {
+              expect(section.patterns).not.toContain('RenderMarkdownComponentExecutableTests');
+            }
+          });
+        },
+      );
+    },
+  );
+
+  Rule(
     'PR change review projections derive affected patterns from explicit options',
     ({ RuleScenario }) => {
       RuleScenario(
@@ -1073,6 +1110,29 @@ function createDocumentationContext(): ProjectionContext {
         uses: ['ProjectionAPI'],
       }),
     },
+  });
+}
+
+function createMixedProductionAndTestFeatureContext(): ProjectionContext {
+  return createProjectionContext({
+    patterns: [
+      createPattern('RenderMarkdownComponent', {
+        status: 'active',
+        role: 'codec',
+        archContext: 'rendering',
+        file: 'packages/architect-projection/src/renderers/render-markdown.ts',
+      }),
+      // A test/executable-spec pattern: identity is a feature under
+      // tests/features/, realizing the production component. The component view
+      // must omit it even though it carries a role + archContext.
+      createPattern('RenderMarkdownComponentExecutableTests', {
+        status: 'active',
+        role: 'projection',
+        archContext: 'rendering',
+        implementsPatterns: ['RenderMarkdownComponent'],
+        file: 'packages/architect-projection/tests/features/renderers/render-markdown.feature',
+      }),
+    ],
   });
 }
 

@@ -2,6 +2,7 @@
  * @architect
  * @architect-pattern DeliveryReportingFragmentContracts
  * @architect-role:contract
+ * @architect-bounded-context:delivery-reporting
  * @architect-status active
  *
  * ### When to Use

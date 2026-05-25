@@ -2,6 +2,7 @@
  * @architect
  * @architect-pattern PatternRelationsFragmentContracts
  * @architect-role:contract
+ * @architect-bounded-context:pattern-relations
  * @architect-status active
  *
  * ### When to Use

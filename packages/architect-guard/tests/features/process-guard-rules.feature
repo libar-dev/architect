@@ -2,7 +2,7 @@
 @architect-pattern:ProcessGuardRulesExecutableTests
 @architect-status:active
 @architect-implements:ProcessGuardLinter
-@architect-bounded-context:guard
+@architect-bounded-context:process-guard
 
 Feature: Process guard rule expressions
 
