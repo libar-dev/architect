@@ -252,3 +252,42 @@ BuildPipeline). docs:all → ARCHITECTURE/CHANGELOG/PATTERNS regenerated, staged
 2. `@architect-implements` is authored on the **test `.feature`** (a relation, not identity)
    — different mechanism from `@architect-uses`. Re-confirm each implements target exists
    as a production pattern before authoring; verify via Data-API read-back (`implementedBy`).
+
+## Session 08 — Connect architect-core test features via @architect-implements (committed 8b22f86)
+
+Prior session commit = `c347045`. De-orphaned **11 of 14** core/tests executable-test
+orphans by adding feature-level `@architect-implements` (verified each target via step
+imports + source `@architect-pattern`, then Data-API read-back). Total orphans **48 → 37**.
+Mapping: ShapeExtraction→ShapeExtractor, DualSourceMergeIntegration→DualSourceExtractor,
+PatternGraphApiReverseLookup→PatternGraphApi, ConfigResolution/ConfigurationAPI/
+ProjectConfigLoader→**ConfigLoader** (3 tests, one many-to-one target — ConfigLoader's
+"load + resolve defaults" surface covers loadProjectConfig + resolveProjectConfig +
+createArchitect registry/roles; ConfigLoader.implementedBy now =4), CodecUtilsValidation→
+CodecUtils, CrossPackageEdgeClassification→PatternClassification, DocStringMediaType→
+GherkinAstParser, FileDiscovery→PatternScanner, PatternReferenceValidation→
+**ExtractionDiagnostics,PatternClassification** (CSV — Rule 1 invalid-pattern-name
+diagnostic + Rule 2 internal/external/dangling classification). All 12 gates green
+(test:dogfood 1057, perf 3/3, dangling --strict 0, audit:subtractive 0).
+
+**Deferred 3 (no clean target — D-9):** SourceMerging (`mergeSourcesForGenerator`,
+merge-sources.ts un-patterned, not reachable from ConfigLoader — barrel-only re-export),
+TagRegistrySchemasValidation (`createDefaultTagRegistry`/`mergeTagRegistries`,
+tag-registry.ts un-patterned), TypeScriptTaxonomyImplementation (`buildRegistry`,
+registry-builder.ts un-patterned). Each needs a new code-originated `@architect-pattern`
+(D-3 style) on the owning file before an implements edge can land.
+
+### Rules for next session
+
+1. **Map test→production by STEP IMPORTS, not feature title.** Read
+   `tests/steps/<area>/<name>.steps.ts` `from '../../../src/...'` to find the exact
+   production module, then check that file's `@architect-pattern`. If the file has none and
+   isn't reachable from a pattern that does, DEFER (don't edge to a transitively-reachable
+   unrelated pattern — that's a false edge).
+2. **D-10: a `completed` test feature lacking `@architect-unlock-reason` trips guard
+   `completed-protection`** when you add a tag. Status transitions stayed 0 (D-6 holds), but
+   spec-file modification needs an unlock-reason (≥10 meaningful chars). Only
+   dual-source-merge.feature needed it here; the other 6 completed features already carried
+   one. Check before staging.
+3. `format:check` is now green repo-wide (the WS-2 dirtiness Session 07 flagged is resolved).
+4. Next core orphans = the guard/cli/mcp packages + the 3 D-9 deferrals (need new
+   production identities first).

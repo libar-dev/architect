@@ -11,9 +11,9 @@
   "ws1": {
     "phase": "1-projection-pilot-COMPLETE; 2-core-expansion-in-progress",
     "currentSession": "WS-1 expansion (core test-features Session 08; then guard/cli/mcp) or WS-2 skills / WS-3 docs",
-    "lastCompletedSession": "07-core-spine",
-    "lastCommit": "c347045",
-    "lastCommitNote": "Session 07 commit (architect-core/src spine de-orphaned). This sha is the session's own commit recorded post-hoc in the bookkeeping edit.",
+    "lastCompletedSession": "08-core-test-features",
+    "lastCommit": "8b22f86",
+    "lastCommitNote": "Session 08 commit (11 architect-core/tests features de-orphaned via @architect-implements; 3 deferred per D-9). Orphans 48 -> 37.",
     "baselineMetrics": {
       "patterns": 270,
       "orphansTotal": 107,
@@ -22,9 +22,11 @@
       "boundedContextCoverage": "157/270"
     },
     "currentMetrics": {
-      "orphansTotal": 48,
+      "orphansTotal": 37,
       "orphansProjection": 0,
       "orphansCoreSrc": 0,
+      "orphansCoreTests": 3,
+      "orphansCoreTestsDeferred": ["SourceMerging", "TagRegistrySchemasValidation", "TypeScriptTaxonomyImplementation"],
       "orphansProjectionByArea": {
         "operational-insights": 0,
         "governance": 0,
