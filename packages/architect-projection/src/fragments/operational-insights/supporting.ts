@@ -34,6 +34,12 @@ export const BlockingEntrySchema = z.strictObject({
   blockedBy: z.array(z.string()),
 });
 
+export const GeneratedViewEntrySchema = z.strictObject({
+  docType: z.string(),
+  verb: z.string(),
+  summary: z.string(),
+});
+
 export const GapsByTagSchema = z.record(z.string(), z.array(z.string()));
 
 export const TagValueCountSchema = z.strictObject({

@@ -18,7 +18,10 @@ import {
   ProjectDocumentationBundleOptionsSchema,
   TaxonomyDigestOptionsSchema,
 } from '@libar-dev/architect-projection/projections';
-import { ProgressiveDisclosureLevelSchema } from '@libar-dev/architect-projection/disclosure';
+import {
+  ContentRichnessSchema,
+  ProgressiveDisclosureLevelSchema,
+} from '@libar-dev/architect-projection/disclosure';
 import { z } from 'zod';
 
 export const MAX_HANDOFF_MODIFIED_FILES = 200;
@@ -70,6 +73,10 @@ export const DocumentationFilterSchema = z
     status: z.array(AcceptedStatusSchema).min(1).optional(),
   })
   .readonly();
+
+export const OptionalContentRichnessShape = {
+  disclosure: ContentRichnessSchema.optional(),
+} satisfies z.ZodRawShape;
 
 export const OptionalDocumentationOptionsShape = {
   disclosure: ProgressiveDisclosureLevelSchema.optional(),

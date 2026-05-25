@@ -2,7 +2,8 @@ import { z } from 'zod';
 
 import type { BundleRouting } from '../fragments/base.js';
 import type { Fragment, ProjectionBundle } from '../fragments/index.js';
-import type { DisclosureSpec } from '../disclosure/spec.js';
+import { ContentRichnessSchema } from '../disclosure/spec.js';
+import type { ContentRichness, DisclosureSpec } from '../disclosure/spec.js';
 import type { LogicalRouteId } from '../routing/route-id.js';
 
 export type ProjectionInput = Fragment | ProjectionBundle<Fragment>;
@@ -72,6 +73,12 @@ export interface RenderCompactOptions {
   sectionSeparator?: '===' | '---' | 'none';
   includeHeader?: boolean;
   wrapLines?: number;
+  /**
+   * Per-entry content depth. Fragments that support disclosure (e.g.
+   * OverviewDigest) trim or expand accordingly; fragments without disclosure
+   * branching ignore it. Undefined renders at full fidelity (back-compatible).
+   */
+  richness?: ContentRichness;
 }
 
 export const RenderCompactOptionsSchema = z
@@ -79,6 +86,7 @@ export const RenderCompactOptionsSchema = z
     sectionSeparator: z.enum(['===', '---', 'none']).optional(),
     includeHeader: z.boolean().optional(),
     wrapLines: z.number().int().optional(),
+    richness: ContentRichnessSchema.optional(),
   })
   .readonly();
 

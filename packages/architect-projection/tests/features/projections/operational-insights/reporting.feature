@@ -2,6 +2,7 @@
 @architect-pattern:OperationalInsightsProjectionExecutableTests
 @architect-implements:OperationalInsightsProjectionSupport,OverviewProjection,AnnotationCoverageProjection,TagUsageProjection,SourceInventoryProjection,RoleProfileProjection,RequirementDigestProjection
 @architect-status:completed
+@architect-unlock-reason:Add-overview-disclosure-rendering-coverage-WS3-S14
 @architect-phase:49
 @architect-product-area:Projection
 @architect-role:projection
@@ -34,7 +35,8 @@ Feature: Operational Insights reporting projections
     **Invariant:** `OverviewDigest` always carries a `progress` block
     (delivery-total counts and a percentage that excludes candidates),
     `activePhases` limited to phases with active work, a `blocking` array of
-    incomplete patterns whose `dependsOn` targets are incomplete, and the
+    incomplete patterns whose `dependsOn` targets are incomplete, a
+    `generatedViews` index of the fetchable documentation surfaces, and the
     embedded CLI-hints list for session bootstrap.
 
     **Rationale:** These fields are the canonical session-start payload;
@@ -48,6 +50,29 @@ Feature: Operational Insights reporting projections
       When I project the overview digest
       Then the overview digest should expose delivery progress active phases and blocking entries
       And the overview digest should preserve unnamed active phase parity
+
+  Rule: Overview compact rendering honors disclosure richness
+
+    **Invariant:** Rendering the overview digest at `name-only` emits the
+    progress section alone; at `summary` it truncates the blocking list to the
+    first few entries with a "more" pointer and collapses the generated-views
+    index to a single line; at `full` it emits every blocking entry and the
+    itemized generated-views index. Disclosure shapes how much is rendered,
+    never what the digest contains.
+
+    **Rationale:** The overview is the session-bootstrap call; a terse default
+    keeps it a heads-up display while `full` preserves the complete payload.
+    See DECISIONS D-17.
+
+    **Verified by:** rendering one overview digest at each richness level and
+    asserting blocking truncation plus the generated-views shape.
+
+    Scenario: rendering the overview digest at each disclosure level
+      Given an Operational Insights overview context with six blocking dependencies
+      When I render the overview digest at name-only summary and full
+      Then the name-only rendering contains only the progress section
+      And the summary rendering truncates blocking and shows a one-line generated-views index
+      And the full rendering shows every blocking entry and the itemized generated-views index
 
   Rule: Annotation coverage stays numeric and graph-only
 

@@ -36,8 +36,13 @@ import {
   type SessionContextBundle,
 } from '../fragments/index.js';
 
+import type { ContentRichness } from '../disclosure/spec.js';
+
 import { dispatchByKind, type KindTable } from './_shared/dispatch.js';
 import type { ProjectionInput, RenderCompactOptions } from './types.js';
+
+/** Blocking entries shown before collapsing to a "… and N more" pointer at non-full richness. */
+const OVERVIEW_SUMMARY_BLOCKING_LIMIT = 5;
 
 const COMPACT_NORMALIZERS: KindTable<string, RenderCompactOptions | undefined> = {
   OverviewDigest: (f, o) => renderOverviewDigest(f, o),
@@ -89,6 +94,9 @@ function renderOverviewDigest(
   overview: OverviewDigest,
   options: RenderCompactOptions | undefined,
 ): string {
+  // Undefined richness renders at full fidelity (back-compatible for internal
+  // callers and fixtures). The CLI/MCP read surface defaults to `summary`.
+  const richness: ContentRichness = options?.richness ?? 'full';
   const sections: string[] = [];
   const { progress } = overview;
 
@@ -101,6 +109,11 @@ function renderOverviewDigest(
         : ''),
   );
 
+  // name-only = the progress line alone — the most compact heads-up signal.
+  if (richness === 'name-only') {
+    return sections.join('\n\n') + '\n';
+  }
+
   if (overview.activePhases.length > 0) {
     const lines = overview.activePhases.map((phase) => {
       const name = phase.name !== undefined ? `: ${phase.name}` : '';
@@ -110,10 +123,22 @@ function renderOverviewDigest(
   }
 
   if (overview.blocking.length > 0) {
-    const lines = overview.blocking.map(
+    const showAll = richness === 'full';
+    const shown = showAll
+      ? overview.blocking
+      : overview.blocking.slice(0, OVERVIEW_SUMMARY_BLOCKING_LIMIT);
+    const lines = shown.map(
       (entry) => `${entry.pattern} blocked by: ${entry.blockedBy.join(', ')}`,
     );
+    const hidden = overview.blocking.length - shown.length;
+    if (hidden > 0) {
+      lines.push(`... and ${String(hidden)} more — run \`arch blocking\``);
+    }
     sections.push(renderMarker('BLOCKING', options) + '\n' + lines.join('\n'));
+  }
+
+  if (overview.generatedViews !== undefined && overview.generatedViews.length > 0) {
+    sections.push(renderGeneratedViews(overview.generatedViews, richness, options));
   }
 
   if (overview.cliHints !== undefined && overview.cliHints.length > 0) {
@@ -121,6 +146,29 @@ function renderOverviewDigest(
   }
 
   return sections.join('\n\n') + '\n';
+}
+
+function renderGeneratedViews(
+  views: NonNullable<OverviewDigest['generatedViews']>,
+  richness: ContentRichness,
+  options: RenderCompactOptions | undefined,
+): string {
+  const header = renderMarker('GENERATED VIEWS', options);
+
+  if (richness === 'full') {
+    const width = Math.max(...views.map((view) => view.docType.length));
+    const lines = views.map(
+      (view) => `  ${view.docType.padEnd(width)}  ${view.summary} — \`${view.verb}\``,
+    );
+    return header + '\n' + lines.join('\n');
+  }
+
+  // summary / summary-with-references: one line naming the fetchable views.
+  return (
+    header +
+    '\n' +
+    `${String(views.length)} docs via \`documentation <type>\`: ${views.map((view) => view.docType).join(', ')}`
+  );
 }
 
 function renderSessionContextBundle(

@@ -5,13 +5,16 @@ import {
   projectSessionContextBundle,
 } from '@libar-dev/architect-projection/projections';
 import type { SessionType } from '@libar-dev/architect-core';
+import type { ContentRichness } from '@libar-dev/architect-projection';
 import type { CommandDef, CommandName } from '../pattern-graph-cli-commands.js';
 import {
   ContextFlagsSchema,
   DepTreeFlagsSchema,
   EmptyFlagsSchema,
   FilesFlagsSchema,
+  OverviewFlagsSchema,
   StringArraySchema,
+  parseContentRichnessValue,
   parseIntegerValue,
   parseSessionTypeValue,
 } from './_shared/schemas.js';
@@ -23,13 +26,30 @@ export const reportingCommands = {
   overview: {
     name: 'overview',
     positional: StringArraySchema,
-    flags: EmptyFlagsSchema,
-    helpSignature: 'overview',
+    flags: OverviewFlagsSchema,
+    usage:
+      'Usage: architect overview [--disclosure <name-only|summary|summary-with-references|full>]',
+    helpSignature: 'overview [--disclosure <level>]',
+    helpDetail: {
+      body: [
+        'Disclosure controls verbosity: name-only (progress only), summary (default —',
+        'top blockers + a generated-views pointer), full (all blockers + itemized views).',
+      ],
+    },
     treatUnknownFlagsAsPositionals: true,
-    execute(context): void {
+    flagParsers: {
+      '--disclosure': {
+        kind: 'value',
+        key: 'disclosure',
+        parse: parseContentRichnessValue,
+      },
+    },
+    execute(context, parsed): void {
+      const flags = parsed.flags as { readonly disclosure?: ContentRichness };
       writeProjectionOutput(
         context.args,
         projectOverviewDigest(requireCliContext(context).projection),
+        { richness: flags.disclosure ?? 'summary' },
       );
     },
   },

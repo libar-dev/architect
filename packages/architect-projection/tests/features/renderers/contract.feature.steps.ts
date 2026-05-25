@@ -24,7 +24,7 @@ import type {
   renderUi,
 } from '../../../src/index.js';
 import type { LogicalRouteId } from '../../../src/routing/route-id.js';
-import type { DisclosureSpec } from '../../../src/disclosure/spec.js';
+import type { ContentRichness, DisclosureSpec } from '../../../src/disclosure/spec.js';
 import { defaultMarkdownRouteProfile } from '../../../src/renderers/markdown-paths.js';
 import { dispatchByKind } from '../../../src/renderers/_shared/dispatch.js';
 import { projectSingle } from '../../../src/fragments/base.js';
@@ -267,6 +267,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               sectionSeparator?: '===' | '---' | 'none';
               includeHeader?: boolean;
               wrapLines?: number;
+              richness?: ContentRichness;
             }>();
 
             expectTypeOf<RenderJsonOptions>().toEqualTypeOf<{

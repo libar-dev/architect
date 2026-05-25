@@ -118,6 +118,55 @@ const OVERVIEW_CLI_HINTS: readonly string[] = [
   'Agent environments: load the `architect-data-api` skill for verb shapes, deterministic gates, and known quirks.',
 ];
 
+/**
+ * The generated documentation surfaces this graph projects, each fetchable via
+ * `documentation <type>`. Mirrors the `docs:all` generator set so an agent
+ * reading the overview learns which views exist without scanning `docs-live/`.
+ * Rendered terse by default (one line) and itemized at `full` disclosure.
+ */
+const OVERVIEW_GENERATED_VIEWS: readonly { docType: string; verb: string; summary: string }[] = [
+  {
+    docType: 'architecture',
+    verb: 'documentation architecture',
+    summary: 'Context map + per-group component diagrams',
+  },
+  {
+    docType: 'patterns',
+    verb: 'documentation patterns',
+    summary: 'Full pattern catalog with relationships',
+  },
+  {
+    docType: 'decisions',
+    verb: 'documentation decisions',
+    summary: 'ADR / PDR decision records',
+  },
+  {
+    docType: 'roadmap',
+    verb: 'documentation roadmap',
+    summary: 'Phased delivery roadmap',
+  },
+  {
+    docType: 'changelog',
+    verb: 'documentation changelog',
+    summary: 'Release changelog from completed work',
+  },
+  {
+    docType: 'requirements-executable',
+    verb: 'documentation requirements-executable',
+    summary: 'Requirements backed by executable specs',
+  },
+  {
+    docType: 'requirements-specs',
+    verb: 'documentation requirements-specs',
+    summary: 'Requirements from design specs',
+  },
+  {
+    docType: 'taxonomy',
+    verb: 'documentation taxonomy',
+    summary: 'Tag taxonomy — roles, contexts, axes',
+  },
+];
+
 export function buildOverviewDigest(context: ProjectionContext): OverviewDigest {
   const patterns = filterPatterns(context.graph.patterns, context.projectionFilter);
   const counts = createStatusCounts(patterns);
@@ -175,6 +224,7 @@ export function buildOverviewDigest(context: ProjectionContext): OverviewDigest 
             },
           ];
     }),
+    generatedViews: OVERVIEW_GENERATED_VIEWS.map((view) => ({ ...view })),
     cliHints: [...OVERVIEW_CLI_HINTS],
   };
 }

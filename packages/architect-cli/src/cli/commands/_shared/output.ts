@@ -7,6 +7,7 @@ import {
   isBundle,
   renderCompactText,
   renderJson,
+  type ContentRichness,
   type Fragment,
   type ProjectionBundle,
 } from '@libar-dev/architect-projection';
@@ -114,6 +115,7 @@ export function writeJson(value: unknown): void {
 export function writeProjectionOutput(
   args: ParsedArgs,
   input: Fragment | ProjectionBundle<Fragment>,
+  options?: { readonly richness?: ContentRichness },
 ): void {
   if (args.format === 'json') {
     process.stdout.write(renderPrettyJson(input));
@@ -121,5 +123,10 @@ export function writeProjectionOutput(
     return;
   }
 
-  process.stdout.write(renderCompactText(input));
+  process.stdout.write(
+    renderCompactText(
+      input,
+      options?.richness !== undefined ? { richness: options.richness } : undefined,
+    ),
+  );
 }

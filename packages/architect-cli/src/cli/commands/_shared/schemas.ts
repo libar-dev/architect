@@ -13,6 +13,7 @@ import {
   type SessionType,
 } from '@libar-dev/architect-core';
 import { BundleIncludeSchema, BundleModeSchema } from '@libar-dev/architect-projection/projections';
+import { ContentRichnessSchema, type ContentRichness } from '@libar-dev/architect-projection';
 import { z } from 'zod';
 
 const MAX_HANDOFF_MODIFIED_FILES = 200;
@@ -96,6 +97,12 @@ export const DocumentationFlagsSchema = z
   })
   .readonly();
 
+export const OverviewFlagsSchema = z
+  .strictObject({
+    disclosure: ContentRichnessSchema.optional(),
+  })
+  .readonly();
+
 export const BundleFlagsSchema = z
   .strictObject({
     mode: BundleModeSchema.optional(),
@@ -162,6 +169,14 @@ export function parseProcessStatusValue(value: string): ProcessStatusValue {
 
 export function parseRenderFormatValue(value: string): z.infer<typeof RenderFormatSchema> {
   return parseSchemaValue(RenderFormatSchema, value, '--format must be compact or json');
+}
+
+export function parseContentRichnessValue(value: string): ContentRichness {
+  return parseSchemaValue(
+    ContentRichnessSchema,
+    value,
+    '--disclosure must be name-only, summary, summary-with-references, or full',
+  );
 }
 
 export function parseBundleIncludeValues(value: string): z.infer<typeof BundleIncludeSchema>[] {

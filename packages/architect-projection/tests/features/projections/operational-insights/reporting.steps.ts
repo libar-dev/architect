@@ -12,6 +12,7 @@ import {
   projectRoleProfiles,
   projectSourceInventoryDigest,
   projectTagUsage,
+  renderCompactText,
   renderJson,
   type AnnotationCoverage,
   type OverviewDigest,
@@ -33,6 +34,7 @@ import {
 interface OperationalInsightsState {
   context: ProjectionContext | null;
   overview: ProjectionBundle<OverviewDigest> | null;
+  overviewRenderings: Record<string, string> | null;
   annotationCoverage: ProjectionBundle<AnnotationCoverage> | null;
   tagUsage: ProjectionBundle<TagUsageMatrix> | null;
   sourceInventory: SourceInventoryEntry[] | null;
@@ -54,6 +56,7 @@ function createState(): OperationalInsightsState {
   return {
     context: null,
     overview: null,
+    overviewRenderings: null,
     annotationCoverage: null,
     tagUsage: null,
     sourceInventory: null,
@@ -199,6 +202,48 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                       blockedBy: ['OperationalInsightsSchemas', 'CoverageGraphInput'],
                     },
                   ],
+                  generatedViews: [
+                    {
+                      docType: 'architecture',
+                      verb: 'documentation architecture',
+                      summary: 'Context map + per-group component diagrams',
+                    },
+                    {
+                      docType: 'patterns',
+                      verb: 'documentation patterns',
+                      summary: 'Full pattern catalog with relationships',
+                    },
+                    {
+                      docType: 'decisions',
+                      verb: 'documentation decisions',
+                      summary: 'ADR / PDR decision records',
+                    },
+                    {
+                      docType: 'roadmap',
+                      verb: 'documentation roadmap',
+                      summary: 'Phased delivery roadmap',
+                    },
+                    {
+                      docType: 'changelog',
+                      verb: 'documentation changelog',
+                      summary: 'Release changelog from completed work',
+                    },
+                    {
+                      docType: 'requirements-executable',
+                      verb: 'documentation requirements-executable',
+                      summary: 'Requirements backed by executable specs',
+                    },
+                    {
+                      docType: 'requirements-specs',
+                      verb: 'documentation requirements-specs',
+                      summary: 'Requirements from design specs',
+                    },
+                    {
+                      docType: 'taxonomy',
+                      verb: 'documentation taxonomy',
+                      summary: 'Tag taxonomy — roles, contexts, axes',
+                    },
+                  ],
                   cliHints: [
                     '=== DATA API — Use Instead of Explore Agents ===',
                     'pnpm architect:query -- <subcommand>',
@@ -239,6 +284,86 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       );
     },
   );
+
+  Rule('Overview compact rendering honors disclosure richness', ({ RuleScenario }) => {
+    RuleScenario(
+      'rendering the overview digest at each disclosure level',
+      ({ Given, When, Then, And }) => {
+        Given('an Operational Insights overview context with six blocking dependencies', () => {
+          const blockedNames = [
+            'BlockedAlpha',
+            'BlockedBravo',
+            'BlockedCharlie',
+            'BlockedDelta',
+            'BlockedEcho',
+            'BlockedFoxtrot',
+          ];
+          const dependency = createPattern('SharedBlockingDependency', {
+            status: 'roadmap',
+            phase: 7,
+            file: 'architect/specs/shared-blocking-dependency.feature',
+          });
+          const blocked = blockedNames.map((name) =>
+            createPattern(name, {
+              status: 'active',
+              phase: 7,
+              file: `packages/architect-projection/src/projections/${name.toLowerCase()}.ts`,
+              dependsOn: ['SharedBlockingDependency'],
+            }),
+          );
+
+          state!.context = createProjectionContext({
+            patterns: [dependency, ...blocked],
+            relationshipIndex: Object.fromEntries(
+              blockedNames.map((name) => [
+                name,
+                createRelationshipEntry({ dependsOn: ['SharedBlockingDependency'] }),
+              ]),
+            ),
+          });
+        });
+
+        When('I render the overview digest at name-only summary and full', () => {
+          const digest = projectOverviewDigest(state!.context!);
+          state!.overviewRenderings = {
+            'name-only': renderCompactText(digest, { richness: 'name-only' }),
+            summary: renderCompactText(digest, { richness: 'summary' }),
+            full: renderCompactText(digest, { richness: 'full' }),
+          };
+        });
+
+        Then('the name-only rendering contains only the progress section', () => {
+          const output = state!.overviewRenderings!['name-only']!;
+          expect(output).toContain('=== PROGRESS ===');
+          expect(output).not.toContain('=== BLOCKING ===');
+          expect(output).not.toContain('=== GENERATED VIEWS ===');
+        });
+
+        And(
+          'the summary rendering truncates blocking and shows a one-line generated-views index',
+          () => {
+            const output = state!.overviewRenderings!['summary']!;
+            const blockingLines = output.split('\n').filter((line) => line.includes('blocked by:'));
+            expect(blockingLines).toHaveLength(5);
+            expect(output).toContain('... and 1 more — run `arch blocking`');
+            expect(output).toContain('docs via `documentation <type>`:');
+            expect(output).not.toContain('— `documentation architecture`');
+          },
+        );
+
+        And(
+          'the full rendering shows every blocking entry and the itemized generated-views index',
+          () => {
+            const output = state!.overviewRenderings!['full']!;
+            const blockingLines = output.split('\n').filter((line) => line.includes('blocked by:'));
+            expect(blockingLines).toHaveLength(6);
+            expect(output).not.toContain('more — run `arch blocking`');
+            expect(output).toContain('— `documentation architecture`');
+          },
+        );
+      },
+    );
+  });
 
   Rule('Annotation coverage stays numeric and graph-only', ({ RuleScenario }) => {
     RuleScenario(

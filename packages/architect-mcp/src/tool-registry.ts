@@ -35,6 +35,7 @@ import {
   renderCompactText,
   renderJson,
   table,
+  type ContentRichness,
   type Fragment,
   type PatternSummary,
   type ProjectionBundle,
@@ -61,6 +62,7 @@ import {
   DocumentTypeShape,
   EmptyInputSchema,
   ListFilterShape,
+  OptionalContentRichnessShape,
   OptionalDocumentationOptionsShape,
   OptionalDepthShape,
   OptionalHandoffSessionShape,
@@ -155,8 +157,12 @@ function formatTextResult(text: string): TextContentResult {
 
 function renderTextToolResult<TFragment extends Fragment>(
   output: ProjectionBundle<TFragment>,
+  richness?: ContentRichness,
 ): ToolResult<ProjectionBundle<TFragment>> {
-  return { text: renderCompactText(output), output };
+  return {
+    text: renderCompactText(output, richness !== undefined ? { richness } : undefined),
+    output,
+  };
 }
 
 function renderJsonToolResult<TFragment extends Fragment>(
@@ -359,9 +365,12 @@ function buildHelpDocument(): SectionedDocument {
  */
 const TOOL_HANDLERS: Record<RegisteredToolName, ToolHandler> = {
   architect_overview: defineToolHandler({
-    inputSchema: EmptyInputSchema,
-    handle: (_input, session) =>
-      renderTextToolResult(projectOverviewDigest(getProjectionContext(session))),
+    inputSchema: createStrictReadonlyObjectSchema({ ...OptionalContentRichnessShape }),
+    handle: ({ disclosure }, session) =>
+      renderTextToolResult(
+        projectOverviewDigest(getProjectionContext(session)),
+        disclosure ?? 'summary',
+      ),
   }),
 
   architect_coverage: defineToolHandler({

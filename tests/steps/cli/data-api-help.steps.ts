@@ -23,7 +23,7 @@ import {
 } from '../../support/helpers/pattern-graph-api-state.js';
 
 const FROZEN_COMMAND_INVENTORY = [
-  'overview',
+  'overview [--disclosure <level>]',
   'status',
   'context <pattern> [--session planning|design|implement]',
   'dep-tree <pattern> [--depth <n>]',
