@@ -101,3 +101,12 @@
 - **Standing rule:** **fragment barrels with a producer** → producer→fragment edge (D-7); **plain module-grouping barrels with no producer** → barrel→submodule edge (this decision, GitModule precedent). Pick by whether a producer function exists.
 - **Consumed by:** sessions/09 (guard).
 - **Status:** resolved (maintainer, 2026-05-25) → mirror GitModule; barrel→submodule for producerless grouping barrels.
+
+## D-12 — A `runCommand`-driven CLI integration test `@architect-implements` the CLI pattern it invokes
+
+- **Question:** Session 08's rule was "map test→production by STEP IMPORTS." CLI integration tests drive the CLI as a subprocess via a `runCommand()` helper — they import **no** production module, so there's no import to follow. Do they get an `@architect-implements` edge, or defer like the no-target features?
+- **Discovered (Session 10):** `lint-process.feature` and `lint-patterns.feature` have step files that call `runCommand(commandString)` where the scenarios run `"lint-process --help"`, `"lint-process --staged"`, `"lint-patterns -i …"`, etc. (the `lint-process --version` scenario even asserts stdout contains `architect-guard`). The invoked command name maps **1:1** to a named production CLI pattern: `lint-process` → `LintProcessCLI` (`cli/lint-process.ts`), `lint-patterns` → `LintPatternsCLI` (`cli/lint-patterns.ts`). Both production patterns confirmed via `search`.
+- **Chosen:** a `runCommand`-driven CLI integration test `@architect-implements` the production CLI pattern for the command it invokes, **when the command maps 1:1 to a named pattern**. The `runCommand('<cmd>')` argument (verified against the feature's `When running "…"` steps) is a concrete, checkable fact — as authoritative as a TS `import`. The de-orphaning principle is not "follow imports" but "author only edges you can verify against something concrete in the file." This is NOT a phantom edge.
+- **Boundary:** defer when the command does **not** map 1:1 to a single named pattern — e.g. `generate-docs.feature` invokes a doc-gen command with **no** production `GenerateDocs*` pattern (search → only the test feature itself); `public-contract`/`cli-mcp-documentation-parity` are multi-surface boundary/freeze tests. No 1:1 target → defer (don't invent one).
+- **Consumed by:** sessions/10 (+ any future CLI/MCP test-feature session).
+- **Status:** resolved (maintainer, 2026-05-25) → accept; runCommand command string is the verified fact, 1:1 mapping only.

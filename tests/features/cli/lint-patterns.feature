@@ -2,6 +2,7 @@
 @architect-pattern:LintPatternsCliBehavior
 @architect-status:completed
 @architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-implements:LintPatternsCLI
 @architect-product-area:DataAPI
 @cli @lint-patterns
 Feature: lint-patterns CLI

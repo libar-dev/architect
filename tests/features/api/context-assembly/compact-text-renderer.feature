@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:CompactTextRendererTests
 @architect-status:active
+@architect-implements:CompactTextRenderer
 @architect-product-area:DataAPI
 Feature: Compact Text Renderer - Plain Text Rendering
 
