@@ -4,16 +4,16 @@
   "updated": "2026-05-25",
   "workstreams": {
     "WS-0-finalize-hygiene": "done (committed 6f2fc6c)",
-    "WS-1-annotation-reenablement": "phase-1 projection pilot COMPLETE (Sessions 01-06); expansion in progress (core done Sessions 07-08; guard done Session 09; cli/mcp test-features + new identities pending Sessions 10-11)",
+    "WS-1-annotation-reenablement": "phase-1 projection pilot COMPLETE (Sessions 01-06); expansion in progress (core done Sessions 07-08; guard done Session 09; connectable test features done Session 10; new code-originated identities pending Session 11)",
     "WS-2-skills": "scoped",
     "WS-3-docs": "scoped"
   },
   "ws1": {
-    "phase": "1-projection-pilot-COMPLETE; 2-core+guard-expansion-in-progress",
-    "currentSession": "WS-1 expansion: Session 10 (connectable test features) next, then Session 11 (new code-originated identities, D-13)",
-    "lastCompletedSession": "09-guard-de-orphan",
-    "lastCommit": "4f775fc",
-    "lastCommitNote": "Session 09 commit (2 architect-guard/src orphans de-orphaned: GitNameStatusParser via consumer edges, ValidationModule via GitModule-precedent barrel edge D-11; D-8 colon-duplicate hygiene cleared in derive-state.ts/decider.ts). Orphans 37 -> 35.",
+    "phase": "1-projection-pilot-COMPLETE; 2-core+guard+test-features-expansion-in-progress",
+    "currentSession": "WS-1 expansion: Session 11 (new code-originated identities, D-13) next — RegistryBuilder/SourceMerge/TagRegistrySchemas/MarkdownBlockParser",
+    "lastCompletedSession": "10-connectable-test-features",
+    "lastCommit": "38a3e72",
+    "lastCommitNote": "Session 10 commit (3 test features de-orphaned via @architect-implements: CompactTextRendererTests->CompactTextRenderer; LintProcessCliBehavior->LintProcessCLI + LintPatternsCliBehavior->LintPatternsCLI per D-12 CLI-test rule). Orphans 35 -> 32.",
     "baselineMetrics": {
       "patterns": 270,
       "orphansTotal": 107,
@@ -22,7 +22,7 @@
       "boundedContextCoverage": "157/270"
     },
     "currentMetrics": {
-      "orphansTotal": 35,
+      "orphansTotal": 32,
       "orphansProjection": 0,
       "orphansCoreSrc": 0,
       "orphansGuardSrc": 0,

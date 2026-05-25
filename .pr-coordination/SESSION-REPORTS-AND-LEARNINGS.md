@@ -330,3 +330,42 @@ docs:all → ARCHITECTURE.md regenerated, committed with code.
 4. Coordination model: agent does the scoped edits + Data-API read-back; main thread runs
    the §6 gates + commit + bookkeeping. format:check flags `.pr-coordination/*` md/json —
    run `prettier --write` on the session's coordination files before the gate.
+
+## Session 10 — Connect remaining test features via @architect-implements (committed 38a3e72)
+
+Prior session commit = `3df826a`. De-orphaned the 3 connectable test-feature orphans.
+Total orphans **35 → 32**. `CompactTextRendererTests → CompactTextRenderer` (verified TS
+import of `renderCompactText`). `LintProcessCliBehavior → LintProcessCLI` and
+`LintPatternsCliBehavior → LintPatternsCLI` per **D-12** — the `runCommand` command strings
+(`"lint-process …"`, `"lint-patterns …"`; the version scenario even asserts stdout contains
+`architect-guard`) map 1:1 to the production CLI patterns. All 3 `implementedBy` edges
+registered first-try. All 12 §6 gates green (pkg test 1769, test:dogfood 1057, perf 3/3,
+dangling --strict 0, audit:subtractive exit 0). guard `--staged`: 3 modified, **0 status
+transitions** — both `completed` `lint-*` features already carried
+`@architect-unlock-reason:Retroactive-completion-during-rebrand` (D-10 satisfied; no second
+reason added). `docs:all` → **no docs-live change** (implements/reverse edges don't alter
+the current projection output).
+
+**Deferred (genuine no-target, recorded per D-12 boundary):** `ArchitectPublicContract`
+(public-contract — API-freeze, broad surface), `DocumentationCommandParityBoundaryTests`
+(cli-mcp parity — multi-surface boundary), `GenerateDocsCli` (generate-docs — no production
+`GenerateDocs*` pattern), `EmptyEpic`/`ParentEpic` (list-parent-\* — `list --parent`
+fixtures, no step implementation). These stay orphans by design.
+
+### Rules for next session (11 — new code-originated identities, D-13)
+
+1. **D-13 approved 4 new identities.** For each: add file-level `@architect-pattern` JSDoc to
+   the production file, THEN the `@architect-implements` edge(s) on the test feature(s) — in
+   the **same commit** (else `dangling --strict` trips on the not-yet-existing target).
+   Confirm `role` + `bounded-context` against sibling patterns in the same dir (Session 07
+   method for `ExtractedPattern`), don't hard-code.
+2. `RegistryBuilder` (`taxonomy/registry-builder.ts`) de-orphans BOTH `StubTaxonomyTagTests`
+   AND the D-9 deferral `TypeScriptTaxonomyImplementation` — one identity, two features.
+   `SourceMerge` (`config/merge-sources.ts`) → `SourceMerging` (D-9). `TagRegistrySchemas`
+   (`validation-schemas/tag-registry.ts`, mirror `ExtractedPattern` role:contract) →
+   `TagRegistrySchemasValidation`. `MarkdownBlockParser` (`parseMarkdownToBlocks`, locate the
+   file) → `LoadPreambleParser`.
+3. **D-10 check** on the `completed` features `TypeScriptTaxonomyImplementation` +
+   `SourceMerging` before staging.
+4. After Session 11 the campaign hits its terminal floor (~27): ~22 forward-looking
+   working-state specs + 5 untargetable integration/fixture features. Document, don't force.
