@@ -3,7 +3,7 @@
  * @architect-pattern DeliveryReportingProjectionSupport
  * @architect-status completed
  * @architect-role:utility
- * @architect-uses DeliveryReportingFragmentContracts
+ * @architect-uses DeliveryReportingFragmentContracts, ExtractedPattern
  * @architect-bounded-context:projection
  *
  * ## Delivery reporting projection support

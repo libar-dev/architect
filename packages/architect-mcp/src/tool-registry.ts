@@ -3,7 +3,7 @@
  * @architect-pattern MCPToolRegistry
  * @architect-status completed
  * @architect-implements MCPToolRegistryIntegrationTests
- * @architect-uses MCPPipelineSession
+ * @architect-uses MCPPipelineSession, CompactTextRenderer, JsonRenderer
  * @architect-role:service
  * @architect-bounded-context:api
  * @architect-product-area:DataAPI

@@ -39,8 +39,12 @@ graph LR
   validation["validation (8)"]
   validation_schemas["validation-schemas (4)"]
   role_contract["role: contract (4)"]
+  api --> pipeline
+  api --> read_api
+  api --> rendering
   cli --> api
   cli --> lint
+  cli --> rendering
   cli --> role_contract
   cli --> scanner
   delivery_reporting --> execution_context
@@ -69,6 +73,7 @@ graph LR
   projection --> operational_insights
   projection --> pattern_relations
   projection --> role_contract
+  projection --> validation_schemas
   read_api --> validation_schemas
   rendering --> role_contract
   validation --> extractor

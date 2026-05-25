@@ -3,7 +3,7 @@
  * @architect-pattern OperationalInsightsProjectionSupport
  * @architect-status completed
  * @architect-role:utility
- * @architect-uses ProjectionFragmentContracts, BusinessRuleReference
+ * @architect-uses ProjectionFragmentContracts, BusinessRuleReference, ExtractedPattern
  * @architect-bounded-context:projection
  *
  * ## Operational insights projection support

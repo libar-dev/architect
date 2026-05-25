@@ -3,7 +3,7 @@
  * @architect-pattern GovernanceProjectionSupport
  * @architect-status completed
  * @architect-role:utility
- * @architect-uses ProjectionFragmentContracts
+ * @architect-uses ProjectionFragmentContracts, ExtractedPattern
  * @architect-bounded-context:projection
  *
  * **Value:** Hosts the small set of string utilities that governance

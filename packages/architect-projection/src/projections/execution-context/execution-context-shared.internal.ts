@@ -3,7 +3,7 @@
  * @architect-pattern ExecutionContextProjectionSupport
  * @architect-status completed
  * @architect-role:utility
- * @architect-uses ProjectionFragmentContracts
+ * @architect-uses ProjectionFragmentContracts, ExtractedPattern
  * @architect-bounded-context:projection
  *
  * ## Execution context projection support

@@ -3,7 +3,7 @@
  * @architect-pattern MCPPipelineSession
  * @architect-status completed
  * @architect-implements MCPToolRegistryIntegrationTests
- * @architect-uses MCPToolRegistry, MCPFileWatcher
+ * @architect-uses MCPToolRegistry, MCPFileWatcher, BuildPipeline, PatternGraphApi
  * @architect-role:service
  * @architect-bounded-context:api
  * @architect-product-area:DataAPI

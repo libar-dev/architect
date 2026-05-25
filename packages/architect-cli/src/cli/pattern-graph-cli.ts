@@ -6,7 +6,7 @@
  * @architect-pattern PatternGraphCLI
  * @architect-status active
  * @architect-implements PatternGraphAPICLI, DataAPICLIErgonomics
- * @architect-uses CLIRuntimePaths, CLIVersionHelper
+ * @architect-uses CLIRuntimePaths, CLIVersionHelper, CompactTextRenderer, JsonRenderer
  * @architect-role:service
  * @architect-bounded-context:cli
  * @architect-product-area:DataAPI
