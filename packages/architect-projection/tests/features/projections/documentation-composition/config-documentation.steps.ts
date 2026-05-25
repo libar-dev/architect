@@ -772,6 +772,41 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   );
 
   Rule(
+    'The context map aggregates only forward dependency edges between groups',
+    ({ RuleScenario }) => {
+      RuleScenario(
+        'the context map keeps forward dependencies and omits derived reverse edges',
+        ({ Given, When, Then, And }) => {
+          Given(
+            'a Documentation Composition architecture context with opposing cross-group dependency and enablement edges',
+            () => {
+              state!.context = createCrossGroupEdgeContext();
+            },
+          );
+
+          When('I project the component architecture diagram for the cross-group context', () => {
+            state!.architectureDiagrams['component'] = parseAndProjectArchitectureDiagram(
+              state!.context!,
+              { scope: 'component' },
+            );
+          });
+
+          Then('the context map should contain the forward cross-group dependency arrow', () => {
+            const map = state!.architectureDiagrams['component']!.root.sections[0];
+            expect(map?.title).toMatch(/^Context Map/u);
+            expect(map?.diagram.content).toContain('context_a --> context_b');
+          });
+
+          And('the context map should omit the derived reverse enablement arrow', () => {
+            const map = state!.architectureDiagrams['component']!.root.sections[0];
+            expect(map?.diagram.content).not.toContain('context_b --> context_a');
+          });
+        },
+      );
+    },
+  );
+
+  Rule(
     'The component view shows production components, not test-feature patterns',
     ({ RuleScenario }) => {
       RuleScenario(
@@ -1109,6 +1144,32 @@ function createDocumentationContext(): ProjectionContext {
       StudioSettings: createRelationshipEntry({
         uses: ['ProjectionAPI'],
       }),
+    },
+  });
+}
+
+function createCrossGroupEdgeContext(): ProjectionContext {
+  return createProjectionContext({
+    patterns: [
+      createPattern('CrossGroupDependant', {
+        status: 'active',
+        role: 'service',
+        archContext: 'context-a',
+        file: 'packages/architect-projection/src/projections/cross-group/a.ts',
+      }),
+      createPattern('CrossGroupDependency', {
+        status: 'active',
+        role: 'service',
+        archContext: 'context-b',
+        file: 'packages/architect-projection/src/projections/cross-group/b.ts',
+      }),
+    ],
+    relationshipIndex: {
+      // Forward dependency (context-a → context-b) and the derived reverse
+      // enablement (context-b → context-a). The map must keep the former and
+      // drop the latter.
+      CrossGroupDependant: createRelationshipEntry({ uses: ['CrossGroupDependency'] }),
+      CrossGroupDependency: createRelationshipEntry({ enables: ['CrossGroupDependant'] }),
     },
   });
 }

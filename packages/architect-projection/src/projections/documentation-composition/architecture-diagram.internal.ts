@@ -348,7 +348,7 @@ function buildArchitectureSections(
     sections.push({
       title: ARCHITECTURE_MAP_TITLES[options.scope],
       description:
-        'Each node is a group; arrows are cross-group relationships. See the per-group diagrams below for detail.',
+        'Each node is a group; each arrow is a cross-group dependency (`depends-on` / `uses`, pointing from dependant to dependency). Usage, enablement, and see-also relationships appear in the per-group diagrams below.',
       diagram: mermaid(buildMapMermaid(groups, mapEdges)),
       patterns: [],
     });
@@ -430,6 +430,17 @@ function aggregateInterGroupEdges(
   const out: { from: string; to: string }[] = [];
 
   for (const edge of edges) {
+    // The context map collapses each ordered group pair to ONE solid arrow, and
+    // the shared legend reads a solid arrow as a dependency. Only forward
+    // structural edges (`depends-on`, `uses`) carry that "A relies on B"
+    // direction. `enables` is a derived REVERSE edge (B enables A ⇔ A depends-on
+    // / uses B): rendering it forward draws a contradictory back-arrow for a
+    // relationship the forward edge already captures. `see-also` is
+    // non-directional. Both stay in the per-group detail diagrams (with their
+    // own operators) but are excluded here so the map's arrows are not misread.
+    if (edge.label !== 'depends-on' && edge.label !== 'uses') {
+      continue;
+    }
     const from = groupKeyByNodeId.get(edge.from);
     const to = groupKeyByNodeId.get(edge.to);
     if (from === undefined || to === undefined || from === to) {

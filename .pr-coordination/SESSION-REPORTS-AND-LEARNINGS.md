@@ -510,9 +510,19 @@ needed); added `@architect-bounded-context` to `BoundedContextFragmentContract` 
 **Coverage:** new executable Rule in `config-documentation.feature` ("component view shows production
 components, not test-feature patterns") with its own mixed production+test fixture.
 
-All §6 gates green: typecheck, format:check, proj test (69 in config-documentation; full suite pass),
-test:dogfood **1061**, docs:all byte-deterministic (md5-stable across two regens), guard `--staged`
-**0 status transitions / 0 deliverable changes** (config-documentation's existing
+**Context-map semantics fix (Codex stop-time review, same session).** The context map collapsed all
+edge types to one solid `-->` per ordered group pair, but the legend reads solid = dependency. Since
+`enables` is a derived REVERSE edge, rendering it forward inverted direction and double-counted —
+**34 of 68 map arrows were contradictory bidirectional pairs.** Fixed `aggregateInterGroupEdges` to
+aggregate only forward structural edges (`depends-on`/`uses`); `enables`/`see-also` stay in the detail
+diagrams. Map: 68→**35 arrows**, bidirectional 34→**1** (the survivor `lint ↔ process-guard` is a real
+mutual dependency). Sharpened the map description; added executable Rule "The context map aggregates
+only forward dependency edges between groups" with an opposing-edge fixture. Lesson: a relationship
+graph that mixes forward + derived-reverse edges into one undifferentiated arrow lies about direction.
+
+All §6 gates green: typecheck, format:check, proj test (**75** in config-documentation; full suite
+pass), test:dogfood **1061**, docs:all byte-deterministic (md5-stable across two regens), guard
+`--staged` **0 status transitions / 0 deliverable changes** (config-documentation's existing
 `@architect-unlock-reason` satisfies completed-protection), dangling `--strict` 0.
 
 ### Rules for next session

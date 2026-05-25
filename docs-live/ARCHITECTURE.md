@@ -13,7 +13,7 @@ This view captures 169 patterns across 24 diagrams in the Component architecture
 
 ### Context Map
 
-Each node is a group; arrows are cross-group relationships. See the per-group diagrams below for detail.
+Each node is a group; each arrow is a cross-group dependency \(\`depends-on\` / \`uses\`, pointing from dependant to dependency\). Usage, enablement, and see-also relationships appear in the per-group diagrams below.
 
 ```mermaid
 graph LR
@@ -40,36 +40,22 @@ graph LR
   validation_schemas["validation-schemas (4)"]
   role_contract["role: contract (4)"]
   pkg_architect_package_content["Architect Package Content (9)"]
-  api --> cli
   cli --> api
   cli --> lint
   cli --> role_contract
   cli --> scanner
   delivery_reporting --> execution_context
   delivery_reporting --> pattern_relations
-  delivery_reporting --> projection
-  documentation_composition --> projection
   documentation_composition --> rendering
-  execution_context --> delivery_reporting
-  execution_context --> pattern_relations
-  execution_context --> projection
-  extractor --> pipeline
   extractor --> read_api
   extractor --> scanner
-  extractor --> validation
   extractor --> validation_schemas
-  generator --> process_guard
-  governance --> projection
   governance --> rendering
-  lint --> cli
   lint --> process_guard
   lint --> validation
   lint --> validation_schemas
-  operational_insights --> projection
   operational_insights --> rendering
-  pattern_relations --> delivery_reporting
   pattern_relations --> execution_context
-  pattern_relations --> projection
   pipeline --> extractor
   pipeline --> scanner
   pipeline --> validation_schemas
@@ -84,30 +70,11 @@ graph LR
   projection --> operational_insights
   projection --> pattern_relations
   projection --> role_contract
-  read_api --> extractor
   read_api --> validation_schemas
-  rendering --> documentation_composition
-  rendering --> governance
-  rendering --> operational_insights
   rendering --> role_contract
-  role_contract --> cli
-  role_contract --> projection
-  role_contract --> rendering
-  scanner --> cli
-  scanner --> extractor
-  scanner --> pipeline
-  scanner --> process_guard
-  scanner --> validation
   validation --> extractor
-  validation --> lint
-  validation --> process_guard
   validation --> scanner
   validation --> validation_schemas
-  validation_schemas --> extractor
-  validation_schemas --> lint
-  validation_schemas --> pipeline
-  validation_schemas --> read_api
-  validation_schemas --> validation
 ```
 
 ### Bounded context: api \(4 patterns\)

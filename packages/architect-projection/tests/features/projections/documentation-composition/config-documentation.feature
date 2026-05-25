@@ -135,6 +135,30 @@ Feature: Documentation Composition projection bodies
       Then the component diagram should lead with a context map section
       And the remaining sections should partition the patterns into per-group detail diagrams
 
+  Rule: The context map aggregates only forward dependency edges between groups
+
+    **Invariant:** The context map collapses each ordered group pair to one solid
+    arrow and the legend reads a solid arrow as a dependency, so the map
+    aggregates only forward structural edges (`depends-on` / `uses`, dependant →
+    dependency). Derived reverse edges (`enables`) and non-directional `see-also`
+    edges are excluded from the map (they remain in the per-group detail
+    diagrams).
+
+    **Rationale:** Rendering a derived reverse `enables` edge as a forward arrow
+    draws a back-arrow for a relationship the forward edge already captures,
+    producing contradictory bidirectional pairs and a dependency direction that
+    is exactly inverted. See DECISIONS D-15.
+
+    **Verified by:** projecting a context with a forward cross-group dependency
+    and an opposing cross-group enablement, then asserting the map keeps only the
+    forward arrow.
+
+    Scenario: the context map keeps forward dependencies and omits derived reverse edges
+      Given a Documentation Composition architecture context with opposing cross-group dependency and enablement edges
+      When I project the component architecture diagram for the cross-group context
+      Then the context map should contain the forward cross-group dependency arrow
+      And the context map should omit the derived reverse enablement arrow
+
   Rule: The component view shows production components, not test-feature patterns
 
     **Invariant:** The component architecture diagram excludes patterns whose
