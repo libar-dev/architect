@@ -3,16 +3,17 @@
   "pr": "campaign/docs-and-skills-consolidation",
   "updated": "2026-05-25",
   "workstreams": {
-    "WS-0-finalize-hygiene": "done (unstaged in tree)",
-    "WS-1-annotation-reenablement": "in-progress (Session 02 done)",
+    "WS-0-finalize-hygiene": "done (committed 6f2fc6c)",
+    "WS-1-annotation-reenablement": "in-progress (Session 03 done)",
     "WS-2-skills": "scoped",
     "WS-3-docs": "scoped"
   },
   "ws1": {
     "phase": "1-projection-pilot",
-    "currentSession": "03-governance-producers (next)",
-    "lastCompletedSession": "02-connect-fragments-to-producers",
-    "lastCommit": null,
+    "currentSession": "04-operational-insights-producers (next)",
+    "lastCompletedSession": "03-governance-producers",
+    "lastCommit": "6f2fc6c",
+    "lastCommitNote": "trailing pointer — names the prior committed session; advanced one step per session (a commit cannot store its own sha)",
     "baselineMetrics": {
       "patterns": 270,
       "orphansTotal": 107,
@@ -21,11 +22,11 @@
       "boundedContextCoverage": "157/270"
     },
     "currentMetrics": {
-      "orphansTotal": 86,
-      "orphansProjection": 28,
+      "orphansTotal": 79,
+      "orphansProjection": 21,
       "orphansProjectionByArea": {
         "operational-insights": 9,
-        "governance": 7,
+        "governance": 0,
         "delivery-reporting": 6,
         "execution-context": 6,
         "pattern-relations": 0

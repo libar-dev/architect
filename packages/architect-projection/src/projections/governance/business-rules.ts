@@ -3,7 +3,7 @@
  * @architect-pattern BusinessRulesProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses GovernanceProjectionSupport, ProjectionFragmentContracts
+ * @architect-uses GovernanceProjectionSupport, ProjectionFragmentContracts, BusinessRule, BusinessRuleSet, GovernanceSupporting
  * @architect-bounded-context:projection
  *
  * **Value:** Exposes normalized `BusinessRule` and `BusinessRuleSet`

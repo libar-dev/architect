@@ -3,7 +3,7 @@
  * @architect-pattern TaxonomyDigestProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses GovernanceProjectionSupport, ProjectionFragmentContracts
+ * @architect-uses GovernanceProjectionSupport, ProjectionFragmentContracts, TaxonomyDigest, GovernanceSupporting
  * @architect-bounded-context:projection
  *
  * **Value:** Produces a `TaxonomyDigest` fragment that describes the

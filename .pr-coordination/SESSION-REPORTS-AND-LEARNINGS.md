@@ -74,3 +74,40 @@ sessions.
    producers/imports fresh — do not assume symmetry with pattern-relations.
 4. Coordinator: fix the "append a new line" wording in EXECUTION-PLAN §5 +
    remaining `sessions/NN-*.md` to "extend the existing line" (D-8).
+
+## Session 03 — Connect governance fragments to producers (uncommitted in tree)
+
+D-7 model applied to all 7 governance projection orphans. 4 producers got
+producer→fragment edges (`BusinessRulesProjection`→`BusinessRule,BusinessRuleSet`;
+`DecisionCatalogProjection`→`DecisionCatalog,DecisionRecord`;
+`TaxonomyDigestProjection`→`TaxonomyDigest`; `ValidationRuleDigestProjection`→
+`ValidationRuleDigest`). `GovernanceSupporting` (imports only zod) de-orphaned by
+**incoming** edges from the 2 producers that import its schemas — the inverse of
+Session 02's outgoing-import Supporting model. All edges extended the existing single
+`@architect-uses` line (D-8) and **registered first-try** (Data-API read-back: orphans
+86→79, `BusinessRule.usedBy=[BusinessRulesProjection]`). All 13 gates green
+(1057 dogfood tests, perf 3/3, validate:all, audit:subtractive, arch dangling 0).
+`docs:all` → ARCHITECTURE.md +27 (the new edges + derived `enables`).
+
+**Additional scope discovered (inline-fixed):**
+
+1. **Cross-context producer.** `BusinessRuleReference` is a governance fragment but is
+   built at `operational-insights/index.ts:615` inside `OperationalInsightsProjectionSupport`.
+   Edge landed here (governance session) — a session is scoped by orphans resolved, not
+   files touched. Extended that pattern's single `@architect-uses` line.
+2. **D-8 "9 lines" note is stale.** `OperationalInsightsProjectionSupport` carries ONE
+   `@architect-uses` line at current HEAD, not 9. The latent multi-line bug D-8 warned
+   about is **not present** — verified by grep + the edge registering first-try. Session 04
+   should still re-confirm via `pattern <X>` but is likely unaffected.
+
+### Rules for upcoming sessions
+
+1. `Supporting` bundles connect in **whichever import direction is real** — outgoing
+   (it imports schemas, Session 02) or incoming (it's a pure source bundle imported by
+   producers, Session 03 `GovernanceSupporting`). Check the actual imports; don't assume.
+2. A fragment's producer may live in a **different bounded-context** — verify via
+   `grep "kind: '<Fragment>'"` across all `projections/`, not just the fragment's own context.
+3. Next context = **operational-insights** (`AnnotationCoverage`, `OverviewDigest`,
+   `RequirementDigest` ×3 producers, `RoleProfile`/`RoleProfileCollection`,
+   `SourceInventoryDigest`/`Entry`, `TagUsageMatrix`/`Entry`). Re-verify the D-8 state of
+   `OperationalInsightsProjectionSupport` before editing.

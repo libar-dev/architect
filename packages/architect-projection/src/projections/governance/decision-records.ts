@@ -3,7 +3,7 @@
  * @architect-pattern DecisionCatalogProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses GovernanceProjectionSupport, ProjectionFragmentContracts
+ * @architect-uses GovernanceProjectionSupport, ProjectionFragmentContracts, DecisionCatalog, DecisionRecord
  * @architect-bounded-context:projection
  *
  * **Value:** Gives consumers a single entry point for looking up one

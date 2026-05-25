@@ -360,8 +360,17 @@ graph TD
   buildpipeline -.->|uses| patterngraph
   buildpipeline -->|depends-on| patternscanner
   buildpipeline -.->|uses| patternscanner
+  businessrule ==>|enables| businessrulesprojection
+  businessrulereference ==>|enables| operationalinsightsprojectionsupport
+  businessruleset ==>|enables| businessrulesprojection
+  businessrulesprojection -->|depends-on| businessrule
+  businessrulesprojection -.->|uses| businessrule
+  businessrulesprojection -->|depends-on| businessruleset
+  businessrulesprojection -.->|uses| businessruleset
   businessrulesprojection -->|depends-on| governanceprojectionsupport
   businessrulesprojection -.->|uses| governanceprojectionsupport
+  businessrulesprojection -->|depends-on| governancesupporting
+  businessrulesprojection -.->|uses| governancesupporting
   businessrulesprojection -->|depends-on| projectionfragmentcontracts
   businessrulesprojection -.->|uses| projectionfragmentcontracts
   canonicalvaluessync -. see-also .- adr001taxonomycanonicalvalues
@@ -378,12 +387,18 @@ graph TD
   compacttextrenderer -.->|uses| fragmentrendererdispatch
   compacttextrenderer -->|depends-on| projectionfragmentschema
   compacttextrenderer -.->|uses| projectionfragmentschema
+  decisioncatalog ==>|enables| decisioncatalogprojection
+  decisioncatalogprojection -->|depends-on| decisioncatalog
+  decisioncatalogprojection -.->|uses| decisioncatalog
+  decisioncatalogprojection -->|depends-on| decisionrecord
+  decisioncatalogprojection -.->|uses| decisionrecord
   decisioncatalogprojection -->|depends-on| governanceprojectionsupport
   decisioncatalogprojection -.->|uses| governanceprojectionsupport
   decisioncatalogprojection -->|depends-on| projectionfragmentcontracts
   decisioncatalogprojection -.->|uses| projectionfragmentcontracts
   decisionrecord -->|depends-on| blockschema
   decisionrecord -.->|uses| blockschema
+  decisionrecord ==>|enables| decisioncatalogprojection
   deliverable ==>|enables| patternrelationssupporting
   deliverablemanifest ==>|enables| patternrelationssupporting
   deliverableprojection -->|depends-on| executioncontextprojectionsupport
@@ -496,6 +511,8 @@ graph TD
   governanceprojectionsupport -.->|uses| projectionfragmentcontracts
   governanceprojectionsupport ==>|enables| taxonomydigestprojection
   governanceprojectionsupport ==>|enables| validationruledigestprojection
+  governancesupporting ==>|enables| businessrulesprojection
+  governancesupporting ==>|enables| taxonomydigestprojection
   handoffprojection -->|depends-on| executioncontextprojectionsupport
   handoffprojection -.->|uses| executioncontextprojectionsupport
   handoffprojection -->|depends-on| projectionfragmentcontracts
@@ -558,6 +575,8 @@ graph TD
   openquestionlistprojection -->|depends-on| patternrelationsprojectionsupport
   openquestionlistprojection -.->|uses| patternrelationsprojectionsupport
   operationalinsightsprojectionsupport ==>|enables| annotationcoverageprojection
+  operationalinsightsprojectionsupport -->|depends-on| businessrulereference
+  operationalinsightsprojectionsupport -.->|uses| businessrulereference
   operationalinsightsprojectionsupport ==>|enables| overviewprojection
   operationalinsightsprojectionsupport -->|depends-on| projectionfragmentcontracts
   operationalinsightsprojectionsupport -.->|uses| projectionfragmentcontracts
@@ -726,10 +745,15 @@ graph TD
   statusdistributionprojection -.->|uses| deliveryreportingprojectionsupport
   tagusageprojection -->|depends-on| operationalinsightsprojectionsupport
   tagusageprojection -.->|uses| operationalinsightsprojectionsupport
+  taxonomydigest ==>|enables| taxonomydigestprojection
   taxonomydigestprojection -->|depends-on| governanceprojectionsupport
   taxonomydigestprojection -.->|uses| governanceprojectionsupport
+  taxonomydigestprojection -->|depends-on| governancesupporting
+  taxonomydigestprojection -.->|uses| governancesupporting
   taxonomydigestprojection -->|depends-on| projectionfragmentcontracts
   taxonomydigestprojection -.->|uses| projectionfragmentcontracts
+  taxonomydigestprojection -->|depends-on| taxonomydigest
+  taxonomydigestprojection -.->|uses| taxonomydigest
   traceabilitymatrixprojection -->|depends-on| deliveryreportingprojectionsupport
   traceabilitymatrixprojection -.->|uses| deliveryreportingprojectionsupport
   uirenderer -->|depends-on| blockschema
@@ -750,10 +774,13 @@ graph TD
   validatepatternscli -.->|uses| patterngraph
   validatepatternscli -->|depends-on| patternscanner
   validatepatternscli -.->|uses| patternscanner
+  validationruledigest ==>|enables| validationruledigestprojection
   validationruledigestprojection -->|depends-on| governanceprojectionsupport
   validationruledigestprojection -.->|uses| governanceprojectionsupport
   validationruledigestprojection -->|depends-on| projectionfragmentcontracts
   validationruledigestprojection -.->|uses| projectionfragmentcontracts
+  validationruledigestprojection -->|depends-on| validationruledigest
+  validationruledigestprojection -.->|uses| validationruledigest
   validatorreadmodelconsolidation -->|depends-on| adr006singlereadmodelarchitecture
   validatorreadmodelconsolidation -.->|uses| adr006singlereadmodelarchitecture
   valueformatcanonicalvaluesdispatch -. see-also .- canonicalvaluessync

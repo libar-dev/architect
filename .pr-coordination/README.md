@@ -16,7 +16,7 @@ This PR re-enables core functionality (annotations + skills + docs together).
 | `PREAMBLE.md`                      | **Read first every session** — mandatory skills + API-first discipline    |
 | `EXECUTION-PLAN.md`                | Scope, diagnosis, workstreams, grounded phase-1 worklist, gates, metrics  |
 | `DECISIONS.md`                     | Locked decisions (D-1..D-7)                                               |
-| `sessions/NN-slug.md`              | Paste-ready worker prompts (next: `02-connect-fragments-to-producers.md`) |
+| `sessions/NN-slug.md`              | Paste-ready worker prompts (next: `04-operational-insights-producers.md`) |
 | `SESSION-REPORTS-AND-LEARNINGS.md` | Append-only per-session log                                               |
 | `state.json`                       | Phase + baseline metrics                                                  |
 

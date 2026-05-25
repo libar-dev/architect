@@ -3,7 +3,7 @@
  * @architect-pattern ValidationRuleDigestProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses GovernanceProjectionSupport, ProjectionFragmentContracts
+ * @architect-uses GovernanceProjectionSupport, ProjectionFragmentContracts, ValidationRuleDigest
  * @architect-bounded-context:projection
  *
  * **Value:** Produces a `ValidationRuleDigest` fragment that describes the
