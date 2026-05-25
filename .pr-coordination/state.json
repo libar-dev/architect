@@ -4,16 +4,16 @@
   "updated": "2026-05-25",
   "workstreams": {
     "WS-0-finalize-hygiene": "done (committed 6f2fc6c)",
-    "WS-1-annotation-reenablement": "phase-1 projection pilot COMPLETE (Sessions 01-06); expansion (core/guard/cli/mcp) pending",
+    "WS-1-annotation-reenablement": "phase-1 projection pilot COMPLETE (Sessions 01-06); expansion in progress (core/src spine done Session 07; core test-features/guard/cli/mcp pending)",
     "WS-2-skills": "scoped",
     "WS-3-docs": "scoped"
   },
   "ws1": {
-    "phase": "1-projection-pilot-COMPLETE",
-    "currentSession": "WS-1 expansion (core/guard/cli/mcp) or WS-2 skills / WS-3 docs",
-    "lastCompletedSession": "06-execution-context-producers",
-    "lastCommit": "d1dcd45",
-    "lastCommitNote": "last campaign commit (Session 06, pilot finale). This finalize bookkeeping commit advances the pointer to it; a session commit cannot store its own sha.",
+    "phase": "1-projection-pilot-COMPLETE; 2-core-expansion-in-progress",
+    "currentSession": "WS-1 expansion (core test-features Session 08; then guard/cli/mcp) or WS-2 skills / WS-3 docs",
+    "lastCompletedSession": "07-core-spine",
+    "lastCommit": "c347045",
+    "lastCommitNote": "Session 07 commit (architect-core/src spine de-orphaned). This sha is the session's own commit recorded post-hoc in the bookkeeping edit.",
     "baselineMetrics": {
       "patterns": 270,
       "orphansTotal": 107,
@@ -22,8 +22,9 @@
       "boundedContextCoverage": "157/270"
     },
     "currentMetrics": {
-      "orphansTotal": 58,
+      "orphansTotal": 48,
       "orphansProjection": 0,
+      "orphansCoreSrc": 0,
       "orphansProjectionByArea": {
         "operational-insights": 0,
         "governance": 0,
@@ -31,7 +32,7 @@
         "execution-context": 0,
         "pattern-relations": 0
       },
-      "newPatterns": ["BlockSchema"]
+      "newPatterns": ["BlockSchema", "ExtractedPattern"]
     }
   }
 }

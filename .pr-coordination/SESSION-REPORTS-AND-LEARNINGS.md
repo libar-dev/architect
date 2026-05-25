@@ -210,3 +210,45 @@ execution-context). Total orphans **107 → 58**. Next phase: WS-1 expansion
 **Three proven edge shapes** for the expansion sessions: producer→fragment
 (`ProjectionBundle<X>` return), fragment→sub-fragment composition (`z.array(childSchema)`),
 and Supporting-bundle (direction follows real imports — outgoing OR incoming).
+
+## Session 07 — Connect architect-core production spine (WS-1 expansion, core pt.1)
+
+Committed = `c347045` (prior `d1dcd45`). De-orphaned all **10 architect-core/src**
+orphans (extractor + read-api spine). Total orphans **58 → 48**, zero
+`packages/architect-core/src` rows remain. A1: created `ExtractedPattern`
+(`role:contract`, `bounded-context:validation-schemas`, `status:active`) — the
+~60-field record contract the PatternGraph read model is built from (ADR-006). A2:
+7 verified `@architect-uses` edges (PatternGraph→ExtractedPattern; PatternHelpers,
+PatternGraphApi, GraphInventory, PatternClassification, ArchitectureInspection,
+DualSourceExtractor → ExtractedPattern/PatternGraph/PatternHelpers per their real
+imports). A3: orchestration→stage edges de-orphan the 4 feeders — DocExtractor→
+ShapeExtractor, GherkinExtractor→GherkinAstParser,LayerInference, BuildPipeline→
+AstParser. All edges registered first-try (Data-API read-back: ExtractedPattern
+`usedBy` = 7 consumers). All §6 gates green except repo-wide `format:check` (see below).
+Guard `--staged`: 14 modified, **0 status transitions** (D-6 holds on `completed`
+BuildPipeline). docs:all → ARCHITECTURE/CHANGELOG/PATTERNS regenerated, staged with code.
+
+**Scope corrections (inline-fixed):**
+
+1. **PatternGraphApi edge table was wrong.** Session-07 table claimed it does NOT
+   import `pattern-graph.js` → proposed `ExtractedPattern, PatternHelpers`. It DOES
+   import the `PatternGraph` type (`validation-schemas/pattern-graph.js` L13-17).
+   Authored the truthful set `ExtractedPattern, PatternHelpers, PatternGraph`.
+2. **AstParser's true importer is BuildPipeline, not the session's candidates.** Both
+   prompt candidates (GherkinScanner, gherkin-extractor) import `gherkin-ast-parser.js`,
+   NOT `ast-parser.js`. The only real consumer of `parseFileDirectives` (AstParser) is
+   the `scanner/index.ts` barrel's `scanPatterns()`, which BuildPipeline imports (L35).
+   Extended BuildPipeline's existing `@architect-uses` line with `AstParser` (D-8) —
+   ADR-006-correct (pipeline orchestration may import scanner stages).
+3. **Util/local symbols correctly NOT edged:** `PatternParseFailure`, `RelationshipEntry`,
+   `ArchIndex`, `NeighborEntry`, relationship-resolver, `fuzzy-match` — all `search`→empty,
+   so no edges (authoring them would be false edges / dangling).
+
+### Rules for next session (08 — core test-feature @architect-implements edges)
+
+1. **`format:check` is dirty repo-wide from coordinator WS-2 state** (`AGENTS.md` +
+   untracked `sessions/07,08-*.md`) — NOT from session edits. Stage explicit files only;
+   my 11 .ts files all pass prettier individually. Coordinator owns those 3 files.
+2. `@architect-implements` is authored on the **test `.feature`** (a relation, not identity)
+   — different mechanism from `@architect-uses`. Re-confirm each implements target exists
+   as a production pattern before authoring; verify via Data-API read-back (`implementedBy`).
