@@ -1,3 +1,15 @@
+/**
+ * @architect
+ * @architect-pattern BlockSchema
+ * @architect-status active
+ * @architect-role:contract
+ * @architect-bounded-context:rendering
+ *
+ * Inline content primitives (heading, paragraph, separator, table, list, code,
+ * mermaid, link-out, collapsible) used inside prose-carrying projection fragments
+ * — e.g. DecisionRecord carries ADR prose as `Block[]` rather than a raw string,
+ * and the markdown / UI renderers consume these primitives directly.
+ */
 import { z } from 'zod';
 
 export const HeadingBlockSchema = z.strictObject({

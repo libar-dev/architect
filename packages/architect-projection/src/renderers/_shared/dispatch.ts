@@ -4,6 +4,7 @@
  * @architect-status completed
  * @architect-role:codec
  * @architect-bounded-context:rendering
+ * @architect-uses ProjectionFragmentSchema
  *
  * ### When to Use
  *

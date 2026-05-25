@@ -4,6 +4,7 @@
  * @architect-status active
  * @architect-role:contract
  * @architect-bounded-context:pattern-relations
+ * @architect-uses Deliverable, DeliverableManifest
  *
  * ### When to Use
  *

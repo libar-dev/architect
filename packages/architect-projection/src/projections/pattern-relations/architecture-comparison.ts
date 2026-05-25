@@ -3,7 +3,7 @@
  * @architect-pattern ArchitectureComparisonProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses PatternRelationsProjectionSupport, PatternRelationsFragmentContracts
+ * @architect-uses PatternRelationsProjectionSupport, PatternRelationsFragmentContracts, ArchitectureComparison
  * @architect-bounded-context:projection
  *
  * ## Architecture comparison projection

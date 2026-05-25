@@ -3,7 +3,7 @@
  * @architect-pattern OrphanPatternListProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses PatternRelationsProjectionSupport, PatternRelationsFragmentContracts
+ * @architect-uses PatternRelationsProjectionSupport, PatternRelationsFragmentContracts, OrphanPatternList
  * @architect-bounded-context:projection
  *
  * ## Orphan pattern list projection

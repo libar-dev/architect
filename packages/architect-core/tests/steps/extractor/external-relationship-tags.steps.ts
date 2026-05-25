@@ -63,9 +63,12 @@ describeFeature(feature, ({ Background, Rule }) => {
 
   Rule('uses (csv) propagates to ExtractedPattern.uses', ({ RuleScenario }) => {
     RuleScenario('Single cross-process dependency surfaces in uses', ({ When, Then }) => {
-        When('I extract a Gherkin feature with header tag "uses:pkg:CandidateExtraction"', async () => {
+      When(
+        'I extract a Gherkin feature with header tag "uses:pkg:CandidateExtraction"',
+        async () => {
           await runExtraction('uses:pkg:CandidateExtraction');
-        });
+        },
+      );
 
       Then('the extracted pattern\'s uses equals "pkg:CandidateExtraction"', () => {
         expect(state.pattern).not.toBeNull();
@@ -74,12 +77,12 @@ describeFeature(feature, ({ Background, Rule }) => {
     });
 
     RuleScenario('Multi-value csv populates uses in order', ({ When, Then }) => {
-        When(
-          'I extract a Gherkin feature with header tag "uses:pkg:CandidateExtraction, studio:PatternBrowserView"',
-          async () => {
-            await runExtraction('uses:pkg:CandidateExtraction, studio:PatternBrowserView');
-          },
-        );
+      When(
+        'I extract a Gherkin feature with header tag "uses:pkg:CandidateExtraction, studio:PatternBrowserView"',
+        async () => {
+          await runExtraction('uses:pkg:CandidateExtraction, studio:PatternBrowserView');
+        },
+      );
 
       Then(
         'the extracted pattern\'s uses equals "pkg:CandidateExtraction, studio:PatternBrowserView"',
@@ -115,9 +118,9 @@ describeFeature(feature, ({ Background, Rule }) => {
 
   Rule('level (enum) propagates to ExtractedPattern.level', ({ RuleScenario }) => {
     RuleScenario('epic level surfaces in level', ({ When, Then }) => {
-        When('I extract a Gherkin feature with header tag "level:epic"', async () => {
-          await runExtraction('level:epic');
-        });
+      When('I extract a Gherkin feature with header tag "level:epic"', async () => {
+        await runExtraction('level:epic');
+      });
 
       Then('the extracted pattern\'s level equals "epic"', () => {
         expect(state.pattern).not.toBeNull();
@@ -126,9 +129,9 @@ describeFeature(feature, ({ Background, Rule }) => {
     });
 
     RuleScenario('slice level surfaces in level', ({ When, Then }) => {
-        When('I extract a Gherkin feature with header tag "level:slice"', async () => {
-          await runExtraction('level:slice');
-        });
+      When('I extract a Gherkin feature with header tag "level:slice"', async () => {
+        await runExtraction('level:slice');
+      });
 
       Then('the extracted pattern\'s level equals "slice"', () => {
         expect(state.pattern).not.toBeNull();
@@ -139,9 +142,9 @@ describeFeature(feature, ({ Background, Rule }) => {
 
   Rule('parent (value) propagates to ExtractedPattern.parent', ({ RuleScenario }) => {
     RuleScenario('parent value surfaces in parent', ({ When, Then }) => {
-        When('I extract a Gherkin feature with header tag "parent:LifecycleMvpEpic"', async () => {
-          await runExtraction('parent:LifecycleMvpEpic');
-        });
+      When('I extract a Gherkin feature with header tag "parent:LifecycleMvpEpic"', async () => {
+        await runExtraction('parent:LifecycleMvpEpic');
+      });
 
       Then('the extracted pattern\'s parent equals "LifecycleMvpEpic"', () => {
         expect(state.pattern).not.toBeNull();

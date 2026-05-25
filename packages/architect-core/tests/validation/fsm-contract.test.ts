@@ -40,14 +40,16 @@ describe('FSM contract seam', () => {
       valid: false,
       from: 'candidate',
       to: 'active',
-      error: "Invalid source status 'candidate'. Valid values: roadmap, active, completed, deferred.",
+      error:
+        "Invalid source status 'candidate'. Valid values: roadmap, active, completed, deferred.",
     });
 
     expect(validateTransition('roadmap', 'candidate')).toMatchObject({
       valid: false,
       from: 'roadmap',
       to: 'candidate',
-      error: "Invalid target status 'candidate'. Valid values: roadmap, active, completed, deferred.",
+      error:
+        "Invalid target status 'candidate'. Valid values: roadmap, active, completed, deferred.",
     });
   });
 

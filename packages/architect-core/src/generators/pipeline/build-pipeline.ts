@@ -106,14 +106,19 @@ export interface BuildResult {
   readonly diagnostics: readonly ExtractionDiagnostic[];
 }
 
-function validatePatternGraphDataset(graph: RuntimePatternGraph): Result<RuntimePatternGraph, PipelineError> {
+function validatePatternGraphDataset(
+  graph: RuntimePatternGraph,
+): Result<RuntimePatternGraph, PipelineError> {
   try {
     return Result.ok(parseAtBoundary(PatternGraphSchema, graph, 'PatternGraph validation failed'));
   } catch (error: unknown) {
     if (error instanceof BoundaryParseError) {
       return Result.err({ step: 'transform', message: error.message });
     }
-    return Result.err({ step: 'transform', message: error instanceof Error ? error.message : String(error) });
+    return Result.err({
+      step: 'transform',
+      message: error instanceof Error ? error.message : String(error),
+    });
   }
 }
 

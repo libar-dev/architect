@@ -8,7 +8,9 @@ import { McpFileWatcher } from '../../src/file-watcher.js';
 import { PipelineSessionManager } from '../../src/pipeline-session.js';
 import { createTestSessionManager } from '../support/session-fixtures.js';
 
-const feature = loadFeatureFromText(readFileSync('tests/features/mcp-runtime-hardening.feature', 'utf8'));
+const feature = loadFeatureFromText(
+  readFileSync('tests/features/mcp-runtime-hardening.feature', 'utf8'),
+);
 
 interface TempArchitectProject {
   readonly rootDir: string;
@@ -67,17 +69,24 @@ Feature: Example pattern executable tests
 
 function delayPipelineBuilds(manager: PipelineSessionManager, delayMs: number): void {
   const buildSession = Reflect.get(manager as object, 'buildSession') as BuildSessionMethod;
-  Reflect.set(manager as object, 'buildSession', async (...args: Parameters<BuildSessionMethod>) => {
-    await waitFor(delayMs);
-    return buildSession.apply(manager, args);
-  });
+  Reflect.set(
+    manager as object,
+    'buildSession',
+    async (...args: Parameters<BuildSessionMethod>) => {
+      await waitFor(delayMs);
+      return buildSession.apply(manager, args);
+    },
+  );
 }
 
 async function stopWatcher(watcher: McpFileWatcher): Promise<void> {
   await watcher.stop();
 }
 
-async function expectPromiseToStayPending(promise: Promise<unknown>, pauseMs: number): Promise<void> {
+async function expectPromiseToStayPending(
+  promise: Promise<unknown>,
+  pauseMs: number,
+): Promise<void> {
   let resolved = false;
   void promise.finally(() => {
     resolved = true;
@@ -123,33 +132,30 @@ describeFeature(feature, ({ Rule }) => {
 
   Rule('Watcher shutdown drains in-flight rebuild work', ({ RuleScenario }) => {
     RuleScenario('stopping watch mode drains an in-flight rebuild', ({ Then }) => {
-      Then(
-        'stopping the MCP file watcher waits for an in-flight rebuild to finish',
-        async () => {
-          let releaseRebuild!: VoidResolver;
-          const inFlightRebuild = new Promise<void>((resolve) => {
-            releaseRebuild = resolve;
-          });
-          const watcher = new McpFileWatcher({
-            globs: ['src/**/*.ts'],
-            baseDir: process.cwd(),
-            debounceMs: 1,
-            sessionManager: createTestSessionManager(),
-            log: () => undefined,
-          });
+      Then('stopping the MCP file watcher waits for an in-flight rebuild to finish', async () => {
+        let releaseRebuild!: VoidResolver;
+        const inFlightRebuild = new Promise<void>((resolve) => {
+          releaseRebuild = resolve;
+        });
+        const watcher = new McpFileWatcher({
+          globs: ['src/**/*.ts'],
+          baseDir: process.cwd(),
+          debounceMs: 1,
+          sessionManager: createTestSessionManager(),
+          log: () => undefined,
+        });
 
-          try {
-            Reflect.set(watcher as object, 'rebuildPromise', inFlightRebuild);
-            const stopPromise = stopWatcher(watcher);
-            await expectPromiseToStayPending(stopPromise, 20);
-            releaseRebuild();
-            await stopPromise;
-            expect(Reflect.get(watcher as object, 'rebuildPromise')).toBeNull();
-          } finally {
-            await stopWatcher(watcher);
-          }
-        },
-      );
+        try {
+          Reflect.set(watcher as object, 'rebuildPromise', inFlightRebuild);
+          const stopPromise = stopWatcher(watcher);
+          await expectPromiseToStayPending(stopPromise, 20);
+          releaseRebuild();
+          await stopPromise;
+          expect(Reflect.get(watcher as object, 'rebuildPromise')).toBeNull();
+        } finally {
+          await stopWatcher(watcher);
+        }
+      });
     });
   });
 });

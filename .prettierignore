@@ -8,3 +8,11 @@ coverage
 .changeset/*.md
 pnpm-lock.yaml
 *.tsbuildinfo
+
+# Generated documentation projection (committed, but the generator owns its format)
+docs-live/
+
+# Ephemeral working / review artifacts (not part of the published surface)
+.cleanup-review/
+.full-review/
+.scratch/

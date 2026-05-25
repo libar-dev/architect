@@ -287,10 +287,13 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
         phase: 49,
         role: 'projection',
         file: 'packages/architect-projection/src/projections/execution-context/session-context.ts',
-        summary: 'Builds session-oriented context bundles for planning, design, and implement sessions.',
+        summary:
+          'Builds session-oriented context bundles for planning, design, and implement sessions.',
       },
     ],
-    specFiles: ['packages/architect-projection/tests/features/projections/execution-context/context-session.feature'],
+    specFiles: [
+      'packages/architect-projection/tests/features/projections/execution-context/context-session.feature',
+    ],
     stubs: [],
     dependencies: [
       {
@@ -341,7 +344,9 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
         },
       },
     ],
-    testFiles: ['packages/architect-projection/tests/features/projections/execution-context/context-session.feature'],
+    testFiles: [
+      'packages/architect-projection/tests/features/projections/execution-context/context-session.feature',
+    ],
   },
   ScopeReadinessCheck: validScopeReadinessCheck,
   ScopeReadinessReport: {
@@ -398,9 +403,13 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
       'packages/architect-projection/src/projections/execution-context/session-context.ts',
       'packages/architect-projection/src/projections/execution-context/scope-readiness.ts',
     ],
-    completedDeps: ['packages/architect-projection/src/projections/execution-context/execution-context-shared.internal.ts'],
+    completedDeps: [
+      'packages/architect-projection/src/projections/execution-context/execution-context-shared.internal.ts',
+    ],
     roadmapDeps: ['packages/architect-projection/src/fragments/index.ts'],
-    architectureNeighbors: ['packages/architect-projection/src/projections/execution-context/handoff.ts'],
+    architectureNeighbors: [
+      'packages/architect-projection/src/projections/execution-context/handoff.ts',
+    ],
   },
   Deliverable: validDeliverable,
   DeliverableManifest: {

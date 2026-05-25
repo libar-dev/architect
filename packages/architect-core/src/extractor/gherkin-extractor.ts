@@ -202,15 +202,15 @@ function buildGherkinPatternDraft(input: {
       position: { startLine: feature.line, endLine: feature.line },
       status: metadata.status,
       ...(unlockReason !== undefined ? { unlockReason } : {}),
-      ...(metadata.boundedContext !== undefined
-        ? { boundedContext: metadata.boundedContext }
-        : {}),
+      ...(metadata.boundedContext !== undefined ? { boundedContext: metadata.boundedContext } : {}),
       ...(metadata.phase !== undefined ? { phase: metadata.phase } : {}),
       ...(metadata.role !== undefined ? { role: metadata.role } : {}),
       ...(metadata.uses !== undefined && metadata.uses.length > 0 ? { uses: metadata.uses } : {}),
       ...(metadata.level !== undefined ? { level: metadata.level } : {}),
       ...(metadata.parent !== undefined ? { parent: metadata.parent } : {}),
-      ...(metadata.executableSpecs !== undefined ? { executableSpecs: metadata.executableSpecs } : {}),
+      ...(metadata.executableSpecs !== undefined
+        ? { executableSpecs: metadata.executableSpecs }
+        : {}),
     },
     code: '',
     source: {
@@ -377,9 +377,7 @@ export async function extractPatternsFromGherkin(
 
     for (const entry of metadata._unrecognizedEnums ?? []) {
       const code =
-        entry.tag === 'status'
-          ? ('unrecognized-status' as const)
-          : ('invalid-enum-value' as const);
+        entry.tag === 'status' ? ('unrecognized-status' as const) : ('invalid-enum-value' as const);
 
       diagnostics.push(
         createDiagnostic(
@@ -477,9 +475,7 @@ export async function extractPatternsFromGherkin(
       );
 
       patternsToVerify.push(
-        behaviorPathToVerify !== undefined
-          ? { pattern, behaviorPathToVerify }
-          : { pattern },
+        behaviorPathToVerify !== undefined ? { pattern, behaviorPathToVerify } : { pattern },
       );
     } catch (error: unknown) {
       if (!(error instanceof BoundaryParseError)) {

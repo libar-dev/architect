@@ -23,7 +23,11 @@
  * - When checking if an unknown error is a DocError
  */
 
-import { exitWithErrorMessage, exitWithProcessError, type DocError } from '@libar-dev/architect-core';
+import {
+  exitWithErrorMessage,
+  exitWithProcessError,
+  type DocError,
+} from '@libar-dev/architect-core';
 
 function stringifyJsonValue(value: unknown): string {
   if (value === undefined) {

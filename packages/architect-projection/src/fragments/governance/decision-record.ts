@@ -4,6 +4,7 @@
  * @architect-status active
  * @architect-role:contract
  * @architect-bounded-context:governance
+ * @architect-uses BlockSchema
  *
  * ### When to Use
  *

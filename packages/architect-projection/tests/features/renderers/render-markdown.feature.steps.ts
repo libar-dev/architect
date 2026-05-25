@@ -449,18 +449,18 @@ function createBusinessRulesDisclosureBundle(): ProjectionBundle<Fragment> {
 
   return withBundleDisclosureSpec(
     {
-    root: documentationFixtureToFragment(root),
-    children: {
-      'business-rules:projection-api': documentationFixtureToFragment(child),
-    },
-    routing: {
-      rootRouteId: 'business-rules:index',
-      childRouteIds: {
-        'business-rules:projection-api': 'business-rules:projection-api',
+      root: documentationFixtureToFragment(root),
+      children: {
+        'business-rules:projection-api': documentationFixtureToFragment(child),
       },
-      childPathStrategy: 'nested',
-      anchorStrategy: 'heading-slug',
-    },
+      routing: {
+        rootRouteId: 'business-rules:index',
+        childRouteIds: {
+          'business-rules:projection-api': 'business-rules:projection-api',
+        },
+        childPathStrategy: 'nested',
+        anchorStrategy: 'heading-slug',
+      },
     },
     {
       grouping: 'flat',
@@ -505,53 +505,53 @@ function createBusinessRuleSetDisclosureBundle(): ProjectionBundle<BusinessRuleS
 
   return withBundleDisclosureSpec(
     {
-    root: {
-      kind: 'BusinessRuleSet',
-      scope: 'all',
-      rules: [...projectionRules, ...cliRules],
-      groupedBy: 'package',
-      groupingEntries: [
-        {
-          childKey: 'architect-cli',
-          label: 'architect-cli',
-          featureCount: 1,
-          ruleCount: 1,
-          invariantCount: 1,
-        },
-        {
-          childKey: 'architect-projection',
-          label: 'architect-projection',
-          featureCount: 1,
-          ruleCount: 1,
-          invariantCount: 1,
-        },
-      ],
-    },
-    children: {
-      'architect-cli': {
+      root: {
         kind: 'BusinessRuleSet',
-        scope: 'package',
-        scopeValue: 'architect-cli',
-        rules: cliRules,
+        scope: 'all',
+        rules: [...projectionRules, ...cliRules],
         groupedBy: 'package',
+        groupingEntries: [
+          {
+            childKey: 'architect-cli',
+            label: 'architect-cli',
+            featureCount: 1,
+            ruleCount: 1,
+            invariantCount: 1,
+          },
+          {
+            childKey: 'architect-projection',
+            label: 'architect-projection',
+            featureCount: 1,
+            ruleCount: 1,
+            invariantCount: 1,
+          },
+        ],
       },
-      'architect-projection': {
-        kind: 'BusinessRuleSet',
-        scope: 'package',
-        scopeValue: 'architect-projection',
-        rules: projectionRules,
-        groupedBy: 'package',
+      children: {
+        'architect-cli': {
+          kind: 'BusinessRuleSet',
+          scope: 'package',
+          scopeValue: 'architect-cli',
+          rules: cliRules,
+          groupedBy: 'package',
+        },
+        'architect-projection': {
+          kind: 'BusinessRuleSet',
+          scope: 'package',
+          scopeValue: 'architect-projection',
+          rules: projectionRules,
+          groupedBy: 'package',
+        },
       },
-    },
-    routing: {
-      rootRouteId: 'business-rules:index',
-      childRouteIds: {
-        'architect-cli': 'business-rules:architect-cli',
-        'architect-projection': 'business-rules:architect-projection',
+      routing: {
+        rootRouteId: 'business-rules:index',
+        childRouteIds: {
+          'architect-cli': 'business-rules:architect-cli',
+          'architect-projection': 'business-rules:architect-projection',
+        },
+        childPathStrategy: 'nested',
+        anchorStrategy: 'heading-slug',
       },
-      childPathStrategy: 'nested',
-      anchorStrategy: 'heading-slug',
-    },
     },
     getSupportedDocumentationTypeMetadata('business-rules').disclosureMatrix.important,
   );
@@ -608,52 +608,52 @@ function createBusinessRuleSetRichnessFixture(
 ): ProjectionBundle<Fragment> {
   return withBundleDisclosureSpec(
     {
-    root: {
-      kind: 'BusinessRuleSet',
-      scope: 'all',
-      rules: [
-        {
-          kind: 'BusinessRule',
-          feature: 'ProjectionAPI',
-          ruleName: 'Canonical document types',
-          package: 'architect-projection',
-          invariant: 'Business rules expose stable disclosure-driven columns.',
-          rationale: 'Renderer richness should be explicit and testable.',
-          verifiedBy: ['BusinessRule table column count per richness'],
-          scenarioCount: 1,
-          pattern: 'ProjectionAPI',
-          phase: 49,
-          productArea: 'Projection Platform',
-        },
-        {
-          kind: 'BusinessRule',
-          feature: 'GenerateDocsCli',
-          ruleName: 'Registry dispatch',
-          package: 'architect-cli',
-          invariant: 'CLI business rules render through the same table policy.',
-          rationale: 'Disclosure richness should not be consumer-specific.',
-          verifiedBy: ['BusinessRule table column count per richness'],
-          scenarioCount: 1,
-          pattern: 'GenerateDocsCli',
-          phase: 49,
-          productArea: 'CLI',
-        },
-        {
-          kind: 'BusinessRule',
-          feature: 'ArchitectMcp',
-          ruleName: 'Documentation tool parity',
-          package: 'architect-mcp',
-          invariant: 'MCP business rules follow the same markdown richness policy.',
-          rationale: 'Boundary surfaces should share disclosure semantics.',
-          verifiedBy: ['BusinessRule table column count per richness'],
-          scenarioCount: 1,
-          pattern: 'ArchitectMcp',
-          phase: 49,
-          productArea: 'MCP',
-        },
-      ],
-    },
-    children: {},
+      root: {
+        kind: 'BusinessRuleSet',
+        scope: 'all',
+        rules: [
+          {
+            kind: 'BusinessRule',
+            feature: 'ProjectionAPI',
+            ruleName: 'Canonical document types',
+            package: 'architect-projection',
+            invariant: 'Business rules expose stable disclosure-driven columns.',
+            rationale: 'Renderer richness should be explicit and testable.',
+            verifiedBy: ['BusinessRule table column count per richness'],
+            scenarioCount: 1,
+            pattern: 'ProjectionAPI',
+            phase: 49,
+            productArea: 'Projection Platform',
+          },
+          {
+            kind: 'BusinessRule',
+            feature: 'GenerateDocsCli',
+            ruleName: 'Registry dispatch',
+            package: 'architect-cli',
+            invariant: 'CLI business rules render through the same table policy.',
+            rationale: 'Disclosure richness should not be consumer-specific.',
+            verifiedBy: ['BusinessRule table column count per richness'],
+            scenarioCount: 1,
+            pattern: 'GenerateDocsCli',
+            phase: 49,
+            productArea: 'CLI',
+          },
+          {
+            kind: 'BusinessRule',
+            feature: 'ArchitectMcp',
+            ruleName: 'Documentation tool parity',
+            package: 'architect-mcp',
+            invariant: 'MCP business rules follow the same markdown richness policy.',
+            rationale: 'Boundary surfaces should share disclosure semantics.',
+            verifiedBy: ['BusinessRule table column count per richness'],
+            scenarioCount: 1,
+            pattern: 'ArchitectMcp',
+            phase: 49,
+            productArea: 'MCP',
+          },
+        ],
+      },
+      children: {},
     },
     disclosureSpec,
   );

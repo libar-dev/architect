@@ -25,7 +25,6 @@ export interface GeneratedDocManifestGenerator {
 
 export interface GeneratedDocsManifest {
   readonly version: 1;
-  readonly updatedAt: string;
   readonly generators: Record<string, GeneratedDocManifestGenerator>;
 }
 
@@ -61,7 +60,6 @@ export async function upsertGeneratedDocsManifest(
 ): Promise<void> {
   const existing = (await loadGeneratedDocsManifest(options.outputDir)) ?? {
     version: 1 as const,
-    updatedAt: new Date(0).toISOString(),
     generators: {},
   };
 
@@ -72,7 +70,6 @@ export async function upsertGeneratedDocsManifest(
 
   const next: GeneratedDocsManifest = {
     version: 1,
-    updatedAt: new Date().toISOString(),
     generators: {
       ...existing.generators,
       [options.generatorName]: {

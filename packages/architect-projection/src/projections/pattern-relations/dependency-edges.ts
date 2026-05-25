@@ -3,7 +3,7 @@
  * @architect-pattern DependencyEdgeProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses PatternRelationsProjectionSupport, PatternRelationsFragmentContracts
+ * @architect-uses PatternRelationsProjectionSupport, PatternRelationsFragmentContracts, DependencyEdge, DependencyEdgeSet
  * @architect-bounded-context:projection
  *
  * ## Dependency edge projection

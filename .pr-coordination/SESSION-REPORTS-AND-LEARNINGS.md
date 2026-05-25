@@ -1,0 +1,76 @@
+# Session reports and learnings
+
+> Append-only log. One entry per session. Keep entries tight (< 20 lines).
+
+## Session 00 — Campaign bootstrap (planning, no code)
+
+Diagnosed the graph: 270 patterns, 107 orphans (40%) — projection 49, specs 32,
+core 24, guard 2; role 64%, bounded-context 58%, `@architect-shape` ~absent.
+Root cause: ~30 refactoring PRs kept pattern identity but stripped edges/shapes/
+invariants. Confirmed scope with maintainer (D-1..D-5). Authored this package.
+No production code touched.
+
+**Rules for upcoming sessions**
+
+1. Edges first; classification is mostly present in projection — don't re-tag what exists.
+2. Author edge-target identity (Cluster B/D) before edges that reference it, or same commit — `arch dangling` is strict.
+3. Add `Rule:` invariants only where architecturally significant; no ceremonial rules.
+4. `.scratch/` is invisible to fresh sessions — keep everything needed inside `.pr-coordination/`.
+
+## Session 01 — Projection renderer spine + block primitives (uncommitted in tree)
+
+Cluster A (5 renderer/dispatch files) + Cluster B (`BlockSchema` new identity +
+5 fragment consumers). Projection orphans **49 → 40**, total **107 → 98**.
+All gates green (build, format:check, lint, typecheck, typecheck:dogfood, test,
+test:dogfood 1057, validate:all, arch dangling 0, perf, audit:subtractive).
+`docs:all` regenerated PATTERNS/ARCHITECTURE/CHANGELOG + manifest — commit with the code.
+
+**Additional scope discovered:** the planned prompt asserted a uniform
+"all 4 renderers → FragmentRendererDispatch" edge. **`JsonRenderer` does not use
+dispatch** (generic serialization) — adding it would have been a false edge.
+Also `MarkdownRenderer` + `UiRenderer` (not just markdown) import `Block` → both
+get `BlockSchema`. **Resolution:** inline — verified every edge against imports;
+corrected `sessions/01` + EXECUTION-PLAN §5 to the per-file verified set.
+
+### Rules for upcoming sessions
+
+1. **Verify every `@architect-uses` edge against the file's actual imports.** Never
+   assume sibling files (renderers, fragments) have identical dependencies. A
+   plausible-but-false edge is worse than a missing one — it lies to the graph.
+2. `@architect-uses` is **space-separated, no colon** (`@architect-uses A, B`).
+   `@architect-role:` / `@architect-bounded-context:` use a colon. Do not mix.
+3. Adding a new code-originated identity (e.g. `BlockSchema`) or new edges changes
+   `docs-live/` — regenerate via `pnpm docs:all` and commit it in the same change.
+
+## Session 02 — Connect pattern-relations fragments to producers (uncommitted in tree)
+
+D-7 two-part model applied to all 10 pattern-relations orphans: 8 producers got a
+producer→fragment edge (9 fragments; `DependencyEdgeProjection` produces both
+`DependencyEdge` + `DependencyEdgeSet`), and `PatternRelationsSupporting` got an
+import edge (`Deliverable, DeliverableManifest`). Projection pattern-relations
+orphans **10 → 0**; total **98 → 86** (the Supporting edge also de-orphaned
+`Deliverable` + `DeliverableManifest`). All 13 gates green; guard `--staged`:
+13 modified, **0 status transitions** (confirms D-6 on 8 `completed` patterns),
+passed. `arch dangling --strict` count 0, no drift. `docs:all` updated
+ARCHITECTURE/PATTERNS/CHANGELOG/manifest — staged with the code.
+
+**Additional scope discovered (inline-fixed + recorded as D-8):** the planned
+method ("append a **new** `@architect-uses` line") is **wrong** — the parser keeps
+only ONE `@architect-uses` line per pattern; a second line is silently dropped.
+First attempt left all 9 fragments orphaned (caught by Data-API read-back before
+gates). Fixed inline by **extending the existing comma-separated line**. Same bug
+already breaks 5 pre-existing patterns (see D-8) — deferred to their owning
+sessions.
+
+### Rules for upcoming sessions
+
+1. **One `@architect-uses` line per pattern, comma-separated.** Extend the existing
+   line; never add a second `@architect-uses` line (it's dropped). See **D-8**.
+2. **Read back via the Data API after authoring edges** (`pattern <X>` →
+   `uses`/`usedBy`, or `arch orphans`) **before** running gates. "Annotation in the
+   file" ≠ "edge in the graph." This caught the multi-line bug cheaply.
+3. Next context = **governance** (`BusinessRule`, `BusinessRuleSet`,
+   `BusinessRuleReference`, `DecisionCatalog`, + its `*Supporting` bundle). Re-verify
+   producers/imports fresh — do not assume symmetry with pattern-relations.
+4. Coordinator: fix the "append a new line" wording in EXECUTION-PLAN §5 +
+   remaining `sessions/NN-*.md` to "extend the existing line" (D-8).

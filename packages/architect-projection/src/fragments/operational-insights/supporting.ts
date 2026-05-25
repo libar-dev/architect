@@ -4,6 +4,7 @@
  * @architect-status active
  * @architect-role:contract
  * @architect-bounded-context:operational-insights
+ * @architect-uses BlockSchema
  *
  * Houses the shared operational-insights helper schemas for progress, blocking, tag gaps, tag counts, and requirement entries.
  */

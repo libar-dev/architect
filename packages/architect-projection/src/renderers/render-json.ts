@@ -4,6 +4,7 @@
  * @architect-status completed
  * @architect-role:codec
  * @architect-bounded-context:rendering
+ * @architect-uses ProjectionFragmentSchema
  *
  * Renders fragments as JSON-safe objects or stable JSON strings for structured tool output.
  * This renderer validates serializability and bundle routing metadata; it does not

@@ -1,9 +1,7 @@
 /**
  * @architect-bounded-context:documentation-composition
  */
-export {
-  parseAndProjectArchitectureDiagram,
-} from './architecture-diagram.js';
+export { parseAndProjectArchitectureDiagram } from './architecture-diagram.js';
 export type { ProjectArchitectureDiagramOptions } from './architecture-diagram.js';
 export {
   ProjectConfigOptionsSchema,

@@ -7,8 +7,14 @@ export {
 } from './string-utils.js';
 export { groupBy } from './collection-utils.js';
 export { generatePatternId } from './id-utils.js';
+export { parseMarkdownToBlocks } from './markdown-parser.js';
 export { parseMarkdownTableRows } from './parse-markdown-table-rows.js';
-export { exitWithErrorMessage, exitWithProcessError, formatZodError, parseOrThrow } from './errors.js';
+export {
+  exitWithErrorMessage,
+  exitWithProcessError,
+  formatZodError,
+  parseOrThrow,
+} from './errors.js';
 export {
   readPackageMetadata,
   resolveInvocationDir,

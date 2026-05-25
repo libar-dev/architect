@@ -582,7 +582,9 @@ export function extractPatternTags(
           validValues !== undefined
             ? values.filter((value) => validValues.includes(value))
             : values;
-        const transformed = validated.map((value) => applyKnownTransform(definition.transform, value));
+        const transformed = validated.map((value) =>
+          applyKnownTransform(definition.transform, value),
+        );
         switch (key) {
           case 'uses':
             uses = appendStringValues(uses, transformed);
@@ -639,7 +641,8 @@ export function extractPatternTags(
         }
         const value = applyKnownTransform(definition.transform, rawValue);
         if (definition.repeatable) {
-          const existingCustomValue = customMetadata === undefined ? undefined : customMetadata[key];
+          const existingCustomValue =
+            customMetadata === undefined ? undefined : customMetadata[key];
           customMetadata = {
             ...(customMetadata ?? {}),
             [key]: appendSingleStringValue(readCustomStringArray(existingCustomValue), value),

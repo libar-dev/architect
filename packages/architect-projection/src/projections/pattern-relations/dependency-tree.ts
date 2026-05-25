@@ -3,7 +3,7 @@
  * @architect-pattern DependencyTreeProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses PatternRelationsProjectionSupport, PatternRelationsFragmentContracts
+ * @architect-uses PatternRelationsProjectionSupport, PatternRelationsFragmentContracts, DependencyTree
  * @architect-bounded-context:projection
  *
  * ## Dependency tree projection

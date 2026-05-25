@@ -35,7 +35,7 @@ In practice this means:
 
 - The same handful of verbs (`overview`, `pattern`, `bundle`, `dep-tree`, `files`, `rules`, `scope-validate`) covers every session shape above.
 - `bundle <Pattern>` is the default pre-flight; it returns deliverables + dependencies + rules + open questions + docstring in one call.
-- The `--mode <plan|design|implement|review>` flag on `bundle` / `context` exists and changes which blocks are included by default, but defaults are good and the variation in returned data is dominated by what the pattern actually *is* on disk.
+- The `--mode <plan|design|implement|review>` flag on `bundle` / `context` exists and changes which blocks are included by default, but defaults are good and the variation in returned data is dominated by what the pattern actually _is_ on disk.
 - Expect intent flags to recede further over time. The skill leads with state-driven exploration; per-intent recipes are not authored here.
 
 ## Pattern exploration — the everyday verbs
@@ -100,7 +100,7 @@ Organized by purpose. Every CLI verb has an MCP twin (mapping in "MCP twins" bel
 
 ### Per-pattern detail
 
-- **`pattern <Name>`** — full PatternDetail (deliverables, relationships, rules, role, maturity, file). When the underlying feature file fails to parse, this verb reports parse provenance `(kind, path, parser line:col)` instead of a flat "not found". A "not found" response is therefore not binary — it can mean *parse failure* OR *truly absent*. Cross-check with `search` or `list --names-only` before concluding.
+- **`pattern <Name>`** — full PatternDetail (deliverables, relationships, rules, role, maturity, file). When the underlying feature file fails to parse, this verb reports parse provenance `(kind, path, parser line:col)` instead of a flat "not found". A "not found" response is therefore not binary — it can mean _parse failure_ OR _truly absent_. Cross-check with `search` or `list --names-only` before concluding.
 - **`context <Pattern> [--session planning|design|implement]`** — curated bundle: summary, dependencies, architecture neighbours. With `--session implement`, also includes an `=== FSM ===` line showing current status + valid transitions + protection level.
 - **`files <Pattern> [--related]`** — primary deliverable file. With `--related`, adds `=== COMPLETED DEPENDENCIES ===`, `=== ROADMAP DEPENDENCIES ===`, `=== ARCHITECTURE NEIGHBORS ===` sections.
 - **`dep-tree <Pattern> [--depth <n>]`** — dependency chain walk.
@@ -237,7 +237,7 @@ The PatternGraph is a living surface. Verbs, flag shapes, and output structures 
 **Coming — first-class `feedback` verb.** A `pnpm architect:query feedback` CLI verb (and `architect_feedback` MCP twin) will let agents and humans flag verb-misbehaviour structurally so failures feed back into development without a separate process. Planned shape:
 
 - **Stateless input.** A freeform short note and an optional count of recent calls that were troublesome. No required arguments — the call itself is the lowest-cost feedback affordance the API can offer.
-- **Session-tagged calls.** Every `pnpm architect:query` invocation carries an opaque session ID so `feedback` can reference *"the last N calls"* without the caller copying anything in.
+- **Session-tagged calls.** Every `pnpm architect:query` invocation carries an opaque session ID so `feedback` can reference _"the last N calls"_ without the caller copying anything in.
 - **Bulk reporting.** One feedback call covers a sequence of troublesome calls; never per-call.
 - **Heuristic auto-flagging.** Suspicious response shapes (too small to be useful, requirements-projection-sized dumps that drown the caller) and repeated calls with the same signature get surfaced as candidate feedback items automatically. The two failure modes of a structured query API are payload underflow and payload overflow — both detectable without inspecting content.
 
@@ -245,7 +245,7 @@ This loop is intentionally tighter than a typical API contract because the codeb
 
 ## Anti-patterns (stop)
 
-- **Reading files before querying.** `Read` / `Glob` / `Grep` against `architect/`, `packages/architect-*/`, or `tests/features/` to *learn about a pattern*. There is a verb for that.
+- **Reading files before querying.** `Read` / `Glob` / `Grep` against `architect/`, `packages/architect-*/`, or `tests/features/` to _learn about a pattern_. There is a verb for that.
 - **Hand-writing hyphenated MCP names.** Callable names are underscored end-to-end — `architect_scope_validate`, `architect_open_questions`, `architect_dep_tree`. Hyphens 404.
 - **Treating `pattern <Name>` "not found" as binary.** It can mean parse failure with provenance. Cross-check with `search` or `list --names-only`.
 - **Parsing `--format json` shapes by regex.** Pipe to `jq` or parse structurally.

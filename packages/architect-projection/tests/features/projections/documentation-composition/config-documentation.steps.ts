@@ -585,17 +585,18 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               expect((rejection as ProjectionError).code).toBe('UNKNOWN_DOCUMENT_TYPE');
             }
 
-            const [rootBarrel, projectionsBarrel, documentationCompositionBarrel] = await Promise.all([
-              readFile(new URL('../../../../src/index.ts', import.meta.url), 'utf8'),
-              readFile(new URL('../../../../src/projections/index.ts', import.meta.url), 'utf8'),
-              readFile(
-                new URL(
-                  '../../../../src/projections/documentation-composition/index.ts',
-                  import.meta.url,
+            const [rootBarrel, projectionsBarrel, documentationCompositionBarrel] =
+              await Promise.all([
+                readFile(new URL('../../../../src/index.ts', import.meta.url), 'utf8'),
+                readFile(new URL('../../../../src/projections/index.ts', import.meta.url), 'utf8'),
+                readFile(
+                  new URL(
+                    '../../../../src/projections/documentation-composition/index.ts',
+                    import.meta.url,
+                  ),
+                  'utf8',
                 ),
-                'utf8',
-              ),
-            ]);
+              ]);
 
             for (const barrel of [rootBarrel, projectionsBarrel]) {
               expect(barrel).not.toMatch(/\bDROPPED_DOCUMENTATION_TYPES\b/u);

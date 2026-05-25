@@ -43,6 +43,11 @@ pnpm-debug.log*
 _ideation/
 _pr-review/
 _working-docs/
+.scratch/
+
+# Review / campaign artifacts (working state, not part of the published surface)
+.cleanup-review/
+.full-review/
 
 # Pi Agent state
 .pi/

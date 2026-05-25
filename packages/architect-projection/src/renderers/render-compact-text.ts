@@ -4,6 +4,7 @@
  * @architect-status completed
  * @architect-role:codec
  * @architect-bounded-context:rendering
+ * @architect-uses FragmentRendererDispatch, ProjectionFragmentSchema
  *
  * Renders projection fragments into compact plain text for AI-facing CLI/MCP output.
  * Dedicated render paths assert the high-signal context fragments; unknown fragment

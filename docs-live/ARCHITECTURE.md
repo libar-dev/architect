@@ -7,7 +7,7 @@
 
 ## Overview
 
-This diagram captures 231 patterns in the Component architecture view.
+This diagram captures 232 patterns in the Component architecture view.
 
 ## Diagram
 
@@ -194,6 +194,14 @@ graph TD
     gherkinscanner["GherkinScanner<br/>(service)"]
     patternscanner["PatternScanner<br/>(service)"]
   end
+  subgraph rendering["rendering"]
+    blockschema["BlockSchema<br/>(contract)"]
+    compacttextrenderer["CompactTextRenderer<br/>(codec)"]
+    fragmentrendererdispatch["FragmentRendererDispatch<br/>(codec)"]
+    jsonrenderer["JsonRenderer<br/>(codec)"]
+    markdownrenderer["MarkdownRenderer<br/>(codec)"]
+    uirenderer["UiRenderer<br/>(codec)"]
+  end
   subgraph pipeline["pipeline"]
     buildpipeline["BuildPipeline<br/>(service)"]
   end
@@ -218,13 +226,6 @@ graph TD
   subgraph validation_schemas["validation-schemas"]
     codecutils["CodecUtils<br/>(codec)"]
     patterngraph["PatternGraph<br/>(contract)"]
-  end
-  subgraph rendering["rendering"]
-    compacttextrenderer["CompactTextRenderer<br/>(codec)"]
-    fragmentrendererdispatch["FragmentRendererDispatch<br/>(codec)"]
-    jsonrenderer["JsonRenderer<br/>(codec)"]
-    markdownrenderer["MarkdownRenderer<br/>(codec)"]
-    uirenderer["UiRenderer<br/>(codec)"]
   end
   subgraph configuration["configuration"]
     configloader["ConfigLoader<br/>(service)"]
@@ -314,19 +315,34 @@ graph TD
   annotationcoverageprojection -.->|uses| operationalinsightsprojectionsupport
   antipatterndetector -->|depends-on| dodvalidationtypes
   antipatterndetector -.->|uses| dodvalidationtypes
+  architecturecomparison ==>|enables| architecturecomparisonprojection
+  architecturecomparisonprojection -->|depends-on| architecturecomparison
+  architecturecomparisonprojection -.->|uses| architecturecomparison
   architecturecomparisonprojection -->|depends-on| patternrelationsfragmentcontracts
   architecturecomparisonprojection -.->|uses| patternrelationsfragmentcontracts
   architecturecomparisonprojection -->|depends-on| patternrelationsprojectionsupport
   architecturecomparisonprojection -.->|uses| patternrelationsprojectionsupport
+  architecturediagram -->|depends-on| blockschema
+  architecturediagram -.->|uses| blockschema
   architecturediagram ==>|enables| documentationcompositionprojectionsupport
   architecturediagramprojection -->|depends-on| documentationcompositionprojectionsupport
   architecturediagramprojection -.->|uses| documentationcompositionprojectionsupport
   architecturediagramprojection -->|depends-on| projectionfragmentcontracts
   architecturediagramprojection -.->|uses| projectionfragmentcontracts
+  architectureneighborhood ==>|enables| architectureneighborhoodprojection
+  architectureneighborhoodprojection -->|depends-on| architectureneighborhood
+  architectureneighborhoodprojection -.->|uses| architectureneighborhood
   architectureneighborhoodprojection -->|depends-on| patternrelationsfragmentcontracts
   architectureneighborhoodprojection -.->|uses| patternrelationsfragmentcontracts
   architectureneighborhoodprojection -->|depends-on| patternrelationsprojectionsupport
   architectureneighborhoodprojection -.->|uses| patternrelationsprojectionsupport
+  blockschema ==>|enables| architecturediagram
+  blockschema ==>|enables| decisionrecord
+  blockschema ==>|enables| documentationcompositionsupporting
+  blockschema ==>|enables| markdownrenderer
+  blockschema ==>|enables| operationalinsightssupporting
+  blockschema ==>|enables| prchangereview
+  blockschema ==>|enables| uirenderer
   boundedcontextfragmentcontract ==>|enables| boundedcontextprojection
   boundedcontextprojection -->|depends-on| boundedcontextfragmentcontract
   boundedcontextprojection -.->|uses| boundedcontextfragmentcontract
@@ -358,10 +374,18 @@ graph TD
   cliversionhelper ==>|enables| patterngraphcli
   codecutils ==>|enables| lintengine
   codecutils ==>|enables| validatepatternscli
+  compacttextrenderer -->|depends-on| fragmentrendererdispatch
+  compacttextrenderer -.->|uses| fragmentrendererdispatch
+  compacttextrenderer -->|depends-on| projectionfragmentschema
+  compacttextrenderer -.->|uses| projectionfragmentschema
   decisioncatalogprojection -->|depends-on| governanceprojectionsupport
   decisioncatalogprojection -.->|uses| governanceprojectionsupport
   decisioncatalogprojection -->|depends-on| projectionfragmentcontracts
   decisioncatalogprojection -.->|uses| projectionfragmentcontracts
+  decisionrecord -->|depends-on| blockschema
+  decisionrecord -.->|uses| blockschema
+  deliverable ==>|enables| patternrelationssupporting
+  deliverablemanifest ==>|enables| patternrelationssupporting
   deliverableprojection -->|depends-on| executioncontextprojectionsupport
   deliverableprojection -.->|uses| executioncontextprojectionsupport
   deliverableprojection -->|depends-on| projectionfragmentcontracts
@@ -374,10 +398,19 @@ graph TD
   deliveryreportingprojectionsupport ==>|enables| roadmaptimelineprojection
   deliveryreportingprojectionsupport ==>|enables| statusdistributionprojection
   deliveryreportingprojectionsupport ==>|enables| traceabilitymatrixprojection
+  dependencyedge ==>|enables| dependencyedgeprojection
+  dependencyedgeprojection -->|depends-on| dependencyedge
+  dependencyedgeprojection -.->|uses| dependencyedge
+  dependencyedgeprojection -->|depends-on| dependencyedgeset
+  dependencyedgeprojection -.->|uses| dependencyedgeset
   dependencyedgeprojection -->|depends-on| patternrelationsfragmentcontracts
   dependencyedgeprojection -.->|uses| patternrelationsfragmentcontracts
   dependencyedgeprojection -->|depends-on| patternrelationsprojectionsupport
   dependencyedgeprojection -.->|uses| patternrelationsprojectionsupport
+  dependencyedgeset ==>|enables| dependencyedgeprojection
+  dependencytree ==>|enables| dependencytreeprojection
+  dependencytreeprojection -->|depends-on| dependencytree
+  dependencytreeprojection -.->|uses| dependencytree
   dependencytreeprojection -->|depends-on| patternrelationsfragmentcontracts
   dependencytreeprojection -.->|uses| patternrelationsfragmentcontracts
   dependencytreeprojection -->|depends-on| patternrelationsprojectionsupport
@@ -409,6 +442,8 @@ graph TD
   documentationcompositionprojectionsupport ==>|enables| projectconfigprojection
   documentationcompositionprojectionsupport -->|depends-on| projectconfigsnapshot
   documentationcompositionprojectionsupport -.->|uses| projectconfigsnapshot
+  documentationcompositionsupporting -->|depends-on| blockschema
+  documentationcompositionsupporting -.->|uses| blockschema
   dodvalidationtypes ==>|enables| antipatterndetector
   dodvalidationtypes ==>|enables| dodvalidator
   dodvalidator -->|depends-on| dodvalidationtypes
@@ -428,6 +463,11 @@ graph TD
   filereadinglistprojection -.->|uses| executioncontextprojectionsupport
   filereadinglistprojection -->|depends-on| projectionfragmentcontracts
   filereadinglistprojection -.->|uses| projectionfragmentcontracts
+  fragmentrendererdispatch ==>|enables| compacttextrenderer
+  fragmentrendererdispatch ==>|enables| markdownrenderer
+  fragmentrendererdispatch -->|depends-on| projectionfragmentschema
+  fragmentrendererdispatch -.->|uses| projectionfragmentschema
+  fragmentrendererdispatch ==>|enables| uirenderer
   fsmstates ==>|enables| fsmvalidator
   fsmtransitions ==>|enables| fsmvalidator
   fsmvalidator ==>|enables| deriveprocessstate
@@ -460,6 +500,8 @@ graph TD
   handoffprojection -.->|uses| executioncontextprojectionsupport
   handoffprojection -->|depends-on| projectionfragmentcontracts
   handoffprojection -.->|uses| projectionfragmentcontracts
+  jsonrenderer -->|depends-on| projectionfragmentschema
+  jsonrenderer -.->|uses| projectionfragmentschema
   lintengine -->|depends-on| codecutils
   lintengine -.->|uses| codecutils
   lintengine ==>|enables| lintmodule
@@ -481,6 +523,12 @@ graph TD
   lintrules ==>|enables| lintengine
   lintrules ==>|enables| lintmodule
   lintrules ==>|enables| lintpatternscli
+  markdownrenderer -->|depends-on| blockschema
+  markdownrenderer -.->|uses| blockschema
+  markdownrenderer -->|depends-on| fragmentrendererdispatch
+  markdownrenderer -.->|uses| fragmentrendererdispatch
+  markdownrenderer -->|depends-on| projectionfragmentschema
+  markdownrenderer -.->|uses| projectionfragmentschema
   mcpfilewatcher -->|depends-on| mcppipelinesession
   mcpfilewatcher ==>|enables| mcppipelinesession
   mcpfilewatcher -.->|uses| mcppipelinesession
@@ -519,6 +567,11 @@ graph TD
   operationalinsightsprojectionsupport ==>|enables| roleprofileprojection
   operationalinsightsprojectionsupport ==>|enables| sourceinventoryprojection
   operationalinsightsprojectionsupport ==>|enables| tagusageprojection
+  operationalinsightssupporting -->|depends-on| blockschema
+  operationalinsightssupporting -.->|uses| blockschema
+  orphanpatternlist ==>|enables| orphanpatternlistprojection
+  orphanpatternlistprojection -->|depends-on| orphanpatternlist
+  orphanpatternlistprojection -.->|uses| orphanpatternlist
   orphanpatternlistprojection -->|depends-on| patternrelationsfragmentcontracts
   orphanpatternlistprojection -.->|uses| patternrelationsfragmentcontracts
   orphanpatternlistprojection -->|depends-on| patternrelationsprojectionsupport
@@ -529,10 +582,16 @@ graph TD
   patternbundleprojection -.->|uses| patternrelationsfragmentcontracts
   patternbundleprojection -->|depends-on| patternrelationsprojectionsupport
   patternbundleprojection -.->|uses| patternrelationsprojectionsupport
+  patterncatalog ==>|enables| patterncatalogprojection
+  patterncatalogprojection -->|depends-on| patterncatalog
+  patterncatalogprojection -.->|uses| patterncatalog
   patterncatalogprojection -->|depends-on| patternrelationsfragmentcontracts
   patterncatalogprojection -.->|uses| patternrelationsfragmentcontracts
   patterncatalogprojection -->|depends-on| patternrelationsprojectionsupport
   patterncatalogprojection -.->|uses| patternrelationsprojectionsupport
+  patterndetail ==>|enables| patterndetailprojection
+  patterndetailprojection -->|depends-on| patterndetail
+  patterndetailprojection -.->|uses| patterndetail
   patterndetailprojection -->|depends-on| patternrelationsfragmentcontracts
   patterndetailprojection -.->|uses| patternrelationsfragmentcontracts
   patterndetailprojection -->|depends-on| patternrelationsprojectionsupport
@@ -568,18 +627,27 @@ graph TD
   patternrelationsprojectionsupport -->|depends-on| patternrelationsfragmentcontracts
   patternrelationsprojectionsupport -.->|uses| patternrelationsfragmentcontracts
   patternrelationsprojectionsupport ==>|enables| patternsummaryprojection
+  patternrelationssupporting -->|depends-on| deliverable
+  patternrelationssupporting -.->|uses| deliverable
+  patternrelationssupporting -->|depends-on| deliverablemanifest
+  patternrelationssupporting -.->|uses| deliverablemanifest
   patternscanner ==>|enables| buildpipeline
   patternscanner ==>|enables| lintpatternscli
   patternscanner ==>|enables| validatepatternscli
+  patternsummary ==>|enables| patternsummaryprojection
   patternsummaryprojection -->|depends-on| patternrelationsfragmentcontracts
   patternsummaryprojection -.->|uses| patternrelationsfragmentcontracts
   patternsummaryprojection -->|depends-on| patternrelationsprojectionsupport
   patternsummaryprojection -.->|uses| patternrelationsprojectionsupport
+  patternsummaryprojection -->|depends-on| patternsummary
+  patternsummaryprojection -.->|uses| patternsummary
   pdr005processguardfsm -->|depends-on| adr001taxonomycanonicalvalues
   pdr005processguardfsm -.->|uses| adr001taxonomycanonicalvalues
   pdr005processguardfsm ==>|enables| adr007coordinatedtaxonomyredesign
   phaseprogressprojection -->|depends-on| deliveryreportingprojectionsupport
   phaseprogressprojection -.->|uses| deliveryreportingprojectionsupport
+  prchangereview -->|depends-on| blockschema
+  prchangereview -.->|uses| blockschema
   prchangereview ==>|enables| documentationcompositionprojectionsupport
   prchangereviewprojection -->|depends-on| documentationcompositionprojectionsupport
   prchangereviewprojection -.->|uses| documentationcompositionprojectionsupport
@@ -624,6 +692,11 @@ graph TD
   projectionfragmentcontracts ==>|enables| sessioncontextprojection
   projectionfragmentcontracts ==>|enables| taxonomydigestprojection
   projectionfragmentcontracts ==>|enables| validationruledigestprojection
+  projectionfragmentschema ==>|enables| compacttextrenderer
+  projectionfragmentschema ==>|enables| fragmentrendererdispatch
+  projectionfragmentschema ==>|enables| jsonrenderer
+  projectionfragmentschema ==>|enables| markdownrenderer
+  projectionfragmentschema ==>|enables| uirenderer
   releasenotesprojection -->|depends-on| deliveryreportingprojectionsupport
   releasenotesprojection -.->|uses| deliveryreportingprojectionsupport
   requirementdigestprojection -->|depends-on| operationalinsightsprojectionsupport
@@ -659,6 +732,12 @@ graph TD
   taxonomydigestprojection -.->|uses| projectionfragmentcontracts
   traceabilitymatrixprojection -->|depends-on| deliveryreportingprojectionsupport
   traceabilitymatrixprojection -.->|uses| deliveryreportingprojectionsupport
+  uirenderer -->|depends-on| blockschema
+  uirenderer -.->|uses| blockschema
+  uirenderer -->|depends-on| fragmentrendererdispatch
+  uirenderer -.->|uses| fragmentrendererdispatch
+  uirenderer -->|depends-on| projectionfragmentschema
+  uirenderer -.->|uses| projectionfragmentschema
   validatepatternscli -->|depends-on| codecutils
   validatepatternscli -.->|uses| codecutils
   validatepatternscli -->|depends-on| docextractor
@@ -712,6 +791,7 @@ graph TD
 - ArchitectureNeighborhood
 - ArchitectureNeighborhoodProjection
 - AstParser
+- BlockSchema
 - BoundedContextFragmentContract
 - BoundedContextProjection
 - BuildPipeline

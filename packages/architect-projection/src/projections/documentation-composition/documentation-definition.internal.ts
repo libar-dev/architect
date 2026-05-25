@@ -41,9 +41,11 @@ export type DocumentationDefinition = Readonly<
 >;
 
 const DOCUMENTATION_PROJECTIONS = {
-  architecture: (context) => projectSingle(buildArchitectureDiagram(context, { scope: 'component' })),
+  architecture: (context) =>
+    projectSingle(buildArchitectureDiagram(context, { scope: 'component' })),
   decisions: (context) => projectDecisionCatalog(context),
-  'business-rules': (context) => projectBusinessRuleSet(context, { scope: 'all', groupedBy: 'package' }),
+  'business-rules': (context) =>
+    projectBusinessRuleSet(context, { scope: 'all', groupedBy: 'package' }),
   patterns: (context) => projectPatternCatalog(context),
   roadmap: (context) => projectRoadmapTimeline(context),
   'current-work': (context) => projectCurrentWork(context),
@@ -55,7 +57,9 @@ const DOCUMENTATION_PROJECTIONS = {
   traceability: (context) => projectTraceabilityMatrix(context),
 } satisfies Record<SupportedDocumentationType, DocumentationProjectionFactory>;
 
-function freezeDocumentationDefinition(definition: DocumentationDefinition): DocumentationDefinition {
+function freezeDocumentationDefinition(
+  definition: DocumentationDefinition,
+): DocumentationDefinition {
   Object.freeze(definition.generatorAliases);
   Object.freeze(definition.disclosureMatrix);
   return Object.freeze(definition);

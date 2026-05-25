@@ -4,7 +4,7 @@
 
 | Field | Value |
 | ----- | ----- |
-| Count | 237   |
+| Count | 238   |
 
 ## Filters
 
@@ -38,6 +38,7 @@
 - ArchitectureNeighborhood
 - ArchitectureNeighborhoodProjection
 - AstParser
+- BlockSchema
 - BoundedContextFragmentContract
 - BoundedContextProjection
 - BuildPipeline
@@ -280,6 +281,7 @@
 | packages/architect-projection/src/fragments/pattern-relations/architecture-neighborhood.ts                           | design     | ArchitectureNeighborhood                              | contract   | typescript | active    |
 | packages/architect-projection/src/projections/pattern-relations/architecture-neighborhood.ts                         | executable | ArchitectureNeighborhoodProjection                    | projection | typescript | completed |
 | packages/architect-core/src/scanner/ast-parser.ts                                                                    | design     | AstParser                                             | service    | typescript | active    |
+| packages/architect-projection/src/blocks/schema.ts                                                                   | design     | BlockSchema                                           | contract   | typescript | active    |
 | packages/architect-projection/src/fragments/pattern-relations/architecture-context.ts                                | design     | BoundedContextFragmentContract                        | contract   | typescript | active    |
 | packages/architect-projection/src/projections/pattern-relations/architecture-context.ts                              | executable | BoundedContextProjection                              | projection | typescript | completed |
 | packages/architect-core/src/generators/pipeline/build-pipeline.ts                                                    | executable | BuildPipeline                                         | service    | typescript | completed |

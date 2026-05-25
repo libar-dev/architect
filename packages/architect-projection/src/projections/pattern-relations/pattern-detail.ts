@@ -3,7 +3,7 @@
  * @architect-pattern PatternDetailProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses PatternRelationsProjectionSupport, PatternRelationsFragmentContracts
+ * @architect-uses PatternRelationsProjectionSupport, PatternRelationsFragmentContracts, PatternDetail
  * @architect-bounded-context:projection
  *
  * ## Pattern detail projection

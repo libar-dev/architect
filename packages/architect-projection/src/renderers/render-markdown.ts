@@ -4,6 +4,7 @@
  * @architect-status completed
  * @architect-role:codec
  * @architect-bounded-context:rendering
+ * @architect-uses FragmentRendererDispatch, ProjectionFragmentSchema, BlockSchema
  *
  * Renders fragments into GitHub-flavored Markdown documents for generated docs.
  * Normalizers map fragment contracts to block sections, then handle frontmatter,

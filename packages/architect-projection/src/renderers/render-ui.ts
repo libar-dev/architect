@@ -4,6 +4,7 @@
  * @architect-status completed
  * @architect-role:codec
  * @architect-bounded-context:rendering
+ * @architect-uses FragmentRendererDispatch, ProjectionFragmentSchema, BlockSchema
  *
  * Renders fragments into UiDocument blocks consumed by the Studio desktop UI.
  * It preserves block-level structure, rewrites child links to bundle anchors,

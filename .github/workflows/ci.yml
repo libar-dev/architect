@@ -23,11 +23,16 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
+      - run: pnpm format:check
       - run: pnpm lint
       - run: pnpm typecheck
+      - run: pnpm typecheck:dogfood
       - run: pnpm test
+      - run: pnpm test:dogfood
       - run: pnpm validate:all
       - run: pnpm docs:all
+      # docs-live/ is committed; docs:all must regenerate it byte-identically.
+      - run: git diff --exit-code docs-live
       - run: pnpm architect:query -- arch dangling --baseline packages/architect-guard/src/lint/dangling-baseline.json --strict
       - run: pnpm --filter @libar-dev/architect-projection test:perf
       - run: pnpm audit:subtractive

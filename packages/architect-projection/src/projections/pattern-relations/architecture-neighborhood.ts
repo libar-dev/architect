@@ -3,7 +3,7 @@
  * @architect-pattern ArchitectureNeighborhoodProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses PatternRelationsProjectionSupport, PatternRelationsFragmentContracts
+ * @architect-uses PatternRelationsProjectionSupport, PatternRelationsFragmentContracts, ArchitectureNeighborhood
  * @architect-bounded-context:projection
  *
  * ## Architecture neighborhood projection

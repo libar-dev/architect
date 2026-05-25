@@ -32,10 +32,7 @@ import {
   type SupportedDocumentationTypeMetadata,
 } from '@libar-dev/architect-projection';
 import { createPublishedEntries, upsertGeneratedDocsManifest } from './generated-docs-manifest.js';
-import {
-  readCliPackageMetadata,
-  resolveCliBaseDirArg,
-} from './runtime-helpers.js';
+import { readCliPackageMetadata, resolveCliBaseDirArg } from './runtime-helpers.js';
 import { createCliProjectionContext } from './projection-context.js';
 import { handleCliError } from './error-handler.js';
 
