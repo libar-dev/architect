@@ -99,7 +99,14 @@ const flatSummaryDisclosureMatrix = disclosureMatrix({
   advanced: disclosureSpec('flat', 'summary', false, true),
 });
 
-export const architectureDisclosureMatrix = flatSummaryDisclosureMatrix;
+// Architecture emits its lens child docs (package-seam, layered) at every level — the
+// root component view stays a flat summary, but the bundle children are always routed out.
+export const architectureDisclosureMatrix = disclosureMatrix({
+  essential: disclosureSpec('flat', 'summary', true, true),
+  important: disclosureSpec('flat', 'summary', true, true),
+  useful: disclosureSpec('flat', 'summary', true, true),
+  advanced: disclosureSpec('flat', 'summary', true, true),
+});
 
 export const decisionsDisclosureMatrix = disclosureMatrix({
   essential: disclosureSpec('flat', 'name-only', false, true),

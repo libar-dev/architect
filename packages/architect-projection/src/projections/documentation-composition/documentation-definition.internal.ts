@@ -2,7 +2,7 @@
  * @architect-bounded-context:documentation-composition
  */
 import type { ProjectionContext } from '../../context/projection-context.js';
-import { projectSingle, type ProjectionBundle } from '../../fragments/base.js';
+import type { ProjectionBundle } from '../../fragments/base.js';
 import type { Fragment } from '../../fragments/index.js';
 import { projectPatternCatalog } from '../pattern-relations/pattern-catalog.js';
 import {
@@ -19,7 +19,7 @@ import {
   projectRequirementSpecsDigest,
 } from '../operational-insights/index.js';
 
-import { buildArchitectureDiagram } from './architecture-diagram.internal.js';
+import { buildArchitectureBundle } from './architecture-diagram.js';
 import { DOCUMENTATION_TYPE_CLI_SURFACE } from './documentation-type-registry.cli-surface.js';
 import { DOCUMENTATION_TYPE_DISCLOSURE } from './documentation-type-registry.disclosure.js';
 import {
@@ -41,8 +41,7 @@ export type DocumentationDefinition = Readonly<
 >;
 
 const DOCUMENTATION_PROJECTIONS = {
-  architecture: (context) =>
-    projectSingle(buildArchitectureDiagram(context, { scope: 'component' })),
+  architecture: (context) => buildArchitectureBundle(context),
   decisions: (context) => projectDecisionCatalog(context),
   'business-rules': (context) =>
     projectBusinessRuleSet(context, { scope: 'all', groupedBy: 'package' }),

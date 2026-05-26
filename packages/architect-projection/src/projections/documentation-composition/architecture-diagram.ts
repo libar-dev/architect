@@ -42,6 +42,10 @@ import {
   buildArchitectureDiagram,
   type ProjectArchitectureDiagramOptions,
 } from './architecture-diagram.internal.js';
+import {
+  createArchitectureDocumentationRouting,
+  createArchitectureViewRouteId,
+} from './architecture-routes.js';
 import { parseAndProject } from '../_shared/parse-and-project.internal.js';
 
 export { ProjectArchitectureDiagramOptionsSchema } from './architecture-diagram.internal.js';
@@ -51,6 +55,43 @@ export function projectArchitectureDiagram(
   options: ProjectArchitectureDiagramOptions,
 ): ProjectionBundle<ArchitectureDiagram> {
   return projectSingle(buildArchitectureDiagram(context, options));
+}
+
+/**
+ * The architecture documentation tree: a component-view root plus one child doc per
+ * additional lens (package-seam, layered). A lens is emitted only when it actually has
+ * patterns, so a graph with no `@architect-layer` annotations does not produce an empty
+ * `architecture/layered.md`. Reuses the generic bundle-routing machinery — the registry's
+ * `childDirectory: 'architecture'` routes children to `architecture/<view>.md`.
+ */
+export function buildArchitectureBundle(
+  context: ProjectionContext,
+): ProjectionBundle<ArchitectureDiagram> {
+  const root = buildArchitectureDiagram(context, { scope: 'component' });
+
+  const lenses: ReadonlyArray<{ readonly view: string; readonly scope: 'package' | 'layered' }> = [
+    { view: 'package-seam', scope: 'package' },
+    { view: 'layered', scope: 'layered' },
+  ];
+
+  const children: Record<string, ArchitectureDiagram> = {};
+  for (const lens of lenses) {
+    const diagram = buildArchitectureDiagram(context, { scope: lens.scope });
+    if (diagram.patterns.length === 0) {
+      continue;
+    }
+    children[createArchitectureViewRouteId(lens.view)] = diagram;
+  }
+
+  if (Object.keys(children).length === 0) {
+    return projectSingle(root);
+  }
+
+  return {
+    root,
+    children,
+    routing: createArchitectureDocumentationRouting(Object.keys(children)),
+  };
 }
 
 export const parseAndProjectArchitectureDiagram = parseAndProject(

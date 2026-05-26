@@ -562,7 +562,10 @@ function normalizeFragment(
   return dispatchByKind(fragment, MARKDOWN_NORMALIZERS, normalizeGenericFragment, normalizeOptions);
 }
 
-function normalizeArchitectureDiagram(fragment: ArchitectureDiagram): MarkdownDocument {
+function normalizeArchitectureDiagram(
+  fragment: ArchitectureDiagram,
+  options: NormalizeMarkdownOptions,
+): MarkdownDocument {
   const metadata = resolveFragmentMetadata(fragment);
   const scopeLabel = humanizeKey(fragment.scope);
   const scopeDescription =
@@ -576,8 +579,28 @@ function normalizeArchitectureDiagram(fragment: ArchitectureDiagram): MarkdownDo
     paragraph(
       `This view captures ${String(fragment.patterns.length)} ${fragment.patterns.length === 1 ? 'pattern' : 'patterns'} across ${String(diagramCount)} ${diagramCount === 1 ? 'diagram' : 'diagrams'} in the ${scopeDescription}`,
     ),
-    heading(2, 'Diagrams'),
   ];
+
+  // Bundle child lenses (package-seam, layered) — the route id's view segment is a
+  // renderer-authored slug; the link structure is trusted, the label humanized from it.
+  const relatedViewLinks = options.childRoutes
+    .map((route) => {
+      const link = toSafeRoutedMarkdownLink(
+        humanizeKey(route.key.split(':').slice(1).join('-')),
+        route.path,
+      );
+      return link === null ? null : trustedMarkdown(link);
+    })
+    .filter((entry): entry is TrustedMarkdownText => entry !== null);
+  if (relatedViewLinks.length > 0) {
+    blocks.push(heading(2, 'Related views'), {
+      type: 'list',
+      ordered: false,
+      items: relatedViewLinks,
+    });
+  }
+
+  blocks.push(heading(2, 'Diagrams'));
 
   for (const section of fragment.sections) {
     // section.title is SOURCED group/scope data (bounded-context / package / role / layer

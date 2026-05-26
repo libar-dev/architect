@@ -9,6 +9,11 @@
 
 This view captures 161 patterns across 23 diagrams in the Component architecture view.
 
+## Related views
+
+- [Layered](architecture/layered.md)
+- [Package Seam](architecture/package-seam.md)
+
 ## Diagrams
 
 ### Context Map

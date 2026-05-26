@@ -25,6 +25,20 @@
           "role": "root",
           "audience": "published",
           "tracking": "commit"
+        },
+        {
+          "path": "architecture/layered.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "ARCHITECTURE.md"
+        },
+        {
+          "path": "architecture/package-seam.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "ARCHITECTURE.md"
         }
       ],
       "documentType": "architecture"

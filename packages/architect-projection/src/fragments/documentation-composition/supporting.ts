@@ -26,6 +26,7 @@ export const ArchitectureDiagramScopeSchema = z.enum([
   'layered',
   'bounded-context',
   'product-area',
+  'package',
 ]);
 
 export type DocumentationSection = z.infer<typeof DocumentationSectionSchema>;

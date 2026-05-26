@@ -12,6 +12,7 @@ type DocumentationTypeOutputRouting = Readonly<{
 export const DOCUMENTATION_TYPE_OUTPUT_ROUTING = {
   architecture: {
     markdownRootTarget: 'ARCHITECTURE.md',
+    childDirectory: 'architecture',
   },
   decisions: {
     markdownRootTarget: 'DECISIONS.md',

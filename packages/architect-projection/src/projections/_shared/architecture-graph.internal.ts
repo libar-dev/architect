@@ -221,6 +221,9 @@ function filterPatternsForArchitecture(
 
   switch (options.scope) {
     case 'component':
+    case 'package':
+      // Package scope spans every pattern (like component); the package grouping is
+      // applied later by buildGroups(nodes, 'package') when sections are assembled.
       return patterns;
     case 'layered':
       return patterns.filter((pattern) => hasText(pattern.adrLayer));

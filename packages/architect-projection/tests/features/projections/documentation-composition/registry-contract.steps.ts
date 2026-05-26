@@ -46,7 +46,7 @@ const expectedMarkdownRootTargets = {
 } as const satisfies Record<SupportedDocumentationType, string>;
 
 const expectedChildDirectoryLayout = {
-  architecture: { childDirectory: null, entityPathLayout: null },
+  architecture: { childDirectory: 'architecture', entityPathLayout: null },
   decisions: { childDirectory: 'decisions', entityPathLayout: null },
   'business-rules': { childDirectory: 'business-rules', entityPathLayout: null },
   patterns: { childDirectory: 'patterns', entityPathLayout: null },
