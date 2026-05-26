@@ -473,6 +473,16 @@ Most-depended-on patterns in this view, ranked by in-view dependant count.
 | ExecutionContextProjectionSupport    | 5          | DeliverableProjection, FileReadingListProjection, HandoffProjection, ScopeReadinessProjection, SessionContextProjection                                |
 | ProjectionFragmentSchema             | 5          | CompactTextRenderer, FragmentRendererDispatch, JsonRenderer, MarkdownRenderer, UiRenderer                                                              |
 
+## Cross-package bounded contexts
+
+Bounded contexts whose patterns span more than one workspace package.
+
+| Bounded context | Packages                                      | Patterns |
+| --------------- | --------------------------------------------- | -------- |
+| cli             | Architect CLI, Architect Guard, Architect MCP | 6        |
+| rendering       | Architect Core, Architect Projection          | 7        |
+| validation      | Architect Core, Architect Guard               | 8        |
+
 ## Legend
 
 ### Legend

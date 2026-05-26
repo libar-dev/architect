@@ -614,6 +614,22 @@ function normalizeArchitectureDiagram(fragment: ArchitectureDiagram): MarkdownDo
     );
   }
 
+  if (fragment.crossPackageContexts !== undefined && fragment.crossPackageContexts.length > 0) {
+    // Context / package names are SOURCED → the plain `table` block escapes every cell.
+    blocks.push(
+      heading(2, 'Cross-package bounded contexts'),
+      paragraph('Bounded contexts whose patterns span more than one workspace package.'),
+      table(
+        ['Bounded context', 'Packages', 'Patterns'],
+        fragment.crossPackageContexts.map((entry) => [
+          entry.context,
+          entry.packages.join(', '),
+          String(entry.patternCount),
+        ]),
+      ),
+    );
+  }
+
   if (fragment.legend !== undefined && fragment.legend.length > 0) {
     blocks.push(heading(2, 'Legend'), ...fragment.legend.map(trustAuthoredBlock));
   }

@@ -20,6 +20,7 @@ import { ProjectionError } from '../errors.js';
 import type {
   ArchitectureDiagram,
   ArchitectureDiagramSection,
+  CrossPackageContextEntry,
   FanInEntry,
 } from '../../fragments/documentation-composition/index.js';
 import {
@@ -86,6 +87,7 @@ export function buildArchitectureDiagram(
   const patterns = nodes.map((node) => node.name);
   const edges = collectArchitectureEdges(context, nodes);
   const fanIn = buildFanIn(context, nodes);
+  const crossPackageContexts = buildCrossPackageContexts(nodes);
 
   return {
     kind: 'ArchitectureDiagram',
@@ -97,8 +99,38 @@ export function buildArchitectureDiagram(
       list(['Solid arrow = dependency (depends-on / uses)', 'Dotted line = reference (see-also)']),
     ],
     ...(fanIn.length > 0 ? { fanIn } : {}),
+    ...(crossPackageContexts.length > 0 ? { crossPackageContexts } : {}),
     patterns,
   };
+}
+
+/**
+ * Detect bounded contexts whose in-view patterns resolve to more than one workspace
+ * package — seams where a single context is implemented across package boundaries.
+ * Sorted by descending package spread then context name for deterministic output.
+ */
+function buildCrossPackageContexts(nodes: readonly NodeShape[]): CrossPackageContextEntry[] {
+  const byContext = new Map<string, { readonly packages: Set<string>; count: number }>();
+  for (const node of nodes) {
+    if (node.archContext === undefined) {
+      continue;
+    }
+    const entry = byContext.get(node.archContext) ?? { packages: new Set<string>(), count: 0 };
+    entry.packages.add(node.packageLabel);
+    entry.count += 1;
+    byContext.set(node.archContext, entry);
+  }
+  return [...byContext.entries()]
+    .filter(([, value]) => value.packages.size >= 2)
+    .map(([context, value]) => ({
+      context,
+      packages: [...value.packages].sort((left, right) => left.localeCompare(right)),
+      patternCount: value.count,
+    }))
+    .sort(
+      (left, right) =>
+        right.packages.length - left.packages.length || left.context.localeCompare(right.context),
+    );
 }
 
 const FAN_IN_LIMIT = 10;

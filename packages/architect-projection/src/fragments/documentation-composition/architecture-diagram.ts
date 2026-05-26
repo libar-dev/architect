@@ -41,6 +41,16 @@ export const FanInEntrySchema = z.strictObject({
   topConsumers: z.array(z.string()),
 });
 
+/**
+ * One bounded context whose member patterns resolve to more than one workspace
+ * package — a seam where a single context is implemented across package boundaries.
+ */
+export const CrossPackageContextEntrySchema = z.strictObject({
+  context: z.string(),
+  packages: z.array(z.string()),
+  patternCount: z.number().int().nonnegative(),
+});
+
 export const ArchitectureDiagramSchema = z.strictObject({
   kind: z.literal('ArchitectureDiagram'),
   scope: ArchitectureDiagramScopeSchema,
@@ -48,9 +58,11 @@ export const ArchitectureDiagramSchema = z.strictObject({
   sections: z.array(ArchitectureDiagramSectionSchema),
   legend: z.array(BlockSchema).optional(),
   fanIn: z.array(FanInEntrySchema).optional(),
+  crossPackageContexts: z.array(CrossPackageContextEntrySchema).optional(),
   patterns: z.array(z.string()),
 });
 
 export type ArchitectureDiagramSection = z.infer<typeof ArchitectureDiagramSectionSchema>;
 export type FanInEntry = z.infer<typeof FanInEntrySchema>;
+export type CrossPackageContextEntry = z.infer<typeof CrossPackageContextEntrySchema>;
 export type ArchitectureDiagram = z.infer<typeof ArchitectureDiagramSchema>;

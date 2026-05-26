@@ -929,6 +929,70 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
     },
   );
 
+  Rule(
+    'The architecture view flags bounded contexts that span multiple packages',
+    ({ RuleScenario }) => {
+      RuleScenario(
+        'cross-package contexts list the packages a context spans',
+        ({ Given, When, Then, And }) => {
+          Given(
+            'an architecture context with one bounded context split across two packages',
+            () => {
+              state!.context = createProjectionContext({
+                patterns: [
+                  createPattern('SharedOne', {
+                    status: 'active',
+                    role: 'service',
+                    archContext: 'shared',
+                    file: 'packages/architect-core/src/shared-one.ts',
+                  }),
+                  createPattern('SharedTwo', {
+                    status: 'active',
+                    role: 'service',
+                    archContext: 'shared',
+                    file: 'packages/architect-cli/src/shared-two.ts',
+                  }),
+                  createPattern('SoloOne', {
+                    status: 'active',
+                    role: 'service',
+                    archContext: 'solo',
+                    file: 'packages/architect-core/src/solo-one.ts',
+                  }),
+                ],
+              });
+            },
+          );
+
+          When('I project the component architecture diagram', () => {
+            state!.architectureDiagrams['component'] = parseAndProjectArchitectureDiagram(
+              state!.context!,
+              { scope: 'component' },
+            );
+          });
+
+          Then(
+            'the cross-package list should include the spanning context with its packages',
+            () => {
+              const crossPackage =
+                state!.architectureDiagrams['component']!.root.crossPackageContexts;
+              expect(crossPackage).toContainEqual({
+                context: 'shared',
+                packages: ['architect-cli', 'architect-core'],
+                patternCount: 2,
+              });
+            },
+          );
+
+          And('a context confined to a single package is not flagged', () => {
+            const crossPackage =
+              state!.architectureDiagrams['component']!.root.crossPackageContexts ?? [];
+            expect(crossPackage.map((entry) => entry.context)).not.toContain('solo');
+          });
+        },
+      );
+    },
+  );
+
   Rule('Per-group detail diagrams draw only forward dependency edges', ({ RuleScenario }) => {
     RuleScenario(
       'a detail diagram collapses co-directional edges and drops the reverse enablement',

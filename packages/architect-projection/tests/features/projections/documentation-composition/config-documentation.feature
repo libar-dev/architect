@@ -204,6 +204,26 @@ Feature: Documentation Composition projection bodies
       Then the fan-in list should rank the hub pattern first with its in-view dependant count
       And patterns with no in-view dependants are omitted from fan-in
 
+  Rule: The architecture view flags bounded contexts that span multiple packages
+
+    **Invariant:** The architecture fragment lists every bounded context whose in-view
+    patterns resolve to two or more workspace packages, with the sorted package set and
+    pattern count; a context confined to a single package is omitted.
+
+    **Rationale:** A bounded context implemented across package seams is an architectural
+    signal (intentional shared kernel or accidental coupling) that the per-group diagrams,
+    grouped by context, cannot surface.
+
+    **Verified by:** projecting a component view with one context split across two packages
+    and one confined to a single package, asserting only the former is flagged with its
+    package set.
+
+    Scenario: cross-package contexts list the packages a context spans
+      Given an architecture context with one bounded context split across two packages
+      When I project the component architecture diagram
+      Then the cross-package list should include the spanning context with its packages
+      And a context confined to a single package is not flagged
+
   Rule: Per-group detail diagrams draw only forward dependency edges
 
     **Invariant:** A per-group detail diagram collapses the `depends-on` and

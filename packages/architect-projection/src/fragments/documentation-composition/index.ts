@@ -1,11 +1,13 @@
 export {
   ArchitectureDiagramSchema,
   ArchitectureDiagramSectionSchema,
+  CrossPackageContextEntrySchema,
   FanInEntrySchema,
 } from './architecture-diagram.js';
 export type {
   ArchitectureDiagram,
   ArchitectureDiagramSection,
+  CrossPackageContextEntry,
   FanInEntry,
 } from './architecture-diagram.js';
 export { PrChangeReviewSchema } from './pr-change-review.js';
