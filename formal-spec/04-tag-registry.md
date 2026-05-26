@@ -30,7 +30,7 @@ Tags that establish a pattern's identity within the project.
 | `@architect`          | flag   | Gates extraction — file must have this tag to be processed                                                                                                      | MUST (all)                          | (no value)                                                |
 | `@architect-pattern`  | value  | Unique pattern name in PascalCase                                                                                                                               | MUST (specs, ADRs, stubs)           | `UserRegistration`, `ADR004Lifecycle`                     |
 | `@architect-status`   | enum   | Current FSM delivery state                                                                                                                                      | MUST (all)                          | `candidate`, `roadmap`, `active`, `completed`, `deferred` |
-| `@architect-maturity` | enum   | Spec refinement level (idea → plan → design → executable). Discriminates idea-tier specs (`idea`) from plan-tier (`plan`) within `@architect-status:candidate`. | OPTIONAL (auto-defaults via status) | `idea`, `plan`, `design`, `executable`                    |
+| `@architect-maturity` | enum   | Consideration-vs-delivery track and refinement level (`idea` = consideration/exploration, `plan` = committed/delivery, then `design`/`executable`). | **Required (explicit) at the idea tier; derived from status otherwise** | `idea`, `plan`, `design`, `executable`                    |
 
 ### Pattern Naming Rules
 
@@ -314,11 +314,12 @@ Tags used by ProcessGuard (§09) for lifecycle management.
 
 The v0.2.0 canonical authored tag count is **~22 tags + the `@architect` gate + 3
 aggregation tags ≈ 26 total** (the exact count depends on whether `@architect-maturity`
-is treated as authored — it is auto-defaulted from `@architect-status`).
+is treated as authored — it is authored explicitly at the idea tier and auto-defaulted
+from `@architect-status` elsewhere).
 
 | Group               | v0.2.0 Canonical | v0.2.0 Tags                                                                            |
 | ------------------- | ---------------- | -------------------------------------------------------------------------------------- |
-| Core Identity       | 4                | gate, pattern, status, maturity (auto-defaulted)                                       |
+| Core Identity       | 4                | gate, pattern, status, maturity (explicit at idea tier, else auto-defaulted)           |
 | Classification      | 4                | product-area, bounded-context, arch-layer, role                                        |
 | Relationships       | 4                | uses, implements, extends, see-also                                                    |
 | ADR                 | 7                | adr, adr-status, adr-category, adr-theme, adr-layer, adr-supersedes, adr-superseded-by |
@@ -344,16 +345,23 @@ is treated as authored — it is auto-defaulted from `@architect-status`).
 
 ## Status → Maturity Defaults
 
-`@architect-maturity` is **optional**: when omitted from a spec, conforming implementations
-MUST infer it from `@architect-status` via the canonical mapping below. This contract — the
-`DEFAULT_MATURITY_BY_STATUS` table — is the **authoritative source** consulted by:
+`@architect-maturity` is **derived from `@architect-status` by default**: when omitted,
+conforming implementations MUST infer it from the canonical mapping below. **The idea
+tier is the exception** and authors `@architect-maturity:idea` explicitly because that is
+the guard's idea-tier discriminator. Promoting an idea to the candidate tier drops that
+explicit tag; maturity then derives to `idea` from `status:candidate`, so the candidate
+tier remains on the consideration track until the acceptance gate advances status to
+`roadmap` and maturity derives to `plan`. This contract — the
+`DEFAULT_MATURITY_BY_STATUS` table — is the
+**authoritative source** consulted by:
 
 - the reference implementation's `_gherkin` extraction helpers (e.g.
   `effective_maturity()` in plugin graders),
-- the tier-shape validators that gate idea-tier vs candidate-tier vs design-tier checks,
-- any tooling that needs to discriminate "≤30 line idea" from "30-80 line candidate"
-  from full design specs without requiring an explicit `@architect-maturity` tag on every
-  file.
+- the tier-shape validators that gate idea- vs candidate- vs plan- vs design-tier checks
+  (idea-tier gating additionally requires the explicit `@architect-maturity:idea`
+  discriminator),
+- any tooling that needs to discriminate plan-/design-/executable-tier shapes from status
+  alone — the idea tier additionally requires the explicit `@architect-maturity:idea` tag.
 
 ### `DEFAULT_MATURITY_BY_STATUS`
 
@@ -370,24 +378,34 @@ MUST infer it from `@architect-status` via the canonical mapping below. This con
 1. **Explicit always wins.** If a spec declares `@architect-maturity:<value>`, that value
    is the effective maturity regardless of status.
 2. **Fall back to status.** If `@architect-maturity` is absent, look up
-   `DEFAULT_MATURITY_BY_STATUS[<status>]`. The result is the effective maturity for tier
-   gating.
+   `DEFAULT_MATURITY_BY_STATUS[<status>]`. The result is the effective maturity for
+   plan/design/executable tier gating. **Idea-tier gating is the exception** (see
+   Conformance): a status-derived `idea` does *not* make a spec idea-tier — only the
+   explicit `@architect-maturity:idea` tag does.
 3. **Unknown status.** If the status is not in the table (custom enum extension, unknown
    value), the effective maturity is undefined — implementations SHOULD treat the spec as
    un-gated (do not auto-promote into a stricter tier check) and SHOULD warn.
-4. **Promotion.** When promoting a candidate spec past `idea`, either set
-   `@architect-status` to advance past `candidate` (so the default no longer resolves to
-   `idea`) or set `@architect-maturity` explicitly. The grader contract for
-   candidate-tier specs (e.g. `grade_candidate_tier.py`) accepts either signal —
-   "explicit `@architect-maturity:plan|design|executable`" OR "status advanced past
-   `candidate` so `DEFAULT_MATURITY_BY_STATUS` no longer auto-defaults to `idea`".
+4. **Promotion.** Promoting idea → candidate drops the explicit
+   `@architect-maturity:idea` while leaving `@architect-status:candidate`; maturity
+   derives to `idea` and the spec leaves idea-tier gating because the explicit opt-in is
+   gone. Delivery commitment arrives at the acceptance gate, when status advances to
+   `roadmap` and maturity derives to `plan`. An explicit `@architect-maturity:plan` at
+   candidate status means "delivery-committed pre-roadmap," not the candidate refinement
+   tier.
 
 ### Conformance
 
 - A conforming extractor MUST expose both `explicit_maturity` and `effective_maturity` for
   every spec, where the effective value is computed via the resolution rules above.
-- Tier validators MUST consult effective maturity, not explicit maturity, so that
-  un-tagged specs are still gated against the correct tier shape.
+- Tier validators MUST consult effective maturity (not just explicit maturity) for the
+  candidate / plan / design / executable tiers, so that un-tagged specs are still gated
+  against the correct tier shape. **The idea tier is the exception:** because `@architect-status:candidate`
+  is shared by the idea tier *and* the candidate tier (and `DEFAULT_MATURITY_BY_STATUS` resolves
+  every `candidate` spec to `idea`), the idea-tier validator MUST key on the **explicit**
+  `@architect-maturity:idea` tag. A `candidate`-status spec without that explicit tag is **not**
+  gated as idea-tier — it escapes the idea-tier shape checks, which is the deliberate behavior
+  that prevents candidate-tier specs (and legacy specs that carry no explicit maturity) from
+  being misclassified as idea-tier.
 - The mapping table is **stable across v0.2.x**. New status values added in future minor
   versions extend the table; existing rows are not renumbered or remapped.
 

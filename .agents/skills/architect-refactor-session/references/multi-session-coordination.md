@@ -23,11 +23,33 @@ scope-discovery rule below.
   surface — the lone `DECISIONS.md` + the scope-discovery rule are
   enough; the folder layout is overhead.
 
-The six universal rules from
-[`./session-preamble.md`](./session-preamble.md) are the floor for
-every session in any campaign. This file adds the package layout, the
-templates, and the campaign-specific discipline (coordinator split,
-scope-discovery handling) on top.
+## The campaign rules (beyond the universal three)
+
+The three universal session rules — **Data API first**, **gates
+non-negotiable**, **commit hygiene** — are the floor for every session
+(stated in [`../../architect-sessions/SKILL.md`](../../architect-sessions/SKILL.md)
+§"Universal session rules"). A campaign adds three more, which the
+sections below operationalize:
+
+4. **Decisions captured before code.** Anything needing human judgment
+   goes to `DECISIONS.md` (template below) *before* the edit that
+   depends on it. Without this separation, agents fabricate answers
+   under pressure.
+5. **Incomplete scope is next-session input, not silent debt.** When
+   investigation surfaces drift mid-session, stop and classify
+   (same-root-cause → fix inline + record; different-root-cause →
+   defer + record). Never land a surface-only commit. See
+   "Scope-discovery handling" below — the single most-reused heuristic
+   across multi-session work.
+6. **Per-session learnings propagate forward.** After each session the
+   coordinator appends one tight entry to the learnings log and
+   rewrites the unstarted prompts' "Scope discipline" sections with
+   newly-discovered rules. Preambles are calibrated against real
+   surprises, not boilerplate.
+
+This file adds the package layout, the templates, and the
+campaign-specific discipline (coordinator split, scope-discovery
+handling) on top of those six.
 
 ## Folder layout — `.pr-coordination/`
 
@@ -192,14 +214,14 @@ inline-vs-defer before continuing.
 
 ## Sibling references
 
-- [`./session-preamble.md`](./session-preamble.md) — six universal
-  rules every session preamble pins (gates, commits, decisions,
-  scope-discovery, learnings propagation, Data API first).
-- [`./canonical-references.md`](./canonical-references.md) —
-  anti-anecdote rule. The templates above are deliberately abstract;
+- [`../../architect-sessions/SKILL.md`](../../architect-sessions/SKILL.md)
+  §"Universal session rules" — the three universal rules (Data API
+  first, gates, commit hygiene) that the campaign rules above build on.
+- [`../../architect-base/SKILL.md`](../../architect-base/SKILL.md)
+  §"Anti-anecdote" — the templates above are deliberately abstract;
   past campaign artifacts are anecdote, useful for understanding why
   the rule exists but not authoritative for what the rule is.
-- [`./four-tier-ladder.md`](./four-tier-ladder.md) — the refactoring
-  carve-out (skip directly to design or executable tier when
-  backfilling coverage for already-shipped code) is one of the
-  scope-discovery patterns this file's Rule 5 anticipates.
+- [`../../architect-base/references/four-tier-ladder.md`](../../architect-base/references/four-tier-ladder.md)
+  — the refactoring carve-out (skip directly to design or executable
+  tier when backfilling coverage for already-shipped code) is one of
+  the scope-discovery patterns Rule 5 anticipates.

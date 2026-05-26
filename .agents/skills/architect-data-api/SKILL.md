@@ -222,7 +222,7 @@ Every CLI verb has an MCP twin. Names map by snake-casing the CLI form and prefi
 | (no CLI twin)       | `architect_config`            |
 | (no CLI twin)       | `architect_help`              |
 
-Source of truth: `packages/architect-mcp/src/tool-registry.ts`. Current inventory: **21 MCP tools**.
+Source of truth: `packages/architect-mcp/src/tool-registry.ts` — read it for the current tool set and count; the mapping above teaches the snake_case rule, it is not a live inventory.
 
 CLI-only carve-outs (no MCP twin today): `arch roles`, `arch bounded-context`, `arch compare`, `arch dangling`, `arch orphans`, `diagnostics`, `tags`, `sources`, `unannotated`, `repl`, the `query <method>` passthrough whitelist.
 
@@ -254,10 +254,10 @@ This loop is intentionally tighter than a typical API contract because the codeb
 
 ## Doctrine cross-references
 
-- [`../_shared/fsm-transitions.md`](../_shared/fsm-transitions.md) — what `scope-validate` checklist entries and `query isValidTransition` outputs mean against the FSM table; `@architect-unlock-reason:` rules.
-- [`../_shared/four-tier-ladder.md`](../_shared/four-tier-ladder.md) — why idea / candidate / plan have no `scope-validate` target.
-- [`../_shared/value-transfer.md`](../_shared/value-transfer.md) — the manual pre-deletion gate the future `value-transfer` verb will mechanize.
-- [`../_shared/canonical-references.md`](../_shared/canonical-references.md) — anti-anecdote rule: the live CLI output is canonical; older skill bodies paraphrasing it are not.
+- [`../architect-base/references/fsm-transitions.md`](../architect-base/references/fsm-transitions.md) — what `scope-validate` checklist entries and `query isValidTransition` outputs mean against the FSM table; `@architect-unlock-reason:` rules.
+- [`../architect-base/references/four-tier-ladder.md`](../architect-base/references/four-tier-ladder.md) — why idea / candidate / plan have no `scope-validate` target.
+- [`../architect-sessions/references/ephemeral-spec-deletion.md`](../architect-sessions/references/ephemeral-spec-deletion.md) — the manual pre-deletion gate the future `value-transfer` verb will mechanize.
+- [`../architect-base/SKILL.md`](../architect-base/SKILL.md) §"Anti-anecdote" — the live CLI output is canonical; older skill bodies paraphrasing it are not (the same instinct as "API surprises are signal" above).
 
 ## Provenance
 

@@ -33,13 +33,18 @@ A feature spec file has this structure, from top to bottom:
 The tag header block appears before the `Feature:` keyword. Tags follow the ordering
 convention defined in §03.
 
-**Level 1 minimum (candidate):**
+**Level 1 minimum (candidate tier — the baseline five):**
 
 ```gherkin
 @architect
 @architect-pattern:UserRegistration
 @architect-status:candidate
+@architect-product-area:<area>
+@architect-parent:<EpicName>
 ```
+
+(The idea tier adds explicit `@architect-maturity:idea`; the candidate tier drops it and
+derives maturity to `idea` from `status:candidate`.)
 
 **Level 1 minimum (accepted):**
 

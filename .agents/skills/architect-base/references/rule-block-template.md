@@ -1,9 +1,9 @@
 # Rule-Block Template (canonical reference)
 
-Shared reference for the structured `Rule:` block convention used in
-both design specs and executable Gherkin. Linked from
-`architect-design-session`, `architect-implement-spec`,
-`architect-plan-session`, and `architect-review-spec`.
+Reference for the structured `Rule:` block convention used in
+both design specs and executable Gherkin. Used by the
+`architect-sessions` plan, design, implement, and review-spec
+references and by `architect-refactor-session`.
 
 ## Rule blocks are OPTIONAL
 
@@ -66,8 +66,8 @@ For the full tier table see
 
 - [`./four-tier-ladder.md`](./four-tier-ladder.md) — tier table for
   when to add `**Rationale:**` + `**Verified by:**`.
-- [`./canonical-references.md`](./canonical-references.md) —
-  self-containment and anti-anecdote rules.
+- [`../SKILL.md`](../SKILL.md) §"Anti-anecdote" — the live graph/CLI
+  is canonical; a stale skill paraphrase is not.
 
 ## Provenance (informational)
 

@@ -106,15 +106,27 @@ Briefs are NOT processed by the extraction pipeline and are NOT part of the patt
 **Purpose:** Capture a feature idea cheaply — ≤30 lines (warn-only soft budget — there is no minimum) — so creating, splitting,
 combining, and discarding ideas is as low-friction as writing a brief
 
-The idea tier is **not** a separate maturity level — it is the lightest shape of a
-Level 1 Candidate spec, distinguished by the `@architect-maturity:idea` value rather than
-a different status. A spec at idea tier already lives in the pattern graph (visible,
-queryable) but carries minimum viable structure.
+The idea tier is **not** a separate status — both the idea and candidate tiers sit at
+`@architect-status:candidate`. The idea tier authors explicit `@architect-maturity:idea`
+as the guard discriminator; the candidate tier drops that explicit tag and derives
+`idea` from `status:candidate`, so both remain on the consideration track. A spec at
+idea tier already lives in the pattern graph (visible, queryable) but carries minimum
+viable structure.
 
-**Discriminator:** Idea-tier specs have `@architect-status:candidate` plus
-`@architect-maturity:idea`. The maturity value MAY be auto-defaulted by the toolchain
-from `status:candidate` (the reference implementation maps `candidate → idea` via
-`DEFAULT_MATURITY_BY_STATUS`), but explicit authoring is preferred for clarity.
+**Discriminator:** Idea-tier specs have `@architect-status:candidate` plus an
+**explicit** `@architect-maturity:idea`. This explicit tag is the idea-tier
+discriminator: the Process Guard's idea-tier checks key on it, and an
+`architect/specs/ideas/` file that omits it is **not** classified as idea-tier —
+it silently escapes idea-tier validation. `status:candidate` alone is
+insufficient, because the candidate tier shares that status (and legacy specs may
+carry no explicit maturity at all). The
+PatternGraph separately auto-defaults `candidate → idea` via
+`DEFAULT_MATURITY_BY_STATUS`, so the maturity field is always populated for
+queries — but that projection default does **not** substitute for the authored
+discriminator the guard requires. (On promotion to candidate tier the explicit
+`@architect-maturity:idea` is **dropped** — see "Promotion: Idea → Candidate" below —
+which is what carries the spec past idea-tier gating; maturity then derives to `idea`
+from `status:candidate`, and status stays `candidate`.)
 
 **Six-tag minimum:**
 
@@ -123,7 +135,7 @@ from `status:candidate` (the reference implementation maps `candidate → idea` 
 | `@architect`              | Gate (extraction opt-in)                         |
 | `@architect-pattern`      | PascalCase pattern name                          |
 | `@architect-status`       | `candidate`                                      |
-| `@architect-maturity`     | `idea` (explicit, or auto-defaulted from status) |
+| `@architect-maturity`     | `idea` — authored explicitly (the idea-tier discriminator) |
 | `@architect-product-area` | Product area grouping                            |
 | `@architect-parent`       | Parent epic — every idea belongs to an epic      |
 
@@ -181,14 +193,15 @@ Feature: <PatternName> - <one-line purpose>
 
 #### Promotion: Idea → Candidate
 
-Promoting an idea-tier spec to a full Level 1 Candidate spec adds:
+Promoting an idea-tier spec to the candidate tier (Level 1) adds:
 
 - An `**Open Questions:**` block listing unresolved questions
 - 1–2 `Scenario:` blocks tagged `@acceptance-criteria @happy-path`
-- Bumps `@architect-maturity:idea` → `@architect-maturity:plan` (status stays `candidate`
-  until the acceptance gate further promotes to `roadmap`)
-- Optionally moves the file from `architect/specs/ideas/` to `architect/specs/candidates/`
-  (or keeps it in place — the maturity tag is the source of truth)
+- Drops the explicit `@architect-maturity:idea`; maturity derives to `idea` from
+  `status:candidate` — still consideration — and status stays `candidate` until the
+  acceptance gate further promotes to `roadmap`
+- Moves the file from `architect/specs/ideas/` to `architect/specs/candidates/`
+  (the explicit idea-tier maturity tag is what the guard keys on)
 
 The same file evolves; the idea-tier spec is the seed of the candidate. From candidate onward,
 the existing acceptance gate (below) governs promotion to plan-level.
@@ -196,8 +209,9 @@ the existing acceptance gate (below) governs promotion to plan-level.
 ### Level 1: Candidate Spec
 
 **Format:** Gherkin `.feature`
-**Location:** `architect/specs/<group>/<feature-name>.feature`
+**Location:** `architect/specs/candidates/<feature-name>.feature`
 **Status:** `@architect-status:candidate`
+**Maturity:** derives to `idea` (consideration) by default — normally no explicit tag; an explicit value still wins (§04, e.g. `:plan` = delivery track)
 **Purpose:** Explore and refine a feature idea in structured Gherkin format
 
 Candidate specs are **proposals under refinement**. They use Gherkin syntax so they're
@@ -209,7 +223,7 @@ accepted plan-level specs.
 | Aspect               | Candidate                                             | Plan-Level (Accepted)                   |
 | -------------------- | ----------------------------------------------------- | --------------------------------------- |
 | Status               | `candidate`                                           | `roadmap`                               |
-| Required tags        | Gate + pattern + status only                          | Full tag set (§03)                      |
+| Required tags        | Baseline five: gate, pattern, status, product-area, parent | Full tag set (§03)                      |
 | Deliverables table   | OPTIONAL                                              | MUST                                    |
 | Rule metadata        | Invariant RECOMMENDED, Rationale/Verified-by OPTIONAL | All three MUST                          |
 | Scenario tags        | OPTIONAL                                              | MUST (`@acceptance-criteria` + subtype) |
@@ -224,7 +238,7 @@ accepted plan-level specs.
 @architect-pattern:DarkModeTheme
 @architect-status:candidate
 @architect-product-area:Desktop
-@architect-bounded-context:desktop
+@architect-parent:DesktopExperience
 Feature: DarkModeTheme - System-aware dark/light theme toggle
 
   **Idea:** Users expect dark mode in desktop apps. Tailwind CSS 4 supports

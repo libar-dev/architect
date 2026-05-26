@@ -1,6 +1,6 @@
 ---
 name: architect-refactor-session
-description: MANDATORY when modifying shipped code WITHOUT a design-level Architect spec — triggers on "refactor", "rename", "extract", "inline", "consolidate", "split package", "move file", "tidy up", "clean up shipped code", or any change to production files for an Architect pattern whose status is `completed` and whose design spec has already been deleted. Operationalizes the kernel's refactoring carve-out — skip the four-tier ladder, evolve the existing executable feature in place (or create a `<Pattern>ExecutableTests` feature if none exists), preserve every documented invariant unless `.pr-coordination/DECISIONS.md` authorizes a change. Multi-session refactor campaigns (touching ≥3 packages) coordinate through `.pr-coordination/` per the canonical layout. Do NOT use for implementing a design-level spec (route to architect-implement-spec — refactor never authors a new plan-level spec for shipped code), bug fixes that restore a documented invariant (just patch + add scenario, no carve-out needed), or feature work that needs a fresh pattern (route to architect-plan-session). Invoke BEFORE any production-code edit on shipped patterns.
+description: MANDATORY when modifying shipped code WITHOUT a design-level Architect spec — triggers on "refactor", "rename", "extract", "inline", "consolidate", "split package", "move file", "tidy up", "clean up shipped code", or any change to production files for an Architect pattern whose status is `completed` and whose design spec has already been deleted. Operationalizes the kernel's refactoring carve-out — skip the four-tier ladder, evolve the existing executable feature in place (or create a `<Pattern>ExecutableTests` feature if none exists), preserve every documented invariant unless `.pr-coordination/DECISIONS.md` authorizes a change. Multi-session refactor campaigns (touching ≥3 packages) coordinate through `.pr-coordination/` per the canonical layout. Do NOT use for implementing a design-level spec (route to architect-sessions, implement reference — refactor never authors a new plan-level spec for shipped code), bug fixes that restore a documented invariant (just patch + add scenario, no carve-out needed), or feature work that needs a fresh pattern (route to architect-sessions, plan reference). Invoke BEFORE any production-code edit on shipped patterns.
 allowed-tools:
   - Bash
   - Read
@@ -28,43 +28,42 @@ design spec INTO durable carriers (executable Gherkin + annotations);
 a refactor session transfers value FROM existing durable carriers
 THROUGH the code edit AND BACK INTO the same carriers, possibly
 evolved. The pre-deletion gate from
-[`../_shared/value-transfer.md`](../_shared/value-transfer.md) does
+[`../architect-sessions/references/ephemeral-spec-deletion.md`](../architect-sessions/references/ephemeral-spec-deletion.md) does
 not apply — there is no spec to delete — but the **invariant carriers**
 still gate completion. Use the adapted gate below in §"Adapted
 invariant-carrier gate".
 
 ## Doctrine references
 
-- [`../_shared/session-preamble.md`](../_shared/session-preamble.md)
-  — six universal rules. Rule 5 (incomplete scope is next-session
-  input) is load-bearing: refactors concentrate the "scope expands
-  mid-session" risk more than any other session type.
-- [`../_shared/multi-session-coordination.md`](../_shared/multi-session-coordination.md)
-  — `.pr-coordination/` layout, coordinator/worker split, and the
-  scope-discovery rule. Required when the refactor touches ≥3
-  packages or spans ≥3 sessions.
-- [`../_shared/four-tier-ladder.md`](../_shared/four-tier-ladder.md)
+Load [`architect-base`](../architect-base/SKILL.md) (vocabulary) and [`architect-sessions`](../architect-sessions/SKILL.md) (the universal session rules + value-transfer concept) first; this skill builds on both. The depth this session leans on:
+
+- [`./references/multi-session-coordination.md`](./references/multi-session-coordination.md)
+  — `.pr-coordination/` layout, coordinator/worker split, the campaign
+  rules, and the scope-discovery rule (Rule 5 — load-bearing: refactors
+  concentrate the "scope expands mid-session" risk more than any other
+  session type). Required when the refactor touches ≥3 packages or
+  spans ≥3 sessions.
+- [`../architect-base/references/four-tier-ladder.md`](../architect-base/references/four-tier-ladder.md)
   — refactoring carve-out: skip idea / candidate / plan tiers. Never
   author a retroactive spec for shipped code.
-- [`../_shared/spec-pattern-relationships.md`](../_shared/spec-pattern-relationships.md)
+- [`../architect-base/references/spec-pattern-relationships.md`](../architect-base/references/spec-pattern-relationships.md)
   — `<Pattern>ExecutableTests` is the formal escape hatch when shipped
-  code lacks a `tests/features/<pattern>.feature`. Bipartite naming
-  applies.
-- [`../_shared/annotation-ownership.md`](../_shared/annotation-ownership.md)
+  code lacks a `tests/features/<pattern>.feature`. Bipartite naming applies.
+- [`../architect-base/references/annotation-ownership.md`](../architect-base/references/annotation-ownership.md)
   — split-ownership policy: production code MUST NOT add
   `@architect-pattern`. Add `@architect-uses` /
   `@architect-usecase` / `@architect-decision` /
   `@architect-role` / `@architect-bounded-context` as additive enrichment only.
-- [`../_shared/rule-block-template.md`](../_shared/rule-block-template.md)
+- [`../architect-base/references/rule-block-template.md`](../architect-base/references/rule-block-template.md)
   — 4-field `Rule:` template (`**Invariant:**` / `**Rationale:**` /
   `**Verified by:**`) for any new or modified Rule block in the
   executable feature.
-- [`../_shared/value-transfer.md`](../_shared/value-transfer.md) —
-  invariant-carrier rules and anti-patterns (zombie spec,
+- [`../architect-sessions/references/ephemeral-spec-deletion.md`](../architect-sessions/references/ephemeral-spec-deletion.md)
+  — invariant-carrier rules and anti-patterns (zombie spec,
   half-transferred value, retroactive plan-level spec). Skip §"Pre-deletion
   gate"; honor §"Anti-patterns".
-- [`../_shared/fsm-transitions.md`](../_shared/fsm-transitions.md) —
-  consult only when the refactor reopens a `completed` pattern
+- [`../architect-base/references/fsm-transitions.md`](../architect-base/references/fsm-transitions.md)
+  — consult only when the refactor reopens a `completed` pattern
   (`completed` → `active` requires `@architect-unlock-reason:` ≥10
   non-placeholder characters). Most refactors never change status.
 
@@ -73,17 +72,18 @@ invariant-carrier gate".
 `scope-validate` is intentionally absent — the verb only accepts
 `design` or `implement` and refactors have no spec to validate.
 
-Run the canonical refactor pre-flight from
-[`../architect-data-api/SKILL.md`](../architect-data-api/SKILL.md) §"Refactor"
-— it covers `overview`, `context --session implement` (current surface),
-`files` (touched-file inventory), `dep-tree` (blast radius), `arch blocking`,
-and `arch dangling --baseline ... --strict` (the graph-integrity gate used in
-the closing checks below).
+Run the pre-flight from
+[`../architect-data-api/SKILL.md`](../architect-data-api/SKILL.md) — for a
+refactor that means `overview`, `context --session implement` (current
+surface), `files` (touched-file inventory), `dep-tree` (blast radius),
+`arch blocking`, and `arch dangling --baseline ... --strict` (the
+graph-integrity gate used in the closing checks below).
 
 If `pnpm architect:query` returns no rows for the pattern (the pattern is
 unknown to the graph), stop. Either the pattern name is wrong, or the
 work is feature work disguised as refactor — route to
-`architect-plan-session`.
+[`architect-sessions`](../architect-sessions/SKILL.md) and its
+[`plan`](../architect-sessions/references/plan.md) reference.
 
 ## Refactor order (strict)
 
@@ -93,7 +93,7 @@ work is feature work disguised as refactor — route to
    If absent, create it as
    `tests/features/<area>/<pattern-kebab>-executable-tests.feature`
    per
-   [`../_shared/spec-pattern-relationships.md`](../_shared/spec-pattern-relationships.md);
+   [`../architect-base/references/spec-pattern-relationships.md`](../architect-base/references/spec-pattern-relationships.md);
    tag it with `@architect-pattern:<Pattern>ExecutableTests` and
    `@architect-implements:<Pattern>`. The new file is the durable
    artifact — never substitute a retroactive design-level spec.
@@ -111,14 +111,13 @@ work is feature work disguised as refactor — route to
    surface you changed, then run `pnpm typecheck` at the next phase
    boundary. Before any commit or handoff, run `pnpm typecheck &&
 pnpm test && pnpm validate:all`. Do not batch verification to the
-   end. Per
-   [`../_shared/session-preamble.md`](../_shared/session-preamble.md)
-   Rule 2, gates are non-negotiable.
+   end. Per [`architect-sessions`](../architect-sessions/SKILL.md)
+   §"Universal session rules", gates are non-negotiable.
 5. **Update executable Gherkin in lockstep with code.** Every changed
    behavior must surface as a new or edited Scenario; every changed
    invariant must surface in the corresponding Rule block carrying
    the full 4-field content from
-   [`../_shared/rule-block-template.md`](../_shared/rule-block-template.md).
+   [`../architect-base/references/rule-block-template.md`](../architect-base/references/rule-block-template.md).
    A previously-documented invariant that no longer holds requires a
    matching `DECISIONS.md` entry — no silent rewrites.
 6. **Refresh `@architect-*` annotations.** On every production file
@@ -129,12 +128,12 @@ pnpm test && pnpm validate:all`. Do not batch verification to the
    changed those semantics. Reverse edges derive from `@architect-uses`,
    they are not authored directly. Production code MUST NOT add
    `@architect-pattern` (per
-   [`../_shared/annotation-ownership.md`](../_shared/annotation-ownership.md)).
+   [`../architect-base/references/annotation-ownership.md`](../architect-base/references/annotation-ownership.md)).
 
 ## Adapted invariant-carrier gate
 
 The five criteria below replace the §"Pre-deletion gate" in
-[`../_shared/value-transfer.md`](../_shared/value-transfer.md). All
+[`../architect-sessions/references/ephemeral-spec-deletion.md`](../architect-sessions/references/ephemeral-spec-deletion.md). All
 five must hold before declaring the refactor done.
 
 1. **Executable feature present.** A file under `tests/features/`
@@ -169,7 +168,7 @@ remains in place.
 ## Multi-session campaign mode
 
 When `.pr-coordination/` carries an active campaign (per
-[`../_shared/multi-session-coordination.md`](../_shared/multi-session-coordination.md)):
+[`./references/multi-session-coordination.md`](./references/multi-session-coordination.md)):
 
 - Defer to `EXECUTION-PLAN.md` for ordering, gates, and closing
   invariants.
@@ -178,7 +177,8 @@ When `.pr-coordination/` carries an active campaign (per
 - Append a tight per-session entry to
   `SESSION-REPORTS-AND-LEARNINGS.md` at session end, including any
   drift surfaced and how it was classified (same-root-cause vs
-  different-root-cause per Rule 5 of the session preamble).
+  different-root-cause per Rule 5 in
+  [`./references/multi-session-coordination.md`](./references/multi-session-coordination.md)).
 - Do not edit `EXECUTION-PLAN.md`, `state.json`, or unstarted
   session prompts under `sessions/`. The coordinator owns those.
   Coordinator self-restraint is the load-bearing primitive — a
@@ -202,7 +202,7 @@ When `.pr-coordination/` carries an active campaign (per
 - **Pattern identity in code.** Adding `@architect-pattern` to a
   production-TS file. Pattern identity belongs to the feature file
   per
-  [`../_shared/annotation-ownership.md`](../_shared/annotation-ownership.md);
+  [`../architect-base/references/annotation-ownership.md`](../architect-base/references/annotation-ownership.md);
   refactor never moves it.
 - **Zombie executable feature.** Stripping every Scenario from a
   feature without removing the file. Either the pattern still ships
@@ -217,10 +217,11 @@ When `.pr-coordination/` carries an active campaign (per
 If the refactor surfaces a missing architectural decision (not just a
 clarification), stop. Do not paper over it with a quick edit and a
 silent invariant change. Report the gap to the user and recommend
-routing to `architect-plan-session` to author a NEW pattern for the
-emergent concern — never a retroactive pattern for the existing
-shipped code. Shipping an under-decided refactor is worse than
-re-opening the design conversation.
+routing to [`architect-sessions`](../architect-sessions/SKILL.md) and its
+[`plan`](../architect-sessions/references/plan.md) reference to author a
+NEW pattern for the emergent concern — never a retroactive pattern for
+the existing shipped code. Shipping an under-decided refactor is worse
+than re-opening the design conversation.
 
 ## Do not
 

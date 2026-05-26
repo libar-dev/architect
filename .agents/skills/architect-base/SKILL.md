@@ -40,7 +40,7 @@ The **canonical source of truth** is annotated production code + executable Gher
 | CLI              | `pnpm architect:query <verb>` (canonical script name across architect-managed repos)                             |
 | MCP              | `architect` server → `mcp__architect__*` callable tools                                                          |
 | Validation entry | `pnpm typecheck`, `pnpm test`, `pnpm validate:all`, `pnpm architect:guard --staged`                              |
-| Doc regeneration | `pnpm docs:all` → `docs-live/` (gitignored, derived)                                                             |
+| Doc regeneration | `pnpm docs:all` → `docs-live/` (git-tracked, derived — determinism-gate diff target)                                                             |
 
 When this package family is consumed by another project, the consumer wires their own `architect.config.ts` and exposes their own `architect:query` script — the contracts above are stable across architect-managed repos.
 
@@ -52,6 +52,7 @@ When this package family is consumed by another project, the consumer wires thei
 | ----------------------------- | ----------------------------------------------------------------------------------- | --------------------------------------------------------------- |
 | `architect/specs/ideas/`      | Idea-tier specs (lightest authored shape)                                           | Until promotion                                                 |
 | `architect/specs/candidates/` | Candidate-tier specs (open questions + 1-2 scenarios)                               | Until promotion                                                 |
+| `architect/slices/`           | Slice-tier multi-pattern lateral views (idea-tier structural variant; `@architect-level:slice`, no `@architect-parent`) | Reference                                                       |
 | `architect/specs/`            | Plan- and design-tier specs (deliverables + full scenarios + stubs)                 | **Until value transferred to executable Gherkin, then deleted** |
 | `architect/stubs/`            | Design-tier TS contract scaffolds (one folder per pattern)                          | Ephemeral                                                       |
 | `architect/step-stubs/`       | Design-tier stub step definitions                                                   | Ephemeral                                                       |
@@ -72,13 +73,16 @@ A **pattern** is a named architectural unit (a feature, service, component, cont
 **Tag taxonomy** (verify live via `pnpm architect:query taxonomy --format json`):
 
 - **Identity**: `@architect-pattern:<Name>` (one file owns identity)
-- **State**: `@architect-status:<candidate|roadmap|active|completed|deferred>`
+- **State**: `@architect-status:<candidate|roadmap|active|completed|deferred>`; `@architect-maturity` derives from status (idea=consideration, plan=delivery) and an explicit value wins (§04) — explicit is **required only at the idea tier** (`@architect-maturity:idea`, the guard's opt-in), dropped on promotion to candidate, derived elsewhere
 - **Structure**: `@architect-bounded-context:<context>`, `@architect-role:<closed-enum>`
+- **Product**: `@architect-product-area:<area>` (PRD grouping; **required** at idea tier)
 - **Edges**: `@architect-uses:<Pattern>` (dependency), `@architect-implements:<Pattern>` (realization, test → production), `@architect-parent:<Pattern>` (hierarchy)
 - **Hierarchy axis**: `@architect-level:<epic|phase|task|slice>` (independent of maturity)
 - **Implementation enrichment** (on production TS): `@architect-usecase`, `@architect-decision:<ADR>`, `@architect-target` (stub forward pointer)
 - **Forward link**: `@architect-executable-specs:<path>` (design spec → executable feature)
 - **Audit**: `@architect-unlock-reason:<reason>` (required for non-standard FSM transitions)
+
+> **Depth:** the categories above are the conceptual model. The three orthogonal classification axes (role · bounded-context · layer) and the csv-vs-colon authoring rules live in [`references/taxonomy.md`](references/taxonomy.md). The **complete enumerated set is generated, never hand-maintained** — query it live (`pnpm architect:query taxonomy --format json`) or read the generated `docs-live/TAXONOMY.md`. Those two are canonical; the categories here teach the shape, they do not enumerate it.
 
 **Instances** of patterns live in two surfaces:
 
@@ -107,9 +111,11 @@ A **pattern** is a named architectural unit (a feature, service, component, cont
 
 All of these are CI-enforced. Failing gates are stop-and-surface; never `--no-verify`.
 
-## 7. Key ADRs (load-bearing, decisions-only)
+## 7. Key decision records (load-bearing, decisions-only)
 
-These records carry _decisions_ and the rationale for them. They do not carry operational or temporal context (status, work-in-progress, ETAs). Read before changing anything in the relevant area.
+ADRs / PDRs in `architect/decisions/` are **permanent and decisions-only**. They record a *decision* + its rationale and **only durable, non-execution-related facts**. Operational or temporal context — status, work-in-progress, ETAs, who is doing what this week — **never** belongs here; that is the difference between a decision record and a worklog. Decisions are amended via a **new** ADR, never by editing the old one. Read the relevant record before changing anything in its area — through the Data API (`pnpm architect:query documentation decisions`, or `pattern ADR006SingleReadModelArchitecture`), never paraphrased from memory.
+
+The load-bearing set:
 
 - **ADR-003** — Source-First Pattern Architecture
 - **ADR-005** — Codec / Renderer Separation
@@ -117,7 +123,9 @@ These records carry _decisions_ and the rationale for them. They do not carry op
 - **ADR-007** — Coordinated Taxonomy Redesign
 - **ADR-009** — Projection Trust Boundary
 
-Decisions are amended via a new ADR, never by editing the old one.
+> **Not the same as a campaign `DECISIONS.md`.** `architect/decisions/` holds **durable** ADRs (permanent). A campaign's `.pr-coordination/DECISIONS.md` holds **ephemeral** judgment-calls for one active campaign (resolved-with-commit-sha, then archived). Both are called "decisions" but have opposite lifetimes — do not file durable architecture in the campaign log, or campaign bookkeeping in an ADR.
+>
+> **Depth:** [`references/decision-records.md`](references/decision-records.md).
 
 ## 8. Annotation ownership (operational)
 
@@ -133,6 +141,8 @@ A pattern is **identified** by exactly one surface — the feature file for beha
 
 Sampled completed patterns like `ConfigLoader` and `DefineConfig` carry zero JSDoc on the production source and are legitimately complete. A reviewer flagging "no annotations on `<file.ts>`" as a value-transfer blocker is mistaken.
 
+> **Depth:** the per-tag ownership tables (what feature files own vs what production TS owns) + the code-originated-identity rules live in [`references/annotation-ownership.md`](references/annotation-ownership.md).
+
 ## 9. Detail tiers and maturity levels
 
 There are **six** levels along the detail/maturity axis. Four are authored in `architect/specs/`; two are post-spec.
@@ -147,6 +157,8 @@ There are **six** levels along the detail/maturity axis. Four are authored in `a
 | Maintenance | Shipped code + its executable feature           | Evolves in place; scenarios grow as behavior grows                                       |
 
 **Promotion is linear**: `idea → candidate → plan → design → executable`. Skipping rungs is rejected EXCEPT for the **refactoring carve-out** — backfilling coverage for code that already ships skips directly to design or executable tier, using the `<Pattern>ExecutableTests` convention.
+
+> **Depth:** the per-tier line budgets, mandatory-tag sets, epic/slice variants, and worked promotion examples live in [`references/four-tier-ladder.md`](references/four-tier-ladder.md). The 4-field `Rule:` block convention (`Invariant` / `Rationale` / `Verified by`) and its per-tier field requirements live in [`references/rule-block-template.md`](references/rule-block-template.md).
 
 ## 10. The detail-level doctrine — CRITICAL, easy to get wrong
 
@@ -186,6 +198,8 @@ pnpm architect:query scope-validate <Pattern> design|implement
 pnpm architect:query query isValidTransition <from> <to>   # deterministic boolean
 ```
 
+> **Depth:** the process-guard transition table, the maturity-flip-vs-FSM distinction, and the `@architect-unlock-reason:` authoring rules live in [`references/fsm-transitions.md`](references/fsm-transitions.md).
+
 ## 12. Spec ↔ Pattern relationships (bipartite)
 
 Production patterns and test patterns are **two nodes** joined by `@architect-implements:`. A test feature carries two file-level tags:
@@ -202,6 +216,8 @@ Two sanctioned suffix conventions:
 
 The PatternGraph treats them identically; the suffix is human-facing.
 
+> **Depth:** the forward/reverse link pair, the `*ExecutableTests` escape-hatch authoring flow, and the hierarchy axis (`@architect-level` / `@architect-parent`) live in [`references/spec-pattern-relationships.md`](references/spec-pattern-relationships.md).
+
 ## 13. Value transfer and design-spec deletion (high level)
 
 Design-level specs are **scaffolds, not permanent documentation**. Once implementation completes, the spec's value moves to durable surfaces and the spec is deleted.
@@ -211,9 +227,11 @@ Durable carriers:
 - **Executable Gherkin** (canonical) — pattern identity, status, dependencies, invariants, scenarios that prove them.
 - **JSDoc `@architect-*` on production code** (additive) — rationale that doesn't fit in Gherkin, decisions, usecases, roles.
 
-**Pre-deletion gate (high level)**: forward link present + resolves; reverse link present; all Rule blocks with invariants have counterparts in the executable feature. Detailed criteria + the manual checklist live in the dedicated review-implementation skill.
+**Pre-deletion gate (high level)**: forward link present + resolves; reverse link present; all Rule blocks with invariants have counterparts in the executable feature.
 
 **Default**: ask the user before deleting. Deferring to code review for batched deletion across a related set is more common than delete-immediately.
+
+> **Depth:** the transfer checklist, the five-criterion pre-deletion gate, and deletion timing live in [`../architect-sessions/references/ephemeral-spec-deletion.md`](../architect-sessions/references/ephemeral-spec-deletion.md) — the central doctrine every session type should understand.
 
 ## 14. Data API — essentials
 
@@ -247,7 +265,7 @@ pnpm architect:query arch neighborhood <Pattern>
 pnpm architect:query taxonomy [--count] [--format json]
 ```
 
-**MCP twins** use snake_case end-to-end: `architect_overview`, `architect_scope_validate`, `architect_bundle`, etc. Source of truth: `packages/architect-mcp/src/tool-registry.ts`. Current inventory: 21 tools.
+**MCP twins** use snake_case end-to-end: `architect_overview`, `architect_scope_validate`, `architect_bundle`, etc. The canonical inventory is `packages/architect-mcp/src/tool-registry.ts` — read it for the current tool set rather than trusting a count cached here.
 
 **Quirks worth knowing now** (full list in the dedicated data-API skill):
 
@@ -271,13 +289,21 @@ pnpm architect:query bundle <Pattern> --mode <plan|design|implement|review> --fo
 
 The Data API is faster (2-5s cold CLI, sub-ms MCP) and more accurate than file scanning, and the output is the canonical signal — file scanning gives you snapshots that can lie.
 
-## 16. What this skill does NOT cover
+## 16. Anti-anecdote — the live graph wins
 
-This is the operational baseline. The following route to dedicated session skills (when available / restored):
+When a sample-derived finding (an old session-handoff note, a snapshot folder with a SHA suffix, an n=2 "we tried this twice" worklog, or a skill body that has drifted) appears to contradict the live state:
 
-- Detailed per-session workflows (idea capture, candidate promotion, design authoring, implementation, gap review, post-merge review, handoff)
-- Multi-session / PR coordination conventions for large campaigns
-- Full pre-deletion gate criteria (mechanical + manual)
-- Refactoring-specific carve-outs and the `<Pattern>ExecutableTests` escape-hatch authoring flow
+- **The live CLI / PatternGraph is canonical.** `pnpm architect:query` output reflects the graph as it is right now; a skill paraphrase reflects the graph as it was when written. When they disagree, the CLI wins.
+- **A sample is useful for *why*, not *what*.** It explains why a rule exists; it is not authoritative for what the rule currently is.
+- **Silence is provisional, not permission.** If the live state is silent on a question a sample answers, treat the sample's finding as provisional and flag it (`FEEDBACK.md`) rather than encoding it as doctrine.
 
-If a session needs one of those, escalate by loading the dedicated skill; do not paraphrase it from memory.
+This is the same instinct as `architect-data-api`'s "API surprises are signal" — surprises feed the loop, they do not override the source of truth.
+
+## 17. What this skill does NOT cover
+
+This is the operational baseline (vocabulary + doctrine). Depth lives in [`references/`](references/); execution lives in two dedicated skills:
+
+- **`architect-sessions`** — the spec-driven session lifecycle (idea/candidate authoring, design, implement, review-spec, review-implementation, handoff), each behind progressive disclosure. The detailed per-session workflows, the full pre-deletion gate, and the value-transfer execution detail are there.
+- **`architect-refactor-session`** — the non-spec-driven carve-out (evolving shipped code in place) and the multi-session / PR coordination conventions for large campaigns.
+
+If a session needs one of those, load the dedicated skill; do not paraphrase it from memory.

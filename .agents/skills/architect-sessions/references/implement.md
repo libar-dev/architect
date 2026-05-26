@@ -1,0 +1,64 @@
+# Implement — design spec → code
+
+The design-level `.feature` is your implementation prompt; the stubs encode shape decisions. Together they specify exactly what to build. This session ends with the spec's value living in production code + executable Gherkin; **deleting the design spec is a separate decision** (see "Deletion" below).
+
+**The spec IS the prompt — do not create a wrapper "context" or "session-prep" document.** If the design has a major gap that needs new architectural decisions (not just clarifications), stop and route back to [`design.md`](design.md) / [`review-spec.md`](review-spec.md) rather than papering over it.
+
+Doctrine depth: the value-transfer concept is in [`../SKILL.md`](../SKILL.md) §"The spec is a scaffold"; the **execution detail** (transfer checklist + pre-deletion gate) is [`ephemeral-spec-deletion.md`](ephemeral-spec-deletion.md). Split-ownership (production code MUST NOT carry `@architect-pattern`; JSDoc is additive) is [`../../architect-base/references/annotation-ownership.md`](../../architect-base/references/annotation-ownership.md); the bipartite naming + forward/reverse link pair is [`../../architect-base/references/spec-pattern-relationships.md`](../../architect-base/references/spec-pattern-relationships.md); the FSM table + `@architect-unlock-reason:` rules are [`../../architect-base/references/fsm-transitions.md`](../../architect-base/references/fsm-transitions.md).
+
+## Pre-flight
+
+Run the pre-flight from [`../../architect-data-api/SKILL.md`](../../architect-data-api/SKILL.md): `overview`, the `scope-validate <Pattern> implement` gate, the implement-mode `bundle`, `files`, `rules --only-invariants`, and the `query isValidTransition` FSM gate.
+
+If `scope-validate <pattern> implement` is not PASS, **stop**: either the design is incomplete (→ [`design.md`](design.md)) or a dependency is blocked (→ [`review-spec.md`](review-spec.md) to find the blocker).
+
+## Implementation order (strict)
+
+1. **Transition FSM to `active` before any code change.** Verify first: `pnpm architect:query query isValidTransition <currentState> active` — proceed only on a confirming verdict. Then bump `@architect-status` `roadmap` → `active` in the spec. Unusual transitions need `@architect-unlock-reason:` (the FSM reference).
+2. **Read all deliverable target files** listed in the spec's `Background:` table.
+3. **Read the stubs** — they encode design decisions (DD-N) and "When to Use" guidance.
+4. **Implement deliverables in the order listed**, guided by Rules + Scenarios.
+5. **After each deliverable:** run the closest targeted typecheck/test slice for the files you touched, then `pnpm typecheck` before the next phase boundary. Before any commit or handoff: `pnpm typecheck && pnpm test && pnpm validate:all`. Do not batch verification to the end.
+6. **Author / refine executable Gherkin** under `tests/features/` as you go — transfer the design Scenarios with `**Invariant:** / **Rationale:** / **Verified by:**` blocks intact. Enumerate what must land with `pnpm architect:query rules --pattern <pattern> --only-invariants`.
+7. **Add `@architect-*` JSDoc** to every production file you create or modify — at minimum `@architect-implements:<Pattern>` (the realization edge). Production code MUST NOT carry `@architect-pattern` (identity is the feature file's). Add `@architect-uses` / `@architect-usecase` / `@architect-decision` / `@architect-role` / `@architect-bounded-context` as additive enrichment. `@architect-uses` is one comma-separated line — extend it, never add a second line. Reverse edges derive; never author them.
+8. **When ALL deliverables complete:** transition the spec to `completed`, regenerate docs, then run the value-transfer-and-delete step below.
+
+## Value transfer (verify before deletion)
+
+Walk the five-criterion **pre-deletion gate** in [`ephemeral-spec-deletion.md`](ephemeral-spec-deletion.md) (forward link present + resolves; reverse link present; rich content landed; architecturally significant rationale in JSDoc where Gherkin can't carry it). When the `pnpm architect:query value-transfer <pattern>` verb ships it returns the same gate as a deterministic `deletionReady` — until then, walk it manually. Every line of the design spec that won't transfer is dead weight — either it transfers, or it was never worth writing.
+
+## Deletion (ask the user first)
+
+Two valid outcomes; **default: ask which applies.**
+
+- **Delete now** — when this session reviewed the value transfer thoroughly and the pattern is the only one in scope.
+- **Defer to code review** (more common) — when several related implementations are reviewed together; the reviewer batches deletions via [`review-implementation.md`](review-implementation.md).
+
+Phrase it like: "Value transfer is verified for `<Pattern>`. Delete the design spec now, or defer to code review where related implementations are batched (the more common path)?"
+
+If the user authorizes deletion now:
+
+```bash
+git rm architect/specs/<pattern>.feature      # delete the design spec
+git rm -r architect/stubs/<pattern>/          # if a stubs directory exists
+pnpm architect:query overview                 # confirm the pattern shows completed
+pnpm docs:all                                 # regenerate docs
+```
+
+If the user defers: leave the spec + stubs in place, and name [`review-implementation.md`](review-implementation.md) as the next step in your handoff. If you *cannot* transfer value because something still depends on the spec, that is a **zombie spec** smell — investigate; either the dependency is wrong or the spec is doing something durable it shouldn't.
+
+## Anti-patterns (stop and redirect)
+
+- **Wrapper documents.** The spec is the prompt; do not create a parallel context markdown.
+- **Retroactive specs at any tier.** Discovering code that already implements the pattern → tag an existing executable feature with `@architect-implements:<Pattern>` and enrich it; never author a fresh idea/candidate/plan/design spec for shipped behavior (refactoring carve-out: skip to design/executable, never via plan).
+- **Zombie design specs.** Leaving the design spec after implementation is a lie at worst, noise at best.
+- **Half-transferred value.** Rules to executable specs but not to annotations (or vice versa) where both should carry weight.
+- **Backward-compat shims.** No `@deprecated`, `// eslint-disable`, `@ts-expect-error`, or re-export aliases — the No-BC guard fails CI.
+
+## Do not
+
+- Do not skip the FSM transition to `active` before coding.
+- Do not delay annotations to a follow-up PR — they are part of the implementation.
+- Do not declare done without value transfer (+ deletion, or an explicit deferral).
+
+**Next session:** if deletion was deferred, [`review-implementation.md`](review-implementation.md) verifies value transfer and batches the deletion. Otherwise capture state with [`handoff.md`](handoff.md).

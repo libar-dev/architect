@@ -13,7 +13,7 @@ A candidate spec — an idea being explored, not yet accepted into the delivery 
 @architect-pattern:DarkModeTheme
 @architect-status:candidate
 @architect-product-area:Desktop
-@architect-bounded-context:desktop
+@architect-parent:DesktopExperience
 Feature: DarkModeTheme - System-aware dark/light theme toggle
 
   **Idea:** Users expect dark mode in desktop apps. Tailwind CSS 4 supports
@@ -42,7 +42,8 @@ Feature: DarkModeTheme - System-aware dark/light theme toggle
 **What this demonstrates:**
 
 - `@architect-status:candidate` — not yet accepted
-- Reduced tag requirements (no phase, effort, priority, release)
+- No explicit `@architect-maturity` — candidate maturity derives to `idea` from `status:candidate`
+- Candidate baseline only — no plan-level tags (role, bounded-context, relationships) until acceptance
 - `**Open Questions:**` section — unresolved issues that must be answered before acceptance
 - Scenarios without `@acceptance-criteria` tags (optional for candidates)
 - No deliverables table (optional for candidates)

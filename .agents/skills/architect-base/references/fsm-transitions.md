@@ -1,9 +1,10 @@
 # FSM Transitions (canonical reference)
 
-Shared reference for the Architect PatternGraph's status transitions
-and the `@architect-unlock-reason:` audit-trail requirement. Linked
-from `architect-implement-spec`, `architect-verify-handoff`, and the
-session-router skill (where transitions surface in the bootstrap).
+Reference for the Architect PatternGraph's status transitions
+and the `@architect-unlock-reason:` audit-trail requirement. The
+`architect-sessions` implement and handoff references rely on this
+table, and the `scope-validate` / `query isValidTransition` verdicts
+in `architect-data-api` resolve against it.
 
 The kernel splits "transitions" into two categories that are easy to
 conflate:
@@ -49,8 +50,9 @@ candidate ──► roadmap                      (acceptance gate cleared during
 
 This flip is performed by the spec author at the moment the
 `@architect-status` tag is bumped from `candidate` to `roadmap` —
-typically in `architect-plan-session` when promoting a candidate to the
-plan tier. It is NOT validated by Process Guard's transition rules
+typically during plan-tier authoring (the `architect-sessions` plan
+reference) when promoting a candidate to the plan tier. It is NOT
+validated by Process Guard's transition rules
 (Process Guard's table starts at `roadmap`). The acceptance gate is
 human judgment plus the four-tier-ladder shape requirements; see
 [`./four-tier-ladder.md`](./four-tier-ladder.md) § "Valid promotion paths".
@@ -103,5 +105,6 @@ live with `pnpm architect:query query isValidTransition roadmap active`;
 verify the FSM behavior live with `pnpm architect:query scope-validate <pattern>
 <session>`. No external doc dependency.
 
-See also [`./canonical-references.md`](./canonical-references.md) for
-the kernel's self-containment and anti-anecdote rules.
+See [`../SKILL.md`](../SKILL.md) §"Anti-anecdote" — when a sampled
+finding contradicts this table, the live CLI (`query isValidTransition`)
+wins, not the sample.

@@ -1,9 +1,9 @@
 # Annotation Ownership (canonical reference)
 
-Shared reference for which `@architect-*` tags live on feature files
-versus on code stubs / production TypeScript. Linked from
-`architect-design-session`, `architect-implement-spec`, and
-`architect-review-implementation`.
+Reference for which `@architect-*` tags live on feature files
+versus on code stubs / production TypeScript. Used by the
+`architect-sessions` design, implement, and review-implementation
+references and by `architect-refactor-session`.
 
 ## Split-ownership principle
 
@@ -24,7 +24,7 @@ This split is what lets the kernel state, definitively:
 | Tag                           | Purpose                                                    |
 | ----------------------------- | ---------------------------------------------------------- |
 | `@architect-pattern`          | Pattern identity (canonical)                               |
-| `@architect-status`           | FSM state (`roadmap`, `active`, `completed`, `deferred`)   |
+| `@architect-status`           | FSM state (`candidate`, `roadmap`, `active`, `completed`, `deferred`)   |
 | `@architect-bounded-context`  | Canonical structural grouping                              |
 | `@architect-uses`             | Declared dependency edges for spec, ADR, and test patterns |
 | `@architect-implements`       | Realization edge (test feature → production pattern)       |
@@ -65,7 +65,7 @@ invariants, scenarios).
 
 Implications:
 
-- Value transfer (see [`./value-transfer.md`](./value-transfer.md))
+- Value transfer (see [`../../architect-sessions/references/ephemeral-spec-deletion.md`](../../architect-sessions/references/ephemeral-spec-deletion.md))
   does NOT require production-TS JSDoc to exist as a precondition for
   deletion-readiness — it only requires the executable feature carry
   the rule content.
@@ -76,13 +76,13 @@ Implications:
 
 ## Sibling references
 
-- [`./value-transfer.md`](./value-transfer.md) — how this policy feeds
+- [`../../architect-sessions/references/ephemeral-spec-deletion.md`](../../architect-sessions/references/ephemeral-spec-deletion.md) — how this policy feeds
   the deletion gate.
 - [`./spec-pattern-relationships.md`](./spec-pattern-relationships.md)
   — bipartite production↔test pattern graph + the
   `@architect-implements` realization edge.
-- [`./canonical-references.md`](./canonical-references.md) —
-  self-containment and anti-anecdote rules.
+- [`../SKILL.md`](../SKILL.md) §"Anti-anecdote" — the live graph/CLI
+  is canonical; a stale skill paraphrase is not.
 
 ## Provenance (informational)
 

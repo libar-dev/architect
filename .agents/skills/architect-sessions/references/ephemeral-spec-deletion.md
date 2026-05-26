@@ -1,11 +1,13 @@
-# Value Transfer (canonical reference)
+# Ephemeral-Spec Deletion (value-transfer execution detail)
 
-Shared reference for the terminal phase of the spec lifecycle: how value
-moves out of an ephemeral design spec into durable surfaces, and what
-makes a design spec safe to delete. Linked from
-`architect-implement-spec` and `architect-review-implementation`. The
-existing `architect-implement-spec` skill body is the operational
-counterpart — this doc carries the doctrine.
+The terminal phase of the spec lifecycle: how value moves out of an
+ephemeral design spec into durable surfaces, and what makes a design
+spec safe to delete. The **concept** — specs are scaffolds, the
+lifecycle ends in deletion — is required context for every session
+type and lives in [`../SKILL.md`](../SKILL.md) §"The spec is a
+scaffold". This file is the **execution detail** the implement and
+review-implementation references use: the transfer checklist, the
+five-criterion pre-deletion gate, and deletion timing.
 
 ## Concept
 
@@ -30,7 +32,7 @@ artifacts are:
 ## The primary durable artifact is the executable feature file
 
 Per the split-ownership policy in
-[`./annotation-ownership.md`](./annotation-ownership.md), the `.feature`
+[`../../architect-base/references/annotation-ownership.md`](../../architect-base/references/annotation-ownership.md), the `.feature`
 file is the **canonical pattern definition**. Production-TS JSDoc
 annotations are **additive, not mandatory** — sampled completed patterns
 (`ConfigLoader`, `DefineConfig`) carry zero `@architect-*` JSDoc on the
@@ -58,9 +60,9 @@ authority for which surface is mandatory vs additive.
 For the bipartite production↔test pattern naming convention (test
 patterns carry `@architect-pattern:<Name>Testing` or
 `<Name>ExecutableTests`) see
-[`./spec-pattern-relationships.md`](./spec-pattern-relationships.md).
+[`../../architect-base/references/spec-pattern-relationships.md`](../../architect-base/references/spec-pattern-relationships.md).
 For the optional 4-field Rule template see
-[`./rule-block-template.md`](./rule-block-template.md).
+[`../../architect-base/references/rule-block-template.md`](../../architect-base/references/rule-block-template.md).
 
 ## Anti-patterns (stop)
 
@@ -76,7 +78,7 @@ For the optional 4-field Rule template see
   plan-level spec for code that already ships. Ephemeral specs describe
   _planned_ work — conjuring one back to "cover" shipped behavior
   inverts the pipeline. Use the `*ExecutableTests` escape hatch in
-  [`./spec-pattern-relationships.md`](./spec-pattern-relationships.md).
+  [`../../architect-base/references/spec-pattern-relationships.md`](../../architect-base/references/spec-pattern-relationships.md).
 
 ## Pre-deletion gate
 
@@ -115,8 +117,9 @@ proposes:
   truth.
 
 Until that ships, the manual checklist above is the gate. After it
-ships, `architect-implement-spec` and `architect-review-implementation`
-will gate `git rm` on `deletionReady === true`.
+ships, the [`implement`](./implement.md) and
+[`review-implementation`](./review-implementation.md) references will
+gate `git rm` on `deletionReady === true`.
 
 ## Deletion timing
 
@@ -129,20 +132,21 @@ The implementer **asks the user** before deleting:
   related implementations are being reviewed together. The reviewer
   batches the spec deletions in a single PR or review pass, after
   verifying value transfer across the related set. The
-  `architect-review-implementation` skill is the canonical owner of
-  batched deletion.
+  [`review-implementation`](./review-implementation.md) reference is the
+  canonical owner of batched deletion.
 
 Default behavior: **ask, don't auto-delete**.
 
 ## Sibling references
 
-- [`./annotation-ownership.md`](./annotation-ownership.md) —
+- [`../../architect-base/references/annotation-ownership.md`](../../architect-base/references/annotation-ownership.md) —
   split-ownership policy that makes the executable feature canonical.
-- [`./spec-pattern-relationships.md`](./spec-pattern-relationships.md)
+- [`../../architect-base/references/spec-pattern-relationships.md`](../../architect-base/references/spec-pattern-relationships.md)
   — bipartite production↔test pattern graph + `*ExecutableTests`
   escape hatch.
-- [`./canonical-references.md`](./canonical-references.md) —
-  anti-anecdote and self-containment rules.
+- [`../../architect-base/SKILL.md`](../../architect-base/SKILL.md)
+  §"Anti-anecdote" — the live graph/CLI is canonical over a stale
+  paraphrase.
 
 The `value-transfer-state.feature` candidate spec referenced above
 (`architect/specs/value-transfer-state.feature`) is

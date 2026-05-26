@@ -144,8 +144,8 @@ This spec defines the format. The toolchain implements it.
 - Added Idea Tier subsection in §08 (Spec Evolution) describing the lightest pre-candidate
   spec shape: `@architect-status:candidate` + `@architect-maturity:idea`, ≤30 lines (warn-only), six-tag
   minimum, no `Background:` block, no `Scenario:` blocks, rules-with-`**Invariant:**` only.
-  Idea tier is not a new maturity level — it is the lightest shape of Level 1 Candidate,
-  expressed via the existing `@architect-maturity` enum value `idea`.
+  Idea tier is not a new status — the idea and candidate tiers both sit at
+  `@architect-status:candidate`, distinguished by `@architect-maturity` (`idea` vs `plan`).
 - No new tags introduced for "track" or "consideration". The existing `@architect-maturity`
   enum (`idea` / `plan` / `design` / `executable`) is the lifecycle discriminator.
 

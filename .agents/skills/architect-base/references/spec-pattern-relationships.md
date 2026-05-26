@@ -1,10 +1,9 @@
 # Spec ↔ Pattern Relationships (canonical reference)
 
-Shared reference for the bipartite production↔test pattern graph and
-the sanctioned naming conventions. Linked from
-`architect-design-session`, `architect-implement-spec`,
-`architect-plan-session` (escape-hatch case), and
-`architect-review-implementation`.
+Reference for the bipartite production↔test pattern graph and
+the sanctioned naming conventions. Used by the `architect-sessions`
+plan (escape-hatch case), design, implement, and review-implementation
+references and by `architect-refactor-session`.
 
 ## The bipartite pattern graph
 
@@ -52,7 +51,7 @@ Two tags form the deletion-gate link pair:
   back to the focal pattern.
 
 Both must exist and resolve to each other for the design spec to be
-safely deletable. See [`./value-transfer.md`](./value-transfer.md)
+safely deletable. See [`../../architect-sessions/references/ephemeral-spec-deletion.md`](../../architect-sessions/references/ephemeral-spec-deletion.md)
 §"Pre-deletion gate" for the full gate criteria.
 
 ## `*ExecutableTests` as the formal escape from retroactive plan-level specs
@@ -107,7 +106,8 @@ Constraints:
 - The level enum is closed: `epic > phase > task > slice`.
 - `@architect-parent X` requires `X` to carry `@architect-level` at
   a strictly-higher level than the file declaring the parent.
-  (`task`'s parent is `phase` or `epic`; `slice`'s parent is `task`.)
+  (`task`'s parent is `phase` or `epic`; `phase`'s parent is `epic`.
+  Epics and slices are exempt — see below.)
 - A pattern at any maturity tier (idea / candidate / plan / design /
   executable) can be at any hierarchy level. Hierarchy and maturity
   are independent.
@@ -119,12 +119,12 @@ Constraints:
 
 ## Sibling references
 
-- [`./value-transfer.md`](./value-transfer.md) — full deletion-gate
+- [`../../architect-sessions/references/ephemeral-spec-deletion.md`](../../architect-sessions/references/ephemeral-spec-deletion.md) — full deletion-gate
   criteria.
 - [`./annotation-ownership.md`](./annotation-ownership.md) —
   split-ownership policy that makes the executable feature canonical.
-- [`./canonical-references.md`](./canonical-references.md) —
-  self-containment and anti-anecdote rules.
+- [`../SKILL.md`](../SKILL.md) §"Anti-anecdote" — the live graph/CLI
+  is canonical; a stale skill paraphrase is not.
 
 ## Provenance (informational)
 
