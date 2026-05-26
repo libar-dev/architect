@@ -42,8 +42,10 @@ s2() { Q query getStatusCounts | jq .; }
 # jq slices to 8 instead of `| head` — `head` closing the pipe early would
 # SIGPIPE pnpm/jq and register a false failure under pipefail.
 s3() { Q search Markdown | jq -r '.[0:8][] | "\(.score)  \(.patternName)"'; }
+# Bundle content lives under `.root` (deliverables/deps/rules/etc. selected by
+# `.root.includes`); `.children` is for routed sub-documents and is empty inline.
 s4() { Q bundle MarkdownRenderer --format json \
-         | jq '{root: (.root.kind), childKinds: [.children[].kind] | unique}'; }
+         | jq '{pattern: .root.pattern.patternName, includes: .root.includes, members: .root.memberCount}'; }
 s5() { Q dep-tree MarkdownRenderer; }
 s6() { Q rules --pattern MarkdownRenderer --only-invariants; }
 s7() { Q query isValidTransition roadmap active | jq '{from:"roadmap", to:"active", allowed:.data}'; }
@@ -51,8 +53,11 @@ s7() { Q query isValidTransition roadmap active | jq '{from:"roadmap", to:"activ
 # future regression to all-null output FAIL the smoke check instead of passing on exit 0.
 s8() { Q arch neighborhood PatternGraph --format json \
          | jq -e '.data | {pattern, role, context, uses, usedByCount: (.usedBy // [] | length)} | select(.pattern != null)'; }
+# drift is on the baseline response (`.data.drift`); the dangling COUNT lives in the
+# envelope's graph-validation summary (`.metadata.validation.danglingReferenceCount`),
+# NOT on `.data` (which carries baseline counts like `currentCount`).
 s9() { Q arch dangling --baseline packages/architect-guard/src/lint/dangling-baseline.json --strict \
-         | jq '{drift: .data.drift, dangling: .data.danglingReferenceCount}'; }
+         | jq '{drift: .data.drift, dangling: .metadata.validation.danglingReferenceCount}'; }
 
 step "1. Health + inventory — START HERE every session (text, human-oriented)" s1
 step "2. Status distribution as JSON — proof that | jq works (note the -s)" s2
