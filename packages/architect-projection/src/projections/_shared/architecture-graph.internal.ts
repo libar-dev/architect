@@ -102,7 +102,9 @@ export function collectArchitectureNodes(
     const baseId = slugify(name).replace(/-/g, '_') || `node_${String(index + 1)}`;
     const nodeId = ensureUniqueNodeId(seenNodeIds, baseId);
     const role = hasText(pattern.role) ? pattern.role.trim() : undefined;
-    const roleSuffix = role !== undefined ? `<br/>(${role})` : '';
+    // Sourced role/name go into a Mermaid node label; escape them while keeping the
+    // renderer-authored `<br/>` line break and `(…)` parens intact (ADR-009 raw-content seam).
+    const roleSuffix = role !== undefined ? `<br/>(${escapeMermaidLabel(role)})` : '';
     const archContext = hasText(pattern.boundedContext) ? pattern.boundedContext.trim() : undefined;
     const archLayer = hasText(pattern.adrLayer) ? pattern.adrLayer.trim() : undefined;
     const packageLabel = resolvePackageLabel(context, pattern.source.file);
@@ -110,7 +112,7 @@ export function collectArchitectureNodes(
     return {
       nodeId,
       name,
-      label: `${name}${roleSuffix}`,
+      label: `${escapeMermaidLabel(name)}${roleSuffix}`,
       ...(archContext !== undefined ? { archContext } : {}),
       ...(archLayer !== undefined ? { archLayer } : {}),
       ...(role !== undefined ? { role } : {}),
@@ -306,6 +308,31 @@ function appendEdges(
   }
 }
 
+const MERMAID_LABEL_ENTITIES: Readonly<Record<string, string>> = {
+  '"': '#34;',
+  '#': '#35;',
+  '<': '#60;',
+  '>': '#62;',
+  '[': '#91;',
+  ']': '#93;',
+};
+
+/**
+ * Neutralize SOURCED text destined for a Mermaid node label (`id["…"]`). Mermaid renders
+ * quoted-string labels, so a sourced `"` would break out of the node, `<…>` could inject
+ * markup, and `#…;` could be read as an entity code. Encode those via numeric Mermaid
+ * entity codes and flatten newlines. No-op for identifier-shaped labels, so the determinism
+ * gate stays byte-identical for current data.
+ *
+ * Apply ONLY to sourced label components — renderer-authored markup (e.g. `<br/>`, the
+ * `(role)` parens) must be added AROUND the escaped value, never passed through here.
+ */
+export function escapeMermaidLabel(label: string): string {
+  return label
+    .replace(/[\r\n]+/g, ' ')
+    .replace(/["#<>[\]]/g, (char) => MERMAID_LABEL_ENTITIES[char] ?? char);
+}
+
 export function buildMapMermaid(
   groups: readonly DiagramGroup[],
   mapEdges: readonly { readonly from: string; readonly to: string }[],
@@ -318,7 +345,7 @@ export function buildMapMermaid(
     const baseId = slugify(group.key).replace(/-/g, '_') || 'group';
     const id = ensureUniqueNodeId(seenNodeIds, baseId);
     idByGroupKey.set(group.key, id);
-    lines.push(`  ${id}["${group.mapLabel} (${String(group.nodes.length)})"]`);
+    lines.push(`  ${id}["${escapeMermaidLabel(group.mapLabel)} (${String(group.nodes.length)})"]`);
   }
 
   for (const edge of mapEdges) {

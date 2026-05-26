@@ -50,6 +50,13 @@ Feature: renderMarkdown renders canonical markdown blocks
       Then the architecture markdown should render the description code spans unescaped
       And the architecture markdown should render the legend parentheses unescaped
 
+    @regression
+    Scenario: Architecture diagram escapes sourced section titles but keeps the pattern-count suffix live
+      Given an ArchitectureDiagram fixture with a hostile sourced section title
+      When I render the fragment as markdown
+      Then the architecture markdown should escape the sourced section title
+      And the architecture markdown should keep the renderer-authored count suffix live
+
   Rule: Routed markdown output can auto-split oversized files at H2 boundaries
 
     @split

@@ -160,6 +160,28 @@ Feature: Documentation Composition projection bodies
       Then the context map should contain the forward cross-group dependency arrow
       And the context map should omit the derived reverse enablement arrow
 
+  Rule: Architecture diagrams encode sourced labels destined for Mermaid nodes
+
+    **Invariant:** Sourced annotation text (bounded-context / role / package names)
+    rendered into a Mermaid node label is encoded with Mermaid entity codes, so a
+    `"`, `<`, `>`, `[`, `]`, or `#` cannot break out of the `id["…"]` node or inject
+    markup. Renderer-authored markup (`<br/>`, the `(role)` parens, the `(N)` count)
+    is added around the escaped value and stays live.
+
+    **Rationale:** Mermaid renders quoted-string node labels, so an unescaped sourced
+    quote terminates the node and the remainder injects arbitrary diagram syntax — the
+    raw-content counterpart of the ADR-009 markdown trust boundary.
+
+    **Verified by:** projecting a component diagram whose bounded-context name carries
+    Mermaid-breaking characters, then asserting the context-map node label encodes them
+    and never contains the raw sourced substring.
+
+    Scenario: a hostile bounded-context name is encoded inside the context-map node label
+      Given an architecture context with a bounded-context name carrying Mermaid-breaking characters
+      When I project the component architecture diagram
+      Then the context-map node label should encode the Mermaid-breaking characters
+      And the context-map diagram should not contain the raw sourced label
+
   Rule: Per-group detail diagrams draw only forward dependency edges
 
     **Invariant:** A per-group detail diagram collapses the `depends-on` and

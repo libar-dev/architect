@@ -580,9 +580,18 @@ function normalizeArchitectureDiagram(fragment: ArchitectureDiagram): MarkdownDo
   ];
 
   for (const section of fragment.sections) {
-    // section.title/description originate from ArchitectureDiagramProjection
-    // (renderer-authored — code spans, parens), not external fragment input.
-    blocks.push(trustedMarkdownHeading(3, section.title));
+    // section.title is SOURCED group/scope data (bounded-context / package / role / layer
+    // name) → escape it; ADR-009 forbids trusting sourced text as raw markdown. Only the
+    // pattern-count suffix is renderer-authored, so its parens stay live. (Mirrors the
+    // DecisionCatalog rule: trust the structure, escape the sourced text.)
+    // section.description is a renderer-authored literal (code spans) → trusted.
+    const patternCount = section.patterns.length;
+    if (patternCount > 0) {
+      const suffix = ` (${String(patternCount)} ${patternCount === 1 ? 'pattern' : 'patterns'})`;
+      blocks.push(trustedMarkdownHeading(3, `${escapePlainMarkdownText(section.title)}${suffix}`));
+    } else {
+      blocks.push(heading(3, section.title));
+    }
     if (section.description !== undefined) {
       blocks.push(trustedMarkdownParagraph(section.description));
     }

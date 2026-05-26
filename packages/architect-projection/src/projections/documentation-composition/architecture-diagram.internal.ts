@@ -31,6 +31,7 @@ import {
   buildMapMermaid,
   collectArchitectureEdges,
   collectArchitectureNodes,
+  escapeMermaidLabel,
   type EdgeShape,
   type NodeShape,
 } from '../_shared/architecture-graph.internal.js';
@@ -145,7 +146,10 @@ function buildArchitectureSections(
     );
     const patterns = group.nodes.map((node) => node.name);
     sections.push({
-      title: `${group.title} (${String(patterns.length)} ${patterns.length === 1 ? 'pattern' : 'patterns'})`,
+      // Raw sourced group title (bounded-context / package / role / layer name). The
+      // renderer owns markdown escaping (ADR-009) and composes the "(N patterns)" suffix
+      // from `patterns` — never trust sourced text as raw markdown by pre-baking it here.
+      title: group.title,
       diagram: mermaid(buildGroupMermaid(group.nodes, intraEdges)),
       patterns,
     });
@@ -157,7 +161,7 @@ function buildArchitectureSections(
 function buildEmptyMermaid(options: ProjectArchitectureDiagramOptions): string {
   return [
     'graph TD',
-    `  empty["No patterns found for ${ARCHITECTURE_SCOPE_TITLES[options.scope]}${hasText(options.scopeValue) ? `: ${options.scopeValue.trim()}` : ''}"]`,
+    `  empty["No patterns found for ${ARCHITECTURE_SCOPE_TITLES[options.scope]}${hasText(options.scopeValue) ? `: ${escapeMermaidLabel(options.scopeValue.trim())}` : ''}"]`,
   ].join('\n');
 }
 

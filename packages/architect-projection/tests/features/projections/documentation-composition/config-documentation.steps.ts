@@ -806,6 +806,56 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
     },
   );
 
+  Rule(
+    'Architecture diagrams encode sourced labels destined for Mermaid nodes',
+    ({ RuleScenario }) => {
+      RuleScenario(
+        'a hostile bounded-context name is encoded inside the context-map node label',
+        ({ Given, When, Then, And }) => {
+          Given(
+            'an architecture context with a bounded-context name carrying Mermaid-breaking characters',
+            () => {
+              state!.context = createProjectionContext({
+                patterns: [
+                  createPattern('AlphaNode', {
+                    status: 'active',
+                    role: 'service',
+                    archContext: 'Aut"h]<x>',
+                    file: 'packages/architect-projection/src/projections/documentation-composition/support.ts',
+                  }),
+                  createPattern('BetaNode', {
+                    status: 'active',
+                    role: 'service',
+                    archContext: 'safe',
+                    file: 'apps/desktop/src/views/Settings.tsx',
+                  }),
+                ],
+              });
+            },
+          );
+
+          When('I project the component architecture diagram', () => {
+            state!.architectureDiagrams['component'] = parseAndProjectArchitectureDiagram(
+              state!.context!,
+              { scope: 'component' },
+            );
+          });
+
+          Then('the context-map node label should encode the Mermaid-breaking characters', () => {
+            const map = state!.architectureDiagrams['component']!.root.sections[0];
+            expect(map?.title).toMatch(/^Context Map/u);
+            expect(map?.diagram.content).toContain('Aut#34;h#93;#60;x#62;');
+          });
+
+          And('the context-map diagram should not contain the raw sourced label', () => {
+            const map = state!.architectureDiagrams['component']!.root.sections[0];
+            expect(map?.diagram.content).not.toContain('Aut"h]');
+          });
+        },
+      );
+    },
+  );
+
   Rule('Per-group detail diagrams draw only forward dependency edges', ({ RuleScenario }) => {
     RuleScenario(
       'a detail diagram collapses co-directional edges and drops the reverse enablement',

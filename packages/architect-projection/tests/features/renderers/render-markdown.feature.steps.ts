@@ -1091,6 +1091,13 @@ function createArchitectureDiagramFixture(): Fragment {
         diagram: { type: 'mermaid', content: 'graph LR\n  a --> b' },
         patterns: [],
       },
+      {
+        // Sourced group title carrying hostile markdown — the renderer must escape it while
+        // keeping the renderer-authored "(N patterns)" suffix live (ADR-009).
+        title: 'Bounded context: Auth **bold** [trap](javascript:alert(1))',
+        diagram: { type: 'mermaid', content: 'graph TD\n  gamma["Gamma"]' },
+        patterns: ['Gamma'],
+      },
     ],
     legend: [
       { type: 'heading', level: 3, text: 'Legend' },
@@ -1321,6 +1328,36 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             expect(markdown).toContain('Solid arrow = dependency (depends-on / uses)');
             expect(markdown).not.toContain('dependency \\(depends-on / uses\\)');
           });
+        },
+      );
+
+      RuleScenario(
+        'Architecture diagram escapes sourced section titles but keeps the pattern-count suffix live',
+        ({ Given, When, Then, And }) => {
+          Given('an ArchitectureDiagram fixture with a hostile sourced section title', () => {
+            state!.input = createArchitectureDiagramFixture();
+          });
+
+          When('I render the fragment as markdown', () => {
+            state!.rendered = renderMarkdown(state!.input!);
+          });
+
+          Then('the architecture markdown should escape the sourced section title', () => {
+            const markdown = assertRenderedString(state!.rendered);
+            expect(markdown).toContain(
+              'Bounded context: Auth \\*\\*bold\\*\\* \\[trap\\]\\(javascript:alert\\(1\\)\\)',
+            );
+            expect(markdown).not.toContain('Auth **bold**');
+          });
+
+          And(
+            'the architecture markdown should keep the renderer-authored count suffix live',
+            () => {
+              const markdown = assertRenderedString(state!.rendered);
+              expect(markdown).toContain('(1 pattern)');
+              expect(markdown).not.toContain('\\(1 pattern\\)');
+            },
+          );
         },
       );
     },
