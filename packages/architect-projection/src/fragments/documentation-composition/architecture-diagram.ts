@@ -30,14 +30,27 @@ export const ArchitectureDiagramSectionSchema = z.strictObject({
   patterns: z.array(z.string()),
 });
 
+/**
+ * One row of the fan-in / hub view — a pattern ranked by how many in-view peers
+ * depend on it. Surfaces hub patterns that otherwise render as edgeless leaves in
+ * the per-group detail diagrams (their consumers live in other groups).
+ */
+export const FanInEntrySchema = z.strictObject({
+  pattern: z.string(),
+  usedByCount: z.number().int().nonnegative(),
+  topConsumers: z.array(z.string()),
+});
+
 export const ArchitectureDiagramSchema = z.strictObject({
   kind: z.literal('ArchitectureDiagram'),
   scope: ArchitectureDiagramScopeSchema,
   scopeValue: z.string().optional(),
   sections: z.array(ArchitectureDiagramSectionSchema),
   legend: z.array(BlockSchema).optional(),
+  fanIn: z.array(FanInEntrySchema).optional(),
   patterns: z.array(z.string()),
 });
 
 export type ArchitectureDiagramSection = z.infer<typeof ArchitectureDiagramSectionSchema>;
+export type FanInEntry = z.infer<typeof FanInEntrySchema>;
 export type ArchitectureDiagram = z.infer<typeof ArchitectureDiagramSchema>;

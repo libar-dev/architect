@@ -182,6 +182,28 @@ Feature: Documentation Composition projection bodies
       Then the context-map node label should encode the Mermaid-breaking characters
       And the context-map diagram should not contain the raw sourced label
 
+  Rule: The architecture view surfaces fan-in for the most-depended-on patterns
+
+    **Invariant:** The architecture fragment carries a fan-in ranking of in-view
+    patterns by how many in-view peers depend on them (usedBy), sorted by descending
+    dependant count then name and limited to the top entries; patterns with no in-view
+    dependants are omitted and each row's dependant list is restricted to in-view peers
+    so the ranking never dangles.
+
+    **Rationale:** Hub patterns render as edgeless leaves in the per-group detail
+    diagrams because their dependants live in other groups; the fan-in ranking restores
+    that signal without a cross-group edge explosion.
+
+    **Verified by:** projecting a component view with a hub pattern depended on by
+    several in-view peers and asserting the hub ranks first with its dependant count and
+    sorted dependant list.
+
+    Scenario: fan-in ranks in-view hub patterns by in-view dependant count
+      Given an architecture context with a hub pattern depended on by several in-view peers
+      When I project the component architecture diagram
+      Then the fan-in list should rank the hub pattern first with its in-view dependant count
+      And patterns with no in-view dependants are omitted from fan-in
+
   Rule: Per-group detail diagrams draw only forward dependency edges
 
     **Invariant:** A per-group detail diagram collapses the `depends-on` and

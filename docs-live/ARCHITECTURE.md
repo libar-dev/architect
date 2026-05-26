@@ -456,6 +456,23 @@ graph TD
   resultmonadtypes["ResultMonadTypes<br/>(contract)"]
 ```
 
+## Fan-in
+
+Most-depended-on patterns in this view, ranked by in-view dependant count.
+
+| Pattern                              | Dependants | Top dependants                                                                                                                                         |
+| ------------------------------------ | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| ProjectionFragmentContracts          | 16         | ArchitectureDiagramProjection, BusinessRulesProjection, DecisionCatalogProjection, DeliverableProjection, DocumentationBundle                          |
+| ExtractedPattern                     | 12         | ArchitectureInspection, DeliveryReportingProjectionSupport, DualSourceExtractor, ExecutionContextProjectionSupport, GovernanceProjectionSupport        |
+| PatternRelationsFragmentContracts    | 11         | ArchitectureComparisonProjection, ArchitectureNeighborhoodProjection, DependencyEdgeProjection, DependencyTreeProjection, OpenQuestionListProjection   |
+| PatternRelationsProjectionSupport    | 11         | ArchitectureComparisonProjection, ArchitectureNeighborhoodProjection, BoundedContextProjection, DependencyEdgeProjection, DependencyTreeProjection     |
+| PatternGraph                         | 9          | ArchitectureInspection, BuildPipeline, DoDValidator, GraphInventory, PatternClassification                                                             |
+| OperationalInsightsProjectionSupport | 8          | AnnotationCoverageProjection, OverviewProjection, RequirementDigestProjection, RequirementExecutableDigestProjection, RequirementSpecsDigestProjection |
+| BlockSchema                          | 7          | ArchitectureDiagram, DecisionRecord, DocumentationCompositionSupporting, MarkdownRenderer, OperationalInsightsSupporting                               |
+| DeliveryReportingProjectionSupport   | 5          | PhaseProgressProjection, ReleaseNotesProjection, RoadmapTimelineProjection, StatusDistributionProjection, TraceabilityMatrixProjection                 |
+| ExecutionContextProjectionSupport    | 5          | DeliverableProjection, FileReadingListProjection, HandoffProjection, ScopeReadinessProjection, SessionContextProjection                                |
+| ProjectionFragmentSchema             | 5          | CompactTextRenderer, FragmentRendererDispatch, JsonRenderer, MarkdownRenderer, UiRenderer                                                              |
+
 ## Legend
 
 ### Legend

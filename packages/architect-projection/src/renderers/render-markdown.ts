@@ -598,6 +598,22 @@ function normalizeArchitectureDiagram(fragment: ArchitectureDiagram): MarkdownDo
     blocks.push(section.diagram);
   }
 
+  if (fragment.fanIn !== undefined && fragment.fanIn.length > 0) {
+    // Pattern / consumer names are SOURCED → the plain `table` block escapes every cell.
+    blocks.push(
+      heading(2, 'Fan-in'),
+      paragraph('Most-depended-on patterns in this view, ranked by in-view dependant count.'),
+      table(
+        ['Pattern', 'Dependants', 'Top dependants'],
+        fragment.fanIn.map((entry) => [
+          entry.pattern,
+          String(entry.usedByCount),
+          entry.topConsumers.join(', '),
+        ]),
+      ),
+    );
+  }
+
   if (fragment.legend !== undefined && fragment.legend.length > 0) {
     blocks.push(heading(2, 'Legend'), ...fragment.legend.map(trustAuthoredBlock));
   }

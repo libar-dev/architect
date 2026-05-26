@@ -856,6 +856,79 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
     },
   );
 
+  Rule(
+    'The architecture view surfaces fan-in for the most-depended-on patterns',
+    ({ RuleScenario }) => {
+      RuleScenario(
+        'fan-in ranks in-view hub patterns by in-view dependant count',
+        ({ Given, When, Then, And }) => {
+          Given(
+            'an architecture context with a hub pattern depended on by several in-view peers',
+            () => {
+              state!.context = createProjectionContext({
+                patterns: [
+                  createPattern('HubPattern', {
+                    status: 'active',
+                    role: 'service',
+                    archContext: 'core',
+                    file: 'packages/architect-core/src/hub.ts',
+                  }),
+                  createPattern('AlphaConsumer', {
+                    status: 'active',
+                    role: 'service',
+                    archContext: 'core',
+                    file: 'packages/architect-core/src/alpha.ts',
+                  }),
+                  createPattern('BetaConsumer', {
+                    status: 'active',
+                    role: 'service',
+                    archContext: 'cli',
+                    file: 'packages/architect-cli/src/beta.ts',
+                  }),
+                  createPattern('GammaConsumer', {
+                    status: 'active',
+                    role: 'service',
+                    archContext: 'cli',
+                    file: 'packages/architect-cli/src/gamma.ts',
+                  }),
+                ],
+                relationshipIndex: {
+                  HubPattern: createRelationshipEntry({
+                    usedBy: ['GammaConsumer', 'AlphaConsumer', 'BetaConsumer'],
+                  }),
+                },
+              });
+            },
+          );
+
+          When('I project the component architecture diagram', () => {
+            state!.architectureDiagrams['component'] = parseAndProjectArchitectureDiagram(
+              state!.context!,
+              { scope: 'component' },
+            );
+          });
+
+          Then(
+            'the fan-in list should rank the hub pattern first with its in-view dependant count',
+            () => {
+              const fanIn = state!.architectureDiagrams['component']!.root.fanIn;
+              expect(fanIn?.[0]).toEqual({
+                pattern: 'HubPattern',
+                usedByCount: 3,
+                topConsumers: ['AlphaConsumer', 'BetaConsumer', 'GammaConsumer'],
+              });
+            },
+          );
+
+          And('patterns with no in-view dependants are omitted from fan-in', () => {
+            const fanIn = state!.architectureDiagrams['component']!.root.fanIn ?? [];
+            expect(fanIn.map((entry) => entry.pattern)).not.toContain('AlphaConsumer');
+          });
+        },
+      );
+    },
+  );
+
   Rule('Per-group detail diagrams draw only forward dependency edges', ({ RuleScenario }) => {
     RuleScenario(
       'a detail diagram collapses co-directional edges and drops the reverse enablement',

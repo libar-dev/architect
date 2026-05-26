@@ -1,8 +1,13 @@
 export {
   ArchitectureDiagramSchema,
   ArchitectureDiagramSectionSchema,
+  FanInEntrySchema,
 } from './architecture-diagram.js';
-export type { ArchitectureDiagram, ArchitectureDiagramSection } from './architecture-diagram.js';
+export type {
+  ArchitectureDiagram,
+  ArchitectureDiagramSection,
+  FanInEntry,
+} from './architecture-diagram.js';
 export { PrChangeReviewSchema } from './pr-change-review.js';
 export type { PrChangeReview } from './pr-change-review.js';
 export { ProjectConfigSnapshotSchema } from './project-config-snapshot.js';

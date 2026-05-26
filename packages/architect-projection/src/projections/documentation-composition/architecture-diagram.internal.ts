@@ -20,6 +20,7 @@ import { ProjectionError } from '../errors.js';
 import type {
   ArchitectureDiagram,
   ArchitectureDiagramSection,
+  FanInEntry,
 } from '../../fragments/documentation-composition/index.js';
 import {
   ArchitectureDiagramScopeSchema,
@@ -35,6 +36,7 @@ import {
   type EdgeShape,
   type NodeShape,
 } from '../_shared/architecture-graph.internal.js';
+import { getRelationships } from '../_shared/pattern-helpers.internal.js';
 
 import { hasText } from './documentation-composition-shared.internal.js';
 
@@ -83,6 +85,7 @@ export function buildArchitectureDiagram(
   const nodes = collectArchitectureNodes(context, resolvedOptions);
   const patterns = nodes.map((node) => node.name);
   const edges = collectArchitectureEdges(context, nodes);
+  const fanIn = buildFanIn(context, nodes);
 
   return {
     kind: 'ArchitectureDiagram',
@@ -93,8 +96,40 @@ export function buildArchitectureDiagram(
       heading(3, 'Legend'),
       list(['Solid arrow = dependency (depends-on / uses)', 'Dotted line = reference (see-also)']),
     ],
+    ...(fanIn.length > 0 ? { fanIn } : {}),
     patterns,
   };
+}
+
+const FAN_IN_LIMIT = 10;
+const FAN_IN_TOP_CONSUMERS = 5;
+
+/**
+ * Rank in-view patterns by how many in-view peers depend on them (`usedBy`), so the
+ * doc surfaces hub patterns that render as edgeless leaves in the per-group detail
+ * diagrams (their dependants sit in other groups). Consumers are restricted to nodes
+ * already in the view so the table never dangles, and both the rows and each row's
+ * consumer list are sorted for deterministic output.
+ */
+function buildFanIn(context: ProjectionContext, nodes: readonly NodeShape[]): FanInEntry[] {
+  const inView = new Set(nodes.map((node) => node.name));
+  return nodes
+    .map((node) => {
+      const consumers = (getRelationships(context, node.name)?.usedBy ?? [])
+        .filter((consumer) => inView.has(consumer))
+        .sort((left, right) => left.localeCompare(right));
+      return {
+        pattern: node.name,
+        usedByCount: consumers.length,
+        topConsumers: consumers.slice(0, FAN_IN_TOP_CONSUMERS),
+      } satisfies FanInEntry;
+    })
+    .filter((entry) => entry.usedByCount > 0)
+    .sort(
+      (left, right) =>
+        right.usedByCount - left.usedByCount || left.pattern.localeCompare(right.pattern),
+    )
+    .slice(0, FAN_IN_LIMIT);
 }
 
 /**
