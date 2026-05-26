@@ -44,7 +44,9 @@ For the projection layer specifically, role+context are mostly present already �
 | **WS-3** | Docs — doc updates / regeneration aligned to the re-enabled graph                                                                                                                                                                                              | scoped, detail TBD          |
 
 WS-1 is detailed below; WS-2/WS-3 get their own sessions once WS-1's pilot proves
-the method and the graph is queryable enough to drive doc generation.
+the method and the graph is queryable enough to drive doc generation. WS-3's
+docs-IA audit + projection roadmap (R1–R7) is captured in
+[`DOCS-IA-FINDINGS.md`](./DOCS-IA-FINDINGS.md).
 
 ## 3. WS-1 strategy
 
