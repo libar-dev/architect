@@ -6,7 +6,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash .claude/hooks/architect-api-first.sh"
+            "command": "bash .claude/hooks/architect-api-first.sh",
+            "timeout": 30
           }
         ]
       }
