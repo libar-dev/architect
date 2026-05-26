@@ -10,7 +10,9 @@ allowed-tools:
 
 # Architect Data API — `pnpm architect:query`
 
-The CLI (`pnpm architect:query <verb>`) is the canonical surface for the PatternGraph. Every "what is the state of X?" question about a pattern, every dependency walk, every FSM gate, every dangling-reference check is one verb away. Output is structured, deterministic, sub-second on warm cache, and pipes cleanly into `jq` or a PR description.
+The CLI (`pnpm architect:query <verb>`) is the canonical surface for the PatternGraph. Every "what is the state of X?" question about a pattern, every dependency walk, every FSM gate, every dangling-reference check is one verb away. Output is structured, deterministic, sub-second on warm cache, and pipes into `jq` or a PR description.
+
+> **Piping to `jq`? Use `pnpm -s`.** Bare `pnpm architect:query <verb> --format json | jq` **fails** with a parse error — `pnpm` prints its `> architect@0.0.0 …` lifecycle banner to **stdout** ahead of the JSON. The `-s` (silent) flag suppresses it: `pnpm -s architect:query <verb> --format json | jq`. This is the single most common reason an agent wrongly concludes "the API isn't clean JSON" and falls back to `grep`. Always `-s` when piping. (See "Output formats & JSON consumption".)
 
 **File scanning to learn about a pattern is a smell.** It is slower, less accurate, and easy to lie to. Treat the CLI as a first-class read surface and reach for `Read` / `Glob` / `Grep` only when you actually need the file's full text.
 
@@ -141,7 +143,7 @@ Organized by purpose. Every CLI verb has an MCP twin (mapping in "MCP twins" bel
 
 ### Documentation projection
 
-- **`documentation <document-type> [--disclosure <level>] [--filter <status=csv>]...`** — emits projected docs (`patterns` / `architecture` / `roadmap` / `changelog` / `decisions` / `taxonomy` / `requirements-executable` / `requirements-specs`). Disclosure level controls verbosity.
+- **`documentation <document-type> [--disclosure <level>] [--filter <status=csv>]...`** — emits projected docs. The verb accepts **12** document types: `patterns` / `architecture` / `roadmap` / `changelog` / `decisions` / `taxonomy` / `requirements-executable` / `requirements-specs` / `business-rules` / `current-work` / `validation-rules` / `traceability` (plus `index`). Disclosure level controls verbosity. (Cross-check the live set: an invalid type errors with the accepted enum.)
 
 ### Interactive
 
@@ -149,13 +151,24 @@ Organized by purpose. Every CLI verb has an MCP twin (mapping in "MCP twins" bel
 
 ## Output formats & JSON consumption
 
-| Verb                                                                                                                                     | Default output | `--format json` available |
-| ---------------------------------------------------------------------------------------------------------------------------------------- | -------------- | ------------------------- |
-| `query <method>`, `diagnostics`, `arch dangling`, `search`, `list --names-only`                                                          | JSON           | (default)                 |
-| `open-questions`, `bundle`, `taxonomy`                                                                                                   | Text           | yes (`--format json`)     |
-| `overview` / `status` / `context` / `files` / `scope-validate` / `handoff` / `pattern` / `dep-tree` / `rules` / `tags` / `arch blocking` | Text           | text-only today           |
+`--format json` is a **global** flag (parsed before the subcommand), so **every data verb can emit JSON** — there are no "text-only" verbs. Default output is human-readable text/compact; add `--format json` for structured output.
 
-Pipe JSON through `jq`. Text output is for human review.
+| Verb                                                                                                                                                                       | Default output | `--format json` |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- | --------------- |
+| `query <method>`, `diagnostics`, `arch dangling`, `search`, `list --names-only`                                                                                            | JSON           | already JSON    |
+| every other data verb — `overview` · `status` · `context` · `files` · `scope-validate` · `handoff` · `pattern` · `dep-tree` · `rules` · `tags` · `bundle` · `taxonomy` · `open-questions` · `arch blocking`/`neighborhood` | Text           | **yes**         |
+
+**Two envelope shapes** (this trips up `jq` paths): structured verbs (`query`, `arch neighborhood`/`blocking`/`dangling`, `diagnostics`) wrap as `{ success, data, metadata }` → read **`.data`**; bundle-style verbs (`bundle`, `overview`, `status`, `pattern`, `dep-tree`, …) return the bundle directly → read **`.root`** / top-level fields.
+
+Pipe JSON through `jq` — **but always via `pnpm -s`**. Without `-s`, pnpm writes its `> architect@0.0.0 …` / `> tsx …` banner to **stdout** before the JSON, so `pnpm architect:query <verb> --format json | jq` dies with `parse error: Invalid numeric literal at line 2`. The `-s` flag is the whole fix:
+
+```bash
+pnpm -s architect:query query getStatusCounts | jq '.data'
+pnpm -s architect:query bundle MarkdownRenderer --format json | jq '.root.kind'
+pnpm -s architect:query arch neighborhood PatternGraph --format json | jq '.data.uses'
+```
+
+Text output is for human review.
 
 Representative JSON shape — `query isValidTransition roadmap active`:
 
@@ -248,7 +261,8 @@ This loop is intentionally tighter than a typical API contract because the codeb
 - **Reading files before querying.** `Read` / `Glob` / `Grep` against `architect/`, `packages/architect-*/`, or `tests/features/` to _learn about a pattern_. There is a verb for that.
 - **Hand-writing hyphenated MCP names.** Callable names are underscored end-to-end — `architect_scope_validate`, `architect_open_questions`, `architect_dep_tree`. Hyphens 404.
 - **Treating `pattern <Name>` "not found" as binary.** It can mean parse failure with provenance. Cross-check with `search` or `list --names-only`.
-- **Parsing `--format json` shapes by regex.** Pipe to `jq` or parse structurally.
+- **Piping bare `pnpm architect:query … | jq`.** The pnpm banner on stdout breaks the pipe — use `pnpm -s`. Getting a `jq` parse error once and switching to `grep` is the #1 self-inflicted reason to abandon the API; the cost is ~10–15× more context per task.
+- **Parsing `--format json` shapes by regex.** Pipe to `jq` (with `-s`) or parse structurally.
 - **Chaining `--include` flags on `bundle`.** Repeated `--include` silently keeps only the last value. Use the comma-list form.
 - **Stitching `overview` + `context` + `dep-tree` + `files` + `rules` manually.** Reach for `bundle <Pattern>` first; drop down to single verbs only when you need a single slice.
 

@@ -57,8 +57,12 @@ const FROZEN_GLOBAL_FLAGS = [
   '--no-cache           Bypass CLI cache metadata tracking',
   '--session <type>     planning, design, or implement',
   '--depth <n>          Dependency tree depth',
+  '--format <type>      Output format: compact (default) or json (pipe via `pnpm -s`)',
   '-h, --help               Show help',
   '-v, --version            Show version',
+  'Piping JSON: run via `pnpm -s` so the pnpm banner stays off stdout, e.g.',
+  'pnpm -s architect:query bundle <Pattern> --format json | jq',
+  'Bare `pnpm architect:query … | jq` fails — the banner breaks the pipe.',
   'Agent environments: load the `architect-data-api` skill for verb shapes,',
   'deterministic gates, JSON shapes, and known quirks.',
 ] as const;
