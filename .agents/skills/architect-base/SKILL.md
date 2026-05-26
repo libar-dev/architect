@@ -58,7 +58,7 @@ When this package family is consumed by another project, the consumer wires thei
 | `architect/step-stubs/`       | Design-tier stub step definitions                                                   | Ephemeral                                                       |
 | `architect/decisions/`        | ADRs / PDRs — compact, durable, decisions-only (no operational or temporal context) | **Permanent**                                                   |
 | `architect/releases/`         | Release notes, roadmap, phase plans                                                 | Permanent                                                       |
-| `architect/design-reviews/`   | Design review captures                                                              | Reference                                                       |
+| `architect/design-reviews/`   | **Auto-generated** architecture-slice review artifacts (sequence + component mermaid; scoped to specs incl. unimplemented) — generated output, **not** a home for hand-authored captures | Generated (derived) |
 | `architect/ideations/`        | Pre-idea-tier notes                                                                 | Until promoted                                                  |
 
 **Two Gherkin parsers, do not confuse them:**
