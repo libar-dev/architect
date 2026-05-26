@@ -5,6 +5,11 @@
  */
 export { projectArchitectureComparison } from './architecture-comparison.js';
 export { projectBoundedContext } from './architecture-context.js';
+export {
+  projectArchitectureGraph,
+  ArchitectureGraphSchema,
+  type ArchitectureGraph,
+} from './architecture-graph.js';
 export { projectArchitectureNeighborhood } from './architecture-neighborhood.js';
 export {
   BundleIncludeSchema,

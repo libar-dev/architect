@@ -4,7 +4,7 @@
 
 | Field | Value |
 | ----- | ----- |
-| Count | 243   |
+| Count | 244   |
 
 ## Filters
 
@@ -33,6 +33,7 @@
 - ArchitectureComparisonProjection
 - ArchitectureDiagram
 - ArchitectureDiagramProjection
+- ArchitectureGraphProjection
 - ArchitectureInspection
 - ArchitectureNavigationProjectionExecutableTests
 - ArchitectureNeighborhood
@@ -281,6 +282,7 @@
 | packages/architect-projection/src/projections/pattern-relations/architecture-comparison.ts                           | executable | ArchitectureComparisonProjection                      | projection | typescript | completed |
 | packages/architect-projection/src/fragments/documentation-composition/architecture-diagram.ts                        | design     | ArchitectureDiagram                                   | contract   | typescript | active    |
 | packages/architect-projection/src/projections/documentation-composition/architecture-diagram.ts                      | executable | ArchitectureDiagramProjection                         | projection | typescript | completed |
+| packages/architect-projection/src/projections/pattern-relations/architecture-graph.ts                                | design     | ArchitectureGraphProjection                           | projection | typescript | active    |
 | packages/architect-core/src/read-api/architecture-inspection.ts                                                      | design     | ArchitectureInspection                                | utility    | typescript | active    |
 | packages/architect-projection/tests/features/projections/pattern-relations/architecture-neighborhood.feature         | executable | ArchitectureNavigationProjectionExecutableTests       | projection | gherkin    | completed |
 | packages/architect-projection/src/fragments/pattern-relations/architecture-neighborhood.ts                           | design     | ArchitectureNeighborhood                              | contract   | typescript | active    |

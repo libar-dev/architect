@@ -7,7 +7,7 @@
 
 ## Overview
 
-This view captures 160 patterns across 23 diagrams in the Component architecture view.
+This view captures 161 patterns across 23 diagrams in the Component architecture view.
 
 ## Diagrams
 
@@ -32,7 +32,7 @@ graph LR
   pattern_relations["pattern-relations (12)"]
   pipeline["pipeline (1)"]
   process_guard["process-guard (6)"]
-  projection["projection (43)"]
+  projection["projection (44)"]
   read_api["read-api (5)"]
   rendering["rendering (7)"]
   scanner["scanner (4)"]
@@ -285,13 +285,14 @@ graph TD
   processguardlinter -->|depends-on| detectchanges
 ```
 
-### Bounded context: projection (43 patterns)
+### Bounded context: projection (44 patterns)
 
 ```mermaid
 graph TD
   annotationcoverageprojection["AnnotationCoverageProjection<br/>(projection)"]
   architecturecomparisonprojection["ArchitectureComparisonProjection<br/>(projection)"]
   architecturediagramprojection["ArchitectureDiagramProjection<br/>(projection)"]
+  architecturegraphprojection["ArchitectureGraphProjection<br/>(projection)"]
   architectureneighborhoodprojection["ArchitectureNeighborhoodProjection<br/>(projection)"]
   boundedcontextprojection["BoundedContextProjection<br/>(projection)"]
   businessrulesprojection["BusinessRulesProjection<br/>(projection)"]
@@ -471,6 +472,7 @@ graph TD
 - ArchitectureComparisonProjection
 - ArchitectureDiagram
 - ArchitectureDiagramProjection
+- ArchitectureGraphProjection
 - ArchitectureInspection
 - ArchitectureNeighborhood
 - ArchitectureNeighborhoodProjection

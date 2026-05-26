@@ -9,6 +9,8 @@ export type { ProjectionFilter } from './_shared/filter.js';
 export {
   projectArchitectureComparison,
   projectBoundedContext,
+  projectArchitectureGraph,
+  ArchitectureGraphSchema,
   projectArchitectureNeighborhood,
   projectDependencyEdges,
   parseAndProjectDependencyTree,
@@ -93,6 +95,7 @@ export type {
   DepTreeOptions,
   OpenQuestionListOptions,
   PatternCatalogOptions,
+  ArchitectureGraph,
 } from './pattern-relations/index.js';
 export type {
   BusinessRuleSetOptions,

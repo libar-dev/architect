@@ -37,7 +37,7 @@ const FROZEN_COMMAND_INVENTORY = [
   'list [--status <value>] [--role <tag>] [--parent <PatternName>] [--count] [--names-only]',
   'open-questions [--parent <PatternName>]',
   'search <query>',
-  'arch roles|bounded-context [name]|neighborhood <pattern>|compare <bounded-context-a> <bounded-context-b>|coverage|dangling [--baseline <path>] [--write-baseline] [--strict]|orphans|blocking',
+  'arch roles|bounded-context [name]|neighborhood <pattern>|graph|compare <bounded-context-a> <bounded-context-b>|coverage|dangling [--baseline <path>] [--write-baseline] [--strict]|orphans|blocking',
   'rules [--product-area <name>] [--pattern <name>] [--package <workspace-name>] [--feature <path-or-glob>] [--only-invariants] [--count] [--names-only]',
   'diagnostics',
   'tags',

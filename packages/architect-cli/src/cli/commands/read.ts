@@ -359,9 +359,9 @@ export const readCommands: Pick<Record<CommandName, CommandDef>, ReadCommandName
     positional: StringArraySchema,
     flags: ArchFlagsSchema,
     usage:
-      'Usage: architect arch roles|bounded-context [name]|neighborhood <pattern>|compare <bounded-context-a> <bounded-context-b>|coverage|dangling [--baseline <path>] [--write-baseline] [--strict]|orphans|blocking',
+      'Usage: architect arch roles|bounded-context [name]|neighborhood <pattern>|graph|compare <bounded-context-a> <bounded-context-b>|coverage|dangling [--baseline <path>] [--write-baseline] [--strict]|orphans|blocking',
     helpSignature:
-      'arch roles|bounded-context [name]|neighborhood <pattern>|compare <bounded-context-a> <bounded-context-b>|coverage|dangling [--baseline <path>] [--write-baseline] [--strict]|orphans|blocking',
+      'arch roles|bounded-context [name]|neighborhood <pattern>|graph|compare <bounded-context-a> <bounded-context-b>|coverage|dangling [--baseline <path>] [--write-baseline] [--strict]|orphans|blocking',
     flagParsers: {
       '--baseline': {
         kind: 'value',

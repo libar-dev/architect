@@ -12,6 +12,7 @@ import {
 import {
   projectAnnotationCoverage,
   projectArchitectureComparison,
+  projectArchitectureGraph,
   projectBoundedContext,
   projectArchitectureNeighborhood,
   projectOrphanPatternList,
@@ -35,6 +36,7 @@ const ARCH_SUBCOMMANDS = [
   'roles',
   'bounded-context',
   'neighborhood',
+  'graph',
   'compare',
   'coverage',
   'dangling',
@@ -255,6 +257,8 @@ async function executeArchCommand(
       }
       return projectArchitectureNeighborhood(context.projection, pattern).root;
     }
+    case 'graph':
+      return projectArchitectureGraph(context.projection);
     case 'compare': {
       const boundedContextA = args[1];
       const boundedContextB = args[2];
