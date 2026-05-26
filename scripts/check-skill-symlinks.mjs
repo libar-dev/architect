@@ -21,10 +21,19 @@
  * Per-harness "required" sets are derived from the canonical skill names by
  * convention (full set / `architect-*` prefix) — no skill name is hardcoded.
  * This is what catches the real regression: a domain skill present in
- * `.agents/skills/` but missing from a harness it belongs in. Run via
- * `pnpm check:skills`. Exits non-zero with a per-violation message on failure.
+ * `.agents/skills/` but missing from a harness it belongs in.
+ *
+ * It also validates each canonical SKILL.md's frontmatter against the two
+ * constraints stricter loaders enforce (Codex CLI rejects skills that violate
+ * either; Claude Code is lenient, so they slip through unnoticed otherwise):
+ *
+ *   5. `description` is ≤ 1024 chars (Agent Skills spec maximum).
+ *   6. `description` is a YAML-safe single-line scalar — an unquoted `: `
+ *      (colon-space) is parsed as a mapping indicator and breaks the frontmatter.
+ *
+ * Run via `pnpm check:skills`. Exits non-zero with a per-violation message on failure.
  */
-import { readdirSync, existsSync, readlinkSync } from 'node:fs';
+import { readdirSync, existsSync, readlinkSync, readFileSync } from 'node:fs';
 import { resolve, dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -103,13 +112,43 @@ for (const { dir, label, required } of HARNESSES) {
   }
 }
 
+// Frontmatter validation: assert each canonical SKILL.md's `description`
+// stays within the Agent Skills spec limit and is YAML-safe. Lexical check
+// (no YAML dependency) targeting exactly the two failure modes strict loaders
+// reject — our descriptions are single-line scalars by convention.
+const DESCRIPTION_MAX = 1024;
+
+for (const name of canon) {
+  const file = join(CANON, name, 'SKILL.md');
+  const fmMatch = readFileSync(file, 'utf8').match(/^---\r?\n([\s\S]*?)\r?\n---/);
+  if (!fmMatch) {
+    errors.push(`${rel(file)} has no YAML frontmatter block (expected a leading --- ... --- fence)`);
+    continue;
+  }
+  const descLine = fmMatch[1].split(/\r?\n/).find((line) => line.startsWith('description:'));
+  if (descLine === undefined) {
+    errors.push(`${rel(file)} frontmatter has no description field`);
+    continue;
+  }
+  const value = descLine.slice('description:'.length).trim();
+  if (value.length > DESCRIPTION_MAX) {
+    errors.push(`${rel(file)} description is ${value.length} chars (max ${DESCRIPTION_MAX})`);
+  }
+  // Quoted / block scalars (" ' | >) carry their own escaping; only plain
+  // scalars are broken by an unquoted colon-space.
+  if (!/^["'|>]/.test(value) && value.includes(': ')) {
+    errors.push(`${rel(file)} description has an unquoted ": " (colon-space) — breaks YAML parsing; rephrase or quote`);
+  }
+}
+
 if (errors.length > 0) {
-  console.error(`✗ skill-symlink check failed (${errors.length} issue${errors.length === 1 ? '' : 's'}):`);
+  console.error(`✗ skill check failed (${errors.length} issue${errors.length === 1 ? '' : 's'}):`);
   for (const e of errors) console.error(`  - ${e}`);
   process.exit(1);
 }
 
 console.log(
-  `✓ skill symlinks OK — ${canon.size} canonical skills; no dangling links; ` +
-    `.claude mirrors the full set; .opencode mirrors the architect-* domain skills.`,
+  `✓ skills OK — ${canon.size} canonical skills; no dangling links; ` +
+    `.claude mirrors the full set; .opencode mirrors the architect-* domain skills; ` +
+    `all descriptions ≤${DESCRIPTION_MAX} chars and YAML-safe.`,
 );
