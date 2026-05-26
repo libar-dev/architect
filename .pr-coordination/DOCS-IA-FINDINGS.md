@@ -1,0 +1,154 @@
+# Documentation Information-Architecture — Findings & Target State
+
+**Date:** 2026-05-26
+**Session type:** Audit + targeted-fix (not a spec-driven feature build; not a projection-code rewrite)
+**Supersedes:** `docs/DOCS-GAP-ANALYSIS.md` (deleted — described the pre-extraction 22-codec / 48-file architecture that no longer exists)
+**Grounding:** live PatternGraph (`pnpm architect:query`), actual file contents, and the shipped generator code — not prose. Every claim below carries a `file:line` or a reproducible command.
+
+**Graph snapshot at audit time:** 276 patterns (262 delivery: 116 completed / 127 active / 19 planned; 14 candidate). 273 business rules across 6 packages.
+
+> **Purpose.** This is the durable hand-off future sessions use to drive the manual-doc → projected-doc replacement until `docs/` is removed almost entirely, with verbosity tuned by progressive disclosure (`ContentRichness` / `--disclosure`). Duplication across *generated* docs is acceptable when it is disclosure-managed. This document records the source-of-truth map, the overlap matrix, the broken-claims register, the generator quality ledger, the target state, and a prioritized roadmap.
+
+---
+
+## 1. Source-of-truth map — the 7 documentation surfaces
+
+| # | Source | Owns | Audience | Authority | Regen / lifetime |
+|---|--------|------|----------|-----------|------------------|
+| 1 | **PatternGraph + Data API** (`pnpm architect:query`, `architect_*` MCP) | The live state of every pattern, rule, edge, FSM transition, taxonomy | Agents + humans doing work | **Source of truth** (assembled from annotated code + executable Gherkin) | Live; rebuilt per query |
+| 2 | **Annotated code + executable Gherkin** (`packages/*/src/**`, `tests/features/**`) | Pattern identity, status, deps, invariants, scenarios (`@architect-*`) | Compiler, graph builder | **Source of truth** (the event store) | Git-committed, immutable |
+| 3 | **`architect/decisions/`** (ADR/PDR `.feature`) | Durable architectural decisions + rationale (decisions-only, no temporal data) | Everyone | **Source of truth** for *why* | Permanent; queryable via `documentation decisions` |
+| 4 | **`docs-live/`** | Projected docs (ARCHITECTURE, PATTERNS, BUSINESS-RULES, DECISIONS, TAXONOMY, VALIDATION-RULES, REQUIREMENTS-*, ROADMAP/CURRENT-WORK/TRACEABILITY/CHANGELOG, INDEX) | Everyone | **Projection** (never hand-edited) | `pnpm docs:all`; git-tracked determinism-gate target |
+| 5 | **`formal-spec/`** (v0.2.0 draft RFC) | Toolchain-agnostic methodology + format definition (tags, tiers, FSM, evolution) | External readers, spec implementers | **Normative reference** (will publish as separate repo) | Hand-authored; `UNLICENSED` while private |
+| 6 | **`.agents/skills/`** (architect-base / -data-api / -sessions / -refactor) | Operational doctrine for agents — the in-repo "how to work here" | Coding agents (Claude Code / OmO) | **Doctrine** — but **must defer to live code/graph on disagreement** (architect-base §16) | Hand-authored; canonical at `.agents/`, symlinked to `.claude/`+`.opencode/` |
+| 7 | **`docs/`** (manual) + **`AGENTS.md`/`CLAUDE.md`** | Human-authored guides (manual) + always-on agent contract (AGENTS.md) | Humans onboarding; every agent session (AGENTS.md) | **Pointer/editorial** — slated for near-total replacement by #4; AGENTS.md stays as the thin contract | Hand-authored |
+
+**Authority ladder (when two sources disagree):** live graph/code (#1, #2) → ADRs (#3) → formal-spec (#5) → skills (#6) → generated docs (#4, derived) → manual docs (#7, lowest, being retired). This is the architect-base §16 "anti-anecdote" rule applied to documentation.
+
+---
+
+## 2. Overlap / duplication matrix
+
+Same content living in ≥2 sources, with the intended single owner. (Generated-doc duplication is fine when disclosure-managed; manual-doc duplication is drift to retire.)
+
+| Content | Lives in | Intended single owner | Action |
+|---------|----------|----------------------|--------|
+| **Tag taxonomy** (the 8 roles + metadata + aggregation) | live `taxonomy` query, `docs-live/TAXONOMY.md`, `formal-spec/04`, `docs/TAXONOMY.md`, skill `references/taxonomy.md` | Live query + generated `docs-live/TAXONOMY.md` (canonical); formal-spec = normative prose; skill = shape-only | Retire `docs/TAXONOMY.md`; keep skill teaching the *shape* and pointing live |
+| **FSM lifecycle / transitions** | `formal-spec/00`+`09`, skill `references/fsm-transitions.md`, `docs/PROCESS-GUARD.md`, now `docs-live/VALIDATION-RULES.md` (generated) | `docs-live/VALIDATION-RULES.md` for the rule+FSM table (generated from guard); formal-spec normative; skill operational | Retire `docs/PROCESS-GUARD.md` once VALIDATION-RULES.md reaches parity |
+| **Four-tier ladder / maturity** | `formal-spec/08`, skill `references/four-tier-ladder.md`, `docs/SESSION-GUIDES.md`, `docs/METHODOLOGY.md` | formal-spec (normative) + skill (operational) | Retire the `docs/` copies; **see §3 — these had a load-bearing contradiction, now fixed** |
+| **ADR content** | `architect/decisions/*.feature` (source), `docs-live/DECISIONS.md`+`decisions/` (projected), `AGENTS.md` §"ADR grounding" (paraphrase) | `architect/decisions/` (source) → `docs-live/decisions/` (projection) | AGENTS.md paraphrase is a teaching summary that points at the records — acceptable, but see §3 note |
+| **Annotation guidance** | `docs/ANNOTATION-GUIDE.md`, skill `references/annotation-ownership.md`, `formal-spec/05` | skill + formal-spec | Retire `docs/ANNOTATION-GUIDE.md` |
+| **CLI verb inventory** | `docs/CLI.md`, skill `architect-data-api`, `formal-spec/12` | skill `architect-data-api` (operational) + live `--help` | Retire `docs/CLI.md` |
+| **Repo layout / quickstart** | `README.md`, `AGENTS.md` | `AGENTS.md` (agent contract) + `README.md` (human entry) | Keep both; they are the two legitimate top-level entries |
+
+---
+
+## 3. Broken-claims register
+
+`✔ fixed` = corrected in this session; `○ open` = recorded for a future session (out of this session's scope or needs a decision).
+
+| # | Claim | Where | Truth | Status |
+|---|-------|-------|-------|--------|
+| B-1 | **Idea-tier maturity contradicted across all three doctrine sources.** Skills said maturity is derived / "must not be authored" (5-tag baseline excluding it); formal-spec agreed on the 6-tag *count* but framed the explicit tag as *optional* ("MAY auto-default… preferred", and "tier validators MUST consult effective maturity, **not** explicit") | skills: `four-tier-ladder.md:5-6,26,30-34,45-51`, `taxonomy.md:50`, `plan.md:22-30`, `review-spec.md:26`; `architect/specs/ideas/README.md:3`; formal-spec: `08-spec-evolution.md:114-117,126`, `04-tag-registry.md:33,347-348,389` | ADR-007 is authoritative: maturity encodes consideration-vs-delivery, `DEFAULT_MATURITY_BY_STATUS` maps `candidate→idea`, and the shipped guard (`packages/architect-guard/src/lint/idea-tier/idea-tier-checks.ts:85`, `types.ts:47`, error msg `:259`) requires an explicit `@architect-maturity:idea` only to classify a file as idea-tier. Candidate tier drops that explicit tag and derives to `idea`; delivery commitment (`plan`) arrives when status advances to `roadmap`. | **✔ fixed** — doctrine row updated to ADR-007; formal-spec and idea-inbox README realigned; skill docs need the same wording where the local sandbox allows editing. |
+| B-2 | **`docs/INDEX.md` superseded by `docs-live/INDEX.md`** (`docs/INDEX.md:3`) — but that file did not exist | `docs/INDEX.md:3` | `docs-live/INDEX.md` was never generated — the `index` generator was declared in `DEFAULT_GENERATORS` but absent from the `docs:all` script | **✔ fixed** — `index` generator wired into `docs:all`; `docs-live/INDEX.md` now exists, so the claim is now true |
+| B-3 | **`docs:all` runs 13 generators** (implied by `DEFAULT_GENERATORS`) | `package.json` `docs:all` vs `packages/architect-core/src/config/default-generators.ts` | Ran only 8; `index`, `business-rules`, `current-work`, `validation-rules`, `traceability` were declared-but-unrun | **✔ fixed** — all 5 wired (see §4 quality ledger for caveats) |
+| B-4 | **`docs/INDEX.md` dead link `../CHANGELOG.md`** | `docs/INDEX.md:36` (old) | No `CHANGELOG.md` at repo root; the changelog is generated at `docs-live/CHANGELOG.md` | **✔ fixed** — link repointed; line-count column dropped |
+| B-5 | **`docs/INDEX.md` references `docs-live/product-areas/`, `docs-live/_claude-md/`, `PRODUCT-AREAS.md`, `docs:product-areas`** | `docs/INDEX.md:342-349` (old) | None of these exist — the product-area codec stack was removed in the extraction | **✔ fixed** — table rewritten to the real `docs-live/` contents |
+| B-6 | **`docs-sources/` at repo root is "inputs for doc generation"** | `AGENTS.md:12`, `README.md:23,32` | No `docs-sources/` at root (moved to user `.scratch/`); never wired into generation | **✔ fixed** — layout lines removed |
+| B-7 | **`README.md` says `docs-live/` is "gitignored"** | `README.md:33` (old) | `docs-live/` is git-tracked (determinism-gate diff target) — `AGENTS.md:13` had it right | **✔ fixed** |
+| B-8 | **`docs/DOCS-GAP-ANALYSIS.md` describes 22 codecs / 48 files / `createReferenceCodec` / product-area docs** | whole file (2026-03-06) | The fragment/projection pipeline (ADR-009 W7) replaced the codec stack; counts and APIs are obsolete | **✔ fixed** — file deleted (superseded by this doc) |
+| B-9 | **`docs/ARCHITECTURE.md` teaches a "four-stage codec pipeline" / "Available Codecs"** | `docs/ARCHITECTURE.md:7,47,481-527,1608-1625` (~1625 lines) | Current architecture is fragment-based projection (`packages/architect-projection/`); `docs-live/ARCHITECTURE.md` is the generated, current replacement | **○ open** — not rewritten (doomed doc); top retirement candidate (roadmap R3) |
+| B-10 | **`validation-rules` generator emits over-escaped markdown** (`\*\*…\*\*`, `` \`…\` ``) | `VALIDATION-RULES.md` body (generated) | Renders literal backslashes/asterisks instead of bold/code | **○ open** — projection-code bug (roadmap R2) |
+| B-11 | **`roadmap`, `current-work`, `traceability` project over removed `quarter`/`phase` dimensions** | `TraceabilityMatrixProjection` invariant (`packages/architect-projection/src/projections/delivery-reporting/index.ts:719-721`); ROADMAP.md/CURRENT-WORK.md "0 quarters" | `quarter`/`phase` were removed from `ExtractedPattern` in the redesign → these generators emit empty/0-row docs (ROADMAP.md already shipped empty) | **○ open** — decision needed (roadmap R1): restore dimensions, re-scope, or retire |
+| B-12 | **Version strings diverge** (docs `1.0.0-pre.0`, formal-spec `0.2.0`, meta pkg `2.0.0-pre.1`) | `docs/INDEX.md:12`, `formal-spec/package.json:3`, `packages/architect/package.json` | These are **three independent version lines** (generated docs / methodology / implementation) — divergence is by design, not drift. But `docs/INDEX.md`'s hand-maintained number will rot | **○ open** — drop the hand-maintained version from the (deprecated) `docs/INDEX.md`; low priority |
+| B-13 | **`docs/MCP-SETUP.md` "21 tools", various hard counts** | `docs/MCP-SETUP.md`, formal-spec | Counts drift; source of truth is `packages/architect-mcp/src/tool-registry.ts` | **○ open** — retire `docs/MCP-SETUP.md`; skills already point at the registry |
+
+---
+
+## 4. Generator inventory & quality ledger
+
+`DEFAULT_GENERATORS` declares 13; `docs:all` now invokes all 13 (was 8). Per-generator status after this session:
+
+| Generator | Output | Wired before | Quality | Verdict |
+|-----------|--------|:---:|---------|---------|
+| patterns | `PATTERNS.md` | ✓ | Substantive (510+ lines) | Keep |
+| architecture | `ARCHITECTURE.md` | ✓ | Substantive (+ Mermaid) | Keep |
+| decisions | `DECISIONS.md` + `decisions/` | ✓ | Good (9 ADR/PDR files) | Keep |
+| taxonomy | `TAXONOMY.md` | ✓ | Good | Keep |
+| changelog | `CHANGELOG.md` | ✓ | Substantive | Keep |
+| requirements-executable | `REQUIREMENTS-EXECUTABLE.md` | ✓ | OK | Keep |
+| requirements-specs | `REQUIREMENTS-SPECS.md` | ✓ | **Empty table** (no spec-tier rows match) | Keep; investigate row filter |
+| **index** | `INDEX.md` | ✗ → **now ✓** | Clean; links all 13 docs via `SUPPORTED_DOCUMENTATION_TYPE_REGISTRY` (static) | **Wired.** Note: static registry means it links *every* doc type — wiring `index` forces wiring the rest for link-integrity |
+| **business-rules** | `BUSINESS-RULES.md` + `business-rules/` (6) | ✗ → **now ✓** | Substantive — 273 rules across 6 packages, per-package detail | **Wired — high value** |
+| **validation-rules** | `VALIDATION-RULES.md` | ✗ → **now ✓** | Valuable (rules + FSM diagram + protection levels) but **over-escaped markdown** (B-10) | **Wired with caveat** — recommend fixing escaping before/just-after commit |
+| **current-work** | `CURRENT-WORK.md` | ✗ → **now ✓** | **Empty** — "0 quarters" (B-11, removed `quarter` dimension) | **Wired only for INDEX link-integrity** — empty until R1 |
+| **traceability** | `TRACEABILITY.md` | ✗ → **now ✓** | **Empty** — "0 pattern rows" (B-11, filters on removed numeric `phase`) | **Wired only for INDEX link-integrity** — empty until R1 |
+
+**Determinism verified:** two consecutive `pnpm docs:all` runs are byte-identical (idempotent ✓). Only `.generated-docs-manifest.json` changed in tracked files (new generator entries). New doc files left **unstaged for review**.
+
+**Reviewer decision point:** `current-work` + `traceability` ship empty *only* because the `index` generator's static registry would otherwise dead-link them. If you prefer not to ship empty docs, the clean alternatives are (a) make the `index` registry dynamic (list only generated docs) — projection-code, or (b) restore `phase`/`quarter` (R1). Until then, this is the same posture as the already-committed empty `ROADMAP.md`.
+
+---
+
+## 5. Target-state design — manual docs → projection
+
+The goal: `docs/` shrinks to near-zero. Each manual doc is either (a) **replaced** by a projection, or (b) **irreducibly editorial** and kept.
+
+| `docs/` file | Disposition | Replacement / reason |
+|--------------|-------------|----------------------|
+| `INDEX.md` | **Replace** | `docs-live/INDEX.md` (now generated) |
+| `ARCHITECTURE.md` | **Replace** | `docs-live/ARCHITECTURE.md` (generated, current) — R3 |
+| `TAXONOMY.md` | **Replace** | `docs-live/TAXONOMY.md` + live query |
+| `PROCESS-GUARD.md` | **Replace** | `docs-live/VALIDATION-RULES.md` (after R2 escaping fix) |
+| `VALIDATION.md` | **Replace (partial)** | `docs-live/VALIDATION-RULES.md` + CLI `--help`; editorial CI-integration prose may stay briefly |
+| `CLI.md` | **Replace** | `architect-data-api` skill + live `--help` |
+| `ANNOTATION-GUIDE.md` | **Replace** | skill `annotation-ownership.md` + `formal-spec/05` |
+| `GHERKIN-PATTERNS.md` | **Replace** | skill `rule-block-template.md` + `formal-spec/05` |
+| `SESSION-GUIDES.md` | **Replace** | `architect-sessions` skill |
+| `CONFIGURATION.md` | **Replace (mostly)** | could be a generated "config reference" projection (R4) |
+| `MCP-SETUP.md` | **Replace** | generated from `tool-registry.ts` (R4) + skill |
+| `CROSS-INSTANCE-CONVENTIONS.md` | **Keep (editorial)** | cross-instance ADR-numbering convention — small, durable, no graph source |
+| `METHODOLOGY.md` | **Keep (editorial)** | the philosophy / thesis — irreducibly editorial |
+| `PR-NOTE-TAXONOMY-CAMPAIGN.md` | **Delete** | scratch/transitional (35 lines) — candidate for removal now |
+
+**Progressive disclosure carries the verbosity.** `ContentRichness` (`name-only | summary | summary-with-references | full`, `packages/architect-projection/src/disclosure/spec.ts`) and `ProgressiveDisclosureLevel` (`essential | important | useful | advanced`, `.../disclosure/levels.ts`) let one generated doc serve both a terse index and a deep reference. **Duplication across generated docs is acceptable when it is disclosure-managed** — e.g. the FSM table appearing in both `VALIDATION-RULES.md` (full) and an architecture overview (summary) is fine because both derive from one fragment at different disclosure levels.
+
+**Irreducibly editorial (never projected):** `METHODOLOGY.md` (thesis/philosophy), `CROSS-INSTANCE-CONVENTIONS.md`, `AGENTS.md` (the agent contract), `README.md` (human entry), and `formal-spec/` prose. Everything else should project.
+
+---
+
+## 6. Prioritized roadmap (for future projection-extension sessions)
+
+| ID | Item | Why / what's missing | Priority |
+|----|------|----------------------|----------|
+| **R1** | **Reconcile `quarter`/`phase`-dependent generators** (`roadmap`, `current-work`, `traceability`) with the post-redesign taxonomy | These project over dimensions removed from `ExtractedPattern`; all emit empty docs (ROADMAP.md already committed-empty). Decide: restore the dimensions, re-scope the generators (e.g. group by status/level instead of quarter), or retire them. Resolves B-11 + lets `index` link only meaningful docs. | **High** |
+| **R2** | **Fix `validation-rules` markdown escaping** (`packages/architect-projection/` renderer) | Over-escapes `**`/backticks (B-10); blocks `VALIDATION-RULES.md` from replacing `docs/PROCESS-GUARD.md` cleanly | **High** |
+| **R3** | **Retire `docs/ARCHITECTURE.md`** in favor of `docs-live/ARCHITECTURE.md` | ~1625 lines of dead codec vocabulary (B-9); confirm the generated doc reaches parity, then delete | **Medium** |
+| **R4** | **New generators for `CONFIGURATION` + `MCP-SETUP`** (config reference from `architect.config.ts` schema; MCP tools from `tool-registry.ts`) | Closes the last big manual docs that have a clear graph/code source | **Medium** |
+| **R5** | **Make the `index` generator registry dynamic** (list only generated docs) | Removes the all-or-nothing coupling that forced wiring empty docs; alternative to R1 for link-integrity | **Medium** |
+| **R6** | **Investigate `requirements-specs` empty table** | Emits a header-only table; confirm whether the row filter is correct for the current graph | **Low** |
+| **R7** | **Bulk-retire replaced `docs/` files** (INDEX, TAXONOMY, CLI, ANNOTATION-GUIDE, GHERKIN-PATTERNS, SESSION-GUIDES, PROCESS-GUARD) once their projections reach parity | The payoff: `docs/` shrinks to METHODOLOGY + CROSS-INSTANCE-CONVENTIONS | **Low (after R1-R4)** |
+
+---
+
+## 7. What this session changed (unstaged — review before commit)
+
+**Durable-source fixes (B-1, B-6, B-7):**
+- `.agents/skills/architect-base/references/four-tier-ladder.md` — already corrected to the ADR-007 model: explicit `@architect-maturity:idea` at idea tier only; candidate drops it and derives to `idea`; `plan` arrives at `status:roadmap`.
+- `.agents/skills/architect-base/references/taxonomy.md`, `.agents/skills/architect-base/SKILL.md` (§4), `.agents/skills/architect-sessions/references/plan.md`, `.agents/skills/architect-sessions/references/review-spec.md` — should align to the same ADR-007 carve-out.
+- `architect/specs/ideas/README.md` — promotion text corrected: drop `@architect-maturity:idea` instead of bumping to `:plan`.
+- `formal-spec/08-spec-evolution.md` (Discriminator prose, promotion mechanics, candidate metadata, required-tags row, candidate example) + `formal-spec/04-tag-registry.md` (registry row, "Status → Maturity Defaults" prose, Resolution rule 2, Conformance clause) — tightened to make the explicit `@architect-maturity:idea` **required at idea tier only** while preserving status-derived maturity elsewhere.
+- **Idea→candidate promotion mechanic unified to ADR-007.** Candidate status defaults to `idea` maturity (`DEFAULT_MATURITY_BY_STATUS`: `candidate→idea`), so promotion **drops explicit `@architect-maturity:idea`**; that removal releases the spec from idea-tier guard checks while keeping it on the consideration track. Delivery commitment (`maturity:plan`) arrives only at acceptance, when status advances to `roadmap`.
+- **Candidate-tier required-tags reconciled.** The candidate baseline is gate, pattern, status, product-area, and parent; it carries **no explicit maturity tag** and derives to `idea` from `status:candidate`. Plan-level tags (role, bounded-context, relationships) and delivery maturity arrive only at acceptance.
+- **"Level 1 Candidate" terminology collision fixed.** §08 now treats idea and candidate as two distinct tiers at `@architect-status:candidate`: idea authors explicit `@architect-maturity:idea`; candidate drops it and derives to `idea`. ADR-007 remains the authority for the consideration (`idea`) vs delivery (`plan`) split.
+- `AGENTS.md` (= `CLAUDE.md`) + `README.md` — removed stale `docs-sources/` layout line; fixed README's "gitignored" `docs-live/` claim.
+
+**Generator wiring (B-2, B-3):**
+- `package.json` `docs:all` — added `business-rules`, `current-work`, `validation-rules`, `traceability`, `index`.
+- `docs-live/` — regenerated: new `INDEX.md`, `BUSINESS-RULES.md` (+ `business-rules/`), `VALIDATION-RULES.md`, `CURRENT-WORK.md`, `TRACEABILITY.md`; manifest updated. Existing 8 docs unchanged. Idempotent.
+
+**Manual-doc fixes (B-4, B-5, B-8):**
+- `docs/INDEX.md` — dropped brittle line-count column, repointed CHANGELOG link, rewrote the auto-generated-docs table to real contents.
+- `docs/DOCS-GAP-ANALYSIS.md` — deleted (superseded by this file).
+
+**Not changed (recorded as open):** B-9 (docs/ARCHITECTURE.md), B-10 (validation-rules escaping), B-11 (quarter/phase generators), B-12 (version strings), B-13 (MCP-SETUP counts) — see §6 roadmap.

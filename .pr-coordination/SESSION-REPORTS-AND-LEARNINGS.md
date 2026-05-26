@@ -607,3 +607,94 @@ is the whole input — exclusion must be unconditional; only the softer filter d
 2. **`overview`'s default output is now `summary`.** `--disclosure full` reproduces the prior wall;
    skills/docs that quoted the full bootstrap output should note the flag.
 3. ADR-content hygiene (D-16) is a separate workstream — do not edit `architect/decisions/*` inline.
+
+## WS-2 — Skills consolidation (docs/skills only, no code)
+
+Completed WS-2 (D-21, plan-approved 2026-05-26). Restructured the skill family to
+match the `architect-base` / `architect-data-api` rebuild: **state-driven, progressive
+disclosure, anti-anecdote**.
+
+**Done:**
+- New **`architect-sessions`** skill = required all-sessions context (shapes, state-driven,
+  value-transfer concept, universal rules, disclosure map — absorbing the old
+  `architect-session-router`'s intent table) + 6 progressive-disclosure `references/`
+  (plan / design / implement / review-spec / review-implementation / handoff), hybrid
+  style (lean execution + up-front context-gathering + next-session pointer).
+- **Dissolved `_shared/`** → `architect-base/references/` (taxonomy, four-tier-ladder,
+  fsm-transitions, annotation-ownership, spec-pattern-relationships, rule-block-template,
+  + new **decision-records.md**). `canonical-references.md` anti-anecdote rule folded into
+  `architect-base` §"Anti-anecdote"; self-containment rule dropped. `value-transfer.md` →
+  `architect-sessions/references/ephemeral-spec-deletion.md`. `multi-session-coordination.md`
+  → `architect-refactor-session/references/` (+ absorbed session-preamble campaign rules 4–6).
+- **Deleted** `architect-cli-overview` (non-production prototype, no symlink, dead pointer).
+- Repointed every `_shared/` cross-ref, `.claude/skills/` symlinks (add architect-sessions;
+  drop the 6 folded + router + _shared), and the PREAMBLE skill list.
+
+### Rules for next session
+
+1. **`_shared/` no longer exists.** Doctrine depth is `architect-base/references/`; session
+   execution is `architect-sessions/references/`; coordination is
+   `architect-refactor-session/references/multi-session-coordination.md`.
+2. **No session-router.** `architect-sessions` is the entry for any spec-driven session and
+   self-routes via its disclosure map; `architect-refactor-session` stays separate.
+3. **Decision records hold durable, non-execution facts only** (D-21 highlight) — distinct
+   from this ephemeral campaign `DECISIONS.md`. See `architect-base/references/decision-records.md`.
+
+## WS-2 — Polish pass (D-22, docs/skills + one guard script)
+
+Post-D-21 pedantic review, this time including `.opencode/skills/` (D-21 only re-wired `.claude/skills/`).
+
+- **`.opencode/skills/` was frozen pre-consolidation** — 8 git-tracked **dangling** symlinks
+  (`_shared` + the 7 deleted session/router skills) and `architect-sessions` missing entirely,
+  so OmO agents couldn't discover it. Re-wired to mirror the canonical set (4 architect skills;
+  Claude-only authoring skills excluded from OmO).
+- **Taxonomy reframed — teach theory, point to live data** (maintainer steering). `taxonomy.md`
+  now teaches axes / tag categories / csv-vs-colon syntax and points to `pnpm architect:query
+  taxonomy` + the generated `docs-live/TAXONOMY.md`, instead of a hand-table that duplicated and
+  drifted. `architect-base` §4 gained `@architect-product-area`; dropped the "full tag set" claim.
+- **Source-grounded finding:** the validation registry (`buildRegistry`, 30 tags → digest →
+  `docs-live/TAXONOMY.md`) omits scanner-recognized `@architect-executable-specs` /
+  `@architect-usecase`. Neither digest nor hand-list is authoritative → logged to `FEEDBACK.md`.
+- **Smaller fixes:** `plan.md` idea-tier template `@architect-parent` (matched its five-tag
+  minimum); `architect-base` §2 `docs-live/` git-tracked (not gitignored); `AGENTS.md` dropped the
+  non-existent `.claude-plugin/` claim + documents `.opencode/skills/` wiring.
+- **Drift guard:** `scripts/check-skill-symlinks.mjs` + `pnpm check:skills`. Verified green
+  (+ negative tests); 162/162 intra-skill links resolve.
+
+### Rules for next session
+
+1. **Run `pnpm check:skills` after any skill add/remove/rename** — it asserts no dangling links,
+   Claude mirrors the full canonical set, and OmO mirrors the canonical `architect-*` skills
+   (so a domain skill missing from a harness — the F1 regression — fails the check). Required
+   sets are derived from canonical names by convention (`architect-*`), no name hardcoded.
+2. **Never hand-enumerate taxonomy in skills.** Teach the model; point to `pnpm architect:query
+   taxonomy` + `docs-live/TAXONOMY.md`. The same "explain theory, point to live data" lens applies
+   to any generated/queryable surface (e.g. the MCP tool inventory → `tool-registry.ts`).
+
+## WS-2 — Second-pass skills review (D-23, docs/skills only)
+
+Critical re-review of the consolidated skills, reading every body + reference directly (the three
+automated audit agents all returned false "all clean" verdicts). Fixed 5 residual skill-content
+defects the May-26 polish wave missed or never propagated:
+
+- **`four-tier-ladder.md`** (predates the wave): both worked examples showed FOUR tags under a
+  "Five authored tags" caption → added `@architect-parent`; `@architect-product-area` was
+  miscategorized as an "above-idea" tag → corrected (it is required baseline tag #4). The identical
+  `@architect-parent` defect D-22 fixed in `plan.md` had never reached the canonical ladder.
+- **`spec-pattern-relationships.md`**: "`slice`'s parent is `task`" contradicted "slices … do not
+  carry `@architect-parent`" → fixed the level-ordering example.
+- **architect-base §3**: added the missing `architect/slices/` folder row.
+- **`annotation-ownership.md`**: `@architect-status` value list was missing `candidate`.
+- **`AGENTS.md`**: elevated `architect-sessions` to a 3rd mandatory skill (box + prose);
+  `architect-refactor-session` kept unadvertised (transitional non-spec-driven exception).
+- **`DECISIONS.md`**: durable-only header + "Key durable decisions" index (maintainer point #4);
+  body-trim of resolved WS-1/3 entries deferred to campaign-archive (the doctrine's trim point) —
+  the learnings log lacks Sessions 15-16, so those entries are the sole prose record besides git.
+
+### Rules for next session
+
+1. **Fix shared rules in ALL copies.** A rule duplicated across `four-tier-ladder.md`, `plan.md`,
+   `review-spec.md` drifts when only one copy is fixed — grep the rule text across the skills tree
+   after any doctrine change.
+2. **Don't trust a reviewer's "all clean" — read the artifact.** The audit agents missed every
+   defect here; the canonical reference ended up less correct than the files citing it.

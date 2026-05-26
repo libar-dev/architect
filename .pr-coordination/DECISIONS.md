@@ -1,7 +1,27 @@
 # Decisions — questions that need human judgment
 
-> Tight entries only. Implementation details live in the session prompt that
-> consumes the decision, not here.
+> **Campaign-ephemeral, durable facts only.** This log holds the judgment-calls
+> one campaign needed before code — `Question / Options / Recommendation /
+> Status (resolved-with-sha)` — then archived at campaign close. Keep entries
+> tight: implementation detail and execution narrative belong in the consuming
+> session prompt, `SESSION-REPORTS-AND-LEARNINGS.md`, or the commit body —
+> **not here**. This is the *opposite* of a durable ADR (`architect/decisions/`,
+> permanent); see `.agents/skills/architect-base/references/decision-records.md`.
+> (Several resolved WS-1/WS-3 entries below still carry execution narrative; that
+> is trimmed when the campaign archives, per the lifecycle above.)
+
+## Key durable decisions (standing rules future work must respect)
+
+- **D-3** — un-patterned shipped abstractions get a code-originated `.ts` `@architect-pattern`.
+- **D-6** — additive `@architect-uses` on a `completed` pattern needs no `@architect-unlock-reason`.
+- **D-7** — de-orphan fragments via the producer (`<X>Projection uses <X>`), never the barrel.
+- **D-8** — `@architect-uses` is ONE comma-separated line; a second line is silently dropped.
+- **D-10** — adding `@architect-implements` to a `completed` test spec needs an `@architect-unlock-reason`.
+- **D-11** — producerless grouping barrels use barrel→submodule edges (GitModule precedent).
+- **D-12** — a `runCommand` CLI test `@architect-implements` the command's 1:1 production pattern.
+- **D-15** — the component view filters test-feature patterns by source path (`implementsPatterns` is NOT a test discriminator).
+- **D-19** — architecture diagrams draw only forward dependency edges (drop the derived `enables`).
+- **D-21** — skills = `architect-base` (+refs), `architect-data-api`, `architect-sessions` (+refs), `architect-refactor-session` (+refs), `omo-plan-author`.
 
 ## D-1 — WS-1 pilot scope
 
@@ -143,7 +163,7 @@
 ## D-15 — WS-3: shrink the ARCHITECTURE.md catch-all buckets by filtering test-feature patterns out of the component view (not by mass-tagging tests)
 
 - **Question:** D-14's diagram left large catch-all buckets (`role: projection` 17, `Architect Core` 22, `Host (Dev)` 22, `MCP` 4) — almost all executable-test features. Shrink them by tagging each test feature with a bounded-context, or by filtering them out of the component view?
-- **Doctrine grounding (`.agents/skills/_shared/value-transfer.md`):** the transfer checklist classifies `@architect-role` / `@architect-bounded-context` as **implementation-classification tags owned by PRODUCTION code** (the split-ownership "how + with what" surface). A test/executable-spec `.feature` owns identity + invariants + the `@architect-implements` edge — _not_ implementation classification. Mass-tagging test features would invert ownership; additive tags on tests are not the right lever.
+- **Doctrine grounding (`.agents/skills/architect-sessions/references/ephemeral-spec-deletion.md`, formerly `_shared/value-transfer.md`):** the transfer checklist classifies `@architect-role` / `@architect-bounded-context` as **implementation-classification tags owned by PRODUCTION code** (the split-ownership "how + with what" surface). A test/executable-spec `.feature` owns identity + invariants + the `@architect-implements` edge — _not_ implementation classification. Mass-tagging test features would invert ownership; additive tags on tests are not the right lever.
 - **Chosen:** the **component** architecture view shows production components defined in source — **exclude patterns whose identity is a `.feature` under `tests/features/`** (`isTestFeaturePattern` in `architecture-diagram.internal.ts`). No file-by-file tagging. Their test→production traceability already lives in the traceability / requirements-executable docs. Result: 237→**169 patterns**, 29→**24 diagrams**; the `role: projection` / `Architect Core` / `Host (Dev)` / `MCP` buckets vanish; residual `role: contract (4)` = genuine cross-cutting production union/type contracts; the 9-ADR bucket retained (ADRs live under `architect/decisions/`, not `tests/features/`).
 - **Load-bearing learning — `implementsPatterns` is NOT a test-pattern discriminator.** First pass filtered on "non-empty `implementsPatterns`"; this over-filtered real components (`process-guard` 6→2, `lint` 4→3) because **production sub-modules legitimately carry `@architect-implements` to a barrel pattern** (verified: `DeriveProcessState`/`DetectChanges`/`SessionStateReader`/`ProcessGuardTypes` each `@architect-implements:ProcessGuardLinter`). The correct, robust discriminator is the **source path** (`tests/features/`), the canonical executable-spec home (self-hosting globs). An implements edge alone says nothing about test-vs-production.
 - **Targeted PRODUCTION annotation fixes (right surface, truthful):**
@@ -222,3 +242,39 @@
 - **Method:** refactoring carve-out — additive JSDoc edges on `completed`/`active` patterns; per D-6 no `@architect-unlock-reason` (edge-only; `guard --staged`: 0 status transitions / 0 deliverable changes); per D-8 extended the single comma-separated `@architect-uses` line; targets all pre-existing so `dangling --strict` stays green (drift false, 0 refs).
 - **Consumed by:** this session (WS-1 cross-package expansion).
 - **Status:** resolved (maintainer "full sweep" + plan-approved 2026-05-26) → 8 surface edges authored; `cli→guard` + utility long-tail deferred (anti-phantom / anti-spam); 6/7 package-pairs honest.
+
+## D-21 — WS-2: skills consolidation (one spec-driven session skill + dissolve `_shared/`)
+
+- **Question:** The session skills predated the `architect-base` / `architect-data-api` rebuild and had drifted (PREAMBLE flagged them "NOT 100% current"; `architect-session-router` cross-referenced data-api sections that no longer exist). How should WS-2 restructure them?
+- **Chosen (plan-approved 2026-05-26):** propagate the core-skill patterns (state-driven, progressive disclosure, anti-anecdote) to the rest.
+  - **One comprehensive `architect-sessions` skill** absorbs the 6 spec-driven session skills (plan / design / implement / review-spec / review-implementation / handoff) as progressive-disclosure `references/`, plus the old `architect-session-router`'s intent table + disambiguation rules into its body. No standalone router (state-driven retires intent dispatch).
+  - **`architect-refactor-session` stays separate** — the non-spec-driven carve-out.
+  - **Dissolve `_shared/`** into doctrine `references/` under the always-loaded `architect-base` (taxonomy, four-tier-ladder, fsm-transitions, annotation-ownership, spec-pattern-relationships, rule-block-template) + a new `decision-records.md`. `canonical-references.md`'s anti-anecdote rule folds into `architect-base` §"Anti-anecdote"; its `_shared/`-self-containment rule is dropped (obsolete). `value-transfer.md` → `architect-sessions/references/ephemeral-spec-deletion.md` (renamed; concept summary stays in base §13 + sessions body). `multi-session-coordination.md` → `architect-refactor-session/references/` and absorbs `session-preamble.md`'s campaign rules 4–6; rules 1–3 are universal in the sessions body.
+  - **Deleted:** `architect-cli-overview` (self-declared non-production prototype, no symlink, dead `proto-output/` pointer — the verbs-by-intent anti-pattern the state-driven rebuild retired).
+- **Per-session references** use a hybrid style: lean execution discipline + a short up-front context-gathering step + a "next session" pointer (light pm-skills inspiration).
+- **Decision-records doctrine highlighted** (maintainer point): ADRs hold only durable, non-execution facts; explicitly distinguished from the ephemeral campaign `DECISIONS.md` (opposite lifetimes) in base §7 + `references/decision-records.md`.
+- **Wiring:** `.claude/skills/` symlinks updated (add `architect-sessions`; drop the 6 folded skills + router + `_shared`). No `.claude-plugin/` manifest exists. `omo-plan-author` untouched (OmO-specific, isolated).
+- **Method:** docs/skills-only workstream — no production code, no `architect/specs/` changes, no FSM concern.
+- **Consumed by:** this session (WS-2).
+- **Status:** resolved (plan-approved 2026-05-26) → consolidated to architect-base (+references), architect-data-api, architect-sessions (+references), architect-refactor-session (+references), omo-plan-author.
+
+## D-22 — WS-2 polish: `.opencode/skills/` drift fix + taxonomy "teach theory, point to live data" + skill-symlink guard
+
+- **Question:** A post-D-21 review (this time including `.opencode/skills/`, which D-21 never touched) surfaced: the OmO skill tree was frozen pre-consolidation; `AGENTS.md` claimed a non-existent `.claude-plugin/`; `plan.md`'s idea-tier template omitted a required tag; and the taxonomy was hand-enumerated in the skills, duplicating the generated `docs-live/TAXONOMY.md` + the live API and already drifting. How to close these?
+- **Chosen (plan-approved 2026-05-26):**
+  - **`.opencode/skills/` re-wired** to mirror the canonical set — removed **8 dangling** symlinks (`_shared` + the 7 deleted session/router skills) and added the missing `architect-sessions`. End state = `architect-base`, `architect-data-api`, `architect-sessions`, `architect-refactor-session` (Claude-only authoring skills intentionally excluded from OmO). Root cause: D-21 re-wired only `.claude/skills/`.
+  - **Taxonomy reframed to "teach theory, point to live data"** (maintainer steering): `architect-base/references/taxonomy.md` now teaches the three classification axes, tag *categories*, and the csv-vs-colon syntax — and points to `pnpm architect:query taxonomy` + the generated `docs-live/TAXONOMY.md` for the enumeration, instead of hand-maintaining a per-tag table. `architect-base` §4 gains `@architect-product-area` (required idea-tier tag) + the live/generated pointer; dropped the "full tag set" overclaim.
+  - **Two-tag-source finding** logged to `FEEDBACK.md`: the validation-registry digest (→ `docs-live/TAXONOMY.md`) omits scanner-recognized tags (`@architect-executable-specs`, `@architect-usecase`), so no single hand-list is authoritative — reinforces point-to-live.
+  - **`plan.md` idea-tier template** corrected to include `@architect-parent` (matching its own five-tag minimum). `architect-base` §2 corrected (`docs-live/` is git-tracked, not gitignored). `AGENTS.md` Harnesses section dropped the non-existent `.claude-plugin/` clause and now documents the `.opencode/skills/` wiring + `pnpm check:skills`.
+  - **Drift guard added:** `scripts/check-skill-symlinks.mjs` + `pnpm check:skills` — asserts no dangling symlinks, Claude mirrors the full canonical set, and **OmO mirrors the canonical `architect-*` skills** (the namespace matching opencode.jsonc's `architect-*` allow rule; non-`architect-*` authoring tools are Claude-only by convention). Per-harness required sets are derived from the canonical names by convention — no skill name hardcoded — so it catches the exact F1 regression (a domain skill present in `.agents/skills/` but missing from a harness), which a plain "subset resolves" check would not.
+- **Method:** docs/skills + one zero-dep guard script — no production code, no `architect/specs/` changes, no FSM concern. Verified: `pnpm check:skills` green (+ negative tests for dangling / missing-mirror), 162/162 intra-skill links resolve, live `taxonomy` query cross-checked against the reframed model.
+- **Consumed by:** this session (WS-2 polish).
+- **Status:** resolved (plan-approved 2026-05-26).
+
+## D-23 — `architect-sessions` is mandatory; `architect-refactor-session` stays unadvertised
+
+- **Question:** After consolidation, how does `AGENTS.md` present the skill set — which skills are mandatory, and is the refactor skill advertised?
+- **Options:** (a) keep `architect-base` + `architect-data-api` as the only headline skills; (b) add `architect-sessions` as a third mandatory skill; (c) also advertise `architect-refactor-session`.
+- **Recommendation:** (b). `architect-sessions` is mandatory (progressive disclosure keeps its context cost low); `architect-refactor-session` stays **unadvertised** in human-facing docs — the transitional non-spec-driven exception for the pre-publish extract phase — while its skill-description routing + `check:skills` wiring remain so it still loads when genuinely needed.
+- **Consumed by:** this review session (the `AGENTS.md` "Skills — mandatory" edit). The review's defect fixes and learnings are in `SESSION-REPORTS-AND-LEARNINGS.md`, not here.
+- **Status:** resolved (maintainer-approved 2026-05-26).

@@ -5,7 +5,7 @@
   "workstreams": {
     "WS-0-finalize-hygiene": "done (committed 6f2fc6c)",
     "WS-1-annotation-reenablement": "phase-1 projection pilot COMPLETE (Sessions 01-06); expansion COMPLETE (core Sessions 07-08; guard Session 09; connectable test features Session 10; new code-originated identities Session 11). Shipped-code connectivity at terminal floor (~27 orphans = working-state specs + untargetable integration/fixture features).",
-    "WS-2-skills": "scoped — next workstream (now unblocked)",
+    "WS-2-skills": "DONE (D-21, plan-approved 2026-05-26) — consolidated the 6 spec-driven session skills + session-router into one progressive-disclosure architect-sessions skill; dissolved _shared/ into architect-base/references/ (+ new taxonomy.md, decision-records.md); renamed value-transfer.md -> architect-sessions/references/ephemeral-spec-deletion.md; moved multi-session-coordination.md -> architect-refactor-session/references/ (absorbing session-preamble campaign rules 4-6); deleted dead architect-cli-overview; repointed all cross-refs + .claude/skills symlinks + PREAMBLE. D-22 polish (plan-approved 2026-05-26): re-wired .opencode/skills (removed 8 dangling, added architect-sessions); reframed taxonomy to teach-theory-point-to-live-data; added pnpm check:skills drift guard.",
     "WS-3-docs": "IN PROGRESS — Session 12 restructured ARCHITECTURE.md (237-node graph TD → context map + 29 per-group diagrams; D-14, committed 5b7ab6e). Session 13 shrank the catch-all buckets by filtering test-feature patterns from the component view + production annotation fixes (D-15; 237->169 patterns, 29->24 diagrams). Remaining: other generated-doc reviews (PATTERNS/ROADMAP/CHANGELOG/requirements); HUD/progressive-disclosure ideation captured (ideation-only)."
   },
   "ws3": {
@@ -29,6 +29,30 @@
       "(D-14 #2) Stale 'docs-live gitignored' wording — fixed in AGENTS.md (Session 13).",
       "(D-15 #2) HUD / progressive-disclosure steps 1+2 — BUILT in Session 14 (D-17): --disclosure on overview + generated-views index, CLI+MCP parity."
     ]
+  },
+  "ws2": {
+    "decision": "D-21",
+    "finalSkillSet": [
+      "architect-base (+references: taxonomy, four-tier-ladder, fsm-transitions, annotation-ownership, spec-pattern-relationships, rule-block-template, decision-records)",
+      "architect-data-api",
+      "architect-sessions (+references: plan, design, implement, review-spec, review-implementation, handoff, ephemeral-spec-deletion)",
+      "architect-refactor-session (+references: multi-session-coordination)",
+      "omo-plan-author (untouched, OmO-specific)"
+    ],
+    "deleted": [
+      "architect-cli-overview (non-production prototype, no symlink, dead proto-output pointer)",
+      "architect-session-router (intent dispatch retired by state-driven model; folded into architect-sessions body)",
+      "architect-plan-session / architect-design-session / architect-implement-spec / architect-review-spec / architect-review-implementation / architect-verify-handoff (folded into architect-sessions/references/)",
+      "_shared/ (dissolved; session-preamble.md + canonical-references.md dissolved into other files)"
+    ],
+    "note": "Skills/docs-only workstream — no production code, no architect/specs/ changes, no FSM concern. Per-session references use hybrid style (lean execution + up-front context-gathering + next-session pointer). Verify: grep _shared/ in .agents/skills returns nothing; .claude/skills symlinks resolve.",
+    "polish": {
+      "decision": "D-22",
+      "opencodeSkillSet": ["architect-base", "architect-data-api", "architect-sessions", "architect-refactor-session"],
+      "summary": "Re-wired .opencode/skills to mirror the canonical set — removed 8 dangling symlinks (_shared + the 7 deleted session/router skills) and added the missing architect-sessions; Claude-only authoring skills intentionally excluded from OmO. Root cause: D-21 re-wired only .claude/skills. Taxonomy reframed to teach theory + point to live data (architect-base/references/taxonomy.md now teaches axes/categories/syntax, points to pnpm architect:query taxonomy + generated docs-live/TAXONOMY.md; base §4 gained @architect-product-area; dropped the 'full tag set' overclaim). Two-tag-source gap (validation-registry digest omits scanner-recognized @architect-executable-specs/@architect-usecase) logged to FEEDBACK.md. plan.md idea-tier template fixed (@architect-parent added); base §2 corrected (docs-live git-tracked); AGENTS.md dropped non-existent .claude-plugin claim + documents .opencode/skills wiring.",
+      "guard": "Added scripts/check-skill-symlinks.mjs + pnpm check:skills — asserts no dangling symlinks, Claude mirrors the full canonical set, and OmO mirrors the canonical architect-* skills (namespace matches opencode.jsonc architect-* allow rule; non-architect-* authoring tools Claude-only by convention). Per-harness required sets derived from canonical names by convention (none hardcoded), so it catches the F1 regression (domain skill missing from a harness) that a plain subset check would miss.",
+      "verify": "pnpm check:skills green (+ negative tests: dangling, missing Claude mirror, AND missing architect-sessions from .opencode now fails); 162/162 intra-skill links resolve; live taxonomy query cross-checked against the reframed model."
+    }
   },
   "ws1": {
     "phase": "1-projection-pilot-COMPLETE; 2-expansion-COMPLETE (core+guard+test-features+new-identities)",

@@ -13,14 +13,18 @@ Two skills are **mandatory** and must be loaded at session start:
 Also load the session-shape skill for the work at hand:
 
 - **`architect-refactor-session`** — for additive annotation enrichment of shipped
-  code (this campaign's default).
+  code (this campaign's default). Its coordination doctrine lives in
+  `architect-refactor-session/references/multi-session-coordination.md`.
+- **`architect-sessions`** — for any spec-driven session (idea/candidate authoring,
+  design, implement, review-spec, review-implementation, handoff). Per-session
+  execution detail lives behind progressive disclosure in
+  `architect-sessions/references/`.
 
-**Other skill files are useful but NOT 100% current** (they predate the recent
-refactors — that gap is part of what WS-2 fixes). Treat them as orientation, not
-gospel: `architect-plan-session`, `architect-design-session`,
-`architect-implement-spec`, `architect-review-spec`, `architect-review-implementation`,
-`architect-session-router`, `_shared/*.md`. When a skill body and the **live CLI
-output** disagree, the CLI wins (per `_shared/canonical-references.md`).
+Doctrine depth (the former `_shared/` kernel) now lives under
+`architect-base/references/` (taxonomy, four-tier-ladder, fsm-transitions,
+annotation-ownership, spec-pattern-relationships, rule-block-template,
+decision-records). When a skill body and the **live CLI output** disagree, the
+CLI wins (per `architect-base` §"Anti-anecdote").
 
 ## 2. API-first — this is the whole point of the campaign
 
