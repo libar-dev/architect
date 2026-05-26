@@ -24,6 +24,7 @@ import {
   type TagUsageMatrix,
 } from '../../../../src/index.js';
 import { createTestPackageResolver } from '../../../support/test-package-resolver.js';
+import { SUPPORTED_DOCUMENTATION_TYPE_IDENTITIES } from '../../../../src/projections/documentation-composition/documentation-type-registry.identity.js';
 import {
   createPattern,
   createProjectionContext,
@@ -206,48 +207,13 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                       blockedBy: ['OperationalInsightsSchemas', 'CoverageGraphInput'],
                     },
                   ],
-                  generatedViews: [
-                    {
-                      docType: 'architecture',
-                      verb: 'documentation architecture',
-                      summary: 'Context map + per-group component diagrams',
-                    },
-                    {
-                      docType: 'patterns',
-                      verb: 'documentation patterns',
-                      summary: 'Full pattern catalog with relationships',
-                    },
-                    {
-                      docType: 'decisions',
-                      verb: 'documentation decisions',
-                      summary: 'ADR / PDR decision records',
-                    },
-                    {
-                      docType: 'roadmap',
-                      verb: 'documentation roadmap',
-                      summary: 'Phased delivery roadmap',
-                    },
-                    {
-                      docType: 'changelog',
-                      verb: 'documentation changelog',
-                      summary: 'Release changelog from completed work',
-                    },
-                    {
-                      docType: 'requirements-executable',
-                      verb: 'documentation requirements-executable',
-                      summary: 'Requirements backed by executable specs',
-                    },
-                    {
-                      docType: 'requirements-specs',
-                      verb: 'documentation requirements-specs',
-                      summary: 'Requirements from design specs',
-                    },
-                    {
-                      docType: 'taxonomy',
-                      verb: 'documentation taxonomy',
-                      summary: 'Tag taxonomy — roles, contexts, axes',
-                    },
-                  ],
+                  // Derived from the canonical registry — same source the overview
+                  // projection uses — so this assertion never drifts from the supported set.
+                  generatedViews: SUPPORTED_DOCUMENTATION_TYPE_IDENTITIES.map((identity) => ({
+                    docType: identity.key,
+                    verb: `documentation ${identity.key}`,
+                    summary: identity.description,
+                  })),
                   cliHints: [
                     '=== DATA API — Use Instead of Explore Agents ===',
                     'pnpm architect:query -- <subcommand>',

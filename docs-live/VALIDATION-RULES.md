@@ -9,18 +9,18 @@
 
 Process Guard validates delivery workflow changes at commit time using a Decider pattern. It enforces the 4-state FSM and prevents common workflow violations.
 
-\*\*6 validation rules\*\* | \*\*4 FSM states\*\* | \*\*3 protection levels\*\*
+**6 validation rules** | **4 FSM states** | **3 protection levels**
 
 ## Validation Rules
 
-| Rule ID                       | Severity | Description                                         | Applies To Roles |
-| ----------------------------- | -------- | --------------------------------------------------- | ---------------- |
-| \`completed-protection\`      | error    | Completed specs require unlock-reason tag to modify |                  |
-| \`invalid-status-transition\` | error    | Status transitions must follow FSM path             |                  |
-| \`scope-creep\`               | error    | Active specs cannot add new deliverables            |                  |
-| \`session-scope\`             | warning  | File outside session scope                          |                  |
-| \`session-excluded\`          | error    | File explicitly excluded from session               |                  |
-| \`deliverable-removed\`       | warning  | Deliverable was removed from spec                   |                  |
+| Rule ID                     | Severity | Description                                         | Applies To Roles |
+| --------------------------- | -------- | --------------------------------------------------- | ---------------- |
+| `completed-protection`      | error    | Completed specs require unlock-reason tag to modify |                  |
+| `invalid-status-transition` | error    | Status transitions must follow FSM path             |                  |
+| `scope-creep`               | error    | Active specs cannot add new deliverables            |                  |
+| `session-scope`             | warning  | File outside session scope                          |                  |
+| `session-excluded`          | error    | File explicitly excluded from session               |                  |
+| `deliverable-removed`       | warning  | Deliverable was removed from spec                   |                  |
 
 ## FSM State Diagram
 

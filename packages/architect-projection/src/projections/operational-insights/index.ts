@@ -81,6 +81,7 @@ import {
   createRequirementPackageIndexRouteId,
   type RequirementDocumentationBucket,
 } from '../documentation-composition/requirement-routes.js';
+import { SUPPORTED_DOCUMENTATION_TYPE_IDENTITIES } from '../documentation-composition/documentation-type-registry.identity.js';
 
 type RoleDefinition = NonNullable<ProjectionContext['graph']['tagRegistry']['roles']>[number];
 
@@ -128,52 +129,17 @@ const OVERVIEW_CLI_HINTS: readonly string[] = [
 
 /**
  * The generated documentation surfaces this graph projects, each fetchable via
- * `documentation <type>`. Mirrors the `docs:all` generator set so an agent
- * reading the overview learns which views exist without scanning `docs-live/`.
- * Rendered terse by default (one line) and itemized at `full` disclosure.
+ * `documentation <type>`. Derived from the canonical documentation-type registry
+ * (the same source the `documentation` verb dispatches on) so the count and list
+ * never drift from the supported set. Rendered terse by default (one line) and
+ * itemized at `full` disclosure.
  */
-const OVERVIEW_GENERATED_VIEWS: readonly { docType: string; verb: string; summary: string }[] = [
-  {
-    docType: 'architecture',
-    verb: 'documentation architecture',
-    summary: 'Context map + per-group component diagrams',
-  },
-  {
-    docType: 'patterns',
-    verb: 'documentation patterns',
-    summary: 'Full pattern catalog with relationships',
-  },
-  {
-    docType: 'decisions',
-    verb: 'documentation decisions',
-    summary: 'ADR / PDR decision records',
-  },
-  {
-    docType: 'roadmap',
-    verb: 'documentation roadmap',
-    summary: 'Phased delivery roadmap',
-  },
-  {
-    docType: 'changelog',
-    verb: 'documentation changelog',
-    summary: 'Release changelog from completed work',
-  },
-  {
-    docType: 'requirements-executable',
-    verb: 'documentation requirements-executable',
-    summary: 'Requirements backed by executable specs',
-  },
-  {
-    docType: 'requirements-specs',
-    verb: 'documentation requirements-specs',
-    summary: 'Requirements from design specs',
-  },
-  {
-    docType: 'taxonomy',
-    verb: 'documentation taxonomy',
-    summary: 'Tag taxonomy — roles, contexts, axes',
-  },
-];
+const OVERVIEW_GENERATED_VIEWS: readonly { docType: string; verb: string; summary: string }[] =
+  SUPPORTED_DOCUMENTATION_TYPE_IDENTITIES.map((identity) => ({
+    docType: identity.key,
+    verb: `documentation ${identity.key}`,
+    summary: identity.description,
+  }));
 
 /**
  * The one-line "explore via the API, not grep" pointer rendered under the

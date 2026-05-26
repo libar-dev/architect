@@ -34,6 +34,22 @@ Feature: renderMarkdown renders canonical markdown blocks
       When I render the hostile requirement bundle as markdown without H2 splitting
       Then the requirement markdown should escape trusted interpolation values
 
+  Rule: Renderer-authored markdown renders live while sourced text stays escaped
+
+    @regression
+    Scenario: Decision catalog renders live ADR links and escapes hostile link text
+      Given a DecisionCatalog fixture with a normal and a hostile decision id
+      When I render the fragment as markdown
+      Then the decision catalog markdown should render the ADR link as a live link
+      And the decision catalog markdown should escape the hostile decision link text
+
+    @regression
+    Scenario: Architecture diagram trusts renderer-authored description and legend
+      Given an ArchitectureDiagram fixture with a code-span description and a legend
+      When I render the fragment as markdown
+      Then the architecture markdown should render the description code spans unescaped
+      And the architecture markdown should render the legend parentheses unescaped
+
   Rule: Routed markdown output can auto-split oversized files at H2 boundaries
 
     @split

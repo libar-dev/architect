@@ -580,15 +580,17 @@ function normalizeArchitectureDiagram(fragment: ArchitectureDiagram): MarkdownDo
   ];
 
   for (const section of fragment.sections) {
-    blocks.push(heading(3, section.title));
+    // section.title/description originate from ArchitectureDiagramProjection
+    // (renderer-authored — code spans, parens), not external fragment input.
+    blocks.push(trustedMarkdownHeading(3, section.title));
     if (section.description !== undefined) {
-      blocks.push(paragraph(section.description));
+      blocks.push(trustedMarkdownParagraph(section.description));
     }
     blocks.push(section.diagram);
   }
 
   if (fragment.legend !== undefined && fragment.legend.length > 0) {
-    blocks.push(heading(2, 'Legend'), ...fragment.legend);
+    blocks.push(heading(2, 'Legend'), ...fragment.legend.map(trustAuthoredBlock));
   }
 
   if (fragment.patterns.length > 0) {
@@ -729,14 +731,19 @@ function normalizeDecisionCatalog(fragment: DecisionCatalog): MarkdownDocument {
       ['left', 'left'],
     ),
     heading(2, 'ADR Index'),
-    table(
+    markdownTable(
       ['ADR', 'Title', 'Status', 'Type'],
-      decisions.map((decision) => [
-        toMarkdownLink(decision.id, `decisions/${slugForFilename(decision.id)}.md`) ?? decision.id,
-        decision.title,
-        decision.status,
-        decision.type,
-      ]),
+      decisions.map((decision) => {
+        // The link is renderer-authored markdown; the link TEXT (decision.id) is
+        // already escaped inside toMarkdownLink. title/status/type stay sourced → escaped.
+        const link = toMarkdownLink(decision.id, `decisions/${slugForFilename(decision.id)}.md`);
+        return [
+          link === null ? decision.id : trustedMarkdown(link),
+          decision.title,
+          decision.status,
+          decision.type,
+        ];
+      }),
       ['left', 'left', 'left', 'left'],
     ),
   ]);
@@ -956,9 +963,9 @@ function normalizeTaxonomyDigest(fragment: TaxonomyDigest): MarkdownDocument {
   const aggregationGroups = fragment.tags.filter(
     (group) => group.entries[0]?.kind === 'aggregation',
   );
-  const sections: Block[] = [
+  const sections: MarkdownRenderableBlock[] = [
     heading(2, 'Overview'),
-    paragraph(
+    trustedMarkdownParagraph(
       `**${String(counts.roles)} roles** | **${String(counts.metadata)} metadata tags** | **${String(counts.aggregation)} aggregation tags** | **${String(counts.total)} total**`,
     ),
     table(
@@ -1063,14 +1070,15 @@ function normalizeValidationRuleDigest(fragment: ValidationRuleDigest): Markdown
     paragraph(
       `Process Guard validates delivery workflow changes at commit time using a Decider pattern. It enforces the ${String(fragment.fsm.states.length)}-state FSM and prevents common workflow violations.`,
     ),
-    paragraph(
+    trustedMarkdownParagraph(
       `**${String(fragment.rules.length)} validation rules** | **${String(fragment.fsm.states.length)} FSM states** | **${String(fragment.protectionLevels.length)} protection levels**`,
     ),
     heading(2, 'Validation Rules'),
-    table(
+    markdownTable(
       ['Rule ID', 'Severity', 'Description', 'Applies To Roles'],
       fragment.rules.map((rule) => [
-        `\`${rule.id}\``,
+        // backticks are renderer-authored inline code; severity/description stay sourced → escaped.
+        trustedMarkdown(`\`${rule.id}\``),
         rule.severity,
         rule.description,
         rule.appliesToRoles?.join(', ') ?? '',
@@ -1940,6 +1948,28 @@ function markdownTable(
   alignment?: ('left' | 'center' | 'right')[],
 ): TrustedTableBlock {
   return { type: 'table', columns, rows, ...(alignment !== undefined ? { alignment } : {}) };
+}
+
+/**
+ * Re-emit a renderer/projection-authored Block as its trusted-markdown variant so
+ * intentional inline markdown (code spans, parens) renders instead of being escaped.
+ */
+// @invariant: apply ONLY to renderer/projection-authored blocks, never to sourced fragment text
+function trustAuthoredBlock(block: Block): MarkdownRenderableBlock {
+  switch (block.type) {
+    case 'heading':
+      return trustedMarkdownHeading(block.level, block.text);
+    case 'paragraph':
+      return trustedMarkdownParagraph(block.text);
+    case 'list':
+      return {
+        type: 'list',
+        ordered: block.ordered,
+        items: block.items.map((item) => (typeof item === 'string' ? trustedMarkdown(item) : item)),
+      };
+    default:
+      return block;
+  }
 }
 
 function isTrustedMarkdown(value: MarkdownText): value is TrustedMarkdownText {

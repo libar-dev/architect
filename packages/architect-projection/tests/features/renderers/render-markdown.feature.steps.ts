@@ -1057,6 +1057,49 @@ const expectedAllBlocksMarkdown = [
   '',
 ].join('\n');
 
+function createDecisionCatalogFixture(): Fragment {
+  const record = (id: string, title: string) => ({
+    kind: 'DecisionRecord',
+    id,
+    type: 'ADR',
+    status: 'accepted',
+    title,
+    context: [],
+    decision: [],
+    consequences: [],
+    relatedDecisions: [],
+    affectedPatterns: [],
+  });
+  return {
+    kind: 'DecisionCatalog',
+    decisions: [
+      record('ADR-001', 'Taxonomy Canonical Values'),
+      record('ADR-X **bold**', 'Hostile Identifier'),
+    ],
+  } as unknown as Fragment;
+}
+
+function createArchitectureDiagramFixture(): Fragment {
+  return {
+    kind: 'ArchitectureDiagram',
+    scope: 'component',
+    sections: [
+      {
+        title: 'Context Map',
+        description:
+          'Each node is a group; each arrow is a cross-group dependency (`depends-on` / `uses`).',
+        diagram: { type: 'mermaid', content: 'graph LR\n  a --> b' },
+        patterns: [],
+      },
+    ],
+    legend: [
+      { type: 'heading', level: 3, text: 'Legend' },
+      { type: 'list', ordered: false, items: ['Solid arrow = dependency (depends-on / uses)'] },
+    ],
+    patterns: ['Alpha', 'Beta'],
+  } as unknown as Fragment;
+}
+
 describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   AfterEachScenario(() => {
     state = null;
@@ -1223,6 +1266,65 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       },
     );
   });
+
+  Rule(
+    'Renderer-authored markdown renders live while sourced text stays escaped',
+    ({ RuleScenario }) => {
+      RuleScenario(
+        'Decision catalog renders live ADR links and escapes hostile link text',
+        ({ Given, When, Then, And }) => {
+          Given('a DecisionCatalog fixture with a normal and a hostile decision id', () => {
+            state!.input = createDecisionCatalogFixture();
+          });
+
+          When('I render the fragment as markdown', () => {
+            state!.rendered = renderMarkdown(state!.input!);
+          });
+
+          Then('the decision catalog markdown should render the ADR link as a live link', () => {
+            const markdown = assertRenderedString(state!.rendered);
+            expect(markdown).toContain('[ADR-001](decisions/adr-001.md)');
+            expect(markdown).not.toContain('\\[ADR-001\\]');
+          });
+
+          And('the decision catalog markdown should escape the hostile decision link text', () => {
+            const markdown = assertRenderedString(state!.rendered);
+            // The link STRUCTURE is trusted, but the link TEXT (sourced id) stays escaped.
+            expect(markdown).toContain('ADR-X \\*\\*bold\\*\\*');
+            expect(markdown).not.toContain('ADR-X **bold**');
+          });
+        },
+      );
+
+      RuleScenario(
+        'Architecture diagram trusts renderer-authored description and legend',
+        ({ Given, When, Then, And }) => {
+          Given('an ArchitectureDiagram fixture with a code-span description and a legend', () => {
+            state!.input = createArchitectureDiagramFixture();
+          });
+
+          When('I render the fragment as markdown', () => {
+            state!.rendered = renderMarkdown(state!.input!);
+          });
+
+          Then(
+            'the architecture markdown should render the description code spans unescaped',
+            () => {
+              const markdown = assertRenderedString(state!.rendered);
+              expect(markdown).toContain('cross-group dependency (`depends-on` / `uses`)');
+              expect(markdown).not.toContain('\\`depends-on\\`');
+            },
+          );
+
+          And('the architecture markdown should render the legend parentheses unescaped', () => {
+            const markdown = assertRenderedString(state!.rendered);
+            expect(markdown).toContain('Solid arrow = dependency (depends-on / uses)');
+            expect(markdown).not.toContain('dependency \\(depends-on / uses\\)');
+          });
+        },
+      );
+    },
+  );
 
   Rule(
     'Routed markdown output can auto-split oversized files at H2 boundaries',

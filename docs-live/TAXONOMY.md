@@ -7,7 +7,7 @@
 
 ## Overview
 
-\*\*8 roles\*\* | \*\*19 metadata tags\*\* | \*\*3 aggregation tags\*\* | \*\*30 total\*\*
+**8 roles** | **19 metadata tags** | **3 aggregation tags** | **30 total**
 
 | Component        | Count |
 | ---------------- | ----- |

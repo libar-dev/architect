@@ -13,7 +13,7 @@ This view captures 160 patterns across 23 diagrams in the Component architecture
 
 ### Context Map
 
-Each node is a group; each arrow is a cross-group dependency \(\`depends-on\` / \`uses\`, pointing from dependant to dependency\). The per-group diagrams below detail each group’s internal dependencies and any see-also references.
+Each node is a group; each arrow is a cross-group dependency (`depends-on` / `uses`, pointing from dependant to dependency). The per-group diagrams below detail each group’s internal dependencies and any see-also references.
 
 ```mermaid
 graph LR
@@ -81,7 +81,7 @@ graph LR
   validation --> validation_schemas
 ```
 
-### Bounded context: api \(4 patterns\)
+### Bounded context: api (4 patterns)
 
 ```mermaid
 graph TD
@@ -98,7 +98,7 @@ graph TD
   mcptoolregistry -->|depends-on| mcppipelinesession
 ```
 
-### Bounded context: cli \(6 patterns\)
+### Bounded context: cli (6 patterns)
 
 ```mermaid
 graph TD
@@ -113,7 +113,7 @@ graph TD
   patterngraphcli -->|depends-on| cliversionhelper
 ```
 
-### Bounded context: configuration \(4 patterns\)
+### Bounded context: configuration (4 patterns)
 
 ```mermaid
 graph TD
@@ -123,7 +123,7 @@ graph TD
   sourcemerge["SourceMerge<br/>(utility)"]
 ```
 
-### Bounded context: delivery-reporting \(7 patterns\)
+### Bounded context: delivery-reporting (7 patterns)
 
 ```mermaid
 graph TD
@@ -136,7 +136,7 @@ graph TD
   traceabilitymatrix["TraceabilityMatrix<br/>(contract)"]
 ```
 
-### Bounded context: documentation-composition \(4 patterns\)
+### Bounded context: documentation-composition (4 patterns)
 
 ```mermaid
 graph TD
@@ -146,14 +146,14 @@ graph TD
   projectconfigsnapshot["ProjectConfigSnapshot<br/>(contract)"]
 ```
 
-### Bounded context: domain \(1 pattern\)
+### Bounded context: domain (1 pattern)
 
 ```mermaid
 graph TD
   packageresolver["PackageResolver<br/>(utility)"]
 ```
 
-### Bounded context: execution-context \(8 patterns\)
+### Bounded context: execution-context (8 patterns)
 
 ```mermaid
 graph TD
@@ -171,7 +171,7 @@ graph TD
   sessioncontextbundle -->|depends-on| executioncontextsupporting
 ```
 
-### Bounded context: extractor \(6 patterns\)
+### Bounded context: extractor (6 patterns)
 
 ```mermaid
 graph TD
@@ -185,7 +185,7 @@ graph TD
   gherkinextractor -->|depends-on| layerinference
 ```
 
-### Bounded context: generator \(4 patterns\)
+### Bounded context: generator (4 patterns)
 
 ```mermaid
 graph TD
@@ -198,7 +198,7 @@ graph TD
   gitmodule -->|depends-on| githelpers
 ```
 
-### Bounded context: governance \(8 patterns\)
+### Bounded context: governance (8 patterns)
 
 ```mermaid
 graph TD
@@ -212,7 +212,7 @@ graph TD
   validationruledigest["ValidationRuleDigest<br/>(contract)"]
 ```
 
-### Bounded context: lint \(4 patterns\)
+### Bounded context: lint (4 patterns)
 
 ```mermaid
 graph TD
@@ -225,7 +225,7 @@ graph TD
   lintmodule -->|depends-on| lintrules
 ```
 
-### Bounded context: operational-insights \(10 patterns\)
+### Bounded context: operational-insights (10 patterns)
 
 ```mermaid
 graph TD
@@ -243,7 +243,7 @@ graph TD
   tagusagematrix -->|depends-on| tagusageentry
 ```
 
-### Bounded context: pattern-relations \(12 patterns\)
+### Bounded context: pattern-relations (12 patterns)
 
 ```mermaid
 graph TD
@@ -261,14 +261,14 @@ graph TD
   patternsummary["PatternSummary<br/>(contract)"]
 ```
 
-### Bounded context: pipeline \(1 pattern\)
+### Bounded context: pipeline (1 pattern)
 
 ```mermaid
 graph TD
   buildpipeline["BuildPipeline<br/>(service)"]
 ```
 
-### Bounded context: process-guard \(6 patterns\)
+### Bounded context: process-guard (6 patterns)
 
 ```mermaid
 graph TD
@@ -285,7 +285,7 @@ graph TD
   processguardlinter -->|depends-on| detectchanges
 ```
 
-### Bounded context: projection \(43 patterns\)
+### Bounded context: projection (43 patterns)
 
 ```mermaid
 graph TD
@@ -371,7 +371,7 @@ graph TD
   validationruledigestprojection -->|depends-on| governanceprojectionsupport
 ```
 
-### Bounded context: read-api \(5 patterns\)
+### Bounded context: read-api (5 patterns)
 
 ```mermaid
 graph TD
@@ -385,7 +385,7 @@ graph TD
   patterngraphapi -->|depends-on| patternhelpers
 ```
 
-### Bounded context: rendering \(7 patterns\)
+### Bounded context: rendering (7 patterns)
 
 ```mermaid
 graph TD
@@ -403,7 +403,7 @@ graph TD
   uirenderer -->|depends-on| fragmentrendererdispatch
 ```
 
-### Bounded context: scanner \(4 patterns\)
+### Bounded context: scanner (4 patterns)
 
 ```mermaid
 graph TD
@@ -413,7 +413,7 @@ graph TD
   patternscanner["PatternScanner<br/>(service)"]
 ```
 
-### Bounded context: validation \(8 patterns\)
+### Bounded context: validation (8 patterns)
 
 ```mermaid
 graph TD
@@ -434,7 +434,7 @@ graph TD
   validationmodule -->|depends-on| dodvalidator
 ```
 
-### Bounded context: validation-schemas \(4 patterns\)
+### Bounded context: validation-schemas (4 patterns)
 
 ```mermaid
 graph TD
@@ -445,7 +445,7 @@ graph TD
   patterngraph -->|depends-on| extractedpattern
 ```
 
-### Uncontextualized · role: contract \(4 patterns\)
+### Uncontextualized · role: contract (4 patterns)
 
 ```mermaid
 graph TD
@@ -459,8 +459,8 @@ graph TD
 
 ### Legend
 
-- Solid arrow = dependency \(depends-on / uses\)
-- Dotted line = reference \(see-also\)
+- Solid arrow = dependency (depends-on / uses)
+- Dotted line = reference (see-also)
 
 ## Patterns
 
