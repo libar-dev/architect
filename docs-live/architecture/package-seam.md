@@ -9,11 +9,6 @@
 
 This view captures 244 patterns across 8 diagrams in the Package architecture view.
 
-## Related views
-
-- [Layered](architecture/layered.md)
-- [Package Seam](architecture/package-seam.md)
-
 ## Diagrams
 
 ### Package Map

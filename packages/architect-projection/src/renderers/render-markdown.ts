@@ -581,23 +581,27 @@ function normalizeArchitectureDiagram(
     ),
   ];
 
-  // Bundle child lenses (package-seam, layered) — the route id's view segment is a
-  // renderer-authored slug; the link structure is trusted, the label humanized from it.
-  const relatedViewLinks = options.childRoutes
-    .map((route) => {
-      const link = toSafeRoutedMarkdownLink(
-        humanizeKey(route.key.split(':').slice(1).join('-')),
-        route.path,
-      );
-      return link === null ? null : trustedMarkdown(link);
-    })
-    .filter((entry): entry is TrustedMarkdownText => entry !== null);
-  if (relatedViewLinks.length > 0) {
-    blocks.push(heading(2, 'Related views'), {
-      type: 'list',
-      ordered: false,
-      items: relatedViewLinks,
-    });
+  // Link the bundle's child lenses (package-seam, layered) ONLY from the root doc. The root
+  // sits at the docs root, so each child route path is already the correct relative link; a
+  // child lens doc lives inside architecture/ and would mis-resolve those docs-root-relative
+  // paths, so children omit this section and rely on their back-link to the root instead.
+  if (options.isRootDocument) {
+    const relatedViewLinks = options.childRoutes
+      .map((route) => {
+        const link = toSafeRoutedMarkdownLink(
+          humanizeKey(route.key.split(':').slice(1).join('-')),
+          route.path,
+        );
+        return link === null ? null : trustedMarkdown(link);
+      })
+      .filter((entry): entry is TrustedMarkdownText => entry !== null);
+    if (relatedViewLinks.length > 0) {
+      blocks.push(heading(2, 'Related views'), {
+        type: 'list',
+        ordered: false,
+        items: relatedViewLinks,
+      });
+    }
   }
 
   blocks.push(heading(2, 'Diagrams'));

@@ -1040,6 +1040,24 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             ]);
             expect(bundle?.routing?.markdownChildDirectory).toBe('architecture');
           });
+
+          And('only the root links the lens docs — children carry no related-view links', () => {
+            const rendered = renderMarkdown(state!.documentationViews['architecture']!, {
+              includeChildren: true,
+              includeFrontmatter: true,
+              splitStrategy: 'never',
+            });
+            if (typeof rendered === 'string') {
+              throw new Error('Expected the architecture bundle to render as routed files.');
+            }
+            expect(rendered['ARCHITECTURE.md']).toContain('Related views');
+            expect(rendered['ARCHITECTURE.md']).toContain('architecture/package-seam.md');
+            // Child lens docs sit inside architecture/ — they must NOT emit the doc-root-relative
+            // related-view links (those would mis-resolve to architecture/architecture/...).
+            expect(rendered['architecture/package-seam.md']).toBeDefined();
+            expect(rendered['architecture/package-seam.md']).not.toContain('Related views');
+            expect(rendered['architecture/package-seam.md']).not.toContain('](architecture/');
+          });
         },
       );
     },

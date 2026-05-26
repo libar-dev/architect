@@ -243,6 +243,7 @@ Feature: Documentation Composition projection bodies
       When I project the architecture documentation bundle
       Then the architecture root should be the component view
       And the architecture bundle should route the package-seam and layered lens docs
+      And only the root links the lens docs — children carry no related-view links
 
   Rule: Per-group detail diagrams draw only forward dependency edges
 

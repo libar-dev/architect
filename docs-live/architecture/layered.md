@@ -9,11 +9,6 @@
 
 This view captures 1 pattern across 1 diagram in the Layered architecture view.
 
-## Related views
-
-- [Layered](architecture/layered.md)
-- [Package Seam](architecture/package-seam.md)
-
 ## Diagrams
 
 ### Layer: refinement (1 pattern)
