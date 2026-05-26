@@ -346,8 +346,10 @@ export function aggregateInterGroupEdges(
     // direction. `enables` is a derived REVERSE edge (B enables A ⇔ A depends-on
     // / uses B): rendering it forward draws a contradictory back-arrow for a
     // relationship the forward edge already captures. `see-also` is
-    // non-directional. Both stay in the per-group detail diagrams (with their
-    // own operators) but are excluded here so the map's arrows are not misread.
+    // non-directional. All three are excluded from the map so its arrows are not
+    // misread; the per-group detail diagrams render forward dependencies plus
+    // `see-also` only and likewise drop the derived `enables` (D-19, applied by
+    // `normalizeDetailEdges` in `documentation-composition/architecture-diagram.internal.ts`).
     if (edge.label !== 'depends-on' && edge.label !== 'uses') {
       continue;
     }
