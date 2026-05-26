@@ -175,6 +175,117 @@
         }
       ],
       "documentType": "taxonomy"
+    },
+    "business-rules": {
+      "generatorName": "business-rules",
+      "kind": "projection",
+      "rootPath": "BUSINESS-RULES.md",
+      "entries": [
+        {
+          "path": "BUSINESS-RULES.md",
+          "role": "root",
+          "audience": "published",
+          "tracking": "commit"
+        },
+        {
+          "path": "business-rules/architect-core.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "BUSINESS-RULES.md"
+        },
+        {
+          "path": "business-rules/architect-dev.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "BUSINESS-RULES.md"
+        },
+        {
+          "path": "business-rules/architect-guard.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "BUSINESS-RULES.md"
+        },
+        {
+          "path": "business-rules/architect-mcp.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "BUSINESS-RULES.md"
+        },
+        {
+          "path": "business-rules/architect-pkg-content.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "BUSINESS-RULES.md"
+        },
+        {
+          "path": "business-rules/architect-projection.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "BUSINESS-RULES.md"
+        }
+      ],
+      "documentType": "business-rules"
+    },
+    "current-work": {
+      "generatorName": "current-work",
+      "kind": "projection",
+      "rootPath": "CURRENT-WORK.md",
+      "entries": [
+        {
+          "path": "CURRENT-WORK.md",
+          "role": "root",
+          "audience": "published",
+          "tracking": "commit"
+        }
+      ],
+      "documentType": "current-work"
+    },
+    "validation-rules": {
+      "generatorName": "validation-rules",
+      "kind": "projection",
+      "rootPath": "VALIDATION-RULES.md",
+      "entries": [
+        {
+          "path": "VALIDATION-RULES.md",
+          "role": "root",
+          "audience": "published",
+          "tracking": "commit"
+        }
+      ],
+      "documentType": "validation-rules"
+    },
+    "traceability": {
+      "generatorName": "traceability",
+      "kind": "projection",
+      "rootPath": "TRACEABILITY.md",
+      "entries": [
+        {
+          "path": "TRACEABILITY.md",
+          "role": "root",
+          "audience": "published",
+          "tracking": "commit"
+        }
+      ],
+      "documentType": "traceability"
+    },
+    "index": {
+      "generatorName": "index",
+      "kind": "index",
+      "rootPath": "INDEX.md",
+      "entries": [
+        {
+          "path": "INDEX.md",
+          "role": "root",
+          "audience": "published",
+          "tracking": "commit"
+        }
+      ]
     }
   }
 }
