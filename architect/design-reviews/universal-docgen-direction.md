@@ -92,6 +92,36 @@ Split along the §3.2 seam. Ship the real part; defer/kill the risky-overtaken p
 
 ---
 
+## 4a. Capability grounding — the prime-candidate clusters
+
+A maintainer-named set of constantly-maintained docs concretizes the direction. They cluster by **shared source**; resolving generation on them is ≈95% of the capability (the rest is the same machinery applied).
+
+| Cluster            | Docs (current)                                                                                         | Shared source                                                                  | Today                                             | Verbosity / audience spread                                                                                          |
+| ------------------ | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------ | ------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| **Taxonomy**       | `formal-spec/04-tag-registry` · `docs-live/TAXONOMY.md` · `architect-base/references/taxonomy.md`      | tag registry (`architect-core`)                                                | 1 generated, 2 hand-authored                      | skill = model + link-to-live (not enumerated) → docs-live = full enumeration → spec = enumeration in normative prose |
+| **API / verbs**    | `formal-spec/12-live-documentation-api` · `docs-live/API-REFERENCE.md` · `architect-data-api/SKILL.md` | CLI schema + MCP registry + `@architect-shape`                                 | shapes generated; verb/tool catalog hand-authored | **partial overlap** — verb catalog shared; quirks, RenderableDocument, doc-API are doc-unique                        |
+| **Pattern graph**  | `formal-spec/10-pattern-graph`                                                                         | `ExtractedPattern` Zod schema                                                  | hand-authored (carries stale "Phase Views")       | field tables derivable from the schema                                                                               |
+| **Spec evolution** | `formal-spec/08-spec-evolution`                                                                        | hand-authored doctrine (four-tier ladder, value transfer) — **no code source** | hand-authored; duplicates skill references        | skill = canonical → spec = full                                                                                      |
+
+**Generation vs routing (load-bearing split):** three clusters generate from a code/schema source (taxonomy registry, CLI/MCP schema, `ExtractedPattern`); spec-evolution has no code source and is **content-routing** of hand-authored doctrine, not generation. Conflating them inflates the value case (§3.2).
+
+**Capabilities implied** (✅ exists · ⚠️ partial · ❌ missing):
+
+1. **Source extractors** — tag registry ✅ (`projectTaxonomyDigest`); CLI verb + MCP tool catalog ❌ (the real drift source); Zod field tables ❌.
+2. **Compose partially-overlapping sources** — shared extracted fragments + doc-unique authored framing ❌ (the thin composition layer; the block renderer ✅ renders it).
+3. **Verbosity via progressive disclosure** — one fragment at `essential…advanced` per consumer ⚠️ (levels exist; per-fragment INPUT-depth emission doesn't).
+4. **Audience / style framing** — skill-voice vs spec-voice vs reference-voice ❌.
+5. **Config-like doc wiring** — declare "doc = [sources] @ [depths] + [framing]" ❌ (small; not the framework).
+6. **Doctrine routing** (spec-evolution only) — one doctrine source → skill + spec without duplication ❌.
+
+**Key enabler:** generated docs need not reproduce current shapes byte-for-byte — they must carry the information and be usable. Designing the target shapes removes the byte-parity risk that sank the old framework.
+
+**Proof order:** taxonomy cluster first (source already generates `TAXONOMY.md`; three clear verbosities; drift documented), then the CLI/MCP catalog (highest real drift). Those two exercise capabilities 1–5; pattern-graph and spec-evolution apply the same machinery — hence the ≈95%.
+
+The candidate members carry these as live, queryable scenarios — `OneSourceMultipleAudiences` (taxonomy → three audiences) and `MultiSourceComposition` (partial-overlap API): `pnpm architect:query pattern <Member>`.
+
+---
+
 ## 5. Go / No-Go gates
 
 **Pre-commitment (decide before any planning session):**

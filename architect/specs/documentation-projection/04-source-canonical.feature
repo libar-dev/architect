@@ -11,6 +11,7 @@ Feature: SourceCanonical - the source aggregate colocates with the artifact it d
   - Editorial framing prose (positioning paragraphs, narrative intros, "why this exists" sections) — does this also colocate with the artifact, or live in a dedicated preamble file outside the source tree and ride through the projection as an exception?
   - For docs that describe cross-package concepts (e.g., the FSM lives in `architect-guard` but is referenced from formal-spec and four skills), where does the canonical source aggregate live — at the implementation, in a shared kernel, or in a designated owner package?
   - Decision records (`architect/decisions/`) live outside per-package source — are they considered "colocated" with the architectural concern they record, or is that a permitted exception to the rule?
+  - Some topics have a code source aggregate (the tag registry → taxonomy) while others are hand-authored doctrine with no code source (spec evolution / the four-tier ladder); for the latter, is the canonical source the skill doctrine treated as a colocated aggregate, or an editorial-framing carve-out?
 
   Rule: Source aggregates colocate with the artifacts they describe
     **Invariant:** Every doc-claim source — annotated JSDoc, Gherkin Rule, Zod description, decision record — lives in the same file or package as the artifact it describes; no parallel-tree narrative file owns claims about shipped behavior the projection then mirrors.

@@ -21,3 +21,11 @@ Feature: OneSourceMultipleAudiences - one source materializes into audience-shap
     When projection runs
     Then the agent-skill read model emits only the lower-depth sections and links to the human-document read model for the rest
     And the human-document read model emits every depth
+
+  @acceptance-criteria @happy-path
+  Scenario: the tag registry materializes into three audience-shaped read models
+    Given the tag registry is the single source for taxonomy content
+    When the documentation projection runs
+    Then the agent-skill read model emits the taxonomy model plus a link to live data, not the full enumeration
+    And the reference read model emits the full enumerated tag tables
+    And the formal-spec read model emits the full enumeration inside its normative framing

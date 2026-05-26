@@ -20,3 +20,11 @@ Feature: MultiSourceComposition - the projection composes over multiple source a
     Given a pattern has @architect-* JSDoc on its TypeScript module and a Gherkin Rule with a verified-by reference
     When the document for that pattern is projected
     Then the rendered output includes both the JSDoc prose and the Gherkin Rule's invariant text
+
+  @acceptance-criteria @happy-path
+  Scenario: documents compose shared and document-unique sources from a partial overlap
+    Given the CLI verb and MCP tool catalog is a source shared by the data-api skill and the live-documentation-api spec
+    And each of those documents also carries document-unique content
+    When the documents are projected
+    Then both include the shared verb and tool catalog projected from the same source
+    And each additionally renders its own document-unique content
