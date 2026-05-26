@@ -95,6 +95,17 @@ function flushList(acc: ListAccumulator): SectionBlock {
   return { type: 'list', ordered: acc.ordered, items: acc.items };
 }
 
+/**
+ * Parse markdown text into an ordered list of typed `SectionBlock` values.
+ *
+ * Runs a line-driven state machine that recognizes headings, code fences
+ * (including mermaid), pipe tables, ordered/unordered lists, separators, and
+ * paragraphs for the rendering pipeline.
+ *
+ * @architect-shape
+ * @param content - Raw markdown text to parse.
+ * @returns The recognized blocks in document order.
+ */
 export function parseMarkdownToBlocks(content: string): readonly SectionBlock[] {
   const lines = content.split('\n');
   const blocks: SectionBlock[] = [];

@@ -13,6 +13,11 @@ import { z } from 'zod';
 
 import { DecisionRecordSchema } from './decision-record.js';
 
+/**
+ * A collection of normalized decision records for a governance surface.
+ *
+ * @architect-shape
+ */
 export const DecisionCatalogSchema = z.strictObject({
   kind: z.literal('DecisionCatalog'),
   decisions: z.array(DecisionRecordSchema),

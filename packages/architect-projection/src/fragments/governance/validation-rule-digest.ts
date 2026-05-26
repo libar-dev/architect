@@ -17,6 +17,12 @@ import {
   ValidationRuleEntrySchema,
 } from './supporting.js';
 
+/**
+ * A digest of validation governance — the rule entries, the lifecycle FSM
+ * graph, and the protection levels that gate pattern changes.
+ *
+ * @architect-shape
+ */
 export const ValidationRuleDigestSchema = z.strictObject({
   kind: z.literal('ValidationRuleDigest'),
   rules: z.array(ValidationRuleEntrySchema),

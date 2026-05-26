@@ -11,6 +11,12 @@
  */
 import { z } from 'zod';
 
+/**
+ * Minimal back-reference from a business rule to the route that owns it —
+ * carries the feature, rule name, and owning route id.
+ *
+ * @architect-shape
+ */
 export const BusinessRuleReferenceSchema = z.strictObject({
   kind: z.literal('BusinessRuleReference'),
   feature: z.string(),

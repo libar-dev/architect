@@ -14,6 +14,12 @@ import { ScopeTypeSchema } from '@libar-dev/architect-core';
 import { ScopeVerdictSchema } from './supporting.js';
 import { ScopeReadinessCheckSchema } from './scope-readiness-check.js';
 
+/**
+ * Fragment shape for a pattern's scope-readiness report — the session type
+ * being checked, the individual readiness checks, and the overall verdict.
+ *
+ * @architect-shape
+ */
 export const ScopeReadinessReportSchema = z.strictObject({
   kind: z.literal('ScopeReadinessReport'),
   pattern: z.string(),

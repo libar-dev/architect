@@ -18,6 +18,12 @@ import { z } from 'zod';
 import { DIAGRAM_SHAPE_VALUES, FORMAT_TYPES, buildRegistry } from '../taxonomy/index.js';
 import { KNOWN_TRANSFORM_NAMES } from '../taxonomy/metadata-transforms.js';
 
+/**
+ * Schema for a role definition — its canonical tag, domain, priority, optional
+ * description, aliases, and diagram shape.
+ *
+ * @architect-shape
+ */
 export const RoleDefinitionSchema = z.strictObject({
   tag: z.string().min(1, 'Role tag cannot be empty').max(100),
   domain: z.string().min(1, 'Role domain cannot be empty').max(200),
@@ -29,6 +35,12 @@ export const RoleDefinitionSchema = z.strictObject({
 
 export type RoleDefinition = z.output<typeof RoleDefinitionSchema>;
 
+/**
+ * Schema for a metadata tag definition — its tag, value format, purpose, and
+ * the flags/values/transform governing how it is parsed.
+ *
+ * @architect-shape
+ */
 export const MetadataTagDefinitionSchema = z.strictObject({
   tag: z.string().min(1, 'Metadata tag cannot be empty').max(100),
   format: z.enum(FORMAT_TYPES),
@@ -44,6 +56,12 @@ export const MetadataTagDefinitionSchema = z.strictObject({
 
 export type MetadataTagDefinition = z.output<typeof MetadataTagDefinitionSchema>;
 
+/**
+ * Schema for an aggregation tag definition — its tag, target document (or
+ * `null`), and purpose.
+ *
+ * @architect-shape
+ */
 export const AggregationTagDefinitionSchema = z.strictObject({
   tag: z.string().min(1, 'Aggregation tag cannot be empty').max(100),
   targetDoc: z.string().max(200).nullable(),
@@ -52,6 +70,12 @@ export const AggregationTagDefinitionSchema = z.strictObject({
 
 export type AggregationTagDefinition = z.output<typeof AggregationTagDefinitionSchema>;
 
+/**
+ * Schema for the full tag registry — version, role/metadata/aggregation tag
+ * definitions, format options, and the configured tag prefix.
+ *
+ * @architect-shape
+ */
 export const TagRegistrySchema = z.strictObject({
   $schema: z.string().max(500).optional(),
   version: z.string().max(20),
@@ -65,14 +89,30 @@ export const TagRegistrySchema = z.strictObject({
 
 export type TagRegistry = z.output<typeof TagRegistrySchema>;
 
+/**
+ * Pre-computed lookup tables for resolving role tags and their aliases.
+ *
+ * @architect-shape
+ */
 export interface RoleLookup {
+  /** Map of canonical role tag to itself, for membership/identity checks. */
   readonly canonical: ReadonlyMap<string, string>;
+  /** Map of alias to the canonical role tag it resolves to. */
   readonly aliases: ReadonlyMap<string, string>;
+  /** Set of every recognized tag (canonical tags and aliases). */
   readonly all: ReadonlySet<string>;
 }
 
 const roleLookupCache = new WeakMap<TagRegistry, RoleLookup>();
 
+/**
+ * Build (and memoize per registry) the {@link RoleLookup} tables for resolving
+ * role tags and aliases.
+ *
+ * @architect-shape
+ * @param registry - The tag registry to derive lookups from.
+ * @returns The cached or freshly built role lookup tables.
+ */
 export function buildRoleLookup(registry: TagRegistry): RoleLookup {
   const cached = roleLookupCache.get(registry);
   if (cached !== undefined) {
@@ -97,6 +137,14 @@ export function buildRoleLookup(registry: TagRegistry): RoleLookup {
   return lookup;
 }
 
+/**
+ * Resolve a raw role value to its canonical role tag, following aliases.
+ *
+ * @architect-shape
+ * @param registry - The tag registry to resolve against.
+ * @param rawValue - The raw role value (canonical tag or alias), or `undefined`.
+ * @returns The canonical role tag, or `undefined` if unknown or input was `undefined`.
+ */
 export function resolveCanonicalRole(
   registry: TagRegistry,
   rawValue: string | undefined,
@@ -113,10 +161,25 @@ export function resolveCanonicalRole(
   return lookup.aliases.get(rawValue);
 }
 
+/**
+ * Report whether a raw value is a recognized role tag or alias in the registry.
+ *
+ * @architect-shape
+ * @param registry - The tag registry to check against.
+ * @param rawValue - The candidate role tag or alias.
+ * @returns `true` if the value is a known canonical tag or alias.
+ */
 export function isKnownRoleTag(registry: TagRegistry, rawValue: string): boolean {
   return buildRoleLookup(registry).all.has(rawValue);
 }
 
+/**
+ * Build the default tag registry from the compiled-in taxonomy, materializing
+ * its role, metadata, and aggregation tag definitions.
+ *
+ * @architect-shape
+ * @returns A fresh, fully populated default tag registry.
+ */
 export function createDefaultTagRegistry(): TagRegistry {
   const registry = buildRegistry();
   return {
@@ -146,6 +209,15 @@ export function createDefaultTagRegistry(): TagRegistry {
   };
 }
 
+/**
+ * Merge an override registry onto a base registry, combining tag arrays by
+ * `tag` (override wins) and replacing scalar fields when present.
+ *
+ * @architect-shape
+ * @param base - The base registry to start from.
+ * @param override - Partial registry whose set fields take precedence.
+ * @returns The merged registry.
+ */
 export function mergeTagRegistries(base: TagRegistry, override: Partial<TagRegistry>): TagRegistry {
   function mergeByTag<T extends { tag: string }>(
     baseArr: readonly T[],

@@ -9,6 +9,12 @@
  */
 import { z } from 'zod';
 
+/**
+ * Fragment shape for one source-file category in the inventory — its type, the
+ * file count, an optional location pattern, and the matching files.
+ *
+ * @architect-shape
+ */
 export const SourceInventoryEntrySchema = z.strictObject({
   kind: z.literal('SourceInventoryEntry'),
   type: z.string(),

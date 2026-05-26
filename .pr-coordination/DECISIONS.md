@@ -31,6 +31,8 @@ Status (resolved-with-sha)` — then archived at campaign close. Keep entries
 > (`name-only…full`), not the progressive level — see `HUD-IDEATION.md`.
 
 - **WS-5** — `package` is resolved into `ArchIndex.byPackage` at `transformToPatternGraph()` time (derived from `pattern.source.file`, not annotated — implements ADR-006); the read API serves it cheaply via the `byPackage` index. No `@architect-package` tag is authored or extracted; package identity is infrastructure, not annotation.
+- **WS-7 (rendering home)** — the `@architect-shape` API surface renders into a **new `api-reference` documentType** (root `API-REFERENCE.md` + per-package `api-reference/<pkg>.md` children, modelled on `business-rules`), NOT into the `patterns` doc. The `patterns` doc is flat (`projectPatternCatalog` emits no children); option (a) would have required building a patterns lens tree on a `completed` projection AND conflated the API surface with the pattern catalog. A new documentType is the ADR-005/006-aligned lens and the smaller change.
+- **WS-7 (annotation done-bar)** — annotate every exported `interface`/`enum`/`function` directly; for Zod-first contracts annotate the **schema `const`** (its source carries the fields), NOT the paired `z.infer`/`z.output` type alias; standalone (non-Zod) `type`/`const` exports annotated directly. Exclude `*.internal.ts`. CRITICAL extractor gotcha: the substring `architect-shape` in a declaration's preceding JSDoc **prose** falsely extracts that declaration — write the literal only as the standalone `@architect-shape` tag line, never in description prose.
 
 ## Open
 

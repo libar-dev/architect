@@ -11,12 +11,22 @@
  */
 import { z } from 'zod';
 
+/**
+ * One orphan pattern entry — its name, optional status, and source file.
+ *
+ * @architect-shape
+ */
 export const OrphanPatternEntrySchema = z.strictObject({
   pattern: z.string(),
   status: z.string().optional(),
   file: z.string(),
 });
 
+/**
+ * A list of patterns that have no incoming or outgoing relationships.
+ *
+ * @architect-shape
+ */
 export const OrphanPatternListSchema = z.strictObject({
   kind: z.literal('OrphanPatternList'),
   items: z.array(OrphanPatternEntrySchema),

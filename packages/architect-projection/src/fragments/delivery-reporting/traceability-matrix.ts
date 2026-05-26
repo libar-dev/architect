@@ -14,6 +14,11 @@ import { z } from 'zod';
 
 import { TraceRowSchema } from './supporting.js';
 
+/**
+ * A pattern-to-test traceability matrix carrying one trace row per pattern.
+ *
+ * @architect-shape
+ */
 export const TraceabilityMatrixSchema = z.strictObject({
   kind: z.literal('TraceabilityMatrix'),
   rows: z.array(TraceRowSchema),

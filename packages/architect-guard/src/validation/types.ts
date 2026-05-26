@@ -46,6 +46,8 @@ import type { TagRegistry } from '@libar-dev/architect-core';
  *   readonly strict?: boolean;
  * }
  * ```
+ *
+ * @architect-shape
  */
 export interface WithTagRegistry {
   /** Tag registry for prefix-aware behavior (defaults to @architect- if not provided) */
@@ -65,6 +67,8 @@ export interface WithTagRegistry {
  * Compatibility note: the historical `tag-duplication` identifier is
  * intentionally not part of the split-package public contract because
  * `detectAntiPatterns()` does not emit it.
+ *
+ * @architect-shape
  */
 export type AntiPatternId =
   | 'process-in-code' // Process metadata in code (should be features-only)
@@ -74,9 +78,11 @@ export type AntiPatternId =
   | 'mega-feature'; // Feature file too large
 
 /**
- * Zod schema for anti-pattern thresholds
+ * Zod schema for anti-pattern thresholds.
  *
  * Configurable limits for detecting anti-patterns.
+ *
+ * @architect-shape
  */
 export const AntiPatternThresholdsSchema = z.object({
   /** Maximum scenarios per feature file before warning */
@@ -90,7 +96,9 @@ export const AntiPatternThresholdsSchema = z.object({
 export type AntiPatternThresholds = z.infer<typeof AntiPatternThresholdsSchema>;
 
 /**
- * Default thresholds for anti-pattern detection
+ * Default thresholds applied when none are supplied to anti-pattern detection.
+ *
+ * @architect-shape
  */
 export const DEFAULT_THRESHOLDS: AntiPatternThresholds = {
   scenarioBloatThreshold: 30,
@@ -99,10 +107,12 @@ export const DEFAULT_THRESHOLDS: AntiPatternThresholds = {
 };
 
 /**
- * Anti-pattern detection result
+ * Anti-pattern detection result.
  *
  * Reports a specific anti-pattern violation with context
  * for remediation.
+ *
+ * @architect-shape
  */
 export interface AntiPatternViolation {
   /** Anti-pattern identifier */
@@ -120,11 +130,13 @@ export interface AntiPatternViolation {
 }
 
 /**
- * DoD validation result for a single phase/pattern
+ * DoD validation result for a single phase/pattern.
  *
  * Reports whether a completed phase meets Definition of Done criteria:
  * 1. All deliverables must have "complete" status
  * 2. At least one @acceptance-criteria scenario must exist
+ *
+ * @architect-shape
  */
 export interface DoDValidationResult {
   /** Pattern name being validated */
@@ -144,9 +156,11 @@ export interface DoDValidationResult {
 }
 
 /**
- * Aggregate DoD validation summary
+ * Aggregate DoD validation summary.
  *
  * Summarizes validation across multiple phases for CLI output.
+ *
+ * @architect-shape
  */
 export interface DoDValidationSummary {
   /** Per-phase validation results */
@@ -162,6 +176,7 @@ export interface DoDValidationSummary {
 /**
  * Get status emoji for phase-level aggregates.
  *
+ * @architect-shape
  * @param allComplete - Whether all patterns in the phase are complete
  * @param anyActive - Whether any patterns in the phase are active/in-progress
  * @returns Status emoji: ✅ if all complete, 🚧 if any active, 📋 otherwise

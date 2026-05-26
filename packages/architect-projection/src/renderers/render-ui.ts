@@ -42,16 +42,36 @@ import {
 import { dispatchByKind, type KindTable } from './_shared/dispatch.js';
 import type { ProjectionInput, RenderUiOptions } from './types.js';
 
+/**
+ * One titled section of a {@link UiDocument} — a stable id, a display title, and
+ * the {@link Block}s the section renders.
+ *
+ * @architect-shape
+ */
 export interface UiSection {
+  /** Stable slug identifying the section (used for anchors and ordering). */
   id: string;
+  /** Human-readable section title. */
   title: string;
+  /** The blocks rendered within the section. */
   blocks: Block[];
 }
 
+/**
+ * A renderable document tree consumed by the Studio desktop UI's BlockRenderer —
+ * the fragment kind, a heading, ordered sections, and optional routed children
+ * keyed by bundle child path.
+ *
+ * @architect-shape
+ */
 export interface UiDocument {
+  /** The originating fragment's kind discriminant. */
   kind: Fragment['kind'];
+  /** The document's top-level heading. */
   heading: string;
+  /** The ordered sections that make up the document body. */
   sections: UiSection[];
+  /** Optional routed child documents, keyed by bundle child path. */
   children?: Record<string, UiDocument>;
 }
 
@@ -93,6 +113,16 @@ const UI_RENDERERS: KindTable<UiDocument, RenderFragmentOptions> = {
   PatternDetail: renderPatternDetail,
 };
 
+/**
+ * Renders a projection fragment or bundle into a {@link UiDocument} tree for the
+ * Studio desktop UI. Bundles render their root and merge in routed children;
+ * child links are rewritten to bundle anchors unless disabled via options.
+ *
+ * @architect-shape
+ * @param input - The fragment or bundle to render.
+ * @param options - Optional controls — `resolveChildLinks` toggles child-link rewriting.
+ * @returns The rendered {@link UiDocument} (typed as `object` at the package boundary).
+ */
 export const renderUi = (input: ProjectionInput, options?: RenderUiOptions): object => {
   const resolvedOptions = resolveOptions(options);
 

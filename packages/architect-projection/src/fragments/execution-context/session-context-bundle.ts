@@ -21,6 +21,14 @@ import {
   StubRefSchema,
 } from './supporting.js';
 
+/**
+ * Fragment shape bundling everything needed to open a session — the in-scope
+ * patterns and session type, per-pattern metadata, spec files, stubs,
+ * dependencies (own, shared, and consumers), architecture neighbors,
+ * deliverables, test files, and FSM context.
+ *
+ * @architect-shape
+ */
 export const SessionContextBundleSchema = z.strictObject({
   kind: z.literal('SessionContextBundle'),
   patterns: z.array(z.string()),

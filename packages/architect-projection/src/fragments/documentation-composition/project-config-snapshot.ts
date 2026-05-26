@@ -12,6 +12,12 @@
  */
 import { z } from 'zod';
 
+/**
+ * A snapshot of project configuration and graph metrics — base directory,
+ * config path, source globs, build time, and pattern/phase/role counts.
+ *
+ * @architect-shape
+ */
 export const ProjectConfigSnapshotSchema = z.strictObject({
   kind: z.literal('ProjectConfigSnapshot'),
   baseDir: z.string(),

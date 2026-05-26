@@ -45,6 +45,17 @@ const DEFAULT_OPTIONS: Required<RenderJsonOptions> = {
   stableKeyOrder: true,
 };
 
+/**
+ * Renders a projection fragment or bundle into a JSON-safe object or, when
+ * `pretty` is set, a pretty-printed JSON string. Validates serializability,
+ * preserves bundle routing metadata, and applies stable key ordering by default.
+ *
+ * @architect-shape
+ * @param input - The fragment or bundle to serialize.
+ * @param options - Output controls — `pretty` selects string output, `stableKeyOrder` sorts keys.
+ * @returns A JSON string when `pretty` is `true`, otherwise a JSON-safe object.
+ * @throws When `input` contains a non-JSON-safe value (bigint, function, symbol, Date, Map, Set, non-finite number, or non-plain object).
+ */
 export function renderJson(
   input: ProjectionInput,
   options: RenderJsonOptions & { pretty: true },

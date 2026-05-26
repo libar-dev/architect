@@ -14,6 +14,11 @@ import { z } from 'zod';
 
 import { StatusCountsSchema, StatusPercentagesSchema } from './supporting.js';
 
+/**
+ * Pattern status breakdown — absolute counts paired with their percentages.
+ *
+ * @architect-shape
+ */
 export const StatusDistributionSchema = z.strictObject({
   kind: z.literal('StatusDistribution'),
   counts: StatusCountsSchema,

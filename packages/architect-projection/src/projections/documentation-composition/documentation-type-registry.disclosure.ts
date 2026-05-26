@@ -5,6 +5,7 @@ import type { ProgressiveDisclosureLevel } from '../../disclosure/levels.js';
 
 import type { SupportedDocumentationType } from './documentation-type-registry.identity.js';
 import {
+  apiReferenceDisclosureMatrix,
   architectureDisclosureMatrix,
   businessRulesDisclosureMatrix,
   changelogDisclosureMatrix,
@@ -28,6 +29,10 @@ export const DOCUMENTATION_TYPE_DISCLOSURE = {
   architecture: {
     defaultDisclosureLevel: 'essential',
     disclosureMatrix: architectureDisclosureMatrix,
+  },
+  'api-reference': {
+    defaultDisclosureLevel: 'important',
+    disclosureMatrix: apiReferenceDisclosureMatrix,
   },
   decisions: {
     defaultDisclosureLevel: 'important',

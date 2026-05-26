@@ -11,6 +11,13 @@ import { z } from 'zod';
 
 import { GapsByTagSchema } from './supporting.js';
 
+/**
+ * Fragment shape summarizing annotation coverage across source files — total
+ * and annotated file counts, the list of unannotated files, the coverage
+ * percentage, and the per-tag gap breakdown.
+ *
+ * @architect-shape
+ */
 export const AnnotationCoverageSchema = z.strictObject({
   kind: z.literal('AnnotationCoverage'),
   totalSourceFiles: z.number().int().nonnegative(),

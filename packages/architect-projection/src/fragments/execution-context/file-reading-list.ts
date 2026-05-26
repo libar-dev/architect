@@ -9,6 +9,13 @@
  */
 import { z } from 'zod';
 
+/**
+ * Fragment shape for the files an agent should read to understand a pattern —
+ * the pattern's own primary files plus its completed dependencies, roadmap
+ * dependencies, and architecture neighbors.
+ *
+ * @architect-shape
+ */
 export const FileReadingListSchema = z.strictObject({
   kind: z.literal('FileReadingList'),
   pattern: z.string(),

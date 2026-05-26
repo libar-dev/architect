@@ -7,14 +7,14 @@
 
 ## Overview
 
-**8 roles** | **19 metadata tags** | **3 aggregation tags** | **30 total**
+**8 roles** | **20 metadata tags** | **3 aggregation tags** | **31 total**
 
 | Component        | Count |
 | ---------------- | ----- |
 | Roles            | 8     |
-| Metadata Tags    | 19    |
+| Metadata Tags    | 20    |
 | Aggregation Tags | 3     |
-| Total            | 30    |
+| Total            | 31    |
 
 ## Roles
 
@@ -77,6 +77,12 @@
 | \`adr-superseded-by\` | value  | ADR/PDR number that supersedes this decision            | No       | No         |                                                                                |               | @architect-adr-superseded-by 020     |
 | \`adr-supersedes\`    | value  | ADR/PDR number this decision supersedes                 | No       | No         |                                                                                |               | @architect-adr-supersedes 012        |
 | \`adr-theme\`         | enum   | Theme grouping for related decisions \(from synthesis\) | No       | No         | persistence, isolation, commands, projections, coordination, taxonomy, testing |               | @architect-adr-theme persistence     |
+
+### Discovery Tags
+
+| Tag       | Format | Purpose                                                                                                                                                                                                                                              | Required | Repeatable | Values | Default Value | Example          |
+| --------- | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ---------- | ------ | ------------- | ---------------- |
+| \`shape\` | flag   | Marks an exported declaration \(interface / type / enum / const / function\) for API-reference shape extraction. An optional trailing group label clusters related shapes; per-shape data is discovered from the AST, not from this presence marker. | No       | No         |        |               | @architect-shape |
 
 ### Other Tags
 

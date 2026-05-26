@@ -9,6 +9,13 @@
  */
 import { z } from 'zod';
 
+/**
+ * Fragment shape for one configured role — its tag, domain, optional sort
+ * priority, the count of patterns carrying it, an optional description, and
+ * example pattern names.
+ *
+ * @architect-shape
+ */
 export const RoleProfileSchema = z.strictObject({
   kind: z.literal('RoleProfile'),
   tag: z.string(),

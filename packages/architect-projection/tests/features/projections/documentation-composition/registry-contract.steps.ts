@@ -17,6 +17,7 @@ const feature = await loadFeature(
 
 const expectedDocumentationTypes = [
   'architecture',
+  'api-reference',
   'decisions',
   'business-rules',
   'patterns',
@@ -32,6 +33,7 @@ const expectedDocumentationTypes = [
 
 const expectedMarkdownRootTargets = {
   architecture: 'ARCHITECTURE.md',
+  'api-reference': 'API-REFERENCE.md',
   decisions: 'DECISIONS.md',
   'business-rules': 'BUSINESS-RULES.md',
   patterns: 'PATTERNS.md',
@@ -47,6 +49,7 @@ const expectedMarkdownRootTargets = {
 
 const expectedChildDirectoryLayout = {
   architecture: { childDirectory: 'architecture', entityPathLayout: null },
+  'api-reference': { childDirectory: 'api-reference', entityPathLayout: null },
   decisions: { childDirectory: 'decisions', entityPathLayout: null },
   'business-rules': { childDirectory: 'business-rules', entityPathLayout: null },
   patterns: { childDirectory: 'patterns', entityPathLayout: null },
@@ -68,6 +71,7 @@ const expectedChildDirectoryLayout = {
 
 const expectedDefaultDisclosureLevels = {
   architecture: 'essential',
+  'api-reference': 'important',
   decisions: 'important',
   'business-rules': 'important',
   patterns: 'important',
@@ -83,6 +87,7 @@ const expectedDefaultDisclosureLevels = {
 
 const expectedGeneratorAliases = {
   architecture: [],
+  'api-reference': ['api'],
   decisions: ['adrs'],
   'business-rules': [],
   patterns: [],

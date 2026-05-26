@@ -53,6 +53,16 @@ const COMPACT_NORMALIZERS: KindTable<string, RenderCompactOptions | undefined> =
   HandoffRecord: (f, o) => renderHandoffRecord(f, o),
 };
 
+/**
+ * Renders a projection fragment or bundle into compact, marker-delimited plain
+ * text for AI-facing CLI/MCP output. Bundles render their root followed by each
+ * child section; unknown fragment kinds fall back to a generic key-value view.
+ *
+ * @architect-shape
+ * @param input - The fragment or bundle to render.
+ * @param options - Optional richness and section-separator controls.
+ * @returns The compact plain-text rendering.
+ */
 export const renderCompactText = (
   input: ProjectionInput,
   options?: RenderCompactOptions,

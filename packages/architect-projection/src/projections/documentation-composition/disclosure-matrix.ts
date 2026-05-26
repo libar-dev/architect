@@ -108,6 +108,15 @@ export const architectureDisclosureMatrix = disclosureMatrix({
   advanced: disclosureSpec('flat', 'summary', true, true),
 });
 
+// API reference always fans out its per-package child docs (like architecture), and the
+// root stays a navigation index (summary table + links) at every disclosure level.
+export const apiReferenceDisclosureMatrix = disclosureMatrix({
+  essential: disclosureSpec('package', 'summary', true, true, undefined, 'navigation'),
+  important: disclosureSpec('package', 'summary', true, true, undefined, 'navigation'),
+  useful: disclosureSpec('package', 'full', true, true, undefined, 'navigation'),
+  advanced: disclosureSpec('package', 'full', true, true, undefined, 'navigation'),
+});
+
 export const decisionsDisclosureMatrix = disclosureMatrix({
   essential: disclosureSpec('flat', 'name-only', false, true),
   important: disclosureSpec('flat', 'summary', true, true),

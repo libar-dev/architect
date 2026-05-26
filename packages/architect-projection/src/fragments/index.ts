@@ -62,6 +62,9 @@ export {
   TagUsageMatrixSchema,
 } from './operational-insights/index.js';
 export {
+  ApiReferenceDigestSchema,
+  ApiShapeSchema,
+  ApiShapeKindSchema,
   ArchitectureDiagramSchema,
   PrChangeReviewSchema,
   ProjectConfigSnapshotSchema,
@@ -121,6 +124,10 @@ export type {
   TagUsageMatrix,
 } from './operational-insights/index.js';
 export type {
+  ApiReferenceDigest,
+  ApiReferenceGroupingEntry,
+  ApiShape,
+  ApiShapeKind,
   ArchitectureDiagram,
   PrChangeReview,
   ProjectConfigSnapshot,

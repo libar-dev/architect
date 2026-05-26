@@ -30,6 +30,12 @@ import { ExtractedShapeSchema } from './extracted-shape.js';
 import { PatternIdentifierSchema, PatternReferenceSchema } from './pattern-contract.js';
 import { ScenarioRefSchema } from './scenario-ref.js';
 
+/**
+ * A business rule extracted from a pattern's scenarios — its name, description,
+ * the count and names of scenarios that exercise it, and any tags.
+ *
+ * @architect-shape
+ */
 export const BusinessRuleSchema = z.object({
   name: z.string(),
   description: z.string(),
@@ -65,6 +71,12 @@ const SourceFilePathSchema = z
   )
   .transform((path) => asSourceFilePath(path));
 
+/**
+ * Source provenance for a pattern — the file it was extracted from and the
+ * 1-based inclusive `[start, end]` line span of its declaration.
+ *
+ * @architect-shape
+ */
 export const SourceInfoSchema = z.strictObject({
   file: SourceFilePathSchema,
   lines: z
@@ -143,8 +155,21 @@ const ExtractedPatternBaseSchema = z.strictObject({
   extractedShapes: z.array(ExtractedShapeSchema).readonly().optional(),
 });
 
+/**
+ * The canonical per-pattern record contract — the ~60-field strict-object
+ * schema every extracted pattern must satisfy.
+ *
+ * @architect-shape
+ */
 export const ExtractedPatternSchema = ExtractedPatternBaseSchema;
 
+/**
+ * Draft variant of {@link ExtractedPatternSchema} that additionally permits a
+ * `_diagnostics` array, carrying extraction warnings before the record is
+ * finalized.
+ *
+ * @architect-shape
+ */
 export const ExtractedPatternDraftSchema = z.strictObject({
   ...ExtractedPatternBaseSchema.shape,
   _diagnostics: z.array(z.string().min(1)).readonly().optional(),
@@ -153,6 +178,14 @@ export const ExtractedPatternDraftSchema = z.strictObject({
 export type ExtractedPattern = z.output<typeof ExtractedPatternBaseSchema>;
 export type ExtractedPatternDraft = z.output<typeof ExtractedPatternDraftSchema>;
 
+/**
+ * Type guard narrowing an unknown value to {@link ExtractedPattern} by parsing
+ * it against {@link ExtractedPatternSchema}.
+ *
+ * @architect-shape
+ * @param value - The unknown value to test against the ExtractedPattern contract.
+ * @returns `true` when `value` is a valid ExtractedPattern (narrowing its type), else `false`.
+ */
 export function isExtractedPattern(value: unknown): value is ExtractedPattern {
   return ExtractedPatternSchema.safeParse(value).success;
 }

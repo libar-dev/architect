@@ -71,6 +71,7 @@ export interface PatternStubOptions {
   readonly level?: ExtractedPattern['level'];
   readonly parent?: ExtractedPattern['parent'];
   readonly children?: ExtractedPattern['children'];
+  readonly extractedShapes?: ExtractedPattern['extractedShapes'];
 }
 
 export interface GraphBuilderOptions {
@@ -159,6 +160,7 @@ export function buildPatternStub(name: string, options: PatternStubOptions = {})
     ...(options.level !== undefined ? { level: options.level } : {}),
     ...(options.parent !== undefined ? { parent: options.parent } : {}),
     ...(options.children !== undefined ? { children: options.children } : {}),
+    ...(options.extractedShapes !== undefined ? { extractedShapes: options.extractedShapes } : {}),
     ...(options.maturity !== undefined ? { maturity: options.maturity } : {}),
     ...(options.dependsOn !== undefined ? { dependsOn: options.dependsOn } : {}),
     ...(options.usedBy !== undefined ? { usedBy: options.usedBy } : {}),

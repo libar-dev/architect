@@ -11,6 +11,13 @@ import { z } from 'zod';
 
 import { DeliverableSchema } from './deliverable.js';
 
+/**
+ * Fragment shape for one pattern's ordered list of deliverables. Carries the
+ * fragment `kind` discriminator, the owning pattern name, and the deliverable
+ * items in declaration order.
+ *
+ * @architect-shape
+ */
 export const DeliverableManifestSchema = z.strictObject({
   kind: z.literal('DeliverableManifest'),
   pattern: z.string(),

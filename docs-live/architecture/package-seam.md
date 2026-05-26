@@ -7,7 +7,7 @@
 
 ## Overview
 
-This view captures 244 patterns across 8 diagrams in the Package architecture view.
+This view captures 247 patterns across 8 diagrams in the Package architecture view.
 
 ## Diagrams
 
@@ -23,7 +23,7 @@ graph LR
   pkg_architect_host_dev["Architect Host (Dev) (26)"]
   pkg_architect_mcp["Architect MCP (9)"]
   pkg_architect_package_content["Architect Package Content (11)"]
-  pkg_architect_projection["Architect Projection (118)"]
+  pkg_architect_projection["Architect Projection (121)"]
   pkg_architect_cli --> pkg_architect_core
   pkg_architect_cli --> pkg_architect_projection
   pkg_architect_guard --> pkg_architect_core
@@ -268,12 +268,15 @@ graph TD
   pdr005processguardfsm -->|depends-on| adr001taxonomycanonicalvalues
 ```
 
-### Package: Architect Projection (118 patterns)
+### Package: Architect Projection (121 patterns)
 
 ```mermaid
 graph TD
   annotationcoverage["AnnotationCoverage<br/>(contract)"]
   annotationcoverageprojection["AnnotationCoverageProjection<br/>(projection)"]
+  apireferencedigest["ApiReferenceDigest<br/>(contract)"]
+  apireferenceprojection["ApiReferenceProjection<br/>(projection)"]
+  apireferenceprojectionexecutabletests["ApiReferenceProjectionExecutableTests<br/>(projection)"]
   architecturecomparison["ArchitectureComparison<br/>(contract)"]
   architecturecomparisonprojection["ArchitectureComparisonProjection<br/>(projection)"]
   architecturediagram["ArchitectureDiagram<br/>(contract)"]
@@ -392,6 +395,8 @@ graph TD
   validationruledigestprojection["ValidationRuleDigestProjection<br/>(projection)"]
   annotationcoverageprojection -->|depends-on| annotationcoverage
   annotationcoverageprojection -->|depends-on| operationalinsightsprojectionsupport
+  apireferenceprojection -->|depends-on| apireferencedigest
+  apireferenceprojection -->|depends-on| projectionfragmentschema
   architecturecomparisonprojection -->|depends-on| architecturecomparison
   architecturecomparisonprojection -->|depends-on| patternrelationsfragmentcontracts
   architecturecomparisonprojection -->|depends-on| patternrelationsprojectionsupport
@@ -539,9 +544,9 @@ Most-depended-on patterns in this view, ranked by in-view dependant count.
 | PatternGraph                         | 9          | ArchitectureInspection, BuildPipeline, DoDValidator, GraphInventory, PatternClassification                                                             |
 | OperationalInsightsProjectionSupport | 8          | AnnotationCoverageProjection, OverviewProjection, RequirementDigestProjection, RequirementExecutableDigestProjection, RequirementSpecsDigestProjection |
 | BlockSchema                          | 7          | ArchitectureDiagram, DecisionRecord, DocumentationCompositionSupporting, MarkdownRenderer, OperationalInsightsSupporting                               |
+| ProjectionFragmentSchema             | 6          | ApiReferenceProjection, CompactTextRenderer, FragmentRendererDispatch, JsonRenderer, MarkdownRenderer                                                  |
 | DeliveryReportingProjectionSupport   | 5          | PhaseProgressProjection, ReleaseNotesProjection, RoadmapTimelineProjection, StatusDistributionProjection, TraceabilityMatrixProjection                 |
 | ExecutionContextProjectionSupport    | 5          | DeliverableProjection, FileReadingListProjection, HandoffProjection, ScopeReadinessProjection, SessionContextProjection                                |
-| ProjectionFragmentSchema             | 5          | CompactTextRenderer, FragmentRendererDispatch, JsonRenderer, MarkdownRenderer, UiRenderer                                                              |
 
 ## Cross-package bounded contexts
 
@@ -573,6 +578,9 @@ Bounded contexts whose patterns span more than one workspace package.
 - AnnotationCoverage
 - AnnotationCoverageProjection
 - AntiPatternDetector
+- ApiReferenceDigest
+- ApiReferenceProjection
+- ApiReferenceProjectionExecutableTests
 - ArchitectPublicContract
 - ArchitectureComparison
 - ArchitectureComparisonProjection

@@ -12,6 +12,13 @@ import { z } from 'zod';
 
 import { CheckSeveritySchema } from './supporting.js';
 
+/**
+ * Fragment shape for a single readiness criterion and its outcome — the check
+ * identifier and label, its severity, whether it passed, and optional detail
+ * text.
+ *
+ * @architect-shape
+ */
 export const ScopeReadinessCheckSchema = z.strictObject({
   kind: z.literal('ScopeReadinessCheck'),
   checkId: z.string(),

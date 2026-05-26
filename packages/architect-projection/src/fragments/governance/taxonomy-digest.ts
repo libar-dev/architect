@@ -13,6 +13,11 @@ import { z } from 'zod';
 
 import { FormatTypeEntrySchema, TagGroupEntrySchema } from './supporting.js';
 
+/**
+ * Summarized tag counts by category (roles, metadata, aggregation) plus a total.
+ *
+ * @architect-shape
+ */
 export const TaxonomyDigestCountSummarySchema = z.strictObject({
   roles: z.number().int().nonnegative(),
   metadata: z.number().int().nonnegative(),
@@ -20,6 +25,12 @@ export const TaxonomyDigestCountSummarySchema = z.strictObject({
   total: z.number().int().nonnegative(),
 });
 
+/**
+ * A digest of the tag taxonomy — grouped tag entries, the supported format
+ * types, and optional per-tag example overrides.
+ *
+ * @architect-shape
+ */
 export const TaxonomyDigestSchema = z.strictObject({
   kind: z.literal('TaxonomyDigest'),
   tags: z.array(TagGroupEntrySchema),

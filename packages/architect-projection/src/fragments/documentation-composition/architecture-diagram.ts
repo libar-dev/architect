@@ -22,6 +22,8 @@ import { ArchitectureDiagramScopeSchema } from './supporting.js';
  * single group's detail diagram. Splitting the architecture view into many
  * bounded sections keeps every Mermaid block renderable (no single block holds
  * all patterns) and far more readable than one mega-graph.
+ *
+ * @architect-shape
  */
 export const ArchitectureDiagramSectionSchema = z.strictObject({
   title: z.string(),
@@ -34,6 +36,8 @@ export const ArchitectureDiagramSectionSchema = z.strictObject({
  * One row of the fan-in / hub view — a pattern ranked by how many in-view peers
  * depend on it. Surfaces hub patterns that otherwise render as edgeless leaves in
  * the per-group detail diagrams (their consumers live in other groups).
+ *
+ * @architect-shape
  */
 export const FanInEntrySchema = z.strictObject({
   pattern: z.string(),
@@ -44,6 +48,8 @@ export const FanInEntrySchema = z.strictObject({
 /**
  * One bounded context whose member patterns resolve to more than one workspace
  * package — a seam where a single context is implemented across package boundaries.
+ *
+ * @architect-shape
  */
 export const CrossPackageContextEntrySchema = z.strictObject({
   context: z.string(),
@@ -51,6 +57,13 @@ export const CrossPackageContextEntrySchema = z.strictObject({
   patternCount: z.number().int().nonnegative(),
 });
 
+/**
+ * The architecture-diagram fragment — its scope, the ordered diagram sections,
+ * an optional legend, optional fan-in and cross-package-context rankings, and
+ * the overall pattern list.
+ *
+ * @architect-shape
+ */
 export const ArchitectureDiagramSchema = z.strictObject({
   kind: z.literal('ArchitectureDiagram'),
   scope: ArchitectureDiagramScopeSchema,

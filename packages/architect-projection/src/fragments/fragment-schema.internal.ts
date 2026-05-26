@@ -62,6 +62,7 @@ import {
   TagUsageMatrixSchema,
 } from './operational-insights/index.js';
 import {
+  ApiReferenceDigestSchema,
   ArchitectureDiagramSchema,
   PrChangeReviewSchema,
   ProjectConfigSnapshotSchema,
@@ -109,6 +110,7 @@ export const FragmentSchema = z.discriminatedUnion('kind', [
   RequirementDigestSchema,
   ProjectConfigSnapshotSchema,
   ArchitectureDiagramSchema,
+  ApiReferenceDigestSchema,
   PrChangeReviewSchema,
   DependencyEdgeSetSchema,
 ]);

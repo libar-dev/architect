@@ -17,6 +17,13 @@ import {
   OverviewProgressSchema,
 } from './supporting.js';
 
+/**
+ * Fragment shape for the delivery overview — progress totals, active-phase
+ * counts, blocking patterns, an optional high-level architecture glimpse, an
+ * optional generated-views index, and optional CLI hints.
+ *
+ * @architect-shape
+ */
 export const OverviewDigestSchema = z.strictObject({
   kind: z.literal('OverviewDigest'),
   progress: OverviewProgressSchema,

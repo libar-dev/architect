@@ -94,7 +94,7 @@ export const METADATA_TAGS_BY_GROUP = {
   ] as const,
   hierarchy: ['title'] as const,
   traceability: [] as const,
-  discovery: [] as const,
+  discovery: ['shape'] as const,
   architecture: ['role', BOUNDED_CONTEXT_TAG] as const,
   extraction: [] as const,
   stub: ['target'] as const,
@@ -303,6 +303,13 @@ export function buildRegistry(options: BuildRegistryOptions = {}): TagRegistry {
         format: 'value',
         purpose: 'Target implementation path for stub files',
         example: '@architect-target src/api/stub-resolver.ts',
+      },
+      {
+        tag: 'shape',
+        format: 'flag',
+        purpose:
+          'Marks an exported declaration (interface / type / enum / const / function) for API-reference shape extraction. An optional trailing group label clusters related shapes; per-shape data is discovered from the AST, not from this presence marker.',
+        example: '@architect-shape',
       },
     ],
     aggregationTags: [

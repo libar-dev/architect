@@ -21,6 +21,13 @@ import {
   StubRefSchema,
 } from './supporting.js';
 
+/**
+ * The expanded per-pattern bundle — the pattern identity plus description, open
+ * questions, deliverables, relationships, hierarchy, embedded rules, stubs, and
+ * the deliverable manifest.
+ *
+ * @architect-shape
+ */
 export const PatternDetailSchema = PatternIdentitySchema.extend({
   kind: z.literal('PatternDetail'),
   description: z.string().optional(),

@@ -5,6 +5,7 @@ Minimal index for the reduced projection-era doc set.
 | Document | Link |
 | --- | --- |
 | Architecture | [ARCHITECTURE.md](ARCHITECTURE.md) |
+| API Reference | [API-REFERENCE.md](API-REFERENCE.md) |
 | Decisions | [DECISIONS.md](DECISIONS.md) |
 | Business Rules | [BUSINESS-RULES.md](BUSINESS-RULES.md) |
 | Patterns | [PATTERNS.md](PATTERNS.md) |

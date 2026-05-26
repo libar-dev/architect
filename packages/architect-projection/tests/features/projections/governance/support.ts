@@ -41,6 +41,7 @@ interface PatternFixtureOptions {
   readonly seeAlso?: ExtractedPattern['seeAlso'];
   readonly apiRef?: ExtractedPattern['apiRef'];
   readonly extendsPattern?: ExtractedPattern['extendsPattern'];
+  readonly extractedShapes?: ExtractedPattern['extractedShapes'];
 }
 
 interface ProjectionContextOptions {

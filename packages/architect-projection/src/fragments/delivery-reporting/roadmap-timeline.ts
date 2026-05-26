@@ -14,6 +14,12 @@ import { z } from 'zod';
 
 import { QuarterEntrySchema } from './supporting.js';
 
+/**
+ * A roadmap view — one of `roadmap`, `milestones`, or `current` — over a set of
+ * quarter entries.
+ *
+ * @architect-shape
+ */
 export const RoadmapTimelineSchema = z.strictObject({
   kind: z.literal('RoadmapTimeline'),
   view: z.enum(['roadmap', 'milestones', 'current']),

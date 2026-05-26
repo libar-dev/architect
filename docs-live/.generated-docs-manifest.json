@@ -300,6 +300,41 @@
           "tracking": "commit"
         }
       ]
+    },
+    "api-reference": {
+      "generatorName": "api-reference",
+      "kind": "projection",
+      "rootPath": "API-REFERENCE.md",
+      "entries": [
+        {
+          "path": "API-REFERENCE.md",
+          "role": "root",
+          "audience": "published",
+          "tracking": "commit"
+        },
+        {
+          "path": "api-reference/architect-core.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "API-REFERENCE.md"
+        },
+        {
+          "path": "api-reference/architect-guard.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "API-REFERENCE.md"
+        },
+        {
+          "path": "api-reference/architect-projection.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "API-REFERENCE.md"
+        }
+      ],
+      "documentType": "api-reference"
     }
   }
 }

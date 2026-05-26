@@ -22,6 +22,11 @@ import { z } from 'zod';
 import { ExtractedPatternSchema } from './extracted-pattern.js';
 import { TagRegistrySchema } from './tag-registry.js';
 
+/**
+ * Schema for a feature-file parse failure record embedded in the graph.
+ *
+ * @architect-shape
+ */
 export const FeatureParseErrorSchema = z.strictObject({
   type: z.literal('FEATURE_PARSE_ERROR'),
   message: z.string(),
@@ -30,6 +35,12 @@ export const FeatureParseErrorSchema = z.strictObject({
   originalError: z.unknown().optional(),
 });
 
+/**
+ * Schema for a spec that failed to parse — names the pattern, its path, and the
+ * underlying {@link FeatureParseErrorSchema}.
+ *
+ * @architect-shape
+ */
 export const PatternParseFailureSchema = z.strictObject({
   kind: z.literal('spec-parse-failed'),
   patternName: z.string(),
@@ -38,6 +49,12 @@ export const PatternParseFailureSchema = z.strictObject({
   parseError: FeatureParseErrorSchema,
 });
 
+/**
+ * Schema for patterns grouped by normalized status (completed / active /
+ * planned / candidate).
+ *
+ * @architect-shape
+ */
 export const StatusGroupsSchema = z.strictObject({
   completed: z.array(ExtractedPatternSchema),
   active: z.array(ExtractedPatternSchema),
@@ -45,6 +62,12 @@ export const StatusGroupsSchema = z.strictObject({
   candidate: z.array(ExtractedPatternSchema),
 });
 
+/**
+ * Schema for patterns grouped by exact (un-normalized) status, including
+ * `roadmap` and `deferred`.
+ *
+ * @architect-shape
+ */
 export const ExactStatusGroupsSchema = z.strictObject({
   candidate: z.array(ExtractedPatternSchema),
   roadmap: z.array(ExtractedPatternSchema),
@@ -53,6 +76,11 @@ export const ExactStatusGroupsSchema = z.strictObject({
   deferred: z.array(ExtractedPatternSchema),
 });
 
+/**
+ * Schema for per-status pattern counts plus a total.
+ *
+ * @architect-shape
+ */
 export const StatusCountsSchema = z.strictObject({
   completed: z.number().int().nonnegative(),
   active: z.number().int().nonnegative(),
@@ -61,6 +89,12 @@ export const StatusCountsSchema = z.strictObject({
   total: z.number().int().nonnegative(),
 });
 
+/**
+ * Schema for a single phase grouping — its number, optional name, member
+ * patterns, and status counts.
+ *
+ * @architect-shape
+ */
 export const PhaseGroupSchema = z.strictObject({
   phaseNumber: z.number().int(),
   phaseName: z.string().optional(),
@@ -68,6 +102,12 @@ export const PhaseGroupSchema = z.strictObject({
   counts: StatusCountsSchema,
 });
 
+/**
+ * Schema for patterns grouped by source type (TypeScript / Gherkin / roadmap /
+ * PRD).
+ *
+ * @architect-shape
+ */
 export const SourceViewsSchema = z.strictObject({
   typescript: z.array(ExtractedPatternSchema),
   gherkin: z.array(ExtractedPatternSchema),
@@ -75,12 +115,24 @@ export const SourceViewsSchema = z.strictObject({
   prd: z.array(ExtractedPatternSchema),
 });
 
+/**
+ * Schema for a reference to an implementing artifact — its name, file, and an
+ * optional description.
+ *
+ * @architect-shape
+ */
 export const ImplementationRefSchema = z.strictObject({
   name: z.string(),
   file: z.string(),
   description: z.string().optional(),
 });
 
+/**
+ * Schema for one pattern's entry in the relationship index — its forward and
+ * derived reverse edges.
+ *
+ * @architect-shape
+ */
 export const RelationshipEntrySchema = z.strictObject({
   uses: z.array(z.string()),
   usedBy: z.array(z.string()),
@@ -94,6 +146,12 @@ export const RelationshipEntrySchema = z.strictObject({
   apiRef: z.array(z.string()),
 });
 
+/**
+ * Schema for the architecture index — patterns indexed by role, context,
+ * layer, view, and package, plus the full set.
+ *
+ * @architect-shape
+ */
 export const ArchIndexSchema = z.strictObject({
   byRole: z.record(z.string(), z.array(ExtractedPatternSchema)),
   byContext: z.record(z.string(), z.array(ExtractedPatternSchema)),
@@ -103,6 +161,13 @@ export const ArchIndexSchema = z.strictObject({
   all: z.array(ExtractedPatternSchema),
 });
 
+/**
+ * Schema for the canonical read model (the PatternGraph) — every pattern, the
+ * tag registry, the status/maturity/phase/role groupings, counts, the
+ * relationship index, and the optional architecture index.
+ *
+ * @architect-shape
+ */
 export const PatternGraphSchema = z.strictObject({
   patterns: z.array(ExtractedPatternSchema),
   tagRegistry: TagRegistrySchema,

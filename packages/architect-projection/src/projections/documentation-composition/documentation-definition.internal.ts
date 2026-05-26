@@ -19,6 +19,7 @@ import {
   projectRequirementSpecsDigest,
 } from '../operational-insights/index.js';
 
+import { buildApiReferenceBundle } from './api-reference.js';
 import { buildArchitectureBundle } from './architecture-diagram.js';
 import { DOCUMENTATION_TYPE_CLI_SURFACE } from './documentation-type-registry.cli-surface.js';
 import { DOCUMENTATION_TYPE_DISCLOSURE } from './documentation-type-registry.disclosure.js';
@@ -42,6 +43,7 @@ export type DocumentationDefinition = Readonly<
 
 const DOCUMENTATION_PROJECTIONS = {
   architecture: (context) => buildArchitectureBundle(context),
+  'api-reference': (context) => buildApiReferenceBundle(context),
   decisions: (context) => projectDecisionCatalog(context),
   'business-rules': (context) =>
     projectBusinessRuleSet(context, { scope: 'all', groupedBy: 'package' }),

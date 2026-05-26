@@ -13,6 +13,13 @@ import { z } from 'zod';
 
 import { ImplementationRefSchema } from './supporting.js';
 
+/**
+ * The relationship neighborhood around a focal pattern — its context, role, and
+ * layer, every typed relation edge (uses, usedBy, dependsOn, enables,
+ * implements), its same-context peers, and the artifacts that implement it.
+ *
+ * @architect-shape
+ */
 export const ArchitectureNeighborhoodSchema = z.strictObject({
   kind: z.literal('ArchitectureNeighborhood'),
   pattern: z.string(),

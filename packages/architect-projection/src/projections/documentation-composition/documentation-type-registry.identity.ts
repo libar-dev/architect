@@ -19,6 +19,12 @@ export const SUPPORTED_DOCUMENTATION_TYPE_IDENTITIES = [
     rootRouteId: createIndexRouteId('architecture'),
   },
   {
+    key: 'api-reference',
+    displayTitle: 'API Reference',
+    description: 'Type and API surface (shapes) extracted from @architect-shape annotations.',
+    rootRouteId: createIndexRouteId('api-reference'),
+  },
+  {
     key: 'decisions',
     displayTitle: 'Decisions',
     description: 'Architecture decision records and their consequences.',

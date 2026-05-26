@@ -15,6 +15,12 @@ import { z } from 'zod';
 
 import { BlockSchema } from '../../blocks/schema.js';
 
+/**
+ * A PR change-review fragment — the branch, its changed files, the patterns
+ * those changes affect, and reviewer recommendation blocks.
+ *
+ * @architect-shape
+ */
 export const PrChangeReviewSchema = z.strictObject({
   kind: z.literal('PrChangeReview'),
   branch: z.string(),

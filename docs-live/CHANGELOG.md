@@ -19,6 +19,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **McpOutputSchemaValidation spec**: architect/specs/mcp-output-schema-validation.feature
 - ADR007CoordinatedTaxonomyRedesign
 - AnnotationCoverage
+- ApiReferenceDigest
+- ApiReferenceProjection
+- ApiReferenceProjectionExecutableTests
 - ArchitectPublicContract
 - ArchitectureComparison
 - ArchitectureDiagram

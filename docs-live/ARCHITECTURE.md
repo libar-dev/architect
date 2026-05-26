@@ -7,7 +7,7 @@
 
 ## Overview
 
-This view captures 161 patterns across 23 diagrams in the Component architecture view.
+This view captures 163 patterns across 23 diagrams in the Component architecture view.
 
 ## Related views
 
@@ -26,7 +26,7 @@ graph LR
   cli["cli (6)"]
   configuration["configuration (4)"]
   delivery_reporting["delivery-reporting (7)"]
-  documentation_composition["documentation-composition (4)"]
+  documentation_composition["documentation-composition (6)"]
   domain["domain (1)"]
   execution_context["execution-context (8)"]
   extractor["extractor (6)"]
@@ -55,6 +55,7 @@ graph LR
   delivery_reporting --> execution_context
   delivery_reporting --> pattern_relations
   documentation_composition --> rendering
+  documentation_composition --> role_contract
   extractor --> read_api
   extractor --> scanner
   extractor --> validation_schemas
@@ -141,14 +142,17 @@ graph TD
   traceabilitymatrix["TraceabilityMatrix<br/>(contract)"]
 ```
 
-### Bounded context: documentation-composition (4 patterns)
+### Bounded context: documentation-composition (6 patterns)
 
 ```mermaid
 graph TD
+  apireferencedigest["ApiReferenceDigest<br/>(contract)"]
+  apireferenceprojection["ApiReferenceProjection<br/>(projection)"]
   architecturediagram["ArchitectureDiagram<br/>(contract)"]
   documentationcompositionsupporting["DocumentationCompositionSupporting<br/>(contract)"]
   prchangereview["PrChangeReview<br/>(contract)"]
   projectconfigsnapshot["ProjectConfigSnapshot<br/>(contract)"]
+  apireferenceprojection -->|depends-on| apireferencedigest
 ```
 
 ### Bounded context: domain (1 pattern)
@@ -474,9 +478,9 @@ Most-depended-on patterns in this view, ranked by in-view dependant count.
 | PatternGraph                         | 9          | ArchitectureInspection, BuildPipeline, DoDValidator, GraphInventory, PatternClassification                                                             |
 | OperationalInsightsProjectionSupport | 8          | AnnotationCoverageProjection, OverviewProjection, RequirementDigestProjection, RequirementExecutableDigestProjection, RequirementSpecsDigestProjection |
 | BlockSchema                          | 7          | ArchitectureDiagram, DecisionRecord, DocumentationCompositionSupporting, MarkdownRenderer, OperationalInsightsSupporting                               |
+| ProjectionFragmentSchema             | 6          | ApiReferenceProjection, CompactTextRenderer, FragmentRendererDispatch, JsonRenderer, MarkdownRenderer                                                  |
 | DeliveryReportingProjectionSupport   | 5          | PhaseProgressProjection, ReleaseNotesProjection, RoadmapTimelineProjection, StatusDistributionProjection, TraceabilityMatrixProjection                 |
 | ExecutionContextProjectionSupport    | 5          | DeliverableProjection, FileReadingListProjection, HandoffProjection, ScopeReadinessProjection, SessionContextProjection                                |
-| ProjectionFragmentSchema             | 5          | CompactTextRenderer, FragmentRendererDispatch, JsonRenderer, MarkdownRenderer, UiRenderer                                                              |
 
 ## Cross-package bounded contexts
 
@@ -500,6 +504,8 @@ Bounded contexts whose patterns span more than one workspace package.
 - AnnotationCoverage
 - AnnotationCoverageProjection
 - AntiPatternDetector
+- ApiReferenceDigest
+- ApiReferenceProjection
 - ArchitectureComparison
 - ArchitectureComparisonProjection
 - ArchitectureDiagram

@@ -4,7 +4,7 @@
 
 | Field | Value |
 | ----- | ----- |
-| Count | 244   |
+| Count | 247   |
 
 ## Filters
 
@@ -28,6 +28,9 @@
 - AnnotationCoverage
 - AnnotationCoverageProjection
 - AntiPatternDetector
+- ApiReferenceDigest
+- ApiReferenceProjection
+- ApiReferenceProjectionExecutableTests
 - ArchitectPublicContract
 - ArchitectureComparison
 - ArchitectureComparisonProjection
@@ -277,6 +280,9 @@
 | packages/architect-projection/src/fragments/operational-insights/annotation-coverage.ts                              | design     | AnnotationCoverage                                    | contract   | typescript | active    |
 | packages/architect-projection/src/projections/operational-insights/index.ts                                          | executable | AnnotationCoverageProjection                          | projection | typescript | completed |
 | packages/architect-guard/src/validation/anti-patterns.ts                                                             | executable | AntiPatternDetector                                   | service    | typescript | completed |
+| packages/architect-projection/src/fragments/documentation-composition/api-reference.ts                               | design     | ApiReferenceDigest                                    | contract   | typescript | active    |
+| packages/architect-projection/src/projections/documentation-composition/api-reference.ts                             | design     | ApiReferenceProjection                                | projection | typescript | active    |
+| packages/architect-projection/tests/features/projections/documentation-composition/api-reference.feature             | design     | ApiReferenceProjectionExecutableTests                 | projection | gherkin    | active    |
 | tests/features/cli/public-contract.feature                                                                           | design     | ArchitectPublicContract                               |            | gherkin    | active    |
 | packages/architect-projection/src/fragments/pattern-relations/architecture-comparison.ts                             | design     | ArchitectureComparison                                | contract   | typescript | active    |
 | packages/architect-projection/src/projections/pattern-relations/architecture-comparison.ts                           | executable | ArchitectureComparisonProjection                      | projection | typescript | completed |

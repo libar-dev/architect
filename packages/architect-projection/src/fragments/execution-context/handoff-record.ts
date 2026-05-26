@@ -12,6 +12,13 @@ import { z } from 'zod';
 
 import { HandoffSessionTypeSchema } from './supporting.js';
 
+/**
+ * Fragment shape for one pattern's session handoff summary — what was
+ * completed and in progress, the files modified, discoveries, blockers, and
+ * the recommended next session.
+ *
+ * @architect-shape
+ */
 export const HandoffRecordSchema = z.strictObject({
   kind: z.literal('HandoffRecord'),
   pattern: z.string(),

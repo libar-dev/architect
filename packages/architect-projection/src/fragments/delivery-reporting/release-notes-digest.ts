@@ -14,6 +14,11 @@ import { z } from 'zod';
 
 import { ReleaseEntrySchema } from './supporting.js';
 
+/**
+ * A changelog-style digest bundling one or more release entries.
+ *
+ * @architect-shape
+ */
 export const ReleaseNotesDigestSchema = z.strictObject({
   kind: z.literal('ReleaseNotesDigest'),
   releases: z.array(ReleaseEntrySchema),

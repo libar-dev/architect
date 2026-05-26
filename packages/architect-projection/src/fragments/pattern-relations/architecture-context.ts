@@ -11,6 +11,12 @@
  */
 import { z } from 'zod';
 
+/**
+ * One entry in a bounded-context catalog — the context name with its pattern
+ * count, member patterns, architecture layers, and roles.
+ *
+ * @architect-shape
+ */
 export const BoundedContextEntrySchema = z.strictObject({
   name: z.string(),
   patternCount: z.number().int().nonnegative(),
@@ -19,6 +25,12 @@ export const BoundedContextEntrySchema = z.strictObject({
   roles: z.array(z.string()),
 });
 
+/**
+ * A catalog of bounded contexts, optionally narrowed by `scope`, with one entry
+ * per context.
+ *
+ * @architect-shape
+ */
 export const BoundedContextSchema = z.strictObject({
   kind: z.literal('BoundedContext'),
   scope: z.string().optional(),

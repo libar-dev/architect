@@ -15,6 +15,13 @@ import { z } from 'zod';
 import { BlockSchema } from '../../blocks/schema.js';
 import { DecisionStatusSchema, DecisionTypeSchema } from './supporting.js';
 
+/**
+ * One decision record (ADR/PDR/DDR/TDR) — its id, type, status, and title plus
+ * structured context, decision, consequences, optional alternatives, and links
+ * to related decisions and affected patterns.
+ *
+ * @architect-shape
+ */
 export const DecisionRecordSchema = z.strictObject({
   kind: z.literal('DecisionRecord'),
   id: z.string(),

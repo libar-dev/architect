@@ -12,6 +12,11 @@ import { z } from 'zod';
 
 import { SourceInventoryEntrySchema } from './source-inventory-entry.js';
 
+/**
+ * Fragment shape grouping source-file inventory summaries into one digest.
+ *
+ * @architect-shape
+ */
 export const SourceInventoryDigestSchema = z.strictObject({
   kind: z.literal('SourceInventoryDigest'),
   items: z.array(SourceInventoryEntrySchema),

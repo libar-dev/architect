@@ -23,6 +23,13 @@ const BusinessRuleGroupingEntrySchema = z.strictObject({
   invariantCount: z.number().int().nonnegative(),
 });
 
+/**
+ * A scoped collection of business rules — discriminated on `scope` (all,
+ * product-area, phase, feature, or package) with optional grouping metadata
+ * describing how the rules are bucketed.
+ *
+ * @architect-shape
+ */
 export const BusinessRuleSetSchema = z.discriminatedUnion('scope', [
   z.strictObject({
     kind: z.literal('BusinessRuleSet'),

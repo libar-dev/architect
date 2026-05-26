@@ -13,6 +13,13 @@ import { z } from 'zod';
 
 import { DependencyTreeNodeSchema } from './supporting.js';
 
+/**
+ * A rooted dependency tree for a pattern — the root name, the recursively
+ * nested nodes, and the traversal options (max depth, whether implementation
+ * dependencies are included) that produced it.
+ *
+ * @architect-shape
+ */
 export const DependencyTreeSchema = z.strictObject({
   kind: z.literal('DependencyTree'),
   root: z.string(),

@@ -11,6 +11,13 @@
  */
 import { z } from 'zod';
 
+/**
+ * A single governance business rule — its owning feature and package, the
+ * invariant it enforces, the scenarios that verify it, and optional pattern,
+ * phase, and product-area scope metadata.
+ *
+ * @architect-shape
+ */
 export const BusinessRuleSchema = z.strictObject({
   kind: z.literal('BusinessRule'),
   id: z.string().optional(),

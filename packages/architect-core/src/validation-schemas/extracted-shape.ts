@@ -4,14 +4,14 @@ export const ShapeKindSchema = z.enum(['interface', 'type', 'enum', 'function', 
 
 export type ShapeKind = z.infer<typeof ShapeKindSchema>;
 
-export const PropertyDocSchema = z.object({
+export const PropertyDocSchema = z.strictObject({
   name: z.string(),
   jsDoc: z.string(),
 });
 
 export type PropertyDoc = z.infer<typeof PropertyDocSchema>;
 
-export const ParamDocSchema = z.object({
+export const ParamDocSchema = z.strictObject({
   name: z.string(),
   type: z.string().optional(),
   description: z.string(),
@@ -19,21 +19,21 @@ export const ParamDocSchema = z.object({
 
 export type ParamDoc = z.infer<typeof ParamDocSchema>;
 
-export const ReturnsDocSchema = z.object({
+export const ReturnsDocSchema = z.strictObject({
   type: z.string().optional(),
   description: z.string(),
 });
 
 export type ReturnsDoc = z.infer<typeof ReturnsDocSchema>;
 
-export const ThrowsDocSchema = z.object({
+export const ThrowsDocSchema = z.strictObject({
   type: z.string().optional(),
   description: z.string(),
 });
 
 export type ThrowsDoc = z.infer<typeof ThrowsDocSchema>;
 
-export const ExtractedShapeSchema = z.object({
+export const ExtractedShapeSchema = z.strictObject({
   name: z.string().min(1, 'Shape name cannot be empty'),
   kind: ShapeKindSchema,
   sourceText: z.string(),
@@ -53,7 +53,7 @@ export const ExtractedShapeSchema = z.object({
 
 export type ExtractedShape = z.infer<typeof ExtractedShapeSchema>;
 
-export const ReExportedShapeSchema = z.object({
+export const ReExportedShapeSchema = z.strictObject({
   name: z.string(),
   sourceModule: z.string(),
   typeOnly: z.boolean().default(false),
@@ -61,7 +61,7 @@ export const ReExportedShapeSchema = z.object({
 
 export type ReExportedShape = z.infer<typeof ReExportedShapeSchema>;
 
-export const ShapeExtractionResultSchema = z.object({
+export const ShapeExtractionResultSchema = z.strictObject({
   shapes: z.array(ExtractedShapeSchema).readonly(),
   notFound: z.array(z.string()).readonly(),
   imported: z.array(z.string()).readonly(),
@@ -71,7 +71,7 @@ export const ShapeExtractionResultSchema = z.object({
 
 export type ShapeExtractionResult = z.infer<typeof ShapeExtractionResultSchema>;
 
-export const ShapeExtractionOptionsSchema = z.object({
+export const ShapeExtractionOptionsSchema = z.strictObject({
   includeJsDoc: z.boolean().default(true),
   functionDetail: z.enum(['signature', 'name-only']).default('signature'),
   preserveFormatting: z.boolean().default(true),

@@ -12,6 +12,11 @@
  */
 import { z } from 'zod';
 
+/**
+ * A heading block carrying a level (1-6) and its text.
+ *
+ * @architect-shape
+ */
 export const HeadingBlockSchema = z.strictObject({
   type: z.literal('heading'),
   level: z.union([
@@ -26,17 +31,33 @@ export const HeadingBlockSchema = z.strictObject({
 });
 export type HeadingBlock = z.infer<typeof HeadingBlockSchema>;
 
+/**
+ * A paragraph block carrying a single run of prose text.
+ *
+ * @architect-shape
+ */
 export const ParagraphBlockSchema = z.strictObject({
   type: z.literal('paragraph'),
   text: z.string(),
 });
 export type ParagraphBlock = z.infer<typeof ParagraphBlockSchema>;
 
+/**
+ * A horizontal-rule separator block with no payload beyond its discriminant.
+ *
+ * @architect-shape
+ */
 export const SeparatorBlockSchema = z.strictObject({
   type: z.literal('separator'),
 });
 export type SeparatorBlock = z.infer<typeof SeparatorBlockSchema>;
 
+/**
+ * A table block carrying column headers, row cells, and optional per-column
+ * alignment.
+ *
+ * @architect-shape
+ */
 export const TableBlockSchema = z.strictObject({
   type: z.literal('table'),
   columns: z.array(z.string()),
@@ -45,8 +66,14 @@ export const TableBlockSchema = z.strictObject({
 });
 export type TableBlock = z.infer<typeof TableBlockSchema>;
 
-// Recursive: ListItem references itself. Zod cannot infer recursive lazy unions,
-// so the type is hand-written and the schema carries an explicit z.ZodType annotation.
+/**
+ * A single list entry — either a bare string or an object carrying text, an
+ * optional checkbox state, and optional nested child items. Recursive: a
+ * `ListItem` may contain further `ListItem`s, so the type is hand-written
+ * because Zod cannot infer recursive lazy unions.
+ *
+ * @architect-shape
+ */
 export type ListItem =
   | string
   | {
@@ -54,6 +81,13 @@ export type ListItem =
       checked?: boolean | undefined;
       children?: ListItem[] | undefined;
     };
+/**
+ * Runtime schema for a {@link ListItem}; uses `z.lazy` so it can reference
+ * itself for nested children, and carries an explicit `z.ZodType` annotation
+ * because the recursive lazy union cannot be inferred.
+ *
+ * @architect-shape
+ */
 export const ListItemSchema: z.ZodType<ListItem> = z.lazy(() =>
   z.union([
     z.string(),
@@ -65,6 +99,12 @@ export const ListItemSchema: z.ZodType<ListItem> = z.lazy(() =>
   ]),
 );
 
+/**
+ * A list block carrying its ordered/unordered flag and its {@link ListItem}
+ * entries.
+ *
+ * @architect-shape
+ */
 export const ListBlockSchema = z.strictObject({
   type: z.literal('list'),
   ordered: z.boolean().default(false),
@@ -72,6 +112,12 @@ export const ListBlockSchema = z.strictObject({
 });
 export type ListBlock = z.infer<typeof ListBlockSchema>;
 
+/**
+ * A code block carrying source content and an optional identifier-shaped
+ * language hint.
+ *
+ * @architect-shape
+ */
 export const CodeBlockSchema = z.strictObject({
   type: z.literal('code'),
   language: z
@@ -83,12 +129,23 @@ export const CodeBlockSchema = z.strictObject({
 });
 export type CodeBlock = z.infer<typeof CodeBlockSchema>;
 
+/**
+ * A Mermaid diagram block carrying raw Mermaid source as its content.
+ *
+ * @architect-shape
+ */
 export const MermaidBlockSchema = z.strictObject({
   type: z.literal('mermaid'),
   content: z.string(),
 });
 export type MermaidBlock = z.infer<typeof MermaidBlockSchema>;
 
+/**
+ * A link-out block carrying display text and a target path to another document
+ * or anchor.
+ *
+ * @architect-shape
+ */
 export const LinkOutBlockSchema = z.strictObject({
   type: z.literal('link-out'),
   text: z.string(),
@@ -100,11 +157,27 @@ export type LinkOutBlock = z.infer<typeof LinkOutBlockSchema>;
 // The `content` field uses z.lazy so it can reference BlockSchema (declared below).
 // Block is hand-written and BlockSchema carries an explicit z.ZodType annotation
 // because Zod cannot infer recursive lazy unions.
+/**
+ * A collapsible block that nests further blocks behind a summary label.
+ * Hand-written (rather than inferred) because its `content` is recursive and
+ * Zod cannot infer recursive lazy unions.
+ *
+ * @architect-shape
+ */
 export interface CollapsibleBlock {
+  /** Discriminant tag identifying this as a collapsible block. */
   type: 'collapsible';
+  /** The always-visible summary label shown above the collapsed content. */
   summary: string;
+  /** The nested blocks revealed when the block is expanded. */
   content: Block[];
 }
+/**
+ * The discriminated union of every inline content primitive — the building
+ * block type that prose-carrying projection fragments compose into.
+ *
+ * @architect-shape
+ */
 export type Block =
   | HeadingBlock
   | ParagraphBlock
@@ -116,12 +189,25 @@ export type Block =
   | CollapsibleBlock
   | LinkOutBlock;
 
+/**
+ * Runtime schema for a {@link CollapsibleBlock}; its `content` uses `z.lazy` to
+ * reference {@link BlockSchema} (declared below) for recursive nesting.
+ *
+ * @architect-shape
+ */
 export const CollapsibleBlockSchema = z.strictObject({
   type: z.literal('collapsible'),
   summary: z.string(),
   content: z.lazy(() => z.array(BlockSchema)),
 });
 
+/**
+ * Runtime schema for any {@link Block}; a discriminated union over every block
+ * primitive keyed on `type`, with an explicit `z.ZodType` annotation because the
+ * recursive collapsible branch cannot be inferred.
+ *
+ * @architect-shape
+ */
 export const BlockSchema: z.ZodType<Block> = z.discriminatedUnion('type', [
   HeadingBlockSchema,
   ParagraphBlockSchema,
@@ -134,8 +220,20 @@ export const BlockSchema: z.ZodType<Block> = z.discriminatedUnion('type', [
   LinkOutBlockSchema,
 ]);
 
+/**
+ * The set of valid block discriminant strings — the `type` literal of every
+ * {@link Block} variant.
+ *
+ * @architect-shape
+ */
 export type BlockType = Block['type'];
 
+/**
+ * Runtime set of every valid {@link BlockType}, used to test whether an unknown
+ * value carries a recognized block discriminant.
+ *
+ * @architect-shape
+ */
 export const BLOCK_TYPES = new Set<BlockType>([
   'heading',
   'paragraph',
@@ -148,6 +246,14 @@ export const BLOCK_TYPES = new Set<BlockType>([
   'link-out',
 ]);
 
+/**
+ * Type guard narrowing an unknown value to a {@link Block} via a cheap shape
+ * check on its `type` discriminant.
+ *
+ * @architect-shape
+ * @param value - The unknown value to test.
+ * @returns `true` when `value` is an object whose `type` is a known block kind.
+ */
 export function isBlock(value: unknown): value is Block {
   return (
     typeof value === 'object' &&
@@ -157,21 +263,51 @@ export function isBlock(value: unknown): value is Block {
   );
 }
 
+/**
+ * Constructs a {@link HeadingBlock}.
+ *
+ * @architect-shape
+ * @param level - The heading level, 1 through 6.
+ * @param text - The heading text.
+ * @returns The constructed heading block.
+ */
 export const heading = (level: 1 | 2 | 3 | 4 | 5 | 6, text: string): HeadingBlock => ({
   type: 'heading',
   level,
   text,
 });
 
+/**
+ * Constructs a {@link ParagraphBlock}.
+ *
+ * @architect-shape
+ * @param text - The paragraph prose.
+ * @returns The constructed paragraph block.
+ */
 export const paragraph = (text: string): ParagraphBlock => ({
   type: 'paragraph',
   text,
 });
 
+/**
+ * Constructs a {@link SeparatorBlock}.
+ *
+ * @architect-shape
+ * @returns The constructed separator block.
+ */
 export const separator = (): SeparatorBlock => ({
   type: 'separator',
 });
 
+/**
+ * Constructs a {@link TableBlock}, omitting `alignment` when not supplied.
+ *
+ * @architect-shape
+ * @param columns - The column header labels.
+ * @param rows - The row cells, each an array of column values.
+ * @param alignment - Optional per-column alignment.
+ * @returns The constructed table block.
+ */
 export const table = (
   columns: string[],
   rows: string[][],
@@ -183,29 +319,68 @@ export const table = (
   ...(alignment && { alignment }),
 });
 
+/**
+ * Constructs a {@link ListBlock}.
+ *
+ * @architect-shape
+ * @param items - The list entries.
+ * @param ordered - Whether the list is ordered; defaults to `false`.
+ * @returns The constructed list block.
+ */
 export const list = (items: ListItem[], ordered = false): ListBlock => ({
   type: 'list',
   ordered,
   items,
 });
 
+/**
+ * Constructs a {@link CodeBlock}, omitting `language` when not supplied.
+ *
+ * @architect-shape
+ * @param content - The source code content.
+ * @param language - Optional language hint for syntax highlighting.
+ * @returns The constructed code block.
+ */
 export const code = (content: string, language?: string): CodeBlock => ({
   type: 'code',
   content,
   ...(language && { language }),
 });
 
+/**
+ * Constructs a {@link MermaidBlock}.
+ *
+ * @architect-shape
+ * @param content - The raw Mermaid diagram source.
+ * @returns The constructed Mermaid block.
+ */
 export const mermaid = (content: string): MermaidBlock => ({
   type: 'mermaid',
   content,
 });
 
+/**
+ * Constructs a {@link CollapsibleBlock}.
+ *
+ * @architect-shape
+ * @param summary - The always-visible summary label.
+ * @param content - The nested blocks revealed on expand.
+ * @returns The constructed collapsible block.
+ */
 export const collapsible = (summary: string, content: Block[]): CollapsibleBlock => ({
   type: 'collapsible',
   summary,
   content,
 });
 
+/**
+ * Constructs a {@link LinkOutBlock}.
+ *
+ * @architect-shape
+ * @param text - The display text for the link.
+ * @param path - The target path the link points to.
+ * @returns The constructed link-out block.
+ */
 export const linkOut = (text: string, path: string): LinkOutBlock => ({
   type: 'link-out',
   text,

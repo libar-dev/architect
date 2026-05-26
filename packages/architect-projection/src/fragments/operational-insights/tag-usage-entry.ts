@@ -11,6 +11,13 @@ import { z } from 'zod';
 
 import { TagValueCountSchema } from './supporting.js';
 
+/**
+ * Fragment shape for one metadata tag's usage — the tag name, the count of
+ * patterns carrying it, and the counted distinct values (null when values are
+ * not enumerated).
+ *
+ * @architect-shape
+ */
 export const TagUsageEntrySchema = z.strictObject({
   kind: z.literal('TagUsageEntry'),
   tag: z.string(),

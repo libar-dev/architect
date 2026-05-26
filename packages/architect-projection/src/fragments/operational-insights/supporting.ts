@@ -12,6 +12,13 @@ import { z } from 'zod';
 
 import { BlockSchema, MermaidBlockSchema } from '../../blocks/schema.js';
 
+/**
+ * Delivery progress totals for the overview — overall pattern count broken
+ * down by lifecycle bucket (completed, active, planned, candidate) plus the
+ * completed percentage.
+ *
+ * @architect-shape
+ */
 export const OverviewProgressSchema = z.strictObject({
   total: z.number().int().nonnegative(),
   completed: z.number().int().nonnegative(),
@@ -21,6 +28,12 @@ export const OverviewProgressSchema = z.strictObject({
   percentage: z.number().min(0).max(100),
 });
 
+/**
+ * One active-phase entry in the overview — the phase number, its optional
+ * name, the total patterns in the phase, and how many are active.
+ *
+ * @architect-shape
+ */
 export const ActivePhaseEntrySchema = z.strictObject({
   phase: z.number().int(),
   name: z.string().optional(),
@@ -28,12 +41,24 @@ export const ActivePhaseEntrySchema = z.strictObject({
   activeCount: z.number().int().nonnegative(),
 });
 
+/**
+ * One blocking entry in the overview — a blocked pattern, its status, and the
+ * patterns blocking it.
+ *
+ * @architect-shape
+ */
 export const BlockingEntrySchema = z.strictObject({
   pattern: z.string(),
   status: z.string().optional(),
   blockedBy: z.array(z.string()),
 });
 
+/**
+ * One entry in the generated-views index — the doc type it produces, the CLI
+ * verb that generates it, and a short summary.
+ *
+ * @architect-shape
+ */
 export const GeneratedViewEntrySchema = z.strictObject({
   docType: z.string(),
   verb: z.string(),
@@ -48,6 +73,8 @@ export const GeneratedViewEntrySchema = z.strictObject({
  * Mermaid (built at projection time, per ADR-005 codec/renderer separation — the
  * renderer cannot reach the grouping machinery behind the renderer boundary).
  * `pointer` is a one-line "explore via the API, not grep" hint.
+ *
+ * @architect-shape
  */
 export const OverviewArchitectureSchema = z.strictObject({
   packageChart: MermaidBlockSchema,
@@ -57,13 +84,31 @@ export const OverviewArchitectureSchema = z.strictObject({
   pointer: z.string(),
 });
 
+/**
+ * Per-tag annotation gaps — maps each tag to the list of source files missing
+ * that tag.
+ *
+ * @architect-shape
+ */
 export const GapsByTagSchema = z.record(z.string(), z.array(z.string()));
 
+/**
+ * A single tag value paired with the number of patterns that carry it.
+ *
+ * @architect-shape
+ */
 export const TagValueCountSchema = z.strictObject({
   value: z.string(),
   count: z.number().int().nonnegative(),
 });
 
+/**
+ * One requirement entry in a requirement digest — the owning pattern and route
+ * id, its status, a rich-text description (block list), and the resolved test
+ * files.
+ *
+ * @architect-shape
+ */
 export const RequirementEntrySchema = z.strictObject({
   pattern: z.string(),
   ownerRouteId: z.string().min(1),

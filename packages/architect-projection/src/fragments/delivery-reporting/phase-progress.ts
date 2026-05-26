@@ -12,6 +12,12 @@
  */
 import { z } from 'zod';
 
+/**
+ * Delivery totals for a single phase — counts per status plus the derived
+ * completion percentage.
+ *
+ * @architect-shape
+ */
 export const PhaseProgressSchema = z.strictObject({
   kind: z.literal('PhaseProgress'),
   phaseNumber: z.number().int(),

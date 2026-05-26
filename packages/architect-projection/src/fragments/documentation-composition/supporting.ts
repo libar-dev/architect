@@ -15,12 +15,23 @@ import { z } from 'zod';
 
 import { BlockSchema } from '../../blocks/schema.js';
 
+/**
+ * One documentation section — its id, title, and the blocks it contains.
+ *
+ * @architect-shape
+ */
 export const DocumentationSectionSchema = z.strictObject({
   id: z.string(),
   title: z.string(),
   blocks: z.array(BlockSchema),
 });
 
+/**
+ * The scope an architecture diagram is drawn at — by component, layer, bounded
+ * context, product area, or package.
+ *
+ * @architect-shape
+ */
 export const ArchitectureDiagramScopeSchema = z.enum([
   'component',
   'layered',

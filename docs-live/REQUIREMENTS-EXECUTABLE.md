@@ -9,6 +9,7 @@
 
 | Pattern                                               | Status    | Test Files |
 | ----------------------------------------------------- | --------- | ---------- |
+| ApiReferenceProjectionExecutableTests                 | active    |            |
 | ArchitectPublicContract                               | active    |            |
 | ArchitectureNavigationProjectionExecutableTests       | completed |            |
 | BusinessRulesProjectionExecutableTests                | completed |            |

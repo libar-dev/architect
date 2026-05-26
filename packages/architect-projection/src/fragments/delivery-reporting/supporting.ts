@@ -16,6 +16,11 @@ import { z } from 'zod';
 import { PatternSummarySchema } from '../pattern-relations/index.js';
 import { EmbeddedDeliverableSchema } from '../pattern-relations/supporting.js';
 
+/**
+ * Absolute pattern counts per delivery status, plus their total.
+ *
+ * @architect-shape
+ */
 export const StatusCountsSchema = z.strictObject({
   completed: z.number().int().nonnegative(),
   active: z.number().int().nonnegative(),
@@ -24,6 +29,11 @@ export const StatusCountsSchema = z.strictObject({
   total: z.number().int().nonnegative(),
 });
 
+/**
+ * Pattern share per delivery status, each a 0-100 percentage.
+ *
+ * @architect-shape
+ */
 export const StatusPercentagesSchema = z.strictObject({
   completed: z.number().min(0).max(100),
   active: z.number().min(0).max(100),
@@ -31,12 +41,24 @@ export const StatusPercentagesSchema = z.strictObject({
   candidate: z.number().min(0).max(100),
 });
 
+/**
+ * One quarter of a roadmap — its label, the patterns scheduled in it, and their
+ * status counts.
+ *
+ * @architect-shape
+ */
 export const QuarterEntrySchema = z.strictObject({
   quarter: z.string(),
   patterns: z.array(PatternSummarySchema),
   counts: StatusCountsSchema,
 });
 
+/**
+ * One release in a notes digest — its label, optional date, member patterns,
+ * deliverables, and optional free-form notes.
+ *
+ * @architect-shape
+ */
 export const ReleaseEntrySchema = z.strictObject({
   release: z.string(),
   date: z.string().optional(),
@@ -45,6 +67,12 @@ export const ReleaseEntrySchema = z.strictObject({
   notes: z.string().optional(),
 });
 
+/**
+ * One row of a traceability matrix — a pattern with its optional status and the
+ * tests, specs, and deliverables that trace to it.
+ *
+ * @architect-shape
+ */
 export const TraceRowSchema = z.strictObject({
   pattern: z.string(),
   status: z.string().optional(),

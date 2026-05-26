@@ -38,6 +38,8 @@ import { slugForFilename } from '../_internal/slug.js';
 import { summarizeTaxonomyDigest } from '../projections/governance/taxonomy-digest.js';
 import {
   isBundle,
+  type ApiReferenceDigest,
+  type ApiShape,
   type ArchitectureDiagram,
   type BusinessRule,
   type BusinessRuleSet,
@@ -175,6 +177,7 @@ interface RoutedChildOutputMaps {
 }
 
 type MarkdownNormalizerKind =
+  | 'ApiReferenceDigest'
   | 'ArchitectureDiagram'
   | 'BusinessRuleSet'
   | 'DecisionCatalog'
@@ -207,6 +210,7 @@ const DEFAULT_NORMALIZE_OPTIONS: NormalizeMarkdownOptions = {
 };
 
 const MARKDOWN_NORMALIZERS = {
+  ApiReferenceDigest: normalizeApiReference,
   ArchitectureDiagram: normalizeArchitectureDiagram,
   BusinessRuleSet: normalizeBusinessRuleSet,
   DecisionCatalog: normalizeDecisionCatalog,
@@ -666,6 +670,160 @@ function normalizeArchitectureDiagram(
   }
 
   return createMarkdownDocument(metadata, blocks);
+}
+
+function normalizeApiReference(
+  fragment: ApiReferenceDigest,
+  options: NormalizeMarkdownOptions,
+): MarkdownDocument {
+  const metadata = resolveFragmentMetadata(fragment);
+  if (fragment.scope === 'all') {
+    return normalizeApiReferenceIndex(fragment, options, metadata);
+  }
+  return normalizeApiReferencePackage(fragment, metadata);
+}
+
+function normalizeApiReferenceIndex(
+  fragment: Extract<ApiReferenceDigest, { scope: 'all' }>,
+  options: NormalizeMarkdownOptions,
+  metadata: MarkdownMetadata,
+): MarkdownDocument {
+  const groupingEntries = fragment.groupingEntries ?? [];
+  const shapeCount = fragment.shapes.length;
+  const packageCount = groupingEntries.length;
+
+  const blocks: MarkdownRenderableBlock[] = [
+    heading(2, 'Overview'),
+    paragraph(
+      `This API reference covers ${String(shapeCount)} ${shapeCount === 1 ? 'shape' : 'shapes'} across ${String(packageCount)} ${packageCount === 1 ? 'package' : 'packages'}, sourced from \`@architect-shape\` annotations.`,
+    ),
+  ];
+
+  if (groupingEntries.length > 0) {
+    // Package labels are SOURCED → the plain `table` block escapes every cell.
+    blocks.push(
+      heading(2, 'Packages'),
+      table(
+        ['Package', 'Patterns', 'Shapes'],
+        groupingEntries.map((entry) => [
+          entry.label,
+          String(entry.patternCount),
+          String(entry.shapeCount),
+        ]),
+        ['left', 'left', 'left'],
+      ),
+    );
+
+    const routes = new Map(options.childRoutes.map((route) => [route.key, route.path]));
+    const links = groupingEntries
+      .map((entry) => {
+        const path = routes.get(entry.childKey);
+        if (path === undefined) {
+          return null;
+        }
+        // The link TEXT (package label) is escaped inside toSafeRoutedMarkdownLink.
+        const link = toSafeRoutedMarkdownLink(entry.label, path);
+        return link === null ? entry.label : trustedMarkdown(link);
+      })
+      .filter((entry): entry is string | TrustedMarkdownText => entry !== null);
+
+    if (links.length > 0) {
+      blocks.push(heading(2, 'Packages — detail'), {
+        type: 'list',
+        ordered: false,
+        items: links,
+      });
+    }
+  }
+
+  return createMarkdownDocument(metadata, blocks);
+}
+
+function normalizeApiReferencePackage(
+  fragment: Extract<ApiReferenceDigest, { scope: 'package' }>,
+  metadata: MarkdownMetadata,
+): MarkdownDocument {
+  const patternCount = new Set(fragment.shapes.map((shape) => shape.pattern)).size;
+  const shapeCount = fragment.shapes.length;
+
+  const blocks: MarkdownRenderableBlock[] = [
+    heading(2, 'Overview'),
+    paragraph(
+      `${String(shapeCount)} ${shapeCount === 1 ? 'shape' : 'shapes'} across ${String(patternCount)} ${patternCount === 1 ? 'pattern' : 'patterns'} in ${fragment.scopeValue}.`,
+    ),
+  ];
+
+  // Shapes arrive pre-sorted by (pattern, name); group consecutive runs by owning pattern.
+  let currentPattern: string | undefined;
+  for (const shape of fragment.shapes) {
+    if (shape.pattern !== currentPattern) {
+      currentPattern = shape.pattern;
+      // Pattern name is SOURCED → the plain `heading` block escapes it.
+      blocks.push(heading(2, currentPattern));
+    }
+    blocks.push(...renderApiShape(shape));
+  }
+
+  return createMarkdownDocument(metadata, blocks);
+}
+
+function renderApiShape(shape: ApiShape): MarkdownRenderableBlock[] {
+  // Shape name is SOURCED → the plain `heading` block escapes it.
+  const blocks: MarkdownRenderableBlock[] = [heading(3, shape.name)];
+
+  if (shape.description !== undefined) {
+    blocks.push(paragraph(shape.description));
+  }
+
+  // sourceText is SOURCED, but a code fence is a sanctioned raw surface (ADR-009);
+  // `code` routes through pickFence so embedded backtick runs cannot break out.
+  blocks.push(code(shape.sourceText, 'ts'));
+
+  if (shape.properties !== undefined && shape.properties.length > 0) {
+    blocks.push(
+      heading(4, 'Properties'),
+      table(
+        ['Property', 'Description'],
+        shape.properties.map((property) => [property.name, property.description]),
+        ['left', 'left'],
+      ),
+    );
+  }
+
+  if (shape.params !== undefined && shape.params.length > 0) {
+    blocks.push(
+      heading(4, 'Parameters'),
+      table(
+        ['Parameter', 'Type', 'Description'],
+        shape.params.map((param) => [param.name, param.type ?? '', param.description]),
+        ['left', 'left', 'left'],
+      ),
+    );
+  }
+
+  if (shape.returns !== undefined) {
+    blocks.push(
+      heading(4, 'Returns'),
+      paragraph(
+        shape.returns.type !== undefined
+          ? `${shape.returns.type} — ${shape.returns.description}`
+          : shape.returns.description,
+      ),
+    );
+  }
+
+  if (shape.throws !== undefined && shape.throws.length > 0) {
+    blocks.push(
+      heading(4, 'Throws'),
+      list(
+        shape.throws.map((entry) =>
+          entry.type !== undefined ? `${entry.type} — ${entry.description}` : entry.description,
+        ),
+      ),
+    );
+  }
+
+  return blocks;
 }
 
 function normalizeBusinessRuleSet(
@@ -1309,6 +1467,23 @@ function createMarkdownDocument(
 // metadata from instance values rather than kind alone.
 function resolveFragmentMetadata(fragment: Fragment): MarkdownMetadata {
   switch (fragment.kind) {
+    case 'ApiReferenceDigest': {
+      switch (fragment.scope) {
+        case 'all':
+          return {
+            title: 'API Reference',
+            purpose: 'Type and API surface extracted from @architect-shape annotations',
+            detailLevel: 'Package index with links to per-package field tables',
+          };
+        case 'package':
+          return {
+            title: `${fragment.scopeValue} API Reference`,
+            purpose: 'Type and API surface for a single workspace package',
+          };
+        default:
+          throw new Error('Unsupported api-reference scope');
+      }
+    }
     case 'ArchitectureDiagram':
       return {
         title: 'Architecture',
