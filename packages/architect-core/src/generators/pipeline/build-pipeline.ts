@@ -40,7 +40,7 @@ import {
   computeHierarchyChildren,
 } from '../../extractor/gherkin-extractor.js';
 import { mergePatterns } from './merge-patterns.js';
-import { loadConfig, formatConfigError } from '../../config/config-loader.js';
+import { loadProjectConfig, formatConfigError } from '../../config/config-loader.js';
 import { DEFAULT_CONTEXT_INFERENCE_RULES } from '../../config/defaults.js';
 import { loadDefaultWorkflow, loadWorkflowFromPath } from '../../config/workflow-loader.js';
 import type { LoadedWorkflow } from '../../config/workflow-loader.js';
@@ -48,6 +48,9 @@ import {
   transformToPatternGraph,
   transformToPatternGraphWithValidation,
 } from './transform-dataset.js';
+import { createPackageResolver } from '../../package/package-resolver.js';
+import type { PackageResolver } from '../../package/package-resolver.js';
+import type { PackageConfig } from '../../package/package-config.js';
 import { Result } from '../../types/result.js';
 import type { ExtractionDiagnostic } from '../../extractor/extraction-diagnostics.js';
 import type { ExtractedPattern } from '../../validation-schemas/index.js';
@@ -70,6 +73,7 @@ export interface PipelineOptions {
   readonly includeValidation?: boolean;
   readonly failOnScanErrors?: boolean;
   readonly tagRegistry?: TagRegistry;
+  readonly packages?: readonly PackageConfig[];
 }
 
 export interface PipelineError {
@@ -147,10 +151,17 @@ export async function buildPatternGraph(
   const allDiagnostics: ExtractionDiagnostic[] = [];
 
   let registry: TagRegistry;
+  let packageResolver: PackageResolver | undefined;
+
+  // Build package resolver from explicitly-provided packages (caller already has the config).
+  if (options.packages !== undefined && options.packages.length > 0) {
+    packageResolver = createPackageResolver(options.packages);
+  }
+
   if (options.tagRegistry !== undefined) {
     registry = options.tagRegistry;
   } else {
-    const configResult = await loadConfig(baseDir);
+    const configResult = await loadProjectConfig(baseDir);
     if (!configResult.ok) {
       return Result.err({
         step: 'config',
@@ -158,6 +169,13 @@ export async function buildPatternGraph(
       });
     }
     registry = configResult.value.instance.registry;
+    // If packages weren't provided by the caller, derive them from the loaded config.
+    if (packageResolver === undefined) {
+      const configPackages = configResult.value.project.packages;
+      if (configPackages.length > 0) {
+        packageResolver = createPackageResolver(configPackages);
+      }
+    }
   }
 
   const scanResult = await scanPatterns(
@@ -330,7 +348,9 @@ export async function buildPatternGraph(
   };
 
   if (options.includeValidation === false) {
-    const datasetResult = validatePatternGraphDataset(transformToPatternGraph(rawDataset));
+    const datasetResult = validatePatternGraphDataset(
+      transformToPatternGraph(rawDataset, packageResolver),
+    );
     if (!datasetResult.ok) {
       return datasetResult;
     }
@@ -348,7 +368,7 @@ export async function buildPatternGraph(
     });
   }
 
-  const { dataset, validation } = transformToPatternGraphWithValidation(rawDataset);
+  const { dataset, validation } = transformToPatternGraphWithValidation(rawDataset, packageResolver);
   const datasetResult = validatePatternGraphDataset(dataset);
   if (!datasetResult.ok) {
     return datasetResult;

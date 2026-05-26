@@ -149,10 +149,16 @@ function buildRichSession(): PipelineSession {
     description:
       '**Problem:** Gap child still has open questions.\n\n**Open Questions:**\n- Which release closes the gap?\n\n**Solution:** Keep it visible in bundle output.',
   });
-  const dataset = transformToPatternGraph({
-    patterns: [parent, focal, dep, bundleChild],
-    tagRegistry: registry,
-  });
+  const testPackageResolver = createPackageResolver([
+    { id: 'mcp-test', displayName: 'MCP Test', match: /.*/u },
+  ]);
+  const dataset = transformToPatternGraph(
+    {
+      patterns: [parent, focal, dep, bundleChild],
+      tagRegistry: registry,
+    },
+    testPackageResolver,
+  );
   if (
     dataset.patterns.find(
       (pattern) => (pattern.patternName ?? pattern.name) === TEST_BUNDLE_PARENT_NAME,
@@ -168,9 +174,7 @@ function buildRichSession(): PipelineSession {
     registry,
     baseDir: '/tmp/architect-mcp-test-project',
     configPath: '/tmp/architect-mcp-test-project/architect.config.ts',
-    packageResolver: createPackageResolver([
-      { id: 'mcp-test', displayName: 'MCP Test', match: /.*/u },
-    ]),
+    packageResolver: testPackageResolver,
     sourceGlobs: { input: ['src/**/*.ts'], features: ['specs/**/*.feature'] },
     buildTimeMs: 42,
     diagnostics: [] as PipelineSession['diagnostics'],

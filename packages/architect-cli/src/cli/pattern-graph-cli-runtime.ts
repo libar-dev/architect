@@ -193,6 +193,7 @@ export async function buildCliContext(args: ParsedArgs): Promise<CliContext> {
     mergeConflictStrategy: 'fatal',
     ...(sourcePlan.exclude.length > 0 ? { exclude: [...sourcePlan.exclude] } : {}),
     ...(sourcePlan.tagRegistry !== undefined ? { tagRegistry: sourcePlan.tagRegistry } : {}),
+    ...(sourcePlan.packages.length > 0 ? { packages: sourcePlan.packages } : {}),
   });
 
   if (!result.ok) {

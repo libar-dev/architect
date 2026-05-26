@@ -17,6 +17,8 @@ export const PatternCatalogFilterSchema = z.strictObject({
   status: z.string().optional(),
   phase: z.number().int().optional(),
   role: z.string().optional(),
+  parent: z.string().optional(),
+  package: z.string().optional(),
   namesOnly: z.boolean(),
   count: z.boolean(),
 });

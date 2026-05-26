@@ -12,7 +12,10 @@ import type { ProjectionContext } from '../../context/projection-context.js';
 import type { PatternCatalog } from '../../fragments/pattern-relations/index.js';
 
 import { filterPatterns } from '../_shared/filter.js';
-import { createPatternSummaryFragment } from '../_shared/pattern-helpers.internal.js';
+import {
+  buildFileToPackageMap,
+  createPatternSummaryFragment,
+} from '../_shared/pattern-helpers.internal.js';
 
 export const PatternCatalogOptionsSchema = z
   .strictObject({
@@ -21,6 +24,7 @@ export const PatternCatalogOptionsSchema = z
     phase: z.number().int().optional(),
     role: z.string().optional(),
     parent: z.string().optional(),
+    package: z.string().optional(),
     namesOnly: z.boolean().optional(),
     count: z.boolean().optional(),
   })
@@ -34,15 +38,22 @@ export function buildPatternCatalog(
 ): PatternCatalog {
   const canonicalRole = resolveCanonicalRoleFilter(context, options.role);
   const parentChildNames = resolveParentChildNames(context, options.parent);
+  const byPackage = context.graph.archIndex?.byPackage;
+  const fileToPackage: ReadonlyMap<string, string> =
+    byPackage !== undefined ? buildFileToPackageMap(byPackage) : new Map();
+  const packageFilter = options.package;
   const items = filterPatterns(context.graph.patterns, context.projectionFilter)
-    .map(createPatternSummaryFragment)
+    .map((pattern) =>
+      createPatternSummaryFragment(pattern, fileToPackage.get(pattern.source.file)),
+    )
     .filter(
       (summary) =>
         (options.status === undefined || summary.status === options.status) &&
         (options.maturity === undefined || summary.maturity === options.maturity) &&
         (options.phase === undefined || summary.phase === options.phase) &&
         (canonicalRole === undefined || summary.role.toLowerCase() === canonicalRole) &&
-        (parentChildNames === undefined || parentChildNames.has(summary.patternName)),
+        (parentChildNames === undefined || parentChildNames.has(summary.patternName)) &&
+        (packageFilter === undefined || summary['package'] === packageFilter),
     )
     .sort((left, right) => left.patternName.localeCompare(right.patternName));
 
@@ -54,6 +65,7 @@ export function buildPatternCatalog(
       ...(options.phase !== undefined ? { phase: options.phase } : {}),
       ...(canonicalRole !== undefined ? { role: canonicalRole } : {}),
       ...(options.parent !== undefined ? { parent: options.parent } : {}),
+      ...(packageFilter !== undefined ? { package: packageFilter } : {}),
       namesOnly: options.namesOnly === true,
       count: options.count === true,
     },

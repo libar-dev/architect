@@ -253,9 +253,9 @@ export const readCommands: Pick<Record<CommandName, CommandDef>, ReadCommandName
     positional: StringArraySchema,
     flags: ListFlagsSchema,
     usage:
-      'Usage: architect list [--status <value>] [--role <tag>] [--parent <PatternName>] [--count] [--names-only]',
+      'Usage: architect list [--status <value>] [--role <tag>] [--parent <PatternName>] [--package <workspace-name>] [--count] [--names-only]',
     helpSignature:
-      'list [--status <value>] [--role <tag>] [--parent <PatternName>] [--count] [--names-only]',
+      'list [--status <value>] [--role <tag>] [--parent <PatternName>] [--package <workspace-name>] [--count] [--names-only]',
     rejectBareValues: true,
     flagParsers: {
       '--status': {
@@ -271,6 +271,10 @@ export const readCommands: Pick<Record<CommandName, CommandDef>, ReadCommandName
         kind: 'value',
         key: 'parent',
       },
+      '--package': {
+        kind: 'value',
+        key: 'package',
+      },
       '--count': {
         kind: 'boolean',
         key: 'count',
@@ -285,6 +289,7 @@ export const readCommands: Pick<Record<CommandName, CommandDef>, ReadCommandName
         readonly status?: AcceptedStatusValue;
         readonly role?: string;
         readonly parent?: string;
+        readonly package?: string;
         readonly count?: boolean;
         readonly namesOnly?: boolean;
       };
@@ -292,6 +297,7 @@ export const readCommands: Pick<Record<CommandName, CommandDef>, ReadCommandName
         ...(flags.status !== undefined ? { status: flags.status } : {}),
         ...(flags.role !== undefined ? { role: flags.role } : {}),
         ...(flags.parent !== undefined ? { parent: flags.parent } : {}),
+        ...(flags['package'] !== undefined ? { package: flags['package'] } : {}),
         count: flags.count === true,
         namesOnly: flags.namesOnly === true,
       }).root;
@@ -359,9 +365,9 @@ export const readCommands: Pick<Record<CommandName, CommandDef>, ReadCommandName
     positional: StringArraySchema,
     flags: ArchFlagsSchema,
     usage:
-      'Usage: architect arch roles|bounded-context [name]|neighborhood <pattern>|graph|compare <bounded-context-a> <bounded-context-b>|coverage|dangling [--baseline <path>] [--write-baseline] [--strict]|orphans|blocking',
+      'Usage: architect arch roles|bounded-context [name]|neighborhood <pattern>|graph|compare <bounded-context-a> <bounded-context-b>|coverage|dangling [--baseline <path>] [--write-baseline] [--strict]|orphans|blocking|packages [name]',
     helpSignature:
-      'arch roles|bounded-context [name]|neighborhood <pattern>|graph|compare <bounded-context-a> <bounded-context-b>|coverage|dangling [--baseline <path>] [--write-baseline] [--strict]|orphans|blocking',
+      'arch roles|bounded-context [name]|neighborhood <pattern>|graph|compare <bounded-context-a> <bounded-context-b>|coverage|dangling [--baseline <path>] [--write-baseline] [--strict]|orphans|blocking|packages [name]',
     flagParsers: {
       '--baseline': {
         kind: 'value',

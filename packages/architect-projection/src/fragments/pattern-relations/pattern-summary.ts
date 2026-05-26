@@ -23,6 +23,7 @@ export const PatternSummarySchema = z.strictObject({
   phase: z.number().int().optional(),
   file: z.string(),
   source: PatternSourceSchema,
+  package: z.string().optional(),
 });
 
 export const PatternIdentitySchema = PatternSummarySchema.omit({ kind: true });

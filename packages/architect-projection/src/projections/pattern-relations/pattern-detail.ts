@@ -40,6 +40,7 @@ import type { ProjectionContext } from '../../context/projection-context.js';
 import { projectSingle, type ProjectionBundle } from '../../fragments/base.js';
 import type { PatternDetail } from '../../fragments/pattern-relations/index.js';
 import {
+  buildFileToPackageMap,
   buildPatternHierarchy,
   createPatternSummaryFragment,
   extractDescription,
@@ -56,7 +57,10 @@ export function projectPatternDetail(
   name: string,
 ): ProjectionBundle<PatternDetail> {
   const pattern = requirePattern(context, name);
-  const summary = createPatternSummaryFragment(pattern);
+  const byPackage = context.graph.archIndex?.byPackage;
+  const fileToPackage: ReadonlyMap<string, string> =
+    byPackage !== undefined ? buildFileToPackageMap(byPackage) : new Map();
+  const summary = createPatternSummaryFragment(pattern, fileToPackage.get(pattern.source.file));
   const deliverables = normalizeDeliverables(pattern);
   const description = extractDescription(pattern.directive.description);
   const openQuestions = extractOpenQuestions(pattern.directive.description);

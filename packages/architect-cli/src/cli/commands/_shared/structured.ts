@@ -42,6 +42,7 @@ const ARCH_SUBCOMMANDS = [
   'dangling',
   'orphans',
   'blocking',
+  'packages',
 ] as const;
 type ArchSubcommand = (typeof ARCH_SUBCOMMANDS)[number];
 const ArchSubcommandSchema = z.enum(ARCH_SUBCOMMANDS);
@@ -275,6 +276,34 @@ async function executeArchCommand(
       return projectOrphanPatternList(context.projection).root.items;
     case 'blocking':
       return projectOverviewDigest(context.projection).root.blocking;
+    case 'packages': {
+      const byPackage = context.build.graph.archIndex?.byPackage;
+      if (byPackage === undefined || Object.keys(byPackage).length === 0) {
+        return {};
+      }
+      const packageName = args[1];
+      if (packageName !== undefined) {
+        const pkgPatterns = byPackage[packageName];
+        return pkgPatterns !== undefined
+          ? pkgPatterns.map((p) => ({
+              patternName: p.patternName ?? p.name,
+              status: p.status,
+              role: p.role,
+              file: p.source.file,
+            }))
+          : [];
+      }
+      const result: Record<string, { count: number; patterns: readonly string[] }> = {};
+      for (const [pkgId, pkgPatterns] of Object.entries(byPackage).sort(([a], [b]) =>
+        a.localeCompare(b),
+      )) {
+        result[pkgId] = {
+          count: pkgPatterns.length,
+          patterns: pkgPatterns.map((p) => p.patternName ?? p.name).sort((a, b) => a.localeCompare(b)),
+        };
+      }
+      return result;
+    }
   }
 }
 

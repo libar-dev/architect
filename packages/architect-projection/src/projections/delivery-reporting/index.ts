@@ -244,7 +244,7 @@ function buildQuarterEntries(patterns: readonly ExtractedPattern[]): QuarterEntr
     .sort(([left], [right]) => compareQuarterLabels(left, right))
     .map(([quarter, quarterPatterns]) => ({
       quarter,
-      patterns: sortPatterns(quarterPatterns).map(createPatternSummaryFragment),
+      patterns: sortPatterns(quarterPatterns).map((pattern) => createPatternSummaryFragment(pattern)),
       counts: createStatusCounts(quarterPatterns),
     }));
 }
@@ -350,7 +350,7 @@ function createReleaseEntry(release: string, patterns: readonly ExtractedPattern
   return {
     release,
     ...(dates[0] !== undefined ? { date: dates[0] } : {}),
-    patterns: sortedPatterns.map(createPatternSummaryFragment),
+    patterns: sortedPatterns.map((pattern) => createPatternSummaryFragment(pattern)),
     deliverables: deduplicateDeliverables(sortedPatterns),
   };
 }

@@ -60,6 +60,7 @@ export const ListFlagsSchema = z
     status: AcceptedStatusSchema.optional(),
     role: z.string().optional(),
     parent: z.string().optional(),
+    package: z.string().optional(),
     count: z.boolean().optional(),
     namesOnly: z.boolean().optional(),
   })

@@ -16,6 +16,8 @@ import {
   buildReverseLookups,
   detectDanglingReferences,
 } from './relationship-resolver.js';
+import type { PackageResolver } from '../../package/package-resolver.js';
+import { ProjectionError } from '../../package/projection-error.js';
 import type {
   ValidationSummary,
   TransformResult,
@@ -83,11 +85,17 @@ export function populateByRoleView(
   return byRole;
 }
 
-export function transformToPatternGraph(raw: RawDataset): RuntimePatternGraph {
-  return transformToPatternGraphWithValidation(raw).dataset;
+export function transformToPatternGraph(
+  raw: RawDataset,
+  packageResolver?: PackageResolver,
+): RuntimePatternGraph {
+  return transformToPatternGraphWithValidation(raw, packageResolver).dataset;
 }
 
-export function transformToPatternGraphWithValidation(raw: RawDataset): TransformResult {
+export function transformToPatternGraphWithValidation(
+  raw: RawDataset,
+  packageResolver?: PackageResolver,
+): TransformResult {
   const { patterns: rawPatterns, tagRegistry, workflow, contextInferenceRules } = raw;
   const roleDefinitions: readonly RegistryRoleDefinition[] = tagRegistry.roles;
   const canonicalRoleByValue = buildCanonicalRoleLookup(roleDefinitions);
@@ -143,6 +151,7 @@ export function transformToPatternGraphWithValidation(raw: RawDataset): Transfor
     byContext: {},
     byLayer: {},
     byView: {},
+    byPackage: {},
     all: [],
   };
 
@@ -183,6 +192,22 @@ export function transformToPatternGraphWithValidation(raw: RawDataset): Transfor
       const productAreaPatterns = byProductAreaMap[pattern.productArea] ?? [];
       productAreaPatterns.push(pattern);
       byProductAreaMap[pattern.productArea] = productAreaPatterns;
+    }
+
+    if (packageResolver !== undefined) {
+      try {
+        const pkg = packageResolver(pattern.source.file);
+        const packagePatterns = archIndex.byPackage[pkg.id] ?? [];
+        packagePatterns.push(pattern);
+        archIndex.byPackage[pkg.id] = packagePatterns;
+      } catch (error) {
+        // Skip patterns whose source file is not covered by the package config.
+        // The resolver hard-errors on unmapped files; we treat unmapped as
+        // "no package dimension for this pattern" rather than aborting the build.
+        if (!(error instanceof ProjectionError && error.code === 'UNMAPPED_PACKAGE')) {
+          throw error;
+        }
+      }
     }
 
     const patternKey = getPatternName(pattern);
@@ -268,7 +293,7 @@ export function transformToPatternGraphWithValidation(raw: RawDataset): Transfor
     ...(raw.featureParseFailures !== undefined
       ? { featureParseFailures: [...raw.featureParseFailures] }
       : {}),
-    ...(archIndex.all.length > 0 && { archIndex }),
+    ...((archIndex.all.length > 0 || Object.keys(archIndex.byPackage).length > 0) && { archIndex }),
   };
 
   return { dataset, validation };

@@ -99,7 +99,10 @@ export function getRelationships(
   return resolveIndexedEntry(context.graph, context.graph.relationshipIndex, name);
 }
 
-export function createPatternSummaryFragment(pattern: ExtractedPattern): PatternSummary {
+export function createPatternSummaryFragment(
+  pattern: ExtractedPattern,
+  packageId?: string,
+): PatternSummary {
   const summary: PatternSummary = {
     kind: 'PatternSummary',
     patternName: getPatternName(pattern),
@@ -109,9 +112,22 @@ export function createPatternSummaryFragment(pattern: ExtractedPattern): Pattern
     file: pattern.source.file,
     source: deriveSource(pattern.source.file),
     ...(pattern.phase !== undefined ? { phase: pattern.phase } : {}),
+    ...(packageId !== undefined ? { package: packageId } : {}),
   };
 
   return summary;
+}
+
+export function buildFileToPackageMap(
+  byPackage: Readonly<Record<string, readonly ExtractedPattern[]>>,
+): ReadonlyMap<string, string> {
+  const map = new Map<string, string>();
+  for (const [pkgId, pkgPatterns] of Object.entries(byPackage)) {
+    for (const pattern of pkgPatterns) {
+      map.set(pattern.source.file, pkgId);
+    }
+  }
+  return map;
 }
 
 export function normalizePatternRelationships(

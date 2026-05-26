@@ -99,6 +99,7 @@ export const ArchIndexSchema = z.strictObject({
   byContext: z.record(z.string(), z.array(ExtractedPatternSchema)),
   byLayer: z.record(z.string(), z.array(ExtractedPatternSchema)),
   byView: z.record(z.string(), z.array(ExtractedPatternSchema)),
+  byPackage: z.record(z.string(), z.array(ExtractedPatternSchema)),
   all: z.array(ExtractedPatternSchema),
 });
 

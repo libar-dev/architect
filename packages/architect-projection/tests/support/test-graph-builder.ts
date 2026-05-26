@@ -377,6 +377,7 @@ function createArchIndex(patterns: readonly ExtractedPattern[]): PatternGraph['a
     byContext,
     byLayer,
     byView: {},
+    byPackage: {},
     all: [...patterns],
   };
 }

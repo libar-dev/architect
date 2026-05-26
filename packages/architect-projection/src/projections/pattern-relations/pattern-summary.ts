@@ -35,6 +35,7 @@ import type { PatternSummary } from '../../fragments/pattern-relations/index.js'
 import type { ProjectionContext } from '../../context/projection-context.js';
 import { projectSingle, type ProjectionBundle } from '../../fragments/base.js';
 import {
+  buildFileToPackageMap,
   createPatternSummaryFragment,
   requirePattern,
 } from '../_shared/pattern-helpers.internal.js';
@@ -43,5 +44,11 @@ export function projectPatternSummary(
   context: ProjectionContext,
   name: string,
 ): ProjectionBundle<PatternSummary> {
-  return projectSingle(createPatternSummaryFragment(requirePattern(context, name)));
+  const pattern = requirePattern(context, name);
+  const byPackage = context.graph.archIndex?.byPackage;
+  const fileToPackage: ReadonlyMap<string, string> =
+    byPackage !== undefined ? buildFileToPackageMap(byPackage) : new Map();
+  return projectSingle(
+    createPatternSummaryFragment(pattern, fileToPackage.get(pattern.source.file)),
+  );
 }

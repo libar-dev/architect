@@ -30,6 +30,8 @@ Status (resolved-with-sha)` — then archived at campaign close. Keep entries
 > Read-surface disclosure vocabulary (D-17): read verbs use `ContentRichness`
 > (`name-only…full`), not the progressive level — see `HUD-IDEATION.md`.
 
+- **WS-5** — `package` is resolved into `ArchIndex.byPackage` at `transformToPatternGraph()` time (derived from `pattern.source.file`, not annotated — implements ADR-006); the read API serves it cheaply via the `byPackage` index. No `@architect-package` tag is authored or extracted; package identity is infrastructure, not annotation.
+
 ## Open
 
 None — all campaign decisions (D-1–D-23) are resolved. Full bodies → [`archive/DECISIONS-resolved.md`](archive/DECISIONS-resolved.md); the standing rules are distilled in the digest above. (D-4 — fragment-union light model — resolved 2026-05-26: shipped in WS-1.)
