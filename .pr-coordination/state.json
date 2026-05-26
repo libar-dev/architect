@@ -2,64 +2,39 @@
   "campaign": "re-enable-architect-core-functionality",
   "pr": "campaign/docs-and-skills-consolidation",
   "updated": "2026-05-26",
+  "note": "Phase tracking + metrics only. Per-session narrative: SESSION-REPORTS-AND-LEARNINGS.md (active WS-3) + archive/. Decision rationale: DECISIONS.md digest + archive/DECISIONS-resolved.md.",
   "workstreams": {
-    "WS-0-finalize-hygiene": "done (committed 6f2fc6c)",
-    "WS-1-annotation-reenablement": "phase-1 projection pilot COMPLETE (Sessions 01-06); expansion COMPLETE (core Sessions 07-08; guard Session 09; connectable test features Session 10; new code-originated identities Session 11). Shipped-code connectivity at terminal floor (~27 orphans = working-state specs + untargetable integration/fixture features).",
-    "WS-2-skills": "DONE (D-21, plan-approved 2026-05-26) — consolidated the 6 spec-driven session skills + session-router into one progressive-disclosure architect-sessions skill; dissolved _shared/ into architect-base/references/ (+ new taxonomy.md, decision-records.md); renamed value-transfer.md -> architect-sessions/references/ephemeral-spec-deletion.md; moved multi-session-coordination.md -> architect-refactor-session/references/ (absorbing session-preamble campaign rules 4-6); deleted dead architect-cli-overview; repointed all cross-refs + .claude/skills symlinks + PREAMBLE. D-22 polish (plan-approved 2026-05-26): re-wired .opencode/skills (removed 8 dangling, added architect-sessions); reframed taxonomy to teach-theory-point-to-live-data; added pnpm check:skills drift guard.",
-    "WS-3-docs": "IN PROGRESS — Session 12 restructured ARCHITECTURE.md (237-node graph TD → context map + 29 per-group diagrams; D-14, committed 5b7ab6e). Session 13 shrank the catch-all buckets by filtering test-feature patterns from the component view + production annotation fixes (D-15; 237->169 patterns, 29->24 diagrams). Remaining: other generated-doc reviews (PATTERNS/ROADMAP/CHANGELOG/requirements); HUD/progressive-disclosure ideation captured (ideation-only)."
+    "WS-0-finalize-hygiene": "DONE (6f2fc6c)",
+    "WS-1-annotation-reenablement": "DONE (Sessions 01-11). Orphans 107->27 = terminal floor (~22 working-state specs + 5 untargetable fixture/integration features); projection/core-src/guard-src at 0.",
+    "WS-2-skills": "DONE (D-21/D-22/D-23). Consolidated to architect-base/-data-api/-sessions/-refactor-session (+omo-plan-author); _shared/ dissolved; pnpm check:skills guard added.",
+    "WS-3-docs": "IN PROGRESS. ARCHITECTURE.md restructured (D-14/D-15/D-16/D-19) + overview architecture glimpse + HUD disclosure (D-17/D-18) + cross-package sweep (D-20). Remaining: generated-doc projection roadmap R1-R7."
   },
   "ws3": {
     "lastCompletedSession": "16-chart-finalization-and-cross-package-sweep",
-    "session16Note": "WS-3/WS-1 Session 16 — review & finalize the D-18 chart work. (A) D-19: forward-only per-group architecture detail diagrams. normalizeDetailEdges() in architecture-diagram.internal.ts drops the derived reverse `enables` edge, collapses co-directional depends-on/uses to one solid arrow per ordered pair, keeps see-also; generalizes D-15's context-map rule to the detail diagrams (grounded: enables/usedBy are purely derived — absent from the 27-directive vocabulary + ExtractedPattern fields). Shared collectArchitectureEdges untouched (feeds the already-forward-only context map); overview glimpse unaffected. docs-live/ARCHITECTURE.md 787->621 lines; projection group ~110->37 forward arrows; whole doc 0 ==> / 0 -.->; legend reduced to 2 classes. New config-documentation.feature Rule + same-group fixture; stale D-15 invariant text fixed. Committed b24ed0c. (B) D-20: cross-package @architect-uses sweep (maintainer 'full sweep'). 8 surface edges (D-7 light model, not D-4 spam): projection->core (5 *ProjectionSupport -> ExtractedPattern[/PatternGraph]); mcp->core (MCPPipelineSession -> BuildPipeline, PatternGraphApi); mcp->projection (MCPToolRegistry -> CompactTextRenderer, JsonRenderer); cli->projection (PatternGraphCLI -> CompactTextRenderer, JsonRenderer, composition root). Package chart 2->6 arrows, mcp no longer isolated; context map gained projection->validation-schemas / cli->rendering / api->pipeline/read-api/rendering. cli->guard DEFERRED (bin wrappers own no pattern; would need D-3 new identity — anti-phantom D-9); utility long-tail not swept (anti-spam).",
-    "lastCommitNote": "WS-3 Session 15 (D-18): high-level architecture glimpse in `overview`. Disclosure-gated `=== ARCHITECTURE ===` section (after PROGRESS, before BLOCKING): name-only omits; summary (default) shows a coarse package-level context map (5 production packages cli/core/guard/mcp/projection = 160 patterns) + an 'explore via the API, not grep' pointer (documentation architecture / arch neighborhood / dep-tree); full adds the bounded-context Context Map identical to ARCHITECTURE.md. Reuse: extracted the context-neutral graph machinery to projections/_shared/architecture-graph.internal.ts (node/edge collection, exclusion filters, grouping, inter-group aggregation, graph LR emission) + a first-class 'package' GroupingMode; ArchitectureDiagramProjection + OverviewProjection both consume it; docs:all byte-identical (refactor behavior-preserving). Mermaid-in-fragment (ADR-005 + renderer ESLint boundary forces it). Production-only component view: filterArchitecturallyInterestingPatterns now excludes ALL working-state under architect/ (generalizes D-16's architect/decisions/-only exclusion) — doc graph only ever held decisions there so ARCHITECTURE.md is unchanged, while the read-surface glimpse no longer leaks a 28-pattern 'Architect Package Content' working-state bucket; read-surface `documentation architecture` now matches the generated doc. Resilience: the glimpse is best-effort — buildOverviewArchitecture catches ONLY UNMAPPED_PACKAGE and omits the optional field (consumer repos / fixtures without package matchers), reconciling with D-14's hard-error (docs:all / validate:all still fail loud). MCP architect_overview reaches it for free (shared projection+renderer). Coverage: reporting.feature disclosure Rule extended (none/one/two Mermaid blocks) + typed architecture-shape assertions; unlock-reason refreshed to Add-overview-architecture-glimpse-rendering-WS3-S15.",
-    "decision": "D-19, D-20 (Session 16)",
-    "priorDecision": "D-18 (Session 15, committed 0ba3f92..1691fcb)",
-    "gates": "all §6 green; guard --staged 0 status transitions / 0 deliverable changes; docs:all byte-identical (no docs-live change — glimpse lives only in the overview verb, and the production-only filter generalization is a no-op for the doc graph); dangling --strict exit 0 (drift false); pkg tests proj 1606 / cli 27 / mcp 172; test:dogfood 1061; perf 3/3; lint 0 warnings; format clean. Codex stop-time fix (1f80630): working-state path filter anchored to repo-root architect/ via startsWith (was /(?:^|\\/)architect\\// which over-matched the bin-only meta package packages/architect/ and nested segments); behavior-identical (no patterns there) so doc + chart unchanged; redundant UNMAPPED_PACKAGE code guard dropped (instanceof the core error is precise).",
+    "lastCommit": "b24ed0c (D-19) / aad4f69 (D-20); bookkeeping eaa954c",
+    "decisions": "D-14..D-20 — detail in SESSION-REPORTS-AND-LEARNINGS.md + archive/DECISIONS-resolved.md",
+    "remaining": "DOCS-IA-FINDINGS.md section 6 — R1 (quarter/phase generators) through R7 (bulk doc retirement); R2 (validation-rules escaping) is the cheapest unblock",
     "followUps": [
-      "cli->guard package edge DEFERRED (D-20): the cli files importing guard (lint-patterns/lint-process/validate-patterns) are bin wrappers owning no @architect-pattern; authoring it needs a new code-originated identity on a cli bin (D-3 approval) — left out per anti-phantom (D-9). Revisit if the package chart's cli->guard arrow is wanted.",
-      "Cross-package @architect-uses long-tail (D-20): only the surface edges were swept (light model). Deeper coverage (e.g. each consumed projection function from mcp/cli, core utility imports) deferred as anti-spam (D-4); some consumed core utils own no pattern (D-9). Expand only if a consumer specifically needs it.",
-      "Other generated docs (PATTERNS/ROADMAP/CHANGELOG/requirements-*) deserve the same readability + correct-scoping review lens applied to ARCHITECTURE.md (incl. the D-19 forward-only edge treatment if they emit diagrams). Durable audit + roadmap (R1-R7) for the manual-doc -> projected-doc replacement lives in .pr-coordination/DOCS-IA-FINDINGS.md.",
-      "HUD step 3 (token-budget signal — generalize bundle --estimate-tokens chars/4 into the shared output path + heuristic overflow/underflow auto-flag) and step 4 (composite hud/brief verb) remain sequenced ideation.",
-      "HUD step 1 fast-follow: extend --disclosure richness branching to bundle / pattern / arch blocking (plumbing + flag pattern already in place).",
-      "ADR-content hygiene pass (D-16): several ADRs in architect/decisions/ carry execution/temporal context contrary to architect-base §3/§7; amend via a new ADR / strip operational prose — separate workstream, do not edit durable records inline."
-    ],
-    "resolvedFollowUps": [
-      "(D-18 #1) Sparse overview package chart (cli->core, guard->core only) — RESOLVED by D-20 (Session 16): cross-package @architect-uses sweep, package chart 2->6 arrows, mcp no longer isolated. (cli->guard deferred — see followUps.)",
-      "(D-14 #1) Unclassified bucket coverage — resolved by D-15 via test-feature filter + targeted production tags, not WS-1-style mass tagging.",
-      "(D-14 #2) Stale 'docs-live gitignored' wording — fixed in AGENTS.md (Session 13).",
-      "(D-15 #2) HUD / progressive-disclosure steps 1+2 — BUILT in Session 14 (D-17): --disclosure on overview + generated-views index, CLI+MCP parity."
+      "cli->guard package edge DEFERRED (D-20): the cli files importing guard are bin wrappers owning no @architect-pattern; needs a new code-originated identity (D-3) — left out per anti-phantom (D-9).",
+      "Cross-package @architect-uses long-tail (D-20): only surface edges swept (light model); deeper coverage deferred as anti-spam (D-4). Expand only if a consumer needs it.",
+      "HUD steps 3 (token-budget signal — generalize bundle --estimate-tokens chars/4 + overflow/underflow auto-flag) and 4 (composite hud/brief verb) remain sequenced ideation; step-1 disclosure fast-follow to bundle/pattern/arch-blocking. See HUD-IDEATION.md.",
+      "ADR-content hygiene pass (D-16): several ADRs in architect/decisions/ carry execution/temporal context contrary to architect-base 3/7; amend via a new ADR — separate workstream, do not edit durable records inline."
     ]
   },
   "ws2": {
-    "decision": "D-21",
+    "decisions": "D-21/D-22/D-23",
     "finalSkillSet": [
-      "architect-base (+references: taxonomy, four-tier-ladder, fsm-transitions, annotation-ownership, spec-pattern-relationships, rule-block-template, decision-records)",
+      "architect-base (+references)",
       "architect-data-api",
-      "architect-sessions (+references: plan, design, implement, review-spec, review-implementation, handoff, ephemeral-spec-deletion)",
-      "architect-refactor-session (+references: multi-session-coordination)",
-      "omo-plan-author (untouched, OmO-specific)"
+      "architect-sessions (+references)",
+      "architect-refactor-session (+references)",
+      "omo-plan-author (OmO-specific)"
     ],
-    "deleted": [
-      "architect-cli-overview (non-production prototype, no symlink, dead proto-output pointer)",
-      "architect-session-router (intent dispatch retired by state-driven model; folded into architect-sessions body)",
-      "architect-plan-session / architect-design-session / architect-implement-spec / architect-review-spec / architect-review-implementation / architect-verify-handoff (folded into architect-sessions/references/)",
-      "_shared/ (dissolved; session-preamble.md + canonical-references.md dissolved into other files)"
-    ],
-    "note": "Skills/docs-only workstream — no production code, no architect/specs/ changes, no FSM concern. Per-session references use hybrid style (lean execution + up-front context-gathering + next-session pointer). Verify: grep _shared/ in .agents/skills returns nothing; .claude/skills symlinks resolve.",
-    "polish": {
-      "decision": "D-22",
-      "opencodeSkillSet": ["architect-base", "architect-data-api", "architect-sessions", "architect-refactor-session"],
-      "summary": "Re-wired .opencode/skills to mirror the canonical set — removed 8 dangling symlinks (_shared + the 7 deleted session/router skills) and added the missing architect-sessions; Claude-only authoring skills intentionally excluded from OmO. Root cause: D-21 re-wired only .claude/skills. Taxonomy reframed to teach theory + point to live data (architect-base/references/taxonomy.md now teaches axes/categories/syntax, points to pnpm architect:query taxonomy + generated docs-live/TAXONOMY.md; base §4 gained @architect-product-area; dropped the 'full tag set' overclaim). Two-tag-source gap (validation-registry digest omits scanner-recognized @architect-executable-specs/@architect-usecase) logged to FEEDBACK.md. plan.md idea-tier template fixed (@architect-parent added); base §2 corrected (docs-live git-tracked); AGENTS.md dropped non-existent .claude-plugin claim + documents .opencode/skills wiring.",
-      "guard": "Added scripts/check-skill-symlinks.mjs + pnpm check:skills — asserts no dangling symlinks, Claude mirrors the full canonical set, and OmO mirrors the canonical architect-* skills (namespace matches opencode.jsonc architect-* allow rule; non-architect-* authoring tools Claude-only by convention). Per-harness required sets derived from canonical names by convention (none hardcoded), so it catches the F1 regression (domain skill missing from a harness) that a plain subset check would miss.",
-      "verify": "pnpm check:skills green (+ negative tests: dangling, missing Claude mirror, AND missing architect-sessions from .opencode now fails); 162/162 intra-skill links resolve; live taxonomy query cross-checked against the reframed model."
-    }
+    "guard": "scripts/check-skill-symlinks.mjs + pnpm check:skills — asserts no dangling symlinks, Claude mirrors the full canonical set, OmO mirrors the canonical architect-* skills."
   },
   "ws1": {
-    "phase": "1-projection-pilot-COMPLETE; 2-expansion-COMPLETE (core+guard+test-features+new-identities)",
-    "currentSession": "WS-1 expansion COMPLETE through Session 11. Next: WS-2 (skills) or WS-3 (docs). Terminal-floor orphans (~22 working-state specs + 5 untargetable integration/fixture features) documented, out of WS-1 scope.",
     "lastCompletedSession": "11-new-code-originated-identities",
     "lastCommit": "8a32d4e",
-    "lastCommitNote": "Session 11 commit (4 code-originated identities RegistryBuilder/SourceMerge/TagRegistrySchemas/MarkdownBlockParser + 5 @architect-implements edges; closes D-9 deferrals via D-13). Orphans 32 -> 27.",
     "baselineMetrics": {
       "patterns": 270,
       "orphansTotal": 107,
@@ -73,16 +48,6 @@
       "orphansProjection": 0,
       "orphansCoreSrc": 0,
       "orphansGuardSrc": 0,
-      "orphansCoreTests": 0,
-      "orphansCoreTestsDeferred": [],
-      "d9Resolved": "Sessions 11 — SourceMerging/TagRegistrySchemasValidation/TypeScriptTaxonomyImplementation realized via new identities (D-13)",
-      "orphansProjectionByArea": {
-        "operational-insights": 0,
-        "governance": 0,
-        "delivery-reporting": 0,
-        "execution-context": 0,
-        "pattern-relations": 0
-      },
       "terminalFloor": {
         "total": 27,
         "workingStateSpecs": "~22 forward-looking roadmap/candidate specs in architect/ (incl. doc-projection cluster, releases, PDR-001) — out of WS-1 scope",

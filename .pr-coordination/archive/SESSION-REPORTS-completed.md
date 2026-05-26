@@ -1,0 +1,518 @@
+# Session reports — completed workstreams (WS-0 / WS-1 / WS-2)
+
+> Archived 2026-05-26 from SESSION-REPORTS-AND-LEARNINGS.md. The per-session record
+> for the completed workstreams. Active WS-3 log → ../SESSION-REPORTS-AND-LEARNINGS.md
+
+---
+
+## WS-0 / WS-1 — bootstrap + annotation re-enablement (Sessions 00–11)
+
+## Session 00 — Campaign bootstrap (planning, no code)
+
+Diagnosed the graph: 270 patterns, 107 orphans (40%) — projection 49, specs 32,
+core 24, guard 2; role 64%, bounded-context 58%, `@architect-shape` ~absent.
+Root cause: ~30 refactoring PRs kept pattern identity but stripped edges/shapes/
+invariants. Confirmed scope with maintainer (D-1..D-5). Authored this package.
+No production code touched.
+
+**Rules for upcoming sessions**
+
+1. Edges first; classification is mostly present in projection — don't re-tag what exists.
+2. Author edge-target identity (Cluster B/D) before edges that reference it, or same commit — `arch dangling` is strict.
+3. Add `Rule:` invariants only where architecturally significant; no ceremonial rules.
+4. `.scratch/` is invisible to fresh sessions — keep everything needed inside `.pr-coordination/`.
+
+## Session 01 — Projection renderer spine + block primitives (uncommitted in tree)
+
+Cluster A (5 renderer/dispatch files) + Cluster B (`BlockSchema` new identity +
+5 fragment consumers). Projection orphans **49 → 40**, total **107 → 98**.
+All gates green (build, format:check, lint, typecheck, typecheck:dogfood, test,
+test:dogfood 1057, validate:all, arch dangling 0, perf, audit:subtractive).
+`docs:all` regenerated PATTERNS/ARCHITECTURE/CHANGELOG + manifest — commit with the code.
+
+**Additional scope discovered:** the planned prompt asserted a uniform
+"all 4 renderers → FragmentRendererDispatch" edge. **`JsonRenderer` does not use
+dispatch** (generic serialization) — adding it would have been a false edge.
+Also `MarkdownRenderer` + `UiRenderer` (not just markdown) import `Block` → both
+get `BlockSchema`. **Resolution:** inline — verified every edge against imports;
+corrected `sessions/01` + EXECUTION-PLAN §5 to the per-file verified set.
+
+### Rules for upcoming sessions
+
+1. **Verify every `@architect-uses` edge against the file's actual imports.** Never
+   assume sibling files (renderers, fragments) have identical dependencies. A
+   plausible-but-false edge is worse than a missing one — it lies to the graph.
+2. `@architect-uses` is **space-separated, no colon** (`@architect-uses A, B`).
+   `@architect-role:` / `@architect-bounded-context:` use a colon. Do not mix.
+3. Adding a new code-originated identity (e.g. `BlockSchema`) or new edges changes
+   `docs-live/` — regenerate via `pnpm docs:all` and commit it in the same change.
+
+## Session 02 — Connect pattern-relations fragments to producers (uncommitted in tree)
+
+D-7 two-part model applied to all 10 pattern-relations orphans: 8 producers got a
+producer→fragment edge (9 fragments; `DependencyEdgeProjection` produces both
+`DependencyEdge` + `DependencyEdgeSet`), and `PatternRelationsSupporting` got an
+import edge (`Deliverable, DeliverableManifest`). Projection pattern-relations
+orphans **10 → 0**; total **98 → 86** (the Supporting edge also de-orphaned
+`Deliverable` + `DeliverableManifest`). All 13 gates green; guard `--staged`:
+13 modified, **0 status transitions** (confirms D-6 on 8 `completed` patterns),
+passed. `arch dangling --strict` count 0, no drift. `docs:all` updated
+ARCHITECTURE/PATTERNS/CHANGELOG/manifest — staged with the code.
+
+**Additional scope discovered (inline-fixed + recorded as D-8):** the planned
+method ("append a **new** `@architect-uses` line") is **wrong** — the parser keeps
+only ONE `@architect-uses` line per pattern; a second line is silently dropped.
+First attempt left all 9 fragments orphaned (caught by Data-API read-back before
+gates). Fixed inline by **extending the existing comma-separated line**. Same bug
+already breaks 5 pre-existing patterns (see D-8) — deferred to their owning
+sessions.
+
+### Rules for upcoming sessions
+
+1. **One `@architect-uses` line per pattern, comma-separated.** Extend the existing
+   line; never add a second `@architect-uses` line (it's dropped). See **D-8**.
+2. **Read back via the Data API after authoring edges** (`pattern <X>` →
+   `uses`/`usedBy`, or `arch orphans`) **before** running gates. "Annotation in the
+   file" ≠ "edge in the graph." This caught the multi-line bug cheaply.
+3. Next context = **governance** (`BusinessRule`, `BusinessRuleSet`,
+   `BusinessRuleReference`, `DecisionCatalog`, + its `*Supporting` bundle). Re-verify
+   producers/imports fresh — do not assume symmetry with pattern-relations.
+4. Coordinator: fix the "append a new line" wording in EXECUTION-PLAN §5 +
+   remaining `sessions/NN-*.md` to "extend the existing line" (D-8).
+
+## Session 03 — Connect governance fragments to producers (uncommitted in tree)
+
+D-7 model applied to all 7 governance projection orphans. 4 producers got
+producer→fragment edges (`BusinessRulesProjection`→`BusinessRule,BusinessRuleSet`;
+`DecisionCatalogProjection`→`DecisionCatalog,DecisionRecord`;
+`TaxonomyDigestProjection`→`TaxonomyDigest`; `ValidationRuleDigestProjection`→
+`ValidationRuleDigest`). `GovernanceSupporting` (imports only zod) de-orphaned by
+**incoming** edges from the 2 producers that import its schemas — the inverse of
+Session 02's outgoing-import Supporting model. All edges extended the existing single
+`@architect-uses` line (D-8) and **registered first-try** (Data-API read-back: orphans
+86→79, `BusinessRule.usedBy=[BusinessRulesProjection]`). All 13 gates green
+(1057 dogfood tests, perf 3/3, validate:all, audit:subtractive, arch dangling 0).
+`docs:all` → ARCHITECTURE.md +27 (the new edges + derived `enables`).
+
+**Additional scope discovered (inline-fixed):**
+
+1. **Cross-context producer.** `BusinessRuleReference` is a governance fragment but is
+   built at `operational-insights/index.ts:615` inside `OperationalInsightsProjectionSupport`.
+   Edge landed here (governance session) — a session is scoped by orphans resolved, not
+   files touched. Extended that pattern's single `@architect-uses` line.
+2. **D-8 "9 lines" note is stale.** `OperationalInsightsProjectionSupport` carries ONE
+   `@architect-uses` line at current HEAD, not 9. The latent multi-line bug D-8 warned
+   about is **not present** — verified by grep + the edge registering first-try. Session 04
+   should still re-confirm via `pattern <X>` but is likely unaffected.
+
+### Rules for upcoming sessions
+
+1. `Supporting` bundles connect in **whichever import direction is real** — outgoing
+   (it imports schemas, Session 02) or incoming (it's a pure source bundle imported by
+   producers, Session 03 `GovernanceSupporting`). Check the actual imports; don't assume.
+2. A fragment's producer may live in a **different bounded-context** — verify via
+   `grep "kind: '<Fragment>'"` across all `projections/`, not just the fragment's own context.
+3. Next context = **operational-insights** (`AnnotationCoverage`, `OverviewDigest`,
+   `RequirementDigest` ×3 producers, `RoleProfile`/`RoleProfileCollection`,
+   `SourceInventoryDigest`/`Entry`, `TagUsageMatrix`/`Entry`). Re-verify the D-8 state of
+   `OperationalInsightsProjectionSupport` before editing.
+
+## Session 04 — Connect operational-insights fragments to producers (uncommitted in tree)
+
+Committed prior session = `0ec6441`. De-orphaned all 9 operational-insights orphans.
+**New topology** vs governance: all producers in one `index.ts`, each its own
+`@architect-pattern`; `kind:` literals built in `build*` helpers (under
+`OperationalInsightsProjectionSupport`) while public `project*` wrappers return
+`ProjectionBundle<X>`. Used the **wrapper** as producer (8 edges:
+`AnnotationCoverageProjection`→`AnnotationCoverage`, `OverviewProjection`→`OverviewDigest`,
+3× Requirement\*→`RequirementDigest`, `RoleProfileProjection`→`RoleProfile,RoleProfileCollection`,
+`SourceInventoryProjection`→`SourceInventoryDigest`, `TagUsageProjection`→`TagUsageMatrix`).
+All edges registered first-try (orphans 79→70). 13 gates green.
+
+**Additional scope discovered (inline-fixed):**
+
+1. **Embedded sub-fragments need composition edges, not producer edges.** `TagUsageEntry`
+   - `SourceInventoryEntry` have no `ProjectionBundle` wrapper — built in helpers, embedded
+     in a parent. Connected via verified schema composition on the parent fragment
+     (`TagUsageMatrix`→`TagUsageEntry`, `SourceInventoryDigest`→`SourceInventoryEntry`; both
+     parents do `z.array(<Entry>Schema)`). First `@architect-uses` line on those fragments.
+2. **D-8 "9 lines" confirmed stale.** `OperationalInsightsProjectionSupport` has ONE
+   `@architect-uses` line at HEAD, not 9 — no collapse needed (delivery-reporting's
+   `DeliveryReportingProjectionSupport` likely the same; still re-verify in Session 05).
+
+### Rules for upcoming sessions
+
+1. **Three edge shapes now proven:** producer→fragment (wrapper returns `ProjectionBundle<X>`),
+   Supporting import-edge (Session 02) / incoming-edge (Session 03), and **fragment→sub-fragment
+   composition** (parent schema `z.array(childSchema)`). Pick by what the code actually does.
+2. When `kind:` literals sit in helper functions, the producer edge still follows the **public
+   `<X>Projection` wrapper's `ProjectionBundle<X>` return type**, not the helper.
+3. Next context = **delivery-reporting** (`PhaseProgress`, `StatusDistribution`,
+   `RoadmapTimeline`, `ReleaseNotesDigest`, `TraceabilityMatrix`, + `DeliveryReportingSupporting`
+   which imports `PatternSummarySchema`/`EmbeddedDeliverableSchema` — outgoing import-edge).
+
+## Session 05 — Connect delivery-reporting fragments to producers (uncommitted in tree)
+
+Committed prior session = `96194aa`. De-orphaned all 6 delivery-reporting orphans. Same
+split topology as op-insights: 5 producer wrappers got producer→fragment edges
+(`PhaseProgressProjection`→`PhaseProgress`, `StatusDistributionProjection`→
+`StatusDistribution`, `RoadmapTimelineProjection`→`RoadmapTimeline`, `ReleaseNotesProjection`→
+`ReleaseNotesDigest`, `TraceabilityMatrixProjection`→`TraceabilityMatrix`).
+`DeliveryReportingSupporting` got an **outgoing** import edge. All registered first-try
+(orphans 70→64). 13 gates green.
+
+**Additional scope discovered (inline-fixed):**
+
+1. **Recon's `EmbeddedDeliverable` target was a phantom.** `DeliveryReportingSupporting`
+   imports `EmbeddedDeliverableSchema`, but `EmbeddedDeliverable` is NOT a graph pattern
+   (`search` → empty); it's `DeliverableSchema.omit({kind:true})`. Authored
+   `@architect-uses PatternSummary, Deliverable` (the real source pattern) — authoring the
+   phantom would have tripped `arch dangling --strict`. Import edges follow the symbol's
+   pattern, falling back to the source when the symbol is a derived alias.
+2. **D-8 "6 lines" confirmed stale.** `DeliveryReportingProjectionSupport` has ONE
+   `@architect-uses` line at HEAD. The D-8 latent multi-line breakage is NOT present in any
+   projection ProjectionSupport pattern — likely already fixed in the refactors that
+   followed D-8's authoring.
+
+### Rules for upcoming sessions
+
+1. **Resolve every import-edge target against the graph** (`search <Name>`) before
+   authoring — a derived alias (`Schema.omit`/`.pick`) is not its own pattern; edge to the
+   source pattern it derives from.
+2. Final context = **execution-context** (`FileReadingList`, `HandoffRecord`,
+   `ScopeReadinessReport`, `SessionContextBundle`, + `ExecutionContextSupporting`). Note
+   `ScopeReadinessCheck` may be embedded (no standalone producer) and `Deliverable`/
+   `DeliverableManifest` are already connected (Session 02) — verify via `arch orphans`.
+
+## Session 06 — Connect execution-context fragments to producers (PILOT FINALE, uncommitted in tree)
+
+Committed prior session = `2641a6b`. De-orphaned all 6 execution-context orphans →
+**projection orphans now 0** (baseline 49; Phase-1 target was <5). Total 64→58. 5 producer
+edges (`FileReadingListProjection`→`FileReadingList`, `HandoffProjection`→`HandoffRecord`,
+`ScopeReadinessProjection`→`ScopeReadinessReport,ScopeReadinessCheck`,
+`SessionContextProjection`→`SessionContextBundle`, `DeliverableProjection`→
+`Deliverable,DeliverableManifest`) + 4 incoming composition edges into
+`ExecutionContextSupporting`. All registered first-try. 13 gates green.
+
+**Scope notes (resolved inline):**
+
+1. **`ScopeReadinessCheck` is produced, not embedded.** `ScopeReadinessProjection` builds
+   its own `kind:'ScopeReadinessCheck'` (scope-readiness.internal.ts:302) — the plan's
+   "may be embedded" caveat was wrong; it's a true produced fragment.
+2. **`ExecutionContextSupporting` = third Supporting topology.** Outgoing imports are
+   cross-package (`@libar-dev/architect-core`, not graph patterns), so it de-orphans only via
+   incoming composition edges from the 4 fragments embedding its schemas. Across all 5
+   contexts the `*Supporting` bundle needed 3 distinct strategies (outgoing-import S02,
+   incoming-from-producers S03, incoming-from-fragments S06) — never assume symmetry.
+
+### WS-1 Phase 1 (projection pilot) — COMPLETE
+
+Projection orphans **49 → 0** across Sessions 01–06 (renderer spine + BlockSchema →
+pattern-relations → governance → operational-insights → delivery-reporting →
+execution-context). Total orphans **107 → 58**. Next phase: WS-1 expansion
+(core → guard → cli → mcp) or WS-2 (skills) / WS-3 (docs), now unblocked.
+
+**Three proven edge shapes** for the expansion sessions: producer→fragment
+(`ProjectionBundle<X>` return), fragment→sub-fragment composition (`z.array(childSchema)`),
+and Supporting-bundle (direction follows real imports — outgoing OR incoming).
+
+## Session 07 — Connect architect-core production spine (WS-1 expansion, core pt.1)
+
+Committed = `c347045` (prior `d1dcd45`). De-orphaned all **10 architect-core/src**
+orphans (extractor + read-api spine). Total orphans **58 → 48**, zero
+`packages/architect-core/src` rows remain. A1: created `ExtractedPattern`
+(`role:contract`, `bounded-context:validation-schemas`, `status:active`) — the
+~60-field record contract the PatternGraph read model is built from (ADR-006). A2:
+7 verified `@architect-uses` edges (PatternGraph→ExtractedPattern; PatternHelpers,
+PatternGraphApi, GraphInventory, PatternClassification, ArchitectureInspection,
+DualSourceExtractor → ExtractedPattern/PatternGraph/PatternHelpers per their real
+imports). A3: orchestration→stage edges de-orphan the 4 feeders — DocExtractor→
+ShapeExtractor, GherkinExtractor→GherkinAstParser,LayerInference, BuildPipeline→
+AstParser. All edges registered first-try (Data-API read-back: ExtractedPattern
+`usedBy` = 7 consumers). All §6 gates green except repo-wide `format:check` (see below).
+Guard `--staged`: 14 modified, **0 status transitions** (D-6 holds on `completed`
+BuildPipeline). docs:all → ARCHITECTURE/CHANGELOG/PATTERNS regenerated, staged with code.
+
+**Scope corrections (inline-fixed):**
+
+1. **PatternGraphApi edge table was wrong.** Session-07 table claimed it does NOT
+   import `pattern-graph.js` → proposed `ExtractedPattern, PatternHelpers`. It DOES
+   import the `PatternGraph` type (`validation-schemas/pattern-graph.js` L13-17).
+   Authored the truthful set `ExtractedPattern, PatternHelpers, PatternGraph`.
+2. **AstParser's true importer is BuildPipeline, not the session's candidates.** Both
+   prompt candidates (GherkinScanner, gherkin-extractor) import `gherkin-ast-parser.js`,
+   NOT `ast-parser.js`. The only real consumer of `parseFileDirectives` (AstParser) is
+   the `scanner/index.ts` barrel's `scanPatterns()`, which BuildPipeline imports (L35).
+   Extended BuildPipeline's existing `@architect-uses` line with `AstParser` (D-8) —
+   ADR-006-correct (pipeline orchestration may import scanner stages).
+3. **Util/local symbols correctly NOT edged:** `PatternParseFailure`, `RelationshipEntry`,
+   `ArchIndex`, `NeighborEntry`, relationship-resolver, `fuzzy-match` — all `search`→empty,
+   so no edges (authoring them would be false edges / dangling).
+
+### Rules for next session (08 — core test-feature @architect-implements edges)
+
+1. **`format:check` is dirty repo-wide from coordinator WS-2 state** (`AGENTS.md` +
+   untracked `sessions/07,08-*.md`) — NOT from session edits. Stage explicit files only;
+   my 11 .ts files all pass prettier individually. Coordinator owns those 3 files.
+2. `@architect-implements` is authored on the **test `.feature`** (a relation, not identity)
+   — different mechanism from `@architect-uses`. Re-confirm each implements target exists
+   as a production pattern before authoring; verify via Data-API read-back (`implementedBy`).
+
+## Session 08 — Connect architect-core test features via @architect-implements (committed 8b22f86)
+
+Prior session commit = `c347045`. De-orphaned **11 of 14** core/tests executable-test
+orphans by adding feature-level `@architect-implements` (verified each target via step
+imports + source `@architect-pattern`, then Data-API read-back). Total orphans **48 → 37**.
+Mapping: ShapeExtraction→ShapeExtractor, DualSourceMergeIntegration→DualSourceExtractor,
+PatternGraphApiReverseLookup→PatternGraphApi, ConfigResolution/ConfigurationAPI/
+ProjectConfigLoader→**ConfigLoader** (3 tests, one many-to-one target — ConfigLoader's
+"load + resolve defaults" surface covers loadProjectConfig + resolveProjectConfig +
+createArchitect registry/roles; ConfigLoader.implementedBy now =4), CodecUtilsValidation→
+CodecUtils, CrossPackageEdgeClassification→PatternClassification, DocStringMediaType→
+GherkinAstParser, FileDiscovery→PatternScanner, PatternReferenceValidation→
+**ExtractionDiagnostics,PatternClassification** (CSV — Rule 1 invalid-pattern-name
+diagnostic + Rule 2 internal/external/dangling classification). All 12 gates green
+(test:dogfood 1057, perf 3/3, dangling --strict 0, audit:subtractive 0).
+
+**Deferred 3 (no clean target — D-9):** SourceMerging (`mergeSourcesForGenerator`,
+merge-sources.ts un-patterned, not reachable from ConfigLoader — barrel-only re-export),
+TagRegistrySchemasValidation (`createDefaultTagRegistry`/`mergeTagRegistries`,
+tag-registry.ts un-patterned), TypeScriptTaxonomyImplementation (`buildRegistry`,
+registry-builder.ts un-patterned). Each needs a new code-originated `@architect-pattern`
+(D-3 style) on the owning file before an implements edge can land.
+
+### Rules for next session
+
+1. **Map test→production by STEP IMPORTS, not feature title.** Read
+   `tests/steps/<area>/<name>.steps.ts` `from '../../../src/...'` to find the exact
+   production module, then check that file's `@architect-pattern`. If the file has none and
+   isn't reachable from a pattern that does, DEFER (don't edge to a transitively-reachable
+   unrelated pattern — that's a false edge).
+2. **D-10: a `completed` test feature lacking `@architect-unlock-reason` trips guard
+   `completed-protection`** when you add a tag. Status transitions stayed 0 (D-6 holds), but
+   spec-file modification needs an unlock-reason (≥10 meaningful chars). Only
+   dual-source-merge.feature needed it here; the other 6 completed features already carried
+   one. Check before staging.
+3. `format:check` is now green repo-wide (the WS-2 dirtiness Session 07 flagged is resolved).
+4. Next core orphans = the guard/cli/mcp packages + the 3 D-9 deferrals (need new
+   production identities first).
+
+## Session 09 — Connect architect-guard production spine + D-8 hygiene (committed 4f775fc)
+
+Prior session commit = `e5de206`. De-orphaned both `architect-guard/src` orphans →
+**zero guard-src orphans remain**. Total orphans **37 → 35**. `GitNameStatusParser`
+connected via incoming edges from `GitBranchDiff` (direct importer of `parseGitNameStatus`,
+branch-diff.ts:30) + `DetectChanges` (imports via `git/index` barrel; extended its existing
+line per D-8). `ValidationModule` (pure re-export barrel, `completed`) connected via
+`@architect-uses DoDValidator, AntiPatternDetector, DoDValidationTypes` — **D-11**: mirrors
+the in-package `GitModule` precedent (barrel→submodule for a producerless grouping barrel,
+distinct from D-7's fragment-barrel-with-producer rule). All edges registered first-try
+(read-back: `GitNameStatusParser.usedBy=[DetectChanges,GitBranchDiff]`,
+`ValidationModule.uses`=3 submodules). All 12 §6 gates green (test:dogfood 1057, perf 3/3,
+dangling --strict 0, audit:subtractive 0). guard `--staged`: 6 modified, **0 status
+transitions** (D-6 holds on `completed` ValidationModule `.ts` — no unlock-reason).
+docs:all → ARCHITECTURE.md regenerated, committed with code.
+
+**D-8 colon-duplicate hygiene CLEARED (the debt was real, not stale):** `derive-state.ts`
+
+- `decider.ts` each carried a redundant malformed `@architect-uses:` colon-form line (line 10)
+  duplicating the correct space-form (line 9). Same targets, so no edges were lost — but
+  illegal colon-on-uses + violates one-line rule. Deleted both line-10 duplicates; graph
+  `uses` unchanged (verified via read-back). `LintPatternsCLI` had only ONE line (D-8's
+  "2 lines" note for it was stale — like the projection ProjectionSupport notes in S03-05).
+
+### Rules for next session (10 — connectable test-feature implements edges)
+
+1. **D-12 (new):** a `runCommand`-driven CLI integration test `@architect-implements` the
+   production CLI pattern for the command it invokes, when the command maps 1:1 to a named
+   pattern (verify the command string first). E.g. `lint-process.feature → LintProcessCLI`,
+   `lint-patterns.feature → LintPatternsCLI`. Both production patterns confirmed to exist.
+2. Only `CompactTextRendererTests → CompactTextRenderer` has a TS-import target (verified).
+   `generate-docs`, `public-contract`, `cli-mcp-documentation-parity`, `list-parent-*` have
+   NO clean target — defer (record, don't author phantom edges).
+3. **D-10 check** on the `completed` features `lint-process`/`lint-patterns`: add
+   `@architect-unlock-reason` if absent before staging (guard `completed-protection`).
+4. Coordination model: agent does the scoped edits + Data-API read-back; main thread runs
+   the §6 gates + commit + bookkeeping. format:check flags `.pr-coordination/*` md/json —
+   run `prettier --write` on the session's coordination files before the gate.
+
+## Session 10 — Connect remaining test features via @architect-implements (committed 38a3e72)
+
+Prior session commit = `3df826a`. De-orphaned the 3 connectable test-feature orphans.
+Total orphans **35 → 32**. `CompactTextRendererTests → CompactTextRenderer` (verified TS
+import of `renderCompactText`). `LintProcessCliBehavior → LintProcessCLI` and
+`LintPatternsCliBehavior → LintPatternsCLI` per **D-12** — the `runCommand` command strings
+(`"lint-process …"`, `"lint-patterns …"`; the version scenario even asserts stdout contains
+`architect-guard`) map 1:1 to the production CLI patterns. All 3 `implementedBy` edges
+registered first-try. All 12 §6 gates green (pkg test 1769, test:dogfood 1057, perf 3/3,
+dangling --strict 0, audit:subtractive exit 0). guard `--staged`: 3 modified, **0 status
+transitions** — both `completed` `lint-*` features already carried
+`@architect-unlock-reason:Retroactive-completion-during-rebrand` (D-10 satisfied; no second
+reason added). `docs:all` → **no docs-live change** (implements/reverse edges don't alter
+the current projection output).
+
+**Deferred (genuine no-target, recorded per D-12 boundary):** `ArchitectPublicContract`
+(public-contract — API-freeze, broad surface), `DocumentationCommandParityBoundaryTests`
+(cli-mcp parity — multi-surface boundary), `GenerateDocsCli` (generate-docs — no production
+`GenerateDocs*` pattern), `EmptyEpic`/`ParentEpic` (list-parent-\* — `list --parent`
+fixtures, no step implementation). These stay orphans by design.
+
+### Rules for next session (11 — new code-originated identities, D-13)
+
+1. **D-13 approved 4 new identities.** For each: add file-level `@architect-pattern` JSDoc to
+   the production file, THEN the `@architect-implements` edge(s) on the test feature(s) — in
+   the **same commit** (else `dangling --strict` trips on the not-yet-existing target).
+   Confirm `role` + `bounded-context` against sibling patterns in the same dir (Session 07
+   method for `ExtractedPattern`), don't hard-code.
+2. `RegistryBuilder` (`taxonomy/registry-builder.ts`) de-orphans BOTH `StubTaxonomyTagTests`
+   AND the D-9 deferral `TypeScriptTaxonomyImplementation` — one identity, two features.
+   `SourceMerge` (`config/merge-sources.ts`) → `SourceMerging` (D-9). `TagRegistrySchemas`
+   (`validation-schemas/tag-registry.ts`, mirror `ExtractedPattern` role:contract) →
+   `TagRegistrySchemasValidation`. `MarkdownBlockParser` (`parseMarkdownToBlocks`, locate the
+   file) → `LoadPreambleParser`.
+3. **D-10 check** on the `completed` features `TypeScriptTaxonomyImplementation` +
+   `SourceMerging` before staging.
+4. After Session 11 the campaign hits its terminal floor (~27): ~22 forward-looking
+   working-state specs + 5 untargetable integration/fixture features. Document, don't force.
+
+## Session 11 — New code-originated identities (committed 8a32d4e)
+
+Prior session commit = `ef91844`. Created **4 code-originated `@architect-pattern`
+identities** (D-13) + **5 `@architect-implements` edges**, de-orphaning 5 test features
+incl. all 3 D-9 deferrals. Total orphans **32 → 27** (patterns 272 → 276). Identities:
+`RegistryBuilder` (taxonomy/registry-builder.ts, utility/configuration), `SourceMerge`
+(config/merge-sources.ts, utility/configuration), `TagRegistrySchemas`
+(validation-schemas/tag-registry.ts, contract/validation-schemas — mirrors ExtractedPattern),
+`MarkdownBlockParser` (utils/markdown-parser.ts, codec/rendering). Realized:
+`StubTaxonomyTagTests`+`TypeScriptTaxonomyImplementation`→RegistryBuilder (one identity, two
+tests), `SourceMerging`→SourceMerge, `TagRegistrySchemasValidation`→TagRegistrySchemas,
+`LoadPreambleParser`→MarkdownBlockParser. All registered first-try; **no new identity is an
+orphan** (read-back confirmed). All 12 §6 gates green (pkg test 1769, test:dogfood 1057, perf
+3/3, dangling --strict 0, audit:subtractive 0). guard `--staged`: 12 modified, **0 status
+transitions** (D-10: both completed features already carried an unlock-reason). docs:all →
+ARCHITECTURE/CHANGELOG/PATTERNS regenerated (276 patterns), committed with code.
+
+**Key learning — `implementedBy` clears orphan status.** `findOrphanPatterns`
+(`read-api/graph-inventory.ts:154-155`) counts `implementsPatterns` + `implementedBy` as
+relationships. So a new code-originated identity is non-orphan the instant a test feature
+`@architect-implements` it — **no `@architect-uses` edge required**. This is why Session 11
+authored zero use-edges and still de-orphaned all 4 new nodes, sidestepping the genuine
+circular import between `registry-builder.ts` (imports tag-registry types) and
+`tag-registry.ts` (imports `buildRegistry`). Roles/contexts: 2 mirrored exact siblings
+(SourceMerge→ConfigLoader's `configuration`, TagRegistrySchemas→ExtractedPattern's
+`validation-schemas`); 2 reasoned reuse of existing contexts (RegistryBuilder→`configuration`
+since `taxonomy` is not a context and its neighbors are config/\*; MarkdownBlockParser→`codec`/
+`rendering` matching CodecUtils + BlockSchema). No new bounded-context spawned.
+
+### WS-1 expansion — COMPLETE (Sessions 07–11)
+
+Orphans **58 → 27** across the expansion (core spine + test features S07-08, guard S09,
+connectable test features S10, new identities S11); campaign total **107 → 27**. Projection,
+core/src, guard/src, and all connectable core/cli test features are at **0 orphans**. The D-9
+deferrals are closed. **Terminal floor = 27**: ~22 forward-looking working-state
+roadmap/candidate specs in `architect/` (parent edges already present don't clear orphan
+status — they're genuinely un-wired future work) + 5 untargetable integration/fixture test
+features (`ArchitectPublicContract`, `DocumentationCommandParityBoundaryTests`,
+`GenerateDocsCli`, `EmptyEpic`, `ParentEpic`). These are out of WS-1 scope (shipped-code
+connectivity). **Next workstreams: WS-2 (skills) / WS-3 (docs)**, now unblocked — the graph
+is connected enough through core+projection to drive doc generation.
+
+**Coordination-model note (Sessions 09-11):** ran agent-per-session for the scoped edits +
+Data-API read-back; main thread owned the full §6 gate sequence + commits + bookkeeping per
+the maintainer's instruction. Each session = 2 commits (code + bookkeeping). format:check
+flags `.pr-coordination/*` md/json each time — `prettier --write` the coordination files
+before the gate. All three sessions: guard `--staged` 0 status transitions (D-6 + D-10 held).
+
+---
+
+## WS-2 — Skills consolidation (docs/skills only, no code)
+
+Completed WS-2 (D-21, plan-approved 2026-05-26). Restructured the skill family to
+match the `architect-base` / `architect-data-api` rebuild: **state-driven, progressive
+disclosure, anti-anecdote**.
+
+**Done:**
+
+- New **`architect-sessions`** skill = required all-sessions context (shapes, state-driven,
+  value-transfer concept, universal rules, disclosure map — absorbing the old
+  `architect-session-router`'s intent table) + 6 progressive-disclosure `references/`
+  (plan / design / implement / review-spec / review-implementation / handoff), hybrid
+  style (lean execution + up-front context-gathering + next-session pointer).
+- **Dissolved `_shared/`** → `architect-base/references/` (taxonomy, four-tier-ladder,
+  fsm-transitions, annotation-ownership, spec-pattern-relationships, rule-block-template,
+  - new **decision-records.md**). `canonical-references.md` anti-anecdote rule folded into
+    `architect-base` §"Anti-anecdote"; self-containment rule dropped. `value-transfer.md` →
+    `architect-sessions/references/ephemeral-spec-deletion.md`. `multi-session-coordination.md`
+    → `architect-refactor-session/references/` (+ absorbed session-preamble campaign rules 4–6).
+- **Deleted** `architect-cli-overview` (non-production prototype, no symlink, dead pointer).
+- Repointed every `_shared/` cross-ref, `.claude/skills/` symlinks (add architect-sessions;
+  drop the 6 folded + router + \_shared), and the PREAMBLE skill list.
+
+### Rules for next session
+
+1. **`_shared/` no longer exists.** Doctrine depth is `architect-base/references/`; session
+   execution is `architect-sessions/references/`; coordination is
+   `architect-refactor-session/references/multi-session-coordination.md`.
+2. **No session-router.** `architect-sessions` is the entry for any spec-driven session and
+   self-routes via its disclosure map; `architect-refactor-session` stays separate.
+3. **Decision records hold durable, non-execution facts only** (D-21 highlight) — distinct
+   from this ephemeral campaign `DECISIONS.md`. See `architect-base/references/decision-records.md`.
+
+## WS-2 — Polish pass (D-22, docs/skills + one guard script)
+
+Post-D-21 pedantic review, this time including `.opencode/skills/` (D-21 only re-wired `.claude/skills/`).
+
+- **`.opencode/skills/` was frozen pre-consolidation** — 8 git-tracked **dangling** symlinks
+  (`_shared` + the 7 deleted session/router skills) and `architect-sessions` missing entirely,
+  so OmO agents couldn't discover it. Re-wired to mirror the canonical set (4 architect skills;
+  Claude-only authoring skills excluded from OmO).
+- **Taxonomy reframed — teach theory, point to live data** (maintainer steering). `taxonomy.md`
+  now teaches axes / tag categories / csv-vs-colon syntax and points to `pnpm architect:query
+taxonomy` + the generated `docs-live/TAXONOMY.md`, instead of a hand-table that duplicated and
+  drifted. `architect-base` §4 gained `@architect-product-area`; dropped the "full tag set" claim.
+- **Source-grounded finding:** the validation registry (`buildRegistry`, 30 tags → digest →
+  `docs-live/TAXONOMY.md`) omits scanner-recognized `@architect-executable-specs` /
+  `@architect-usecase`. Neither digest nor hand-list is authoritative → logged to `FEEDBACK.md`.
+- **Smaller fixes:** `plan.md` idea-tier template `@architect-parent` (matched its five-tag
+  minimum); `architect-base` §2 `docs-live/` git-tracked (not gitignored); `AGENTS.md` dropped the
+  non-existent `.claude-plugin/` claim + documents `.opencode/skills/` wiring.
+- **Drift guard:** `scripts/check-skill-symlinks.mjs` + `pnpm check:skills`. Verified green
+  (+ negative tests); 162/162 intra-skill links resolve.
+
+### Rules for next session
+
+1. **Run `pnpm check:skills` after any skill add/remove/rename** — it asserts no dangling links,
+   Claude mirrors the full canonical set, and OmO mirrors the canonical `architect-*` skills
+   (so a domain skill missing from a harness — the F1 regression — fails the check). Required
+   sets are derived from canonical names by convention (`architect-*`), no name hardcoded.
+2. **Never hand-enumerate taxonomy in skills.** Teach the model; point to `pnpm architect:query
+taxonomy` + `docs-live/TAXONOMY.md`. The same "explain theory, point to live data" lens applies
+   to any generated/queryable surface (e.g. the MCP tool inventory → `tool-registry.ts`).
+
+## WS-2 — Second-pass skills review (D-23, docs/skills only)
+
+Critical re-review of the consolidated skills, reading every body + reference directly (the three
+automated audit agents all returned false "all clean" verdicts). Fixed 5 residual skill-content
+defects the May-26 polish wave missed or never propagated:
+
+- **`four-tier-ladder.md`** (predates the wave): both worked examples showed FOUR tags under a
+  "Five authored tags" caption → added `@architect-parent`; `@architect-product-area` was
+  miscategorized as an "above-idea" tag → corrected (it is required baseline tag #4). The identical
+  `@architect-parent` defect D-22 fixed in `plan.md` had never reached the canonical ladder.
+- **`spec-pattern-relationships.md`**: "`slice`'s parent is `task`" contradicted "slices … do not
+  carry `@architect-parent`" → fixed the level-ordering example.
+- **architect-base §3**: added the missing `architect/slices/` folder row.
+- **`annotation-ownership.md`**: `@architect-status` value list was missing `candidate`.
+- **`AGENTS.md`**: elevated `architect-sessions` to a 3rd mandatory skill (box + prose);
+  `architect-refactor-session` kept unadvertised (transitional non-spec-driven exception).
+- **`DECISIONS.md`**: durable-only header + "Key durable decisions" index (maintainer point #4);
+  body-trim of resolved WS-1/3 entries deferred to campaign-archive (the doctrine's trim point) —
+  the learnings log lacks Sessions 15-16, so those entries are the sole prose record besides git.
+
+### Rules for next session
+
+1. **Fix shared rules in ALL copies.** A rule duplicated across `four-tier-ladder.md`, `plan.md`,
+   `review-spec.md` drifts when only one copy is fixed — grep the rule text across the skills tree
+   after any doctrine change.
+2. **Don't trust a reviewer's "all clean" — read the artifact.** The audit agents missed every
+   defect here; the canonical reference ended up less correct than the files citing it.

@@ -3,19 +3,11 @@
 > Maintainer steer: "use progressive-disclosure features to reuse the same
 > projections and drastically reduce verbosity for API output."
 >
-> **Build status (WS-3 Session 14, D-16/D-17):** steps **1 + 2 are BUILT** —
-> `--disclosure <ContentRichness>` on `overview` (default `summary`) with a
-> disclosure-gated generated-views index; CLI + MCP parity. Steps **3 + 4 remain
-> sequenced ideation.**
->
-> **Build status (WS-3 Session 15, D-18):** the `overview` HUD now also carries a
-> disclosure-gated **architecture glimpse** — a coarse package-level context map
-> at `summary` (+ an "explore via the API, not grep" pointer) and the full
-> bounded-context Context Map at `full`. Reuses one shared context-map builder
-> (`_shared/architecture-graph.internal.ts`) with the architecture doc; the
-> component view is now production-only (working-state under `architect/`
-> excluded, generalizing D-16). This is the "glimpse of architecture + API
-> capability" half of the maintainer ask, complementing the step-2 views index.
+> **Build status:** steps **1 + 2 shipped** (WS-3 Sessions 14–15, D-17/D-18) — `--disclosure
+<ContentRichness>` on `overview` (default `summary`), a disclosure-gated generated-views
+> index, and an architecture glimpse (package map at `summary`, bounded-context map at `full`);
+> CLI + MCP parity; production-only component view. Steps **3 + 4 remain sequenced ideation**
+> (below). Per-session detail: SESSION-REPORTS S14–S15 + `archive/DECISIONS-resolved.md` D-17/D-18.
 >
 > **Vocabulary clarification (load-bearing, resolved in D-17):** the read surface
 > uses `ContentRichnessSchema` (`name-only · summary · summary-with-references ·
@@ -45,34 +37,16 @@ turning a wall of text into a heads-up display.
 
 ## First steps (smallest blast radius first)
 
-1. **[BUILT — Session 14] `--disclosure <ContentRichness>` on the read surface.**
-   Shipped on `overview` (default `summary`); `bundle` / `pattern` / `arch blocking`
-   are the documented fast-follow (the renderer plumbing + flag pattern are now in
-   place — each just needs per-fragment richness branching).
-   - Reuse `ContentRichnessSchema` verbatim — no new vocabulary.
-   - `overview` at `summary` = progress line + top-N blockers + a one-line "more:
-     …"; `full` = today's output. Directly delivers "drastically reduce verbosity."
-   - Plumb a richness arg into `renderCompactText`
-     (`renderers/render-compact-text.ts`) the way `renderMarkdown` already accepts
-     a `DisclosureSpec`. The projection stays the source of truth; only render
-     depth changes.
-   - MCP parity is free: `architect_overview` and twins share the same projection +
-     `renderCompactText` (`packages/architect-mcp/src/tool-registry.ts`), so the
-     flag reaches both surfaces at once.
+1. **[SHIPPED — Session 14] `--disclosure <ContentRichness>` on the read surface.**
+   `overview` defaults `summary` (progress + top-N blockers + one-line "more: …"); `full`
+   reproduces the prior output. `bundle` / `pattern` / `arch blocking` are the documented
+   fast-follow — renderer plumbing (`render-compact-text.ts`) + flag pattern in place, each
+   needs per-fragment richness branching. MCP parity free (shared projection + renderer).
 
-2. **[BUILT — Session 14] A compact "generated-views index" `overview` section**
-   (the "context that these shapes exist" ask) — disclosure-gated so it ships terse
-   (one line at `summary`, itemized at `full`). Implemented as a structured
-   `generatedViews` field on `OverviewDigest`, rendered per richness.
-   - One line per generated surface (`architecture`, `decisions`,
-     `requirements-*`, `roadmap`, `changelog`, `taxonomy`) + the verb to fetch it.
-   - Clean insertion point already mapped: add a structured field to
-     `OverviewDigest` (`fragments/operational-insights/overview-digest.ts`),
-     populate it in `buildOverviewDigest`
-     (`projections/operational-insights/index.ts:121-180`), render it in
-     `renderOverviewDigest` (`render-compact-text.ts:88-124`). The existing
-     `cliHints` field (verbatim-rendered) is the precedent for a static section.
-   - Defer until (1) lands so it is born terse, not another wall of text.
+2. **[SHIPPED — Session 14] A compact "generated-views index" `overview` section** —
+   a structured `generatedViews` field on `OverviewDigest`, disclosure-gated (one line at
+   `summary`, itemized at `full`); one line per generated surface (`architecture`, `decisions`,
+   `requirements-*`, `roadmap`, `changelog`, `taxonomy`) + the verb to fetch it.
 
 3. **Token-budget signal everywhere.** Generalize `bundle --estimate-tokens`
    (`chars / 4` heuristic) into the shared output path so any verb can report
