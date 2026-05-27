@@ -38,9 +38,20 @@ CONTRACT_BLOCK="$(cat <<'EOF'
 [Architect API-first contract]
 Use `pnpm architect:query <verb>` as the first read surface for pattern state, dependencies, rules, decisions, and transitions.
 Prefer `pnpm -s` whenever piping or capturing JSON because bare `pnpm` writes a lifecycle banner to stdout.
-Default verbs: `overview`, `search <fragment>`, `bundle <Pattern> --format json`, `dep-tree <Pattern>`, `rules --pattern <Pattern>`, `scope-validate <Pattern> <design|implement>`.
-If live CLI output disagrees with docs or memory, trust the live CLI.
+Default verbs: `overview`, `search <fragment>`, `bundle <Pattern> --format json`, `dep-tree <Pattern>`, `rules --pattern <Pattern>`, `scope-validate <Pattern> <design|implement>`, `arch blocking`, `list --status <status>`.
+Generated docs are themselves a projection verb: `documentation <type>` (architecture · api-reference · decisions · business-rules · patterns · taxonomy · roadmap · …) — query it instead of reading docs-live/ by hand.
+Read load-bearing decisions through the API (`documentation decisions`, or `pattern ADR006SingleReadModelArchitecture`), never paraphrased from memory.
+If live CLI output disagrees with docs or memory, trust the live CLI; if a verb or workflow surprises you, append a short note to FEEDBACK.md at the repo root.
 For a full API demo run once: `bash scripts/api-capability-tour.sh`
+EOF
+)"
+
+MENTAL_MODEL_BLOCK="$(cat <<'EOF'
+[Architect mental model — source-first, event-sourced, projected]
+Source of truth = annotated production TS (`@architect-*` JSDoc) + executable Gherkin (`tests/features/**`); git-committed annotated code is the immutable event store.
+The PatternGraph, generated docs (`docs-live/`), CLI/MCP output, and Studio UI are all PROJECTIONS off that one graph — never hand-author or hand-edit a projection to reconcile it with source.
+`docs-live/` regenerates via `pnpm docs:all` and is git-tracked, so `pnpm docs:all && git diff --exit-code docs-live` is a determinism gate; a non-empty diff means a projection drifted from source.
+Working state under `architect/` (specs · stubs · decisions) is scaffold, not source: a design spec transfers its invariants to executable Gherkin + its rationale to JSDoc, then is deleted. `architect/decisions/` ADRs are the permanent exception.
 EOF
 )"
 
@@ -54,7 +65,7 @@ Before proceeding, load all 3 mandatory skills NOW from the canonical repo-root 
 EOF
 )"
 
-ADDITIONAL_CONTEXT="${CONTRACT_BLOCK}"$'\n\n'"${SKILL_BLOCK}"
+ADDITIONAL_CONTEXT="${CONTRACT_BLOCK}"$'\n\n'"${MENTAL_MODEL_BLOCK}"$'\n\n'"${SKILL_BLOCK}"
 
 if [[ "$SOURCE" != "resume" && "$SOURCE" != "clear" && "$SOURCE" != "compact" ]]; then
   LIVE_BLOCK="$(

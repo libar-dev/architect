@@ -35,7 +35,7 @@ interface CodecError {
 | ---------------- | ---------------------------------------------------------------------------- |
 | type             | Discriminator literal identifying a codec error.                             |
 | operation        | Which operation failed.                                                      |
-| source           | Originating source label \(e.g. file path\), if known.                       |
+| source           | Originating source label (e.g. file path), if known.                         |
 | message          | Human-readable error message.                                                |
 | validationErrors | Formatted schema validation errors, if the failure was a validation failure. |
 
@@ -77,7 +77,7 @@ function createJsonInputCodec<T>(schema: ZodType<T>): JsonInputCodec<T>;
 
 #### Returns
 
-A codec exposing \`parse\` \(Result-returning\) and \`safeParse\`.
+A codec exposing \`parse\` (Result-returning) and \`safeParse\`.
 
 ### createJsonOutputCodec
 
@@ -92,10 +92,10 @@ function createJsonOutputCodec<T>(
 
 #### Parameters
 
-| Parameter     | Type | Description                                                                       |
-| ------------- | ---- | --------------------------------------------------------------------------------- |
-| schema        |      | Zod schema the value must satisfy before serialization.                           |
-| defaultIndent |      | Indent width used when \`serialize\` is called without options \(defaults to 2\). |
+| Parameter     | Type | Description                                                                     |
+| ------------- | ---- | ------------------------------------------------------------------------------- |
+| schema        |      | Zod schema the value must satisfy before serialization.                         |
+| defaultIndent |      | Indent width used when \`serialize\` is called without options (defaults to 2). |
 
 #### Returns
 
@@ -828,7 +828,7 @@ function isExtractedPattern(value: unknown): value is ExtractedPattern;
 
 #### Returns
 
-\`true\` when \`value\` is a valid ExtractedPattern \(narrowing its type\), else \`false\`.
+\`true\` when \`value\` is a valid ExtractedPattern (narrowing its type), else \`false\`.
 
 ### SourceInfoSchema
 
@@ -865,11 +865,11 @@ function createDeprecatedTagDiagnostic(
 
 #### Parameters
 
-| Parameter      | Type | Description                                             |
-| -------------- | ---- | ------------------------------------------------------- |
-| filePath       |      | Source file containing the deprecated tag.              |
-| deprecatedTag  |      | The legacy tag found \(with or without leading \`@\`\). |
-| replacementTag |      | The currently supported tag to use instead.             |
+| Parameter      | Type | Description                                           |
+| -------------- | ---- | ----------------------------------------------------- |
+| filePath       |      | Source file containing the deprecated tag.            |
+| deprecatedTag  |      | The legacy tag found (with or without leading \`@\`). |
+| replacementTag |      | The currently supported tag to use instead.           |
 
 #### Returns
 
@@ -921,7 +921,7 @@ function createPatternContractDiagnostics(
 
 #### Returns
 
-Diagnostics for the recognized name/uses errors \(empty if none match\).
+Diagnostics for the recognized name/uses errors (empty if none match).
 
 ### createRemovedLayerTagDiagnostic
 
@@ -936,16 +936,16 @@ function createRemovedLayerTagDiagnostic(
 
 #### Parameters
 
-| Parameter     | Type | Description                                              |
-| ------------- | ---- | -------------------------------------------------------- |
-| filePath      |      | Source file containing the removed tag.                  |
-| deprecatedTag |      | The removed tag found \(with or without leading \`@\`\). |
+| Parameter     | Type | Description                                            |
+| ------------- | ---- | ------------------------------------------------------ |
+| filePath      |      | Source file containing the removed tag.                |
+| deprecatedTag |      | The removed tag found (with or without leading \`@\`). |
 
 #### Returns
 
 A diagnostic advising removal of the legacy tag.
 
-### EXTRACTION\_DIAGNOSTIC\_CODES
+### EXTRACTION_DIAGNOSTIC_CODES
 
 \## ExtractionDiagnostics - Pattern Extraction Diagnostic Codes Closed enum of diagnostic codes the extractor pipeline raises for malformed JSDoc / Gherkin directives. Consumers map codes to human-readable messages; never extend without coordinating with the extractor's emitting sites. ### When to Use - Extractor: emit a diagnostic with one of these codes - Lint/UI: format diagnostics with code-specific guidance
 
@@ -964,7 +964,7 @@ EXTRACTION_DIAGNOSTIC_CODES = [
 ] as const
 ```
 
-### EXTRACTION\_DIAGNOSTIC\_SEVERITIES
+### EXTRACTION_DIAGNOSTIC_SEVERITIES
 
 The severity levels a diagnostic may carry, ordered most to least severe.
 
@@ -972,7 +972,7 @@ The severity levels a diagnostic may carry, ordered most to least severe.
 EXTRACTION_DIAGNOSTIC_SEVERITIES = ['error', 'warning', 'info'] as const
 ```
 
-### EXTRACTION\_DIAGNOSTIC\_SEVERITY\_BY\_CODE
+### EXTRACTION_DIAGNOSTIC_SEVERITY_BY_CODE
 
 Lookup mapping every diagnostic code to its default severity level.
 
@@ -1013,7 +1013,7 @@ interface ExtractionDiagnostic {
 
 ### ExtractionDiagnosticCode
 
-Union of the recognized extraction diagnostic code literals, derived from EXTRACTION\_DIAGNOSTIC\_CODES.
+Union of the recognized extraction diagnostic code literals, derived from EXTRACTION_DIAGNOSTIC_CODES.
 
 ```ts
 type ExtractionDiagnosticCode = (typeof EXTRACTION_DIAGNOSTIC_CODES)[number];
@@ -1021,7 +1021,7 @@ type ExtractionDiagnosticCode = (typeof EXTRACTION_DIAGNOSTIC_CODES)[number];
 
 ### ExtractionDiagnosticSeverity
 
-Union of the diagnostic severity literals, derived from EXTRACTION\_DIAGNOSTIC\_SEVERITIES.
+Union of the diagnostic severity literals, derived from EXTRACTION_DIAGNOSTIC_SEVERITIES.
 
 ```ts
 type ExtractionDiagnosticSeverity = (typeof EXTRACTION_DIAGNOSTIC_SEVERITIES)[number];
@@ -1031,7 +1031,7 @@ type ExtractionDiagnosticSeverity = (typeof EXTRACTION_DIAGNOSTIC_SEVERITIES)[nu
 
 ### parseMarkdownToBlocks
 
-Parse markdown text into an ordered list of typed \`SectionBlock\` values. Runs a line-driven state machine that recognizes headings, code fences \(including mermaid\), pipe tables, ordered/unordered lists, separators, and paragraphs for the rendering pipeline.
+Parse markdown text into an ordered list of typed \`SectionBlock\` values. Runs a line-driven state machine that recognizes headings, code fences (including mermaid), pipe tables, ordered/unordered lists, separators, and paragraphs for the rendering pipeline.
 
 ```ts
 function parseMarkdownToBlocks(content: string): readonly SectionBlock[];
@@ -1066,7 +1066,7 @@ ArchIndexSchema = z.strictObject({
 
 ### ExactStatusGroupsSchema
 
-Schema for patterns grouped by exact \(un-normalized\) status, including \`roadmap\` and \`deferred\`.
+Schema for patterns grouped by exact (un-normalized) status, including \`roadmap\` and \`deferred\`.
 
 ```ts
 ExactStatusGroupsSchema = z.strictObject({
@@ -1106,7 +1106,7 @@ ImplementationRefSchema = z.strictObject({
 
 ### PatternGraphSchema
 
-Schema for the canonical read model \(the PatternGraph\) — every pattern, the tag registry, the status/maturity/phase/role groupings, counts, the relationship index, and the optional architecture index.
+Schema for the canonical read model (the PatternGraph) — every pattern, the tag registry, the status/maturity/phase/role groupings, counts, the relationship index, and the optional architecture index.
 
 ```ts
 PatternGraphSchema = z.strictObject({
@@ -1177,7 +1177,7 @@ RelationshipEntrySchema = z.strictObject({
 
 ### SourceViewsSchema
 
-Schema for patterns grouped by source type \(TypeScript / Gherkin / roadmap / PRD\).
+Schema for patterns grouped by source type (TypeScript / Gherkin / roadmap / PRD).
 
 ```ts
 SourceViewsSchema = z.strictObject({
@@ -1204,7 +1204,7 @@ StatusCountsSchema = z.strictObject({
 
 ### StatusGroupsSchema
 
-Schema for patterns grouped by normalized status \(completed / active / planned / candidate\).
+Schema for patterns grouped by normalized status (completed / active / planned / candidate).
 
 ```ts
 StatusGroupsSchema = z.strictObject({
@@ -1259,7 +1259,7 @@ interface Ok<T> {
 
 ### Result
 
-Result type representing either success \(Ok\) or failure \(Err\).
+Result type representing either success (Ok) or failure (Err).
 
 ```ts
 type Result<T, E = Error> = Ok<T> | Err<E>;
@@ -1342,7 +1342,7 @@ Result = {
 
 ### AggregationTagDefinitionSchema
 
-Schema for an aggregation tag definition — its tag, target document \(or \`null\`\), and purpose.
+Schema for an aggregation tag definition — its tag, target document (or \`null\`), and purpose.
 
 ```ts
 AggregationTagDefinitionSchema = z.strictObject({
@@ -1354,7 +1354,7 @@ AggregationTagDefinitionSchema = z.strictObject({
 
 ### buildRoleLookup
 
-Build \(and memoize per registry\) the RoleLookup tables for resolving role tags and aliases.
+Build (and memoize per registry) the RoleLookup tables for resolving role tags and aliases.
 
 ```ts
 function buildRoleLookup(registry: TagRegistry): RoleLookup;
@@ -1403,7 +1403,7 @@ function isKnownRoleTag(registry: TagRegistry, rawValue: string): boolean;
 
 ### mergeTagRegistries
 
-Merge an override registry onto a base registry, combining tag arrays by \`tag\` \(override wins\) and replacing scalar fields when present.
+Merge an override registry onto a base registry, combining tag arrays by \`tag\` (override wins) and replacing scalar fields when present.
 
 ```ts
 function mergeTagRegistries(base: TagRegistry, override: Partial<TagRegistry>): TagRegistry;
@@ -1452,10 +1452,10 @@ function resolveCanonicalRole(
 
 #### Parameters
 
-| Parameter | Type | Description                                                      |
-| --------- | ---- | ---------------------------------------------------------------- |
-| registry  |      | The tag registry to resolve against.                             |
-| rawValue  |      | The raw role value \(canonical tag or alias\), or \`undefined\`. |
+| Parameter | Type | Description                                                    |
+| --------- | ---- | -------------------------------------------------------------- |
+| registry  |      | The tag registry to resolve against.                           |
+| rawValue  |      | The raw role value (canonical tag or alias), or \`undefined\`. |
 
 #### Returns
 
@@ -1497,7 +1497,7 @@ interface RoleLookup {
 | --------- | -------------------------------------------------------------------- |
 | canonical | Map of canonical role tag to itself, for membership/identity checks. |
 | aliases   | Map of alias to the canonical role tag it resolves to.               |
-| all       | Set of every recognized tag \(canonical tags and aliases\).          |
+| all       | Set of every recognized tag (canonical tags and aliases).            |
 
 ### TagRegistrySchema
 

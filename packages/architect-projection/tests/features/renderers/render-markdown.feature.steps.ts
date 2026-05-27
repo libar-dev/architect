@@ -309,6 +309,38 @@ function createHostileReleaseNotesFixture(): Fragment {
   } as unknown as Fragment;
 }
 
+function createHostileTaxonomyDigestFixture(): Fragment {
+  return {
+    kind: 'TaxonomyDigest',
+    tags: [
+      {
+        groupName: 'Roles',
+        entries: [
+          {
+            kind: 'role',
+            tag: 'projection',
+            domain: 'Projection',
+            priority: 1,
+            description: 'Safe role tag',
+            aliases: [],
+          },
+          {
+            // A sourced tag value carrying a backtick + link: the backtick would
+            // close a naive `code` span and let the rest inject a live link.
+            kind: 'role',
+            tag: 'evil`[click](javascript:alert(11))',
+            domain: 'Injected',
+            priority: 2,
+            description: 'Hostile tag value',
+            aliases: [],
+          },
+        ],
+      },
+    ],
+    formatTypes: [],
+  } as unknown as Fragment;
+}
+
 function createHostileRequirementDigestFixture(): ProjectionBundle<Fragment> {
   const pattern = 'RendererRequirement [trap](javascript:alert(7))';
   const requirement = {
@@ -1150,10 +1182,10 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         Then('the markdown output should escape hostile plain text', () => {
           const markdown = assertRenderedString(state!.rendered);
           expect(markdown).toContain(
-            '&lt;script&gt;alert\\("x"\\)&lt;/script&gt; \\[trap\\]\\(javascript:alert\\(1\\)\\) \\*\\*bold\\*\\*',
+            '&lt;script&gt;alert("x")&lt;/script&gt; \\[trap\\](javascript:alert(1)) \\*\\*bold\\*\\*',
           );
-          expect(markdown).toContain('- \\!\\[img\\]\\(https://example.com/x.png\\)');
-          expect(markdown).toContain('- \\[link\\]\\(javascript:alert\\(2\\)\\)');
+          expect(markdown).toContain('- !\\[img\\](https://example.com/x.png)');
+          expect(markdown).toContain('- \\[link\\](javascript:alert(2))');
         });
 
         And('the markdown output should neutralize block-level markdown markers', () => {
@@ -1168,14 +1200,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         And('the markdown output should escape hostile collapsible summaries', () => {
           const markdown = assertRenderedString(state!.rendered);
           expect(markdown).toContain(
-            '<summary>\\*\\*Summary\\*\\* \\[trap\\]\\(javascript:alert\\(9\\)\\) &lt;b&gt;tag&lt;/b&gt;</summary>',
+            '<summary>\\*\\*Summary\\*\\* \\[trap\\](javascript:alert(9)) &lt;b&gt;tag&lt;/b&gt;</summary>',
           );
         });
 
         And('the markdown output should block unsafe link targets', () => {
           const markdown = assertRenderedString(state!.rendered);
           expect(markdown).not.toContain('[Click');
-          expect(markdown).toContain('Click\\]\\(javascript:alert\\(3\\)\\)');
+          expect(markdown).toContain('Click\\](javascript:alert(3))');
           expect(markdown).toContain('[Safe Docs](https://example.com/docs%20path)');
           expect(markdown).toContain('Protocol Relative');
           expect(markdown).not.toContain('[Protocol Relative](');
@@ -1230,15 +1262,15 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         Then('the release notes markdown should escape trusted interpolation values', () => {
           const markdown = assertRenderedString(state!.rendered);
           expect(markdown).toContain(
-            '## [v1.0\\]\\(javascript:alert\\(1\\)\\)] - &lt;script&gt;alert\\(2\\)&lt;/script&gt;',
+            '## [v1.0\\](javascript:alert(1))] - &lt;script&gt;alert(2)&lt;/script&gt;',
           );
           expect(markdown).toContain(
-            '- **Deliverable \\[click\\]\\(javascript:alert\\(4\\)\\)**: &lt;script&gt;alert\\(5\\)&lt;/script&gt;',
+            '- **Deliverable \\[click\\](javascript:alert(4))**: &lt;script&gt;alert(5)&lt;/script&gt;',
           );
           expect(markdown).toContain(
-            '- Pattern \\*\\*bold\\*\\* \\[trap\\]\\(javascript:alert\\(3\\)\\)',
+            '- Pattern \\*\\*bold\\*\\* \\[trap\\](javascript:alert(3))',
           );
-          expect(markdown).toContain('Release note \\[trap\\]\\(javascript:alert\\(6\\)\\)');
+          expect(markdown).toContain('Release note \\[trap\\](javascript:alert(6))');
         });
       },
     );
@@ -1261,10 +1293,10 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         Then('the requirement markdown should escape trusted interpolation values', () => {
           const rendered = assertRenderedRecord(state!.rendered);
           expect(rendered['REQUIREMENTS-EXECUTABLE.md']).toContain(
-            '[RendererRequirement \\[trap\\]\\(javascript:alert\\(7\\)\\)](requirements-executable/renderer-package/renderer-threat.md)',
+            '[RendererRequirement \\[trap\\](javascript:alert(7))](requirements-executable/renderer-package/renderer-threat.md)',
           );
           expect(rendered['requirements-executable/renderer-package/renderer-threat.md']).toContain(
-            '**Status:** active \\*\\*bold\\*\\* \\[trap\\]\\(javascript:alert\\(8\\)\\)',
+            '**Status:** active \\*\\*bold\\*\\* \\[trap\\](javascript:alert(8))',
           );
           expect(rendered['requirements-executable/renderer-package/renderer-threat.md']).toContain(
             'Requirement body remains plain text.',
@@ -1345,7 +1377,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           Then('the architecture markdown should escape the sourced section title', () => {
             const markdown = assertRenderedString(state!.rendered);
             expect(markdown).toContain(
-              'Bounded context: Auth \\*\\*bold\\*\\* \\[trap\\]\\(javascript:alert\\(1\\)\\)',
+              'Bounded context: Auth \\*\\*bold\\*\\* \\[trap\\](javascript:alert(1))',
             );
             expect(markdown).not.toContain('Auth **bold**');
           });
@@ -1358,6 +1390,32 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               expect(markdown).not.toContain('\\(1 pattern\\)');
             },
           );
+        },
+      );
+
+      RuleScenario(
+        'Taxonomy tag code spans render live but sourced tag text cannot inject',
+        ({ Given, When, Then, And }) => {
+          Given(
+            'a TaxonomyDigest fixture with a safe tag and a backtick-bearing hostile tag',
+            () => {
+              state!.input = createHostileTaxonomyDigestFixture();
+            },
+          );
+          When('I render the fragment as markdown', () => {
+            state!.rendered = renderMarkdown(state!.input!);
+          });
+          Then('the taxonomy markdown should render the safe tag as a live code span', () => {
+            const markdown = assertRenderedString(state!.rendered);
+            expect(markdown).toContain('`projection`');
+            expect(markdown).not.toContain('\\`projection\\`');
+          });
+          And('the taxonomy markdown should not let the hostile tag inject a live link', () => {
+            const markdown = assertRenderedString(state!.rendered);
+            // The hostile tag's backtick forces the escaped-plain-text fallback, so its
+            // `]` is escaped and no `](javascript:…)` link forms (lookbehind = unescaped `]`).
+            expect(markdown).not.toMatch(/(?<!\\)\]\(\s*javascript:alert\(11\)\)/i);
+          });
         },
       );
     },
@@ -1549,9 +1607,15 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             () => {
               const rendered = assertRenderedRecord(state!.rendered);
               expect(rendered['BUSINESS-RULES.md']).toContain(
-                '| \\[CLI Trap\\]\\(javascript:alert\\(10\\)\\) | 1        | 1     | 1               |',
+                '| \\[CLI Trap\\](javascript:alert(10)) | 1        | 1     | 1               |',
               );
-              expect(rendered['BUSINESS-RULES.md']).not.toMatch(/\]\(\s*javascript:alert\(10\)\)/i);
+              // The label's brackets are escaped (`\]`), so no live link forms even
+              // though `](javascript:…)` now appears as a substring — assert there is
+              // no `](…)` whose `]` is UNescaped (the lookbehind), which is the real
+              // injection guard now that redundant paren-escaping is gone.
+              expect(rendered['BUSINESS-RULES.md']).not.toMatch(
+                /(?<!\\)\]\(\s*javascript:alert\(10\)\)/i,
+              );
               expect(rendered['BUSINESS-RULES.md']).not.toContain('## Package Detail');
             },
           );
@@ -1594,7 +1658,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           Then('the business-rules root should render traversal labels as plain text', () => {
             const rendered = assertRenderedRecord(state!.rendered);
             expect(rendered['BUSINESS-RULES.md']).toContain(
-              '| \\[CLI Trap\\]\\(javascript:alert\\(10\\)\\) | 1        | 1     | 1               |',
+              '| \\[CLI Trap\\](javascript:alert(10)) | 1        | 1     | 1               |',
             );
             expect(rendered['BUSINESS-RULES.md']).not.toContain(
               '[architect-projection](/tmp/absolute.md)',

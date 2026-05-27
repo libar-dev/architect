@@ -58,7 +58,8 @@ plausible-but-false edge is worse than a missing one — it lies to every future
 ## 3. The six universal rules (floor for every session)
 
 1. **Gates are non-negotiable** — run the full sequence in `EXECUTION-PLAN.md §6`
-   before any commit/handoff; a failing gate is stop-and-surface, never `--no-verify`.
+   (mirrored in architect-base §6 / CLAUDE.md) before any commit/handoff; a failing gate
+   is stop-and-surface, never `--no-verify`.
 2. **Capture decisions before code** — anything needing judgment goes to
    `DECISIONS.md` before the edit that depends on it.
 3. **Stage explicit files** — never `git add -A` on this branch.

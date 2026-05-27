@@ -167,6 +167,13 @@
           "parentPath": "DECISIONS.md"
         },
         {
+          "path": "decisions/adr-010.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "DECISIONS.md"
+        },
+        {
           "path": "decisions/pdr-005.md",
           "role": "progressive-child",
           "audience": "published",

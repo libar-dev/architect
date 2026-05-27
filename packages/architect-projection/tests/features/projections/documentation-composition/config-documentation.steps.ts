@@ -402,6 +402,30 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           );
 
           And(
+            'flat-catalog documentation types should declare emitChildren false at every level',
+            () => {
+              // `patterns` and `taxonomy` project a single flat fragment
+              // (`projectSingle`) with no bundle children, so their disclosure
+              // matrices must not advertise a child fan-out the projection never
+              // produces. Types that legitimately emit children (api-reference,
+              // architecture, requirements, decisions) are excluded.
+              const flatCatalogTypes = ['patterns', 'taxonomy'] as const;
+              for (const documentType of flatCatalogTypes) {
+                const metadata = SUPPORTED_DOCUMENTATION_TYPE_REGISTRY.find(
+                  (entry) => entry.key === documentType,
+                );
+                expect(metadata).toBeDefined();
+                expect(
+                  Object.keys(state!.documentationViews[documentType]?.children ?? {}).length,
+                ).toBe(0);
+                for (const level of PROGRESSIVE_DISCLOSURE_LEVELS) {
+                  expect(metadata!.disclosureMatrix[level].emitChildren).toBe(false);
+                }
+              }
+            },
+          );
+
+          And(
             'the patterns documentation bundle should expose per-pattern detail additional files',
             () => {
               const patternsBundle = state!.documentationViews['patterns'];

@@ -12,7 +12,7 @@
 
 ### AntiPatternId
 
-Anti-pattern rule identifiers Each ID corresponds to a specific violation of the dual-source documentation architecture or process hygiene. Compatibility note: the historical \`tag-duplication\` identifier is intentionally not part of the split-package public contract because \`detectAntiPatterns\(\)\` does not emit it.
+Anti-pattern rule identifiers Each ID corresponds to a specific violation of the dual-source documentation architecture or process hygiene. Compatibility note: the historical \`tag-duplication\` identifier is intentionally not part of the split-package public contract because \`detectAntiPatterns()\` does not emit it.
 
 ```ts
 type AntiPatternId =
@@ -61,16 +61,16 @@ interface AntiPatternViolation {
 
 #### Properties
 
-| Property | Description                                                           |
-| -------- | --------------------------------------------------------------------- |
-| id       | Anti-pattern identifier                                               |
-| message  | Human-readable description                                            |
-| file     | File where violation was found                                        |
-| line     | Line number \(if applicable\)                                         |
-| severity | Severity \(error = architectural violation, warning = hygiene issue\) |
-| fix      | Fix guidance                                                          |
+| Property | Description                                                         |
+| -------- | ------------------------------------------------------------------- |
+| id       | Anti-pattern identifier                                             |
+| message  | Human-readable description                                          |
+| file     | File where violation was found                                      |
+| line     | Line number (if applicable)                                         |
+| severity | Severity (error = architectural violation, warning = hygiene issue) |
+| fix      | Fix guidance                                                        |
 
-### DEFAULT\_THRESHOLDS
+### DEFAULT_THRESHOLDS
 
 Default thresholds applied when none are supplied to anti-pattern detection.
 
@@ -160,7 +160,7 @@ Status emoji: ✅ if all complete, 🚧 if any active, 📋 otherwise
 
 ### WithTagRegistry
 
-Base interface for options that accept a TagRegistry for prefix-aware behavior. Many validation functions need to be aware of the configured tag prefix \(e.g., "@architect-" vs "@acme-"\). This interface provides a consistent way to pass that configuration. ### When to Use Extend this interface when creating options for functions that: - Generate error messages referencing tag names - Detect tags in source code - Validate tag formats
+Base interface for options that accept a TagRegistry for prefix-aware behavior. Many validation functions need to be aware of the configured tag prefix (e.g., "@architect-" vs "@acme-"). This interface provides a consistent way to pass that configuration. ### When to Use Extend this interface when creating options for functions that: - Generate error messages referencing tag names - Detect tags in source code - Validate tag formats
 
 ```ts
 interface WithTagRegistry {
@@ -171,9 +171,9 @@ interface WithTagRegistry {
 
 #### Properties
 
-| Property | Description                                                                        |
-| -------- | ---------------------------------------------------------------------------------- |
-| registry | Tag registry for prefix-aware behavior \(defaults to @architect- if not provided\) |
+| Property | Description                                                                      |
+| -------- | -------------------------------------------------------------------------------- |
+| registry | Tag registry for prefix-aware behavior (defaults to @architect- if not provided) |
 
 ## ProcessGuardTypes
 
@@ -198,13 +198,13 @@ interface ChangeDetection {
 
 #### Properties
 
-| Property           | Description                                                |
-| ------------------ | ---------------------------------------------------------- |
-| modifiedFiles      | Files that were modified \(relative paths\)                |
-| addedFiles         | Files that were added                                      |
-| deletedFiles       | Files that were deleted                                    |
-| statusTransitions  | Status transitions detected \(file path -&gt; transition\) |
-| deliverableChanges | Deliverable changes detected \(file path -&gt; changes\)   |
+| Property           | Description                                              |
+| ------------------ | -------------------------------------------------------- |
+| modifiedFiles      | Files that were modified (relative paths)                |
+| addedFiles         | Files that were added                                    |
+| deletedFiles       | Files that were deleted                                  |
+| statusTransitions  | Status transitions detected (file path -&gt; transition) |
+| deliverableChanges | Deliverable changes detected (file path -&gt; changes)   |
 
 ### DeciderEvent
 
@@ -257,11 +257,11 @@ interface DeciderOptions {
 
 #### Properties
 
-| Property      | Description                                               |
-| ------------- | --------------------------------------------------------- |
-| strict        | Treat warnings as errors                                  |
-| ignoreSession | Ignore session scope rules                                |
-| registry      | Tag registry for prefix-aware error messages \(optional\) |
+| Property      | Description                                             |
+| ------------- | ------------------------------------------------------- |
+| strict        | Treat warnings as errors                                |
+| ignoreSession | Ignore session scope rules                              |
+| registry      | Tag registry for prefix-aware error messages (optional) |
 
 ### DeciderOutput
 
@@ -278,10 +278,10 @@ interface DeciderOutput {
 
 #### Properties
 
-| Property | Description                              |
-| -------- | ---------------------------------------- |
-| result   | The validation result.                   |
-| events   | Commands to emit \(for logging/metrics\) |
+| Property | Description                            |
+| -------- | -------------------------------------- |
+| result   | The validation result.                 |
+| events   | Commands to emit (for logging/metrics) |
 
 ### DeliverableChange
 
@@ -333,16 +333,16 @@ interface FileState {
 
 #### Properties
 
-| Property         | Description                                   |
-| ---------------- | --------------------------------------------- |
-| path             | Absolute file path                            |
-| relativePath     | Relative path from project root               |
-| status           | Status from @architect-status annotation      |
-| normalizedStatus | Normalized status for display                 |
-| protection       | Protection level from FSM \(none/scope/hard\) |
-| deliverables     | Deliverable names from Background table       |
-| hasUnlockReason  | Whether file has @architect-unlock-reason     |
-| unlockReason     | The unlock reason text if present             |
+| Property         | Description                                 |
+| ---------------- | ------------------------------------------- |
+| path             | Absolute file path                          |
+| relativePath     | Relative path from project root             |
+| status           | Status from @architect-status annotation    |
+| normalizedStatus | Normalized status for display               |
+| protection       | Protection level from FSM (none/scope/hard) |
+| deliverables     | Deliverable names from Background table     |
+| hasUnlockReason  | Whether file has @architect-unlock-reason   |
+| unlockReason     | The unlock reason text if present           |
 
 ### LintProcessOptions
 
@@ -367,14 +367,14 @@ interface LintProcessOptions {
 
 #### Properties
 
-| Property      | Description                                         |
-| ------------- | --------------------------------------------------- |
-| mode          | Validation mode                                     |
-| files         | Specific files to validate \(when mode is 'files'\) |
-| strict        | Treat warnings as errors                            |
-| ignoreSession | Ignore session scope rules                          |
-| showState     | Show derived process state \(debugging\)            |
-| baseDir       | Base directory for relative paths                   |
+| Property      | Description                                       |
+| ------------- | ------------------------------------------------- |
+| mode          | Validation mode                                   |
+| files         | Specific files to validate (when mode is 'files') |
+| strict        | Treat warnings as errors                          |
+| ignoreSession | Ignore session scope rules                        |
+| showState     | Show derived process state (debugging)            |
+| baseDir       | Base directory for relative paths                 |
 
 ### ProcessGuardRule
 
@@ -466,13 +466,13 @@ interface ProcessViolation {
 
 #### Properties
 
-| Property   | Description                                            |
-| ---------- | ------------------------------------------------------ |
-| rule       | Unique rule ID that triggered the violation            |
-| severity   | Severity \(error = blocking, warning = informational\) |
-| message    | Human-readable error message                           |
-| file       | File that triggered the violation                      |
-| suggestion | Suggested fix or action                                |
+| Property   | Description                                          |
+| ---------- | ---------------------------------------------------- |
+| rule       | Unique rule ID that triggered the violation          |
+| severity   | Severity (error = blocking, warning = informational) |
+| message    | Human-readable error message                         |
+| file       | File that triggered the violation                    |
+| suggestion | Suggested fix or action                              |
 
 ### SessionState
 
@@ -528,11 +528,11 @@ interface StatusTagLocation {
 
 #### Properties
 
-| Property        | Description                                     |
-| --------------- | ----------------------------------------------- |
-| lineNumber      | Line number in the new file version             |
-| insideDocstring | Whether this tag was inside a docstring \("""\) |
-| rawLine         | The raw line from git diff \(for debugging\)    |
+| Property        | Description                                   |
+| --------------- | --------------------------------------------- |
+| lineNumber      | Line number in the new file version           |
+| insideDocstring | Whether this tag was inside a docstring (""") |
+| rawLine         | The raw line from git diff (for debugging)    |
 
 ### StatusTransition
 
@@ -555,12 +555,12 @@ interface StatusTransition {
 
 #### Properties
 
-| Property        | Description                                                                |
-| --------------- | -------------------------------------------------------------------------- |
-| isNewFile       | True if this is a new file \(no previous status, defaults from 'roadmap'\) |
-| hasUnlockReason | True if the diff contains unlock-reason tag \(supports file splits\)       |
-| toLocation      | Location of the 'to' status tag                                            |
-| allDetectedTags | All status tags found in diff \(for debugging false positives\)            |
+| Property        | Description                                                              |
+| --------------- | ------------------------------------------------------------------------ |
+| isNewFile       | True if this is a new file (no previous status, defaults from 'roadmap') |
+| hasUnlockReason | True if the diff contains unlock-reason tag (supports file splits)       |
+| toLocation      | Location of the 'to' status tag                                          |
+| allDetectedTags | All status tags found in diff (for debugging false positives)            |
 
 ### ValidationMode
 
@@ -591,13 +591,13 @@ interface ValidationResult {
 
 #### Properties
 
-| Property     | Description                             |
-| ------------ | --------------------------------------- |
-| valid        | Whether all checks passed \(no errors\) |
-| violations   | Blocking violations \(must be fixed\)   |
-| warnings     | Non-blocking warnings                   |
-| processState | Process state at time of validation     |
-| changes      | Changes that were validated             |
+| Property     | Description                           |
+| ------------ | ------------------------------------- |
+| valid        | Whether all checks passed (no errors) |
+| violations   | Blocking violations (must be fixed)   |
+| warnings     | Non-blocking warnings                 |
+| processState | Process state at time of validation   |
+| changes      | Changes that were validated           |
 
 ### ViolationSeverity
 

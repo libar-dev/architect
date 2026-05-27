@@ -99,7 +99,7 @@ ArchitectureDiagramSchema = z.strictObject({
 
 ### ArchitectureDiagramSectionSchema
 
-One labeled diagram within an architecture document — the context map or a single group's detail diagram. Splitting the architecture view into many bounded sections keeps every Mermaid block renderable \(no single block holds all patterns\) and far more readable than one mega-graph.
+One labeled diagram within an architecture document — the context map or a single group's detail diagram. Splitting the architecture view into many bounded sections keeps every Mermaid block renderable (no single block holds all patterns) and far more readable than one mega-graph.
 
 ```ts
 ArchitectureDiagramSectionSchema = z.strictObject({
@@ -124,7 +124,7 @@ CrossPackageContextEntrySchema = z.strictObject({
 
 ### FanInEntrySchema
 
-One row of the fan-in / hub view — a pattern ranked by how many in-view peers depend on it. Surfaces hub patterns that otherwise render as edgeless leaves in the per-group detail diagrams \(their consumers live in other groups\).
+One row of the fan-in / hub view — a pattern ranked by how many in-view peers depend on it. Surfaces hub patterns that otherwise render as edgeless leaves in the per-group detail diagrams (their consumers live in other groups).
 
 ```ts
 FanInEntrySchema = z.strictObject({
@@ -138,7 +138,7 @@ FanInEntrySchema = z.strictObject({
 
 ### ArchitectureNeighborhoodSchema
 
-The relationship neighborhood around a focal pattern — its context, role, and layer, every typed relation edge \(uses, usedBy, dependsOn, enables, implements\), its same-context peers, and the artifacts that implement it.
+The relationship neighborhood around a focal pattern — its context, role, and layer, every typed relation edge (uses, usedBy, dependsOn, enables, implements), its same-context peers, and the artifacts that implement it.
 
 ```ts
 ArchitectureNeighborhoodSchema = z.strictObject({
@@ -176,7 +176,7 @@ type Block =
   | LinkOutBlock;
 ```
 
-### BLOCK\_TYPES
+### BLOCK_TYPES
 
 Runtime set of every valid BlockType, used to test whether an unknown value carries a recognized block discriminant.
 
@@ -252,7 +252,7 @@ collapsible = (summary: string, content: Block[]): CollapsibleBlock => ({
 
 ### CollapsibleBlock
 
-A collapsible block that nests further blocks behind a summary label. Hand-written \(rather than inferred\) because its \`content\` is recursive and Zod cannot infer recursive lazy unions.
+A collapsible block that nests further blocks behind a summary label. Hand-written (rather than inferred) because its \`content\` is recursive and Zod cannot infer recursive lazy unions.
 
 ```ts
 interface CollapsibleBlock {
@@ -275,7 +275,7 @@ interface CollapsibleBlock {
 
 ### CollapsibleBlockSchema
 
-Runtime schema for a CollapsibleBlock; its \`content\` uses \`z.lazy\` to reference BlockSchema \(declared below\) for recursive nesting.
+Runtime schema for a CollapsibleBlock; its \`content\` uses \`z.lazy\` to reference BlockSchema (declared below) for recursive nesting.
 
 ```ts
 CollapsibleBlockSchema = z.strictObject({
@@ -299,7 +299,7 @@ heading = (level: 1 | 2 | 3 | 4 | 5 | 6, text: string): HeadingBlock => ({
 
 ### HeadingBlockSchema
 
-A heading block carrying a level \(1-6\) and its text.
+A heading block carrying a level (1-6) and its text.
 
 ```ts
 HeadingBlockSchema = z.strictObject({
@@ -568,7 +568,7 @@ BusinessRuleReferenceSchema = z.strictObject({
 
 ### BusinessRuleSetSchema
 
-A scoped collection of business rules — discriminated on \`scope\` \(all, product-area, phase, feature, or package\) with optional grouping metadata describing how the rules are bucketed.
+A scoped collection of business rules — discriminated on \`scope\` (all, product-area, phase, feature, or package) with optional grouping metadata describing how the rules are bucketed.
 
 ```ts
 BusinessRuleSetSchema = z.discriminatedUnion('scope', [
@@ -650,7 +650,7 @@ DecisionCatalogSchema = z.strictObject({
 
 ### DecisionRecordSchema
 
-One decision record \(ADR/PDR/DDR/TDR\) — its id, type, status, and title plus structured context, decision, consequences, optional alternatives, and links to related decisions and affected patterns.
+One decision record (ADR/PDR/DDR/TDR) — its id, type, status, and title plus structured context, decision, consequences, optional alternatives, and links to related decisions and affected patterns.
 
 ```ts
 DecisionRecordSchema = z.strictObject({
@@ -802,7 +802,7 @@ DependencyEdgeSetSchema = z.strictObject({
 
 ### DependencyTreeSchema
 
-A rooted dependency tree for a pattern — the root name, the recursively nested nodes, and the traversal options \(max depth, whether implementation dependencies are included\) that produced it.
+A rooted dependency tree for a pattern — the root name, the recursively nested nodes, and the traversal options (max depth, whether implementation dependencies are included) that produced it.
 
 ```ts
 DependencyTreeSchema = z.strictObject({
@@ -1143,7 +1143,7 @@ TagEntryKindSchema = z.enum(['role', 'metadata', 'aggregation'])
 
 ### TagEntrySchema
 
-One taxonomy tag entry — its kind, tag name, purpose, and the full set of optional documentation metadata \(format, allowed values, default, example, aliases, and more\).
+One taxonomy tag entry — its kind, tag name, purpose, and the full set of optional documentation metadata (format, allowed values, default, example, aliases, and more).
 
 ```ts
 TagEntrySchema = z.strictObject({
@@ -1266,7 +1266,7 @@ GeneratedViewEntrySchema = z.strictObject({
 
 ### OverviewArchitectureSchema
 
-The high-level architecture glimpse rendered in \`overview\`. \`packageChart\` is a coarse package-level context map shown at every non-\`name-only\` disclosure; \`contextMap\` is the richer bounded-context map \(identical grouping to \`docs-live/ARCHITECTURE.md\`\) shown only at \`full\`. Both are pre-rendered Mermaid \(built at projection time, per ADR-005 codec/renderer separation — the renderer cannot reach the grouping machinery behind the renderer boundary\). \`pointer\` is a one-line "explore via the API, not grep" hint.
+The high-level architecture glimpse rendered in \`overview\`. \`packageChart\` is a coarse package-level context map shown at every non-\`name-only\` disclosure; \`contextMap\` is the richer bounded-context map (identical grouping to \`docs-live/ARCHITECTURE.md\`) shown only at \`full\`. Both are pre-rendered Mermaid (built at projection time, per ADR-005 codec/renderer separation — the renderer cannot reach the grouping machinery behind the renderer boundary). \`pointer\` is a one-line "explore via the API, not grep" hint.
 
 ```ts
 OverviewArchitectureSchema = z.strictObject({
@@ -1280,7 +1280,7 @@ OverviewArchitectureSchema = z.strictObject({
 
 ### OverviewProgressSchema
 
-Delivery progress totals for the overview — overall pattern count broken down by lifecycle bucket \(completed, active, planned, candidate\) plus the completed percentage.
+Delivery progress totals for the overview — overall pattern count broken down by lifecycle bucket (completed, active, planned, candidate) plus the completed percentage.
 
 ```ts
 OverviewProgressSchema = z.strictObject({
@@ -1295,7 +1295,7 @@ OverviewProgressSchema = z.strictObject({
 
 ### RequirementEntrySchema
 
-One requirement entry in a requirement digest — the owning pattern and route id, its status, a rich-text description \(block list\), and the resolved test files.
+One requirement entry in a requirement digest — the owning pattern and route id, its status, a rich-text description (block list), and the resolved test files.
 
 ```ts
 RequirementEntrySchema = z.strictObject({
@@ -1688,7 +1688,7 @@ RequirementDigestSchema = z.strictObject({
 })
 ```
 
-### REQUIREMENTS\_ALL\_AREAS\_LABEL
+### REQUIREMENTS_ALL_AREAS_LABEL
 
 Display label for the aggregate area covering every product area.
 
@@ -1696,17 +1696,17 @@ Display label for the aggregate area covering every product area.
 REQUIREMENTS_ALL_AREAS_LABEL = 'All Product Areas'
 ```
 
-### REQUIREMENTS\_EXECUTABLE\_AREA\_LABEL
+### REQUIREMENTS_EXECUTABLE_AREA_LABEL
 
-Display label for requirements whose value transfer is complete \(backed by executable specs\).
+Display label for requirements whose value transfer is complete (backed by executable specs).
 
 ```ts
 REQUIREMENTS_EXECUTABLE_AREA_LABEL = 'Implemented (Value Transfer Complete)'
 ```
 
-### REQUIREMENTS\_SPECS\_AREA\_LABEL
+### REQUIREMENTS_SPECS_AREA_LABEL
 
-Display label for requirements still pending implementation \(spec-only\).
+Display label for requirements still pending implementation (spec-only).
 
 ```ts
 REQUIREMENTS_SPECS_AREA_LABEL = 'Specs (Pending Implementation)'
@@ -1794,7 +1794,7 @@ ScopeReadinessReportSchema = z.strictObject({
 
 ### SessionContextBundleSchema
 
-Fragment shape bundling everything needed to open a session — the in-scope patterns and session type, per-pattern metadata, spec files, stubs, dependencies \(own, shared, and consumers\), architecture neighbors, deliverables, test files, and FSM context.
+Fragment shape bundling everything needed to open a session — the in-scope patterns and session type, per-pattern metadata, spec files, stubs, dependencies (own, shared, and consumers), architecture neighbors, deliverables, test files, and FSM context.
 
 ```ts
 SessionContextBundleSchema = z.strictObject({
@@ -1862,7 +1862,7 @@ StatusDistributionSchema = z.strictObject({
 
 ### TagUsageEntrySchema
 
-Fragment shape for one metadata tag's usage — the tag name, the count of patterns carrying it, and the counted distinct values \(null when values are not enumerated\).
+Fragment shape for one metadata tag's usage — the tag name, the count of patterns carrying it, and the counted distinct values (null when values are not enumerated).
 
 ```ts
 TagUsageEntrySchema = z.strictObject({
@@ -1891,7 +1891,7 @@ TagUsageMatrixSchema = z.strictObject({
 
 ### TaxonomyDigestCountSummarySchema
 
-Summarized tag counts by category \(roles, metadata, aggregation\) plus a total.
+Summarized tag counts by category (roles, metadata, aggregation) plus a total.
 
 ```ts
 TaxonomyDigestCountSummarySchema = z.strictObject({
@@ -1989,11 +1989,11 @@ interface UiSection {
 
 #### Properties
 
-| Property | Description                                                            |
-| -------- | ---------------------------------------------------------------------- |
-| id       | Stable slug identifying the section \(used for anchors and ordering\). |
-| title    | Human-readable section title.                                          |
-| blocks   | The blocks rendered within the section.                                |
+| Property | Description                                                          |
+| -------- | -------------------------------------------------------------------- |
+| id       | Stable slug identifying the section (used for anchors and ordering). |
+| title    | Human-readable section title.                                        |
+| blocks   | The blocks rendered within the section.                              |
 
 ## ValidationRuleDigest
 

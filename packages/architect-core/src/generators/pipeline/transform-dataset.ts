@@ -202,9 +202,10 @@ export function transformToPatternGraphWithValidation(
         archIndex.byPackage[pkg.id] = packagePatterns;
       } catch (error) {
         // Skip patterns whose source file is not covered by the package config.
-        // The resolver hard-errors on unmapped files; we treat unmapped as
-        // "no package dimension for this pattern" rather than aborting the build.
-        if (!(error instanceof ProjectionError && error.code === 'UNMAPPED_PACKAGE')) {
+        // The resolver hard-errors on unmapped files via `ProjectionError` (whose
+        // only code is `UNMAPPED_PACKAGE`); we treat unmapped as "no package
+        // dimension for this pattern" rather than aborting the build.
+        if (!(error instanceof ProjectionError)) {
           throw error;
         }
       }

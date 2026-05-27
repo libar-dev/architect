@@ -10,18 +10,116 @@ for anything that does not fit the verb's shape.
 
 ---
 
+## 2026-05-27 — projected `docstring` is capped (~512 chars), silently dropping later design prose
+
+- **Verb / surface:** `pnpm -s architect:query bundle <Pattern> --format json` (`.root.blocks.docstring`) and `pattern <Name>`.
+- **Expected:** an epic/candidate spec's Feature description prose to be queryable — the `DocumentationProjection` epic was authored to carry foundational design context (a **Guiding principle** + an **MVP approach** block) so future sessions coordinate *from the graph*.
+- **Got:** the `docstring` block is ~513 chars — it returned the User Story plus the *first sentence* of the next paragraph (`**Scope of the corpus:** … not a narrow slice.`) and dropped everything after (the Guiding-principle and MVP-approach paragraphs). No marker signals the truncation. `Rule:` blocks are unaffected — fully projected.
+- **Impact:** an epic meant to hold high-level design context only surfaces its head via the API; context not encoded as a `Rule` invariant is invisible to `bundle`/`pattern` consumers — and this bites the universal-doc-gen capability's own use case (the graph as coordination surface). Mitigation this session: encode the load-bearing essence as a `Rule` invariant (queryable) and keep full prose in the canonical source feature. A section-aware/longer docstring, or an explicit `truncated` flag (as `dep-tree` already carries), would close it.
+
+## 2026-05-27 — `test:perf:baseline` soft thresholds are non-deterministic on a loaded dev machine (false failures jitter between unrelated metrics)
+
+- **Verb / surface:** `pnpm --filter @libar-dev/architect-projection run test:perf:baseline`.
+- **Expected:** a stable pass/fail; a real regression flags the metric it touched.
+- **Got:** two consecutive runs on the same tree failed on **different, unrelated** sub-millisecond metrics — first `documentationView` (0.0313 vs 0.0269ms) + `requirementDigestAllAreas` (0.302 vs 0.161ms), then on a settled re-run those **passed** and `graphBuild` (467 vs 444ms) failed instead. Every **hard** limit passed with wide margin (e.g. documentationView hard=8ms; graphBuild hard=2000ms). The soft `baseline×1.5` gate trips on thermal/load noise for micro-benchmarks measured in µs–fractional-ms.
+- **Impact:** the gate produces false stop-and-surface failures locally (right after `test:dogfood` loads the machine), pressuring a re-record (suppression) that the doctrine forbids. A median-of-N / warm-up, a noise floor (skip soft-check below ~0.1ms where jitter dominates), or treating soft-baseline as a warning while only `hard` fails the gate, would make it trustworthy. Not suppressed this session — diagnosed as noise via the re-run.
+
+## 2026-05-27 — a tag's allowed **values** aren't queryable (had to read `product-area-values.ts` source)
+
+- **Verb / surface:** `pnpm -s architect:query taxonomy --format json` — needed the valid `@architect-product-area` set to author a new spec.
+- **Expected:** the taxonomy digest to surface each constrained tag's allowed-value list (e.g. product-area → the 8 canonical self-hosting values in `ARCHITECT_PACKAGE_PRODUCT_AREAS`).
+- **Got:** no discoverable values list in the JSON for product-area; fell back to reading `packages/architect-core/src/taxonomy/product-area-values.ts` (and `registry-builder.ts`) source. (Distinct from the earlier "digest incomplete for recognized *tags*" entry — this is about a tag's allowed *value enum*.)
+- **Impact:** an author choosing a `@architect-product-area` / `@architect-role` / status value can't confirm the legal set through the API, so they guess or grep source — the anti-pattern the API exists to remove. Surfacing `values:` per tag in the digest would make authoring on-API.
+
+## 2026-05-27 — no determinism `--check` for `docs:all`; proving idempotency on a dirty tree needs a manual checksum loop
+
+- **Verb / surface:** the determinism gate `pnpm docs:all && git diff --exit-code docs-live/`.
+- **Expected:** a way to assert "the committed `docs-live/` equals canonical regen" that works while the changeset legitimately has uncommitted `docs-live/` edits.
+- **Got:** `git diff --exit-code` conflates "uncommitted changeset" with "non-deterministic regen" — it is always non-empty on a dirty tree, so it can't confirm idempotency mid-changeset. I had to hand-roll a `shasum` of `docs-live/` before/after a second `docs:all` to prove the generator is deterministic.
+- **Impact:** verifying a doc-gen changeset's determinism (the load-bearing property of a projection system) is a manual dance. A `docs:all --check` (regenerate to a temp dir, diff against the working tree, report drift without mutating it) would make idempotency a clean gate independent of git state.
+
+## 2026-05-26 — Migrate the architect-studio `architect-claude-plugin` hook system into this repo (bash hook is an MVP stopgap)
+
+- **Verb / surface:** Claude Code session integration. This repo ships only an MVP static bash `SessionStart` hook (`.claude/hooks/architect-api-first.sh`, wired in `.claude/settings.json`) that `cat`s an API-first contract.
+- **Expected:** the full hook system architect-studio already ships as a packaged plugin — `architect-studio/packages/architect-claude-plugin` (marketplace `libar-architect`). It provides **5 hooks**: `UserPromptSubmit`; `PreToolUse` (matcher `Read|Glob|Grep` + `if: isArchitectScoped(...)` — intercepts architect-scoped file-scanning to **enforce** API-first); `CwdChanged`; `PostCompact` (re-injects context after compaction); `PostToolUseFailure` — plus a session-router + per-session skills, slash commands (plan/design/implement/review/refactor/review-implementation/handoff), dogfooding feedback capture, tests + evals, compiled TS. Docs: `MIGRATION.md`, `docs/HOOKS-API-ADOPTION.md`.
+- **Got:** a single static `SessionStart` bash hook. It only **advises** (no `PreToolUse` enforcement), does **not survive compaction** (no `PostCompact` re-inject), and is single-shot (no per-prompt / cwd / failure reactions).
+- **Impact:** the bash hook is an acceptable **temporary** stopgap for session-open context, but the durable answer is adopting `architect-claude-plugin` here (or folding it into the `@libar-dev/architect-*` family). Priority stopgap gaps vs the plugin: (1) **PostCompact** — long sessions lose the API-first context after a compact; (2) **PreToolUse** API-over-grep enforcement is absent; (3) no feedback-capture hook. Migration path is pre-written in the plugin's `MIGRATION.md` / `HOOKS-API-ADOPTION.md`.
+
+## 2026-05-26 — architect-base §3 mislabels `architect/design-reviews/` as a hand-authored folder (caused real misfiling)
+
+- **Verb / surface:** the architect-base §3 "Architect State" folder table — row `architect/design-reviews/` → "Design review captures" / lifetime "Reference".
+- **Expected:** the table to describe the folder's actual role.
+- **Got:** the folder actually holds **auto-generated** design-review artifacts — per-pattern sequence + component mermaid diagrams scoped to specs incl. unimplemented (`mcp-server-integration.md`, `setup-command.md`, `status-maturity-extraction.md`, each headed "Auto-generated design review with sequence and component diagrams"). "Design review captures / Reference" reads as "hand-authored captures live here."
+- **Impact:** a prior session dropped a hand-authored prose review (`universal-docgen-direction.md`) into this generated tree and the handoff then called it "canonical"; two sessions treated a generated-output dir as a hand-authored home. The misplaced file risks clobbering on regen and corrupts canonical-read-order. Fix: §3 (and any architect-sessions reference) should describe `design-reviews/` as generated; hand-authored direction captures need a separate documented home.
+
+## 2026-05-26 — Over-escaping reaches the flagship `TAXONOMY.md`, not just the unwired `validation-rules`
+
+- **Verb / surface:** `pnpm docs:all` → generated `docs-live/TAXONOMY.md` (the `taxonomy` normalizer, one of the 11 special-cased `MARKDOWN_NORMALIZERS` kinds).
+- **Expected:** code spans in table cells render as code — `` `projection` `` styled, no visible backslashes.
+- **Got:** **31** backslash-escaped backticks (`\`projection\``) plus escaped parens (`\(per PDR-005 FSM\)`) in the shipped, git-tracked `TAXONOMY.md`. These render as literal backslashes, not code styling. Same defect *class* as the earlier `validation-rules` entry, but a **different normalizer** and a **flagship, wired** doc — so the blast radius is wider than "one unwired generator over-escapes."
+- **Impact:** a prime-candidate "generate this" target ships visibly wrong markdown today. Reinforces the design-review finding that byte-parity with the current output is the wrong oracle — the target shape must be *redesigned* (escape-only-where-needed), not reproduced. A renderer-level escaping audit (which fragment kinds escape table-cell code spans, and why) should precede any docgen build on these normalizers.
+
+## 2026-05-26 — No verb introspects the projection/generation pipeline (dead-code reachability gap)
+
+- **Verb / surface:** auditing the projection/generation pipeline for removable code — fell back to ad-hoc `grep` over `packages/*/src` (orphan-kind reference counts; reading `documentation-definition.internal.ts` for the generator→projection map; reading `render-markdown.ts` for `MARKDOWN_NORMALIZERS`).
+- **Expected:** a deterministic verb to introspect the pipeline — for each of the 44 `FragmentSchema` kinds: which `project*` produces it, which renderer normalizer / CLI verb / doc generator / MCP tool consumes it, and whether it is reachable from any entry point. The registry already encodes most of this wiring.
+- **Got:** nothing — the wiring is knowable only by reading dispatch tables + grepping. The grep heuristic also produced **false positives** (kinds with one file-reference looked orphan but were produced+consumed inside one `operational-insights` module), and a separate grep mis-counted normalizers (40 `normalize*` symbols vs 11 actual `MARKDOWN_NORMALIZERS` entries) — proving reference-count grep is the wrong tool and a registry-backed reachability verb is needed.
+- **Impact:** pipeline-simplification audits (the "remove unneeded code" work) are non-deterministic and error-prone. A `pipeline` / `arch reachability` verb (kind → producer → consumer → entry-point, flagging unreachable) would make "what is dead?" a gate, not a guess.
+
+## 2026-05-26 — No verb flags degenerate/empty generator output (doc-rot detection gap)
+
+- **Verb / surface:** detecting dead doc generators — read `docs-live/ROADMAP.md` / `CURRENT-WORK.md` by hand to find "covering 0 quarters" (empty because the `quarter`/`phase` dimensions were removed from `ExtractedPattern`).
+- **Expected:** `documentation` (a `--health` flag, or a `diagnostics` extension) to flag any generator whose projection yields an empty/degenerate fragment (0 groups / 0 rows / 0 quarters), so doc-rot from removed dimensions surfaces in a gate.
+- **Got:** empty docs ship silently; only manual inspection of `docs-live/` reveals them. (Cross-ref the earlier "8 of 13 generators" entry, which noted roadmap/current-work/traceability emit empty — this is the missing *detection* verb for it.)
+- **Impact:** generators orphaned by schema/dimension removal rot invisibly between full doc reviews. An emptiness check at `docs:all` time would catch them deterministically.
+
+## 2026-05-26 — `open-questions --parent <Epic>` excludes the epic's own questions
+
+- **Verb / surface:** `pnpm architect:query open-questions --parent DocumentationProjection`
+- **Expected:** the epic's own `**Open Questions:**` plus its members', to gauge candidate readiness of the whole sub-tree in one call.
+- **Got:** only the 4 member patterns' questions (those carrying `@architect-parent:DocumentationProjection`). The epic's own questions are reachable only via the unfiltered `open-questions` (then filter to the pattern). `--parent X` means "children of X", excluding X itself.
+- **Impact:** a reader gauging an epic's readiness via `--parent` silently misses epic-level (cross-cutting) open questions. A `--include-self` flag, or `--parent X` including X's own questions, would make epic readiness one call.
+
+## 2026-05-26 — Piping `--format json` to `jq` fails without `pnpm -s` (banner on stdout)
+
+- **Verb / surface:** every `--format json` verb invoked as `pnpm architect:query <verb> --format json | jq`.
+- **Expected:** clean JSON on stdout, pipeable to `jq` (the skill claimed "pipes cleanly into jq").
+- **Got:** `jq: parse error: Invalid numeric literal at line 2` — `pnpm` writes its `> architect@0.0.0 …` / `> tsx …` lifecycle banner to **stdout** ahead of the JSON. `2>/dev/null` does not help (it's stdout, not stderr); only `pnpm -s` suppresses it (verified: 600 vs 428 bytes).
+- **Impact:** **the single biggest driver of API aversion.** Mining 5 review-agent transcripts: 69/101 API calls used bare `pnpm`; 4/5 agents wrote stdout-strip workarounds (`2>&1 | python3 …find('{')`); the one agent that used `-s` wrote none. Burned once, an agent concludes "the API isn't clean JSON" and reverts to grep (~10–15× more context/task). Fixed the `architect-data-api` skill + CLI `--help` this session to mandate `-s`; the durable fix is `--format json` guaranteeing JSON-only stdout (or a clean entry that bypasses the pnpm-run banner).
+
+## 2026-05-26 — No whole-graph dump; rebuilding the graph costs an N-call loop
+
+- **Verb / surface:** `arch neighborhood <P>` / `dep-tree <P>` (per-pattern); no aggregate.
+- **Expected:** one verb returning all nodes + typed edges (with package/context/role/isTest) for graph-wide questions ("all forward edges", "diff a doc against the graph").
+- **Got:** a review agent called `arch neighborhood` **~160 times** (≈3 min) to reconstruct the edge set; another looped `pattern <Name>` ~114 times. `documentation architecture --format json` emits `patterns[]` + rendered mermaid `sections`, not a flat edge array.
+- **Impact:** aggregate/graph-shaped questions force loops-then-scripts. A `arch graph --format json` (nodes + edges + flags) collapses them and is the substrate the Studio Architecture Explorer needs.
+
+## 2026-05-26 — `package` is not a queryable dimension (forces `grep @architect-pattern`)
+
+- **Verb / surface:** `list` (no `--package`), `pattern <Name>` (no owning-package field), `arch *`.
+- **Expected:** a pattern's owning package available via the API (`list --package <ws>`, a `package` field, or `arch packages`).
+- **Got:** `package` is only a `rules --package` filter; to map pattern→package a review agent fell back to `grep -r @architect-pattern packages/*/src` — the exact anti-pattern the skill forbids.
+- **Impact:** package-grouped architecture questions (cross-package context detection, the 5-package seam) can't be answered through the API. Studio's grouping/Explorer needs it.
+
+## 2026-05-26 — No forward-link / value-transfer resolution verb; everyday verbs lack `--format json`
+
+- **Verb / surface:** desired `value-transfer <P>` (`ValueTransferState` is its spec'd home) or `files --forward-link` resolving `@architect-executable-specs`; plus text-only `rules` / `dep-tree` / `scope-validate` / `overview` / `status`.
+- **Expected:** one verb answering "is this design spec safe to delete?" (forward link resolves + reverse `@architect-implements` present + invariants transferred); and JSON output on the everyday verbs.
+- **Got:** triaging 28 specs took 24 spec-file Reads + a 28-item grep loop because no verb surfaces the forward link or the deletion gate; `scope-validate` only covers design/implement; the everyday verbs are text-only so they can't be piped.
+- **Impact:** spec-lifecycle work (and Studio's Spec Lifecycle Manager / graduation) can't be driven by the API yet; `--format json` on the everyday verbs would remove the remaining pipe-blockers.
+
 ## 2026-05-26 — doc-IA audit: generators orphaned from removed taxonomy dimensions + `index` static-registry coupling
 
 - **Verb / surface:** `pnpm exec architect-generate -g <name>` (the doc generators) + `package.json` `docs:all`.
 - **Expected:** `DEFAULT_GENERATORS` (13) and `docs:all` (was 8) to agree; each generator to emit a meaningful doc.
-- **Got:** five generators declared but unrun (`index`, `business-rules`, `current-work`, `validation-rules`, `traceability`). Of these: `business-rules` is excellent; `validation-rules` is valuable but **over-escapes markdown** (`\*\*…\*\*`, `` \`…\` `` render literal backslashes); `current-work` + `traceability` emit **empty** docs because they project over the `quarter`/`phase` pattern dimensions that were **removed from `ExtractedPattern`** (the already-wired `roadmap` generator is likewise empty — "0 quarters"). The `index` generator builds its link table from a **static** `SUPPORTED_DOCUMENTATION_TYPE_REGISTRY`, so it links *all 13* doc types regardless of which ran — wiring `index` forces wiring everything or shipping dead links.
+- **Got:** five generators declared but unrun (`index`, `business-rules`, `current-work`, `validation-rules`, `traceability`). Of these: `business-rules` is excellent; `validation-rules` is valuable but **over-escapes markdown** (`\*\*…\*\*`, `` \`…\` `` render literal backslashes); `current-work` + `traceability` emit **empty** docs because they project over the `quarter`/`phase` pattern dimensions that were **removed from `ExtractedPattern`** (the already-wired `roadmap` generator is likewise empty — "0 quarters"). The `index` generator builds its link table from a **static** `SUPPORTED_DOCUMENTATION_TYPE_REGISTRY`, so it links _all 13_ doc types regardless of which ran — wiring `index` forces wiring everything or shipping dead links.
 - **Impact:** closing the "8 of 13" gap is not a clean flip — it surfaced (a) a renderer escaping bug, (b) a family of generators orphaned from removed dimensions, and (c) an all-or-nothing coupling in the index. Full analysis + roadmap in `.pr-coordination/DOCS-IA-FINDINGS.md`.
 
 ## 2026-05-26 — idea-tier maturity rule: skills contradicted the shipped guard
 
 - **Verb / surface:** `packages/architect-guard/src/lint/idea-tier/` vs the rebuilt skills.
 - **Expected:** skills, `formal-spec/08`, and the guard to agree on idea-tier baseline tags.
-- **Got:** the guard **requires** an explicit `@architect-maturity:idea` (`idea-tier-checks.ts:85`) and its own error message (`:259`) lists the minimum as "gate, pattern, status, **maturity**, product-area" — but the rebuilt skills said maturity "must not be authored" and listed a 5-tag baseline *excluding* it. Three-way drift (code ✓ / formal-spec ✓ / skills ✗) on a load-bearing rule, surfacing right as idea-tier authoring begins.
+- **Got:** the guard **requires** an explicit `@architect-maturity:idea` (`idea-tier-checks.ts:85`) and its own error message (`:259`) lists the minimum as "gate, pattern, status, **maturity**, product-area" — but the rebuilt skills said maturity "must not be authored" and listed a 5-tag baseline _excluding_ it. Three-way drift (code ✓ / formal-spec ✓ / skills ✗) on a load-bearing rule, surfacing right as idea-tier authoring begins.
 - **Impact:** an author following the skill would omit the one tag the guard keys on, and the file would silently not be validated as idea-tier. Fixed the skills this session; a deterministic "does my idea spec satisfy the guard" check (or surfacing idea-tier lint in `scope-validate`) would have caught the drift earlier.
 
 ## 2026-05-26 — `taxonomy` digest is not a complete view of recognized tags

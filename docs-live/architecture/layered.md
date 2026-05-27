@@ -7,15 +7,17 @@
 
 ## Overview
 
-This view captures 1 pattern across 1 diagram in the Layered architecture view.
+This view captures 2 patterns across 1 diagram in the Layered architecture view.
 
 ## Diagrams
 
-### Layer: refinement (1 pattern)
+### Layer: refinement (2 patterns)
 
 ```mermaid
 graph TD
   adr009projectiontrustboundary["ADR009ProjectionTrustBoundary"]
+  adr010documentationcompositionhelpers["ADR010DocumentationCompositionHelpers"]
+  adr010documentationcompositionhelpers -. see-also .- adr009projectiontrustboundary
 ```
 
 ## Legend
@@ -28,6 +30,7 @@ graph TD
 ## Patterns
 
 - ADR009ProjectionTrustBoundary
+- ADR010DocumentationCompositionHelpers
 
 ---
 

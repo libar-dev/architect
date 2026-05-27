@@ -31,13 +31,17 @@
 import type { ExtractedPattern } from '@libar-dev/architect-core';
 
 import type { ProjectionContext } from '../../context/projection-context.js';
-import { projectSingle, type ProjectionBundle } from '../../fragments/base.js';
+import type { ProjectionBundle } from '../../fragments/base.js';
 import type {
   ApiReferenceDigest,
   ApiReferenceGroupingEntry,
   ApiShape,
 } from '../../fragments/documentation-composition/index.js';
 import { filterPatterns } from '../_shared/filter.js';
+import {
+  buildGroupedRoutedBundle,
+  type GroupDescriptor,
+} from '../_shared/grouped-routed-bundle.internal.js';
 
 import { createApiReferenceDocumentationRouting } from './api-reference-routes.js';
 
@@ -65,61 +69,39 @@ const NUMERIC_BASE_COLLATOR = new Intl.Collator(undefined, {
 export function buildApiReferenceBundle(
   context: ProjectionContext,
 ): ProjectionBundle<ApiReferenceDigest> {
-  const packaged = collectApiShapes(context);
-  const allShapes = [...packaged.map((entry) => entry.shape)].sort(compareApiShapes);
+  return buildGroupedRoutedBundle<PackagedShape, ApiReferenceDigest>({
+    items: collectApiShapes(context),
+    groupKey: (item) => slugify(item.packageId),
+    compareGroups: (left, right) =>
+      NUMERIC_BASE_COLLATOR.compare(packageLabel(left), packageLabel(right)),
+    buildRoot: (items, groups) => {
+      const groupingEntries: ApiReferenceGroupingEntry[] = groups.map((group) => ({
+        childKey: group.key,
+        label: packageLabel(group),
+        patternCount: new Set(group.items.map((entry) => entry.shape.pattern)).size,
+        shapeCount: group.items.length,
+      }));
+      return {
+        kind: 'ApiReferenceDigest',
+        scope: 'all',
+        shapes: [...items.map((entry) => entry.shape)].sort(compareApiShapes),
+        ...(groupingEntries.length > 0 ? { groupingEntries } : {}),
+      };
+    },
+    buildGroupChild: (group) =>
+      ({
+        kind: 'ApiReferenceDigest',
+        scope: 'package',
+        scopeValue: packageLabel(group),
+        shapes: [...group.items.map((entry) => entry.shape)].sort(compareApiShapes),
+      }) satisfies ApiReferenceDigest,
+    buildRouting: createApiReferenceDocumentationRouting,
+  });
+}
 
-  const grouped = new Map<string, { label: string; shapes: ApiShape[] }>();
-  for (const { packageId, shape } of packaged) {
-    const key = slugify(packageId);
-    const existing = grouped.get(key);
-    if (existing === undefined) {
-      grouped.set(key, { label: packageId, shapes: [shape] });
-    } else {
-      existing.shapes.push(shape);
-    }
-  }
-
-  const childEntries = [...grouped.entries()]
-    .sort((left, right) => NUMERIC_BASE_COLLATOR.compare(left[1].label, right[1].label))
-    .map(([key, value]) => ({
-      key,
-      label: value.label,
-      shapes: [...value.shapes].sort(compareApiShapes),
-    }));
-
-  const children: Record<string, ApiReferenceDigest> = {};
-  for (const child of childEntries) {
-    children[child.key] = {
-      kind: 'ApiReferenceDigest',
-      scope: 'package',
-      scopeValue: child.label,
-      shapes: child.shapes,
-    };
-  }
-
-  const groupingEntries: ApiReferenceGroupingEntry[] = childEntries.map((child) => ({
-    childKey: child.key,
-    label: child.label,
-    patternCount: new Set(child.shapes.map((shape) => shape.pattern)).size,
-    shapeCount: child.shapes.length,
-  }));
-
-  const root: ApiReferenceDigest = {
-    kind: 'ApiReferenceDigest',
-    scope: 'all',
-    shapes: allShapes,
-    ...(groupingEntries.length > 0 ? { groupingEntries } : {}),
-  };
-
-  if (childEntries.length === 0) {
-    return projectSingle(root);
-  }
-
-  return {
-    root,
-    children,
-    routing: createApiReferenceDocumentationRouting(childEntries.map((child) => child.key)),
-  };
+/** The package's display label is the first-seen raw package id in the group. */
+function packageLabel(group: GroupDescriptor<PackagedShape>): string {
+  return group.items[0]?.packageId ?? '';
 }
 
 function collectApiShapes(context: ProjectionContext): PackagedShape[] {

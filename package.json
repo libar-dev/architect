@@ -35,7 +35,7 @@
     "docs:roadmap": "pnpm exec architect-generate --base-dir . -g roadmap -f",
     "docs:taxonomy": "pnpm exec architect-generate --base-dir . -g taxonomy -f",
     "docs:api-reference": "pnpm exec architect-generate --base-dir . -g api-reference -f",
-    "docs:all": "pnpm exec architect-generate --base-dir . -g patterns -g architecture -g api-reference -g roadmap -g changelog -g requirements-executable -g requirements-specs -g decisions -g taxonomy -g business-rules -g current-work -g validation-rules -g traceability -g index -f",
+    "docs:all": "pnpm exec architect-generate --base-dir . --all -f",
     "changeset": "changeset",
     "changeset:version": "changeset version",
     "changeset:publish": "changeset publish",

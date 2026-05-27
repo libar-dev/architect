@@ -40,6 +40,7 @@ interface ParsedArgs {
   readonly help: boolean;
   readonly version: boolean;
   readonly listGenerators: boolean;
+  readonly all: boolean;
   readonly baseDir: string;
   readonly input: readonly string[];
   readonly generators: readonly string[];
@@ -215,6 +216,7 @@ function parseArgs(argv: readonly string[]): ParsedArgs {
   let help = false;
   let version = false;
   let listGenerators = false;
+  let all = false;
   let baseDir = invocationDir;
   const input: string[] = [];
   let outputDir: string | undefined;
@@ -241,6 +243,9 @@ function parseArgs(argv: readonly string[]): ParsedArgs {
         break;
       case '--list-generators':
         listGenerators = true;
+        break;
+      case '--all':
+        all = true;
         break;
       case '-b':
       case '--base-dir':
@@ -302,6 +307,7 @@ function parseArgs(argv: readonly string[]): ParsedArgs {
     help,
     version,
     listGenerators,
+    all,
     baseDir,
     input,
     generators,
@@ -317,12 +323,14 @@ function printHelp(): void {
     'architect-generate\n\n' +
       'Usage:\n' +
       '  architect-generate --list-generators [--base-dir <dir>]\n' +
+      '  architect-generate --all [-o <dir>] [-f] [--base-dir <dir>]\n' +
       '  architect-generate [-g <generator>]... [-o <dir>] [-f] [--base-dir <dir>]\n' +
       '  architect-generate --help\n' +
       '  architect-generate --version\n\n' +
       'Options:\n' +
       '  -b, --base-dir <dir>   Resolve architect.config from this directory (default: cwd)\n' +
       '  -i, --input <glob>     TypeScript source glob (repeatable)\n' +
+      '      --all              Run every registered generator (all document types + index)\n' +
       '  -g, --generators <id>  Run specific generator(s); repeatable and comma-separated\n' +
       '  -o, --output <dir>     Override the config output directory for this run\n' +
       '  -f, --overwrite        Overwrite existing files for this run\n' +
@@ -557,8 +565,11 @@ async function main(): Promise<void> {
     throw new Error('No source files specified');
   }
 
-  const requestedGeneratorNames =
-    args.generators.length > 0 ? args.generators : effectiveConfig.project.generators;
+  const requestedGeneratorNames = args.all
+    ? GENERATORS.map((generator) => generator.name)
+    : args.generators.length > 0
+      ? args.generators
+      : effectiveConfig.project.generators;
   const requestedGenerators = resolveRequestedGenerators(requestedGeneratorNames);
   const build = await buildGraph(effectiveConfig, args.baseDir);
   const projectionContext = createCliProjectionContext({

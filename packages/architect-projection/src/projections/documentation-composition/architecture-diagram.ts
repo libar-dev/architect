@@ -69,7 +69,7 @@ export function buildArchitectureBundle(
 ): ProjectionBundle<ArchitectureDiagram> {
   const root = buildArchitectureDiagram(context, { scope: 'component' });
 
-  const lenses: ReadonlyArray<{ readonly view: string; readonly scope: 'package' | 'layered' }> = [
+  const lenses: readonly { readonly view: string; readonly scope: 'package' | 'layered' }[] = [
     { view: 'package-seam', scope: 'package' },
     { view: 'layered', scope: 'layered' },
   ];

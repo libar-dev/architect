@@ -321,3 +321,104 @@ Feature: TypeScript Shape Extraction
       When extracting shape "Config"
       Then the shape should be extracted with kind "interface"
       And the shape should have exported true
+
+  # ============================================================================
+  # RULE 14: Tagged-Shape Discovery Recognises Only Standalone Tag Lines
+  # ============================================================================
+
+  Rule: Tagged-shape discovery recognises only standalone @architect-shape tag lines
+
+    **Invariant:** `discoverTaggedShapes` extracts a declaration only when its JSDoc carries the literal `@architect-shape` marker as a standalone block-tag line; neither a prose mention mid-sentence nor a line-start mention missing the `@` marker (e.g. a wrapped sentence beginning "architect-shape contracts …") triggers extraction. An optional trailing token on the tag line is captured as the shape's group, and a sibling `@architect-include` line resolves to a csv list.
+    **Rationale:** Tag detection drives the entire api-reference projection. A substring match over the raw JSDoc lets a declaration whose prose merely references the tag be silently extracted, polluting the API surface; anchoring to the tag line is the structural fix. Leniency at this trust boundary is the bug — making the `@` optional would re-open the false positive a line-start prose mention represents, so the marker is required.
+
+    @acceptance-criteria @unit
+    Scenario: Prose mention of the tag does not extract the declaration
+      Given TypeScript source code:
+        """
+        /**
+         * Implements the @architect-shape discovery contract for tagged
+         * declarations across the extractor.
+         */
+        export interface NotTaggedByProse {
+          value: number;
+        }
+        """
+      When tagged shapes are discovered
+      Then no tagged shapes should be discovered
+
+    @acceptance-criteria @unit
+    Scenario: Standalone tag line extracts the declaration without a group
+      Given TypeScript source code:
+        """
+        /**
+         * A tagged contract.
+         * @architect-shape
+         */
+        export interface TaggedContract {
+          value: number;
+        }
+        """
+      When tagged shapes are discovered
+      Then 1 tagged shape should be discovered
+      And the discovered shape should have no group
+
+    @acceptance-criteria @unit
+    Scenario: Trailing token on the tag line is captured as the group
+      Given TypeScript source code:
+        """
+        /**
+         * @architect-shape Contracts
+         */
+        export interface GroupedContract {
+          value: number;
+        }
+        """
+      When tagged shapes are discovered
+      Then 1 tagged shape should be discovered
+      And the discovered shape group should be "Contracts"
+
+    @acceptance-criteria @unit
+    Scenario: Sibling include line resolves to a csv list
+      Given TypeScript source code:
+        """
+        /**
+         * @architect-shape
+         * @architect-include Helper, Other
+         */
+        export interface WithIncludes {
+          value: number;
+        }
+        """
+      When tagged shapes are discovered
+      Then 1 tagged shape should be discovered
+      And the discovered shape should include "Helper"
+      And the discovered shape should include "Other"
+
+    @acceptance-criteria @unit
+    Scenario: Line-start prose missing the @ marker does not extract the declaration
+      Given TypeScript source code:
+        """
+        /**
+         * architect-shape contracts are documented in the API reference; this
+         * type is part of that surface conceptually.
+         */
+        export interface NotTaggedByMarkerlessLine {
+          value: number;
+        }
+        """
+      When tagged shapes are discovered
+      Then no tagged shapes should be discovered
+
+    @acceptance-criteria @unit
+    Scenario: A bare markerless tag line alone does not extract the declaration
+      Given TypeScript source code:
+        """
+        /**
+         * architect-shape
+         */
+        export interface NotTaggedByBareMarkerlessLine {
+          value: number;
+        }
+        """
+      When tagged shapes are discovered
+      Then no tagged shapes should be discovered

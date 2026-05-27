@@ -131,11 +131,16 @@ export const businessRulesDisclosureMatrix = disclosureMatrix({
   advanced: disclosureSpec('feature', 'full', false, false),
 });
 
+// `projectPatternCatalog` is a flat `projectSingle` catalog with no bundle
+// children, so `emitChildren` is honestly `false` at every level — the API
+// surface lens lives in the dedicated `api-reference` doc type, not a patterns
+// child tree (WS-7). A `true` here would advertise a fan-out the projection
+// never produces.
 export const patternsDisclosureMatrix = disclosureMatrix({
   essential: disclosureSpec('package', 'name-only', false, true),
   important: disclosureSpec('package', 'summary', false, true),
-  useful: disclosureSpec('per-entity', 'full', true, false),
-  advanced: disclosureSpec('per-entity', 'full', true, false),
+  useful: disclosureSpec('per-entity', 'full', false, false),
+  advanced: disclosureSpec('per-entity', 'full', false, false),
 });
 
 export const roadmapDisclosureMatrix = disclosureMatrix({
@@ -161,11 +166,14 @@ export const validationRulesDisclosureMatrix = disclosureMatrix({
   advanced: disclosureSpec('flat', 'full', false, true),
 });
 
+// `projectTaxonomyDigest` is a single flat fragment with no bundle children,
+// so `emitChildren` is `false` at every level — a `true` would claim a child
+// fan-out the projection never produces.
 export const taxonomyDisclosureMatrix = disclosureMatrix({
   essential: disclosureSpec('flat', 'summary', false, true),
-  important: disclosureSpec('flat', 'full', true, true),
-  useful: disclosureSpec('flat', 'full', true, true),
-  advanced: disclosureSpec('flat', 'full', true, true),
+  important: disclosureSpec('flat', 'full', false, true),
+  useful: disclosureSpec('flat', 'full', false, true),
+  advanced: disclosureSpec('flat', 'full', false, true),
 });
 
 export const changelogDisclosureMatrix = flatSummaryDisclosureMatrix;

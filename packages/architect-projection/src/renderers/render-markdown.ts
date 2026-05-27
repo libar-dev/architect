@@ -714,19 +714,7 @@ function normalizeApiReferenceIndex(
       ),
     );
 
-    const routes = new Map(options.childRoutes.map((route) => [route.key, route.path]));
-    const links = groupingEntries
-      .map((entry) => {
-        const path = routes.get(entry.childKey);
-        if (path === undefined) {
-          return null;
-        }
-        // The link TEXT (package label) is escaped inside toSafeRoutedMarkdownLink.
-        const link = toSafeRoutedMarkdownLink(entry.label, path);
-        return link === null ? entry.label : trustedMarkdown(link);
-      })
-      .filter((entry): entry is string | TrustedMarkdownText => entry !== null);
-
+    const links = buildChildRouteLinks(groupingEntries, options.childRoutes);
     if (links.length > 0) {
       blocks.push(heading(2, 'Packages — detail'), {
         type: 'list',
@@ -1303,8 +1291,9 @@ function normalizeValidationRuleDigest(fragment: ValidationRuleDigest): Markdown
     markdownTable(
       ['Rule ID', 'Severity', 'Description', 'Applies To Roles'],
       fragment.rules.map((rule) => [
-        // backticks are renderer-authored inline code; severity/description stay sourced → escaped.
-        trustedMarkdown(`\`${rule.id}\``),
+        // Rule id renders as inline code; `inlineCode` trusts the backtick fence only
+        // when the sourced id cannot break out of it. severity/description stay sourced → escaped.
+        inlineCode(rule.id),
         rule.severity,
         rule.description,
         rule.appliesToRoles?.join(', ') ?? '',
@@ -1689,18 +1678,7 @@ function buildBusinessRuleGroupingLinks(
     return null;
   }
 
-  const routes = new Map(childRoutes.map((route) => [route.key, route.path]));
-  const links = groupingEntries
-    .map((entry) => {
-      const path = routes.get(entry.childKey);
-      if (path === undefined) {
-        return null;
-      }
-
-      const link = toSafeRoutedMarkdownLink(entry.label, path);
-      return link === null ? entry.label : trustedMarkdown(link);
-    })
-    .filter((entry): entry is string | TrustedMarkdownText => entry !== null);
+  const links = buildChildRouteLinks(groupingEntries, childRoutes);
 
   if (links.length === 0) {
     return null;
@@ -1725,14 +1703,22 @@ function buildBusinessRuleGroupingLinks(
   };
 }
 
-function buildTaxonomyGroupTable(group: TaxonomyDigest['tags'][number]): TableBlock {
+function buildTaxonomyGroupTable(group: TaxonomyDigest['tags'][number]): TrustedTableBlock {
   const kind = group.entries[0]?.kind;
 
+  // The `Tag` column renders as an inline code span. The tag VALUE is sourced, so
+  // `inlineCode` only trusts the backtick fence when the value cannot break out of
+  // it (no embedded backtick) and otherwise degrades to escaped plain text. Every
+  // other column is sourced text and stays a plain string → escaped by
+  // `escapeTableCell`.
+  const tagCell = (entry: TaxonomyDigest['tags'][number]['entries'][number]): MarkdownText =>
+    inlineCode(entry.tag);
+
   if (kind === 'role') {
-    return table(
+    return markdownTable(
       ['Tag', 'Domain', 'Priority', 'Description', 'Aliases'],
       group.entries.map((entry) => [
-        `\`${entry.tag}\``,
+        tagCell(entry),
         entry.domain ?? '',
         entry.priority === undefined ? '' : String(entry.priority),
         entry.description ?? '',
@@ -1743,17 +1729,17 @@ function buildTaxonomyGroupTable(group: TaxonomyDigest['tags'][number]): TableBl
   }
 
   if (kind === 'aggregation') {
-    return table(
+    return markdownTable(
       ['Tag', 'Target Document', 'Purpose'],
-      group.entries.map((entry) => [`\`${entry.tag}\``, entry.targetDoc ?? '', entry.purpose]),
+      group.entries.map((entry) => [tagCell(entry), entry.targetDoc ?? '', entry.purpose]),
       ['left', 'left', 'left'],
     );
   }
 
-  return table(
+  return markdownTable(
     ['Tag', 'Format', 'Purpose', 'Required', 'Repeatable', 'Values', 'Default Value', 'Example'],
     group.entries.map((entry) => [
-      `\`${entry.tag}\``,
+      tagCell(entry),
       entry.format ?? '',
       entry.purpose,
       entry.required === undefined ? '' : entry.required ? 'Yes' : 'No',
@@ -2165,6 +2151,21 @@ function renderMarkdownLinkText(text: string): string {
   return escapePlainMarkdownText(text);
 }
 
+/**
+ * Renders a sourced value as an inline code span WITHOUT trusting it raw. The
+ * backtick fence makes any markup inside inert, but the one character that can
+ * close the span early — a backtick — would let the remainder of a hostile value
+ * inject live markdown. So the trusted code span is emitted only when the value
+ * contains no backtick; otherwise the value falls back to a plain string that the
+ * caller's escaping path renders literally (never as markup). `|`/newline stay the
+ * table layer's concern (`escapeTableCell`). This is the ONLY sanctioned way to
+ * code-span sourced text — never hand-wrap sourced values in `trustedMarkdown`
+ * backticks, which trusts them and re-opens the injection this guards against.
+ */
+function inlineCode(value: string): MarkdownText {
+  return value.includes('`') ? value : trustedMarkdown(`\`${value}\``);
+}
+
 function trustedMarkdown(text: string): TrustedMarkdownText {
   return { text, [TRUSTED_MARKDOWN]: true };
 }
@@ -2242,12 +2243,51 @@ function toSafeRoutedMarkdownLink(text: string, path: string): string | null {
   return toMarkdownLink(text, path);
 }
 
+/**
+ * Resolves grouping entries to routed child links — the navigation list shared
+ * by every routed-bundle index (api-reference packages, business-rule groups,
+ * …). Each entry's `childKey` is matched against `childRoutes`; the link TEXT
+ * (a sourced label) is escaped inside `toSafeRoutedMarkdownLink`, and entries
+ * whose route is missing (or whose path is unsafe) fall back to the plain
+ * escaped label. Entries with no resolvable route are dropped.
+ */
+function buildChildRouteLinks(
+  entries: readonly { readonly childKey: string; readonly label: string }[],
+  childRoutes: readonly ChildRouteRef[],
+): (string | TrustedMarkdownText)[] {
+  const routes = new Map(childRoutes.map((route) => [route.key, route.path]));
+  return entries
+    .map((entry) => {
+      const path = routes.get(entry.childKey);
+      if (path === undefined) {
+        return null;
+      }
+      const link = toSafeRoutedMarkdownLink(entry.label, path);
+      return link === null ? entry.label : trustedMarkdown(link);
+    })
+    .filter((entry): entry is string | TrustedMarkdownText => entry !== null);
+}
+
 function escapePlainMarkdownText(text: string): string {
   return escapeHtml(text).split('\n').map(escapePlainMarkdownLine).join('\n');
 }
 
 function escapePlainMarkdownLine(line: string): string {
-  const escapedInline = line.replace(/([\\`*_\[\]()!])/g, '\\$1');
+  // Escape only the inline constructs that could actually start markup, so the
+  // text renders literally without gratuitous backslashes. Deliberately NOT
+  // escaped: `(` `)` are never markup standalone (a link needs a preceding `]`,
+  // which IS escaped here, so the `](…)` form can never close); `!` only matters
+  // as `![` (the `[` is escaped); and intra-word `_` never emphasizes in
+  // CommonMark, so `snake_case` / `MARKDOWN_NORMALIZERS` stay literal. `*`, by
+  // contrast, emphasizes mid-word and is always escaped.
+  const escapedInline = line
+    .replace(/[\\`*\[\]]/g, '\\$&')
+    .replace(/_/g, (underscore: string, offset: number, source: string) => {
+      const left = source[offset - 1] ?? '';
+      const right = source[offset + 1] ?? '';
+      const intraWord = /[\p{L}\p{N}]/u.test(left) && /[\p{L}\p{N}]/u.test(right);
+      return intraWord ? underscore : `\\${underscore}`;
+    });
 
   if (/^\s*$/.test(escapedInline)) {
     return escapedInline;

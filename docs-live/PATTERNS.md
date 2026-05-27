@@ -4,7 +4,7 @@
 
 | Field | Value |
 | ----- | ----- |
-| Count | 247   |
+| Count | 248   |
 
 ## Filters
 
@@ -25,6 +25,7 @@
 - ADR007CoordinatedTaxonomyRedesign
 - ADR008StepDefinitionStubsConvention
 - ADR009ProjectionTrustBoundary
+- ADR010DocumentationCompositionHelpers
 - AnnotationCoverage
 - AnnotationCoverageProjection
 - AntiPatternDetector
@@ -277,6 +278,7 @@
 | architect/decisions/adr-007-coordinated-taxonomy-redesign.feature                                                    | design     | ADR007CoordinatedTaxonomyRedesign                     |            | gherkin    | active    |
 | architect/decisions/adr-008-step-definition-stubs-convention.feature                                                 | executable | ADR008StepDefinitionStubsConvention                   |            | gherkin    | completed |
 | architect/decisions/adr-009-projection-trust-boundary.feature                                                        | executable | ADR009ProjectionTrustBoundary                         |            | gherkin    | completed |
+| architect/decisions/adr-010-documentation-composition-helpers.feature                                                | executable | ADR010DocumentationCompositionHelpers                 |            | gherkin    | completed |
 | packages/architect-projection/src/fragments/operational-insights/annotation-coverage.ts                              | design     | AnnotationCoverage                                    | contract   | typescript | active    |
 | packages/architect-projection/src/projections/operational-insights/index.ts                                          | executable | AnnotationCoverageProjection                          | projection | typescript | completed |
 | packages/architect-guard/src/validation/anti-patterns.ts                                                             | executable | AntiPatternDetector                                   | service    | typescript | completed |

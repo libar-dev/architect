@@ -297,7 +297,7 @@ export const readCommands: Pick<Record<CommandName, CommandDef>, ReadCommandName
         ...(flags.status !== undefined ? { status: flags.status } : {}),
         ...(flags.role !== undefined ? { role: flags.role } : {}),
         ...(flags.parent !== undefined ? { parent: flags.parent } : {}),
-        ...(flags['package'] !== undefined ? { package: flags['package'] } : {}),
+        ...(flags.package !== undefined ? { package: flags.package } : {}),
         count: flags.count === true,
         namesOnly: flags.namesOnly === true,
       }).root;

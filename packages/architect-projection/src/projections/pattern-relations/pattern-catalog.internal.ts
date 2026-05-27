@@ -53,7 +53,7 @@ export function buildPatternCatalog(
         (options.phase === undefined || summary.phase === options.phase) &&
         (canonicalRole === undefined || summary.role.toLowerCase() === canonicalRole) &&
         (parentChildNames === undefined || parentChildNames.has(summary.patternName)) &&
-        (packageFilter === undefined || summary['package'] === packageFilter),
+        (packageFilter === undefined || summary.package === packageFilter),
     )
     .sort((left, right) => left.patternName.localeCompare(right.patternName));
 

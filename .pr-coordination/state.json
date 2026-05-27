@@ -1,24 +1,23 @@
 {
   "campaign": "re-enable-architect-core-functionality",
   "pr": "campaign/docs-and-skills-consolidation",
-  "updated": "2026-05-26",
-  "note": "Phase tracking + metrics only. Per-session narrative: SESSION-REPORTS-AND-LEARNINGS.md (active WS-3) + archive/. Decision rationale: DECISIONS.md digest + archive/DECISIONS-resolved.md.",
+  "updated": "2026-05-27",
+  "note": "Phase tracking + metrics only. WS-0/1/2 done. WS-3 (universal doc generation) is an IN-PROGRESS capability whose foundation stays live here (DOCS-IA-FINDINGS.md = IA base + target-state corpus + roadmap; HUD-IDEATION.md = disclosure model; EXECUTION-PLAN.md = plan + gates). ADR-010 + the api-reference shape tier are step 1. See CONSOLIDATION-2026-05-27.md for what is base-vs-archived and the pre-deletion checklist. Per-session narrative: SESSION-REPORTS-AND-LEARNINGS.md + archive/. Decision rationale: DECISIONS.md digest + archive/DECISIONS-resolved.md.",
   "workstreams": {
     "WS-0-finalize-hygiene": "DONE (6f2fc6c)",
     "WS-1-annotation-reenablement": "DONE (Sessions 01-11). Orphans 107->27 = terminal floor (~22 working-state specs + 5 untargetable fixture/integration features); projection/core-src/guard-src at 0.",
     "WS-2-skills": "DONE (D-21/D-22/D-23). Consolidated to architect-base/-data-api/-sessions/-refactor-session (+omo-plan-author); _shared/ dissolved; pnpm check:skills guard added.",
-    "WS-3-docs": "IN PROGRESS. ARCHITECTURE.md restructured (D-14/D-15/D-16/D-19) + overview architecture glimpse + HUD disclosure (D-17/D-18) + cross-package sweep (D-20). Remaining: generated-doc projection roadmap R1-R7."
+    "WS-3-docs": "IN PROGRESS — universal doc generation (replace the whole manual docs/ corpus with generators). Step 1 shipped: ADR-010 composable-helper composition + api-reference @architect-shape tier; ARCHITECTURE.md restructure (D-14/D-15/D-16/D-19) + overview glimpse + HUD disclosure steps 1-2 (D-17/D-18) + cross-package sweep (D-20); R2 (validation-rules escaping) fixed. Foundation live in DOCS-IA-FINDINGS.md (target-state corpus + roadmap R1, R3-R7) + HUD-IDEATION.md. Spec-graph entry points created (see ws3.entryPoints)."
   },
   "ws3": {
-    "lastCompletedSession": "16-chart-finalization-and-cross-package-sweep",
-    "lastCommit": "b24ed0c (D-19) / aad4f69 (D-20); bookkeeping eaa954c",
-    "decisions": "D-14..D-20 — detail in SESSION-REPORTS-AND-LEARNINGS.md + archive/DECISIONS-resolved.md",
-    "remaining": "DOCS-IA-FINDINGS.md section 6 — R1 (quarter/phase generators) through R7 (bulk doc retirement); R2 (validation-rules escaping) is the cheapest unblock",
-    "followUps": [
-      "cli->guard package edge DEFERRED (D-20): the cli files importing guard are bin wrappers owning no @architect-pattern; needs a new code-originated identity (D-3) — left out per anti-phantom (D-9).",
-      "Cross-package @architect-uses long-tail (D-20): only surface edges swept (light model); deeper coverage deferred as anti-spam (D-4). Expand only if a consumer needs it.",
-      "HUD steps 3 (token-budget signal — generalize bundle --estimate-tokens chars/4 + overflow/underflow auto-flag) and 4 (composite hud/brief verb) remain sequenced ideation; step-1 disclosure fast-follow to bundle/pattern/arch-blocking. See HUD-IDEATION.md.",
-      "ADR-content hygiene pass (D-16): several ADRs in architect/decisions/ carry execution/temporal context contrary to architect-base 3/7; amend via a new ADR — separate workstream, do not edit durable records inline."
+    "lastCompletedSession": "consolidation-2026-05-27 (entry-point carriers + handoff archive)",
+    "lastCommit": "b24ed0c (D-19) / aad4f69 (D-20); doc-gen changeset adds ADR-010 + api-reference shape tier",
+    "decisions": "D-14..D-20 + WS-8 (ADR-010) — detail in SESSION-REPORTS-AND-LEARNINGS.md + archive/DECISIONS-resolved.md",
+    "capability": "Universal doc generation: replace the entire manual docs/ corpus (14 files) with universal generators over the single read model. Hard-won foundation = DOCS-IA-FINDINGS.md (source-of-truth map, overlap matrix, generator quality ledger, target-state corpus, roadmap) + HUD-IDEATION.md (disclosure model). NOT done — at step 1.",
+    "entryPoints": "DocumentationProjection epic (manual-docs retirement + source-less-generator parity invariants = ex-R1/R3-R7), ApiReferenceShapeCoverage (@architect-shape pass), ArchitectBriefDeterministicBundle Q-TOKEN-BUDGET-SIGNAL (ex-HUD step 3; step 4 = that spec), DecisionRecordTemporalHygiene (ex-ADR-hygiene followUp). These are graph entry points, NOT a replacement for the IA base.",
+    "deferredEdges": [
+      "cli->guard package edge DEFERRED (D-20): cli files importing guard are bin wrappers owning no @architect-pattern; needs a new code-originated identity (D-3) — left out per anti-phantom (D-9).",
+      "Cross-package @architect-uses long-tail (D-20): only surface edges swept (light model); deeper coverage deferred as anti-spam (D-4). Expand only if a consumer needs it."
     ]
   },
   "ws2": {

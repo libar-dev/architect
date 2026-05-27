@@ -9,8 +9,8 @@
 
 | Metric     | Value |
 | ---------- | ----- |
-| Total ADRs | 9     |
-| Accepted   | 9     |
+| Total ADRs | 10    |
+| Accepted   | 10    |
 | Proposed   | 0     |
 | Deprecated | 0     |
 | Superseded | 0     |
@@ -27,4 +27,5 @@
 | [ADR-007](decisions/adr-007.md) | Coordinated Taxonomy Redesign     | accepted | ADR  |
 | [ADR-008](decisions/adr-008.md) | Step Definition Stubs Convention  | accepted | ADR  |
 | [ADR-009](decisions/adr-009.md) | Projection Trust Boundary         | accepted | ADR  |
+| [ADR-010](decisions/adr-010.md) | Documentation Composition Helpers | accepted | ADR  |
 | [PDR-005](decisions/pdr-005.md) | Process Guard FSM                 | accepted | PDR  |

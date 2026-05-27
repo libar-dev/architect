@@ -11,10 +11,14 @@ import { z } from 'zod';
 
 import type { ProjectionContext } from '../../context/projection-context.js';
 import { ProjectionError } from '../errors.js';
-import { type ProjectionBundle } from '../../fragments/base.js';
+import { projectSingle, type BundleRouting, type ProjectionBundle } from '../../fragments/base.js';
 import { type BusinessRule, type BusinessRuleSet } from '../../fragments/governance/index.js';
 import { BusinessRuleGroupingSchema } from '../../fragments/governance/supporting.js';
 import { filterPattern, filterPatterns } from '../_shared/filter.js';
+import {
+  buildGroupedRoutedBundle,
+  type GroupDescriptor,
+} from '../_shared/grouped-routed-bundle.internal.js';
 
 import {
   getPatternName,
@@ -32,11 +36,7 @@ type ScopedRuleSet =
   | Extract<BusinessRuleSet, { scope: 'phase' }>
   | Extract<BusinessRuleSet, { scope: 'feature' }>;
 
-interface GroupedBusinessRuleChild {
-  readonly key: string;
-  readonly sortKey: string;
-  readonly root: ScopedRuleSet;
-}
+type BusinessRuleGrouping = NonNullable<BusinessRuleSetOptions['groupedBy']>;
 
 interface BusinessRuleAnnotations {
   readonly invariant?: string;
@@ -121,34 +121,46 @@ export function buildBusinessRuleSet(
 ): ProjectionBundle<BusinessRuleSet> {
   const groupedBy = options.groupedBy;
   const rules = filterBusinessRules(collectBusinessRules(context, options), options);
-  const groupedChildren =
-    groupedBy === undefined ? [] : createBusinessRuleChildren(rules, groupedBy, options);
-  const root = createBusinessRuleSetRoot(
-    options,
-    rules,
-    groupedBy === undefined
-      ? undefined
-      : createBusinessRuleGroupingEntries(groupedChildren, groupedBy),
-  );
-  const children = Object.fromEntries(
-    groupedChildren.map(({ key, root: childRoot }) => [key, childRoot]),
-  );
 
+  // Ungrouped: a single flat rule set with no child routing.
+  if (groupedBy === undefined) {
+    return projectSingle(createBusinessRuleSetRoot(options, rules));
+  }
+
+  if (groupedBy === 'phase' && rules.some((rule) => rule.phase === undefined)) {
+    throw new ProjectionError(
+      'INVALID_SCOPE',
+      'Cannot group business rules by phase when one or more projected rules have no phase.',
+    );
+  }
+
+  return buildGroupedRoutedBundle<BusinessRule, BusinessRuleSet>({
+    items: rules,
+    groupKey: (rule) => businessRuleGroupKey(rule, groupedBy),
+    compareGroups: (left, right) =>
+      NUMERIC_BASE_COLLATOR.compare(
+        businessRuleGroupFacets(left, groupedBy).sortKey,
+        businessRuleGroupFacets(right, groupedBy).sortKey,
+      ),
+    buildRoot: (items, groups) =>
+      createBusinessRuleSetRoot(
+        options,
+        items,
+        businessRuleGroupingEntries(groups, groupedBy),
+      ),
+    buildGroupChild: (group) => createScopedBusinessRuleSet(group, groupedBy, options),
+    buildRouting: businessRuleRouting,
+  });
+}
+
+function businessRuleRouting(childKeys: readonly string[]): BundleRouting {
   return {
-    root,
-    children,
-    ...(Object.keys(children).length > 0
-      ? {
-          routing: {
-            rootRouteId: createIndexRouteId('business-rules'),
-            childRouteIds: Object.fromEntries(
-              groupedChildren.map(({ key }) => [key, createEntityRouteId('business-rules', key)]),
-            ),
-            childPathStrategy: 'nested' as const,
-            anchorStrategy: 'heading-slug' as const,
-          },
-        }
-      : {}),
+    rootRouteId: createIndexRouteId('business-rules'),
+    childRouteIds: Object.fromEntries(
+      childKeys.map((key) => [key, createEntityRouteId('business-rules', key)]),
+    ),
+    childPathStrategy: 'nested',
+    anchorStrategy: 'heading-slug',
   };
 }
 
@@ -287,133 +299,117 @@ function createBusinessRuleSetRoot(
   }
 }
 
-function createBusinessRuleChildren(
-  rules: readonly BusinessRule[],
-  groupedBy: NonNullable<BusinessRuleSetOptions['groupedBy']>,
-  options: BusinessRuleSetOptions,
-): GroupedBusinessRuleChild[] {
-  if (groupedBy === 'phase' && rules.some((rule) => rule.phase === undefined)) {
-    throw new ProjectionError(
-      'INVALID_SCOPE',
-      'Cannot group business rules by phase when one or more projected rules have no phase.',
-    );
+/** The stable child key (and route segment) for a rule under the grouping axis. */
+function businessRuleGroupKey(rule: BusinessRule, groupedBy: BusinessRuleGrouping): string {
+  switch (groupedBy) {
+    case 'package':
+      return slugify(rule.package);
+    case 'product-area':
+      return slugify(rule.productArea ?? DEFAULT_PRODUCT_AREA);
+    case 'phase':
+      return `phase-${String(rule.phase)}`;
+    case 'feature':
+      return slugify(rule.feature);
   }
-
-  const grouped = new Map<string, { root: ScopedRuleSet; sortKey: string }>();
-
-  for (const rule of rules) {
-    if (groupedBy === 'package') {
-      const key = slugify(rule.package);
-      const existing = grouped.get(key);
-      if (existing === undefined) {
-        grouped.set(key, {
-          sortKey: rule.package,
-          root: {
-            kind: 'BusinessRuleSet',
-            scope: 'package',
-            scopeValue: rule.package,
-            rules: [rule],
-            ...(options.scope === 'all' ? {} : { groupedBy }),
-          },
-        });
-      } else {
-        existing.root.rules.push(rule);
-      }
-      continue;
-    }
-
-    if (groupedBy === 'product-area') {
-      const area = rule.productArea ?? DEFAULT_PRODUCT_AREA;
-      const key = slugify(area);
-      const existing = grouped.get(key);
-      if (existing === undefined) {
-        grouped.set(key, {
-          sortKey: area,
-          root: {
-            kind: 'BusinessRuleSet',
-            scope: 'product-area',
-            scopeValue: area,
-            rules: [rule],
-            ...(options.scope === 'all' ? {} : { groupedBy }),
-          },
-        });
-      } else {
-        existing.root.rules.push(rule);
-      }
-      continue;
-    }
-
-    if (groupedBy === 'phase' && rule.phase !== undefined) {
-      const key = `phase-${String(rule.phase)}`;
-      const existing = grouped.get(key);
-      if (existing === undefined) {
-        grouped.set(key, {
-          sortKey: key,
-          root: {
-            kind: 'BusinessRuleSet',
-            scope: 'phase',
-            scopeValue: rule.phase,
-            rules: [rule],
-            ...(options.scope === 'all' ? {} : { groupedBy }),
-          },
-        });
-      } else {
-        existing.root.rules.push(rule);
-      }
-      continue;
-    }
-
-    if (groupedBy === 'feature') {
-      const key = slugify(rule.feature);
-      const existing = grouped.get(key);
-      if (existing === undefined) {
-        grouped.set(key, {
-          sortKey: rule.feature,
-          root: {
-            kind: 'BusinessRuleSet',
-            scope: 'feature',
-            scopeValue: rule.feature,
-            rules: [rule],
-            ...(options.scope === 'all' ? {} : { groupedBy }),
-          },
-        });
-      } else {
-        existing.root.rules.push(rule);
-      }
-    }
-  }
-
-  return [...grouped.entries()]
-    .sort((left, right) => NUMERIC_BASE_COLLATOR.compare(left[1].sortKey, right[1].sortKey))
-    .map(([key, value]) => ({
-      key,
-      sortKey: value.sortKey,
-      root: {
-        ...value.root,
-        rules: [...value.root.rules].sort(compareBusinessRules),
-        ...(options.scope === 'all' ? {} : { groupedBy }),
-      },
-    }));
 }
 
-function createBusinessRuleGroupingEntries(
-  children: readonly GroupedBusinessRuleChild[],
-  groupedBy: NonNullable<BusinessRuleSetOptions['groupedBy']>,
+/**
+ * The group's deterministic ordering key and human-facing label, both derived
+ * from its first-seen rule. They coincide for every axis except `phase`, where
+ * the sort key is the stable `phase-N` route segment but the label is the bare
+ * phase number.
+ */
+function businessRuleGroupFacets(
+  group: GroupDescriptor<BusinessRule>,
+  groupedBy: BusinessRuleGrouping,
+): { readonly sortKey: string; readonly label: string } {
+  const first = group.items[0];
+  switch (groupedBy) {
+    case 'package': {
+      const value = first?.package ?? '';
+      return { sortKey: value, label: value };
+    }
+    case 'product-area': {
+      const value = first?.productArea ?? DEFAULT_PRODUCT_AREA;
+      return { sortKey: value, label: value };
+    }
+    case 'phase':
+      return { sortKey: group.key, label: String(first?.phase ?? 0) };
+    case 'feature': {
+      const value = first?.feature ?? '';
+      return { sortKey: value, label: value };
+    }
+  }
+}
+
+function createScopedBusinessRuleSet(
+  group: GroupDescriptor<BusinessRule>,
+  groupedBy: BusinessRuleGrouping,
+  options: BusinessRuleSetOptions,
+): ScopedRuleSet {
+  const rules = [...group.items].sort(compareBusinessRules);
+  // Scoped child queries echo their grouping axis; the documentation `scope:'all'`
+  // root does not, matching the prior projection's child shape.
+  const groupedByField = options.scope === 'all' ? {} : { groupedBy };
+  const first = group.items[0];
+
+  switch (groupedBy) {
+    case 'package':
+      return {
+        kind: 'BusinessRuleSet',
+        scope: 'package',
+        scopeValue: first?.package ?? '',
+        rules,
+        ...groupedByField,
+      };
+    case 'product-area':
+      return {
+        kind: 'BusinessRuleSet',
+        scope: 'product-area',
+        scopeValue: first?.productArea ?? DEFAULT_PRODUCT_AREA,
+        rules,
+        ...groupedByField,
+      };
+    case 'phase':
+      return {
+        kind: 'BusinessRuleSet',
+        scope: 'phase',
+        scopeValue: first?.phase ?? 0,
+        rules,
+        ...groupedByField,
+      };
+    case 'feature':
+      return {
+        kind: 'BusinessRuleSet',
+        scope: 'feature',
+        scopeValue: first?.feature ?? '',
+        rules,
+        ...groupedByField,
+      };
+  }
+}
+
+function businessRuleGroupingEntries(
+  groups: readonly GroupDescriptor<BusinessRule>[],
+  groupedBy: BusinessRuleGrouping,
 ): NonNullable<BusinessRuleSet['groupingEntries']> | undefined {
-  if (children.length === 0) {
+  if (groups.length === 0) {
     return undefined;
   }
 
-  return children.map(({ key, root }) => ({
-    childKey: key,
-    label: getBusinessRuleSetScopeValue(root),
-    ...(groupedBy === 'feature'
-      ? { secondaryLabel: root.rules[0]?.productArea ?? DEFAULT_PRODUCT_AREA }
-      : {}),
-    featureCount: new Set(root.rules.map((rule) => rule.feature)).size,
-    ruleCount: root.rules.length,
-    invariantCount: root.rules.filter((rule) => hasText(rule.invariant)).length,
-  }));
+  return groups.map((group) => {
+    const sortedRules = [...group.items].sort(compareBusinessRules);
+    return {
+      childKey: group.key,
+      label: businessRuleGroupFacets(group, groupedBy).label,
+      ...(groupedBy === 'feature'
+        ? { secondaryLabel: sortedRules[0]?.productArea ?? DEFAULT_PRODUCT_AREA }
+        : {}),
+      featureCount: new Set(group.items.map((rule) => rule.feature)).size,
+      ruleCount: group.items.length,
+      invariantCount: group.items.filter((rule) => hasText(rule.invariant)).length,
+    };
+  });
 }
 
 function compareBusinessRules(left: BusinessRule, right: BusinessRule): number {
@@ -516,16 +512,6 @@ function requirePatternByName(context: ProjectionContext, feature: string): Extr
   }
 
   throw new ProjectionError('RULE_NOT_FOUND', `Feature not found: "${feature}".`);
-}
-
-function getBusinessRuleSetScopeValue(fragment: ScopedRuleSet): string {
-  switch (fragment.scope) {
-    case 'package':
-    case 'product-area':
-    case 'feature':
-    case 'phase':
-      return String(fragment.scopeValue);
-  }
 }
 
 function hasText(value: string | undefined): boolean {

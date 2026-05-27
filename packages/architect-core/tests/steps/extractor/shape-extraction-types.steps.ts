@@ -1,7 +1,11 @@
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';
 import type { ShapeExtractionTestState } from '../../support/helpers/shape-extraction-state.js';
-import { resetState, unwrapExtraction } from '../../support/helpers/shape-extraction-state.js';
+import {
+  resetState,
+  unwrapExtraction,
+  unwrapDiscovery,
+} from '../../support/helpers/shape-extraction-state.js';
 import type { ExtractedShape } from '../../../src/validation-schemas/extracted-shape.js';
 
 const feature = await loadFeature('tests/features/extractor/shape-extraction-types.feature');
@@ -10,6 +14,12 @@ let state: ShapeExtractionTestState;
 
 function firstShape(): ExtractedShape {
   const shape = state.extractionResult?.shapes[0];
+  expect(shape).toBeDefined();
+  return shape!;
+}
+
+function firstDiscoveredShape(): ExtractedShape {
+  const shape = state.discoveryResult?.shapes[0];
   expect(shape).toBeDefined();
   return shape!;
 }
@@ -353,4 +363,108 @@ describeFeature(feature, ({ Background, Rule }) => {
       });
     });
   });
+
+  Rule(
+    'Tagged-shape discovery recognises only standalone @architect-shape tag lines',
+    ({ RuleScenario }) => {
+      RuleScenario(
+        'Prose mention of the tag does not extract the declaration',
+        ({ Given, When, Then }) => {
+          Given('TypeScript source code:', (_ctx: unknown, docString: string) => {
+            state.sourceCode = docString;
+          });
+          When('tagged shapes are discovered', () => {
+            state.discoveryResult = unwrapDiscovery(state.sourceCode);
+          });
+          Then('no tagged shapes should be discovered', () => {
+            expect(state.discoveryResult!.shapes.length).toBe(0);
+          });
+        },
+      );
+
+      RuleScenario(
+        'Standalone tag line extracts the declaration without a group',
+        ({ Given, When, Then, And }) => {
+          Given('TypeScript source code:', (_ctx: unknown, docString: string) => {
+            state.sourceCode = docString;
+          });
+          When('tagged shapes are discovered', () => {
+            state.discoveryResult = unwrapDiscovery(state.sourceCode);
+          });
+          Then('1 tagged shape should be discovered', () => {
+            expect(state.discoveryResult!.shapes.length).toBe(1);
+          });
+          And('the discovered shape should have no group', () => {
+            expect(firstDiscoveredShape().group).toBeUndefined();
+          });
+        },
+      );
+
+      RuleScenario(
+        'Trailing token on the tag line is captured as the group',
+        ({ Given, When, Then, And }) => {
+          Given('TypeScript source code:', (_ctx: unknown, docString: string) => {
+            state.sourceCode = docString;
+          });
+          When('tagged shapes are discovered', () => {
+            state.discoveryResult = unwrapDiscovery(state.sourceCode);
+          });
+          Then('1 tagged shape should be discovered', () => {
+            expect(state.discoveryResult!.shapes.length).toBe(1);
+          });
+          And('the discovered shape group should be "Contracts"', () => {
+            expect(firstDiscoveredShape().group).toBe('Contracts');
+          });
+        },
+      );
+
+      RuleScenario('Sibling include line resolves to a csv list', ({ Given, When, Then, And }) => {
+        Given('TypeScript source code:', (_ctx: unknown, docString: string) => {
+          state.sourceCode = docString;
+        });
+        When('tagged shapes are discovered', () => {
+          state.discoveryResult = unwrapDiscovery(state.sourceCode);
+        });
+        Then('1 tagged shape should be discovered', () => {
+          expect(state.discoveryResult!.shapes.length).toBe(1);
+        });
+        And('the discovered shape should include "Helper"', () => {
+          expect(firstDiscoveredShape().includes).toContain('Helper');
+        });
+        And('the discovered shape should include "Other"', () => {
+          expect(firstDiscoveredShape().includes).toContain('Other');
+        });
+      });
+
+      RuleScenario(
+        'Line-start prose missing the @ marker does not extract the declaration',
+        ({ Given, When, Then }) => {
+          Given('TypeScript source code:', (_ctx: unknown, docString: string) => {
+            state.sourceCode = docString;
+          });
+          When('tagged shapes are discovered', () => {
+            state.discoveryResult = unwrapDiscovery(state.sourceCode);
+          });
+          Then('no tagged shapes should be discovered', () => {
+            expect(state.discoveryResult!.shapes.length).toBe(0);
+          });
+        },
+      );
+
+      RuleScenario(
+        'A bare markerless tag line alone does not extract the declaration',
+        ({ Given, When, Then }) => {
+          Given('TypeScript source code:', (_ctx: unknown, docString: string) => {
+            state.sourceCode = docString;
+          });
+          When('tagged shapes are discovered', () => {
+            state.discoveryResult = unwrapDiscovery(state.sourceCode);
+          });
+          Then('no tagged shapes should be discovered', () => {
+            expect(state.discoveryResult!.shapes.length).toBe(0);
+          });
+        },
+      );
+    },
+  );
 });

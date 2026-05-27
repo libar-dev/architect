@@ -81,7 +81,7 @@ Feature: generate-docs CLI
 
     **Invariant:** Given valid input patterns and a generator name, the CLI must scan sources, extract patterns, and produce markdown output files.
     **Rationale:** This is the core pipeline — the CLI is the primary entry point for transforming annotated source code into generated documentation.
-    **Verified by:** Generate patterns documentation, Generate docs manifest with projection root classification, Use default generator (patterns) when not specified, Generate docs with disclosure override, Generate docs with status filter override, Generate docs with repeated status filters
+    **Verified by:** Generate patterns documentation, Generate docs manifest with projection root classification, Use default generator (patterns) when not specified, Generate docs with disclosure override, Generate docs with status filter override, Generate docs with repeated status filters, --all runs every registered generator plus index
 
     @happy-path
     Scenario: Generate patterns documentation
@@ -133,6 +133,19 @@ Feature: generate-docs CLI
       Then exit code is 0
       And file "docs/PATTERNS.md" contains "CompletedGeneratorPattern"
       And file "docs/PATTERNS.md" also contains "ActiveGeneratorPattern"
+
+    @happy-path
+    Scenario: --all runs every registered generator plus index
+      Given an architect.config.js mapping sources to a package
+      And a TypeScript file "src/pattern.ts" with pattern annotations
+      When running "generate-docs --all -o docs -f"
+      Then exit code is 0
+      And the working directory contains files:
+        | path                  |
+        | docs/PATTERNS.md      |
+        | docs/API-REFERENCE.md |
+        | docs/ARCHITECTURE.md  |
+        | docs/INDEX.md         |
 
   # ============================================================================
   # RULE 5: Unknown Options

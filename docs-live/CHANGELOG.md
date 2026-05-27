@@ -163,15 +163,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Update monorepo source-annotations.md**: monorepo \_claude-md/
 - **Reframe tag-duplication anti-pattern**: src/validation/anti-patterns.ts
 - **RenderableDocument schema**: src/renderable/renderable-document.ts
-- **Section block types \(heading, table, paragraph, code, list\)**: src/renderable/renderable-document.ts
+- **Section block types (heading, table, paragraph, code, list)**: src/renderable/renderable-document.ts
 - **Markdown renderer**: src/renderable/markdown-renderer.ts
-- **PatternCodec \(pattern detail pages\)**: src/renderable/codecs/pattern.ts
-- **RoadmapCodec \(phase-grouped roadmap\)**: src/renderable/codecs/roadmap.ts
-- **ReferenceCodec \(composite reference docs\)**: src/renderable/codecs/reference.ts
-- **CompositeCodec \(codec composition\)**: src/renderable/codecs/composite.ts
-- **ADR codec \(decision records\)**: src/renderable/codecs/adr.ts
+- **PatternCodec (pattern detail pages)**: src/renderable/codecs/pattern.ts
+- **RoadmapCodec (phase-grouped roadmap)**: src/renderable/codecs/roadmap.ts
+- **ReferenceCodec (composite reference docs)**: src/renderable/codecs/reference.ts
+- **CompositeCodec (codec composition)**: src/renderable/codecs/composite.ts
+- **ADR codec (decision records)**: src/renderable/codecs/adr.ts
 - **Decision spec**: architect/decisions/adr-008
 - **Decision spec**: architect/decisions/adr-009-projection-trust-boundary.feature
+- **Decision spec**: architect/decisions/adr-010-documentation-composition-helpers.feature
 - **Executable test feature**: packages/architect-projection/tests/features/projections/pattern-relations/architecture-neighborhood.feature
 - **Executable test feature**: packages/architect-projection/tests/features/projections/governance/business-rules.feature
 - **Per-subcommand help contract**: packages/architect-cli/src/cli/pattern-graph-cli.ts
@@ -206,6 +207,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - ADR006SingleReadModelArchitecture
 - ADR008StepDefinitionStubsConvention
 - ADR009ProjectionTrustBoundary
+- ADR010DocumentationCompositionHelpers
 - AnnotationCoverageProjection
 - AntiPatternDetector
 - ArchitectureComparisonProjection

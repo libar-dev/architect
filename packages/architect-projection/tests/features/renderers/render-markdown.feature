@@ -57,6 +57,13 @@ Feature: renderMarkdown renders canonical markdown blocks
       Then the architecture markdown should escape the sourced section title
       And the architecture markdown should keep the renderer-authored count suffix live
 
+    @regression
+    Scenario: Taxonomy tag code spans render live but sourced tag text cannot inject
+      Given a TaxonomyDigest fixture with a safe tag and a backtick-bearing hostile tag
+      When I render the fragment as markdown
+      Then the taxonomy markdown should render the safe tag as a live code span
+      And the taxonomy markdown should not let the hostile tag inject a live link
+
   Rule: Routed markdown output can auto-split oversized files at H2 boundaries
 
     @split

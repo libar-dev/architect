@@ -75,6 +75,7 @@ Feature: Documentation Composition projection bodies
       And each supported disclosure matrix should define maturity and status filter defaults
       And each supported documentation default disclosure level should exist in its disclosure matrix
       And committed false disclosure levels should only appear on opt-in detail surfaces
+      And flat-catalog documentation types should declare emitChildren false at every level
       And the patterns documentation bundle should expose per-pattern detail additional files
       And the requirements executable documentation links should resolve to emitted files
       And the requirements specs documentation should omit roadmap requirements by default

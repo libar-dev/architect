@@ -408,3 +408,14 @@ Feature: ArchitectBriefDeterministicBundle
   # pattern's value-transfer rollup)? Out of scope for this candidate;
   # may motivate a separate `architect_dashboard_brief` candidate paired
   # with the `ValueTransferRollup` Q from the sibling spec.
+  #
+  # Q-TOKEN-BUDGET-SIGNAL: Should the brief (and the sibling read verbs
+  # bundle / pattern / arch) emit a deterministic token-budget signal --
+  # an estimated payload size plus an over/under-budget flag -- so a
+  # caller can tell whether the response fits its context window before
+  # reading, and self-route to a narrower verb when it does not? The
+  # estimate is heuristic (chars/4, already shipped behind `bundle
+  # --estimate-tokens`); generalising it as a structured field with an
+  # overflow/underflow flag is the open part. Keep it deterministic (no
+  # model call); defer until the brief payload shape settles so the
+  # estimate measures the real bundle.

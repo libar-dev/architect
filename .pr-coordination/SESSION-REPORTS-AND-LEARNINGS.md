@@ -235,3 +235,48 @@ All §6 gates green; `dangling --strict` exit 0.
    R1 quarter/phase-dependent generators (emit empty docs), R2 validation-rules markdown over-escaping, R3 retire
    `docs/ARCHITECTURE.md`, R4 config/MCP generators, R5 dynamic index registry, R6 requirements-specs filter, R7 bulk doc retirement.
 2. **Architecture diagrams are forward-only (D-19) + production-only (D-18).** Any doc that emits diagrams keeps both invariants.
+
+---
+
+### Consolidation — 2026-05-27 (entry-point carriers + handoff archive; NOT close-out)
+
+Consolidation pass, **not** a close-out. WS-3 (universal documentation generation — replace the whole
+manual `docs/` corpus with universal generators) is a **major in-progress capability at step 1**; its
+hard-won foundation stays live. Full disposition in [`CONSOLIDATION-2026-05-27.md`](CONSOLIDATION-2026-05-27.md).
+
+- **Verified** the doc-gen changeset (ADR-010 composable-helper composition + `api-reference` shape
+  tier) against the full gate suite: typecheck/build green, `docs:all` deterministic (idempotent regen,
+  clean determinism diff), `arch dangling --strict` exit 0, `validate:all` + `check:skills` pass, package
+  tests (1924+) and dogfood (1067) green. Perf soft-baseline jitters between unrelated sub-ms metrics on a
+  loaded machine (hard limits all pass with margin) — environmental noise, not a regression; not suppressed.
+- **Kept live (doc-gen foundation):** `DOCS-IA-FINDINGS.md` (IA base — source map, overlap matrix,
+  generator ledger, target-state corpus, roadmap R1/R3–R7), `HUD-IDEATION.md` (disclosure model),
+  `EXECUTION-PLAN.md` (WS-3 plan + gates). These ground the whole program and are not disposable.
+- **Enriched the `DocumentationProjection` epic with the capability essence** (per the maintainer's 2026-05-27
+  articulation): the guiding principle (similar docs = one generation family over partially-overlapping sources,
+  shaped per audience by progressive disclosure, never duplicated), the MVP discipline (build docs as needed, no
+  bulk catalog), the corpus scope (all technical docs + core skills body + maintained repo docs), and a
+  synthesizing Rule. Authored `TaxonomyDocumentationCluster` (idea-tier member) as the **MVP first proof-point**
+  (one source → skill/reference/formal-spec/live-API shapes).
+- **Created spec-graph entry points** (pointers into the base, NOT a transfer of it): two parity invariants
+  + an open question on the epic; new idea spec `ApiReferenceShapeCoverage` (the `@architect-shape` pass);
+  `Q-TOKEN-BUDGET-SIGNAL` on `ArchitectBriefDeterministicBundle` (HUD step 3; step 4 = that spec); new candidate
+  spec `DecisionRecordTemporalHygiene`. R2 (escaping) already fixed.
+- **Archived** → `archive/`: only the genuinely-shipped handoffs `HANDOFF-docs-api-sweep.md` (WS-5/6) and
+  `HANDOFF-WS7-shape-tier.md` (rendering shipped). Everything else stays live.
+- **Open decision for the maintainer:** where the doc-gen foundation lives long-term, since
+  `.pr-coordination/` is eventually deletable but the capability outlives the campaign — keep it here until
+  the capability is built, or relocate the IA base to design-tier specs under `documentation-projection/`.
+
+**Lesson: a hard-won knowledge base for an UNFINISHED capability is not "resolved" just because a thin
+forward-pointer exists in the graph — archiving it buries the substrate the program runs on. Transfer
+≠ pointer; keep the base live until the capability that consumes it is built.**
+
+### Rules for next session
+
+1. **WS-3 is the universal-doc-gen program, at step 1.** The base is `DOCS-IA-FINDINGS.md` (target-state
+   corpus + roadmap). The graph entry points (`DocumentationProjection`, `ApiReferenceShapeCoverage`,
+   `ArchitectBriefDeterministicBundle`, `DecisionRecordTemporalHygiene`) anchor it; the detailed requirements
+   stay in the IA doc.
+2. **Do not archive the doc-gen foundation until the capability is built or its base is relocated** to a
+   durable home (see the open decision above).

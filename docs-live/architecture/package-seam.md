@@ -7,7 +7,7 @@
 
 ## Overview
 
-This view captures 247 patterns across 8 diagrams in the Package architecture view.
+This view captures 248 patterns across 8 diagrams in the Package architecture view.
 
 ## Diagrams
 
@@ -22,7 +22,7 @@ graph LR
   pkg_architect_guard["Architect Guard (21)"]
   pkg_architect_host_dev["Architect Host (Dev) (26)"]
   pkg_architect_mcp["Architect MCP (9)"]
-  pkg_architect_package_content["Architect Package Content (11)"]
+  pkg_architect_package_content["Architect Package Content (12)"]
   pkg_architect_projection["Architect Projection (121)"]
   pkg_architect_cli --> pkg_architect_core
   pkg_architect_cli --> pkg_architect_projection
@@ -185,7 +185,7 @@ graph TD
   validationmodule -->|depends-on| dodvalidator
 ```
 
-### Package: Architect Host \(Dev\) (26 patterns)
+### Package: Architect Host (Dev) (26 patterns)
 
 ```mermaid
 graph TD
@@ -241,7 +241,7 @@ graph TD
   mcptoolregistry -->|depends-on| mcppipelinesession
 ```
 
-### Package: Architect Package Content (11 patterns)
+### Package: Architect Package Content (12 patterns)
 
 ```mermaid
 graph TD
@@ -253,6 +253,7 @@ graph TD
   adr007coordinatedtaxonomyredesign["ADR007CoordinatedTaxonomyRedesign"]
   adr008stepdefinitionstubsconvention["ADR008StepDefinitionStubsConvention"]
   adr009projectiontrustboundary["ADR009ProjectionTrustBoundary"]
+  adr010documentationcompositionhelpers["ADR010DocumentationCompositionHelpers"]
   pdr005processguardfsm["PDR005ProcessGuardFSM"]
   releasev100["ReleaseV100"]
   releasevnext["ReleaseVNEXT"]
@@ -265,6 +266,9 @@ graph TD
   adr008stepdefinitionstubsconvention -->|depends-on| adr003sourcefirstpatternarchitecture
   adr009projectiontrustboundary -. see-also .- adr005codecbasedmarkdownrendering
   adr009projectiontrustboundary -. see-also .- adr006singlereadmodelarchitecture
+  adr010documentationcompositionhelpers -. see-also .- adr005codecbasedmarkdownrendering
+  adr010documentationcompositionhelpers -. see-also .- adr006singlereadmodelarchitecture
+  adr010documentationcompositionhelpers -. see-also .- adr009projectiontrustboundary
   pdr005processguardfsm -->|depends-on| adr001taxonomycanonicalvalues
 ```
 
@@ -575,6 +579,7 @@ Bounded contexts whose patterns span more than one workspace package.
 - ADR007CoordinatedTaxonomyRedesign
 - ADR008StepDefinitionStubsConvention
 - ADR009ProjectionTrustBoundary
+- ADR010DocumentationCompositionHelpers
 - AnnotationCoverage
 - AnnotationCoverageProjection
 - AntiPatternDetector
