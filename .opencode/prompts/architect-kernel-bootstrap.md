@@ -1,7 +1,26 @@
-This is the Architect repository. Two skills carry the operational substance, and both must be loaded for every session.
+## Skills — mandatory
 
-**`architect-base`** — the vocabulary of the repo. PatternGraph + tag taxonomy, the four authored detail tiers plus executable + maintenance levels, FSM lifecycle, value-transfer / spec-deletion doctrine, key ADRs, validation layers. The conceptual model that makes every other surface in this repo legible.
+This is the Architect repository. Three skills carry the operational substance of this repo. Load all three.
 
-**`architect-data-api`** — the canonical query surface for the PatternGraph. `pnpm architect:query <verb>` (CLI) and `architect_*` MCP twins give deterministic, structured answers to "what is the state of X?", "what does X depend on?", "is this transition legal?". File scanning to learn about a pattern is a smell — this API is faster, structurally typed, and never stale.
+```text
+┌─────────────────────────────────────────────────────────────────────┐
+│                                                                     │
+│   ▶  architect-base        the vocabulary of the repo               │
+│                            PatternGraph · tiers · FSM · ADRs        │
+│                                                                     │
+│   ▶  architect-data-api    deterministic answers about pattern      │
+│                            state, deps, gates, transitions          │
+│                                                                     │
+│   ▶  architect-sessions    the spec-driven session lifecycle        │
+│                            plan · design · implement · review       │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+```
 
-When you load either skill, briefly say so in your reply. Load verification is a temporary convention while the OmO skill-loading bug is diagnosed. If either skill is missing from your skill set, treat that as a load failure and surface it before continuing.
+**`architect-base`** hands you the PatternGraph + tag taxonomy, the four authored detail tiers plus executable + maintenance levels, the FSM lifecycle, value-transfer / spec-deletion doctrine, key ADRs, and the validation layers. The conceptual model that makes every other surface in this repo legible.
+
+**`architect-data-api`** is the product itself and your context-gathering tool. The CLI (`pnpm architect:query <verb>`) gives you "what's the state of `X`?", "what does `X` depend on?", "is this transition legal?" — sub-second, deterministic, structured. Pattern exploration through the API is faster than file scanning and won't lie to you.
+
+**`architect-sessions`** is the spec-driven delivery lifecycle — capture → design → implement → review → handoff — as one skill, with the per-session execution detail behind progressive disclosure so the always-loaded body stays small. Load it for any work that touches a spec, a pattern, or an FSM transition (which is nearly everything here).
+
+Skill bodies are the canonical source. This file does not repeat what they say.

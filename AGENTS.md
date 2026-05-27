@@ -39,7 +39,7 @@ The package family powers **Libar Studio** (Desktop / Web / CI-CD) surfaces cove
 - **Git-committed annotated code is the immutable event store.**
 - **The PatternGraph, generated docs, CLI / MCP output, and Studio UI are all projections** off the same graph — never hand-authored.
 
-`architect/` (specs, stubs, step-stubs, decisions, releases, design-reviews, ideations) holds **working state**, not the source of truth. It is parsed by Gherkin for projection but excluded from TS compile, ESLint, and vitest. Lifetime + per-folder roles: `architect-base` §3.
+`architect/` (specs, stubs, step-stubs, decisions, releases, design-reviews) holds **working state**, not the source of truth. It is parsed by Gherkin for projection but excluded from TS compile, ESLint, and vitest. Lifetime + per-folder roles: `architect-base` §3.
 
 ### ADR grounding
 
@@ -110,10 +110,11 @@ The architect dogfood CLI (`architect:overview`, `architect:status`, `architect:
 
 **Harnesses we use for coding:**
 
+- **Codex** — skills at `.codex/skills/` (directory symlink to `.agents/skills/`); session hook at `.codex/hooks/architect-api-first.sh` injects the API-first contract and live overview.
 - **Claude Code** — skills at `.claude/skills/` (symlinks into `.agents/skills/`, the canonical source).
 - **OpenCode + oh-my-openagent (OmO)** — skills at `.opencode/skills/` (symlinks into `.agents/skills/`); coordination state at `.sisyphus/` (`plans/`, `notepads/`, `drafts/`, `evidence/`).
 
-All three skill trees symlink into `.agents/skills/`; run `pnpm check:skills` to verify the wiring resolves (no dangling links, Claude mirrors the canonical set).
+All three skill trees symlink into `.agents/skills/`; run `pnpm check:skills` to verify the wiring resolves (no dangling links, Codex points at the canonical set, Claude mirrors the full set, OpenCode mirrors the Architect domain set).
 
 ## Skills — mandatory
 

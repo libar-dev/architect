@@ -61,7 +61,7 @@ Before proceeding, load all 3 mandatory skills NOW from the canonical repo-root 
 - `.agents/skills/architect-base`
 - `.agents/skills/architect-data-api`
 - `.agents/skills/architect-sessions`
-`.claude/skills/` symlinks into `.agents/skills/`; use `.agents/skills/` as the canonical path set.
+`.codex/skills/` symlinks to `.agents/skills/`; `.claude/skills/` and `.opencode/skills/` mirror it. Use `.agents/skills/` as the canonical path set.
 EOF
 )"
 
@@ -75,7 +75,7 @@ import subprocess
 import sys
 
 repo_root = os.environ["REPO_ROOT"]
-command = ["pnpm", "-s", "architect:query", "overview"]
+command = ["pnpm", "exec", "architect", "--base-dir", ".", "overview"]
 fallback_header = "[Live overview unavailable]"
 
 try:
@@ -89,14 +89,14 @@ try:
 except subprocess.TimeoutExpired:
     sys.stdout.write(
         f"{fallback_header}\n"
-        "`pnpm -s architect:query overview` timed out after 15s. "
+        "`pnpm exec architect --base-dir . overview` timed out after 15s. "
         "Continue with the contract and mandatory skills above, then run it manually when the environment permits it."
     )
     raise SystemExit
 except Exception as exc:
     sys.stdout.write(
         f"{fallback_header}\n"
-        f"`pnpm -s architect:query overview` could not be executed: {exc}. "
+        f"`pnpm exec architect --base-dir . overview` could not be executed: {exc}. "
         "Continue with the contract and mandatory skills above, then run it manually when the environment permits it."
     )
     raise SystemExit
@@ -116,7 +116,7 @@ if len(detail) > 600:
 
 sys.stdout.write(
     f"{fallback_header}\n"
-    "`pnpm -s architect:query overview` failed or returned no output. "
+    "`pnpm exec architect --base-dir . overview` failed or returned no output. "
     f"Reason: {detail}"
 )
 PY

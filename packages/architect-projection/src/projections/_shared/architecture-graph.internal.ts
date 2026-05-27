@@ -160,7 +160,7 @@ function isTestFeaturePattern(pattern: ExtractedPattern): boolean {
 /**
  * A working-state pattern lives under `architect/` — the home of specs (ideas /
  * candidates / plan / design), decision records (`architect/decisions/`),
- * releases, ideations, stubs, and design reviews. None are production
+ * releases, stubs, and design reviews. None are production
  * components: they are plans and durable decisions, not source classified into
  * the architecture. A *component* view omits them all — decisions surface in the
  * generated `decisions` doc; specs/roadmap surface in roadmap/requirements docs.

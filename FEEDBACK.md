@@ -129,9 +129,37 @@ for anything that does not fit the verb's shape.
 - **Got:** the digest projects only the **validation registry** (`buildRegistry`, 30 tags). Tags the scanner recognizes but that aren't in the registry — notably `@architect-executable-specs` and `@architect-usecase` (parsed into pattern metadata in `scanner/ast-parser.ts` / `gherkin-ast-parser.ts`) — do **not** appear in the digest or `docs-live/TAXONOMY.md`. Conversely, registry tags like `unlock-reason` / `target` are grouped under "Other"/filtered.
 - **Impact:** authors verifying a tag against the digest can wrongly conclude a real, load-bearing tag (the design-spec forward link!) is unrecognized. Skills now teach the model and point to live data rather than enumerate, but a single authoritative "all recognized tags" surface (registry ∪ scanner-recognized) would close the gap.
 
+## 2026-05-27 — Codex hooks need the sandbox-safe Architect CLI entrypoint
+
+- **Verb / surface:** Codex SessionStart hook requesting a live Architect overview.
+- **Expected:** the Architect Data API runs as the first-read surface without extra permission changes.
+- **Got:** the `tsx` package-script path can fail in the Codex sandbox before Architect starts. The repo hook now uses `pnpm exec architect --base-dir . overview`, which works in the same environment.
+- **Impact:** Keep Codex hooks on the built-bin entrypoint. Interactive humans can still use `pnpm architect:query <verb>` normally.
+
+## 2026-05-27 — `documentation` help advertises rejected flags
+
+- **Verb / surface:** `pnpm architect:query documentation decisions --disclosure brief` and `pnpm architect:query documentation decisions --filter status=accepted`.
+- **Expected:** the flags advertised by `pnpm architect:query documentation --help` and the `architect-data-api` skill to be accepted.
+- **Got:** `--disclosure` exits with `Error: --disclosure`; `--filter` exits with `Error: --filter` when run without a pipeline masking the exit code. Plain `documentation decisions` works.
+- **Impact:** agents following the skill/help will hit a flag-shape mismatch on the documentation projection and must retry without filters.
+
 ## YYYY-MM-DD — <short title>
 
 - **Verb / surface:** `pnpm architect:query <verb> <args>` (or `architect_<tool>` MCP)
 - **Expected:** ...
 - **Got:** ...
 - **Impact:** ...
+
+## 2026-05-27 — `pattern` / `list` drop already-authored classification fields
+
+- **Verb / surface:** `pnpm -s architect:query pattern ArchitectBriefDeterministicBundle --format json` and `list --format json`
+- **Expected:** classification fields already authored in source and already meaningful for AI routing — especially `productArea`, `boundedContext`, and `level` — to appear in `PatternDetail` / `PatternSummary` when present on the source pattern.
+- **Got:** the source spec carries `@architect-product-area:DataAPI` and `@architect-bounded-context:api`, but the returned `PatternDetail` exposes neither field. The pattern output keeps `package`, `status`, `maturity`, `relationships`, and `hierarchy`, but drops these authored classification dimensions.
+- **Impact:** this reads like an annotation gap when it is actually a projection/surface gap. Agents fall back to spec-file reads or grep for classification questions the read model should answer directly. The fix is higher leverage than more annotation: surface the fields already present.
+
+## 2026-05-27 — `open-questions --parent <Epic>` still hides focal epic questions
+
+- **Verb / surface:** `pnpm -s architect:query open-questions --parent DocumentationProjection --format json`
+- **Expected:** the unresolved state of the work surface rooted at the epic — meaning the epic's own `**Open Questions:**` plus the child patterns' questions.
+- **Got:** only member-pattern questions are returned. The focal epic `DocumentationProjection` has load-bearing gating questions in `architect/specs/documentation-projection/00-documentation-projection.feature`, but they are absent from the `--parent` result.
+- **Impact:** an API-first design review can still miss the most important unresolved architecture decisions unless it reads the spec file directly. For epic refinement, `--parent` behaves like "children of X" rather than "open questions in the X subtree," which is the more useful AI-native interpretation.

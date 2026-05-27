@@ -35,7 +35,7 @@ The **canonical source of truth** is annotated production code + executable Gher
 | Aspect           | Value                                                                                                            |
 | ---------------- | ---------------------------------------------------------------------------------------------------------------- |
 | Config           | `architect.config.ts` at the repo root                                                                           |
-| Working state    | `architect/` (specs, decisions, releases, stubs, step-stubs, design-reviews, ideations)                          |
+| Working state    | `architect/` (specs, decisions, releases, stubs, step-stubs, design-reviews)                          |
 | Source of truth  | Annotated `packages/*/src/**/*.ts` + executable Gherkin under `tests/features/` and `packages/*/tests/features/` |
 | CLI              | `pnpm architect:query <verb>` (canonical script name across architect-managed repos)                             |
 | MCP              | `architect` server → `mcp__architect__*` callable tools                                                          |
@@ -59,7 +59,6 @@ When this package family is consumed by another project, the consumer wires thei
 | `architect/decisions/`        | ADRs / PDRs — compact, durable, decisions-only (no operational or temporal context) | **Permanent**                                                   |
 | `architect/releases/`         | Release notes, roadmap, phase plans                                                 | Permanent                                                       |
 | `architect/design-reviews/`   | **Auto-generated** architecture-slice review artifacts (sequence + component mermaid; scoped to specs incl. unimplemented) — generated output, **not** a home for hand-authored captures | Generated (derived) |
-| `architect/ideations/`        | Pre-idea-tier notes                                                                 | Until promoted                                                  |
 
 **Two Gherkin parsers, do not confuse them:**
 

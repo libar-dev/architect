@@ -4,16 +4,17 @@
  * check-skill-symlinks — drift guard for the skill wiring.
  *
  * Canonical skill content lives in `.agents/skills/`. Each harness dir
- * (`.claude/skills/`, `.opencode/skills/`) symlinks into it. Nothing keeps the
+ * (`.codex/skills/`, `.claude/skills/`, `.opencode/skills/`) symlinks into it. Nothing keeps the
  * three in sync automatically, so they drift — this asserts the invariants:
  *
- *   1. No dangling symlinks in any harness skills dir (every target resolves).
- *   2. Every harness entry is a symlink pointing at the matching
+ *   1. `.codex/skills/` is a directory symlink to `.agents/skills/`.
+ *   2. No dangling symlinks in any per-skill harness skills dir (every target resolves).
+ *   3. Every per-skill harness entry is a symlink pointing at the matching
  *      `.agents/skills/<name>` (no stray targets, no orphan names that no longer
  *      exist in the canonical set).
- *   3. `.claude/skills/` MIRRORS the full canonical set — a symlink for every
+ *   4. `.claude/skills/` MIRRORS the full canonical set — a symlink for every
  *      skill (Claude is the superset).
- *   4. `.opencode/skills/` MIRRORS the canonical `architect-*` domain skills —
+ *   5. `.opencode/skills/` MIRRORS the canonical `architect-*` domain skills —
  *      the namespace OmO actually consumes (matches the `architect-*` allow rule
  *      in `.opencode/opencode.jsonc`). Non-`architect-*` skills (e.g. Claude-side
  *      authoring tools) are Claude-only by convention and are not required here.
@@ -39,6 +40,7 @@ import { fileURLToPath } from 'node:url';
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const CANON = join(repoRoot, '.agents', 'skills');
+const CODEX_SKILLS = join(repoRoot, '.codex', 'skills');
 
 /**
  * Each harness declares the canonical skills it MUST carry, derived from the
@@ -72,6 +74,25 @@ const canon = new Set(
 if (canon.size === 0) {
   console.error(`✗ no canonical skills found under ${rel(CANON)} — wrong repo root?`);
   process.exit(1);
+}
+
+if (!existsSync(CODEX_SKILLS)) {
+  errors.push(`missing Codex skills symlink: ${rel(CODEX_SKILLS)} → ${rel(CANON)}`);
+} else {
+  let target;
+  try {
+    target = readlinkSync(CODEX_SKILLS);
+  } catch {
+    errors.push(`${rel(CODEX_SKILLS)} is not a symlink (Codex should point directly at .agents/skills/)`);
+  }
+
+  if (target !== undefined) {
+    if (!existsSync(CODEX_SKILLS)) {
+      errors.push(`${rel(CODEX_SKILLS)} → ${target} is DANGLING (target does not exist)`);
+    } else if (resolve(dirname(CODEX_SKILLS), target) !== CANON) {
+      errors.push(`${rel(CODEX_SKILLS)} → ${target} should point at ${rel(CANON)}`);
+    }
+  }
 }
 
 for (const { dir, label, required } of HARNESSES) {
@@ -149,6 +170,7 @@ if (errors.length > 0) {
 
 console.log(
   `✓ skills OK — ${canon.size} canonical skills; no dangling links; ` +
-    `.claude mirrors the full set; .opencode mirrors the architect-* domain skills; ` +
+    `.codex points at .agents/skills; .claude mirrors the full set; ` +
+    `.opencode mirrors the architect-* domain skills; ` +
     `all descriptions ≤${DESCRIPTION_MAX} chars and YAML-safe.`,
 );

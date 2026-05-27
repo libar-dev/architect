@@ -8,86 +8,100 @@
         ],
         "enable": [
             "architect-base",
-            "architect-data-api"
+            "architect-data-api",
+            "architect-sessions"
         ]
     },
     "agents": {
         "build": {
             "skills": [
                 "architect-base",
-                "architect-data-api"
+                "architect-data-api",
+                "architect-sessions"
             ]
         },
         "hephaestus": {
             "skills": [
                 "architect-base",
-                "architect-data-api"
+                "architect-data-api",
+                "architect-sessions"
             ]
         },
         "oracle": {
             "skills": [
                 "architect-base",
-                "architect-data-api"
+                "architect-data-api",
+                "architect-sessions"
             ]
         },
         "librarian": {
             "skills": [
                 "architect-base",
-                "architect-data-api"
+                "architect-data-api",
+                "architect-sessions"
             ]
         },
         "explore": {
             "skills": [
                 "architect-base",
-                "architect-data-api"
+                "architect-data-api",
+                "architect-sessions"
             ]
         },
         "multimodal-looker": {
             "skills": [
                 "architect-base",
-                "architect-data-api"
+                "architect-data-api",
+                "architect-sessions"
             ]
         },
         "atlas": {
             "skills": [
                 "architect-base",
-                "architect-data-api"
+                "architect-data-api",
+                "architect-sessions"
             ]
         },
         "prometheus": {
             "skills": [
                 "architect-base",
-                "architect-data-api"
+                "architect-data-api",
+                "architect-sessions"
             ]
         },
         "sisyphus": {
             "skills": [
                 "architect-base",
-                "architect-data-api"
+                "architect-data-api",
+                "architect-sessions"
             ]
         },
         "sisyphus-junior": {
             "skills": [
                 "architect-base",
-                "architect-data-api"
+                "architect-data-api",
+                "architect-sessions"
             ]
         },
         "metis": {
             "skills": [
                 "architect-base",
-                "architect-data-api"
+                "architect-data-api",
+                "architect-sessions"
             ]
         },
         "momus": {
             "skills": [
                 "architect-base",
-                "architect-data-api"
+                "architect-data-api",   
+                "architect-sessions"
             ]
         },
         "plan": {
             "skills": [
                 "architect-base",
-                "architect-data-api"
+                "architect-data-api",   
+                "architect-sessions"
             ]
         }
     },
