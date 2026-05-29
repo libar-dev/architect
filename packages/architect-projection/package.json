@@ -24,34 +24,42 @@
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
+      "source": "./src/index.ts",
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
     "./blocks": {
+      "source": "./src/blocks/schema.ts",
       "types": "./dist/blocks/schema.d.ts",
       "import": "./dist/blocks/schema.js"
     },
     "./context": {
+      "source": "./src/context/projection-context.ts",
       "types": "./dist/context/projection-context.d.ts",
       "import": "./dist/context/projection-context.js"
     },
     "./disclosure": {
+      "source": "./src/disclosure/index.ts",
       "types": "./dist/disclosure/index.d.ts",
       "import": "./dist/disclosure/index.js"
     },
     "./routing": {
+      "source": "./src/routing/index.ts",
       "types": "./dist/routing/index.d.ts",
       "import": "./dist/routing/index.js"
     },
     "./fragments": {
+      "source": "./src/fragments/index.ts",
       "types": "./dist/fragments/index.d.ts",
       "import": "./dist/fragments/index.js"
     },
     "./projections": {
+      "source": "./src/projections/index.ts",
       "types": "./dist/projections/index.d.ts",
       "import": "./dist/projections/index.js"
     },
     "./renderers": {
+      "source": "./src/renderers/index.ts",
       "types": "./dist/renderers/index.d.ts",
       "import": "./dist/renderers/index.js"
     },
