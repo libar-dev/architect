@@ -7,14 +7,14 @@
 
 ## Overview
 
-**8 roles** | **20 metadata tags** | **3 aggregation tags** | **31 total**
+**8 roles** | **21 metadata tags** | **3 aggregation tags** | **32 total**
 
 | Component        | Count |
 | ---------------- | ----- |
 | Roles            | 8     |
-| Metadata Tags    | 20    |
+| Metadata Tags    | 21    |
 | Aggregation Tags | 3     |
-| Total            | 31    |
+| Total            | 32    |
 
 ## Roles
 
@@ -40,12 +40,13 @@
 
 ### Relationship Tags
 
-| Tag          | Format | Purpose                                                             | Required | Repeatable | Values | Default Value | Example                                                            |
-| ------------ | ------ | ------------------------------------------------------------------- | -------- | ---------- | ------ | ------------- | ------------------------------------------------------------------ |
-| `extends`    | value  | Base pattern this pattern extends (generalization relationship)     | No       | No         |        |               | @architect-extends ProjectionCategories                            |
-| `implements` | csv    | Patterns this code file realizes (realization relationship)         | No       | No         |        |               | @architect-implements EventStoreDurability, IdempotentAppend       |
-| `see-also`   | csv    | Related patterns for cross-reference without dependency implication | No       | No         |        |               | @architect-see-also AgentAsBoundedContext, CrossContextIntegration |
-| `uses`       | csv    | Patterns this depends on                                            | No       | No         |        |               | @architect-uses CommandBus, EventStore                             |
+| Tag                 | Format | Purpose                                                                                                              | Required | Repeatable | Values | Default Value | Example                                                                                       |
+| ------------------- | ------ | -------------------------------------------------------------------------------------------------------------------- | -------- | ---------- | ------ | ------------- | --------------------------------------------------------------------------------------------- |
+| `enforces-decision` | csv    | Decision records (ADR/PDR/…) whose invariants this feature/pattern enforces — the structured ADR→enforcing-rule edge | No       | No         |        |               | @architect-enforces-decision ADR009ProjectionTrustBoundary, ADR006SingleReadModelArchitecture |
+| `extends`           | value  | Base pattern this pattern extends (generalization relationship)                                                      | No       | No         |        |               | @architect-extends ProjectionCategories                                                       |
+| `implements`        | csv    | Patterns this code file realizes (realization relationship)                                                          | No       | No         |        |               | @architect-implements EventStoreDurability, IdempotentAppend                                  |
+| `see-also`          | csv    | Related patterns for cross-reference without dependency implication                                                  | No       | No         |        |               | @architect-see-also AgentAsBoundedContext, CrossContextIntegration                            |
+| `uses`              | csv    | Patterns this depends on                                                                                             | No       | No         |        |               | @architect-uses CommandBus, EventStore                                                        |
 
 ### Architecture Tags
 

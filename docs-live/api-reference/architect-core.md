@@ -6,7 +6,7 @@
 
 ## Overview
 
-74 shapes across 8 patterns in architect-core.
+75 shapes across 9 patterns in architect-core.
 
 ## CodecUtils
 
@@ -1172,6 +1172,8 @@ RelationshipEntrySchema = z.strictObject({
   extendedBy: z.array(z.string()),
   seeAlso: z.array(z.string()),
   apiRef: z.array(z.string()),
+  enforcesDecisions: z.array(z.string()),
+  enforcedBy: z.array(z.string()),
 })
 ```
 
@@ -1336,6 +1338,20 @@ Result = {
     return { ok: false, error: fn(result.error) };
   },
 }
+```
+
+## RuleAggregation
+
+### ProvenancedRuleSchema
+
+A business rule tagged with the provenance of the pattern that owns it — used by reverse-trace aggregation so a rule sourced from an implementing feature carries the feature name and file it came from.
+
+```ts
+ProvenancedRuleSchema = z.strictObject({
+  rule: BusinessRuleSchema,
+  sourcePattern: z.string(),
+  sourceFile: z.string(),
+})
 ```
 
 ## TagRegistrySchemas

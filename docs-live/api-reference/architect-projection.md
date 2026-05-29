@@ -6,7 +6,7 @@
 
 ## Overview
 
-140 shapes across 51 patterns in architect-projection.
+143 shapes across 51 patterns in architect-projection.
 
 ## AnnotationCoverage
 
@@ -138,7 +138,7 @@ FanInEntrySchema = z.strictObject({
 
 ### ArchitectureNeighborhoodSchema
 
-The relationship neighborhood around a focal pattern — its context, role, and layer, every typed relation edge (uses, usedBy, dependsOn, enables, implements), its same-context peers, and the artifacts that implement it.
+The relationship neighborhood around a focal pattern — its context, role, and layer, every typed relation edge (uses, usedBy, dependsOn, enables, implements), its see-also cross-links, the rules that enforce it (\`enforcedBy\`, the inverse of \`@architect-enforces-decision\`), its same-context peers, and the artifacts that implement it.
 
 ```ts
 ArchitectureNeighborhoodSchema = z.strictObject({
@@ -151,6 +151,8 @@ ArchitectureNeighborhoodSchema = z.strictObject({
   usedBy: z.array(z.string()),
   dependsOn: z.array(z.string()),
   enables: z.array(z.string()),
+  seeAlso: z.array(z.string()),
+  enforcedBy: z.array(z.string()),
   sameContext: z.array(z.string()),
   implements: z.array(z.string()),
   implementedBy: z.array(ImplementationRefSchema),
@@ -568,7 +570,7 @@ BusinessRuleReferenceSchema = z.strictObject({
 
 ### BusinessRuleSetSchema
 
-A scoped collection of business rules — discriminated on \`scope\` (all, product-area, phase, feature, or package) with optional grouping metadata describing how the rules are bucketed.
+A scoped collection of business rules — discriminated on \`scope\` (all, product-area, phase, feature, package, or decision) with optional grouping metadata describing how the rules are bucketed.
 
 ```ts
 BusinessRuleSetSchema = z.discriminatedUnion('scope', [
@@ -606,6 +608,14 @@ BusinessRuleSetSchema = z.discriminatedUnion('scope', [
   z.strictObject({
     kind: z.literal('BusinessRuleSet'),
     scope: z.literal('package'),
+    scopeValue: z.string(),
+    rules: z.array(BusinessRuleSchema),
+    groupedBy: BusinessRuleGroupingSchema.optional(),
+    groupingEntries: z.array(BusinessRuleGroupingEntrySchema).optional(),
+  }),
+  z.strictObject({
+    kind: z.literal('BusinessRuleSet'),
+    scope: z.literal('decision'),
     scopeValue: z.string(),
     rules: z.array(BusinessRuleSchema),
     groupedBy: BusinessRuleGroupingSchema.optional(),
@@ -769,6 +779,30 @@ TraceRowSchema = z.strictObject({
 })
 ```
 
+## DependencyContext
+
+### DependencyContextSchema
+
+Focal-rooted, bidirectional transitive dependency context for one pattern. \`upstream\` is the cycle-safe closure over the focal's prerequisites (what it needs); \`downstream\` is the closure over its dependents (what needs it, the blast radius). The focal pattern is the root of both forests, named by \`focal\`, and never appears as a node. \`summary\` precomputes the direct and transitive counts in each direction so a consumer can size impact without re-walking. \`options.maxDepth\` records the depth cap that produced the view.
+
+```ts
+DependencyContextSchema = z.strictObject({
+  kind: z.literal('DependencyContext'),
+  focal: z.string(),
+  upstream: z.array(DependencyContextNodeSchema),
+  downstream: z.array(DependencyContextNodeSchema),
+  summary: z.strictObject({
+    upstreamDirect: z.number().int().nonnegative(),
+    upstreamTransitive: z.number().int().nonnegative(),
+    downstreamDirect: z.number().int().nonnegative(),
+    downstreamTransitive: z.number().int().nonnegative(),
+  }),
+  options: z.strictObject({
+    maxDepth: z.number().int().nonnegative(),
+  }),
+})
+```
+
 ## DependencyEdge
 
 ### DependencyEdgeSchema
@@ -795,24 +829,6 @@ DependencyEdgeSetSchema = z.strictObject({
   kind: z.literal('DependencyEdgeSet'),
   from: z.string(),
   items: z.array(DependencyEdgeSchema),
-})
-```
-
-## DependencyTree
-
-### DependencyTreeSchema
-
-A rooted dependency tree for a pattern — the root name, the recursively nested nodes, and the traversal options (max depth, whether implementation dependencies are included) that produced it.
-
-```ts
-DependencyTreeSchema = z.strictObject({
-  kind: z.literal('DependencyTree'),
-  root: z.string(),
-  nodes: z.array(DependencyTreeNodeSchema),
-  options: z.strictObject({
-    maxDepth: z.number().int().nonnegative(),
-    includeImplementationDeps: z.boolean(),
-  }),
 })
 ```
 
@@ -1264,6 +1280,18 @@ GeneratedViewEntrySchema = z.strictObject({
 })
 ```
 
+### OrientationReferenceSchema
+
+One orientation reference in the overview's "start here" tier — a generated doc the agent should read first (decisions, taxonomy, validation rules, business rules, API reference), the \`documentation &lt;type&gt;\` verb that emits it, and its display title. Derived from the documentation-type registry so the list never drifts from the supported set.
+
+```ts
+OrientationReferenceSchema = z.strictObject({
+  docType: z.string(),
+  verb: z.string(),
+  title: z.string(),
+})
+```
+
 ### OverviewArchitectureSchema
 
 The high-level architecture glimpse rendered in \`overview\`. \`packageChart\` is a coarse package-level context map shown at every non-\`name-only\` disclosure; \`contextMap\` is the richer bounded-context map (identical grouping to \`docs-live/ARCHITECTURE.md\`) shown only at \`full\`. Both are pre-rendered Mermaid (built at projection time, per ADR-005 codec/renderer separation — the renderer cannot reach the grouping machinery behind the renderer boundary). \`pointer\` is a one-line "explore via the API, not grep" hint.
@@ -1275,6 +1303,19 @@ OverviewArchitectureSchema = z.strictObject({
   contextMap: MermaidBlockSchema.optional(),
   contextNodeCount: z.number().int().nonnegative().optional(),
   pointer: z.string(),
+})
+```
+
+### OverviewOrientationSchema
+
+The overview's "start here" orientation block — the high-signal generated docs to read first, a one-line note on the \`--disclosure\` drill-down mechanic, and the count + sample of roadmap patterns whose dependencies are all satisfied (the "safe to start" actionable set, the complement of BLOCKING). Rendered at \`summary-with-references\` and \`full\` richness so a cold-start agent is steered toward orientation + workable items rather than only the BLOCKING wall.
+
+```ts
+OverviewOrientationSchema = z.strictObject({
+  references: z.array(OrientationReferenceSchema),
+  disclosureHint: z.string(),
+  startableCount: z.number().int().nonnegative(),
+  startableSample: z.array(z.string()),
 })
 ```
 
@@ -1304,6 +1345,17 @@ RequirementEntrySchema = z.strictObject({
   status: z.string().optional(),
   description: z.array(BlockSchema),
   testFiles: z.array(z.string()),
+})
+```
+
+### RoleCountSchema
+
+One role-distribution entry — a canonical \`@architect-role\` value and how many patterns carry it. Sourced from the precomputed graph, not re-derived.
+
+```ts
+RoleCountSchema = z.strictObject({
+  role: z.string(),
+  count: z.number().int().nonnegative(),
 })
 ```
 
@@ -1347,7 +1399,7 @@ OrphanPatternListSchema = z.strictObject({
 
 ### OverviewDigestSchema
 
-Fragment shape for the delivery overview — progress totals, active-phase counts, blocking patterns, an optional high-level architecture glimpse, an optional generated-views index, and optional CLI hints.
+Fragment shape for the delivery overview — progress totals, active-phase counts, blocking patterns, an optional "start here" orientation block (orientation doc references + the safe-to-start roadmap set), an optional role distribution, an optional high-level architecture glimpse, an optional generated-views index, and optional CLI hints.
 
 ```ts
 OverviewDigestSchema = z.strictObject({
@@ -1355,6 +1407,8 @@ OverviewDigestSchema = z.strictObject({
   progress: OverviewProgressSchema,
   activePhases: z.array(ActivePhaseEntrySchema),
   blocking: z.array(BlockingEntrySchema),
+  orientation: OverviewOrientationSchema.optional(),
+  roleDistribution: z.array(RoleCountSchema).optional(),
   architecture: OverviewArchitectureSchema.optional(),
   generatedViews: z.array(GeneratedViewEntrySchema).optional(),
   cliHints: z.array(z.string()).optional(),
@@ -1402,6 +1456,14 @@ The expanded per-pattern bundle — the pattern identity plus description, open 
 ```ts
 PatternDetailSchema = PatternIdentitySchema.extend({
   kind: z.literal('PatternDetail'),
+  // Classification axes beyond role (which PatternIdentity already carries):
+  // bounded-context, product-area, and the hierarchy level. The source
+  // ExtractedPattern carries all three; surfacing them here lets `pattern <Name>`
+  // answer the full role · bounded-context · layer · product-area classification
+  // in one call instead of forcing a stitch across `arch neighborhood` / `taxonomy`.
+  boundedContext: z.string().optional(),
+  productArea: z.string().optional(),
+  level: z.string().optional(),
   description: z.string().optional(),
   openQuestions: z.array(z.string()).optional(),
   deliverables: z.array(EmbeddedDeliverableSchema),
@@ -1414,6 +1476,44 @@ PatternDetailSchema = PatternIdentitySchema.extend({
 ```
 
 ## PatternRelationsSupporting
+
+### DependencyContextNode
+
+One node in a recursive dependency-context forest. Defined as an interface so the Zod schema can reference it for its self-referential \`children\` type. The focal pattern is the root of both forests (named by the fragment's \`focal\` field) and is never represented as a node, so there is no per-node focal flag.
+
+```ts
+interface DependencyContextNode {
+  /** The pattern name this node represents. */
+  name: string;
+  /** The pattern's lifecycle status, when known. */
+  status?: string | undefined;
+  /** The pattern's phase number, when assigned. */
+  phase?: number | undefined;
+  /** Whether traversal stopped here because the depth limit was reached and
+   * unexpanded edges remain in this direction. */
+  truncated: boolean;
+  /** This node's direct children in the same direction. */
+  children: DependencyContextNode[];
+}
+```
+
+#### Properties
+
+| Property  | Description                                                                                                       |
+| --------- | ----------------------------------------------------------------------------------------------------------------- |
+| name      | The pattern name this node represents.                                                                            |
+| status    | The pattern's lifecycle status, when known.                                                                       |
+| phase     | The pattern's phase number, when assigned.                                                                        |
+| truncated | Whether traversal stopped here because the depth limit was reached and unexpanded edges remain in this direction. |
+| children  | This node's direct children in the same direction.                                                                |
+
+### DependencyContextNodeSchema
+
+The recursive Zod schema for a dependency-context node, validating the shape described by DependencyContextNode with lazily-evaluated children.
+
+```ts
+const DependencyContextNodeSchema: z.ZodType<DependencyContextNode>;
+```
 
 ### DependencyRelationKindSchema
 
@@ -1429,46 +1529,6 @@ DependencyRelationKindSchema = z.enum([
   'see-also',
   'api-ref',
 ])
-```
-
-### DependencyTreeNode
-
-One node in a recursive dependency tree. Defined as an interface so the Zod schema can reference it for its self-referential \`children\` type.
-
-```ts
-interface DependencyTreeNode {
-  /** The pattern name this node represents. */
-  name: string;
-  /** The pattern's lifecycle status, when known. */
-  status?: string | undefined;
-  /** The pattern's phase number, when assigned. */
-  phase?: number | undefined;
-  /** Whether this node is the focal pattern the tree was rooted at. */
-  isFocal: boolean;
-  /** Whether traversal stopped here because the depth limit was reached. */
-  truncated: boolean;
-  /** This node's direct dependency children. */
-  children: DependencyTreeNode[];
-}
-```
-
-#### Properties
-
-| Property  | Description                                                         |
-| --------- | ------------------------------------------------------------------- |
-| name      | The pattern name this node represents.                              |
-| status    | The pattern's lifecycle status, when known.                         |
-| phase     | The pattern's phase number, when assigned.                          |
-| isFocal   | Whether this node is the focal pattern the tree was rooted at.      |
-| truncated | Whether traversal stopped here because the depth limit was reached. |
-| children  | This node's direct dependency children.                             |
-
-### DependencyTreeNodeSchema
-
-The recursive Zod schema for a dependency-tree node, validating the shape described by DependencyTreeNode with lazily-evaluated children.
-
-```ts
-const DependencyTreeNodeSchema: z.ZodType<DependencyTreeNode>;
 ```
 
 ### EmbeddedDeliverableManifestSchema

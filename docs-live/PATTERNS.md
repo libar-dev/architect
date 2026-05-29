@@ -4,7 +4,7 @@
 
 | Field | Value |
 | ----- | ----- |
-| Count | 247   |
+| Count | 253   |
 
 ## Filters
 
@@ -71,6 +71,7 @@
 - DecisionCatalogProjection
 - DecisionCatalogProjectionExecutableTests
 - DecisionRecord
+- DecisionResolution
 - DefineConfig
 - DefineConfigExecutableTests
 - Deliverable
@@ -81,13 +82,13 @@
 - DeliveryReportingProjectionSupport
 - DeliveryReportingProjectionSupportExecutableTests
 - DeliveryReportingSupporting
+- DependencyContext
+- DependencyContextProjection
+- DependencyContextProjectionExecutableTests
 - DependencyEdge
 - DependencyEdgeProjection
 - DependencyEdgeProjectionExecutableTests
 - DependencyEdgeSet
-- DependencyTree
-- DependencyTreeProjection
-- DependencyTreeProjectionExecutableTests
 - DeriveProcessState
 - DetectChanges
 - DocExtractor
@@ -101,8 +102,8 @@
 - DoDValidator
 - DualSourceExtractor
 - DualSourceMergeIntegration
-- ErrorFactories
 - ErrorFactoryTypes
+- ErrorFactoryTypesExecutableTests
 - ExecutionContextProjectionExecutableTests
 - ExecutionContextProjectionSupport
 - ExecutionContextSupporting
@@ -114,8 +115,11 @@
 - FragmentRendererDispatch
 - FSMStates
 - FSMTransitions
+- FSMTransitionsExecutableTests
 - FSMValidator
 - GenerateDocsCli
+- GeneratorDegeneracyGuard
+- GeneratorDegeneracyGuardExecutableTests
 - GherkinAstParser
 - GherkinExternalRelationshipTagPropagation
 - GherkinExtractor
@@ -168,6 +172,7 @@
 - PatternBundleProjectionExecutableTests
 - PatternCatalog
 - PatternCatalogProjection
+- PatternCatalogStatusFilterExecutableTests
 - PatternClassification
 - PatternDetail
 - PatternDetailProjection
@@ -221,13 +226,14 @@
 - RequirementDigestProjection
 - RequirementExecutableDigestProjection
 - RequirementSpecsDigestProjection
-- ResultMonad
 - ResultMonadTypes
+- ResultMonadTypesExecutableTests
 - RoadmapTimeline
 - RoadmapTimelineProjection
 - RoleProfile
 - RoleProfileCollection
 - RoleProfileProjection
+- RuleAggregation
 - ScannerCore
 - ScopeReadinessCheck
 - ScopeReadinessProjection
@@ -323,6 +329,7 @@
 | packages/architect-projection/src/projections/governance/decision-records.ts                                         | executable | DecisionCatalogProjection                             | projection | typescript | completed |
 | packages/architect-projection/tests/features/projections/governance/decision-records.feature                         | executable | DecisionCatalogProjectionExecutableTests              | projection | gherkin    | completed |
 | packages/architect-projection/src/fragments/governance/decision-record.ts                                            | design     | DecisionRecord                                        | contract   | typescript | active    |
+| packages/architect-core/src/read-api/decision-resolution.ts                                                          | design     | DecisionResolution                                    | utility    | typescript | active    |
 | packages/architect-core/src/config/define-config.ts                                                                  | design     | DefineConfig                                          | utility    | typescript | active    |
 | packages/architect-core/tests/features/config/define-config.feature                                                  | executable | DefineConfigExecutableTests                           |            | gherkin    | completed |
 | packages/architect-projection/src/fragments/execution-context/deliverable.ts                                         | design     | Deliverable                                           | contract   | typescript | active    |
@@ -333,13 +340,13 @@
 | packages/architect-projection/src/projections/delivery-reporting/index.ts                                            | executable | DeliveryReportingProjectionSupport                    | utility    | typescript | completed |
 | packages/architect-projection/tests/features/projections/delivery-reporting/roadmap-timeline.feature                 | executable | DeliveryReportingProjectionSupportExecutableTests     | projection | gherkin    | completed |
 | packages/architect-projection/src/fragments/delivery-reporting/supporting.ts                                         | design     | DeliveryReportingSupporting                           | contract   | typescript | active    |
+| packages/architect-projection/src/fragments/pattern-relations/dependency-context.ts                                  | design     | DependencyContext                                     | contract   | typescript | active    |
+| packages/architect-projection/src/projections/pattern-relations/dependency-context.ts                                | executable | DependencyContextProjection                           | projection | typescript | completed |
+| packages/architect-projection/tests/features/projections/pattern-relations/dependency-context.feature                | executable | DependencyContextProjectionExecutableTests            | projection | gherkin    | completed |
 | packages/architect-projection/src/fragments/pattern-relations/dependency-edge.ts                                     | design     | DependencyEdge                                        | contract   | typescript | active    |
 | packages/architect-projection/src/projections/pattern-relations/dependency-edges.ts                                  | executable | DependencyEdgeProjection                              | projection | typescript | completed |
 | packages/architect-projection/tests/features/projections/pattern-relations/dependency-edges.feature                  | executable | DependencyEdgeProjectionExecutableTests               | projection | gherkin    | completed |
 | packages/architect-projection/src/fragments/pattern-relations/dependency-edge-set.ts                                 | design     | DependencyEdgeSet                                     | contract   | typescript | active    |
-| packages/architect-projection/src/fragments/pattern-relations/dependency-tree.ts                                     | design     | DependencyTree                                        | contract   | typescript | active    |
-| packages/architect-projection/src/projections/pattern-relations/dependency-tree.ts                                   | executable | DependencyTreeProjection                              | projection | typescript | completed |
-| packages/architect-projection/tests/features/projections/pattern-relations/dependency-tree.feature                   | executable | DependencyTreeProjectionExecutableTests               | projection | gherkin    | completed |
 | packages/architect-guard/src/lint/process-guard/derive-state.ts                                                      | design     | DeriveProcessState                                    | read-model | typescript | active    |
 | packages/architect-guard/src/lint/process-guard/detect-changes.ts                                                    | design     | DetectChanges                                         | service    | typescript | active    |
 | packages/architect-core/src/extractor/doc-extractor.ts                                                               | design     | DocExtractor                                          | service    | typescript | active    |
@@ -353,8 +360,8 @@
 | packages/architect-guard/src/validation/dod-validator.ts                                                             | executable | DoDValidator                                          | service    | typescript | completed |
 | packages/architect-core/src/extractor/dual-source-extractor.ts                                                       | design     | DualSourceExtractor                                   | service    | typescript | active    |
 | packages/architect-core/tests/features/extractor/dual-source-merge.feature                                           | executable | DualSourceMergeIntegration                            |            | gherkin    | completed |
-| packages/architect-core/tests/features/types/error-factories.feature                                                 | executable | ErrorFactories                                        | contract   | gherkin    | completed |
 | packages/architect-core/src/types/errors.ts                                                                          | executable | ErrorFactoryTypes                                     | contract   | typescript | completed |
+| packages/architect-core/tests/features/types/error-factories.feature                                                 | executable | ErrorFactoryTypesExecutableTests                      | contract   | gherkin    | completed |
 | packages/architect-projection/tests/features/projections/execution-context/context-session.feature                   | executable | ExecutionContextProjectionExecutableTests             | projection | gherkin    | completed |
 | packages/architect-projection/src/projections/execution-context/execution-context-shared.internal.ts                 | executable | ExecutionContextProjectionSupport                     | utility    | typescript | completed |
 | packages/architect-projection/src/fragments/execution-context/supporting.ts                                          | design     | ExecutionContextSupporting                            | contract   | typescript | active    |
@@ -366,8 +373,11 @@
 | packages/architect-projection/src/renderers/\_shared/dispatch.ts                                                     | executable | FragmentRendererDispatch                              | codec      | typescript | completed |
 | packages/architect-core/src/validation/fsm/states.ts                                                                 | design     | FSMStates                                             | read-model | typescript | active    |
 | packages/architect-core/src/validation/fsm/transitions.ts                                                            | design     | FSMTransitions                                        | read-model | typescript | active    |
+| packages/architect-core/tests/features/validation/fsm-transitions.feature                                            | design     | FSMTransitionsExecutableTests                         |            | gherkin    | active    |
 | packages/architect-core/src/validation/fsm/validator.ts                                                              | design     | FSMValidator                                          | decider    | typescript | active    |
 | tests/features/cli/generate-docs.feature                                                                             | executable | GenerateDocsCli                                       |            | gherkin    | completed |
+| packages/architect-projection/src/projections/documentation-composition/degenerate-guard.ts                          | executable | GeneratorDegeneracyGuard                              | utility    | typescript | completed |
+| packages/architect-projection/tests/features/projections/documentation-composition/degenerate-guard.feature          | executable | GeneratorDegeneracyGuardExecutableTests               | projection | gherkin    | completed |
 | packages/architect-core/src/scanner/gherkin-ast-parser.ts                                                            | design     | GherkinAstParser                                      | service    | typescript | active    |
 | packages/architect-core/tests/features/extractor/external-relationship-tags.feature                                  | design     | GherkinExternalRelationshipTagPropagation             |            | gherkin    | active    |
 | packages/architect-core/src/extractor/gherkin-extractor.ts                                                           | design     | GherkinExtractor                                      | service    | typescript | active    |
@@ -420,6 +430,7 @@
 | packages/architect-projection/tests/features/projections/pattern-relations/pattern-bundle.feature                    | design     | PatternBundleProjectionExecutableTests                | projection | gherkin    | active    |
 | packages/architect-projection/src/fragments/pattern-relations/pattern-catalog.ts                                     | design     | PatternCatalog                                        | contract   | typescript | active    |
 | packages/architect-projection/src/projections/pattern-relations/pattern-catalog.ts                                   | executable | PatternCatalogProjection                              | projection | typescript | completed |
+| packages/architect-projection/tests/features/projections/pattern-relations/pattern-catalog-status-filter.feature     | executable | PatternCatalogStatusFilterExecutableTests             | projection | gherkin    | completed |
 | packages/architect-core/src/read-api/pattern-classification.ts                                                       | design     | PatternClassification                                 | utility    | typescript | active    |
 | packages/architect-projection/src/fragments/pattern-relations/pattern-detail.ts                                      | design     | PatternDetail                                         | contract   | typescript | active    |
 | packages/architect-projection/src/projections/pattern-relations/pattern-detail.ts                                    | executable | PatternDetailProjection                               | projection | typescript | completed |
@@ -473,13 +484,14 @@
 | packages/architect-projection/src/projections/operational-insights/index.ts                                          | executable | RequirementDigestProjection                           | projection | typescript | completed |
 | packages/architect-projection/src/projections/operational-insights/index.ts                                          | executable | RequirementExecutableDigestProjection                 | projection | typescript | completed |
 | packages/architect-projection/src/projections/operational-insights/index.ts                                          | executable | RequirementSpecsDigestProjection                      | projection | typescript | completed |
-| packages/architect-core/tests/features/types/result-monad.feature                                                    | executable | ResultMonad                                           | contract   | gherkin    | completed |
 | packages/architect-core/src/types/result.ts                                                                          | executable | ResultMonadTypes                                      | contract   | typescript | completed |
+| packages/architect-core/tests/features/types/result-monad.feature                                                    | executable | ResultMonadTypesExecutableTests                       | contract   | gherkin    | completed |
 | packages/architect-projection/src/fragments/delivery-reporting/roadmap-timeline.ts                                   | design     | RoadmapTimeline                                       | contract   | typescript | active    |
 | packages/architect-projection/src/projections/delivery-reporting/index.ts                                            | executable | RoadmapTimelineProjection                             | projection | typescript | completed |
 | packages/architect-projection/src/fragments/operational-insights/role-profile.ts                                     | design     | RoleProfile                                           | contract   | typescript | active    |
 | packages/architect-projection/src/fragments/operational-insights/role-profile-collection.ts                          | design     | RoleProfileCollection                                 | contract   | typescript | active    |
 | packages/architect-projection/src/projections/operational-insights/index.ts                                          | executable | RoleProfileProjection                                 | projection | typescript | completed |
+| packages/architect-core/src/read-api/rule-aggregation.ts                                                             | design     | RuleAggregation                                       | utility    | typescript | active    |
 | packages/architect-core/tests/features/behavior/scanner-core.feature                                                 | executable | ScannerCore                                           |            | gherkin    | completed |
 | packages/architect-projection/src/fragments/execution-context/scope-readiness-check.ts                               | design     | ScopeReadinessCheck                                   | contract   | typescript | active    |
 | packages/architect-projection/src/projections/execution-context/scope-readiness.ts                                   | executable | ScopeReadinessProjection                              | projection | typescript | completed |

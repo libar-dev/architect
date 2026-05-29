@@ -42,14 +42,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - CrossPackageEdgeClassification
 - DecisionCatalog
 - DecisionRecord
+- DecisionResolution
 - DefineConfig
 - Deliverable
 - DeliverableManifest
 - DeliveryReportingFragmentContracts
 - DeliveryReportingSupporting
+- DependencyContext
 - DependencyEdge
 - DependencyEdgeSet
-- DependencyTree
 - DeriveProcessState
 - DetectChanges
 - DocExtractor
@@ -62,6 +63,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - FileReadingList
 - FSMStates
 - FSMTransitions
+- FSMTransitionsExecutableTests
 - FSMValidator
 - GherkinAstParser
 - GherkinExternalRelationshipTagPropagation
@@ -127,6 +129,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - RoadmapTimeline
 - RoleProfile
 - RoleProfileCollection
+- RuleAggregation
 - ScopeReadinessCheck
 - ScopeReadinessReport
 - SessionContextBundle
@@ -182,8 +185,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Executable test feature**: packages/architect-projection/tests/features/projections/governance/decision-records.feature
 - **Executable test feature**: packages/architect-projection/tests/features/projections/delivery-reporting/phase-progress-status.feature
 - **Executable test feature**: packages/architect-projection/tests/features/projections/delivery-reporting/roadmap-timeline.feature
+- **Executable test feature**: packages/architect-projection/tests/features/projections/pattern-relations/dependency-context.feature
 - **Executable test feature**: packages/architect-projection/tests/features/projections/pattern-relations/dependency-edges.feature
-- **Executable test feature**: packages/architect-projection/tests/features/projections/pattern-relations/dependency-tree.feature
 - **Executable test feature**: packages/architect-projection/tests/features/projections/documentation-composition/config-documentation.feature
 - **Executable test feature**: packages/architect-projection/tests/features/projections/execution-context/context-session.feature
 - **Executable test feature**: packages/architect-projection/tests/features/projections/governance/validation-taxonomy.feature
@@ -197,7 +200,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **CLI query step coverage**: tests/steps/cli/pattern-graph-cli-query.steps.ts
 - **Executable test feature**: packages/architect-projection/tests/features/projections/pattern-relations/pattern-summary.feature
 - **Executable test feature**: packages/architect-projection/tests/features/projections/delivery-reporting/release-notes.feature
-- **Executable test feature**: packages/architect-projection/tests/features/projections/delivery-reporting/traceability-matrix.feature
 - **PatternGraph-backed validation read model**: packages/architect-guard/src/cli/validate-patterns.ts
 - **DoD validation integration**: packages/architect-guard/src/validation/dod-validator.ts
 - **validate-patterns CLI behavior**: packages/architect/tests/features/cli/validate-patterns.feature
@@ -235,10 +237,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - DeliveryProgressProjectionExecutableTests
 - DeliveryReportingProjectionSupport
 - DeliveryReportingProjectionSupportExecutableTests
+- DependencyContextProjection
+- DependencyContextProjectionExecutableTests
 - DependencyEdgeProjection
 - DependencyEdgeProjectionExecutableTests
-- DependencyTreeProjection
-- DependencyTreeProjectionExecutableTests
 - DocStringMediaType
 - DocumentationBundle
 - DocumentationCompositionProjectionExecutableTests
@@ -246,14 +248,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - DoDValidationTypes
 - DoDValidator
 - DualSourceMergeIntegration
-- ErrorFactories
 - ErrorFactoryTypes
+- ErrorFactoryTypesExecutableTests
 - ExecutionContextProjectionExecutableTests
 - ExecutionContextProjectionSupport
 - FileDiscovery
 - FileReadingListProjection
 - FragmentRendererDispatch
 - GenerateDocsCli
+- GeneratorDegeneracyGuard
+- GeneratorDegeneracyGuardExecutableTests
 - GherkinRulesSupport
 - GovernanceProjectionSupport
 - GovernanceValidationTaxonomyProjectionExecutableTests
@@ -276,6 +280,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - OrphanPatternListProjection
 - OverviewProjection
 - PatternCatalogProjection
+- PatternCatalogStatusFilterExecutableTests
 - PatternDetailProjection
 - PatternDetailProjectionExecutableTests
 - PatternGraphAPICLI
@@ -297,8 +302,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - RequirementDigestProjection
 - RequirementExecutableDigestProjection
 - RequirementSpecsDigestProjection
-- ResultMonad
 - ResultMonadTypes
+- ResultMonadTypesExecutableTests
 - RoadmapTimelineProjection
 - RoleProfileProjection
 - ScannerCore

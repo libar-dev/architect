@@ -7,7 +7,7 @@
 
 ## Overview
 
-This view captures 163 patterns across 23 diagrams in the Component architecture view.
+This view captures 166 patterns across 23 diagrams in the Component architecture view.
 
 ## Related views
 
@@ -26,7 +26,7 @@ graph LR
   cli["cli (6)"]
   configuration["configuration (4)"]
   delivery_reporting["delivery-reporting (7)"]
-  documentation_composition["documentation-composition (6)"]
+  documentation_composition["documentation-composition (7)"]
   domain["domain (1)"]
   execution_context["execution-context (8)"]
   extractor["extractor (6)"]
@@ -38,7 +38,7 @@ graph LR
   pipeline["pipeline (1)"]
   process_guard["process-guard (6)"]
   projection["projection (44)"]
-  read_api["read-api (5)"]
+  read_api["read-api (7)"]
   rendering["rendering (7)"]
   scanner["scanner (4)"]
   validation["validation (8)"]
@@ -142,7 +142,7 @@ graph TD
   traceabilitymatrix["TraceabilityMatrix<br/>(contract)"]
 ```
 
-### Bounded context: documentation-composition (6 patterns)
+### Bounded context: documentation-composition (7 patterns)
 
 ```mermaid
 graph TD
@@ -150,6 +150,7 @@ graph TD
   apireferenceprojection["ApiReferenceProjection<br/>(projection)"]
   architecturediagram["ArchitectureDiagram<br/>(contract)"]
   documentationcompositionsupporting["DocumentationCompositionSupporting<br/>(contract)"]
+  generatordegeneracyguard["GeneratorDegeneracyGuard<br/>(utility)"]
   prchangereview["PrChangeReview<br/>(contract)"]
   projectconfigsnapshot["ProjectConfigSnapshot<br/>(contract)"]
   apireferenceprojection -->|depends-on| apireferencedigest
@@ -259,9 +260,9 @@ graph TD
   architecturecomparison["ArchitectureComparison<br/>(contract)"]
   architectureneighborhood["ArchitectureNeighborhood<br/>(contract)"]
   boundedcontextfragmentcontract["BoundedContextFragmentContract<br/>(contract)"]
+  dependencycontext["DependencyContext<br/>(contract)"]
   dependencyedge["DependencyEdge<br/>(contract)"]
   dependencyedgeset["DependencyEdgeSet<br/>(contract)"]
-  dependencytree["DependencyTree<br/>(contract)"]
   orphanpatternlist["OrphanPatternList<br/>(contract)"]
   patterncatalog["PatternCatalog<br/>(contract)"]
   patterndetail["PatternDetail<br/>(contract)"]
@@ -308,8 +309,8 @@ graph TD
   decisioncatalogprojection["DecisionCatalogProjection<br/>(projection)"]
   deliverableprojection["DeliverableProjection<br/>(projection)"]
   deliveryreportingprojectionsupport["DeliveryReportingProjectionSupport<br/>(utility)"]
+  dependencycontextprojection["DependencyContextProjection<br/>(projection)"]
   dependencyedgeprojection["DependencyEdgeProjection<br/>(projection)"]
-  dependencytreeprojection["DependencyTreeProjection<br/>(projection)"]
   documentationbundle["DocumentationBundle<br/>(projection)"]
   documentationcompositionprojectionsupport["DocumentationCompositionProjectionSupport<br/>(utility)"]
   executioncontextprojectionsupport["ExecutionContextProjectionSupport<br/>(utility)"]
@@ -350,8 +351,8 @@ graph TD
   businessrulesprojection -->|depends-on| governanceprojectionsupport
   decisioncatalogprojection -->|depends-on| governanceprojectionsupport
   deliverableprojection -->|depends-on| executioncontextprojectionsupport
+  dependencycontextprojection -->|depends-on| patternrelationsprojectionsupport
   dependencyedgeprojection -->|depends-on| patternrelationsprojectionsupport
-  dependencytreeprojection -->|depends-on| patternrelationsprojectionsupport
   documentationbundle -->|depends-on| documentationcompositionprojectionsupport
   filereadinglistprojection -->|depends-on| executioncontextprojectionsupport
   handoffprojection -->|depends-on| executioncontextprojectionsupport
@@ -381,18 +382,22 @@ graph TD
   validationruledigestprojection -->|depends-on| governanceprojectionsupport
 ```
 
-### Bounded context: read-api (5 patterns)
+### Bounded context: read-api (7 patterns)
 
 ```mermaid
 graph TD
   architectureinspection["ArchitectureInspection<br/>(utility)"]
+  decisionresolution["DecisionResolution<br/>(utility)"]
   graphinventory["GraphInventory<br/>(utility)"]
   patternclassification["PatternClassification<br/>(utility)"]
   patterngraphapi["PatternGraphApi<br/>(utility)"]
   patternhelpers["PatternHelpers<br/>(utility)"]
+  ruleaggregation["RuleAggregation<br/>(utility)"]
   architectureinspection -->|depends-on| patternhelpers
+  decisionresolution -->|depends-on| patternhelpers
   graphinventory -->|depends-on| patternhelpers
   patterngraphapi -->|depends-on| patternhelpers
+  ruleaggregation -->|depends-on| patternhelpers
 ```
 
 ### Bounded context: rendering (7 patterns)
@@ -469,18 +474,18 @@ graph TD
 
 Most-depended-on patterns in this view, ranked by in-view dependant count.
 
-| Pattern                              | Dependants | Top dependants                                                                                                                                         |
-| ------------------------------------ | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| ProjectionFragmentContracts          | 16         | ArchitectureDiagramProjection, BusinessRulesProjection, DecisionCatalogProjection, DeliverableProjection, DocumentationBundle                          |
-| ExtractedPattern                     | 12         | ArchitectureInspection, DeliveryReportingProjectionSupport, DualSourceExtractor, ExecutionContextProjectionSupport, GovernanceProjectionSupport        |
-| PatternRelationsFragmentContracts    | 11         | ArchitectureComparisonProjection, ArchitectureNeighborhoodProjection, DependencyEdgeProjection, DependencyTreeProjection, OpenQuestionListProjection   |
-| PatternRelationsProjectionSupport    | 11         | ArchitectureComparisonProjection, ArchitectureNeighborhoodProjection, BoundedContextProjection, DependencyEdgeProjection, DependencyTreeProjection     |
-| PatternGraph                         | 9          | ArchitectureInspection, BuildPipeline, DoDValidator, GraphInventory, PatternClassification                                                             |
-| OperationalInsightsProjectionSupport | 8          | AnnotationCoverageProjection, OverviewProjection, RequirementDigestProjection, RequirementExecutableDigestProjection, RequirementSpecsDigestProjection |
-| BlockSchema                          | 7          | ArchitectureDiagram, DecisionRecord, DocumentationCompositionSupporting, MarkdownRenderer, OperationalInsightsSupporting                               |
-| ProjectionFragmentSchema             | 6          | ApiReferenceProjection, CompactTextRenderer, FragmentRendererDispatch, JsonRenderer, MarkdownRenderer                                                  |
-| DeliveryReportingProjectionSupport   | 5          | PhaseProgressProjection, ReleaseNotesProjection, RoadmapTimelineProjection, StatusDistributionProjection, TraceabilityMatrixProjection                 |
-| ExecutionContextProjectionSupport    | 5          | DeliverableProjection, FileReadingListProjection, HandoffProjection, ScopeReadinessProjection, SessionContextProjection                                |
+| Pattern                              | Dependants | Top dependants                                                                                                                                          |
+| ------------------------------------ | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ProjectionFragmentContracts          | 17         | ArchitectureDiagramProjection, BusinessRulesProjection, DecisionCatalogProjection, DeliverableProjection, DocumentationBundle                           |
+| ExtractedPattern                     | 14         | ArchitectureInspection, DecisionResolution, DeliveryReportingProjectionSupport, DualSourceExtractor, ExecutionContextProjectionSupport                  |
+| PatternGraph                         | 11         | ArchitectureInspection, BuildPipeline, DecisionResolution, DoDValidator, GraphInventory                                                                 |
+| PatternRelationsFragmentContracts    | 11         | ArchitectureComparisonProjection, ArchitectureNeighborhoodProjection, DependencyContextProjection, DependencyEdgeProjection, OpenQuestionListProjection |
+| PatternRelationsProjectionSupport    | 11         | ArchitectureComparisonProjection, ArchitectureNeighborhoodProjection, BoundedContextProjection, DependencyContextProjection, DependencyEdgeProjection   |
+| OperationalInsightsProjectionSupport | 8          | AnnotationCoverageProjection, OverviewProjection, RequirementDigestProjection, RequirementExecutableDigestProjection, RequirementSpecsDigestProjection  |
+| BlockSchema                          | 7          | ArchitectureDiagram, DecisionRecord, DocumentationCompositionSupporting, MarkdownRenderer, OperationalInsightsSupporting                                |
+| PatternHelpers                       | 6          | ArchitectureInspection, DecisionResolution, DualSourceExtractor, GraphInventory, PatternGraphApi                                                        |
+| ProjectionFragmentSchema             | 6          | ApiReferenceProjection, CompactTextRenderer, FragmentRendererDispatch, JsonRenderer, MarkdownRenderer                                                   |
+| DeliveryReportingProjectionSupport   | 5          | PhaseProgressProjection, ReleaseNotesProjection, RoadmapTimelineProjection, StatusDistributionProjection, TraceabilityMatrixProjection                  |
 
 ## Cross-package bounded contexts
 
@@ -532,6 +537,7 @@ Bounded contexts whose patterns span more than one workspace package.
 - DecisionCatalog
 - DecisionCatalogProjection
 - DecisionRecord
+- DecisionResolution
 - DefineConfig
 - Deliverable
 - DeliverableManifest
@@ -539,11 +545,11 @@ Bounded contexts whose patterns span more than one workspace package.
 - DeliveryReportingFragmentContracts
 - DeliveryReportingProjectionSupport
 - DeliveryReportingSupporting
+- DependencyContext
+- DependencyContextProjection
 - DependencyEdge
 - DependencyEdgeProjection
 - DependencyEdgeSet
-- DependencyTree
-- DependencyTreeProjection
 - DeriveProcessState
 - DetectChanges
 - DocExtractor
@@ -564,6 +570,7 @@ Bounded contexts whose patterns span more than one workspace package.
 - FSMStates
 - FSMTransitions
 - FSMValidator
+- GeneratorDegeneracyGuard
 - GherkinAstParser
 - GherkinExtractor
 - GherkinScanner
@@ -638,6 +645,7 @@ Bounded contexts whose patterns span more than one workspace package.
 - RoleProfile
 - RoleProfileCollection
 - RoleProfileProjection
+- RuleAggregation
 - ScopeReadinessCheck
 - ScopeReadinessProjection
 - ScopeReadinessReport
