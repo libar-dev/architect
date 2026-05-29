@@ -34,17 +34,17 @@ source, many audience shapes), `ApiReferenceShapeCoverage` (the `@architect-shap
 
 ## Files
 
-| File                               | Purpose                                                                                                                  |
-| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `PREAMBLE.md`                      | **Read first every session** — mandatory skills + API-first discipline                                                   |
-| `DECISIONS.md`                     | Standing-rules digest (all decisions resolved); resolved bodies in `archive/`                                            |
-| `DOCS-IA-FINDINGS.md`              | **The doc-gen capability base** — IA audit, overlap matrix, generator ledger, target-state corpus, roadmap (R1, R3–R7)   |
-| `HUD-IDEATION.md`                  | Read-surface progressive-disclosure model (steps 1–2 shipped; 3–4 → `ArchitectBriefDeterministicBundle`)                 |
-| `EXECUTION-PLAN.md`                | Why/diagnosis, workstream status, **§6 gates**, method guardrails                                                        |
-| `CONSOLIDATION-2026-05-27.md`      | Disposition of every doc + what is base-vs-archived + pre-deletion checklist                                             |
-| `SESSION-REPORTS-AND-LEARNINGS.md` | Append-only session log                                                                                                  |
-| `state.json`                       | Phase tracking + metrics                                                                                                 |
-| `archive/`                         | Completed-work history — WS-0/1/2 log, resolved decisions, WS-1 strategy, the WS-5/6/7 handoffs, session prompts         |
+| File                               | Purpose                                                                                                                |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `PREAMBLE.md`                      | **Read first every session** — mandatory skills + API-first discipline                                                 |
+| `DECISIONS.md`                     | Standing-rules digest (all decisions resolved); resolved bodies in `archive/`                                          |
+| `DOCS-IA-FINDINGS.md`              | **The doc-gen capability base** — IA audit, overlap matrix, generator ledger, target-state corpus, roadmap (R1, R3–R7) |
+| `HUD-IDEATION.md`                  | Read-surface progressive-disclosure model (steps 1–2 shipped; 3–4 → `ArchitectBriefDeterministicBundle`)               |
+| `EXECUTION-PLAN.md`                | Why/diagnosis, workstream status, **§6 gates**, method guardrails                                                      |
+| `CONSOLIDATION-2026-05-27.md`      | Disposition of every doc + what is base-vs-archived + pre-deletion checklist                                           |
+| `SESSION-REPORTS-AND-LEARNINGS.md` | Append-only session log                                                                                                |
+| `state.json`                       | Phase tracking + metrics                                                                                               |
+| `archive/`                         | Completed-work history — WS-0/1/2 log, resolved decisions, WS-1 strategy, the WS-5/6/7 handoffs, session prompts       |
 
 ## How to run a session
 

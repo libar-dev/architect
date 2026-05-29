@@ -259,9 +259,9 @@ hard-won foundation stays live. Full disposition in [`CONSOLIDATION-2026-05-27.m
   synthesizing Rule. Authored `TaxonomyDocumentationCluster` (idea-tier member) as the **MVP first proof-point**
   (one source → skill/reference/formal-spec/live-API shapes).
 - **Created spec-graph entry points** (pointers into the base, NOT a transfer of it): two parity invariants
-  + an open question on the epic; new idea spec `ApiReferenceShapeCoverage` (the `@architect-shape` pass);
-  `Q-TOKEN-BUDGET-SIGNAL` on `ArchitectBriefDeterministicBundle` (HUD step 3; step 4 = that spec); new candidate
-  spec `DecisionRecordTemporalHygiene`. R2 (escaping) already fixed.
+  - an open question on the epic; new idea spec `ApiReferenceShapeCoverage` (the `@architect-shape` pass);
+    `Q-TOKEN-BUDGET-SIGNAL` on `ArchitectBriefDeterministicBundle` (HUD step 3; step 4 = that spec); new candidate
+    spec `DecisionRecordTemporalHygiene`. R2 (escaping) already fixed.
 - **Archived** → `archive/`: only the genuinely-shipped handoffs `HANDOFF-docs-api-sweep.md` (WS-5/6) and
   `HANDOFF-WS7-shape-tier.md` (rendering shipped). Everything else stays live.
 - **Open decision for the maintainer:** where the doc-gen foundation lives long-term, since

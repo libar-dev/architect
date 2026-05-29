@@ -12,11 +12,11 @@ CLI**, and the remaining workstreams with file anchors + implementation guidance
 
 ## Shipped this session (committed, all gates green)
 
-| Commit | What |
-| --- | --- |
+| Commit    | What                                                                                                                                                                                                                                                                               |
+| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `06bfd91` | **WS-1 B-A + WS-2 GLIMPSE.** Un-escaped renderer-authored markdown (DECISIONS.md dead ADR links fixed; arch titles/description/legend; validation-rule IDs; taxonomy/validation bold overviews). `overview` doc-types now derive from the registry (8→12). docs-live re-baselined. |
-| `014f5ca` | **WS-3 API ergonomics & `--format` discoverability** (last-session E1/hook/tour folded in). |
-| `dbefc37` | **WS-4 `arch graph` verb (N1)** — whole-graph dump (161 nodes, 666 edges) in one call. |
+| `014f5ca` | **WS-3 API ergonomics & `--format` discoverability** (last-session E1/hook/tour folded in).                                                                                                                                                                                        |
+| `dbefc37` | **WS-4 `arch graph` verb (N1)** — whole-graph dump (161 nodes, 666 edges) in one call.                                                                                                                                                                                             |
 
 **Uncommitted, left for the maintainer:** `FEEDBACK.md` (open in editor). Its
 last-session "`--format json` gaps" entry is now **outdated** — see corrected premise #1.
@@ -32,12 +32,12 @@ determinism clean · `check:skills`.
 1. **E2 was wrong: `--format json` is NOT missing.** It is a **global** flag
    (`pattern-graph-cli.ts:136`, default `compact`) that already works on every data verb
    (`overview`, `status`, `dep-tree`, `scope-validate`, `rules`, `pattern`, `context`,
-   `files`, `handoff`, `tags`, `arch *`). The gap was *documentation*: it was missing from
+   `files`, `handoff`, `tags`, `arch *`). The gap was _documentation_: it was missing from
    `--help` and the skill falsely tagged those verbs "text-only today". Fixed in `014f5ca`.
    **Do not re-plan E2 as new plumbing.**
 
 2. **B-A "5 docs / 94+54+18+18+13 escape hits" OVER-COUNTED.** Most TAXONOMY/VALIDATION
-   escapes are *legitimate* — they protect **sourced data** (tag examples like
+   escapes are _legitimate_ — they protect **sourced data** (tag examples like
    `@architect-uses:`, identifiers with `_`/`*`). Only **renderer-authored** markdown was
    fixable (ADR links, arch titles/description/legend, a few `**bold**` overview lines,
    backtick-wrapped IDs). CHANGELOG needed **zero** changes. The fix vehicle is the existing
@@ -62,6 +62,7 @@ determinism clean · `check:skills`.
 calls `resolvePackageLabel`.
 
 **Remaining work — expose package in the read API surface:**
+
 - `list --package <workspace-name>` filter — command def in `packages/architect-cli/src/cli/commands/read.ts` (`list` ~251-306); flag plumbing mirrors existing `--role`/`--status`.
 - `package` field on `pattern` / `arch neighborhood` output.
 - `arch packages` summary subcommand (follow the `arch graph` pattern just added in
@@ -70,11 +71,11 @@ calls `resolvePackageLabel`.
 **Schema decision (the fork):** `ExtractedPattern`
 (`packages/architect-core/src/validation-schemas/extracted-pattern.ts`) has **no** package
 field today — it's resolved dynamically. Two options:
-  (a) Resolve package into the `PatternGraph`/`archIndex` at transform time (one resolve,
-      read API serves it cheaply) — preferred for a first-class dimension; touches core
-      transform + schema.
-  (b) Resolve per-verb in the projection layer (no core schema change) — lighter, but
-      re-resolves and keeps package out of the core read model.
+(a) Resolve package into the `PatternGraph`/`archIndex` at transform time (one resolve,
+read API serves it cheaply) — preferred for a first-class dimension; touches core
+transform + schema.
+(b) Resolve per-verb in the projection layer (no core schema change) — lighter, but
+re-resolves and keeps package out of the core read model.
 Recommend (a) if package is meant to be a true graph dimension; (b) if it's just a CLI
 convenience. **Update the frozen help-contract** (`tests/steps/cli/data-api-help.steps.ts`)
 for any new flag/subcommand.
@@ -99,7 +100,7 @@ generator hack.**
 - **D-2 cross-package-context signal.** Annotate nodes whose bounded-context spans packages
   (`validation` splits core/guard; also `rendering`, `cli`).
 - **architecture/ tree.** Split into `docs-live/architecture/{index,context-map,<context>,
-  package-seam,layered}.md` via the registry's `childDirectory` + `entityPathLayout`
+package-seam,layered}.md` via the registry's `childDirectory` + `entityPathLayout`
   (`documentation-type-registry.ts:~17-34`; precedent: `business-rules/`, `decisions/`).
 
 Manual `docs/ARCHITECTURE.md` retirement stays orthogonal (`.pr-coordination/DOCS-IA-FINDINGS.md`).
@@ -125,6 +126,7 @@ API-reference pages). The next annotation tier, not a regression.
 - **Perf gate:** `pnpm --filter @libar-dev/architect-projection run test:perf:baseline` (×1.5).
 
 ### Open follow-up created this session
+
 **`ArchitectureGraphProjection` is an orphan** (`pattern-relations/architecture-graph.ts`):
 its only dependency is the unannotated `_shared/architecture-graph.internal.ts` collection,
 so no honest forward `@architect-uses` edge exists. **Clean fix:** promote that shared

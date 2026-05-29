@@ -13,13 +13,13 @@ field-tables/API-reference content lives) needs deliberate architectural review 
 
 ## What shipped this campaign session (baseline — all gates green)
 
-| Commit | What |
-| --- | --- |
-| `0f0d25a` | **Phase 0** — escape sourced architecture titles + mermaid labels (ADR-009 fix + raw-content hardening). The bug that broke the prior session. |
+| Commit    | What                                                                                                                                                                                                                       |
+| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `0f0d25a` | **Phase 0** — escape sourced architecture titles + mermaid labels (ADR-009 fix + raw-content hardening). The bug that broke the prior session.                                                                             |
 | `e28392d` | **WS-5** — `package` as a first-class read-model dimension: `ArchIndex.byPackage` resolved at `transformToPatternGraph()` time; `list --package`, `arch packages`, `package` on read output; frozen help-contract updated. |
-| `d1809a5` | **WS-6a** — fan-in/hub ranking section on the architecture view (`fanIn` on `ArchitectureDiagram`). |
-| `1b283b2` | **WS-6b** — cross-package bounded-context table (`crossPackageContexts`). |
-| `60145b3` | **WS-6c** — split `ARCHITECTURE.md` into a routed lens tree: root (component) + `architecture/package-seam.md` + `architecture/layered.md`; added `'package'` scope; `buildArchitectureBundle`; root↔child links. |
+| `d1809a5` | **WS-6a** — fan-in/hub ranking section on the architecture view (`fanIn` on `ArchitectureDiagram`).                                                                                                                        |
+| `1b283b2` | **WS-6b** — cross-package bounded-context table (`crossPackageContexts`).                                                                                                                                                  |
+| `60145b3` | **WS-6c** — split `ARCHITECTURE.md` into a routed lens tree: root (component) + `architecture/package-seam.md` + `architecture/layered.md`; added `'package'` scope; `buildArchitectureBundle`; root↔child links.          |
 
 Substrate now available to WS-7: `graph.archIndex.byPackage` (WS-5), the routed-docs
 bundle pattern proven for `architecture` (WS-6c), and the **ADR-009 escaping discipline**
@@ -33,6 +33,7 @@ campaign session — leave them alone unless the user says otherwise.
 ## WS-7 facts (verified this session)
 
 ### Annotation side — machinery exists, data source is empty
+
 - `@architect-shape` occurrences in `packages/*/src/**`: **0**. The tier is entirely
   unstarted on the production side.
 - **Tag grammar:** `@architect-shape [optional-group]` (bare tag, or one string group
@@ -52,6 +53,7 @@ campaign session — leave them alone unless the user says otherwise.
   decide whether to register it (likely yes, for guard/validation consistency).
 
 ### Annotation targets (the bulk pass — ideal for `/codex-rescue-x` GPT-5.4)
+
 - **62 `@architect-role:contract` patterns + 7 `@architect-role:codec` patterns** (≈69
   modules) — enumerate live with:
   `pnpm -s architect:query list --role contract --format json | jq` (and `--role codec`).
@@ -66,6 +68,7 @@ campaign session — leave them alone unless the user says otherwise.
   collide with the rendering work.
 
 ### Rendering side — UNIMPLEMENTED (the real design work)
+
 - No projection or fragment consumes `extractedShapes` today. Grep confirms `extractedShapes`
   appears only in `extracted-pattern.ts` (the record field) and `doc-extractor.ts` (the
   populate site) — nothing on the projection/renderer side.
@@ -87,10 +90,10 @@ campaign session — leave them alone unless the user says otherwise.
      `patterns` documentType already has `childDirectory: 'patterns'` routing — no new
      documentType. Shapes sit with their owning pattern. Lighter; reuses everything.
    - **(b) New `api-reference` documentType + generator.** A dedicated `API-REFERENCE.md`
-     + per-module children. Cleaner separation of API surface from the pattern catalog, but
-     it is a NET-NEW documentType (registry identity/output-routing/disclosure/cli-surface
-     entries + a generator) — more machinery, and a new pattern, so it routes through
-     `architect-sessions` plan→design, not the refactor carve-out.
+     - per-module children. Cleaner separation of API surface from the pattern catalog, but
+       it is a NET-NEW documentType (registry identity/output-routing/disclosure/cli-surface
+       entries + a generator) — more machinery, and a new pattern, so it routes through
+       `architect-sessions` plan→design, not the refactor carve-out.
    - Picking (a) vs (b) decides whether WS-7 rendering is a **refactor** (evolve the shipped
      patterns projection) or a **new pattern** (full lifecycle). This is why it needs review.
 2. **Field-table shape & disclosure.** What columns (name/kind/type/description?), how
@@ -117,6 +120,7 @@ campaign session — leave them alone unless the user says otherwise.
 5. Re-baseline `docs-live/` and the projection perf baseline (both will move — intended).
 
 ## Gate suite (every commit)
+
 ```
 pnpm typecheck && pnpm build && pnpm test && pnpm test:dogfood
 pnpm docs:all && git diff --exit-code docs-live/   # WS-7 will re-baseline intentionally
@@ -126,6 +130,7 @@ pnpm validate:all && pnpm check:skills
 ```
 
 ## Doctrine tripwires (carried from this session)
+
 - **ADR-009 / raw-content:** sourced text is escaped by default; only renderer-authored
   markdown/mermaid is trusted. Shape field text is sourced — escape it. (Phase 0 was
   entirely about fixing this class of bug; do not reintroduce it.)
@@ -134,7 +139,7 @@ pnpm validate:all && pnpm check:skills
   follow the `fanIn`/`crossPackageContexts` precedent added in WS-6.
 - **Refactor carve-out** (if rendering home = option (a)): evolve the shipped pattern's
   executable Gherkin in lockstep with code; additive behavior needs no `DECISIONS.md`
-  entry, but any *changed* invariant does.
+  entry, but any _changed_ invariant does.
 - **WS-5 note for reviewers:** `transformToPatternGraph`'s `packageResolver` param is
   optional and `UNMAPPED_PACKAGE` is swallowed during `byPackage` population (best-effort;
   production config covers all roots). Flagged as a known design choice, not a bug.
