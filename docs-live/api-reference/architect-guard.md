@@ -28,7 +28,7 @@ type AntiPatternId =
 Zod schema for anti-pattern thresholds. Configurable limits for detecting anti-patterns.
 
 ```ts
-AntiPatternThresholdsSchema = z.object({
+AntiPatternThresholdsSchema = z.strictObject({
   /** Maximum scenarios per feature file before warning */
   scenarioBloatThreshold: z.number().int().positive().default(30),
   /** Maximum lines per feature file before warning */

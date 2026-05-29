@@ -7,7 +7,7 @@
 
 ## Overview
 
-This view captures 248 patterns across 8 diagrams in the Package architecture view.
+This view captures 247 patterns across 8 diagrams in the Package architecture view.
 
 ## Diagrams
 
@@ -18,12 +18,12 @@ Each node is a group; each arrow is a cross-group dependency (`depends-on` / `us
 ```mermaid
 graph LR
   pkg_architect_cli["Architect CLI (4)"]
-  pkg_architect_core["Architect Core (55)"]
+  pkg_architect_core["Architect Core (56)"]
   pkg_architect_guard["Architect Guard (21)"]
-  pkg_architect_host_dev["Architect Host (Dev) (26)"]
+  pkg_architect_host_dev["Architect Host (Dev) (23)"]
   pkg_architect_mcp["Architect MCP (9)"]
   pkg_architect_package_content["Architect Package Content (12)"]
-  pkg_architect_projection["Architect Projection (121)"]
+  pkg_architect_projection["Architect Projection (122)"]
   pkg_architect_cli --> pkg_architect_core
   pkg_architect_cli --> pkg_architect_projection
   pkg_architect_guard --> pkg_architect_core
@@ -46,7 +46,7 @@ graph TD
   patterngraphcli -->|depends-on| cliversionhelper
 ```
 
-### Package: Architect Core (55 patterns)
+### Package: Architect Core (56 patterns)
 
 ```mermaid
 graph TD
@@ -87,6 +87,7 @@ graph TD
   patternclassification["PatternClassification<br/>(utility)"]
   patterngraph["PatternGraph<br/>(contract)"]
   patterngraphapi["PatternGraphApi<br/>(utility)"]
+  patterngraphapiconsistencyexecutabletests["PatternGraphApiConsistencyExecutableTests<br/>(utility)"]
   patterngraphapireverselookup["PatternGraphApiReverseLookup"]
   patternhelpers["PatternHelpers<br/>(utility)"]
   patternreferencevalidation["PatternReferenceValidation"]
@@ -185,26 +186,23 @@ graph TD
   validationmodule -->|depends-on| dodvalidator
 ```
 
-### Package: Architect Host (Dev) (26 patterns)
+### Package: Architect Host (Dev) (23 patterns)
 
 ```mermaid
 graph TD
   architectpubliccontract["ArchitectPublicContract"]
   canonicalvaluessync["CanonicalValuesSync"]
-  childalpha["ChildAlpha"]
-  childbeta["ChildBeta"]
   compacttextrenderertests["CompactTextRendererTests"]
   dataapicliergonomics["DataAPICLIErgonomics"]
   dataapioutputshaping["DataAPIOutputShaping"]
   documentationcommandparityboundarytests["DocumentationCommandParityBoundaryTests"]
-  emptyepic["EmptyEpic"]
   generatedocscli["GenerateDocsCli"]
   lintpatternsclibehavior["LintPatternsCliBehavior"]
   lintprocessclibehavior["LintProcessCliBehavior"]
   loadpreambleparser["LoadPreambleParser"]
   mcptoolregistryboundarytests["MCPToolRegistryBoundaryTests"]
-  parentepic["ParentEpic"]
   patterngraphapicli["PatternGraphAPICLI"]
+  patterngraphapicli_2["PatternGraphAPICLI"]
   patterngraphcliarchhealth["PatternGraphCliArchHealth"]
   patterngraphclicache["PatternGraphCliCache"]
   patterngraphclidryrun["PatternGraphCliDryRun"]
@@ -215,7 +213,6 @@ graph TD
   patterngraphclisubcommands["PatternGraphCliSubcommands"]
   stubtaxonomytagtests["StubTaxonomyTagTests"]
   validatorreadmodelconsolidation["ValidatorReadModelConsolidation"]
-  childalpha -->|depends-on| childbeta
 ```
 
 ### Package: Architect MCP (9 patterns)
@@ -272,7 +269,7 @@ graph TD
   pdr005processguardfsm -->|depends-on| adr001taxonomycanonicalvalues
 ```
 
-### Package: Architect Projection (121 patterns)
+### Package: Architect Projection (122 patterns)
 
 ```mermaid
 graph TD
@@ -364,6 +361,7 @@ graph TD
   projectconfigsnapshot["ProjectConfigSnapshot<br/>(contract)"]
   projectionfragmentcontracts["ProjectionFragmentContracts<br/>(contract)"]
   projectionfragmentschema["ProjectionFragmentSchema<br/>(contract)"]
+  projectionkernelrelationshipcontractexecutabletests["ProjectionKernelRelationshipContractExecutableTests<br/>(projection)"]
   releasenotesdigest["ReleaseNotesDigest<br/>(contract)"]
   releasenotesprojection["ReleaseNotesProjection<br/>(projection)"]
   releasenotesprojectionexecutabletests["ReleaseNotesProjectionExecutableTests<br/>(projection)"]
@@ -607,8 +605,6 @@ Bounded contexts whose patterns span more than one workspace package.
 - BusinessRulesProjection
 - BusinessRulesProjectionExecutableTests
 - CanonicalValuesSync
-- ChildAlpha
-- ChildBeta
 - CLIErrorHandler
 - CLIRuntimePaths
 - CLIVersionHelper
@@ -657,7 +653,6 @@ Bounded contexts whose patterns span more than one workspace package.
 - DoDValidator
 - DualSourceExtractor
 - DualSourceMergeIntegration
-- EmptyEpic
 - ErrorFactories
 - ErrorFactoryTypes
 - ExecutionContextProjectionExecutableTests
@@ -721,7 +716,6 @@ Bounded contexts whose patterns span more than one workspace package.
 - OverviewProjection
 - PackageResolver
 - PackageResolverExecutableTests
-- ParentEpic
 - PatternBundleProjection
 - PatternBundleProjectionExecutableTests
 - PatternCatalog
@@ -733,6 +727,8 @@ Bounded contexts whose patterns span more than one workspace package.
 - PatternGraph
 - PatternGraphApi
 - PatternGraphAPICLI
+- PatternGraphAPICLI
+- PatternGraphApiConsistencyExecutableTests
 - PatternGraphApiReverseLookup
 - PatternGraphCLI
 - PatternGraphCliArchHealth
@@ -766,6 +762,7 @@ Bounded contexts whose patterns span more than one workspace package.
 - ProjectConfigSnapshot
 - ProjectionFragmentContracts
 - ProjectionFragmentSchema
+- ProjectionKernelRelationshipContractExecutableTests
 - RegistryBuilder
 - ReleaseNotesDigest
 - ReleaseNotesProjection

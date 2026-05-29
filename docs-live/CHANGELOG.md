@@ -35,8 +35,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - BusinessRuleReference
 - BusinessRuleSet
 - CanonicalValuesSync
-- ChildAlpha
-- ChildBeta
 - CodecUtils
 - CodecUtilsValidation
 - CompactTextRendererTests
@@ -58,7 +56,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - DocumentationCommandParityBoundaryTests
 - DocumentationCompositionSupporting
 - DualSourceExtractor
-- EmptyEpic
 - ExecutionContextSupporting
 - ExtractedPattern
 - ExtractionDiagnostics
@@ -93,7 +90,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - OverviewDigest
 - PackageResolver
 - PackageResolverExecutableTests
-- ParentEpic
 - PatternBundleProjection
 - PatternBundleProjectionExecutableTests
 - PatternCatalog
@@ -101,6 +97,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - PatternDetail
 - PatternGraph
 - PatternGraphApi
+- PatternGraphApiConsistencyExecutableTests
 - PatternGraphApiReverseLookup
 - PatternGraphCLI
 - PatternGraphCliCache
@@ -122,6 +119,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - ProjectConfigSnapshot
 - ProjectionFragmentContracts
 - ProjectionFragmentSchema
+- ProjectionKernelRelationshipContractExecutableTests
 - RegistryBuilder
 - ReleaseNotesDigest
 - ReleaseVNEXT
@@ -194,6 +192,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **PatternGraph CLI core routing**: packages/architect-cli/src/cli/pattern-graph-cli.ts
 - **CLI core behavior specification**: packages/architect/tests/features/cli/pattern-graph-cli-core.feature
 - **CLI core step coverage**: packages/architect/tests/steps/cli/pattern-graph-cli-core.steps.ts
+- **Query passthrough compaction**: packages/architect-cli/src/cli/commands/\_shared/structured.ts
+- **CLI query behavior specification**: tests/features/cli/pattern-graph-cli-query.feature
+- **CLI query step coverage**: tests/steps/cli/pattern-graph-cli-query.steps.ts
 - **Executable test feature**: packages/architect-projection/tests/features/projections/pattern-relations/pattern-summary.feature
 - **Executable test feature**: packages/architect-projection/tests/features/projections/delivery-reporting/release-notes.feature
 - **Executable test feature**: packages/architect-projection/tests/features/projections/delivery-reporting/traceability-matrix.feature

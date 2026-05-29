@@ -132,14 +132,19 @@ Organized by purpose. Every CLI verb has an MCP twin (mapping in "MCP twins" bel
 
 - **`handoff --pattern <X> [--session planning|design|implement|review] [--modified-file <p>]...`** — emits `=== HANDOFF ===` block. Pass `--modified-file` once per file touched.
 
-### Whitelisted `query` methods
+### `query` passthrough — the typed read kernel, fully traversable
 
-`query <method> [args...]` is a passthrough to the typed read API. Returns `{success, data, metadata}` JSON.
+`query <method> [args...]` is a passthrough to the `PatternGraphAPI` typed read kernel. Returns `{success, data, metadata}` JSON (read **`.data`**). Almost the entire 29-method interface is reachable (only `getPatternGraph`, which returns the whole read model, is withheld to avoid payload overflow) — so the kernel is self-traversable and every accessor is CLI-verifiable. Grouped by argument shape:
 
-- `query getStatusCounts` → `{completed, active, planned, candidate, total}`.
-- `query isValidTransition <from> <to>` → `{success, data: boolean}`.
-- `query getPatternsByStatus <status>` → array of pattern summaries.
-- `query getPatternsByPhase <phase>` → array of pattern summaries.
+- **No-arg:** `getStatusCounts` → `{completed, active, planned, candidate, total}` · `getStatusDistribution` → `{counts, deliveryPercentages:{completed,active,planned}, candidateShare}` (delivery shares sum to 100 over the delivery base; `candidateShare` is over the grand total — the two are structurally non-summable) · `getCompletionPercentage` · `getActivePhases` · `getAllPhases` · `listRoles` · `getQuarters` · `getCurrentWork` · `getRoadmapItems` · `getRecentlyCompleted [limit]`
+- **Pattern-name arg:** `getPattern <Name>` · `getPatternParseFailure <Name>` · `getPatternDependencies <Name>` · `getPatternRelationships <Name>` · `getRelatedPatterns <Name>` · `getApiReferences <Name>` · `getPatternDeliverables <Name>`
+- **Role / quarter / phase arg:** `getPatternsByRole <role>` · `getRoleInfo <role>` · `getPatternsByQuarter <quarter>` · `getPatternsByPhase <phase>` · `getPhaseProgress <phase>`
+- **Status arg:** `getPatternsByStatus <accepted-status>` (accepts `roadmap`/`deferred`) · `getPatternsByNormalizedStatus <completed|active|planned|candidate>` (collapses `roadmap`/`deferred` → `planned`)
+- **FSM (two args / status arg):** `query isValidTransition <from> <to>` → boolean gate · `checkTransition <from> <to>` → `TransitionCheck` · `getValidTransitionsFrom <status>` · `getProtectionInfo <status>`
+
+**Pattern-list methods return compact summaries, not full records.** The eight methods that resolve to a *list of patterns* — `getCurrentWork`, `getRoadmapItems`, `getRecentlyCompleted`, `getPatternsByRole`, `getPatternsByQuarter`, `getPatternsByPhase`, `getPatternsByStatus`, `getPatternsByNormalizedStatus` — emit one compact `{patternName, status, role, file}` entry per pattern (the same shape `list` and `arch packages` use), **not** the kernel's full `ExtractedPattern` (which carries every scenario, rule, and directive). Returning the raw records would balloon a single `getCurrentWork` call to ~700 KB and drown the caller — the payload-overflow failure mode below. Single-pattern lookups (`getPattern <Name>`) and the scalar / object / FSM methods are unaffected and return their full shape. For inventory work, the dedicated verbs (`list --status …`, `overview`, `arch blocking`) remain the first reach; the passthrough list methods exist for kernel self-traversal and parity checks.
+
+An unknown method errors with the full whitelist, so `query <typo>` is self-documenting.
 
 ### Documentation projection
 

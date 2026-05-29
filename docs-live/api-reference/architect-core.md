@@ -784,7 +784,7 @@ type ScanError = FileSystemError | FileParseError | DirectiveValidationError;
 A business rule extracted from a pattern's scenarios — its name, description, the count and names of scenarios that exercise it, and any tags.
 
 ```ts
-BusinessRuleSchema = z.object({
+BusinessRuleSchema = z.strictObject({
   name: z.string(),
   description: z.string(),
   scenarioCount: z.number().int().nonnegative(),

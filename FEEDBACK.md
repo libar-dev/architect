@@ -163,3 +163,17 @@ for anything that does not fit the verb's shape.
 - **Expected:** the unresolved state of the work surface rooted at the epic — meaning the epic's own `**Open Questions:**` plus the child patterns' questions.
 - **Got:** only member-pattern questions are returned. The focal epic `DocumentationProjection` has load-bearing gating questions in `architect/specs/documentation-projection/00-documentation-projection.feature`, but they are absent from the `--parent` result.
 - **Impact:** an API-first design review can still miss the most important unresolved architecture decisions unless it reads the spec file directly. For epic refinement, `--parent` behaves like "children of X" rather than "open questions in the X subtree," which is the more useful AI-native interpretation.
+
+## 2026-05-29 — `pnpm architect:query` reflects last-BUILT dist, not current source
+
+- **Verb / surface:** all `pnpm architect:query <verb>` (the dogfood CLI runs `tsx pattern-graph-cli.ts`, but its `@libar-dev/architect-core` / `-projection` imports resolve via package `exports` → `dist/`).
+- **Expected:** the API-first contract implies the CLI reports the *current* state of the repo; after editing read-api/projection **source**, `query` should reflect it.
+- **Got:** `query` reflects the last `pnpm build` (or the implicit rebuild a `pnpm test` triggers). Mid-refactor, `query getStatusDistribution` returned the OLD return shape until a rebuild synced `dist/`. The CLI *entry* is tsx-from-source, but cross-package code is dist-resolved.
+- **Impact:** an agent dogfooding a source change to a core/projection pattern can get silently stale answers and mis-conclude. Workaround: `pnpm build` (or `pnpm --filter <pkg> build`) after source edits before trusting `query`. Worth considering a dev `exports` condition that points at `src` under tsx, or a freshness warning when `dist` is older than `src`.
+
+## 2026-05-29 — `query` pattern-list passthrough methods drowned the caller (700 KB)
+
+- **Verb / surface:** `pnpm architect:query query <method>` for the eight list-returning kernel methods (`getCurrentWork`, `getRoadmapItems`, `getRecentlyCompleted`, `getPatternsByRole`, `getPatternsByQuarter`, `getPatternsByPhase`, `getPatternsByStatus`, `getPatternsByNormalizedStatus`).
+- **Expected:** a compact inventory comparable to `list --status …` (the same logical query through `list` returns a ~39 KB `PatternSummary[]`).
+- **Got:** the raw kernel `ExtractedPattern[]` — full directive/scenarios/rules per pattern. `getCurrentWork` and `getPatternsByNormalizedStatus active` were **707 KB each** (~175K tokens), `getPatternsByRole` 420 KB, `getRoadmapItems`/`getPatternsByStatus` 380 KB. An agent following the skill's "self-traversable kernel" framing could blow its whole context on one call.
+- **Impact:** the payload-overflow failure mode the API itself names. **Fixed this session:** the CLI passthrough now projects these eight methods to the compact `{patternName, status, role, file}` shape (kernel return type unchanged — doc/projection consumers still get full records). Single-pattern (`getPattern`) and scalar/FSM methods are untouched.

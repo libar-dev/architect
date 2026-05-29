@@ -4,7 +4,7 @@
 
 | Field | Value |
 | ----- | ----- |
-| Count | 248   |
+| Count | 247   |
 
 ## Filters
 
@@ -53,8 +53,6 @@
 - BusinessRulesProjection
 - BusinessRulesProjectionExecutableTests
 - CanonicalValuesSync
-- ChildAlpha
-- ChildBeta
 - CLIErrorHandler
 - CLIRuntimePaths
 - CLIVersionHelper
@@ -103,7 +101,6 @@
 - DoDValidator
 - DualSourceExtractor
 - DualSourceMergeIntegration
-- EmptyEpic
 - ErrorFactories
 - ErrorFactoryTypes
 - ExecutionContextProjectionExecutableTests
@@ -167,7 +164,6 @@
 - OverviewProjection
 - PackageResolver
 - PackageResolverExecutableTests
-- ParentEpic
 - PatternBundleProjection
 - PatternBundleProjectionExecutableTests
 - PatternCatalog
@@ -179,6 +175,8 @@
 - PatternGraph
 - PatternGraphApi
 - PatternGraphAPICLI
+- PatternGraphAPICLI
+- PatternGraphApiConsistencyExecutableTests
 - PatternGraphApiReverseLookup
 - PatternGraphCLI
 - PatternGraphCliArchHealth
@@ -212,6 +210,7 @@
 - ProjectConfigSnapshot
 - ProjectionFragmentContracts
 - ProjectionFragmentSchema
+- ProjectionKernelRelationshipContractExecutableTests
 - RegistryBuilder
 - ReleaseNotesDigest
 - ReleaseNotesProjection
@@ -306,8 +305,6 @@
 | packages/architect-projection/src/projections/governance/business-rules.ts                                           | executable | BusinessRulesProjection                               | projection | typescript | completed |
 | packages/architect-projection/tests/features/projections/governance/business-rules.feature                           | executable | BusinessRulesProjectionExecutableTests                | projection | gherkin    | completed |
 | tests/features/api/canonical-values-sync.feature                                                                     | design     | CanonicalValuesSync                                   |            | gherkin    | active    |
-| tests/features/cli/list-parent-child-alpha.feature                                                                   | design     | ChildAlpha                                            |            | gherkin    | active    |
-| tests/features/cli/list-parent-child-beta.feature                                                                    | design     | ChildBeta                                             |            | gherkin    | active    |
 | packages/architect-cli/src/cli/error-handler.ts                                                                      | executable | CLIErrorHandler                                       | utility    | typescript | completed |
 | packages/architect-cli/src/cli/runtime-helpers.ts                                                                    | executable | CLIRuntimePaths                                       | utility    | typescript | completed |
 | packages/architect-cli/src/cli/version.ts                                                                            | executable | CLIVersionHelper                                      | utility    | typescript | completed |
@@ -356,7 +353,6 @@
 | packages/architect-guard/src/validation/dod-validator.ts                                                             | executable | DoDValidator                                          | service    | typescript | completed |
 | packages/architect-core/src/extractor/dual-source-extractor.ts                                                       | design     | DualSourceExtractor                                   | service    | typescript | active    |
 | packages/architect-core/tests/features/extractor/dual-source-merge.feature                                           | executable | DualSourceMergeIntegration                            |            | gherkin    | completed |
-| tests/features/cli/list-parent-empty-epic.feature                                                                    | design     | EmptyEpic                                             |            | gherkin    | active    |
 | packages/architect-core/tests/features/types/error-factories.feature                                                 | executable | ErrorFactories                                        | contract   | gherkin    | completed |
 | packages/architect-core/src/types/errors.ts                                                                          | executable | ErrorFactoryTypes                                     | contract   | typescript | completed |
 | packages/architect-projection/tests/features/projections/execution-context/context-session.feature                   | executable | ExecutionContextProjectionExecutableTests             | projection | gherkin    | completed |
@@ -420,7 +416,6 @@
 | packages/architect-projection/src/projections/operational-insights/index.ts                                          | executable | OverviewProjection                                    | projection | typescript | completed |
 | packages/architect-core/src/package/package-resolver.ts                                                              | design     | PackageResolver                                       | utility    | typescript | active    |
 | packages/architect-core/tests/features/config/package-resolver.feature                                               | design     | PackageResolverExecutableTests                        |            | gherkin    | active    |
-| tests/features/cli/list-parent-parent-epic.feature                                                                   | design     | ParentEpic                                            |            | gherkin    | active    |
 | packages/architect-projection/src/projections/pattern-relations/bundle.ts                                            | design     | PatternBundleProjection                               | projection | typescript | active    |
 | packages/architect-projection/tests/features/projections/pattern-relations/pattern-bundle.feature                    | design     | PatternBundleProjectionExecutableTests                | projection | gherkin    | active    |
 | packages/architect-projection/src/fragments/pattern-relations/pattern-catalog.ts                                     | design     | PatternCatalog                                        | contract   | typescript | active    |
@@ -432,6 +427,8 @@
 | packages/architect-core/src/validation-schemas/pattern-graph.ts                                                      | design     | PatternGraph                                          | contract   | typescript | active    |
 | packages/architect-core/src/read-api/pattern-graph-api.ts                                                            | design     | PatternGraphApi                                       | utility    | typescript | active    |
 | tests/features/cli/pattern-graph-cli-core.feature                                                                    | executable | PatternGraphAPICLI                                    |            | gherkin    | completed |
+| tests/features/cli/pattern-graph-cli-query.feature                                                                   | executable | PatternGraphAPICLI                                    |            | gherkin    | completed |
+| packages/architect-core/tests/features/read-api/pattern-graph-api-consistency.feature                                | design     | PatternGraphApiConsistencyExecutableTests             | utility    | gherkin    | active    |
 | packages/architect-core/tests/features/read-api/pattern-graph-api.feature                                            | design     | PatternGraphApiReverseLookup                          |            | gherkin    | active    |
 | packages/architect-cli/src/cli/pattern-graph-cli.ts                                                                  | design     | PatternGraphCLI                                       | service    | typescript | active    |
 | tests/features/cli/pattern-graph-cli-arch-health.feature                                                             | executable | PatternGraphCliArchHealth                             |            | gherkin    | completed |
@@ -465,6 +462,7 @@
 | packages/architect-projection/src/fragments/documentation-composition/project-config-snapshot.ts                     | design     | ProjectConfigSnapshot                                 | contract   | typescript | active    |
 | packages/architect-projection/src/fragments/index.ts                                                                 | design     | ProjectionFragmentContracts                           | contract   | typescript | active    |
 | packages/architect-projection/src/fragments/fragment-schema.internal.ts                                              | design     | ProjectionFragmentSchema                              | contract   | typescript | active    |
+| packages/architect-projection/tests/features/projections/pattern-relations/kernel-relationship-contract.feature      | design     | ProjectionKernelRelationshipContractExecutableTests   | projection | gherkin    | active    |
 | packages/architect-core/src/taxonomy/registry-builder.ts                                                             | design     | RegistryBuilder                                       | utility    | typescript | active    |
 | packages/architect-projection/src/fragments/delivery-reporting/release-notes-digest.ts                               | design     | ReleaseNotesDigest                                    | contract   | typescript | active    |
 | packages/architect-projection/src/projections/delivery-reporting/index.ts                                            | executable | ReleaseNotesProjection                                | projection | typescript | completed |

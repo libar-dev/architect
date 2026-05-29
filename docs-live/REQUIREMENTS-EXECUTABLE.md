@@ -60,6 +60,8 @@
 | PatternBundleProjectionExecutableTests                | active    |            |
 | PatternDetailProjectionExecutableTests                | completed |            |
 | PatternGraphAPICLI                                    | completed |            |
+| PatternGraphAPICLI                                    | completed |            |
+| PatternGraphApiConsistencyExecutableTests             | active    |            |
 | PatternGraphApiReverseLookup                          | active    |            |
 | PatternGraphCLI                                       | active    |            |
 | PatternGraphCliArchHealth                             | completed |            |
@@ -73,6 +75,7 @@
 | PatternReferenceValidation                            | active    |            |
 | PatternSummaryCatalogProjectionExecutableTests        | completed |            |
 | ProjectConfigLoader                                   | completed |            |
+| ProjectionKernelRelationshipContractExecutableTests   | active    |            |
 | ReleaseNotesProjectionExecutableTests                 | completed |            |
 | ResultMonad                                           | completed |            |
 | ResultMonadTypes                                      | completed |            |
