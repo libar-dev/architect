@@ -223,6 +223,8 @@ wording should carve out that Gherkin-owned patterns author their own `uses` on 
 
 ## 2026-05-29 — duplicate `@architect-pattern:PatternGraphAPICLI` identity across two feature files (not gate-caught)
 
+> **RESOLVED 2026-05-29** (commit `c398088`): `pattern-graph-cli-query.feature` renamed to `@architect-pattern:PatternGraphCliQueryPassthrough` + `@architect-implements:PatternGraphAPICLI` (matching its sibling slice features), and a `detectDuplicateFeatureIdentities` anti-pattern gate now fails `validate:all` on any future feature-level identity collision (reads feature-LEVEL tags via `extractProcessMetadata`, so docstring fixtures don't false-positive).
+
 Two feature files both claim the same pattern identity:
 
 - `tests/features/cli/pattern-graph-cli-core.feature` → `@architect-pattern:PatternGraphAPICLI`

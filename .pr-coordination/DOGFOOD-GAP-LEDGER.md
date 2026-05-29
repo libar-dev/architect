@@ -228,3 +228,27 @@ This chunk targeted the NAVIGABILITY + SILENT-EMPTY/TRUST + ANNOTATE clusters ab
 7. `rules` scope flags are mutually exclusive — "rules on pattern X from ADR Y" can't be one call.
 
 **Verdict:** the chunk's bar is met. Grep is the exception for navigability/trust/governance; the next chunk is making the new edges symmetric, adding the duplicate-identity gate, and self-explaining the alias/empty cases.
+
+---
+
+## Re-measure (validation + skills/demo polish + residual sweep, 2026-05-29)
+
+A validation pass (6 parallel blind-audit agents: 3 skills · demo hook · closed-gap regression · residual triage) re-checked the prior chunk against the live CLI, then this session fixed/polished from the findings. **Every gate green** at HEAD (typecheck · validate:all · docs-determinism zero-diff · package tests · dogfood 1162 · guard 43).
+
+**Closed-gap regression: 7.5/8 hold — one ledger CORRECTION.** N1, N2, N3, T1, T2, T3, A1, and 2b all reproduce live. The lone deviation is **inside A2, and it is a mis-recorded verification target, NOT a CLI regression**: the earlier re-measure claimed `rules --pattern ProcessGuardDecider --only-invariants` → 6, but it returns **0**. The 6 invariants live on **ProcessGuardLinter** — `packages/architect-guard/tests/features/process-guard-rules.feature` carries `@architect-implements:ProcessGuardLinter`, and `git log -S` confirms it has *never* pointed at ProcessGuardDecider. The N2 implementedBy-resolution mechanism is proven intact (PatternGraphApi=8, FSMValidator=4, ProcessGuardLinter=6); only the ledger's example pattern name was wrong. **No action needed beyond this correction.**
+
+**Landed this session:**
+
+- **Skills resynced to the live CLI** (the prior chunk's fixes had invalidated frozen facts): `list --status planned` now accepted; 34-method kernel (was 29); `@architect-enforces-decision` is the pattern→ADR edge; `bundle --include` accumulates; counts 266/286→272/292; `--package` short-names; `arch graph`/`packages`; `context --session` (no review); `index` not a doc type; replaced the rotted ConfigLoader/DefineConfig "zero-JSDoc completed" example (both are `active` + carry `@architect-pattern`) with a live-verification method. Commit `d12ebdc`.
+- **Capability tour re-centered on `PatternGraphApi`** (the read kernel) instead of markdown rendering — search→bundle→dep-tree→rules→ADR-006 governance→scope-gate, one coherent read-model story; fixed the empty step-6 rules block; added governance + scope-gate steps + an emptiness guard. Commit `d38ca5d`.
+- **Residual #1 CLOSED** — renamed `pattern-graph-cli-query.feature` identity to `PatternGraphCliQueryPassthrough` + `@architect-implements:PatternGraphAPICLI` (matching its 4 sibling slice features), and added a `detectDuplicateFeatureIdentities` anti-pattern gate (error-severity → fails `validate:all`) that reads feature-LEVEL tags only (immune to docstring fixtures). Executable-tested. Commit `c398088`.
+- **Residual #6 CLOSED** — `search ADR-009` now resolves to `ADR009ProjectionTrustBoundary` via a punctuation-insensitive fuzzy-match fallback. Unit-tested. Commit `0738b87`.
+- **Residual #5 MITIGATED + deferred** — added a skill note that `pattern <Name>`'s own `=== Rules ===` block is empty when rules live on implementing specs (use `rules --pattern`). The *renderer* hint is **deferred (NEEDS-DESIGN)**: `pattern <Name>` renders through the shared generic key-value fallback, so a clean conditional hint needs a dedicated `PatternDetail` compact renderer (not a fragile special-case of the shared renderer).
+- **`@projection` deprecated-tag hygiene** — removed the redundant legacy `@projection` tag from `pattern-catalog-status-filter.feature` (the proper `@architect-role:projection` was already present), clearing the lone `validate:all` warning.
+
+**Still deferred (NEEDS-DESIGN / deliberate — re-confirmed real, not quick fixes):**
+
+- **#3 (JSON error envelope)** — enum-validation errors print a plain stderr line + exit 1 even under `--format json`. Real trust issue for JSON consumers. Deferred because it is a **global error-contract change**: `format` isn't in scope at the top-level `main().catch`, so the fix must thread `format` into `handleCliError` (or deliberately re-derive it from argv) AND decide the envelope shape (`{success:false,error:{message,acceptedValues}}`) and whether ALL errors or only enum errors emit it. Deserves its own focused commit.
+- **#2 (planned/roadmap dual label)** — the `(roadmap+deferred)` parenthetical already signals it; cosmetic, churns the determinism gate.
+- **#4 (governance edge symmetry)** — `enforcedBy` is the computed reverse of authored `@architect-enforces-decision`; surfacing a forward `enforces` on the enforcer + a symmetric `seeAlso` is a graph-modeling decision against the "history lives in git / computed reverse edges only" doctrine.
+- **#7 (mutually-exclusive `rules` scope flags)** — deliberate constraint; intersecting `--pattern X` + `--decision Y` needs AND-composition design.
