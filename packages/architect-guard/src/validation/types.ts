@@ -84,7 +84,7 @@ export type AntiPatternId =
  *
  * @architect-shape
  */
-export const AntiPatternThresholdsSchema = z.object({
+export const AntiPatternThresholdsSchema = z.strictObject({
   /** Maximum scenarios per feature file before warning */
   scenarioBloatThreshold: z.number().int().positive().default(30),
   /** Maximum lines per feature file before warning */

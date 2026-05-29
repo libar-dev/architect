@@ -36,7 +36,7 @@ import { ScenarioRefSchema } from './scenario-ref.js';
  *
  * @architect-shape
  */
-export const BusinessRuleSchema = z.object({
+export const BusinessRuleSchema = z.strictObject({
   name: z.string(),
   description: z.string(),
   scenarioCount: z.number().int().nonnegative(),

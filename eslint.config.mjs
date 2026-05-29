@@ -69,6 +69,28 @@ export default tseslint.config(
     },
   },
 
+  // No circular imports doctrine (CLAUDE.md → "Engineering doctrine → TypeScript
+  // strictness") — production source only. The same rule lives in the
+  // `tests/scripts/architect.config.ts` block below for those surfaces;
+  // pre-existing source cycles are tracked separately under P1-12.
+  {
+    files: ['packages/*/src/**/*.ts'],
+    plugins: {
+      import: importPlugin,
+    },
+    settings: {
+      'import/resolver': {
+        typescript: {
+          alwaysTryTypes: true,
+          project: ['./tsconfig.json', './tsconfig.eslint.json'],
+        },
+      },
+    },
+    rules: {
+      'import/no-cycle': ['warn', { ignoreExternal: true }],
+    },
+  },
+
   // architect-projection src — honour the `_`-prefix unused convention used by factory wrappers
   {
     files: ['src/**/*.ts'],
