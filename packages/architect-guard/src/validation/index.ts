@@ -48,6 +48,7 @@ export {
   detectMagicComments,
   detectScenarioBloat,
   detectMegaFeature,
+  detectDuplicateFeatureIdentities,
   detectAntiPatterns,
   formatAntiPatternReport,
   toValidationIssues,

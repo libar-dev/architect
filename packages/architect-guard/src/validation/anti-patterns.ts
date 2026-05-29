@@ -39,6 +39,7 @@ import { DEFAULT_THRESHOLDS } from './types.js';
 import {
   ARCHITECT_PACKAGE_FEATURE_ONLY_TAG_SUFFIXES,
   DEFAULT_TAG_PREFIX,
+  extractProcessMetadata,
 } from '@libar-dev/architect-core';
 
 // Re-export types for consumers that import from this module
@@ -337,6 +338,52 @@ export function detectMegaFeature(
  * }
  * ```
  */
+/**
+ * Detect duplicate Gherkin pattern identities — the same feature-level
+ * `@architect-pattern:<Name>` declared across more than one `.feature` file.
+ *
+ * ADR-001 requires exactly one file to own a pattern's identity. When two
+ * features declare the same identity, the dual-source extractor's `featureIndex`
+ * map silently last-write-wins (the second file's rules/scenarios are dropped),
+ * and every downstream gate (`validate:all`, `arch dangling`, the process guard)
+ * passes over it because the duplicate has already collapsed to one node.
+ *
+ * This check runs over the RAW scanned feature files — the one place the
+ * collision is still visible — and uses {@link extractProcessMetadata} (the same
+ * feature-level extractor the graph builder uses), so it reads ONLY the top
+ * feature tag block and never false-positives on `@architect-pattern:` tokens
+ * that appear inside scenario docstrings / `"""`-fenced fixtures.
+ */
+export function detectDuplicateFeatureIdentities(
+  features: readonly ScannedGherkinFile[],
+): AntiPatternViolation[] {
+  const filesByIdentity = new Map<string, string[]>();
+  for (const feature of features) {
+    const metadata = extractProcessMetadata(feature);
+    if (!metadata?.pattern) continue;
+    const files = filesByIdentity.get(metadata.pattern) ?? [];
+    files.push(feature.filePath);
+    filesByIdentity.set(metadata.pattern, files);
+  }
+
+  const violations: AntiPatternViolation[] = [];
+  for (const [identity, files] of filesByIdentity) {
+    if (files.length < 2) continue;
+    const sorted = [...files].sort();
+    for (const file of sorted) {
+      violations.push({
+        id: 'duplicate-pattern-identity',
+        message: `Gherkin pattern identity "${identity}" is declared in ${String(sorted.length)} feature files: ${sorted.join(', ')}. ADR-001 requires exactly one file to own a pattern's @architect-pattern identity; the extractor silently drops all but one.`,
+        file,
+        line: 1,
+        severity: 'error',
+        fix: `Give all but one of these features a distinct @architect-pattern identity (add @architect-implements:${identity} if it realizes the same pattern, mirroring the sibling slice features).`,
+      });
+    }
+  }
+  return violations;
+}
+
 export function detectAntiPatterns(
   scannedFiles: readonly ScannedFile[],
   features: readonly ScannedGherkinFile[],
@@ -352,6 +399,7 @@ export function detectAntiPatterns(
     // Error-level (architectural violations)
     ...detectProcessInCode(scannedFiles, registry),
     ...detectRemovedTags(features, registry),
+    ...detectDuplicateFeatureIdentities(features),
     // Warning-level (hygiene issues)
     ...detectMagicComments(features, mergedThresholds.magicCommentThreshold),
     ...detectScenarioBloat(features, mergedThresholds.scenarioBloatThreshold),

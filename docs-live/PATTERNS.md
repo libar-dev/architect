@@ -180,7 +180,6 @@
 - PatternGraph
 - PatternGraphApi
 - PatternGraphAPICLI
-- PatternGraphAPICLI
 - PatternGraphApiConsistencyExecutableTests
 - PatternGraphApiReverseLookup
 - PatternGraphCLI
@@ -189,6 +188,7 @@
 - PatternGraphCliDryRun
 - PatternGraphCliMetadata
 - PatternGraphCliOutputModifiers
+- PatternGraphCliQueryPassthrough
 - PatternGraphCliRepl
 - PatternGraphCliRulesSubcommand
 - PatternGraphCliSubcommands
@@ -438,7 +438,6 @@
 | packages/architect-core/src/validation-schemas/pattern-graph.ts                                                      | design     | PatternGraph                                          | contract   | typescript | active    |
 | packages/architect-core/src/read-api/pattern-graph-api.ts                                                            | design     | PatternGraphApi                                       | utility    | typescript | active    |
 | tests/features/cli/pattern-graph-cli-core.feature                                                                    | executable | PatternGraphAPICLI                                    |            | gherkin    | completed |
-| tests/features/cli/pattern-graph-cli-query.feature                                                                   | executable | PatternGraphAPICLI                                    |            | gherkin    | completed |
 | packages/architect-core/tests/features/read-api/pattern-graph-api-consistency.feature                                | design     | PatternGraphApiConsistencyExecutableTests             | utility    | gherkin    | active    |
 | packages/architect-core/tests/features/read-api/pattern-graph-api.feature                                            | design     | PatternGraphApiReverseLookup                          |            | gherkin    | active    |
 | packages/architect-cli/src/cli/pattern-graph-cli.ts                                                                  | design     | PatternGraphCLI                                       | service    | typescript | active    |
@@ -447,6 +446,7 @@
 | tests/features/cli/data-api-dryrun.feature                                                                           | design     | PatternGraphCliDryRun                                 |            | gherkin    | active    |
 | tests/features/cli/data-api-metadata.feature                                                                         | design     | PatternGraphCliMetadata                               |            | gherkin    | active    |
 | tests/features/cli/pattern-graph-cli-output-modifiers.feature                                                        | executable | PatternGraphCliOutputModifiers                        |            | gherkin    | completed |
+| tests/features/cli/pattern-graph-cli-query.feature                                                                   | executable | PatternGraphCliQueryPassthrough                       |            | gherkin    | completed |
 | tests/features/cli/data-api-repl.feature                                                                             | design     | PatternGraphCliRepl                                   |            | gherkin    | active    |
 | tests/features/cli/pattern-graph-cli-rules-subcommand.feature                                                        | executable | PatternGraphCliRulesSubcommand                        |            | gherkin    | completed |
 | tests/features/cli/pattern-graph-cli-subcommands.feature                                                             | executable | PatternGraphCliSubcommands                            |            | gherkin    | completed |

@@ -18,6 +18,7 @@ Anti-pattern rule identifiers Each ID corresponds to a specific violation of the
 type AntiPatternId =
   | 'process-in-code' // Process metadata in code (should be features-only)
   | 'removed-tag' // Removed tag still present in source (silent data loss)
+  | 'duplicate-pattern-identity' // Same @architect-pattern identity declared in >1 feature file (ADR-001)
   | 'magic-comments' // Generator hints in features
   | 'scenario-bloat' // Too many scenarios per feature
   | 'mega-feature';

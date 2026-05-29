@@ -63,7 +63,6 @@
 | PatternCatalogStatusFilterExecutableTests             | completed |            |
 | PatternDetailProjectionExecutableTests                | completed |            |
 | PatternGraphAPICLI                                    | completed |            |
-| PatternGraphAPICLI                                    | completed |            |
 | PatternGraphApiConsistencyExecutableTests             | active    |            |
 | PatternGraphApiReverseLookup                          | active    |            |
 | PatternGraphCLI                                       | active    |            |
@@ -72,6 +71,7 @@
 | PatternGraphCliDryRun                                 | active    |            |
 | PatternGraphCliMetadata                               | active    |            |
 | PatternGraphCliOutputModifiers                        | completed |            |
+| PatternGraphCliQueryPassthrough                       | completed |            |
 | PatternGraphCliRepl                                   | active    |            |
 | PatternGraphCliRulesSubcommand                        | completed |            |
 | PatternGraphCliSubcommands                            | completed |            |

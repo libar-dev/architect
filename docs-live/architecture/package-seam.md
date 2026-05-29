@@ -212,12 +212,12 @@ graph TD
   loadpreambleparser["LoadPreambleParser"]
   mcptoolregistryboundarytests["MCPToolRegistryBoundaryTests"]
   patterngraphapicli["PatternGraphAPICLI"]
-  patterngraphapicli_2["PatternGraphAPICLI"]
   patterngraphcliarchhealth["PatternGraphCliArchHealth"]
   patterngraphclicache["PatternGraphCliCache"]
   patterngraphclidryrun["PatternGraphCliDryRun"]
   patterngraphclimetadata["PatternGraphCliMetadata"]
   patterngraphclioutputmodifiers["PatternGraphCliOutputModifiers"]
+  patterngraphcliquerypassthrough["PatternGraphCliQueryPassthrough"]
   patterngraphclirepl["PatternGraphCliRepl"]
   patterngraphclirulessubcommand["PatternGraphCliRulesSubcommand"]
   patterngraphclisubcommands["PatternGraphCliSubcommands"]
@@ -746,7 +746,6 @@ Bounded contexts whose patterns span more than one workspace package.
 - PatternGraph
 - PatternGraphApi
 - PatternGraphAPICLI
-- PatternGraphAPICLI
 - PatternGraphApiConsistencyExecutableTests
 - PatternGraphApiReverseLookup
 - PatternGraphCLI
@@ -755,6 +754,7 @@ Bounded contexts whose patterns span more than one workspace package.
 - PatternGraphCliDryRun
 - PatternGraphCliMetadata
 - PatternGraphCliOutputModifiers
+- PatternGraphCliQueryPassthrough
 - PatternGraphCliRepl
 - PatternGraphCliRulesSubcommand
 - PatternGraphCliSubcommands

@@ -1,5 +1,6 @@
 @architect
-@architect-pattern:PatternGraphAPICLI
+@architect-pattern:PatternGraphCliQueryPassthrough
+@architect-implements:PatternGraphAPICLI
 @architect-status:completed
 @architect-unlock-reason:Split-from-original
 @architect-phase:24

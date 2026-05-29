@@ -8,6 +8,7 @@ import { expect } from 'vitest';
 
 import {
   detectAntiPatterns,
+  detectDuplicateFeatureIdentities,
   detectFileChanges,
   detectProcessInCode,
   runIdeaTierLint,
@@ -173,6 +174,53 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
             'tag-duplication',
           );
           expect(state.antiPatternViolations?.[0]?.id).toBe('process-in-code');
+        });
+      },
+    );
+
+    RuleScenario(
+      'Flag the same @architect-pattern identity declared in two feature files',
+      ({ When, Then }): void => {
+        When('I detect anti-patterns for two features sharing one pattern identity', () => {
+          // extractProcessMetadata reads feature.feature.tags (pattern: + phase: required),
+          // so these fixtures exercise feature-LEVEL identity only — the same path the graph
+          // builder uses, immune to @architect-pattern tokens inside scenario docstrings.
+          state.antiPatternViolations = detectDuplicateFeatureIdentities([
+            { filePath: 'cli/core.feature', feature: { tags: ['pattern:DupCli', 'phase:24'] } },
+            { filePath: 'cli/query.feature', feature: { tags: ['pattern:DupCli', 'phase:24'] } },
+          ] as never);
+        });
+
+        Then('a duplicate-pattern-identity violation is reported for each file', () => {
+          const dups = state.antiPatternViolations?.filter(
+            (violation) => violation.id === 'duplicate-pattern-identity',
+          );
+          expect(dups).toHaveLength(2);
+          expect(dups?.every((violation) => violation.severity === 'error')).toBe(true);
+          expect(dups?.map((violation) => violation.file).sort()).toEqual([
+            'cli/core.feature',
+            'cli/query.feature',
+          ]);
+        });
+      },
+    );
+
+    RuleScenario(
+      'Allow distinct pattern identities across feature files',
+      ({ When, Then }): void => {
+        When('I detect anti-patterns for two features with distinct pattern identities', () => {
+          state.antiPatternViolations = detectDuplicateFeatureIdentities([
+            { filePath: 'cli/core.feature', feature: { tags: ['pattern:AlphaCli', 'phase:24'] } },
+            { filePath: 'cli/query.feature', feature: { tags: ['pattern:BetaCli', 'phase:24'] } },
+          ] as never);
+        });
+
+        Then('no duplicate-pattern-identity violation is reported', () => {
+          expect(
+            state.antiPatternViolations?.some(
+              (violation) => violation.id === 'duplicate-pattern-identity',
+            ),
+          ).toBe(false);
         });
       },
     );

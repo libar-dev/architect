@@ -19,6 +19,14 @@ Feature: Architect guard runtime
       When I detect anti-patterns for architect process metadata
       Then the removed tag-duplication anti-pattern id should not be reported
 
+    Scenario: Flag the same @architect-pattern identity declared in two feature files
+      When I detect anti-patterns for two features sharing one pattern identity
+      Then a duplicate-pattern-identity violation is reported for each file
+
+    Scenario: Allow distinct pattern identities across feature files
+      When I detect anti-patterns for two features with distinct pattern identities
+      Then no duplicate-pattern-identity violation is reported
+
     Scenario: Block completed spec edits without unlock reason
       When I validate a completed spec edit without unlock reason
       Then the process guard should reject the change for completed protection
