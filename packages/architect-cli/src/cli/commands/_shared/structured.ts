@@ -30,6 +30,7 @@ import {
   parseIntegerValue,
   parseNormalizedStatusValue,
   parseProcessStatusValue,
+  resolvePackageFilter,
 } from './schemas.js';
 
 const QUERY_METHODS = [
@@ -48,10 +49,18 @@ const QUERY_METHODS = [
   'getPattern',
   'getPatternParseFailure',
   'getPatternDependencies',
+  'getDependencyContext',
   'getPatternRelationships',
   'getRelatedPatterns',
   'getApiReferences',
+  'getRulesForPattern',
   'getPatternDeliverables',
+  // Decision lookups
+  'getRulesByDecision',
+  'getPatternsByDecision',
+  'listDecisions',
+  // Package inventory
+  'listPackages',
   // Role / quarter / phase lookups
   'getPatternsByRole',
   'getRoleInfo',
@@ -225,6 +234,19 @@ function executeQueryMethod(api: PatternGraphAPI, args: readonly string[]): unkn
       return api.getPatternDependencies(
         requireArg(args[1], 'Usage: architect query getPatternDependencies <name>'),
       );
+    case 'getDependencyContext': {
+      const name = requireArg(
+        args[1],
+        'Usage: architect query getDependencyContext <name> [maxDepth]',
+      );
+      const maxDepthArg = args[2];
+      if (maxDepthArg === undefined) {
+        return api.getDependencyContext(name);
+      }
+      return api.getDependencyContext(name, {
+        maxDepth: parseIntegerValue(maxDepthArg, 'maxDepth must be an integer'),
+      });
+    }
     case 'getPatternRelationships':
       return api.getPatternRelationships(
         requireArg(args[1], 'Usage: architect query getPatternRelationships <name>'),
@@ -237,10 +259,30 @@ function executeQueryMethod(api: PatternGraphAPI, args: readonly string[]): unkn
       return api.getApiReferences(
         requireArg(args[1], 'Usage: architect query getApiReferences <name>'),
       );
+    case 'getRulesForPattern':
+      return api.getRulesForPattern(
+        requireArg(args[1], 'Usage: architect query getRulesForPattern <name>'),
+      );
     case 'getPatternDeliverables':
       return api.getPatternDeliverables(
         requireArg(args[1], 'Usage: architect query getPatternDeliverables <name>'),
       );
+
+    // ---- Decision lookups ------------------------------------------------
+    case 'getRulesByDecision':
+      return api.getRulesByDecision(
+        requireArg(args[1], 'Usage: architect query getRulesByDecision <decision>'),
+      );
+    case 'getPatternsByDecision':
+      return api.getPatternsByDecision(
+        requireArg(args[1], 'Usage: architect query getPatternsByDecision <decision>'),
+      );
+    case 'listDecisions':
+      return api.listDecisions();
+
+    // ---- Package inventory -----------------------------------------------
+    case 'listPackages':
+      return api.listPackages();
 
     // ---- Role / quarter / phase lookups ----------------------------------
     case 'getPatternsByRole':
@@ -301,10 +343,7 @@ function executeQueryMethod(api: PatternGraphAPI, args: readonly string[]): unkn
       return api.checkTransition(from, to);
     }
     case 'getValidTransitionsFrom': {
-      const status = requireArg(
-        args[1],
-        'Usage: architect query getValidTransitionsFrom <status>',
-      );
+      const status = requireArg(args[1], 'Usage: architect query getValidTransitionsFrom <status>');
       return api.getValidTransitionsFrom(parseProcessStatusValue(status));
     }
     case 'getProtectionInfo': {
@@ -453,7 +492,8 @@ async function executeArchCommand(
       }
       const packageName = args[1];
       if (packageName !== undefined) {
-        const pkgPatterns = byPackage[packageName];
+        const resolved = resolvePackageFilter(Object.keys(byPackage).sort(), packageName);
+        const pkgPatterns = byPackage[resolved];
         return pkgPatterns !== undefined ? toCompactSummaries(pkgPatterns) : [];
       }
       const result: Record<string, { count: number; patterns: readonly string[] }> = {};
@@ -462,7 +502,9 @@ async function executeArchCommand(
       )) {
         result[pkgId] = {
           count: pkgPatterns.length,
-          patterns: pkgPatterns.map((p) => p.patternName ?? p.name).sort((a, b) => a.localeCompare(b)),
+          patterns: pkgPatterns
+            .map((p) => p.patternName ?? p.name)
+            .sort((a, b) => a.localeCompare(b)),
         };
       }
       return result;

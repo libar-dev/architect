@@ -47,6 +47,36 @@ export function normalizeScopeValidateInput(
   };
 }
 
+/**
+ * The mutually-exclusive `rules` scope filters cannot be combined. Surfaced as
+ * its own function so the CLI can reject the conflict BEFORE any per-flag value
+ * resolution (package / decision fail-loud), keeping the usage error about
+ * combining flags independent of whether each individual value is valid.
+ */
+export function assertSingleRuleScopeFilter(flags: Readonly<Record<string, unknown>>): void {
+  const typedFlags = flags as {
+    readonly productArea?: string;
+    readonly pattern?: string;
+    readonly package?: string;
+    readonly feature?: string;
+    readonly decision?: string;
+  };
+
+  const scopeFilters = [
+    typedFlags.productArea,
+    typedFlags.pattern,
+    typedFlags.package,
+    typedFlags.feature,
+    typedFlags.decision,
+  ].filter((value) => value !== undefined);
+
+  if (scopeFilters.length > 1) {
+    throw new Error(
+      '--pattern, --product-area, --package, --feature, and --decision cannot be combined',
+    );
+  }
+}
+
 export function buildBusinessRuleSetProjectionOptions(
   flags: Readonly<Record<string, unknown>>,
 ): BusinessRuleSetOptions {
@@ -55,20 +85,19 @@ export function buildBusinessRuleSetProjectionOptions(
     readonly pattern?: string;
     readonly package?: string;
     readonly feature?: string;
+    readonly decision?: string;
     readonly onlyInvariants?: boolean;
   };
 
-  const scopeFilters = [
-    typedFlags.productArea,
-    typedFlags.pattern,
-    typedFlags.package,
-    typedFlags.feature,
-  ].filter((value) => value !== undefined);
+  assertSingleRuleScopeFilter(flags);
 
-  if (scopeFilters.length > 1) {
-    throw new Error('--pattern, --product-area, --package, and --feature cannot be combined');
+  if (typedFlags.decision !== undefined) {
+    return {
+      scope: 'decision',
+      scopeValue: typedFlags.decision,
+      onlyInvariants: typedFlags.onlyInvariants === true,
+    };
   }
-
   if (typedFlags.pattern !== undefined) {
     return {
       scope: 'feature',

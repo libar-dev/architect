@@ -1,7 +1,7 @@
 import {
   findPatternParseFailure,
   fuzzyMatchPatterns,
-  type AcceptedStatusValue,
+  type StatusFilterValue,
 } from '@libar-dev/architect-core';
 import {
   ProgressiveDisclosureLevelSchema,
@@ -29,8 +29,9 @@ import {
   parseBundleIncludeValues,
   parseBundleModeValue,
   parseSchemaValue,
-  parseAcceptedStatusValue,
   parseRenderFormatValue,
+  parseStatusFilterValue,
+  resolvePackageFilter,
 } from './_shared/schemas.js';
 import { requireCliContext, requireFirstPositional } from './_shared/runtime.js';
 import { writeJson, writeProjectionOutput } from './_shared/output.js';
@@ -261,7 +262,7 @@ export const readCommands: Pick<Record<CommandName, CommandDef>, ReadCommandName
       '--status': {
         kind: 'value',
         key: 'status',
-        parse: parseAcceptedStatusValue,
+        parse: parseStatusFilterValue,
       },
       '--role': {
         kind: 'value',
@@ -286,18 +287,23 @@ export const readCommands: Pick<Record<CommandName, CommandDef>, ReadCommandName
     },
     execute(context, parsed): void {
       const flags = parsed.flags as {
-        readonly status?: AcceptedStatusValue;
+        readonly status?: StatusFilterValue;
         readonly role?: string;
         readonly parent?: string;
         readonly package?: string;
         readonly count?: boolean;
         readonly namesOnly?: boolean;
       };
-      const catalog = projectPatternCatalog(requireCliContext(context).projection, {
+      const cliContext = requireCliContext(context);
+      const resolvedPackage =
+        flags.package !== undefined
+          ? resolvePackageFilter(cliContext.api.listPackages(), flags.package)
+          : undefined;
+      const catalog = projectPatternCatalog(cliContext.projection, {
         ...(flags.status !== undefined ? { status: flags.status } : {}),
         ...(flags.role !== undefined ? { role: flags.role } : {}),
         ...(flags.parent !== undefined ? { parent: flags.parent } : {}),
-        ...(flags.package !== undefined ? { package: flags.package } : {}),
+        ...(resolvedPackage !== undefined ? { package: resolvedPackage } : {}),
         count: flags.count === true,
         namesOnly: flags.namesOnly === true,
       }).root;

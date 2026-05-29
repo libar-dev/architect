@@ -6,13 +6,19 @@ import {
   RenderFormatSchema,
   ScopeTypeSchema,
   SessionTypeSchema,
+  StatusFilterSchema,
+  getPatternName,
+  listDecisionPatterns,
   parseAtBoundary,
+  resolveDecisionPattern,
   type AcceptedStatusValue,
   type HandoffSessionType,
   type NormalizedStatus,
+  type PatternGraph,
   type ProcessStatusValue,
   type ScopeType,
   type SessionType,
+  type StatusFilterValue,
 } from '@libar-dev/architect-core';
 import { BundleIncludeSchema, BundleModeSchema } from '@libar-dev/architect-projection/projections';
 import { ContentRichnessSchema, type ContentRichness } from '@libar-dev/architect-projection';
@@ -61,7 +67,7 @@ export const HandoffFlagsSchema = z
 
 export const ListFlagsSchema = z
   .strictObject({
-    status: AcceptedStatusSchema.optional(),
+    status: StatusFilterSchema.optional(),
     role: z.string().optional(),
     parent: z.string().optional(),
     package: z.string().optional(),
@@ -83,6 +89,7 @@ export const RulesFlagsSchema = z
     pattern: z.string().optional(),
     package: z.string().optional(),
     feature: z.string().optional(),
+    decision: z.string().optional(),
     onlyInvariants: z.boolean().optional(),
     count: z.boolean().optional(),
     namesOnly: z.boolean().optional(),
@@ -124,16 +131,81 @@ export const ArchFlagsSchema = z
   })
   .readonly();
 
+/**
+ * Defensively read the finite accepted-value set from a Zod schema.
+ *
+ * Zod 4 `z.enum([...])` exposes its members via `.options`, and `.describe(...)`
+ * preserves both the `ZodEnum` brand and `.options` — so wrapped enums
+ * (e.g. `ProgressiveDisclosureLevelSchema`, `ContentRichnessSchema`) are still
+ * covered. `.options` is typed `EnumValue[]` (`string | number`), so each entry
+ * is normalised to a string. Non-enum schemas (e.g. `z.number().int()`) have no
+ * finite set and yield `undefined` — callers fall back to the bare message.
+ */
+function acceptedEnumValues(schema: z.ZodType): readonly string[] | undefined {
+  if (schema instanceof z.ZodEnum) {
+    return schema.options.map((option) => String(option));
+  }
+  return undefined;
+}
+
 export function parseSchemaValue<T>(schema: z.ZodType<T>, value: unknown, errorMessage: string): T {
   try {
     return parseAtBoundary(schema, value, errorMessage);
   } catch {
+    const accepted = acceptedEnumValues(schema);
+    if (accepted !== undefined && accepted.length > 0) {
+      // Mirror the self-documenting `query <typo>` whitelist behaviour: keep the
+      // leading token (callers may pin on it) then enumerate the accepted set and
+      // echo the received value.
+      throw new Error(
+        `${errorMessage}: invalid value ${JSON.stringify(String(value))}. Accepted: ${accepted.join(', ')}`,
+      );
+    }
     throw new Error(errorMessage);
   }
 }
 
 export function parseIntegerValue(value: string, errorMessage: string): number {
   return parseSchemaValue(z.number().int(), Number.parseInt(value, 10), errorMessage);
+}
+
+/**
+ * Fail-loud resolver for the `--package` filter — the dynamic analogue of the
+ * `acceptedEnumValues` whitelist. `accepted` is the live set of canonical
+ * workspace package ids (from `PatternGraphAPI.listPackages()`), an UNSCOPED
+ * config-declared key such as `architect-core`. Returns `value` when it is in
+ * the accepted set, else throws an error enumerating the accepted set — so the
+ * scoped `@libar-dev/...` form and a display name both fail loud (No-BC: the
+ * scoped form is rejected, not aliased). Shared by `arch packages`, `list`, and
+ * `rules` so the rejection message is identical across all three surfaces.
+ */
+export function resolvePackageFilter(accepted: readonly string[], value: string): string {
+  if (accepted.includes(value)) {
+    return value;
+  }
+  throw new Error(
+    `--package: invalid value ${JSON.stringify(value)}. Accepted: ${[...accepted].sort().join(', ')}`,
+  );
+}
+
+/**
+ * Fail-loud resolver for the `--decision` filter — the decision analogue of
+ * `resolvePackageFilter`. Accepts any decision-reference form the kernel
+ * recognizes (canonical pattern name `ADR009ProjectionTrustBoundary`, human ADR
+ * id `ADR-009` / `ADR009` / `009`) and returns the canonical decision pattern
+ * NAME so the projection's decision scope matches on a single normalized key.
+ * An unmatched value throws an error enumerating the accepted decisions — never
+ * a silent empty result (No-BC: a typo fails loud, it is not aliased away).
+ */
+export function resolveDecisionFilter(graph: PatternGraph, value: string): string {
+  const resolved = resolveDecisionPattern(graph, value);
+  if (resolved !== undefined) {
+    return getPatternName(resolved);
+  }
+  const accepted = listDecisionPatterns(graph).map(getPatternName);
+  throw new Error(
+    `--decision: invalid value ${JSON.stringify(value)}. Accepted: ${[...accepted].sort().join(', ')}`,
+  );
 }
 
 export function parseSessionTypeValue(value: string): SessionType {
@@ -161,6 +233,23 @@ export function parseAcceptedStatusValue(value: string): AcceptedStatusValue {
     AcceptedStatusSchema,
     value,
     `Expected accepted status value, received: ${value}`,
+  );
+}
+
+/**
+ * Boundary parser for the consumer-facing status FILTER vocabulary used by
+ * `list --status` (and its MCP twin). Distinct from `parseAcceptedStatusValue`
+ * (authored-tag validator) and `parseProcessStatusValue` (FSM transition
+ * validator): the filter set additionally accepts the normalized bucket word
+ * `planned` (roadmap ∪ deferred), so every word an agent reads in `overview` /
+ * `getStatusDistribution` is a legal filter. `parseSchemaValue` auto-enumerates
+ * the six accepted words on a typo so the error self-documents the bridge.
+ */
+export function parseStatusFilterValue(value: string): StatusFilterValue {
+  return parseSchemaValue(
+    StatusFilterSchema,
+    value,
+    `Expected status filter value, received: ${value}`,
   );
 }
 

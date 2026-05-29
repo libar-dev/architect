@@ -14,8 +14,13 @@ import {
   RulesFlagsSchema,
   StringArraySchema,
   TaxonomyFlagsSchema,
+  resolveDecisionFilter,
+  resolvePackageFilter,
 } from './_shared/schemas.js';
-import { buildBusinessRuleSetProjectionOptions } from './_shared/projection-options.js';
+import {
+  assertSingleRuleScopeFilter,
+  buildBusinessRuleSetProjectionOptions,
+} from './_shared/projection-options.js';
 import { requireCliContext } from './_shared/runtime.js';
 import { writeJson, writeProjectionOutput } from './_shared/output.js';
 
@@ -25,9 +30,9 @@ export const metaCommands = {
     positional: StringArraySchema,
     flags: RulesFlagsSchema,
     usage:
-      'Usage: architect rules [--product-area <name>] [--pattern <name>] [--package <workspace-name>] [--feature <path-or-glob>] [--only-invariants] [--count] [--names-only]',
+      'Usage: architect rules [--product-area <name>] [--pattern <name>] [--package <workspace-package-id>] [--feature <path-or-glob>] [--decision <ADR>] [--only-invariants] [--count] [--names-only]',
     helpSignature:
-      'rules [--product-area <name>] [--pattern <name>] [--package <workspace-name>] [--feature <path-or-glob>] [--only-invariants] [--count] [--names-only]',
+      'rules [--product-area <name>] [--pattern <name>] [--package <workspace-package-id>] [--feature <path-or-glob>] [--decision <ADR>] [--only-invariants] [--count] [--names-only]',
     rejectBareValues: true,
     flagParsers: {
       '--product-area': {
@@ -46,6 +51,10 @@ export const metaCommands = {
         kind: 'value',
         key: 'feature',
       },
+      '--decision': {
+        kind: 'value',
+        key: 'decision',
+      },
       '--only-invariants': {
         kind: 'boolean',
         key: 'onlyInvariants',
@@ -63,10 +72,29 @@ export const metaCommands = {
       const flags = parsed.flags as {
         readonly count?: boolean;
         readonly namesOnly?: boolean;
+        readonly package?: string;
+        readonly decision?: string;
       };
+      const cliContext = requireCliContext(context);
+      // Reject combined scope filters before resolving any individual value, so
+      // the conflict error wins over a per-flag fail-loud (package / decision).
+      assertSingleRuleScopeFilter(parsed.flags);
+      let resolvedFlags: Readonly<Record<string, unknown>> = parsed.flags;
+      if (flags.package !== undefined) {
+        resolvedFlags = {
+          ...resolvedFlags,
+          package: resolvePackageFilter(cliContext.api.listPackages(), flags.package),
+        };
+      }
+      if (flags.decision !== undefined) {
+        resolvedFlags = {
+          ...resolvedFlags,
+          decision: resolveDecisionFilter(cliContext.api.getPatternGraph(), flags.decision),
+        };
+      }
       const ruleSet = projectBusinessRuleSet(
-        requireCliContext(context).projection,
-        buildBusinessRuleSetProjectionOptions(parsed.flags),
+        cliContext.projection,
+        buildBusinessRuleSetProjectionOptions(resolvedFlags),
       );
       if (flags.namesOnly === true) {
         const childRuleSets = Object.values(ruleSet.children) as {

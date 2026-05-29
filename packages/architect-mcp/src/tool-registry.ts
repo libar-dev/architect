@@ -45,7 +45,7 @@ import {
   parseAndProjectConfig,
   parseAndProjectDocumentationBundle,
   projectBusinessRuleSet,
-  projectDependencyTree,
+  projectDependencyContext,
   projectFileReadingList,
   projectHandoffRecord,
   projectOpenQuestionList,
@@ -417,10 +417,9 @@ const TOOL_HANDLERS: Record<RegisteredToolName, ToolHandler> = {
     }),
     handle: ({ name, maxDepth }, session) =>
       renderTextToolResult(
-        projectDependencyTree(getProjectionContext(session), {
+        projectDependencyContext(getProjectionContext(session), {
           pattern: name,
           maxDepth: maxDepth ?? 10,
-          includeImplementationDeps: false,
         }),
       ),
   }),

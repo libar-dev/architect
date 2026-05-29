@@ -1,6 +1,6 @@
 import { projectOverviewDigest, projectStatusDistribution } from '@libar-dev/architect-projection';
 import {
-  projectDependencyTree,
+  projectDependencyContext,
   projectFileReadingList,
   projectSessionContextBundle,
 } from '@libar-dev/architect-projection/projections';
@@ -132,10 +132,9 @@ export const reportingCommands = {
       const flags = parsed.flags as { readonly depth?: number };
       writeProjectionOutput(
         context.args,
-        projectDependencyTree(requireCliContext(context).projection, {
+        projectDependencyContext(requireCliContext(context).projection, {
           pattern,
           maxDepth: flags.depth ?? context.args.depth,
-          includeImplementationDeps: false,
         }),
       );
     },

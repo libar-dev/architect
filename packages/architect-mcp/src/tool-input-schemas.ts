@@ -11,6 +11,7 @@ import {
   ScopeTypeSchema,
   SafeStringSchema,
   SessionTypeSchema,
+  StatusFilterSchema,
 } from '@libar-dev/architect-core';
 import {
   PatternBundleOptionsSchema,
@@ -88,7 +89,7 @@ export const SearchQueryShape = {
 } satisfies z.ZodRawShape;
 
 export const ListFilterShape = {
-  status: AcceptedStatusSchema.optional(),
+  status: StatusFilterSchema.optional(),
   role: SafeStringSchema.optional(),
   namesOnly: z.boolean().optional(),
   count: z.boolean().optional(),
