@@ -23,8 +23,10 @@
  * **Invariant:** Pattern lookup is case-insensitive and falls back through
  * exact, canonical-name, and lowercased-key matches; unknown names throw
  * `PATTERN_NOT_FOUND` with a fuzzy suggestion bounded by a minimum similarity
- * score and a maximum Levenshtein distance; relationship normalization falls
- * back to raw pattern arrays when the relationship index is absent; and
+ * score and a maximum Levenshtein distance; relationship normalization throws
+ * `PATTERN_RELATIONSHIP_INVARIANT` when the canonical relationship index is
+ * absent for an existing pattern (mirroring the upstream `pattern-helpers.ts`
+ * canonical resolver — ADR-006: no silent fallback to raw pattern arrays); and
  * `ImplementationRef` objects are always emitted in a stable shape.
  *
  * **Behavior:**
@@ -134,22 +136,14 @@ export function normalizePatternRelationships(
   context: ProjectionContext,
   patternName: string,
 ): PatternRelationships {
-  const pattern = requirePattern(context, patternName);
+  requirePattern(context, patternName);
   const relationships = getRelationships(context, patternName);
 
   if (relationships === undefined) {
-    return {
-      dependsOn: [...(pattern.uses ?? [])],
-      enables: [],
-      uses: [...(pattern.uses ?? [])],
-      usedBy: [],
-      implementsPatterns: [...(pattern.implementsPatterns ?? [])],
-      implementedBy: [],
-      ...(pattern.extendsPattern !== undefined ? { extendsPattern: pattern.extendsPattern } : {}),
-      extendedBy: [],
-      seeAlso: [...(pattern.seeAlso ?? [])],
-      apiRef: [...(pattern.apiRef ?? [])],
-    };
+    throw new ProjectionError(
+      'PATTERN_RELATIONSHIP_INVARIANT',
+      `Projection invariant violated: canonical relationship entry missing for pattern "${patternName}". The relationship index must be populated by transformToPatternGraph; falling back to raw pattern.uses arrays would silently return wrong relationship data to AI agents (ADR-006).`,
+    );
   }
 
   return {
