@@ -4,7 +4,7 @@
 @architect-status:completed
 @architect-product-area:Projection
 @architect-role:projection
-@projection @pattern-relations
+@pattern-relations
 Feature: Pattern catalog status filter speaks both FSM and normalized words
   The pattern catalog `--status` filter accepts every word a cold-start agent
   reads in `overview`/`getStatusDistribution`. The normalized bucket word
