@@ -38,7 +38,7 @@ const FROZEN_COMMAND_INVENTORY = [
   'open-questions [--parent <PatternName>]',
   'search <query>',
   'arch roles|bounded-context [name]|neighborhood <pattern>|graph|compare <bounded-context-a> <bounded-context-b>|coverage|dangling [--baseline <path>] [--write-baseline] [--strict]|orphans|blocking|packages [name]',
-  'rules [--product-area <name>] [--pattern <name>] [--package <workspace-name>] [--feature <path-or-glob>] [--only-invariants] [--count] [--names-only]',
+  'rules [--product-area <name>] [--pattern <name>] [--package <workspace-package-id>] [--feature <path-or-glob>] [--decision <ADR>] [--only-invariants] [--count] [--names-only]',
   'diagnostics',
   'tags',
   'taxonomy [--count]',
@@ -257,7 +257,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             {
               command:
                 "pattern-graph-cli -i 'src/**/*.ts' --format json dep-tree ContextFormatterImpl --depth 2",
-              expectedKind: 'DependencyTree',
+              expectedKind: 'DependencyContext',
             },
             {
               command: "pattern-graph-cli -i 'src/**/*.ts' --format json arch bounded-context api",

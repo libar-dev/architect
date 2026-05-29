@@ -162,8 +162,13 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             () => {
               // The architecture glimpse derives from a separate component-scope
               // graph walk; its exact Mermaid is exercised in the disclosure rule
-              // below, so split it off and assert the stable fields exactly.
-              const { architecture, ...root } = state!.overview!.root;
+              // below. The orientation block (registry-derived references + the
+              // graph-derived safe-to-start set), the role distribution, and the
+              // curated cliHints are asserted structurally afterwards (their exact
+              // wording is presentation copy that evolves with the Gap Ledger), so
+              // split them off and assert the stable structural fields exactly.
+              const { architecture, orientation, roleDistribution, cliHints, ...root } =
+                state!.overview!.root;
               expect({ root, children: state!.overview!.children }).toEqual({
                 root: {
                   kind: 'OverviewDigest',
@@ -214,23 +219,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                     verb: `documentation ${identity.key}`,
                     summary: identity.description,
                   })),
-                  cliHints: [
-                    '=== DATA API — Use Instead of Explore Agents ===',
-                    'pnpm architect:query -- <subcommand>',
-                    '',
-                    '  overview                             Project health (this output)',
-                    '  context <pattern> --session <type>   Curated context bundle (planning/design/implement)',
-                    '  scope-validate <pattern> <session>   Pre-flight check before starting work',
-                    '  dep-tree <pattern>                   Dependency chains',
-                    '  list --status roadmap                Available patterns to work on',
-                    '  context <pattern> --session design   Includes stubs in the curated bundle',
-                    '  files <pattern>                      File paths for a pattern',
-                    '  rules                                Business rules from Gherkin',
-                    '  arch blocking                        Patterns stuck on incomplete deps',
-                    '',
-                    'Full reference: pnpm architect:query -- --help',
-                    'Agent environments: load the `architect-data-api` skill for verb shapes, deterministic gates, and known quirks.',
-                  ],
                 },
                 children: {},
               });
@@ -239,6 +227,26 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               expect(architecture?.packageChart.type).toBe('mermaid');
               expect(architecture?.contextMap?.type).toBe('mermaid');
               expect(architecture?.pointer).toContain('not grep');
+
+              // Orientation references are the curated orientation-doc subset,
+              // derived from the registry (verb + title), in declared order.
+              expect(orientation?.references.map((reference) => reference.docType)).toEqual([
+                'decisions',
+                'taxonomy',
+                'validation-rules',
+                'business-rules',
+                'api-reference',
+              ]);
+              expect(orientation?.disclosureHint).toContain('--disclosure');
+              expect(typeof orientation?.startableCount).toBe('number');
+              // Role distribution tallies the canonical @architect-role of every
+              // pattern that declares one; sorted by count descending.
+              expect(Array.isArray(roleDistribution)).toBe(true);
+              // cliHints lead with the Data API banner and promote the map verb.
+              expect(cliHints?.[0]).toContain('DATA API');
+              expect(cliHints?.some((hint) => hint.includes('documentation architecture'))).toBe(
+                true,
+              );
             },
           );
 

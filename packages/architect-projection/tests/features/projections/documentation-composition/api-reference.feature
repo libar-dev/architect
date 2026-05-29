@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:ApiReferenceProjectionExecutableTests
 @architect-implements:ApiReferenceProjection
+@architect-enforces-decision:ADR009ProjectionTrustBoundary
 @architect-status:active
 @architect-product-area:Projection
 @architect-role:projection

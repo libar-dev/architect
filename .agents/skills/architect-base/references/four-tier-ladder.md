@@ -16,12 +16,12 @@ planning intent.
 
 ## Tiers
 
-| Tier      | Authored status / location                                         | Folder                        | Line budget               | What this tier adds vs the one above                                                                                                                                                                                                                                                                           |
-| --------- | ------------------------------------------------------------------ | ----------------------------- | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Tier      | Authored status / location                                         | Folder                        | Line budget               | What this tier adds vs the one above                                                                                                                                                                                                                                                                                                                                    |
+| --------- | ------------------------------------------------------------------ | ----------------------------- | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Idea      | `@architect-status:candidate`; idea-tier shape                     | `architect/specs/ideas/`      | **≤30 lines (warn-only)** | User story + 1-3 invariant-only rules. Six authored tags total (the five baseline + explicit `@architect-maturity:idea`); structural-variant carve-outs (epic / slice) may add `**Members:**` and `**Usage:**` blocks — see "Epic and slice variants" below. Both still respect the ≤30 budget. Otherwise no `Background:`, no scenarios, no rationale, no verified-by. |
-| Candidate | `@architect-status:candidate`; candidate-tier shape                | `architect/specs/candidates/` | **30-80 lines**           | Adds `**Open Questions:**` block + 1-2 happy-path scenarios; drops the explicit `@architect-maturity:idea` (maturity derives to `idea` from `status:candidate` — still consideration — which releases it from idea-tier gating).                                                                                |
-| Plan      | `@architect-status:roadmap`; deliverables + plan-tier metadata     | `architect/specs/`            | untyped (150+)            | Adds deliverables table, full scenario set, and `**Rationale:**` / `**Verified by:**` on rules. Hierarchy-axis metadata stays on the `@architect-level` / `@architect-parent` pair.                                                                                                                            |
-| Design    | `@architect-status:roadmap`; plan-tier shape plus design scaffolds | `architect/specs/`            | untyped (300+)            | Adds stubs in `architect/stubs/<pattern>/`, error/edge/integration scenarios, ADR refs.                                                                                                                                                                                                                        |
+| Candidate | `@architect-status:candidate`; candidate-tier shape                | `architect/specs/candidates/` | **30-80 lines**           | Adds `**Open Questions:**` block + 1-2 happy-path scenarios; drops the explicit `@architect-maturity:idea` (maturity derives to `idea` from `status:candidate` — still consideration — which releases it from idea-tier gating).                                                                                                                                        |
+| Plan      | `@architect-status:roadmap`; deliverables + plan-tier metadata     | `architect/specs/`            | untyped (150+)            | Adds deliverables table, full scenario set, and `**Rationale:**` / `**Verified by:**` on rules. Hierarchy-axis metadata stays on the `@architect-level` / `@architect-parent` pair.                                                                                                                                                                                     |
+| Design    | `@architect-status:roadmap`; plan-tier shape plus design scaffolds | `architect/specs/`            | untyped (300+)            | Adds stubs in `architect/stubs/<pattern>/`, error/edge/integration scenarios, ADR refs.                                                                                                                                                                                                                                                                                 |
 
 ## Mandatory tags per tier
 
@@ -35,7 +35,7 @@ The four-tier ladder is the maturity axis. It is independent of the hierarchy ax
 4. `@architect-product-area:<area>`
 5. `@architect-parent:<ParentPattern>`
 
-**Idea tier adds a 6th:** `@architect-maturity:idea`. This is the explicit discriminator the guard's `detectIdeaTier` requires (`packages/architect-guard/src/lint/idea-tier/`) — without it, an `architect/specs/ideas/` file is *not* recognized as idea-tier and silently escapes idea-tier validation (line budget, baseline-tag count, parent requirement). Authored only at idea tier; **dropped on promotion to candidate** — removing it is what releases the spec from idea-tier gating, and maturity then derives to `idea` from `status:candidate` (still consideration, no longer the explicit opt-in). The guard's idea-tier minimum-tag count is the five (gate, pattern, status, **maturity**, product-area), with `@architect-parent` enforced separately — matching `formal-spec/08-spec-evolution.md`'s six-tag idea minimum.
+**Idea tier adds a 6th:** `@architect-maturity:idea`. This is the explicit discriminator the guard's `detectIdeaTier` requires (`packages/architect-guard/src/lint/idea-tier/`) — without it, an `architect/specs/ideas/` file is _not_ recognized as idea-tier and silently escapes idea-tier validation (line budget, baseline-tag count, parent requirement). Authored only at idea tier; **dropped on promotion to candidate** — removing it is what releases the spec from idea-tier gating, and maturity then derives to `idea` from `status:candidate` (still consideration, no longer the explicit opt-in). The guard's idea-tier minimum-tag count is the five (gate, pattern, status, **maturity**, product-area), with `@architect-parent` enforced separately — matching `formal-spec/08-spec-evolution.md`'s six-tag idea minimum.
 
 ## Epic and slice variants
 
@@ -52,14 +52,14 @@ Epic file shape: idea template + a human-facing `**Members:**` bullet list namin
 `plan` = delivery); an explicit value always wins (`formal-spec/04` "explicit always
 wins"). Canonical defaults live at `formal-spec/04-tag-registry.md`
 § "Status → Maturity Defaults" (`candidate→idea`, `roadmap→plan`, `active→design`,
-`completed→executable`). The **one place an explicit tag is *required*** is the idea
+`completed→executable`). The **one place an explicit tag is _required_** is the idea
 tier; elsewhere it is normally left to derive (an explicit override is permitted but
 rarely needed).
 
 **Why the idea tier needs the explicit tag.** A file in `architect/specs/ideas/`
 must author `@architect-maturity:idea` to be recognized as idea-tier by the guard
 (`packages/architect-guard/src/lint/idea-tier/`); `@architect-status:candidate`
-alone is *not* sufficient, because the candidate tier shares that status (and legacy
+alone is _not_ sufficient, because the candidate tier shares that status (and legacy
 specs may carry no explicit maturity), and the guard **deliberately stopped** inferring
 idea-tier from it (otherwise those specs cascade false positives through the idea-tier
 checks). The PatternGraph auto-defaults `candidate→idea` for queries, but the guard's
@@ -69,7 +69,7 @@ the explicit tag.
 **Why the candidate tier drops the explicit tag.** Promoting idea→candidate **drops**
 the explicit `@architect-maturity:idea` (status stays `candidate`). Removing it is what
 releases the spec from idea-tier gating; its maturity then derives to `idea` from
-`status:candidate` — still the *consideration* track (open questions unresolved), exactly
+`status:candidate` — still the _consideration_ track (open questions unresolved), exactly
 as `DEFAULT_MATURITY_BY_STATUS` prescribes. Delivery commitment (`maturity:plan`) normally
 arrives at the acceptance gate, when status advances to `roadmap` — though an explicit
 `@architect-maturity:plan` may mark delivery earlier (§04 "explicit always wins"; valid at

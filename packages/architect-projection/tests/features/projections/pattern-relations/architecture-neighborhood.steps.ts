@@ -106,6 +106,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 usedBy: ['PatternBrowserView'],
                 dependsOn: ['PatternGraph'],
                 enables: ['ArchitectMcpServer'],
+                seeAlso: [],
+                enforcedBy: [],
                 sameContext: ['ContextAssemblerImpl'],
                 implements: ['PatternGraphReadModel'],
                 implementedBy: [
@@ -192,6 +194,57 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             expect(state!.bundle?.root.sameContext).toEqual([]);
             expect(state!.bundle?.root.uses).toEqual(['PatternHelpers']);
           });
+        },
+      );
+
+      RuleScenario(
+        'a decision neighborhood surfaces its see-also governance chain and enforcedBy rules',
+        ({ Given, When, Then }) => {
+          Given(
+            'an architecture neighborhood context for a decision with see-also links and enforcing rules',
+            () => {
+              state!.context = createProjectionContext({
+                patterns: [
+                  createPattern('ADR009ProjectionTrustBoundary'),
+                  createPattern('ADR005CodecBasedMarkdownRendering'),
+                  createPattern('ADR006SingleReadModelArchitecture'),
+                  createPattern('ApiReferenceProjectionExecutableTests'),
+                ],
+                relationshipIndex: {
+                  ADR009ProjectionTrustBoundary: createRelationshipEntry({
+                    seeAlso: [
+                      'ADR005CodecBasedMarkdownRendering',
+                      'ADR006SingleReadModelArchitecture',
+                    ],
+                    enforcedBy: ['ApiReferenceProjectionExecutableTests'],
+                  }),
+                },
+              });
+            },
+          );
+
+          When(
+            'I project the architecture neighborhood for "ADR009ProjectionTrustBoundary"',
+            () => {
+              state!.bundle = projectArchitectureNeighborhood(
+                state!.context!,
+                'ADR009ProjectionTrustBoundary',
+              );
+            },
+          );
+
+          Then(
+            'the architecture neighborhood should list its see-also decisions and the rules that enforce it',
+            () => {
+              expect(state!.bundle?.root.seeAlso).toEqual([
+                'ADR005CodecBasedMarkdownRendering',
+                'ADR006SingleReadModelArchitecture',
+              ]);
+              expect(state!.bundle?.root.enforcedBy).toEqual([
+                'ApiReferenceProjectionExecutableTests',
+              ]);
+            },
+          );
         },
       );
     },

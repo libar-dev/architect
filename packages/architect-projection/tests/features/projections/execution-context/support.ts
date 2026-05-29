@@ -93,6 +93,8 @@ export function createRelationshipEntry(
     extendedBy: overrides.extendedBy ?? [],
     seeAlso: overrides.seeAlso ?? [],
     apiRef: overrides.apiRef ?? [],
+    enforcesDecisions: overrides.enforcesDecisions ?? [],
+    enforcedBy: overrides.enforcedBy ?? [],
   };
 }
 

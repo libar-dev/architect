@@ -250,6 +250,70 @@ export function createFeatureFilesWithRules(): Array<{ path: string; content: st
   ];
 }
 
+export function createDecisionEnforcingFeatureFiles(): Array<{ path: string; content: string }> {
+  return [
+    {
+      path: 'architect/decisions/adr-777-sample.feature',
+      content: [
+        '@architect',
+        '@architect-adr:777',
+        '@architect-pattern:ADR777Sample',
+        '@architect-status:completed',
+        '@architect-product-area:Validation',
+        'Feature: ADR-777 Sample Decision',
+        '',
+        '  Rule: Decision record owns its rationale',
+        '',
+        '    **Invariant:** The decision feature carries its own rule.',
+        '',
+        '    @acceptance-criteria',
+        '    Scenario: Own rule',
+        '      Given the decision record',
+        '      Then it owns a rule',
+      ].join('\n'),
+    },
+    {
+      path: 'packages/architect-core/specs/enforcer-rules.feature',
+      content: [
+        '@architect',
+        '@architect-pattern:DecisionEnforcerTest',
+        '@architect-status:completed',
+        '@architect-product-area:Validation',
+        '@architect-enforces-decision:777',
+        'Feature: Decision Enforcer Test',
+        '',
+        '  Rule: Enforcer keeps the decision invariant',
+        '',
+        '    **Invariant:** This rule enforces ADR-777.',
+        '',
+        '    @acceptance-criteria',
+        '    Scenario: Enforced invariant',
+        '      Given a guarded operation',
+        '      Then ADR-777 holds',
+      ].join('\n'),
+    },
+    {
+      path: 'packages/architect-cli/specs/unrelated-rules.feature',
+      content: [
+        '@architect',
+        '@architect-pattern:UnrelatedRulesTest',
+        '@architect-status:completed',
+        '@architect-product-area:CoreTypes',
+        'Feature: Unrelated Rules Test',
+        '',
+        '  Rule: Unrelated rule is excluded from the decision set',
+        '',
+        '    **Invariant:** This rule does not enforce ADR-777.',
+        '',
+        '    @acceptance-criteria',
+        '    Scenario: Unrelated invariant',
+        '      Given an unrelated operation',
+        '      Then nothing about ADR-777 applies',
+      ].join('\n'),
+    },
+  ];
+}
+
 export function createParentHierarchyFeatureFiles(): Array<{ path: string; content: string }> {
   return [
     {
@@ -472,6 +536,29 @@ export async function writeFeatureFilesWithRules(state: CLITestState | null): Pr
     ].join('\n'),
   );
   for (const file of createFeatureFilesWithRules()) {
+    await writeTempFile(dir, file.path, file.content);
+  }
+}
+
+export async function writeDecisionEnforcingFeatureFiles(
+  state: CLITestState | null,
+): Promise<void> {
+  const dir = getTempDir(state);
+  await writeTempFile(
+    dir,
+    'architect.config.js',
+    [
+      'export default {',
+      '  packages: [',
+      "    { id: 'architect-cli', displayName: 'Architect CLI', match: 'packages/architect-cli/' },",
+      "    { id: 'architect-core', displayName: 'Architect Core', match: 'packages/architect-core/' },",
+      "    { id: 'architect-dev', displayName: 'Architect Host', match: 'architect/' },",
+      '  ],',
+      '};',
+      '',
+    ].join('\n'),
+  );
+  for (const file of createDecisionEnforcingFeatureFiles()) {
     await writeTempFile(dir, file.path, file.content);
   }
 }

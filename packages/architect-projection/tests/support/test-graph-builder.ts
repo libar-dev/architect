@@ -59,6 +59,7 @@ export interface PatternStubOptions {
   readonly usedBy?: readonly string[];
   readonly enables?: readonly string[];
   readonly implementsPatterns?: ExtractedPattern['implementsPatterns'];
+  readonly enforcesDecisions?: ExtractedPattern['enforcesDecisions'];
   readonly rules?: readonly BusinessRuleStubOptions[];
   readonly adr?: ExtractedPattern['adr'];
   readonly adrStatus?: ExtractedPattern['adrStatus'];
@@ -138,6 +139,9 @@ export function buildPatternStub(name: string, options: PatternStubOptions = {})
     ...(options.uses !== undefined ? { uses: options.uses } : {}),
     ...(options.implementsPatterns !== undefined
       ? { implementsPatterns: options.implementsPatterns }
+      : {}),
+    ...(options.enforcesDecisions !== undefined
+      ? { enforcesDecisions: options.enforcesDecisions }
       : {}),
     ...(options.rules !== undefined
       ? {
@@ -343,6 +347,8 @@ function buildRelationshipIndex(
       extendedBy: override?.extendedBy ?? [],
       seeAlso: override?.seeAlso ?? [...(pattern.seeAlso ?? [])],
       apiRef: override?.apiRef ?? [...(pattern.apiRef ?? [])],
+      enforcesDecisions: override?.enforcesDecisions ?? [...(pattern.enforcesDecisions ?? [])],
+      enforcedBy: override?.enforcedBy ?? [],
     };
   }
 

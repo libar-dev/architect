@@ -20,9 +20,7 @@ import type { StatusCounts } from '../../../src/validation-schemas/pattern-graph
 import type { ProcessStatusValue } from '../../../src/taxonomy/index.js';
 import { createDefaultTagRegistry } from '../../../src/validation-schemas/tag-registry.js';
 
-const feature = await loadFeature(
-  'tests/features/read-api/pattern-graph-api-consistency.feature',
-);
+const feature = await loadFeature('tests/features/read-api/pattern-graph-api-consistency.feature');
 
 const NORMALIZED = ['completed', 'active', 'planned', 'candidate'] as const;
 
@@ -94,11 +92,46 @@ const REPRESENTATIVE_SPECS: readonly PatternSpec[] = [
     seeAlso: [USED_PATTERN],
     apiRef: ['AlphaCore.run'],
   },
-  { name: USED_PATTERN, status: 'completed', phase: 1, quarter: '2026-Q1', role: 'utility', completed: '2026-02-15' },
-  { name: 'GammaCore', status: 'completed', phase: 1, quarter: '2026-Q1', role: 'utility', completed: '2026-03-20' },
-  { name: 'DeltaCore', status: 'completed', phase: 2, quarter: '2026-Q2', role: 'codec', completed: '2026-04-01' },
-  { name: 'EpsilonCore', status: 'completed', phase: 2, quarter: '2026-Q2', role: 'codec', completed: '2026-05-05' },
-  { name: 'ZetaCore', status: 'active', phase: 2, quarter: '2026-Q2', role: 'decider', uses: [USING_PATTERN] },
+  {
+    name: USED_PATTERN,
+    status: 'completed',
+    phase: 1,
+    quarter: '2026-Q1',
+    role: 'utility',
+    completed: '2026-02-15',
+  },
+  {
+    name: 'GammaCore',
+    status: 'completed',
+    phase: 1,
+    quarter: '2026-Q1',
+    role: 'utility',
+    completed: '2026-03-20',
+  },
+  {
+    name: 'DeltaCore',
+    status: 'completed',
+    phase: 2,
+    quarter: '2026-Q2',
+    role: 'codec',
+    completed: '2026-04-01',
+  },
+  {
+    name: 'EpsilonCore',
+    status: 'completed',
+    phase: 2,
+    quarter: '2026-Q2',
+    role: 'codec',
+    completed: '2026-05-05',
+  },
+  {
+    name: 'ZetaCore',
+    status: 'active',
+    phase: 2,
+    quarter: '2026-Q2',
+    role: 'decider',
+    uses: [USING_PATTERN],
+  },
   { name: 'EtaCore', status: 'active', phase: 3, quarter: '2026-Q3', role: 'decider' },
   { name: 'ThetaCore', status: 'active', phase: 3, quarter: '2026-Q3', role: 'projection' },
   { name: 'IotaCore', status: 'roadmap', phase: 3, quarter: '2026-Q3', role: 'projection' },
@@ -214,6 +247,21 @@ describeFeature(feature, ({ Background, Rule }) => {
         );
       });
     });
+
+    RuleScenario(
+      'The planned bucket equals the roadmap plus deferred exact buckets',
+      ({ When, Then }) => {
+        When('I read the planned normalized bucket', () => {
+          state.counts = state.api.getStatusCounts();
+        });
+        Then('the planned bucket size equals the roadmap plus deferred exact bucket sizes', () => {
+          const planned = state.api.getPatternsByNormalizedStatus('planned').length;
+          const roadmap = state.api.getPatternsByStatus('roadmap').length;
+          const deferred = state.api.getPatternsByStatus('deferred').length;
+          expect(planned).toBe(roadmap + deferred);
+        });
+      },
+    );
   });
 
   Rule('Delivery and candidate bases stay separate and correct', ({ RuleScenario }) => {
@@ -527,34 +575,37 @@ describeFeature(feature, ({ Background, Rule }) => {
       });
     });
 
-    RuleScenario('Phase and quarter rollups are bounded by the grand total', ({ When, Then, And }) => {
-      When('I read the status counts', () => {
-        state.counts = state.api.getStatusCounts();
-      });
-      Then('no phase total exceeds the grand total', () => {
-        const total = requireCounts().total;
-        for (const phase of state.api.getAllPhases()) {
-          expect(phase.counts.total).toBeLessThanOrEqual(total);
-        }
-      });
-      And('every phase bucket partitions its own total', () => {
-        for (const phase of state.api.getAllPhases()) {
-          const { completed, active, planned, candidate, total } = phase.counts;
-          expect(completed + active + planned + candidate).toBe(total);
-        }
-      });
-      And('no quarter total exceeds the grand total', () => {
-        const total = requireCounts().total;
-        for (const quarter of state.api.getQuarters()) {
-          expect(quarter.counts.total).toBeLessThanOrEqual(total);
-        }
-      });
-      And('every quarter total equals its pattern-list length', () => {
-        for (const quarter of state.api.getQuarters()) {
-          expect(quarter.counts.total).toBe(quarter.patterns.length);
-        }
-      });
-    });
+    RuleScenario(
+      'Phase and quarter rollups are bounded by the grand total',
+      ({ When, Then, And }) => {
+        When('I read the status counts', () => {
+          state.counts = state.api.getStatusCounts();
+        });
+        Then('no phase total exceeds the grand total', () => {
+          const total = requireCounts().total;
+          for (const phase of state.api.getAllPhases()) {
+            expect(phase.counts.total).toBeLessThanOrEqual(total);
+          }
+        });
+        And('every phase bucket partitions its own total', () => {
+          for (const phase of state.api.getAllPhases()) {
+            const { completed, active, planned, candidate, total } = phase.counts;
+            expect(completed + active + planned + candidate).toBe(total);
+          }
+        });
+        And('no quarter total exceeds the grand total', () => {
+          const total = requireCounts().total;
+          for (const quarter of state.api.getQuarters()) {
+            expect(quarter.counts.total).toBeLessThanOrEqual(total);
+          }
+        });
+        And('every quarter total equals its pattern-list length', () => {
+          for (const quarter of state.api.getQuarters()) {
+            expect(quarter.counts.total).toBe(quarter.patterns.length);
+          }
+        });
+      },
+    );
 
     RuleScenario('Phase progress agrees with the phase patterns', ({ When, Then, And }) => {
       When('I read the status counts', () => {
@@ -615,27 +666,30 @@ describeFeature(feature, ({ Background, Rule }) => {
   );
 
   Rule('The tag-usage oracle agrees with the status counters', ({ RuleScenario }) => {
-    RuleScenario('The tag-usage status tally agrees with the status counts', ({ When, Then, And }) => {
-      When('I read the status counts', () => {
-        state.counts = state.api.getStatusCounts();
-      });
-      And('I aggregate tag usage over the graph', () => {
-        state.tagUsage = aggregateTagUsage(state.api.getPatternGraph());
-      });
-      Then('the tag-usage active count equals the active status count', () => {
-        expect(tagStatusCount('active')).toBe(requireCounts().active);
-      });
-      And('the tag-usage completed count equals the completed status count', () => {
-        expect(tagStatusCount('completed')).toBe(requireCounts().completed);
-      });
-      And('the tag-usage candidate count equals the candidate status count', () => {
-        expect(tagStatusCount('candidate')).toBe(requireCounts().candidate);
-      });
-      And('the tag-usage status total equals the grand total', () => {
-        if (state.tagUsage === null) throw new Error('tag usage not aggregated');
-        const statusTag = state.tagUsage.tags.find((tag) => tag.tag === 'status');
-        expect(statusTag?.count).toBe(requireCounts().total);
-      });
-    });
+    RuleScenario(
+      'The tag-usage status tally agrees with the status counts',
+      ({ When, Then, And }) => {
+        When('I read the status counts', () => {
+          state.counts = state.api.getStatusCounts();
+        });
+        And('I aggregate tag usage over the graph', () => {
+          state.tagUsage = aggregateTagUsage(state.api.getPatternGraph());
+        });
+        Then('the tag-usage active count equals the active status count', () => {
+          expect(tagStatusCount('active')).toBe(requireCounts().active);
+        });
+        And('the tag-usage completed count equals the completed status count', () => {
+          expect(tagStatusCount('completed')).toBe(requireCounts().completed);
+        });
+        And('the tag-usage candidate count equals the candidate status count', () => {
+          expect(tagStatusCount('candidate')).toBe(requireCounts().candidate);
+        });
+        And('the tag-usage status total equals the grand total', () => {
+          if (state.tagUsage === null) throw new Error('tag usage not aggregated');
+          const statusTag = state.tagUsage.tags.find((tag) => tag.tag === 'status');
+          expect(statusTag?.count).toBe(requireCounts().total);
+        });
+      },
+    );
   });
 });

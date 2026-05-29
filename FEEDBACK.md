@@ -10,11 +10,31 @@ for anything that does not fit the verb's shape.
 
 ---
 
+## 2026-05-29 — Resolved: self-documenting value errors close the `--disclosure` / flag-enum confusion
+
+- **Resolves:** "2026-05-27 — `documentation` help advertises rejected flags" and the underlying skill misreport that a flag was "broken."
+- **Resolving change:** CLI value-validation errors now **enumerate the accepted set** in the message. Verified live: `documentation decisions --disclosure brief` → `Error: --disclosure: invalid value "brief". Accepted: essential, important, useful, advanced`; `documentation bogus` → lists all 13 document types; `list --status planned` → `Accepted: candidate, roadmap, active, completed, deferred`; an invalid `overview --richness` → the four richness levels. The valid `--disclosure` enum (`essential|important|useful|advanced`) is now documented explicitly in `architect-data-api`. The earlier "broken flag" conclusion came from guessing a value rather than reading the (now enumerated) error.
+
+## 2026-05-29 — Resolved: `pattern` now surfaces all four classification axes
+
+- **Resolves:** "2026-05-27 — `pattern` / `list` drop already-authored classification fields."
+- **Resolving change (fix 1e):** `pattern <Name> --format json` now returns `boundedContext`, `productArea`, and `level` alongside `role` — all four classification axes from ONE call, each populated when the source declares it. Verified live: `pattern PatternGraphApi` → `role: utility`, `boundedContext: read-api`; `pattern ArchitectureDelta` → `productArea: Generation`. (Axes the source omits return `null`/`""`.) `architect-data-api`'s `pattern` verb description updated. Classification questions the read model should answer no longer force a spec-file read.
+
+## 2026-05-29 — Resolved: SessionStart hook re-injects orientation on `compact` (PostCompact gap)
+
+- **Resolves:** the **PostCompact** stopgap gap called out in "2026-05-26 — Migrate the architect-studio `architect-claude-plugin` hook system into this repo" (gap 1: long sessions lose API-first context after a compact).
+- **Resolving change:** `.claude/hooks/architect-api-first.sh` now injects the live overview snapshot on `startup` / `clear` / `compact` (skipping only `resume`), and it injects `overview --richness summary-with-references` — the START HERE orientation tier — rather than a bare progress line. The broader plugin migration (PreToolUse enforcement, feedback-capture hook) remains open; only the orientation-on-compact gap is closed.
+
+## 2026-05-29 — Resolved: `GenerateDocsCli → MarkdownRenderer` uses-edge authored on the feature header
+
+- **Resolves:** "2026-05-29 — uses-edge for a Gherkin-owned pattern cannot be authored on production TS."
+- **Resolving change:** added `@architect-uses:MarkdownRenderer` as a Gherkin header tag on `tests/features/cli/generate-docs.feature` (verified present), using the sanctioned mechanism for a Gherkin-owned pattern's consumer edge. The deeper doctrine question (whether `combineSources` should also key the code↔feature merge on `@architect-implements` so production TS can contribute `uses`, vs. the doctrine carving out that Gherkin-owned patterns author their own `uses` on the feature header) remains open for a future decision.
+
 ## 2026-05-27 — projected `docstring` is capped (~512 chars), silently dropping later design prose
 
 - **Verb / surface:** `pnpm -s architect:query bundle <Pattern> --format json` (`.root.blocks.docstring`) and `pattern <Name>`.
-- **Expected:** an epic/candidate spec's Feature description prose to be queryable — the `DocumentationProjection` epic was authored to carry foundational design context (a **Guiding principle** + an **MVP approach** block) so future sessions coordinate *from the graph*.
-- **Got:** the `docstring` block is ~513 chars — it returned the User Story plus the *first sentence* of the next paragraph (`**Scope of the corpus:** … not a narrow slice.`) and dropped everything after (the Guiding-principle and MVP-approach paragraphs). No marker signals the truncation. `Rule:` blocks are unaffected — fully projected.
+- **Expected:** an epic/candidate spec's Feature description prose to be queryable — the `DocumentationProjection` epic was authored to carry foundational design context (a **Guiding principle** + an **MVP approach** block) so future sessions coordinate _from the graph_.
+- **Got:** the `docstring` block is ~513 chars — it returned the User Story plus the _first sentence_ of the next paragraph (`**Scope of the corpus:** … not a narrow slice.`) and dropped everything after (the Guiding-principle and MVP-approach paragraphs). No marker signals the truncation. `Rule:` blocks are unaffected — fully projected.
 - **Impact:** an epic meant to hold high-level design context only surfaces its head via the API; context not encoded as a `Rule` invariant is invisible to `bundle`/`pattern` consumers — and this bites the universal-doc-gen capability's own use case (the graph as coordination surface). Mitigation this session: encode the load-bearing essence as a `Rule` invariant (queryable) and keep full prose in the canonical source feature. A section-aware/longer docstring, or an explicit `truncated` flag (as `dep-tree` already carries), would close it.
 
 ## 2026-05-27 — `test:perf:baseline` soft thresholds are non-deterministic on a loaded dev machine (false failures jitter between unrelated metrics)
@@ -28,7 +48,7 @@ for anything that does not fit the verb's shape.
 
 - **Verb / surface:** `pnpm -s architect:query taxonomy --format json` — needed the valid `@architect-product-area` set to author a new spec.
 - **Expected:** the taxonomy digest to surface each constrained tag's allowed-value list (e.g. product-area → the 8 canonical self-hosting values in `ARCHITECT_PACKAGE_PRODUCT_AREAS`).
-- **Got:** no discoverable values list in the JSON for product-area; fell back to reading `packages/architect-core/src/taxonomy/product-area-values.ts` (and `registry-builder.ts`) source. (Distinct from the earlier "digest incomplete for recognized *tags*" entry — this is about a tag's allowed *value enum*.)
+- **Got:** no discoverable values list in the JSON for product-area; fell back to reading `packages/architect-core/src/taxonomy/product-area-values.ts` (and `registry-builder.ts`) source. (Distinct from the earlier "digest incomplete for recognized _tags_" entry — this is about a tag's allowed _value enum_.)
 - **Impact:** an author choosing a `@architect-product-area` / `@architect-role` / status value can't confirm the legal set through the API, so they guess or grep source — the anti-pattern the API exists to remove. Surfacing `values:` per tag in the digest would make authoring on-API.
 
 ## 2026-05-27 — no determinism `--check` for `docs:all`; proving idempotency on a dirty tree needs a manual checksum loop
@@ -57,7 +77,7 @@ for anything that does not fit the verb's shape.
 - **Verb / surface:** `pnpm docs:all` → generated `docs-live/TAXONOMY.md` (the `taxonomy` normalizer, one of the 11 special-cased `MARKDOWN_NORMALIZERS` kinds).
 - **Expected:** code spans in table cells render as code — `` `projection` `` styled, no visible backslashes.
 - **Got:** **31** backslash-escaped backticks (`\`projection\``) plus escaped parens (`\(per PDR-005 FSM\)`) in the shipped, git-tracked `TAXONOMY.md`. These render as literal backslashes, not code styling. Same defect *class* as the earlier `validation-rules` entry, but a **different normalizer** and a **flagship, wired** doc — so the blast radius is wider than "one unwired generator over-escapes."
-- **Impact:** a prime-candidate "generate this" target ships visibly wrong markdown today. Reinforces the design-review finding that byte-parity with the current output is the wrong oracle — the target shape must be *redesigned* (escape-only-where-needed), not reproduced. A renderer-level escaping audit (which fragment kinds escape table-cell code spans, and why) should precede any docgen build on these normalizers.
+- **Impact:** a prime-candidate "generate this" target ships visibly wrong markdown today. Reinforces the design-review finding that byte-parity with the current output is the wrong oracle — the target shape must be _redesigned_ (escape-only-where-needed), not reproduced. A renderer-level escaping audit (which fragment kinds escape table-cell code spans, and why) should precede any docgen build on these normalizers.
 
 ## 2026-05-26 — No verb introspects the projection/generation pipeline (dead-code reachability gap)
 
@@ -70,7 +90,7 @@ for anything that does not fit the verb's shape.
 
 - **Verb / surface:** detecting dead doc generators — read `docs-live/ROADMAP.md` / `CURRENT-WORK.md` by hand to find "covering 0 quarters" (empty because the `quarter`/`phase` dimensions were removed from `ExtractedPattern`).
 - **Expected:** `documentation` (a `--health` flag, or a `diagnostics` extension) to flag any generator whose projection yields an empty/degenerate fragment (0 groups / 0 rows / 0 quarters), so doc-rot from removed dimensions surfaces in a gate.
-- **Got:** empty docs ship silently; only manual inspection of `docs-live/` reveals them. (Cross-ref the earlier "8 of 13 generators" entry, which noted roadmap/current-work/traceability emit empty — this is the missing *detection* verb for it.)
+- **Got:** empty docs ship silently; only manual inspection of `docs-live/` reveals them. (Cross-ref the earlier "8 of 13 generators" entry, which noted roadmap/current-work/traceability emit empty — this is the missing _detection_ verb for it.)
 - **Impact:** generators orphaned by schema/dimension removal rot invisibly between full doc reviews. An emptiness check at `docs:all` time would catch them deterministically.
 
 ## 2026-05-26 — `open-questions --parent <Epic>` excludes the epic's own questions
@@ -167,8 +187,8 @@ for anything that does not fit the verb's shape.
 ## 2026-05-29 — `pnpm architect:query` reflects last-BUILT dist, not current source
 
 - **Verb / surface:** all `pnpm architect:query <verb>` (the dogfood CLI runs `tsx pattern-graph-cli.ts`, but its `@libar-dev/architect-core` / `-projection` imports resolve via package `exports` → `dist/`).
-- **Expected:** the API-first contract implies the CLI reports the *current* state of the repo; after editing read-api/projection **source**, `query` should reflect it.
-- **Got:** `query` reflects the last `pnpm build` (or the implicit rebuild a `pnpm test` triggers). Mid-refactor, `query getStatusDistribution` returned the OLD return shape until a rebuild synced `dist/`. The CLI *entry* is tsx-from-source, but cross-package code is dist-resolved.
+- **Expected:** the API-first contract implies the CLI reports the _current_ state of the repo; after editing read-api/projection **source**, `query` should reflect it.
+- **Got:** `query` reflects the last `pnpm build` (or the implicit rebuild a `pnpm test` triggers). Mid-refactor, `query getStatusDistribution` returned the OLD return shape until a rebuild synced `dist/`. The CLI _entry_ is tsx-from-source, but cross-package code is dist-resolved.
 - **Impact:** an agent dogfooding a source change to a core/projection pattern can get silently stale answers and mis-conclude. Workaround: `pnpm build` (or `pnpm --filter <pkg> build`) after source edits before trusting `query`. Worth considering a dev `exports` condition that points at `src` under tsx, or a freshness warning when `dist` is older than `src`.
 
 ## 2026-05-29 — `query` pattern-list passthrough methods drowned the caller (700 KB)
@@ -177,3 +197,50 @@ for anything that does not fit the verb's shape.
 - **Expected:** a compact inventory comparable to `list --status …` (the same logical query through `list` returns a ~39 KB `PatternSummary[]`).
 - **Got:** the raw kernel `ExtractedPattern[]` — full directive/scenarios/rules per pattern. `getCurrentWork` and `getPatternsByNormalizedStatus active` were **707 KB each** (~175K tokens), `getPatternsByRole` 420 KB, `getRoadmapItems`/`getPatternsByStatus` 380 KB. An agent following the skill's "self-traversable kernel" framing could blow its whole context on one call.
 - **Impact:** the payload-overflow failure mode the API itself names. **Fixed this session:** the CLI passthrough now projects these eight methods to the compact `{patternName, status, role, file}` shape (kernel return type unchanged — doc/projection consumers still get full records). Single-pattern (`getPattern`) and scalar/FSM methods are untouched.
+
+## 2026-05-29 — uses-edge for a Gherkin-owned pattern cannot be authored on production TS
+
+While repairing spec↔pattern edges I tried to add a `@architect-uses:MarkdownRenderer`
+dependency edge for `GenerateDocsCli` (Gherkin-owned, `tests/features/cli/generate-docs.feature`)
+by annotating its implementing production file `packages/architect-cli/src/cli/generate-docs.ts`.
+
+Two TS-side approaches both fail:
+
+- `@architect-pattern:GenerateDocsCli` on the .ts → hard pipeline error
+  "Pattern conflicts detected: GenerateDocsCli … defined in both TypeScript and Gherkin sources."
+- `@architect-implements:GenerateDocsCli` + `@architect-uses:` on the .ts → silently dropped:
+  `combineSources` keys the code↔feature merge on `patternName` only, never on `@architect-implements`,
+  so a code pattern with no own `patternName` is never matched onto the feature node and its `uses` is lost.
+
+The only working mechanism is a `@architect-uses` **Gherkin header tag on the feature file**
+(precedent: `tests/features/cli/validate-patterns.feature` → `ValidatorReadModelConsolidation`
+uses `ADR006SingleReadModelArchitecture`, which resolves a correct reverse `usedBy`).
+
+Impact: doctrine says `@architect-uses` is "owned by production TS, authored on the consumer," but for a
+Gherkin-owned pattern the consumer edge can only be authored in Gherkin. Either the merge should also key on
+`@architect-implements` (so production TS can contribute `uses` to the pattern it realizes), or the doctrine
+wording should carve out that Gherkin-owned patterns author their own `uses` on the feature header.
+
+## 2026-05-29 — duplicate `@architect-pattern:PatternGraphAPICLI` identity across two feature files (not gate-caught)
+
+Two feature files both claim the same pattern identity:
+
+- `tests/features/cli/pattern-graph-cli-core.feature` → `@architect-pattern:PatternGraphAPICLI`
+- `tests/features/cli/pattern-graph-cli-query.feature` → `@architect-pattern:PatternGraphAPICLI`
+
+This violates the ADR-001 invariant `@architect-pattern:X` may appear in exactly one file. The graph
+carries `PatternGraphAPICLI` **twice** (`search PatternGraphAPICLI` and `list --names-only` both return it
+twice), which surfaces as a duplicate row in `documentation traceability` (80 rows / 79 distinct patterns,
+child keys `pattern-graph-apicli` + `pattern-graph-apicli-2`).
+
+Notably **no gate catches it**: `validate:all`, `arch dangling --strict`, and `architect:guard --staged` all
+pass green. The duplicate-identity detection that the cross-source merge applies for TS↔Gherkin conflicts
+(`Pattern conflicts detected: … defined in both TypeScript and Gherkin sources`) does not fire for two
+Gherkin features claiming the same identity.
+
+Impact / scope decision: this is a genuine annotation bug, not a projection defect, so per the fix brief it
+was **reported, not papered over** — the traceability projection still emits both rows. The clean fix is to
+rename one feature's identity (e.g. `pattern-graph-cli-query.feature` → `PatternGraphAPICLIQuery` with
+`@architect-implements:PatternGraphAPICLI` if it should stay a realization of the CLI pattern), and ideally
+to add a duplicate-Gherkin-identity gate so this fails loud next time. Deferred from this session because it
+ripples pattern identity + reverse edges + downstream `@architect-implements` refs.

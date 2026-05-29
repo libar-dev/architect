@@ -67,7 +67,13 @@ EOF
 
 ADDITIONAL_CONTEXT="${CONTRACT_BLOCK}"$'\n\n'"${MENTAL_MODEL_BLOCK}"$'\n\n'"${SKILL_BLOCK}"
 
-if [[ "$SOURCE" != "resume" && "$SOURCE" != "clear" && "$SOURCE" != "compact" ]]; then
+# Inject the live overview snapshot whenever the session has no live context to
+# lean on: a fresh start (`startup`), an explicit `clear`, or after a `compact`
+# (the agent just lost its working context and most needs re-orientation). Skip
+# only `resume`, where the prior context is still intact. This closes the
+# PostCompact orientation gap — the contract + skill nudge above are injected
+# unconditionally, but the overview snapshot was previously dropped on compact.
+if [[ "$SOURCE" != "resume" ]]; then
   LIVE_BLOCK="$(
     REPO_ROOT="$REPO_ROOT" python3 - <<'PY'
 import os
@@ -75,7 +81,19 @@ import subprocess
 import sys
 
 repo_root = os.environ["REPO_ROOT"]
-command = ["pnpm", "exec", "architect", "--base-dir", ".", "overview"]
+# `summary-with-references` is the orientation tier: progress + START HERE
+# (which docs to read first + the safe-to-start set) + architecture glimpse +
+# top blockers — the cold-start dashboard, kept compact.
+command = [
+    "pnpm",
+    "exec",
+    "architect",
+    "--base-dir",
+    ".",
+    "overview",
+    "--richness",
+    "summary-with-references",
+]
 fallback_header = "[Live overview unavailable]"
 
 try:
@@ -105,7 +123,18 @@ stdout = (result.stdout or "").strip()
 stderr = (result.stderr or "").strip()
 
 if result.returncode == 0 and stdout:
-    snapshot = stdout[:4000]
+    # The summary-with-references overview is bounded (blocking is capped, no
+    # itemized role list), so it normally fits well under this generous limit.
+    # If it ever exceeds it, cut at the limit and SAY SO — a silent truncation
+    # reads as "this is the whole picture" when it is not.
+    limit = 8000
+    if len(stdout) > limit:
+        snapshot = (
+            stdout[:limit]
+            + "\n\n[snapshot truncated — run `pnpm -s architect:query overview --richness full` for the full view]"
+        )
+    else:
+        snapshot = stdout
     sys.stdout.write("[Live overview snapshot]\n" + snapshot)
     raise SystemExit
 

@@ -28,6 +28,7 @@ interface PatternFixtureOptions {
   readonly extendsPattern?: ExtractedPattern['extendsPattern'];
   readonly seeAlso?: ExtractedPattern['seeAlso'];
   readonly apiRef?: ExtractedPattern['apiRef'];
+  readonly adr?: ExtractedPattern['adr'];
   readonly boundedContext?: ExtractedPattern['boundedContext'];
   readonly adrLayer?: ExtractedPattern['adrLayer'];
   readonly archContext?: string;
@@ -69,6 +70,7 @@ export function createPattern(name: string, options: PatternFixtureOptions = {})
     ...(options.extendsPattern !== undefined ? { extendsPattern: options.extendsPattern } : {}),
     ...(options.seeAlso !== undefined ? { seeAlso: options.seeAlso } : {}),
     ...(options.apiRef !== undefined ? { apiRef: options.apiRef } : {}),
+    ...(options.adr !== undefined ? { adr: options.adr } : {}),
     ...(options.boundedContext !== undefined ? { boundedContext: options.boundedContext } : {}),
     ...(options.adrLayer !== undefined ? { adrLayer: options.adrLayer } : {}),
     ...(options.archContext !== undefined ? { archContext: options.archContext } : {}),
@@ -95,6 +97,8 @@ export function createRelationshipEntry(
     extendedBy: overrides.extendedBy ?? [],
     seeAlso: overrides.seeAlso ?? [],
     apiRef: overrides.apiRef ?? [],
+    enforcesDecisions: overrides.enforcesDecisions ?? [],
+    enforcedBy: overrides.enforcedBy ?? [],
   };
 }
 

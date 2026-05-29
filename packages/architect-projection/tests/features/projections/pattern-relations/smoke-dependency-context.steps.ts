@@ -2,9 +2,9 @@ import { describeFeature, loadFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';
 
 import {
-  DependencyTreeSchema,
-  parseAndProjectDependencyTree,
-  type DependencyTree,
+  DependencyContextSchema,
+  parseAndProjectDependencyContext,
+  type DependencyContext,
   type ProjectionBundle,
   type ProjectionContext,
 } from '../../../../src/index.js';
@@ -12,11 +12,11 @@ import { createPattern, createProjectionContext, createRelationshipEntry } from 
 
 interface SmokeState {
   context: ProjectionContext | null;
-  bundle: ProjectionBundle<DependencyTree> | null;
+  bundle: ProjectionBundle<DependencyContext> | null;
 }
 
 const feature = await loadFeature(
-  'tests/features/projections/pattern-relations/smoke-dependency-tree.feature',
+  'tests/features/projections/pattern-relations/smoke-dependency-context.feature',
 );
 
 let state: SmokeState | null = null;
@@ -33,10 +33,10 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   });
 
   Rule(
-    'Dependency tree runs against a minimal graph and produces a valid fragment',
+    'Dependency context runs against a minimal graph and produces a valid fragment',
     ({ RuleScenario }) => {
       RuleScenario(
-        'smoke test projects a valid dependency tree from a small graph with relationships',
+        'smoke test projects a valid dependency context from a small graph with relationships',
         ({ Given, When, Then, And }) => {
           Given('a Pattern Relations context with three patterns and a dependency chain', () => {
             state!.context = createProjectionContext({
@@ -56,23 +56,25 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             });
           });
 
-          When('I project the dependency tree for the middle pattern', () => {
-            state!.bundle = parseAndProjectDependencyTree(state!.context!, {
+          When('I project the dependency context for the middle pattern', () => {
+            state!.bundle = parseAndProjectDependencyContext(state!.context!, {
               pattern: 'MiddleService',
               maxDepth: 3,
-              includeImplementationDeps: false,
             });
           });
 
-          Then('the dependency tree should validate against its Zod schema', () => {
-            DependencyTreeSchema.parse(state!.bundle!.root);
+          Then('the dependency context should validate against its Zod schema', () => {
+            DependencyContextSchema.parse(state!.bundle!.root);
           });
 
-          And('the dependency tree root should be the ancestor of the chain', () => {
-            expect(state!.bundle!.root.kind).toBe('DependencyTree');
-            expect(state!.bundle!.root.root).toBe('RootLib');
-            expect(state!.bundle!.root.nodes).toHaveLength(1);
-            expect(state!.bundle!.root.nodes[0]!.name).toBe('RootLib');
+          And('the dependency context should be focal-rooted at the middle pattern', () => {
+            const fragment = state!.bundle!.root;
+            expect(fragment.kind).toBe('DependencyContext');
+            expect(fragment.focal).toBe('MiddleService');
+            // upstream = prerequisites (what MiddleService needs)
+            expect(fragment.upstream.map((node) => node.name)).toEqual(['RootLib']);
+            // downstream = blast radius (what needs MiddleService)
+            expect(fragment.downstream.map((node) => node.name)).toEqual(['LeafConsumer']);
           });
         },
       );

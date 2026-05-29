@@ -11,7 +11,7 @@ import { createPackageResolver, type ExtractedPattern } from '@libar-dev/archite
 
 import {
   type FileReadingList,
-  parseAndProjectDependencyTree,
+  parseAndProjectDependencyContext,
   parseAndProjectFileReadingList,
   parseAndProjectSessionContext,
   projectOverviewDigest,
@@ -67,13 +67,12 @@ function renderSessionContext(
   );
 }
 
-function renderDependencyTreeFor(patterns: ExtractedPattern[], pattern: string): string {
+function renderDependencyContextFor(patterns: ExtractedPattern[], pattern: string): string {
   const dataset = createTestPatternGraph({ patterns });
   return renderCompactText(
-    parseAndProjectDependencyTree(createProjectionContext(dataset), {
+    parseAndProjectDependencyContext(createProjectionContext(dataset), {
       pattern,
       maxDepth: 5,
-      includeImplementationDeps: true,
     }),
   );
 }
@@ -204,32 +203,35 @@ describeFeature(feature, ({ Rule }) => {
     });
   });
 
-  Rule('formatDepTree renders indented tree', ({ RuleScenario }) => {
-    RuleScenario('Tree renders with arrows and focal marker', ({ Given, When, Then }) => {
-      Given('a dep-tree with root, middle, and focal leaf', () => {
-        state = initState();
-      });
+  Rule('formatDependencyContext renders a bidirectional focal view', ({ RuleScenario }) => {
+    RuleScenario(
+      'Context renders the focal summary and bidirectional trees',
+      ({ Given, When, Then }) => {
+        Given('a dependency context with root, middle, and focal leaf', () => {
+          state = initState();
+        });
 
-      When('I format the tree', () => {
-        state!.output = renderDependencyTreeFor(
-          [
-            createTestPattern({ name: 'Root', status: 'completed' }),
-            createTestPattern({ name: 'Middle', status: 'active', dependsOn: ['Root'] }),
-            createTestPattern({ name: 'Leaf', status: 'roadmap', dependsOn: ['Middle'] }),
-          ],
-          'Leaf',
+        When('I format the dependency context', () => {
+          state!.output = renderDependencyContextFor(
+            [
+              createTestPattern({ name: 'Root', status: 'completed' }),
+              createTestPattern({ name: 'Middle', status: 'active', dependsOn: ['Root'] }),
+              createTestPattern({ name: 'Leaf', status: 'roadmap', dependsOn: ['Middle'] }),
+            ],
+            'Leaf',
+          );
+        });
+
+        Then(
+          'the output contains all expected sections',
+          (_ctx: unknown, table: Array<{ section: string }>) => {
+            for (const row of table) {
+              expect(state!.output).toContain(row.section.trim());
+            }
+          },
         );
-      });
-
-      Then(
-        'the output contains all expected sections',
-        (_ctx: unknown, table: Array<{ section: string }>) => {
-          for (const row of table) {
-            expect(state!.output).toContain(row.section.trim());
-          }
-        },
-      );
-    });
+      },
+    );
   });
 
   Rule('formatOverview renders progress summary', ({ RuleScenario }) => {

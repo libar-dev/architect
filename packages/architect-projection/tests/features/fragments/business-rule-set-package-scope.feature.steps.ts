@@ -26,6 +26,7 @@ interface ScopeState {
   runtimeContext: ProjectionContext | null;
   runtimeKeys: string[];
   previousRuntimeKeys: string[];
+  filteredRules: BusinessRuleSet['rules'];
 }
 
 let state: ScopeState | null = null;
@@ -40,6 +41,7 @@ function init(): ScopeState {
     runtimeContext: null,
     runtimeKeys: [],
     previousRuntimeKeys: [],
+    filteredRules: [],
   };
 }
 
@@ -279,4 +281,52 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       );
     },
   );
+
+  Rule('The package scope filter matches by the resolver package id', ({ RuleScenario }) => {
+    RuleScenario('Package filter selects rules by resolver id', ({ Given, When, Then, And }) => {
+      Given('a BusinessRuleSet sourced from 4 patterns across 3 workspace packages', () => {
+        state!.runtimeContext = createPackageGroupingRuntimeContext();
+      });
+
+      When('I project the rule set filtered to package {string}', (_ctx: unknown, pkg: string) => {
+        const context = state!.runtimeContext;
+        if (context === null) {
+          throw new Error('Runtime context not initialized');
+        }
+        state!.filteredRules = parseAndProjectBusinessRuleSet(context, {
+          scope: 'package',
+          scopeValue: pkg,
+        }).root.rules;
+      });
+
+      Then('every projected rule should carry package {string}', (_ctx: unknown, pkg: string) => {
+        expect(state!.filteredRules.every((rule) => rule.package === pkg)).toBe(true);
+      });
+
+      And('at least one rule should be projected', () => {
+        expect(state!.filteredRules.length).toBeGreaterThan(0);
+      });
+    });
+
+    RuleScenario('Scoped package form matches nothing', ({ Given, When, Then }) => {
+      Given('a BusinessRuleSet sourced from 4 patterns across 3 workspace packages', () => {
+        state!.runtimeContext = createPackageGroupingRuntimeContext();
+      });
+
+      When('I project the rule set filtered to package {string}', (_ctx: unknown, pkg: string) => {
+        const context = state!.runtimeContext;
+        if (context === null) {
+          throw new Error('Runtime context not initialized');
+        }
+        state!.filteredRules = parseAndProjectBusinessRuleSet(context, {
+          scope: 'package',
+          scopeValue: pkg,
+        }).root.rules;
+      });
+
+      Then('no rules should be projected', () => {
+        expect(state!.filteredRules).toHaveLength(0);
+      });
+    });
+  });
 });

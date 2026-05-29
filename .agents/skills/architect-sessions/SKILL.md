@@ -23,8 +23,8 @@ The lifecycle recognizes a small number of work shapes. Knowing which one you ar
 - **Idea / candidate authoring** — drafting a new pattern, sharpening invariants, refining open questions. The lightest two rungs. → [`references/plan.md`](references/plan.md)
 - **Design** — promoting a plan-level spec: deliverables, stubs, exhaustive scenarios, ADR refs. → [`references/design.md`](references/design.md)
 - **Implement** — building from a design spec; transferring value to annotated production code + executable Gherkin. → [`references/implement.md`](references/implement.md)
-- **Review (spec)** — gap-finding on a design spec *before* implementation. Output is a gap list, not a rewrite. → [`references/review-spec.md`](references/review-spec.md)
-- **Review (implementation)** — verifying value transfer on *completed* work and deciding whether design specs are safe to delete. → [`references/review-implementation.md`](references/review-implementation.md)
+- **Review (spec)** — gap-finding on a design spec _before_ implementation. Output is a gap list, not a rewrite. → [`references/review-spec.md`](references/review-spec.md)
+- **Review (implementation)** — verifying value transfer on _completed_ work and deciding whether design specs are safe to delete. → [`references/review-implementation.md`](references/review-implementation.md)
 - **Handoff** — end-of-session state capture so the next session resumes clean. → [`references/handoff.md`](references/handoff.md)
 
 `architect-base` §9–§13 carries the maturity ladder, FSM lifecycle, spec↔pattern bipartite relationship, and value-transfer doctrine that make these shapes legible.
@@ -37,7 +37,7 @@ In practice:
 
 - The same handful of verbs (`overview`, `bundle`, `pattern`, `dep-tree`, `files`, `rules`, `scope-validate`) covers every shape above. `bundle <Pattern>` is the default pre-flight.
 - The work shape tells you which reference to read and which gate to honor — not a different command set.
-- The `--mode` flag on `bundle` / `context` nudges which blocks are included by default, but defaults are good and the returned data is dominated by what the pattern actually *is*. Do not over-rely on intent flags; they are receding over time.
+- The `--mode` flag on `bundle` / `context` nudges which blocks are included by default, but defaults are good and the returned data is dominated by what the pattern actually _is_. Do not over-rely on intent flags; they are receding over time.
 
 Run the pre-flight from [`architect-data-api`](../architect-data-api/SKILL.md) before any architect-scoped `Read` / `Glob` / `Grep`. File scanning to learn pattern state is a smell — there is a verb for it.
 
@@ -57,15 +57,15 @@ Three rules hold for every session here (the campaign-coordination rules — dec
 
 ## Disclosure map — pick your reference
 
-| You are about to… | Open | Note |
-| --- | --- | --- |
-| capture a new idea / refine a candidate / decide what to build | [`references/plan.md`](references/plan.md) | lightest tiers; no `scope-validate` target |
-| promote a plan-level spec to design (stubs, deliverables, ADRs) | [`references/design.md`](references/design.md) | writes specs + stubs only, never production code |
-| build a design spec end-to-end | [`references/implement.md`](references/implement.md) | FSM → active, value transfer, deletion gate |
-| find gaps in a spec **before** implementing | [`references/review-spec.md`](references/review-spec.md) | output is a gap list, not a rewrite |
-| verify value transfer on **completed** work / batch-delete specs | [`references/review-implementation.md`](references/review-implementation.md) | per-pattern verdict; deletion is opt-in |
-| wrap a session for the next one | [`references/handoff.md`](references/handoff.md) | forward-looking note, not a recap |
-| modify shipped code with **no** design spec | [`architect-refactor-session`](../architect-refactor-session/SKILL.md) | separate skill — the carve-out |
+| You are about to…                                                | Open                                                                         | Note                                             |
+| ---------------------------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------ |
+| capture a new idea / refine a candidate / decide what to build   | [`references/plan.md`](references/plan.md)                                   | lightest tiers; no `scope-validate` target       |
+| promote a plan-level spec to design (stubs, deliverables, ADRs)  | [`references/design.md`](references/design.md)                               | writes specs + stubs only, never production code |
+| build a design spec end-to-end                                   | [`references/implement.md`](references/implement.md)                         | FSM → active, value transfer, deletion gate      |
+| find gaps in a spec **before** implementing                      | [`references/review-spec.md`](references/review-spec.md)                     | output is a gap list, not a rewrite              |
+| verify value transfer on **completed** work / batch-delete specs | [`references/review-implementation.md`](references/review-implementation.md) | per-pattern verdict; deletion is opt-in          |
+| wrap a session for the next one                                  | [`references/handoff.md`](references/handoff.md)                             | forward-looking note, not a recap                |
+| modify shipped code with **no** design spec                      | [`architect-refactor-session`](../architect-refactor-session/SKILL.md)       | separate skill — the carve-out                   |
 
 ### Disambiguation (the old router rules, kept)
 

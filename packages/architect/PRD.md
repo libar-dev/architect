@@ -12,15 +12,15 @@ The shell is the **assembly layer** that turns five independently published runt
 
 The meta package's bin shims (`packages/architect/bin/*.js`) are one-line re-exports; the implementation lives in the owner package's own `./bin/<name>` export.
 
-| Bin | Owner package | Shim re-exports |
-| --- | --- | --- |
-| `architect` | `@libar-dev/architect-cli` | `architect-cli/bin/architect` |
-| `architect-generate` | `@libar-dev/architect-cli` | `architect-cli/bin/architect-generate` |
-| `architect-guard` | `@libar-dev/architect-cli` | `architect-cli/bin/architect-guard` |
+| Bin                       | Owner package              | Shim re-exports                             |
+| ------------------------- | -------------------------- | ------------------------------------------- |
+| `architect`               | `@libar-dev/architect-cli` | `architect-cli/bin/architect`               |
+| `architect-generate`      | `@libar-dev/architect-cli` | `architect-cli/bin/architect-generate`      |
+| `architect-guard`         | `@libar-dev/architect-cli` | `architect-cli/bin/architect-guard`         |
 | `architect-lint-patterns` | `@libar-dev/architect-cli` | `architect-cli/bin/architect-lint-patterns` |
-| `architect-lint-steps` | `@libar-dev/architect-cli` | `architect-cli/bin/architect-lint-steps` |
-| `architect-validate` | `@libar-dev/architect-cli` | `architect-cli/bin/architect-validate` |
-| `architect-mcp` | `@libar-dev/architect-mcp` | `architect-mcp/bin/architect-mcp` |
+| `architect-lint-steps`    | `@libar-dev/architect-cli` | `architect-cli/bin/architect-lint-steps`    |
+| `architect-validate`      | `@libar-dev/architect-cli` | `architect-cli/bin/architect-validate`      |
+| `architect-mcp`           | `@libar-dev/architect-mcp` | `architect-mcp/bin/architect-mcp`           |
 
 So 6 of 7 bins are owned by `architect-cli`; only `architect-mcp` is owned by `architect-mcp`. The CLI and MCP composition-root internals are out of scope here (other agents cover them).
 

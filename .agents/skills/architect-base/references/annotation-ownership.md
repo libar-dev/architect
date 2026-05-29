@@ -21,15 +21,15 @@ This split is what lets the kernel state, definitively:
 
 ## Feature files own (planning)
 
-| Tag                           | Purpose                                                    |
-| ----------------------------- | ---------------------------------------------------------- |
-| `@architect-pattern`          | Pattern identity (canonical)                               |
-| `@architect-status`           | FSM state (`candidate`, `roadmap`, `active`, `completed`, `deferred`)   |
-| `@architect-bounded-context`  | Canonical structural grouping                              |
-| `@architect-uses`             | Declared dependency edges for spec, ADR, and test patterns |
-| `@architect-implements`       | Realization edge (test feature → production pattern)       |
-| `@architect-executable-specs` | Forward link from design spec to executable feature        |
-| `@architect-unlock-reason`    | Audit-trail for unusual FSM transitions                    |
+| Tag                           | Purpose                                                               |
+| ----------------------------- | --------------------------------------------------------------------- |
+| `@architect-pattern`          | Pattern identity (canonical)                                          |
+| `@architect-status`           | FSM state (`candidate`, `roadmap`, `active`, `completed`, `deferred`) |
+| `@architect-bounded-context`  | Canonical structural grouping                                         |
+| `@architect-uses`             | Declared dependency edges for spec, ADR, and test patterns            |
+| `@architect-implements`       | Realization edge (test feature → production pattern)                  |
+| `@architect-executable-specs` | Forward link from design spec to executable feature                   |
+| `@architect-unlock-reason`    | Audit-trail for unusual FSM transitions                               |
 
 ## Code stubs / production TS own (implementation)
 

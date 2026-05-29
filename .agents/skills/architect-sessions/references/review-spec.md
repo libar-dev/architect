@@ -8,7 +8,7 @@ Doctrine depth (for judgment calls about Gherkin or pattern conventions): the op
 
 ## Gather context first
 
-Know what "complete" means for *this* spec before scanning for gaps:
+Know what "complete" means for _this_ spec before scanning for gaps:
 
 1. **Tier** — idea/candidate (structural checklist below) or plan/design (`scope-validate` gate + full checklist)?
 2. **Normative source** — what ADR / redesign / brief does the spec derive from? You'll check coverage against it.

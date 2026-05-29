@@ -17,9 +17,9 @@ Feature: Pattern Graph CLI - Discovery Subcommands
 
   Rule: CLI list subcommand filters patterns
 
-    **Invariant:** The list subcommand must return a valid JSON result for valid filters and a non-zero exit code with a descriptive error for invalid filters.
-    **Rationale:** Consumers parse list output programmatically; malformed JSON or silent failures cause downstream tooling to break without diagnosis.
-    **Verified by:** List all patterns returns JSON array, List filters candidate status, List with removed phase flag shows error, List with removed maturity flag shows error
+    **Invariant:** The list subcommand must return a valid JSON result for valid filters and a non-zero exit code with a descriptive error for invalid filters. The `--status` filter speaks the consumer-facing status vocabulary: the FSM authored words (candidate/roadmap/active/completed/deferred) exact-match, and the normalized bucket word `planned` matches the roadmap ∪ deferred union — so every word an agent reads in `overview` is a legal filter.
+    **Rationale:** Consumers parse list output programmatically; malformed JSON or silent failures cause downstream tooling to break without diagnosis. Accepting the normalized bucket word `planned` removes the trap where an agent reads `planned` in the digest but cannot filter on it.
+    **Verified by:** List all patterns returns JSON array, List filters candidate status, List filters by normalized planned bucket, List with removed phase flag shows error, List with removed maturity flag shows error
 
     @happy-path
     Scenario: List all patterns returns JSON array
@@ -36,6 +36,15 @@ Feature: Pattern Graph CLI - Discovery Subcommands
       And stdout is valid JSON
       And stdout contains "CandidatePattern"
       And stdout does not contain "RoadmapPattern"
+
+    @validation
+    Scenario: List filters by normalized planned bucket
+      Given TypeScript files with candidate and delivery pattern annotations
+      When running "pattern-graph-cli -i 'src/**/*.ts' list --status planned"
+      Then exit code is 0
+      And stdout is valid JSON
+      And stdout contains "RoadmapPattern"
+      And stdout does not contain "CandidatePattern"
 
     @validation
     Scenario: List with removed phase flag shows error
@@ -82,9 +91,9 @@ Feature: Pattern Graph CLI - Discovery Subcommands
 
   Rule: CLI context assembly subcommands return text output
 
-    **Invariant:** Context assembly subcommands (context, overview, dep-tree) must produce non-empty human-readable text containing the requested pattern or summary, and require a pattern argument where applicable.
-    **Rationale:** These subcommands replace manual file reads in AI sessions; empty or off-target output forces expensive explore-agent fallbacks that consume 5-10x more context.
-    **Verified by:** Context returns curated text bundle, Context without pattern name shows error, Overview returns executive summary text, Dep-tree returns dependency tree text
+    **Invariant:** Context assembly subcommands (context, overview, dep-tree) must produce non-empty human-readable text containing the requested pattern or summary, and require a pattern argument where applicable. The dep-tree subcommand is a focal-rooted bidirectional dependency-context view: the focal pattern is the root of two transitively-expanded forests — DEPENDS ON (upstream) and REQUIRED BY (downstream) — never re-rooted at a dependency.
+    **Rationale:** These subcommands replace manual file reads in AI sessions; empty or off-target output forces expensive explore-agent fallbacks that consume 5-10x more context. A single focal-rooted bidirectional view answers both "what does X need" and "what breaks if X changes" without the consumer reasoning about graph internals or passing a direction flag.
+    **Verified by:** Context returns curated text bundle, Context without pattern name shows error, Overview returns executive summary text, Dep-tree returns focal-rooted bidirectional dependency context
 
     @happy-path
     Scenario: Context returns curated text bundle
@@ -110,11 +119,12 @@ Feature: Pattern Graph CLI - Discovery Subcommands
       And stdout contains "PROGRESS"
 
     @happy-path
-    Scenario: Dep-tree returns dependency tree text
+    Scenario: Dep-tree returns focal-rooted bidirectional dependency context
       Given TypeScript files with architecture annotations and dependencies
       When running "pattern-graph-cli -i 'src/**/*.ts' dep-tree ContextFormatterImpl"
       Then exit code is 0
       And stdout is non-empty
+      And stdout is a focal-rooted bidirectional dependency context for "ContextFormatterImpl" with upstream "ContextAssemblerImpl"
 
   # ============================================================================
   # RULE 11B: Diagnostics Subcommand

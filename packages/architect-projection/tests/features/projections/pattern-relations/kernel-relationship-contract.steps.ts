@@ -91,22 +91,19 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               // pattern. To exercise the canonical-invariant throw we delete
               // OrphanCore's entry, mirroring the pipeline-corruption scenario
               // the invariant exists to fail loudly on.
-              delete (
-                state!.context.graph.relationshipIndex as Record<string, unknown>
-              )['OrphanCore'];
+              delete (state!.context.graph.relationshipIndex as Record<string, unknown>)[
+                'OrphanCore'
+              ];
             },
           );
 
-          When(
-            'I normalize relationships for "OrphanCore" through the projection kernel',
-            () => {
-              try {
-                state!.result = normalizePatternRelationships(state!.context!, 'OrphanCore');
-              } catch (caught) {
-                state!.error = caught;
-              }
-            },
-          );
+          When('I normalize relationships for "OrphanCore" through the projection kernel', () => {
+            try {
+              state!.result = normalizePatternRelationships(state!.context!, 'OrphanCore');
+            } catch (caught) {
+              state!.error = caught;
+            }
+          });
 
           Then('a ProjectionError with code "PATTERN_RELATIONSHIP_INVARIANT" is thrown', () => {
             expect(state!.error).toBeInstanceOf(ProjectionError);

@@ -6,6 +6,7 @@
 @architect-status:completed
 @architect-product-area:Generation
 @architect-uses:ADR005CodecBasedMarkdownRendering
+@architect-see-also:PatternGraph
 @architect-unlock-reason:Add-Verified-by-sections-and-acceptance-criteria
 Feature: ADR-006 - Single Read Model Architecture
 

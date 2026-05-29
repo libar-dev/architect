@@ -11,19 +11,21 @@
 **Bin:** `architect-mcp` → `bin/architect-mcp.js` → `runtime-bridge.js` → built `cli/mcp-server.js` → `startMcpServer()`. CLI flags: `-i/--input`, `-f/--features`, `-b/--base-dir`, `-w/--watch`, `-h/--help`, `-v/--version`. Speaks MCP over stdio (`StdioServerTransport`).
 
 **Library entry points (`src/index.ts`):**
+
 - `startMcpServer(argv?, options?)` + `McpServerOptions` — server entry.
 - `PipelineSessionManager`, `PipelineSession`, `SessionOptions` — graph lifecycle.
 - `McpFileWatcher`, `FileWatcherOptions` — live-rebuild watcher.
 - `registerAllTools`, `invokeTool`, `REGISTERED_TOOL_NAMES`, `RegisteredToolName`, `ToolResult` — tool registry. `invokeTool` returns the **typed** `ToolResult<TOut>` (text + projection output) for programmatic callers (e.g. the desktop main process); `registerAllTools` wraps `.text` into the MCP `TextContentResult`.
 
 **MCP tool inventory (21 tools, `src/tool-metadata.ts` is the source of truth):**
-- *Inventory / health (4):* `architect_overview`, `architect_status`, `architect_coverage`, `architect_list`
-- *Per-pattern detail (6):* `architect_pattern`, `architect_context`, `architect_files`, `architect_dep_tree`, `architect_bundle`, `architect_rules`
-- *Architecture views (3):* `architect_arch_neighborhood`, `architect_arch_blocking`, `architect_open_questions`
-- *Discovery / meta (4):* `architect_search`, `architect_taxonomy`, `architect_config`, `architect_help`
-- *Gates / session (2):* `architect_scope_validate`, `architect_handoff`
-- *Documentation (1):* `architect_documentation`
-- *Server-only mutation (1):* `architect_rebuild`
+
+- _Inventory / health (4):_ `architect_overview`, `architect_status`, `architect_coverage`, `architect_list`
+- _Per-pattern detail (6):_ `architect_pattern`, `architect_context`, `architect_files`, `architect_dep_tree`, `architect_bundle`, `architect_rules`
+- _Architecture views (3):_ `architect_arch_neighborhood`, `architect_arch_blocking`, `architect_open_questions`
+- _Discovery / meta (4):_ `architect_search`, `architect_taxonomy`, `architect_config`, `architect_help`
+- _Gates / session (2):_ `architect_scope_validate`, `architect_handoff`
+- _Documentation (1):_ `architect_documentation`
+- _Server-only mutation (1):_ `architect_rebuild`
 
 ## Enumerated functionality
 
@@ -37,6 +39,7 @@
 ## Dependencies
 
 **Intra-repo (runtime, all one-directional — this package is a leaf consumer):**
+
 - `@libar-dev/architect-core` → graph build (`buildPatternGraph`), `createPatternGraphAPI`, config loading/source resolution, package resolver, Zod boundary primitives, runtime/bin helpers.
 - `@libar-dev/architect-projection` (incl. `/projections`, `/disclosure` subpaths) → every projection function the tools emit, plus the compact-text / JSON renderers and the option schemas reused as MCP input shapes.
 

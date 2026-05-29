@@ -1267,9 +1267,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           expect(markdown).toContain(
             '- **Deliverable \\[click\\](javascript:alert(4))**: &lt;script&gt;alert(5)&lt;/script&gt;',
           );
-          expect(markdown).toContain(
-            '- Pattern \\*\\*bold\\*\\* \\[trap\\](javascript:alert(3))',
-          );
+          expect(markdown).toContain('- Pattern \\*\\*bold\\*\\* \\[trap\\](javascript:alert(3))');
           expect(markdown).toContain('Release note \\[trap\\](javascript:alert(6))');
         });
       },

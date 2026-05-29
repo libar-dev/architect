@@ -35,12 +35,12 @@ The **canonical source of truth** is annotated production code + executable Gher
 | Aspect           | Value                                                                                                            |
 | ---------------- | ---------------------------------------------------------------------------------------------------------------- |
 | Config           | `architect.config.ts` at the repo root                                                                           |
-| Working state    | `architect/` (specs, decisions, releases, stubs, step-stubs, design-reviews)                          |
+| Working state    | `architect/` (specs, decisions, releases, stubs, step-stubs, design-reviews)                                     |
 | Source of truth  | Annotated `packages/*/src/**/*.ts` + executable Gherkin under `tests/features/` and `packages/*/tests/features/` |
 | CLI              | `pnpm architect:query <verb>` (canonical script name across architect-managed repos)                             |
 | MCP              | `architect` server → `mcp__architect__*` callable tools                                                          |
 | Validation entry | `pnpm typecheck`, `pnpm test`, `pnpm validate:all`, `pnpm architect:guard --staged`                              |
-| Doc regeneration | `pnpm docs:all` → `docs-live/` (git-tracked, derived — determinism-gate diff target)                                                             |
+| Doc regeneration | `pnpm docs:all` → `docs-live/` (git-tracked, derived — determinism-gate diff target)                             |
 
 When this package family is consumed by another project, the consumer wires their own `architect.config.ts` and exposes their own `architect:query` script — the contracts above are stable across architect-managed repos.
 
@@ -48,17 +48,17 @@ When this package family is consumed by another project, the consumer wires thei
 
 `architect/` holds **working state**, not the source of truth. It is parsed by `@cucumber/gherkin` for projection / extraction and is explicitly **excluded from TypeScript compile, ESLint, vitest**.
 
-| Folder                        | Role                                                                                | Lifetime                                                        |
-| ----------------------------- | ----------------------------------------------------------------------------------- | --------------------------------------------------------------- |
-| `architect/specs/ideas/`      | Idea-tier specs (lightest authored shape)                                           | Until promotion                                                 |
-| `architect/specs/candidates/` | Candidate-tier specs (open questions + 1-2 scenarios)                               | Until promotion                                                 |
-| `architect/slices/`           | Slice-tier multi-pattern lateral views (idea-tier structural variant; `@architect-level:slice`, no `@architect-parent`) | Reference                                                       |
-| `architect/specs/`            | Plan- and design-tier specs (deliverables + full scenarios + stubs)                 | **Until value transferred to executable Gherkin, then deleted** |
-| `architect/stubs/`            | Design-tier TS contract scaffolds (one folder per pattern)                          | Ephemeral                                                       |
-| `architect/step-stubs/`       | Design-tier stub step definitions                                                   | Ephemeral                                                       |
-| `architect/decisions/`        | ADRs / PDRs — compact, durable, decisions-only (no operational or temporal context) | **Permanent**                                                   |
-| `architect/releases/`         | Release notes, roadmap, phase plans                                                 | Permanent                                                       |
-| `architect/design-reviews/`   | **Auto-generated** architecture-slice review artifacts (sequence + component mermaid; scoped to specs incl. unimplemented) — generated output, **not** a home for hand-authored captures | Generated (derived) |
+| Folder                        | Role                                                                                                                                                                                     | Lifetime                                                        |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| `architect/specs/ideas/`      | Idea-tier specs (lightest authored shape)                                                                                                                                                | Until promotion                                                 |
+| `architect/specs/candidates/` | Candidate-tier specs (open questions + 1-2 scenarios)                                                                                                                                    | Until promotion                                                 |
+| `architect/slices/`           | Slice-tier multi-pattern lateral views (idea-tier structural variant; `@architect-level:slice`, no `@architect-parent`)                                                                  | Reference                                                       |
+| `architect/specs/`            | Plan- and design-tier specs (deliverables + full scenarios + stubs)                                                                                                                      | **Until value transferred to executable Gherkin, then deleted** |
+| `architect/stubs/`            | Design-tier TS contract scaffolds (one folder per pattern)                                                                                                                               | Ephemeral                                                       |
+| `architect/step-stubs/`       | Design-tier stub step definitions                                                                                                                                                        | Ephemeral                                                       |
+| `architect/decisions/`        | ADRs / PDRs — compact, durable, decisions-only (no operational or temporal context)                                                                                                      | **Permanent**                                                   |
+| `architect/releases/`         | Release notes, roadmap, phase plans                                                                                                                                                      | Permanent                                                       |
+| `architect/design-reviews/`   | **Auto-generated** architecture-slice review artifacts (sequence + component mermaid; scoped to specs incl. unimplemented) — generated output, **not** a home for hand-authored captures | Generated (derived)                                             |
 
 **Two Gherkin parsers, do not confuse them:**
 
@@ -112,7 +112,7 @@ All of these are CI-enforced. Failing gates are stop-and-surface; never `--no-ve
 
 ## 7. Key decision records (load-bearing, decisions-only)
 
-ADRs / PDRs in `architect/decisions/` are **permanent and decisions-only**. They record a *decision* + its rationale and **only durable, non-execution-related facts**. Operational or temporal context — status, work-in-progress, ETAs, who is doing what this week — **never** belongs here; that is the difference between a decision record and a worklog. Decisions are amended via a **new** ADR, never by editing the old one. Read the relevant record before changing anything in its area — through the Data API (`pnpm architect:query documentation decisions`, or `pattern ADR006SingleReadModelArchitecture`), never paraphrased from memory.
+ADRs / PDRs in `architect/decisions/` are **permanent and decisions-only**. They record a _decision_ + its rationale and **only durable, non-execution-related facts**. Operational or temporal context — status, work-in-progress, ETAs, who is doing what this week — **never** belongs here; that is the difference between a decision record and a worklog. Decisions are amended via a **new** ADR, never by editing the old one. Read the relevant record before changing anything in its area — through the Data API (`pnpm architect:query documentation decisions`, or `pattern ADR006SingleReadModelArchitecture`), never paraphrased from memory.
 
 The load-bearing set:
 
@@ -238,7 +238,7 @@ Default surface: **CLI**. Reach for MCP only when bursting ≥5 verbs.
 
 ```bash
 # Health / inventory
-pnpm architect:query overview                               # progress + blockers
+pnpm architect:query overview [--richness <level>]          # progress + blockers; --richness summary-with-references leads with a START HERE orientation tier (depth: data-api skill)
 pnpm architect:query status                                 # status distribution
 pnpm architect:query list [--status v] [--names-only]
 pnpm architect:query search <query>                         # fuzzy pattern-name match
@@ -271,6 +271,7 @@ pnpm architect:query taxonomy [--count] [--format json]
 - `scope-validate` only accepts `design` and `implement`. `planning` / `review` error with `Scope type must be design or implement`.
 - `bundle --include` keeps only the **last** repeated flag — use the comma form: `--include rules,deps,open-questions`.
 - `pattern <Name>` "not found" can mean parse failure (with provenance) OR doesn't exist — cross-check with `search` or `list --names-only`.
+- `list --status` accepts only the **accepted** FSM values (`candidate`/`roadmap`/`active`/`completed`/`deferred`); `planned` is the normalized reporting bucket, not accepted here. Out-of-enum values now error with the accepted set enumerated — read the error, don't guess. (Status-vocabulary detail: data-api skill.)
 
 ## 15. Bootstrap discipline (every session)
 
@@ -293,7 +294,7 @@ The Data API is faster (2-5s cold CLI, sub-ms MCP) and more accurate than file s
 When a sample-derived finding (an old session-handoff note, a snapshot folder with a SHA suffix, an n=2 "we tried this twice" worklog, or a skill body that has drifted) appears to contradict the live state:
 
 - **The live CLI / PatternGraph is canonical.** `pnpm architect:query` output reflects the graph as it is right now; a skill paraphrase reflects the graph as it was when written. When they disagree, the CLI wins.
-- **A sample is useful for *why*, not *what*.** It explains why a rule exists; it is not authoritative for what the rule currently is.
+- **A sample is useful for _why_, not _what_.** It explains why a rule exists; it is not authoritative for what the rule currently is.
 - **Silence is provisional, not permission.** If the live state is silent on a question a sample answers, treat the sample's finding as provisional and flag it (`FEEDBACK.md`) rather than encoding it as doctrine.
 
 This is the same instinct as `architect-data-api`'s "API surprises are signal" — surprises feed the loop, they do not override the source of truth.

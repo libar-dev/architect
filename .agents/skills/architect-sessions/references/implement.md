@@ -45,7 +45,7 @@ pnpm architect:query overview                 # confirm the pattern shows comple
 pnpm docs:all                                 # regenerate docs
 ```
 
-If the user defers: leave the spec + stubs in place, and name [`review-implementation.md`](review-implementation.md) as the next step in your handoff. If you *cannot* transfer value because something still depends on the spec, that is a **zombie spec** smell — investigate; either the dependency is wrong or the spec is doing something durable it shouldn't.
+If the user defers: leave the spec + stubs in place, and name [`review-implementation.md`](review-implementation.md) as the next step in your handoff. If you _cannot_ transfer value because something still depends on the spec, that is a **zombie spec** smell — investigate; either the dependency is wrong or the spec is doing something durable it shouldn't.
 
 ## Anti-patterns (stop and redirect)
 

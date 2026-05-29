@@ -29,22 +29,27 @@ Feature: Architecture neighborhood projection
   Rule: Architecture neighborhoods preserve directional coverage without leaking raw DTOs
 
     **Invariant:** Every relationship direction (`uses`, `usedBy`, `dependsOn`,
-    `enables`, `sameContext`, `implements`, `implementedBy`) is present as an
-    array, implementation references are structured `ImplementationRef`
-    objects, and missing relationship or architecture indices degrade to empty
-    arrays rather than errors.
+    `enables`, `seeAlso`, `enforcedBy`, `sameContext`, `implements`,
+    `implementedBy`) is present as an array, implementation references are
+    structured `ImplementationRef` objects, and missing relationship or
+    architecture indices degrade to empty arrays rather than errors.
 
     **Rationale:** Consumers must be able to iterate every direction without
     null-checking, and must never see raw graph DTOs whose shape can drift
     across core versions.
 
-    **Verified by:** architecture neighborhoods include all relationship directions, missing relationship indices keep neighborhood metadata but empty directional arrays, missing architecture indices remove same-context neighbors only
+    **Verified by:** architecture neighborhoods include all relationship directions, missing relationship indices keep neighborhood metadata but empty directional arrays, missing architecture indices remove same-context neighbors only, a decision neighborhood surfaces its see-also governance chain and enforcedBy rules
 
     @acceptance-criteria
     Scenario: architecture neighborhoods include all relationship directions
       Given an architecture neighborhood context with full direction coverage
       When I project the architecture neighborhood for "PatternGraphAPI"
       Then the architecture neighborhood should include all direction buckets and structured implementation refs
+
+    Scenario: a decision neighborhood surfaces its see-also governance chain and enforcedBy rules
+      Given an architecture neighborhood context for a decision with see-also links and enforcing rules
+      When I project the architecture neighborhood for "ADR009ProjectionTrustBoundary"
+      Then the architecture neighborhood should list its see-also decisions and the rules that enforce it
 
     Scenario: missing relationship indices keep neighborhood metadata but empty directional arrays
       Given an architecture neighborhood context without a relationship index

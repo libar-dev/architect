@@ -1,4 +1,4 @@
-import type { ExtractedPattern, TagRegistry } from '@libar-dev/architect-core';
+import type { ExtractedPattern, RelationshipEntry, TagRegistry } from '@libar-dev/architect-core';
 
 type PatternMaturity = 'idea' | 'plan' | 'design' | 'executable';
 
@@ -37,6 +37,7 @@ interface PatternFixtureOptions {
   readonly uses?: ExtractedPattern['uses'];
   readonly enables?: readonly string[];
   readonly implementsPatterns?: ExtractedPattern['implementsPatterns'];
+  readonly enforcesDecisions?: ExtractedPattern['enforcesDecisions'];
   readonly usedBy?: readonly string[];
   readonly seeAlso?: ExtractedPattern['seeAlso'];
   readonly apiRef?: ExtractedPattern['apiRef'];
@@ -48,6 +49,26 @@ interface ProjectionContextOptions {
   readonly patterns: readonly ExtractedPattern[];
   readonly tagRegistry?: TagRegistry;
   readonly projectionFilter?: ProjectionFilter;
+  readonly relationshipIndex?: Record<string, RelationshipEntry>;
+}
+
+export function createRelationshipEntry(
+  overrides: Partial<RelationshipEntry> = {},
+): RelationshipEntry {
+  return {
+    uses: overrides.uses ?? [],
+    usedBy: overrides.usedBy ?? [],
+    dependsOn: overrides.dependsOn ?? [],
+    enables: overrides.enables ?? [],
+    implementsPatterns: overrides.implementsPatterns ?? [],
+    implementedBy: overrides.implementedBy ?? [],
+    ...(overrides.extendsPattern !== undefined ? { extendsPattern: overrides.extendsPattern } : {}),
+    extendedBy: overrides.extendedBy ?? [],
+    seeAlso: overrides.seeAlso ?? [],
+    apiRef: overrides.apiRef ?? [],
+    enforcesDecisions: overrides.enforcesDecisions ?? [],
+    enforcedBy: overrides.enforcedBy ?? [],
+  };
 }
 
 export function createRule(options: RuleFixture): RuleFixture {
@@ -79,6 +100,9 @@ export function createProjectionContext(options: ProjectionContextOptions): Proj
     graph: buildGraphFromPatterns({
       patterns: options.patterns,
       tagRegistry: options.tagRegistry ?? createTagRegistry(),
+      ...(options.relationshipIndex !== undefined
+        ? { relationshipIndex: options.relationshipIndex }
+        : {}),
     }),
     packageResolver: createTestPackageResolver(),
     ...(options.projectionFilter !== undefined

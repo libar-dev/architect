@@ -112,6 +112,33 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       });
     });
 
+    RuleScenario('List filters by normalized planned bucket', ({ Given, When, Then, And }) => {
+      Given('TypeScript files with candidate and delivery pattern annotations', async () => {
+        await writeCandidateAndDeliveryPatternFiles(state);
+      });
+
+      When('running {string}', async (_ctx: unknown, cmd: string) => {
+        await runCLICommand(state, cmd);
+      });
+
+      Then('exit code is {int}', (_ctx: unknown, code: number) => {
+        expect(getResult(state).exitCode).toBe(code);
+      });
+
+      And('stdout is valid JSON', () => {
+        const result = getResult(state);
+        expect(() => JSON.parse(result.stdout) as unknown).not.toThrow();
+      });
+
+      And('stdout contains {string}', (_ctx: unknown, text: string) => {
+        expect(getResult(state).stdout).toContain(text);
+      });
+
+      And('stdout does not contain {string}', (_ctx: unknown, text: string) => {
+        expect(getResult(state).stdout).not.toContain(text);
+      });
+    });
+
     RuleScenario('List with removed phase flag shows error', ({ Given, When, Then, And }) => {
       Given('TypeScript files with pattern annotations', async () => {
         await writePatternFiles(state);
@@ -267,23 +294,37 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       });
     });
 
-    RuleScenario('Dep-tree returns dependency tree text', ({ Given, When, Then, And }) => {
-      Given('TypeScript files with architecture annotations and dependencies', async () => {
-        await writeArchPatternFilesWithDeps(state);
-      });
+    RuleScenario(
+      'Dep-tree returns focal-rooted bidirectional dependency context',
+      ({ Given, When, Then, And }) => {
+        Given('TypeScript files with architecture annotations and dependencies', async () => {
+          await writeArchPatternFilesWithDeps(state);
+        });
 
-      When('running {string}', async (_ctx: unknown, cmd: string) => {
-        await runCLICommand(state, cmd);
-      });
+        When('running {string}', async (_ctx: unknown, cmd: string) => {
+          await runCLICommand(state, cmd);
+        });
 
-      Then('exit code is {int}', (_ctx: unknown, code: number) => {
-        expect(getResult(state).exitCode).toBe(code);
-      });
+        Then('exit code is {int}', (_ctx: unknown, code: number) => {
+          expect(getResult(state).exitCode).toBe(code);
+        });
 
-      And('stdout is non-empty', () => {
-        expect(getResult(state).stdout.trim().length).toBeGreaterThan(0);
-      });
-    });
+        And('stdout is non-empty', () => {
+          expect(getResult(state).stdout.trim().length).toBeGreaterThan(0);
+        });
+
+        And(
+          'stdout is a focal-rooted bidirectional dependency context for {string} with upstream {string}',
+          (_ctx: unknown, focal: string, upstream: string) => {
+            const { stdout } = getResult(state);
+            expect(stdout).toContain(`${focal} depends on`);
+            expect(stdout).toContain('DEPENDS ON (upstream)');
+            expect(stdout).toContain('REQUIRED BY (downstream)');
+            expect(stdout).toContain(upstream);
+          },
+        );
+      },
+    );
   });
 
   // ---------------------------------------------------------------------------

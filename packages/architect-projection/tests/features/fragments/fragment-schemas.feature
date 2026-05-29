@@ -54,7 +54,7 @@ Feature: Fragment schema mirror
         | PatternDetail            |
         | DependencyEdge           |
         | DependencyEdgeSet        |
-        | DependencyTree           |
+        | DependencyContext        |
         | ArchitectureNeighborhood |
         | OpenQuestionList         |
         | OrphanPatternList        |
@@ -103,7 +103,7 @@ Feature: Fragment schema mirror
         | PatternDetail            |
         | DependencyEdge           |
         | DependencyEdgeSet        |
-        | DependencyTree           |
+        | DependencyContext        |
         | ArchitectureNeighborhood |
         | OpenQuestionList         |
         | OrphanPatternList        |
@@ -152,7 +152,7 @@ Feature: Fragment schema mirror
         | PatternDetail            |
         | DependencyEdge           |
         | DependencyEdgeSet        |
-        | DependencyTree           |
+        | DependencyContext        |
         | ArchitectureNeighborhood |
         | OpenQuestionList         |
         | OrphanPatternList        |

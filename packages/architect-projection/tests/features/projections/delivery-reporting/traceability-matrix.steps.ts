@@ -1,3 +1,4 @@
+import type { RelationshipEntry } from '@libar-dev/architect-core';
 import { describeFeature, loadFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';
 
@@ -27,96 +28,174 @@ function createState(): TraceabilityState {
   };
 }
 
+function relationshipEntry(
+  implementedBy: readonly { name: string; file: string }[],
+): RelationshipEntry {
+  return {
+    uses: [],
+    usedBy: [],
+    dependsOn: [],
+    enables: [],
+    implementsPatterns: [],
+    implementedBy: implementedBy.map((reference) => ({ ...reference })),
+    extendedBy: [],
+    seeAlso: [],
+    apiRef: [],
+    enforcesDecisions: [],
+    enforcedBy: [],
+  };
+}
+
 describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   AfterEachScenario(() => {
     state = null;
   });
 
-  Background(({ Given, And }) => {
+  Background(({ Given }) => {
     Given('the Delivery Reporting traceability projection state is initialized', () => {
       state = createState();
     });
-    And('the following deliverables:', () => void 0);
   });
 
-  Rule('Traceability rows stay projection-shaped and deterministic', ({ RuleScenario }) => {
-    RuleScenario(
-      'projecting the traceability matrix from timeline specs',
-      ({ Given, When, Then, And }) => {
-        Given('a traceability projection context with gherkin and non-gherkin patterns', () => {
-          state!.context = createProjectionContext({
-            patterns: [
-              createPattern('BehaviorPhaseOne', {
-                status: 'active',
-                phase: 11,
-                file: 'architect/specs/behavior-phase-one.feature',
-                executableSpecs: ['tests/features/behavior/phase-one.feature'],
-                behaviorFile: 'tests/features/behavior/phase-one.steps.ts',
-                deliverables: [
+  Rule(
+    'Traceability rows are sourced from realization edges and stay deterministic',
+    ({ RuleScenario }) => {
+      RuleScenario(
+        'projecting the traceability matrix from realization edges',
+        ({ Given, When, Then, And }) => {
+          Given('a traceability projection context with realized and unrealized patterns', () => {
+            state!.context = createProjectionContext({
+              patterns: [
+                createPattern('PatternGraphApi', {
+                  status: 'completed',
+                  file: 'packages/architect-core/src/read-api/pattern-graph-api.ts',
+                  deliverables: [
+                    {
+                      name: 'Read API surface',
+                      status: 'complete',
+                      tests: 2,
+                      location: 'packages/architect-core/src/read-api/pattern-graph-api.ts',
+                    },
+                  ],
+                }),
+                createPattern('TraceabilityMatrixProjection', {
+                  status: 'completed',
+                  file: 'packages/architect-projection/src/projections/delivery-reporting/index.ts',
+                }),
+                createPattern('UnrealizedPattern', {
+                  status: 'active',
+                  file: 'packages/architect-projection/src/projections/orphan.ts',
+                }),
+              ],
+              relationshipIndex: {
+                PatternGraphApi: relationshipEntry([
                   {
-                    name: 'Phase one bundle',
-                    status: 'complete',
-                    tests: 2,
-                    location: 'src/projections/delivery-reporting/phase-progress.ts',
+                    name: 'PatternGraphApiReverseLookup',
+                    file: 'packages/architect-core/tests/features/read-api/reverse-lookup.feature',
                   },
-                ],
-              }),
-              createPattern('BehaviorPhaseTwo', {
-                status: 'completed',
-                phase: 12,
-                file: 'architect/specs/behavior-phase-two.feature',
-                behaviorFileVerified: true,
-                deliverables: [
                   {
-                    name: 'Phase two bundle',
-                    status: 'complete',
-                    tests: 1,
-                    location: 'src/projections/delivery-reporting/release-notes.ts',
+                    name: 'PatternGraphApiConsistencyExecutableTests',
+                    file: 'packages/architect-core/tests/features/read-api/consistency.feature',
                   },
-                ],
-              }),
-              createPattern('ImplementationOnly', {
-                status: 'active',
-                phase: 13,
-                file: 'packages/architect-projection/src/index.ts',
-              }),
-            ],
+                ]),
+                TraceabilityMatrixProjection: relationshipEntry([
+                  {
+                    name: 'TraceabilityMatrixProjectionExecutableTests',
+                    file: 'packages/architect-projection/tests/features/projections/delivery-reporting/traceability-matrix.feature',
+                  },
+                ]),
+                UnrealizedPattern: relationshipEntry([]),
+              },
+            });
           });
-        });
+
+          When('I project the traceability matrix', () => {
+            state!.bundle = projectTraceabilityMatrix(state!.context!);
+          });
+
+          Then(
+            'the traceability matrix should include only patterns with realization edges',
+            () => {
+              expect(state!.bundle?.root.rows.map((row) => row.pattern)).toEqual([
+                'PatternGraphApi',
+                'TraceabilityMatrixProjection',
+              ]);
+            },
+          );
+
+          And("each row's tests should be the realizing source files", () => {
+            expect(state!.bundle?.root.rows).toEqual([
+              {
+                pattern: 'PatternGraphApi',
+                status: 'completed',
+                tests: [
+                  'packages/architect-core/tests/features/read-api/consistency.feature',
+                  'packages/architect-core/tests/features/read-api/reverse-lookup.feature',
+                ],
+                specs: ['packages/architect-core/src/read-api/pattern-graph-api.ts'],
+                deliverables: ['packages/architect-core/src/read-api/pattern-graph-api.ts'],
+              },
+              {
+                pattern: 'TraceabilityMatrixProjection',
+                status: 'completed',
+                tests: [
+                  'packages/architect-projection/tests/features/projections/delivery-reporting/traceability-matrix.feature',
+                ],
+                specs: [
+                  'packages/architect-projection/src/projections/delivery-reporting/index.ts',
+                ],
+                deliverables: [],
+              },
+            ]);
+          });
+
+          And('the traceability child keys should be deterministic', () => {
+            expect(Object.keys(state!.bundle?.children ?? {})).toEqual([
+              'pattern-graph-api',
+              'traceability-matrix-projection',
+            ]);
+          });
+        },
+      );
+
+      RuleScenario('the tests column excludes production TS realizers', ({ Given, When, Then }) => {
+        Given(
+          'a traceability projection context with a TS and a feature realizer on one pattern',
+          () => {
+            state!.context = createProjectionContext({
+              patterns: [
+                createPattern('PatternGraphAPICLI', {
+                  status: 'completed',
+                  file: 'tests/features/cli/pattern-graph-cli-core.feature',
+                }),
+              ],
+              relationshipIndex: {
+                PatternGraphAPICLI: relationshipEntry([
+                  {
+                    name: 'PatternGraphCLI',
+                    file: 'packages/architect-cli/src/cli/pattern-graph-cli.ts',
+                  },
+                  {
+                    name: 'PatternGraphCliSubcommands',
+                    file: 'tests/features/cli/pattern-graph-cli-subcommands.feature',
+                  },
+                ]),
+              },
+            });
+          },
+        );
 
         When('I project the traceability matrix', () => {
           state!.bundle = projectTraceabilityMatrix(state!.context!);
         });
 
-        Then('the traceability matrix should include only phased gherkin rows', () => {
-          expect(state!.bundle?.root.rows).toEqual([
-            {
-              pattern: 'BehaviorPhaseOne',
-              status: 'active',
-              tests: [
-                'tests/features/behavior/phase-one.feature',
-                'tests/features/behavior/phase-one.steps.ts',
-              ],
-              specs: ['architect/specs/behavior-phase-one.feature'],
-              deliverables: ['src/projections/delivery-reporting/phase-progress.ts'],
-            },
-            {
-              pattern: 'BehaviorPhaseTwo',
-              status: 'completed',
-              tests: [],
-              specs: ['architect/specs/behavior-phase-two.feature'],
-              deliverables: ['src/projections/delivery-reporting/release-notes.ts'],
-            },
+        Then("the row's tests should contain only the executable feature file", () => {
+          expect(state!.bundle?.root.rows).toHaveLength(1);
+          expect(state!.bundle?.root.rows[0]?.tests).toEqual([
+            'tests/features/cli/pattern-graph-cli-subcommands.feature',
           ]);
         });
-
-        And('the traceability child keys should be deterministic', () => {
-          expect(Object.keys(state!.bundle?.children ?? {})).toEqual([
-            'behavior-phase-one',
-            'behavior-phase-two',
-          ]);
-        });
-      },
-    );
-  });
+      });
+    },
+  );
 });

@@ -25,11 +25,11 @@ Tags are organized by functional group. Within each group, tags are listed alpha
 
 Tags that establish a pattern's identity within the project.
 
-| Tag                   | Format | Purpose                                                                                                                                                         | Required                            | Values / Example                                          |
-| --------------------- | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- | --------------------------------------------------------- |
-| `@architect`          | flag   | Gates extraction — file must have this tag to be processed                                                                                                      | MUST (all)                          | (no value)                                                |
-| `@architect-pattern`  | value  | Unique pattern name in PascalCase                                                                                                                               | MUST (specs, ADRs, stubs)           | `UserRegistration`, `ADR004Lifecycle`                     |
-| `@architect-status`   | enum   | Current FSM delivery state                                                                                                                                      | MUST (all)                          | `candidate`, `roadmap`, `active`, `completed`, `deferred` |
+| Tag                   | Format | Purpose                                                                                                                                             | Required                                                                | Values / Example                                          |
+| --------------------- | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- | --------------------------------------------------------- |
+| `@architect`          | flag   | Gates extraction — file must have this tag to be processed                                                                                          | MUST (all)                                                              | (no value)                                                |
+| `@architect-pattern`  | value  | Unique pattern name in PascalCase                                                                                                                   | MUST (specs, ADRs, stubs)                                               | `UserRegistration`, `ADR004Lifecycle`                     |
+| `@architect-status`   | enum   | Current FSM delivery state                                                                                                                          | MUST (all)                                                              | `candidate`, `roadmap`, `active`, `completed`, `deferred` |
 | `@architect-maturity` | enum   | Consideration-vs-delivery track and refinement level (`idea` = consideration/exploration, `plan` = committed/delivery, then `design`/`executable`). | **Required (explicit) at the idea tier; derived from status otherwise** | `idea`, `plan`, `design`, `executable`                    |
 
 ### Pattern Naming Rules
@@ -380,7 +380,7 @@ tier remains on the consideration track until the acceptance gate advances statu
 2. **Fall back to status.** If `@architect-maturity` is absent, look up
    `DEFAULT_MATURITY_BY_STATUS[<status>]`. The result is the effective maturity for
    plan/design/executable tier gating. **Idea-tier gating is the exception** (see
-   Conformance): a status-derived `idea` does *not* make a spec idea-tier — only the
+   Conformance): a status-derived `idea` does _not_ make a spec idea-tier — only the
    explicit `@architect-maturity:idea` tag does.
 3. **Unknown status.** If the status is not in the table (custom enum extension, unknown
    value), the effective maturity is undefined — implementations SHOULD treat the spec as
@@ -400,7 +400,7 @@ tier remains on the consideration track until the acceptance gate advances statu
 - Tier validators MUST consult effective maturity (not just explicit maturity) for the
   candidate / plan / design / executable tiers, so that un-tagged specs are still gated
   against the correct tier shape. **The idea tier is the exception:** because `@architect-status:candidate`
-  is shared by the idea tier *and* the candidate tier (and `DEFAULT_MATURITY_BY_STATUS` resolves
+  is shared by the idea tier _and_ the candidate tier (and `DEFAULT_MATURITY_BY_STATUS` resolves
   every `candidate` spec to `idea`), the idea-tier validator MUST key on the **explicit**
   `@architect-maturity:idea` tag. A `candidate`-status spec without that explicit tag is **not**
   gated as idea-tier — it escapes the idea-tier shape checks, which is the deliberate behavior

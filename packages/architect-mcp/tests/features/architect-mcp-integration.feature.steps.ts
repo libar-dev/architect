@@ -354,7 +354,7 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
         );
 
         RuleScenario(
-          'architect_dep_tree returns a compact dependency tree for the seeded pattern',
+          'architect_dep_tree returns a focal-rooted bidirectional dependency context for the seeded pattern',
           ({ When, Then, And }) => {
             When(
               'I invoke the "architect_dep_tree" tool with a name arg targeting the seeded pattern',
@@ -365,9 +365,15 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
             Then('the result text is non-empty', () => {
               expect(state!.result?.text.length ?? 0).toBeGreaterThan(0);
             });
-            And('the result text mentions the seeded pattern name', () => {
-              expect(state!.result!.text).toContain(TEST_PATTERN_NAME);
-            });
+            And(
+              'the result text is a focal-rooted bidirectional dependency context for the seeded pattern',
+              () => {
+                const text = state!.result!.text;
+                expect(text).toContain(`${TEST_PATTERN_NAME} depends on`);
+                expect(text).toContain('DEPENDS ON (upstream)');
+                expect(text).toContain('REQUIRED BY (downstream)');
+              },
+            );
           },
         );
 

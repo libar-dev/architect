@@ -58,6 +58,8 @@ function buildRelationshipIndex(
       extendedBy: [],
       seeAlso: [],
       apiRef: [],
+      enforcesDecisions: [],
+      enforcedBy: [],
     };
   }
 

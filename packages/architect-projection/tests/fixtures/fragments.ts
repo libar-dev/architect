@@ -15,7 +15,7 @@ import {
   DeliverableSchema,
   DependencyEdgeSchema,
   DependencyEdgeSetSchema,
-  DependencyTreeSchema,
+  DependencyContextSchema,
   FileReadingListSchema,
   HandoffRecordSchema,
   OpenQuestionListSchema,
@@ -83,7 +83,7 @@ export type PublicFragmentKind =
   | 'PatternDetail'
   | 'DependencyEdge'
   | 'DependencyEdgeSet'
-  | 'DependencyTree'
+  | 'DependencyContext'
   | 'ArchitectureNeighborhood'
   | 'OpenQuestionList'
   | 'OrphanPatternList';
@@ -954,31 +954,43 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
       },
     ],
   },
-  DependencyTree: {
-    kind: 'DependencyTree',
-    root: 'PatternGraph',
-    nodes: [
+  DependencyContext: {
+    kind: 'DependencyContext',
+    focal: 'PatternGraphAPI',
+    upstream: [
       {
         name: 'PatternGraph',
         status: 'completed',
         phase: 1,
-        isFocal: false,
         truncated: false,
         children: [
           {
-            name: 'PatternGraphAPI',
+            name: 'PatternHelpers',
             status: 'active',
             phase: 2,
-            isFocal: true,
-            truncated: false,
+            truncated: true,
             children: [],
           },
         ],
       },
     ],
+    downstream: [
+      {
+        name: 'ApiReferenceProjection',
+        status: 'active',
+        phase: 3,
+        truncated: false,
+        children: [],
+      },
+    ],
+    summary: {
+      upstreamDirect: 1,
+      upstreamTransitive: 2,
+      downstreamDirect: 1,
+      downstreamTransitive: 1,
+    },
     options: {
       maxDepth: 3,
-      includeImplementationDeps: true,
     },
   },
   ArchitectureNeighborhood: {
@@ -991,6 +1003,8 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
     usedBy: ['PatternBrowserView'],
     dependsOn: ['PatternGraph'],
     enables: ['ArchitectMcpServer'],
+    seeAlso: [],
+    enforcedBy: [],
     sameContext: ['ContextAssemblerImpl'],
     implements: ['PatternGraphReadModel'],
     implementedBy: [
@@ -1461,23 +1475,28 @@ export const FRAGMENT_INVALID_FIXTURES: Record<PublicFragmentKind, unknown> = {
     from: 'PatternGraphAPI',
     items: 'not-an-array',
   },
-  DependencyTree: {
-    kind: 'DependencyTree',
-    root: 'PatternGraph',
-    nodes: [
+  DependencyContext: {
+    kind: 'DependencyContext',
+    focal: 'PatternGraphAPI',
+    upstream: [
       {
-        name: 'PatternGraphAPI',
+        name: 'PatternGraph',
         status: 'active',
         phase: 2,
-        isFocal: true,
         truncated: false,
         children: [],
         extraField: 'not allowed',
       },
     ],
+    downstream: [],
+    summary: {
+      upstreamDirect: 1,
+      upstreamTransitive: 1,
+      downstreamDirect: 0,
+      downstreamTransitive: 0,
+    },
     options: {
       maxDepth: 3,
-      includeImplementationDeps: true,
     },
   },
   ArchitectureNeighborhood: {
@@ -1490,6 +1509,8 @@ export const FRAGMENT_INVALID_FIXTURES: Record<PublicFragmentKind, unknown> = {
     usedBy: ['PatternBrowserView'],
     dependsOn: ['PatternGraph'],
     enables: ['ArchitectMcpServer'],
+    seeAlso: [],
+    enforcedBy: [],
     sameContext: ['ContextAssemblerImpl'],
     implements: ['PatternGraphReadModel'],
     implementedBy: ['PatternGraphAPIImpl'],
@@ -1555,7 +1576,7 @@ export const FRAGMENT_SCHEMAS: Record<PublicFragmentKind, ZodType<Fragment>> = {
   PatternDetail: PatternDetailSchema,
   DependencyEdge: DependencyEdgeSchema,
   DependencyEdgeSet: DependencyEdgeSetSchema,
-  DependencyTree: DependencyTreeSchema,
+  DependencyContext: DependencyContextSchema,
   ArchitectureNeighborhood: ArchitectureNeighborhoodSchema,
   OpenQuestionList: OpenQuestionListSchema,
   OrphanPatternList: OrphanPatternListSchema,

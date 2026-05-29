@@ -50,7 +50,7 @@ describeFeature(feature, ({ Rule }) => {
               'parseAndProjectArchitectureDiagram',
               'parseAndProjectBusinessRuleSet',
               'parseAndProjectConfig',
-              'parseAndProjectDependencyTree',
+              'parseAndProjectDependencyContext',
               'parseAndProjectDocumentationBundle',
               'parseAndProjectFileReadingList',
               'parseAndProjectHandoffRecord',

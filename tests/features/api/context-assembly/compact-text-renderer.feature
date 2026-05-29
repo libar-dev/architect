@@ -35,20 +35,22 @@ Feature: Compact Text Renderer - Plain Text Rendering
         | === FSM ===          |
       And the output contains checkbox markers
 
-  Rule: formatDepTree renders indented tree
+  Rule: formatDependencyContext renders a bidirectional focal view
 
-    **Invariant:** The dependency tree compact renderer must render with indentation arrows and a focal pattern marker to visually distinguish the target pattern from its dependencies.
-    **Rationale:** Visual hierarchy in the dependency tree makes dependency chains scannable at a glance — flat output would require mental parsing to understand depth and relationships.
-    **Verified by:** Tree renders with arrows and focal marker
+    **Invariant:** The dependency-context compact renderer must lead with a one-line focal summary, then render an upstream "DEPENDS ON" tree and a downstream "REQUIRED BY" tree, using `-> ` indentation arrows for transitive nodes so the chain depth stays scannable.
+    **Rationale:** A bidirectional view answers both "what does the focal pattern depend on?" and "what depends on the focal pattern?" in one render — a one-directional tree forces two separate queries, and arrows make transitive depth legible at a glance.
+    **Verified by:** Context renders the focal summary and bidirectional trees
 
     @acceptance-criteria @happy-path
-    Scenario: Tree renders with arrows and focal marker
-      Given a dep-tree with root, middle, and focal leaf
-      When I format the tree
+    Scenario: Context renders the focal summary and bidirectional trees
+      Given a dependency context with root, middle, and focal leaf
+      When I format the dependency context
       Then the output contains all expected sections
-        | section          |
-        | ->               |
-        | <- YOU ARE HERE  |
+        | section                       |
+        | Leaf depends on 1             |
+        | === DEPENDS ON (upstream) === |
+        | === REQUIRED BY (downstream) === |
+        | ->                            |
 
   Rule: formatOverview renders progress summary
 
@@ -70,8 +72,8 @@ Feature: Compact Text Renderer - Plain Text Rendering
     Scenario: Overview renders architect query guidance
       Given an overview with 69 total patterns at 52 percent
       When I format the overview
-      Then the output contains "pnpm architect:query -- <subcommand>"
-      And the output contains "Full reference: pnpm architect:query -- --help"
+      Then the output contains "pnpm -s architect:query <verb>"
+      And the output contains "Full reference: pnpm -s architect:query --help"
 
   Rule: formatFileReadingList renders categorized file paths
 

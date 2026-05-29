@@ -45,6 +45,11 @@ Feature: PatternGraphAPI tells a mutually-consistent story
       When I read the status counts
       Then the four normalized counts sum to the total count
 
+    @acceptance-criteria @happy-path
+    Scenario: The planned bucket equals the roadmap plus deferred exact buckets
+      When I read the planned normalized bucket
+      Then the planned bucket size equals the roadmap plus deferred exact bucket sizes
+
   Rule: Delivery and candidate bases stay separate and correct
 
     Delivery percentages share one denominator — the delivery base

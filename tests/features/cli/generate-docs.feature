@@ -3,6 +3,7 @@
 @architect-status:completed
 @architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:DataAPI
+@architect-uses:MarkdownRenderer
 @cli @generate-docs
 Feature: generate-docs CLI
   Command-line interface for generating documentation from annotated TypeScript.

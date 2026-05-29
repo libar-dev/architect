@@ -736,6 +736,95 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
     );
   });
 
+  Rule(
+    'Reverse-trace surfaces the realizing features as specs primary and tests',
+    ({ RuleScenario }) => {
+      const realizingFeature =
+        'packages/architect-projection/tests/features/projections/execution-context/reverse-trace-body.feature';
+
+      function createReverseTraceContext(): ProjectionContext {
+        const body = createPattern('ReverseTraceBody', {
+          status: 'active',
+          file: 'packages/architect-projection/src/projections/execution-context/reverse-trace-body.ts',
+        });
+        const realizer = createPattern('ReverseTraceBodyExecutableTests', {
+          status: 'active',
+          file: realizingFeature,
+          implementsPatterns: ['ReverseTraceBody'],
+        });
+
+        return createProjectionContext({
+          patterns: [body, realizer],
+          relationshipIndex: {
+            ReverseTraceBody: createRelationshipEntry({
+              implementedBy: [{ name: 'ReverseTraceBodyExecutableTests', file: realizingFeature }],
+            }),
+          },
+        });
+      }
+
+      RuleScenario(
+        'session context follows implementedBy for specs and tests',
+        ({ Given, When, Then, And }) => {
+          Given(
+            'a Execution Context session projection context where a TS pattern is realized by a feature spec',
+            () => {
+              state!.context = createReverseTraceContext();
+            },
+          );
+
+          When('I project session context for the design and implement sessions', () => {
+            state!.designContext = parseAndProjectSessionContext(state!.context!, {
+              patterns: ['ReverseTraceBody'],
+              sessionType: 'design',
+            });
+            state!.implementContext = parseAndProjectSessionContext(state!.context!, {
+              patterns: ['ReverseTraceBody'],
+              sessionType: 'implement',
+            });
+          });
+
+          Then('the design session context specFiles should include the realizing feature', () => {
+            expect(state!.designContext?.root.specFiles).toContain(realizingFeature);
+          });
+
+          And(
+            'the implement session context testFiles should include the realizing feature',
+            () => {
+              expect(state!.implementContext?.root.testFiles).toContain(realizingFeature);
+            },
+          );
+        },
+      );
+
+      RuleScenario(
+        'file reading list lists realizing features as primary',
+        ({ Given, When, Then }) => {
+          Given(
+            'a Execution Context session projection context where a TS pattern is realized by a feature spec',
+            () => {
+              state!.context = createReverseTraceContext();
+            },
+          );
+
+          When(
+            'I project the file reading list for "ReverseTraceBody" without related files',
+            () => {
+              state!.fileReadingList = parseAndProjectFileReadingList(state!.context!, {
+                pattern: 'ReverseTraceBody',
+                includeRelated: false,
+              })?.root;
+            },
+          );
+
+          Then('the file reading list primary should include the realizing feature', () => {
+            expect(state!.fileReadingList?.primary).toContain(realizingFeature);
+          });
+        },
+      );
+    },
+  );
+
   Rule('Handoff stays flattened and separate from scope/context bundles', ({ RuleScenario }) => {
     RuleScenario(
       'handoff projection derives flattened session state from graph data',

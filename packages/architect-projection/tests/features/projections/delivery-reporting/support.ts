@@ -1,4 +1,4 @@
-import type { ExtractedPattern, PatternGraph } from '@libar-dev/architect-core';
+import type { ExtractedPattern, PatternGraph, RelationshipEntry } from '@libar-dev/architect-core';
 import { buildGraphFromPatterns, buildPatternStub } from '../../../support/test-graph-builder.js';
 
 import type { ProjectionContext, ProjectionFilter } from '../../../../src/index.js';
@@ -28,6 +28,7 @@ interface ProjectionContextOptions {
   readonly patterns: readonly ExtractedPattern[];
   readonly phaseNames?: Record<number, string>;
   readonly projectionFilter?: ProjectionFilter;
+  readonly relationshipIndex?: Record<string, RelationshipEntry>;
 }
 
 let _nextPatternId = 1;
@@ -67,6 +68,9 @@ function createPatternGraph(options: ProjectionContextOptions): PatternGraph {
   return buildGraphFromPatterns({
     patterns: options.patterns,
     phaseNames: options.phaseNames,
+    ...(options.relationshipIndex !== undefined
+      ? { relationshipIndex: options.relationshipIndex }
+      : {}),
     tagRegistry: {
       ...createProjectionTagRegistry(),
     },

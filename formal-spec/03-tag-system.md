@@ -161,17 +161,17 @@ tags in any order, consistent ordering improves readability and review.
 
 ### Candidate Specs (Pre-Acceptance)
 
-Candidate specs (`@architect-status:candidate`) carry the full idea/candidate **baseline** but omit the *plan-level* tags (role, bounded-context, relationships) until acceptance:
+Candidate specs (`@architect-status:candidate`) carry the full idea/candidate **baseline** but omit the _plan-level_ tags (role, bounded-context, relationships) until acceptance:
 
-| Tag                       | Required | Notes                                                        |
-| ------------------------- | -------- | ------------------------------------------------------------ |
-| `@architect`              | MUST     | Gate tag                                                     |
-| `@architect-pattern`      | MUST     | PascalCase pattern name                                      |
-| `@architect-status`       | MUST     | `candidate`                                                  |
-| `@architect-product-area` | MUST     | Product area                                                 |
-| `@architect-parent`       | MUST     | Parent epic (unless `@architect-level:epic` / `:slice`)      |
+| Tag                       | Required | Notes                                                                                                                                                                                                                               |
+| ------------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@architect`              | MUST     | Gate tag                                                                                                                                                                                                                            |
+| `@architect-pattern`      | MUST     | PascalCase pattern name                                                                                                                                                                                                             |
+| `@architect-status`       | MUST     | `candidate`                                                                                                                                                                                                                         |
+| `@architect-product-area` | MUST     | Product area                                                                                                                                                                                                                        |
+| `@architect-parent`       | MUST     | Parent epic (unless `@architect-level:epic` / `:slice`)                                                                                                                                                                             |
 | `@architect-maturity`     | OPTIONAL | Derives to `idea` (consideration) from `status:candidate`; the refinement tier normally carries none. Do not author `:idea` here (it re-triggers idea-tier gating); an explicit value still wins per §04 (`:plan` = delivery track) |
-| Plan-level tags           | MAY      | role, bounded-context, relationships — added at acceptance promotion |
+| Plan-level tags           | MAY      | role, bounded-context, relationships — added at acceptance promotion                                                                                                                                                                |
 
 ### Level 2 (Standard) — Accepted Feature Specs
 

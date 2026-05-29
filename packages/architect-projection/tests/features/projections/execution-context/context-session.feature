@@ -109,6 +109,32 @@ Feature: Execution Context context and session projections
       When I project the file reading list for "ProjectionBody" without related files
       Then the file reading list should keep only primary files
 
+  Rule: Reverse-trace surfaces the realizing features as specs primary and tests
+
+    **Invariant:** When the focal pattern is a TypeScript pattern realized by a
+    `.feature` spec via the derived `implementedBy` reverse edge, design and
+    implement session context push the implementing `.feature` paths into
+    `specFiles`, implement context also pushes them into `testFiles`, and the
+    file reading list lists those `.feature` paths in `primary` (not gated by
+    `--related`).
+
+    **Rationale:** The only link from a TS pattern to its behavioral spec is
+    `implementedBy` (ADR-002/ADR-003); a reverse-trace question must follow it
+    rather than returning an empty spec/test set for the TS focal node.
+
+    **Verified by:** session context follows implementedBy for specs and tests, file reading list lists realizing features as primary
+
+    Scenario: session context follows implementedBy for specs and tests
+      Given a Execution Context session projection context where a TS pattern is realized by a feature spec
+      When I project session context for the design and implement sessions
+      Then the design session context specFiles should include the realizing feature
+      And the implement session context testFiles should include the realizing feature
+
+    Scenario: file reading list lists realizing features as primary
+      Given a Execution Context session projection context where a TS pattern is realized by a feature spec
+      When I project the file reading list for "ReverseTraceBody" without related files
+      Then the file reading list primary should include the realizing feature
+
   Rule: Handoff stays flattened and separate from scope/context bundles
 
     Scenario: handoff projection derives flattened session state from graph data

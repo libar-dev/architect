@@ -57,3 +57,25 @@ Feature: BusinessRuleSet — package scope branch
       When I project the same bundle with an architect-pkg-style packages config
       Then the children keys should differ from the previous run
       And no source code changed between the two runs
+
+  Rule: The package scope filter matches by the resolver package id
+
+    **Invariant:** The `scope: 'package'` FILTER keeps a rule when the resolver
+    maps its source file to the canonical unscoped package id (`architect-core`,
+    `architect-projection`, …) — the same id the package GROUPING axis and the
+    `BusinessRule.package` field use. The scoped `@libar-dev/<pkg>` form is not a
+    package id the resolver produces, so it matches nothing.
+    **Verified by:** Package filter selects rules by resolver id, Scoped package form matches nothing
+
+    @happy-path
+    Scenario: Package filter selects rules by resolver id
+      Given a BusinessRuleSet sourced from 4 patterns across 3 workspace packages
+      When I project the rule set filtered to package "architect-projection"
+      Then every projected rule should carry package "architect-projection"
+      And at least one rule should be projected
+
+    @validation
+    Scenario: Scoped package form matches nothing
+      Given a BusinessRuleSet sourced from 4 patterns across 3 workspace packages
+      When I project the rule set filtered to package "@libar-dev/architect-projection"
+      Then no rules should be projected

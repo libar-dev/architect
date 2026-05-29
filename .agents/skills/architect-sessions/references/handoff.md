@@ -18,17 +18,17 @@ Run `handoff` per pattern for multi-pattern sessions.
 
 For each pattern touched:
 
-| Field | Source |
-| ----- | ------ |
-| Session intent | What you were doing (`planning` / `design` / `implement` / `review`) |
-| Pattern name | The primary pattern under work |
-| Current FSM state | `pnpm architect:query context <pattern> --session implement` — read the `=== FSM ===` line |
-| Transitions made | Your edit history |
-| Files modified | Pass to `--modified-file` flags on `handoff` |
-| Open dependencies | `pnpm architect:query dep-tree <pattern>` minus the satisfied ones |
-| Open blockers | `pnpm architect:query arch blocking` filtered to this pattern |
-| Outstanding open questions | `pnpm architect:query open-questions [--parent <pattern>]` |
-| Outstanding work | What you didn't finish, one-line "why" each |
+| Field                      | Source                                                                                     |
+| -------------------------- | ------------------------------------------------------------------------------------------ |
+| Session intent             | What you were doing (`planning` / `design` / `implement` / `review`)                       |
+| Pattern name               | The primary pattern under work                                                             |
+| Current FSM state          | `pnpm architect:query context <pattern> --session implement` — read the `=== FSM ===` line |
+| Transitions made           | Your edit history                                                                          |
+| Files modified             | Pass to `--modified-file` flags on `handoff`                                               |
+| Open dependencies          | `pnpm architect:query dep-tree <pattern>` minus the satisfied ones                         |
+| Open blockers              | `pnpm architect:query arch blocking` filtered to this pattern                              |
+| Outstanding open questions | `pnpm architect:query open-questions [--parent <pattern>]`                                 |
+| Outstanding work           | What you didn't finish, one-line "why" each                                                |
 
 ## Handoff note format
 
@@ -48,18 +48,18 @@ Five fields, no recap of conversation, no thanks-for-this-session prose. The nex
 
 Set the `Recommended next:` field from where the session ended (all references are in this skill unless noted):
 
-| Session ended at | Spec state | Recommended next |
-| ---------------- | ---------- | ---------------- |
-| Idea tier | Idea captured, ready to refine | [`plan.md`](plan.md) (promote idea → candidate) |
-| Candidate tier | Open questions resolved, acceptance gate cleared | [`plan.md`](plan.md) (promote candidate → plan; flips status to `roadmap`) |
-| Plan tier | Plan-level spec ready for design | [`design.md`](design.md) |
-| Design tier | `scope-validate <pattern> implement` = PASS | [`implement.md`](implement.md) |
-| Design tier | `scope-validate <pattern> implement` = WARN/BLOCKED | [`review-spec.md`](review-spec.md) (find gaps) → [`design.md`](design.md) |
-| Implement | Spec deleted, value transferred | (none — pattern complete; optionally start the next pattern's planning) |
-| Implement | Value transferred, deletion deferred | [`review-implementation.md`](review-implementation.md) (batched verification + deletion) |
-| Review (spec) | Gap list produced | [`design.md`](design.md) to fix, or [`implement.md`](implement.md) if PASS |
-| Review (implementation) | Per-pattern verdicts, batched deletion proposed | (none if user authorized deletion; otherwise re-invoke when ready) |
-| Refactor (no design spec) | Shipped code evolved in place | [`architect-refactor-session`](../../architect-refactor-session/SKILL.md) |
+| Session ended at          | Spec state                                          | Recommended next                                                                         |
+| ------------------------- | --------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| Idea tier                 | Idea captured, ready to refine                      | [`plan.md`](plan.md) (promote idea → candidate)                                          |
+| Candidate tier            | Open questions resolved, acceptance gate cleared    | [`plan.md`](plan.md) (promote candidate → plan; flips status to `roadmap`)               |
+| Plan tier                 | Plan-level spec ready for design                    | [`design.md`](design.md)                                                                 |
+| Design tier               | `scope-validate <pattern> implement` = PASS         | [`implement.md`](implement.md)                                                           |
+| Design tier               | `scope-validate <pattern> implement` = WARN/BLOCKED | [`review-spec.md`](review-spec.md) (find gaps) → [`design.md`](design.md)                |
+| Implement                 | Spec deleted, value transferred                     | (none — pattern complete; optionally start the next pattern's planning)                  |
+| Implement                 | Value transferred, deletion deferred                | [`review-implementation.md`](review-implementation.md) (batched verification + deletion) |
+| Review (spec)             | Gap list produced                                   | [`design.md`](design.md) to fix, or [`implement.md`](implement.md) if PASS               |
+| Review (implementation)   | Per-pattern verdicts, batched deletion proposed     | (none if user authorized deletion; otherwise re-invoke when ready)                       |
+| Refactor (no design spec) | Shipped code evolved in place                       | [`architect-refactor-session`](../../architect-refactor-session/SKILL.md)                |
 
 The full ladder is in [`../../architect-base/references/four-tier-ladder.md`](../../architect-base/references/four-tier-ladder.md).
 

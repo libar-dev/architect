@@ -26,6 +26,7 @@ import {
   writePatternFiles,
   writeDanglingRefFiles,
   writeFeatureFilesWithRules,
+  writeDecisionEnforcingFeatureFiles,
   writeParentHierarchyFeatureFiles,
   createTempDir,
 } from '../../support/helpers/pattern-graph-api-state.js';
@@ -1090,7 +1091,7 @@ describeFeature(rulesSubcommandFeature, ({ Background, Rule, AfterEachScenario }
       },
     );
 
-    RuleScenario('Rules filters by canonical package name', ({ Given, When, Then, And }) => {
+    RuleScenario('Rules filters by canonical package id', ({ Given, When, Then, And }) => {
       Given('TypeScript files with pattern annotations', async () => {
         await writePatternFiles(state);
       });
@@ -1115,6 +1116,33 @@ describeFeature(rulesSubcommandFeature, ({ Background, Rule, AfterEachScenario }
         expect(getResult(state).stdout).not.toContain(text);
       });
     });
+
+    RuleScenario(
+      'Rules rejects an unknown package with the accepted set',
+      ({ Given, When, Then, And }) => {
+        Given('TypeScript files with pattern annotations', async () => {
+          await writePatternFiles(state);
+        });
+
+        And('Gherkin feature files with business rules', async () => {
+          await writeFeatureFilesWithRules(state);
+        });
+
+        When('running {string}', async (_ctx: unknown, cmd: string) => {
+          await runCLICommand(state, cmd);
+        });
+
+        Then('exit code is {int}', (_ctx: unknown, code: number) => {
+          expect(getResult(state).exitCode).toBe(code);
+        });
+
+        And('output is a fail-loud package error enumerating the accepted set', () => {
+          const combined = getResult(state).stdout + getResult(state).stderr;
+          expect(combined).toContain('--package: invalid value');
+          expect(combined).toContain('Accepted:');
+        });
+      },
+    );
 
     RuleScenario('Rules package filter works with count', ({ Given, When, Then, And }) => {
       Given('TypeScript files with pattern annotations', async () => {
@@ -1289,6 +1317,160 @@ describeFeature(rulesSubcommandFeature, ({ Background, Rule, AfterEachScenario }
         expect(combined).toContain(text);
       });
     });
+
+    RuleScenario(
+      'Rules aggregates a decision across enforcing patterns',
+      ({ Given, When, Then, And }) => {
+        Given('Gherkin feature files enforcing a decision', async () => {
+          await writeDecisionEnforcingFeatureFiles(state);
+        });
+
+        When('running {string}', async (_ctx: unknown, cmd: string) => {
+          await runCLICommand(state, cmd);
+        });
+
+        Then('exit code is {int}', (_ctx: unknown, code: number) => {
+          expect(getResult(state).exitCode).toBe(code);
+        });
+
+        And('stdout is a JSON string array', () => {
+          const parsed = JSON.parse(getResult(state).stdout) as unknown;
+          expect(Array.isArray(parsed)).toBe(true);
+        });
+
+        And('the names-only result aggregates the decision rule and its enforcing rule', () => {
+          const parsed = JSON.parse(getResult(state).stdout) as unknown;
+          expect(parsed).toContain('Decision record owns its rationale');
+          expect(parsed).toContain('Enforcer keeps the decision invariant');
+        });
+      },
+    );
+
+    RuleScenario('Rules decision filter accepts the ADR id form', ({ Given, When, Then, And }) => {
+      Given('Gherkin feature files enforcing a decision', async () => {
+        await writeDecisionEnforcingFeatureFiles(state);
+      });
+
+      When('running {string}', async (_ctx: unknown, cmd: string) => {
+        await runCLICommand(state, cmd);
+      });
+
+      Then('exit code is {int}', (_ctx: unknown, code: number) => {
+        expect(getResult(state).exitCode).toBe(code);
+      });
+
+      And('stdout is a JSON string array', () => {
+        const parsed = JSON.parse(getResult(state).stdout) as unknown;
+        expect(Array.isArray(parsed)).toBe(true);
+      });
+
+      And('the names-only result aggregates the decision rule and its enforcing rule', () => {
+        const parsed = JSON.parse(getResult(state).stdout) as unknown;
+        expect(parsed).toContain('Decision record owns its rationale');
+        expect(parsed).toContain('Enforcer keeps the decision invariant');
+      });
+    });
+
+    RuleScenario(
+      'Rules decision filter accepts the canonical pattern name',
+      ({ Given, When, Then, And }) => {
+        Given('Gherkin feature files enforcing a decision', async () => {
+          await writeDecisionEnforcingFeatureFiles(state);
+        });
+
+        When('running {string}', async (_ctx: unknown, cmd: string) => {
+          await runCLICommand(state, cmd);
+        });
+
+        Then('exit code is {int}', (_ctx: unknown, code: number) => {
+          expect(getResult(state).exitCode).toBe(code);
+        });
+
+        And('stdout is a JSON string array', () => {
+          const parsed = JSON.parse(getResult(state).stdout) as unknown;
+          expect(Array.isArray(parsed)).toBe(true);
+        });
+
+        And('the names-only result aggregates the decision rule and its enforcing rule', () => {
+          const parsed = JSON.parse(getResult(state).stdout) as unknown;
+          expect(parsed).toContain('Decision record owns its rationale');
+          expect(parsed).toContain('Enforcer keeps the decision invariant');
+        });
+      },
+    );
+
+    RuleScenario('Rules decision filter excludes unrelated rules', ({ Given, When, Then, And }) => {
+      Given('Gherkin feature files enforcing a decision', async () => {
+        await writeDecisionEnforcingFeatureFiles(state);
+      });
+
+      When('running {string}', async (_ctx: unknown, cmd: string) => {
+        await runCLICommand(state, cmd);
+      });
+
+      Then('exit code is {int}', (_ctx: unknown, code: number) => {
+        expect(getResult(state).exitCode).toBe(code);
+      });
+
+      And('stdout is a JSON string array', () => {
+        const parsed = JSON.parse(getResult(state).stdout) as unknown;
+        expect(Array.isArray(parsed)).toBe(true);
+      });
+
+      And('stdout does not contain {string}', (_ctx: unknown, text: string) => {
+        expect(getResult(state).stdout).not.toContain(text);
+      });
+    });
+
+    RuleScenario(
+      'Rules rejects an unknown decision with the accepted set',
+      ({ Given, When, Then, And }) => {
+        Given('Gherkin feature files enforcing a decision', async () => {
+          await writeDecisionEnforcingFeatureFiles(state);
+        });
+
+        When('running {string}', async (_ctx: unknown, cmd: string) => {
+          await runCLICommand(state, cmd);
+        });
+
+        Then('exit code is {int}', (_ctx: unknown, code: number) => {
+          expect(getResult(state).exitCode).toBe(code);
+        });
+
+        And('output is a fail-loud decision error enumerating the accepted set', () => {
+          const combined = getResult(state).stdout + getResult(state).stderr;
+          expect(combined).toContain('--decision: invalid value');
+          expect(combined).toContain('Accepted:');
+          expect(combined).toContain('ADR777Sample');
+        });
+      },
+    );
+
+    RuleScenario(
+      'Rules rejects conflicting decision and pattern filters',
+      ({ Given, When, Then, And }) => {
+        Given('TypeScript files with pattern annotations', async () => {
+          await writePatternFiles(state);
+        });
+
+        And('Gherkin feature files with business rules', async () => {
+          await writeFeatureFilesWithRules(state);
+        });
+
+        When('running {string}', async (_ctx: unknown, cmd: string) => {
+          await runCLICommand(state, cmd);
+        });
+
+        Then('exit code is {int}', (_ctx: unknown, code: number) => {
+          expect(getResult(state).exitCode).toBe(code);
+        });
+
+        And('output contains {string}', (_ctx: unknown, text: string) => {
+          const combined = getResult(state).stdout + getResult(state).stderr;
+          expect(combined).toContain(text);
+        });
+      },
+    );
 
     RuleScenario(
       'Rules rejects conflicting pattern and product-area filters',

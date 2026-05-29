@@ -103,7 +103,7 @@ engine.
 - **`fragments/base.ts`** — `projectSingle`, `isBundle`, `ProjectionBundle`, `BundleRouting`. The
   ADR-010 bundle shape. ~100 LOC; everything routes through it.
 - **`projections/_shared/grouped-routed-bundle.internal.ts`** — `buildGroupedRoutedBundle`. The one
-  generalized group→sort→root+children→route→degrade helper. This is the *shape* the ~5 surviving
+  generalized group→sort→root+children→route→degrade helper. This is the _shape_ the ~5 surviving
   views should converge on; it already deliberately refuses speculative generality (the
   one-child-per-group constraint, documented in its header).
 - **`projections/_shared/`** — `filter.ts` (ProjectionFilter), `pattern-helpers.internal.ts`,
@@ -115,7 +115,7 @@ engine.
   are what the CLI/MCP/Studio surfaces lean on every session.
 - **`renderers/render-ui.ts`** (Studio) + **`renderers/render-json.ts`** (MCP) + a compact-text path
   for agents. These map to real, demanding sinks.
-- **`disclosure/`** vocabulary as *types* (grouping/richness/rootShape) — the concept is sound; what's
+- **`disclosure/`** vocabulary as _types_ (grouping/richness/rootShape) — the concept is sound; what's
   incidental is treating it as a config engine (below).
 
 Estimate: the genuinely load-bearing core is roughly **30–40% of the package** (~7k of ~18k LOC),
@@ -128,10 +128,10 @@ overview path.
    single biggest cut. `documentation-definition.internal.ts` wires **13 document types** each to a
    bespoke factory; `documentation-type-registry.{identity,disclosure,output-routing,cli-surface}.ts`
    split one registry across four files; `documentation-bundle.internal.ts` + `projection-filter-resolver.ts`
-   + `disclosure-matrix.ts` form a config-engine that exists to make "one bespoke projection per
-   output" feel uniform. Under a source-first model this collapses to a handful of Views over one
-   engine; most of these 13 types are doc-shaped slices of the same graph and do not need their own
-   factory, registry row, routing block, and disclosure matrix.
+   - `disclosure-matrix.ts` form a config-engine that exists to make "one bespoke projection per
+     output" feel uniform. Under a source-first model this collapses to a handful of Views over one
+     engine; most of these 13 types are doc-shaped slices of the same graph and do not need their own
+     factory, registry row, routing block, and disclosure matrix.
 
 2. **Dead/degenerate generators over dimensions the read-model no longer carries.**
    - `delivery-reporting/` (~740 LOC) — `projectCurrentWork`, `projectRoadmapTimeline`,
@@ -156,7 +156,7 @@ overview path.
 4. **The disclosure-matrix-as-config-engine.** The `DisclosureSpec` (grouping × richness × rootShape ×
    emitChildren × committed × filter) per document type per level, resolved through
    `projection-filter-resolver.ts` and `disclosure-matrix.ts`, is configuration standing in for code.
-   Keep the disclosure *level* concept; delete the per-docType matrix machinery — a View decides its
+   Keep the disclosure _level_ concept; delete the per-docType matrix machinery — a View decides its
    own shape directly.
 
 5. **`render-markdown.ts` is 2,544 LOC — the single largest file in the package**, and markdown is

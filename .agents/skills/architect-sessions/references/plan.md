@@ -21,7 +21,7 @@ Run the everyday-verb pre-flight from [`../../architect-data-api/SKILL.md`](../.
 
 ## Six-tag idea-tier minimum
 
-An idea-tier spec carries six authored tags — the five cross-tier baseline plus the explicit `@architect-maturity:idea` the guard's idea-tier checks require (without it the file is *not* recognized as idea-tier and silently escapes idea-tier validation):
+An idea-tier spec carries six authored tags — the five cross-tier baseline plus the explicit `@architect-maturity:idea` the guard's idea-tier checks require (without it the file is _not_ recognized as idea-tier and silently escapes idea-tier validation):
 
 1. `@architect` — the gate tag
 2. `@architect-pattern:<PatternName>`
@@ -103,11 +103,11 @@ Block these aggressively (the idea-tier anti-pattern set; details in the ladder 
 - **No deliverables.** Ideas are not committed to files.
 - **No phase / effort / priority / release metadata.** Planning metadata means commitment.
 - **No ADRs.** If an idea needs a decision, note it in the parent epic, not here.
-- **No narrative.** One-line Feature description. *Needing* more than one line means the idea is ready for candidate tier — that is signal to promote, not to grow the idea file.
+- **No narrative.** One-line Feature description. _Needing_ more than one line means the idea is ready for candidate tier — that is signal to promote, not to grow the idea file.
 - **No scenarios at idea tier.** Rules-with-invariants suffice; scenarios belong at candidate tier and above.
-- **No `**Rationale:**` / `**Verified by:**` at idea tier** — those are plan-tier additions.
+- **No `**Rationale:**`/`**Verified by:**` at idea tier** — those are plan-tier additions.
 
-> **Tripwire — retroactive plan-level specs (the #1 failure mode).** If the validator reports missing Gherkin coverage for a pattern that is *already shipping*, the fix is to tag an existing executable feature with `@architect-implements:<Pattern>` and enrich it — never to author a fresh plan-level spec. A plan-level spec is meant to die after implementation; conjuring one back to "cover" shipped behavior inverts the pipeline and leaves a zombie. (Refactoring carve-out: backfilling coverage skips directly to design or executable tier, never via plan.)
+> **Tripwire — retroactive plan-level specs (the #1 failure mode).** If the validator reports missing Gherkin coverage for a pattern that is _already shipping_, the fix is to tag an existing executable feature with `@architect-implements:<Pattern>` and enrich it — never to author a fresh plan-level spec. A plan-level spec is meant to die after implementation; conjuring one back to "cover" shipped behavior inverts the pipeline and leaves a zombie. (Refactoring carve-out: backfilling coverage skips directly to design or executable tier, never via plan.)
 
 ## Output for this session
 

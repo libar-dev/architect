@@ -130,14 +130,14 @@ from `status:candidate`, and status stays `candidate`.)
 
 **Six-tag minimum:**
 
-| Tag                       | Purpose                                          |
-| ------------------------- | ------------------------------------------------ |
-| `@architect`              | Gate (extraction opt-in)                         |
-| `@architect-pattern`      | PascalCase pattern name                          |
-| `@architect-status`       | `candidate`                                      |
+| Tag                       | Purpose                                                    |
+| ------------------------- | ---------------------------------------------------------- |
+| `@architect`              | Gate (extraction opt-in)                                   |
+| `@architect-pattern`      | PascalCase pattern name                                    |
+| `@architect-status`       | `candidate`                                                |
 | `@architect-maturity`     | `idea` — authored explicitly (the idea-tier discriminator) |
-| `@architect-product-area` | Product area grouping                            |
-| `@architect-parent`       | Parent epic — every idea belongs to an epic      |
+| `@architect-product-area` | Product area grouping                                      |
+| `@architect-parent`       | Parent epic — every idea belongs to an epic                |
 
 **Parent carve-out for level variants.** Files carrying `@architect-level:epic` or `@architect-level:slice` MAY omit `@architect-parent` — they are top-of-chain or cross-cutting and have no parent by design. The other five baseline tags remain required.
 
@@ -220,16 +220,16 @@ accepted plan-level specs.
 
 **What makes a candidate different from a plan-level spec:**
 
-| Aspect               | Candidate                                             | Plan-Level (Accepted)                   |
-| -------------------- | ----------------------------------------------------- | --------------------------------------- |
-| Status               | `candidate`                                           | `roadmap`                               |
+| Aspect               | Candidate                                                  | Plan-Level (Accepted)                   |
+| -------------------- | ---------------------------------------------------------- | --------------------------------------- |
+| Status               | `candidate`                                                | `roadmap`                               |
 | Required tags        | Baseline five: gate, pattern, status, product-area, parent | Full tag set (§03)                      |
-| Deliverables table   | OPTIONAL                                              | MUST                                    |
-| Rule metadata        | Invariant RECOMMENDED, Rationale/Verified-by OPTIONAL | All three MUST                          |
-| Scenario tags        | OPTIONAL                                              | MUST (`@acceptance-criteria` + subtype) |
-| Quality review       | Not required                                          | MUST pass quality checklist             |
-| In pattern graph     | Yes (visible, queryable)                              | Yes                                     |
-| In delivery pipeline | No                                                    | Yes                                     |
+| Deliverables table   | OPTIONAL                                                   | MUST                                    |
+| Rule metadata        | Invariant RECOMMENDED, Rationale/Verified-by OPTIONAL      | All three MUST                          |
+| Scenario tags        | OPTIONAL                                                   | MUST (`@acceptance-criteria` + subtype) |
+| Quality review       | Not required                                               | MUST pass quality checklist             |
+| In pattern graph     | Yes (visible, queryable)                                   | Yes                                     |
+| In delivery pipeline | No                                                         | Yes                                     |
 
 **Candidate spec example:**
 

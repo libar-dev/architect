@@ -74,3 +74,32 @@ Feature: Process guard rule expressions
 
     **Verified by:** session-scope step bindings in the guard test suite
     exercise the warning path against the decider.
+
+  Rule: Session Exclusion
+
+    **Invariant:** Files explicitly excluded from the active session are a
+    hard error (a `session-excluded` violation), not a warning, unless the
+    run sets `--ignore-session`.
+
+    **Rationale:** Explicit exclusion is a deliberate protective boundary.
+    Unlike the soft `session-scope` warning, crossing an explicit exclusion
+    requires changing the session configuration, not a drive-by override --
+    so the decider escalates it to a blocking error.
+
+    **Verified by:** the guard-runtime `session-excluded` path: `validateChanges`
+    runs `checkSessionExcluded` (skipped only when `ignoreSession` is set) and
+    emits an error-severity `session-excluded` violation for excluded files.
+
+  Rule: Deliverable Removal
+
+    **Invariant:** Removing a deliverable from a scope-locked (active) spec
+    emits a `deliverable-removed` warning, never an error.
+
+    **Rationale:** Removal may be legitimate -- the deliverable was descoped
+    or completed elsewhere -- but it warrants author attention so the commit
+    documents the intent. Blocking it would punish a valid descope; ignoring
+    it would let scope silently shrink.
+
+    **Verified by:** the guard-runtime deliverable-removal path: when a change
+    set reports removed deliverables on an active spec, `validateChanges` emits
+    a warning-severity `deliverable-removed` violation.

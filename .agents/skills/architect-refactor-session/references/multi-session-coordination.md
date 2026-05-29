@@ -32,7 +32,7 @@ non-negotiable**, **commit hygiene** — are the floor for every session
 sections below operationalize:
 
 4. **Decisions captured before code.** Anything needing human judgment
-   goes to `DECISIONS.md` (template below) *before* the edit that
+   goes to `DECISIONS.md` (template below) _before_ the edit that
    depends on it. Without this separation, agents fabricate answers
    under pressure.
 5. **Incomplete scope is next-session input, not silent debt.** When

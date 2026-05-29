@@ -55,6 +55,6 @@ Feature: Every renderer accepts every fragment kind without throwing
         | PatternDetail            |
         | DependencyEdge           |
         | DependencyEdgeSet        |
-        | DependencyTree           |
+        | DependencyContext        |
         | ArchitectureNeighborhood |
         | OrphanPatternList        |

@@ -2,7 +2,7 @@
 
 The implementations are done; the design specs may or may not still exist. Verify value has transferred to durable surfaces, then either confirm batched deletion is safe or surface what's blocking it.
 
-> This is the **post-implementation** counterpart to [`review-spec.md`](review-spec.md) (which reviews specs *before* implementation). The two do not overlap — pick by lifecycle phase.
+> This is the **post-implementation** counterpart to [`review-spec.md`](review-spec.md) (which reviews specs _before_ implementation). The two do not overlap — pick by lifecycle phase.
 
 Doctrine depth: the pre-deletion gate + transfer checklist + anti-patterns are in [`ephemeral-spec-deletion.md`](ephemeral-spec-deletion.md); the forward/reverse link pair + `*ExecutableTests` are in [`../../architect-base/references/spec-pattern-relationships.md`](../../architect-base/references/spec-pattern-relationships.md); split-ownership (**production-TS JSDoc is additive — never flag its absence as a value-transfer blocker**) is in [`../../architect-base/references/annotation-ownership.md`](../../architect-base/references/annotation-ownership.md).
 
@@ -10,7 +10,7 @@ Doctrine depth: the pre-deletion gate + transfer checklist + anti-patterns are i
 
 1. **Which patterns?** Reviewing a comma-separated set as a batch is the common case — get the full list.
 2. **Spec state** — are the design specs still present, or already deleted? (Deleted specs make the forward-link check moot; verify against memory of the spec.)
-3. **Authorization** — is deletion in scope for *this* session, or review-only? Default is review-only; deletion is opt-in.
+3. **Authorization** — is deletion in scope for _this_ session, or review-only? Default is review-only; deletion is opt-in.
 
 ## Pre-flight
 
