@@ -4,10 +4,6 @@
  * @architect-status active
  * @architect-role:service
  * @architect-bounded-context:scanner
- *
- * ### When to Use
- *
- * - As a typed contract / data shape consumed by projection or render layers.
  */
 import {
   AST_NODE_TYPES,
@@ -319,6 +315,7 @@ function parseDirective(
   const implementsPatterns = readStringArrayMetadata(metadataResults, 'implements');
   const extendsPattern = readStringMetadata(metadataResults, 'extends');
   const seeAlso = readStringArrayMetadata(metadataResults, 'see-also');
+  const enforcesDecisions = readStringArrayMetadata(metadataResults, 'enforces-decision');
   const apiRef = readStringArrayMetadata(metadataResults, 'api-ref');
   const role = readStringMetadata(metadataResults, 'role');
   const unlockReason = readStringMetadata(metadataResults, 'unlock-reason');
@@ -393,6 +390,7 @@ function parseDirective(
     ...(implementsPatterns && implementsPatterns.length > 0 && { implements: implementsPatterns }),
     ...(extendsPattern && { extends: extendsPattern }),
     ...(seeAlso && seeAlso.length > 0 && { seeAlso }),
+    ...(enforcesDecisions && enforcesDecisions.length > 0 && { enforcesDecisions }),
     ...(apiRef && apiRef.length > 0 && { apiRef }),
     ...(target && { target }),
     ...(since && { since }),

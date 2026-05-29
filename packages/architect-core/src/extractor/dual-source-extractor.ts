@@ -5,10 +5,6 @@
  * @architect-role:service
  * @architect-bounded-context:extractor
  * @architect-uses ExtractedPattern, PatternHelpers
- *
- * ### When to Use
- *
- * - As a typed contract / data shape consumed by projection or render layers.
  */
 import type { ExtractedPattern } from '../types/index.js';
 import { getPatternName } from '../read-api/pattern-helpers.js';

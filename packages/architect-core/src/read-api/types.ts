@@ -108,10 +108,60 @@ export interface PatternRelationships {
   apiRef: readonly string[];
 }
 
+/**
+ * One node in a {@link DependencyContext} forest. The focal pattern is the root
+ * of both forests (named by {@link DependencyContext.focal}) and is never
+ * represented as a node, so there is no per-node focal flag. `truncated` is set
+ * when the node has further edges in its direction that were not expanded
+ * because the depth cap was reached.
+ */
+export interface DependencyContextNode {
+  name: string;
+  status?: string;
+  phase?: number;
+  truncated: boolean;
+  children: readonly DependencyContextNode[];
+}
+
+/**
+ * Focal-rooted, bidirectional transitive dependency context for a single
+ * pattern. `upstream` is the cycle-safe closure over `dependsOn`∪`uses` (the
+ * prerequisites / what the focal needs); `downstream` is the closure over
+ * `usedBy`∪`enables` (the blast radius / what needs the focal). The focal
+ * pattern is the root of both forests. `summary` precomputes the direct and
+ * transitive counts so a consumer can size blast radius without re-walking.
+ */
+export interface DependencyContext {
+  focal: string;
+  upstream: readonly DependencyContextNode[];
+  downstream: readonly DependencyContextNode[];
+  summary: {
+    upstreamDirect: number;
+    upstreamTransitive: number;
+    downstreamDirect: number;
+    downstreamTransitive: number;
+  };
+  options: {
+    maxDepth: number;
+  };
+}
+
 export interface QuarterGroup {
   quarter: string;
   patterns: ExtractedPattern[];
   counts: StatusCounts;
+}
+
+/**
+ * A lightweight reference to a business rule that enforces a decision — the
+ * owning pattern, the rule name, and an optional invariant string. Returned by
+ * the decision-scoped rule aggregation so the CLI/projection can resolve full
+ * rule fragments without the kernel needing the fragment layer.
+ */
+export interface BusinessRuleRef {
+  pattern: string;
+  ruleName: string;
+  invariant?: string;
 }
 
 export interface TransitionCheck {

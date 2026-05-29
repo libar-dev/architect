@@ -3,7 +3,6 @@
  * @architect-role:contract
  * @architect-pattern ResultMonadTypes
  * @architect-status completed
- * @architect-implements ResultMonad
  * @architect-product-area CoreTypes
  *
  * ## Result Monad - Type Definitions

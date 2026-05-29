@@ -4,10 +4,6 @@
  * @architect-status active
  * @architect-role:service
  * @architect-bounded-context:extractor
- *
- * ### When to Use
- *
- * - As a typed contract / data shape consumed by projection or render layers.
  */
 import { AST_NODE_TYPES, AST_TOKEN_TYPES, parse } from '@typescript-eslint/typescript-estree';
 import type { TSESTree } from '@typescript-eslint/typescript-estree';

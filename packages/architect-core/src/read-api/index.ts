@@ -9,6 +9,9 @@ export type {
   PhaseProgress,
   PatternDependencies,
   PatternRelationships,
+  DependencyContext,
+  DependencyContextNode,
+  BusinessRuleRef,
   QuarterGroup,
   TransitionCheck,
   ProtectionInfo,
@@ -21,6 +24,13 @@ export type { PatternGraphAPI } from './pattern-graph-api.js';
 export { createPatternGraphAPI } from './pattern-graph-api.js';
 
 export {
+  resolveImplementingFeatures,
+  getRulesForPattern,
+  ProvenancedRuleSchema,
+} from './rule-aggregation.js';
+export type { ProvenancedRule } from './rule-aggregation.js';
+
+export {
   getPatternName,
   findPatternByName,
   findPatternParseFailure,
@@ -29,6 +39,13 @@ export {
   resolveRoleDefinition,
   suggestPattern,
 } from './pattern-helpers.js';
+
+export {
+  isDecisionPattern,
+  listDecisionPatterns,
+  resolveDecisionPattern,
+  canonicalDecisionKey,
+} from './decision-resolution.js';
 
 export type { NeighborhoodResult, ContextComparison } from './architecture-inspection.js';
 export { computeNeighborhood, compareContexts } from './architecture-inspection.js';

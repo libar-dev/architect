@@ -5,10 +5,6 @@
  * @architect-role:utility
  * @architect-bounded-context:read-api
  * @architect-uses ExtractedPattern, PatternGraph
- *
- * ### When to Use
- *
- * - As a typed contract / data shape consumed by projection or render layers.
  */
 import type { ExtractedPattern } from '../validation-schemas/extracted-pattern.js';
 import type { PatternGraph } from '../validation-schemas/pattern-graph.js';

@@ -24,10 +24,6 @@
  * runtime validation for configs, registries, and graph inputs. Those runtime
  * dependencies belong here because every higher package relies on the same
  * foundational scan → parse → validate → merge pipeline.
- *
- * ### When to Use
- *
- * - As a typed contract / data shape consumed by projection or render layers.
  */
 
 import * as path from 'path';
@@ -368,7 +364,10 @@ export async function buildPatternGraph(
     });
   }
 
-  const { dataset, validation } = transformToPatternGraphWithValidation(rawDataset, packageResolver);
+  const { dataset, validation } = transformToPatternGraphWithValidation(
+    rawDataset,
+    packageResolver,
+  );
   const datasetResult = validatePatternGraphDataset(dataset);
   if (!datasetResult.ok) {
     return datasetResult;

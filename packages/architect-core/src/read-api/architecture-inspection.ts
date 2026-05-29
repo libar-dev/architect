@@ -5,10 +5,6 @@
  * @architect-role:utility
  * @architect-bounded-context:read-api
  * @architect-uses ExtractedPattern, PatternGraph, PatternHelpers
- *
- * ### When to Use
- *
- * - As a typed contract / data shape consumed by projection or render layers.
  */
 import type { ExtractedPattern } from '../validation-schemas/extracted-pattern.js';
 import type { ArchIndex, PatternGraph } from '../validation-schemas/pattern-graph.js';
@@ -41,6 +37,8 @@ export interface NeighborhoodResult {
   readonly dependsOn: readonly NeighborEntry[];
   readonly enables: readonly NeighborEntry[];
   readonly sameContext: readonly NeighborEntry[];
+  readonly seeAlso: readonly NeighborEntry[];
+  readonly enforcedBy: readonly NeighborEntry[];
   readonly implements: readonly string[];
   readonly implementedBy: readonly string[];
 }
@@ -89,6 +87,12 @@ export function computeNeighborhood(
   const enables = (relationships?.enables ?? []).map((entry) =>
     resolveNeighborEntry(dataset, entry),
   );
+  const seeAlso = (relationships?.seeAlso ?? []).map((entry) =>
+    resolveNeighborEntry(dataset, entry),
+  );
+  const enforcedBy = (relationships?.enforcedBy ?? []).map((entry) =>
+    resolveNeighborEntry(dataset, entry),
+  );
 
   const sameContext: NeighborEntry[] = [];
   if (pattern.boundedContext !== undefined && dataset.archIndex !== undefined) {
@@ -112,6 +116,8 @@ export function computeNeighborhood(
     dependsOn,
     enables,
     sameContext,
+    seeAlso,
+    enforcedBy,
     implements: relationships?.implementsPatterns ?? [],
     implementedBy: (relationships?.implementedBy ?? []).map((entry) => entry.name),
   };

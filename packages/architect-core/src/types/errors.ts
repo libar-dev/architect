@@ -3,7 +3,6 @@
  * @architect-role:contract
  * @architect-pattern ErrorFactoryTypes
  * @architect-status completed
- * @architect-implements ErrorFactories
  * @architect-product-area CoreTypes
  *
  * ## Error Factories - Type Definitions

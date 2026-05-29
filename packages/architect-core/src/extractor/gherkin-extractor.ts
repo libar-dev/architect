@@ -233,6 +233,9 @@ function buildGherkinPatternDraft(input: {
     ...(metadata.seeAlso !== undefined && metadata.seeAlso.length > 0
       ? { seeAlso: metadata.seeAlso }
       : {}),
+    ...(metadata.enforcesDecisions !== undefined && metadata.enforcesDecisions.length > 0
+      ? { enforcesDecisions: metadata.enforcesDecisions }
+      : {}),
     ...(metadata.apiRef !== undefined && metadata.apiRef.length > 0
       ? { apiRef: metadata.apiRef }
       : {}),

@@ -19,10 +19,6 @@
  * `_other` bucket. Mirrors the resolver-failure shape D-11 prescribes
  * for cross-bundle link resolution: actionable feedback over silent
  * fallback.
- *
- * ### When to Use
- *
- * - As a typed contract / data shape consumed by projection or render layers.
  */
 import type { PackageConfig, PackageMatcher } from './package-config.js';
 import type { Package } from './package.js';

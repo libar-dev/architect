@@ -6,16 +6,19 @@
  * @architect-bounded-context:validation-schemas
  * @architect-uses ExtractedPattern
  *
- * ## PatternGraph - Read Model Schema
+ * ## PatternGraph - Read Model Contract
  *
- * Zod schema for the canonical read model produced by `buildPatternGraph()`.
- * Single source of truth for every CLI subcommand, MCP tool, generated doc,
- * and desktop view per ADR-006 (Single Read Model).
+ * This is the Zod CONTRACT (`role:contract`) for the assembled read model — the
+ * schema that validates the graph's shape. It is not itself the read model.
  *
- * ### When to Use
- *
- * - Consumer code: import the inferred type for graph fields
- * - Tests: validate that fixture/builder output conforms to the schema
+ * The assembled runtime read model — patterns + `relationshipIndex` +
+ * precomputed views — is the value produced by `transformToPatternGraph()`
+ * (`generators/pipeline`) and served read-only by the `PatternGraphApi` facade
+ * (`read-api`). Per ADR-006 (Single Read Model) that assembled value, not this
+ * schema, is the single read model every CLI subcommand, MCP tool, generated
+ * doc, and desktop view queries. `RuntimePatternGraph` is a type alias of the
+ * inferred `PatternGraph` type, so the schema below is the one canonical shape
+ * for both the contract and the value it validates.
  */
 import { z } from 'zod';
 
@@ -144,6 +147,8 @@ export const RelationshipEntrySchema = z.strictObject({
   extendedBy: z.array(z.string()),
   seeAlso: z.array(z.string()),
   apiRef: z.array(z.string()),
+  enforcesDecisions: z.array(z.string()),
+  enforcedBy: z.array(z.string()),
 });
 
 /**

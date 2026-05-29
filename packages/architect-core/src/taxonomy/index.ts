@@ -42,6 +42,7 @@ export { ADR_CATEGORY_VALUES, type AdrCategoryValue } from './adr-category-value
 export { QUARTER_PATTERN } from './quarter-format.js';
 export {
   NORMALIZED_STATUS_VALUES,
+  NORMALIZED_ONLY_STATUS_VALUES,
   STATUS_NORMALIZATION_MAP,
   isPatternActive,
   isPatternCandidate,
@@ -49,6 +50,7 @@ export {
   isPatternPlanned,
   normalizeStatus,
   type NormalizedStatus,
+  type NormalizedOnlyStatusValue,
 } from './normalized-status.js';
 export {
   DEFAULT_HIERARCHY_LEVEL,

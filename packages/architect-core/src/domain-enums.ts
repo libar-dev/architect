@@ -7,6 +7,7 @@
  */
 import { z } from 'zod';
 import { ACCEPTED_STATUS_VALUES, PROCESS_STATUS_VALUES } from './taxonomy/status-values.js';
+import { NORMALIZED_ONLY_STATUS_VALUES } from './taxonomy/normalized-status.js';
 import { DELIVERABLE_STATUS_VALUES } from './taxonomy/deliverable-status.js';
 import { MATURITY_VALUES } from './taxonomy/maturity-values.js';
 
@@ -27,3 +28,24 @@ export const ProcessStatusSchema = z.enum(PROCESS_STATUS_VALUES);
 export const StatusValueSchema = AcceptedStatusSchema;
 export const DeliverableStatusSchema = z.enum(DELIVERABLE_STATUS_VALUES);
 export const MaturitySchema = z.enum(MATURITY_VALUES);
+
+/**
+ * Consumer-facing status FILTER vocabulary for catalog / list / search / MCP
+ * status filtering only.
+ *
+ * The union of the authored accepted values (`candidate`, `roadmap`, `active`,
+ * `completed`, `deferred`) plus the normalized-only bucket word `planned`
+ * (= roadmap ∪ deferred), so every status word an agent reads in `overview` /
+ * `getStatusDistribution` is a legal filter.
+ *
+ * DISTINCT from {@link AcceptedStatusSchema} (authored `@architect-status`
+ * validation) and {@link ProcessStatusSchema} (FSM transition validation):
+ * those must never widen to accept `planned`, or a non-FSM word could reach the
+ * transition path. StatusFilterSchema is scoped to filtering, never to
+ * authored-tag validation or FSM transitions.
+ */
+export const StatusFilterSchema = z.enum([
+  ...ACCEPTED_STATUS_VALUES,
+  ...NORMALIZED_ONLY_STATUS_VALUES,
+]);
+export type StatusFilterValue = z.infer<typeof StatusFilterSchema>;

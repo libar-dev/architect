@@ -6,9 +6,14 @@
  * @architect-bounded-context:read-api
  * @architect-uses ExtractedPattern, PatternHelpers, PatternGraph
  *
- * ### When to Use
+ * ## PatternGraphApi - Read Model Facade
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * `PatternGraphApi` is the read-model FACADE (`role:utility`):
+ * `createPatternGraphAPI(dataset: PatternGraph)` wraps the assembled,
+ * deep-frozen read model and exposes typed read methods over it. This is the
+ * live read model ADR-006 (Single Read Model) names — the `PatternGraph` schema
+ * is its contract, this facade is how every consumer (CLI, MCP, projection,
+ * Studio) queries that single assembled value.
  */
 import type { ExtractedPattern } from '../validation-schemas/extracted-pattern.js';
 import type {
@@ -27,9 +32,13 @@ import {
 import {
   findPatternByName,
   findPatternParseFailure,
+  getPatternName,
   getRelationships,
   resolveRoleDefinition,
 } from './pattern-helpers.js';
+import { listDecisionPatterns, resolveDecisionPattern } from './decision-resolution.js';
+import { getRulesForPattern as resolveRulesForPattern } from './rule-aggregation.js';
+import type { ProvenancedRule } from './rule-aggregation.js';
 import type { Deliverable } from '../validation-schemas/dual-source.js';
 import type {
   StatusCounts,
@@ -42,6 +51,9 @@ import type {
   TransitionCheck,
   ProtectionInfo,
   RoleInfo,
+  DependencyContext,
+  DependencyContextNode,
+  BusinessRuleRef,
 } from './types.js';
 
 export interface PatternGraphAPI {
@@ -63,9 +75,15 @@ export interface PatternGraphAPI {
   getPattern(name: string): ExtractedPattern | undefined;
   getPatternParseFailure(name: string): PatternParseFailure | undefined;
   getPatternDependencies(name: string): PatternDependencies | undefined;
+  getDependencyContext(name: string, opts?: { maxDepth?: number }): DependencyContext | undefined;
   getPatternRelationships(name: string): PatternRelationships | undefined;
   getRelatedPatterns(name: string): readonly string[];
   getApiReferences(name: string): readonly string[];
+  getRulesForPattern(name: string): readonly ProvenancedRule[];
+  getRulesByDecision(decision: string): readonly BusinessRuleRef[];
+  getPatternsByDecision(decision: string): readonly string[];
+  listDecisions(): readonly string[];
+  listPackages(): readonly string[];
   getPatternDeliverables(name: string): readonly Deliverable[];
   listRoles(): readonly RoleInfo[];
   getPatternsByRole(role: string): ExtractedPattern[];
@@ -121,6 +139,96 @@ export function createPatternGraphAPI(dataset: PatternGraph): PatternGraphAPI {
 
   function getCanonicalRelationshipEntry(name: string): RelationshipEntry | undefined {
     return getRelationships(frozenGraph, name);
+  }
+
+  const DEFAULT_DEPENDENCY_CONTEXT_MAX_DEPTH = 10;
+
+  type DependencyDirection = 'upstream' | 'downstream';
+
+  function directionEdges(entry: RelationshipEntry, direction: DependencyDirection): string[] {
+    const seen = new Set<string>();
+    const ordered: string[] = [];
+    const edges =
+      direction === 'upstream'
+        ? [...entry.dependsOn, ...entry.uses]
+        : [...entry.usedBy, ...entry.enables];
+    for (const target of edges) {
+      if (!seen.has(target)) {
+        seen.add(target);
+        ordered.push(target);
+      }
+    }
+    return ordered;
+  }
+
+  function buildDependencyForest(
+    rootName: string,
+    direction: DependencyDirection,
+    maxDepth: number,
+  ): { nodes: DependencyContextNode[]; direct: number; transitive: number } {
+    const visited = new Set<string>([rootName]);
+    let transitive = 0;
+
+    function expand(name: string, depth: number): DependencyContextNode[] {
+      const entry = getCanonicalRelationshipEntry(name);
+      if (entry === undefined) return [];
+
+      const targets = directionEdges(entry, direction);
+      const nodes: DependencyContextNode[] = [];
+
+      for (const target of targets) {
+        if (visited.has(target)) continue;
+        visited.add(target);
+        transitive += 1;
+
+        const pattern = findPatternByName(frozenGraph, target);
+        const childEntry = getCanonicalRelationshipEntry(target);
+        const hasFurther =
+          childEntry !== undefined &&
+          directionEdges(childEntry, direction).some((t) => !visited.has(t));
+        const reachedCap = depth + 1 >= maxDepth;
+        const children = reachedCap ? [] : expand(target, depth + 1);
+
+        nodes.push({
+          name: target,
+          ...(pattern?.status !== undefined ? { status: pattern.status } : {}),
+          ...(pattern?.phase !== undefined ? { phase: pattern.phase } : {}),
+          truncated: reachedCap && hasFurther,
+          children,
+        });
+      }
+
+      return nodes;
+    }
+
+    const rootEntry = getCanonicalRelationshipEntry(rootName);
+    const direct = rootEntry === undefined ? 0 : directionEdges(rootEntry, direction).length;
+    const nodes = maxDepth <= 0 ? [] : expand(rootName, 0);
+    return { nodes, direct, transitive };
+  }
+
+  function normalizeDecisionKey(decision: string): string {
+    const pattern = resolveDecisionPattern(frozenGraph, decision);
+    return pattern !== undefined ? getPatternName(pattern) : decision;
+  }
+
+  function resolvePatternsByDecision(decision: string): string[] {
+    const canonical = normalizeDecisionKey(decision);
+    const entry = getCanonicalRelationshipEntry(canonical);
+    const enforcedBy = entry?.enforcedBy ?? [];
+
+    const seen = new Set<string>();
+    const result: string[] = [];
+    for (const name of enforcedBy) {
+      if (!seen.has(name)) {
+        seen.add(name);
+        result.push(name);
+      }
+    }
+    if (findPatternByName(frozenGraph, canonical) !== undefined && !seen.has(canonical)) {
+      result.push(canonical);
+    }
+    return result;
   }
 
   return {
@@ -213,6 +321,34 @@ export function createPatternGraphAPI(dataset: PatternGraph): PatternGraphAPI {
         usedBy: entry.usedBy,
       };
     },
+    getDependencyContext(name, opts) {
+      const focalPattern = findPatternByName(frozenGraph, name);
+      const entry = getCanonicalRelationshipEntry(name);
+      if (entry === undefined) return undefined;
+
+      const focal = focalPattern !== undefined ? getPatternName(focalPattern) : name;
+      const requestedDepth = opts?.maxDepth;
+      const maxDepth =
+        requestedDepth !== undefined && requestedDepth >= 0
+          ? requestedDepth
+          : DEFAULT_DEPENDENCY_CONTEXT_MAX_DEPTH;
+
+      const upstream = buildDependencyForest(focal, 'upstream', maxDepth);
+      const downstream = buildDependencyForest(focal, 'downstream', maxDepth);
+
+      return {
+        focal,
+        upstream: upstream.nodes,
+        downstream: downstream.nodes,
+        summary: {
+          upstreamDirect: upstream.direct,
+          upstreamTransitive: upstream.transitive,
+          downstreamDirect: downstream.direct,
+          downstreamTransitive: downstream.transitive,
+        },
+        options: { maxDepth },
+      };
+    },
     getPatternRelationships(name) {
       const entry = getCanonicalRelationshipEntry(name);
       if (!entry) return undefined;
@@ -239,6 +375,30 @@ export function createPatternGraphAPI(dataset: PatternGraph): PatternGraphAPI {
       const entry = getCanonicalRelationshipEntry(name);
       if (!entry) return [];
       return entry.apiRef;
+    },
+    getRulesForPattern(name) {
+      return resolveRulesForPattern(frozenGraph, name);
+    },
+    getRulesByDecision(decision) {
+      const patterns = resolvePatternsByDecision(decision);
+      const refs: BusinessRuleRef[] = [];
+      for (const patternName of patterns) {
+        const pattern = findPatternByName(frozenGraph, patternName);
+        if (pattern === undefined) continue;
+        for (const rule of pattern.rules ?? []) {
+          refs.push({ pattern: patternName, ruleName: rule.name });
+        }
+      }
+      return refs;
+    },
+    getPatternsByDecision(decision) {
+      return resolvePatternsByDecision(decision);
+    },
+    listDecisions() {
+      return listDecisionPatterns(frozenGraph).map((pattern) => getPatternName(pattern));
+    },
+    listPackages() {
+      return Object.keys(frozenGraph.archIndex?.byPackage ?? {}).sort();
     },
     getPatternDeliverables(name) {
       const pattern = this.getPattern(name);

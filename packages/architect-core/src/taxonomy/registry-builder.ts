@@ -80,7 +80,7 @@ export const BOUNDED_CONTEXT_TAG = 'bounded-context';
 
 export const METADATA_TAGS_BY_GROUP = {
   core: ['pattern', 'status'] as const,
-  relationship: ['uses', 'implements', 'extends', 'see-also'] as const,
+  relationship: ['uses', 'implements', 'extends', 'see-also', 'enforces-decision'] as const,
   process: ['completed'] as const,
   prd: ['product-area'] as const,
   adr: [
@@ -297,6 +297,15 @@ export function buildRegistry(options: BuildRegistryOptions = {}): TagRegistry {
         format: 'csv',
         purpose: 'Related patterns for cross-reference without dependency implication',
         example: '@architect-see-also AgentAsBoundedContext, CrossContextIntegration',
+      },
+      {
+        tag: 'enforces-decision',
+        format: 'csv',
+        purpose:
+          'Decision records (ADR/PDR/…) whose invariants this feature/pattern enforces — the structured ADR→enforcing-rule edge',
+        metadataKey: 'enforcesDecisions',
+        example:
+          '@architect-enforces-decision ADR009ProjectionTrustBoundary, ADR006SingleReadModelArchitecture',
       },
       {
         tag: 'target',

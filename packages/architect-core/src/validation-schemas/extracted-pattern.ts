@@ -119,6 +119,7 @@ const ExtractedPatternBaseSchema = z.strictObject({
   executableSpecs: z.array(z.string()).readonly().optional(),
   convention: z.array(z.string()).readonly().optional(),
   seeAlso: z.array(z.string()).readonly().optional(),
+  enforcesDecisions: z.array(z.string()).readonly().optional(),
   apiRef: z.array(z.string()).readonly().optional(),
   quarter: z.string().regex(QUARTER_PATTERN).optional(),
   completed: z.string().optional(),

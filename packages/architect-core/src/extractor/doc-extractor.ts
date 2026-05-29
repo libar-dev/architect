@@ -251,6 +251,8 @@ export function buildPattern(
     ...(directive.extends !== undefined && { extendsPattern: directive.extends }),
     ...(directive.seeAlso !== undefined &&
       directive.seeAlso.length > 0 && { seeAlso: directive.seeAlso }),
+    ...(directive.enforcesDecisions !== undefined &&
+      directive.enforcesDecisions.length > 0 && { enforcesDecisions: directive.enforcesDecisions }),
     ...(directive.apiRef !== undefined &&
       directive.apiRef.length > 0 && { apiRef: directive.apiRef }),
     ...(directive.target !== undefined && { targetPath: directive.target }),

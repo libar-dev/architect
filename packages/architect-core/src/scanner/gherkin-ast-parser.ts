@@ -4,10 +4,6 @@
  * @architect-status active
  * @architect-role:service
  * @architect-bounded-context:scanner
- *
- * ### When to Use
- *
- * - As a typed contract / data shape consumed by projection or render layers.
  */
 import { z } from 'zod';
 import {
@@ -115,6 +111,7 @@ export const FeatureTagMetadataSchema = z.strictObject({
   implementsPatterns: z.array(z.string()).readonly().optional(),
   extendsPattern: z.string().optional(),
   seeAlso: z.array(z.string()).readonly().optional(),
+  enforcesDecisions: z.array(z.string()).readonly().optional(),
   apiRef: z.array(z.string()).readonly().optional(),
   role: z.string().optional(),
   quarter: z.string().optional(),
@@ -463,6 +460,7 @@ export function extractPatternTags(
   let implementsPatterns: readonly string[] | undefined;
   let extendsPattern: string | undefined;
   let seeAlso: readonly string[] | undefined;
+  let enforcesDecisions: readonly string[] | undefined;
   let apiRef: readonly string[] | undefined;
   let quarter: string | undefined;
   let completed: string | undefined;
@@ -594,6 +592,9 @@ export function extractPatternTags(
             break;
           case 'seeAlso':
             seeAlso = appendStringValues(seeAlso, transformed);
+            break;
+          case 'enforcesDecisions':
+            enforcesDecisions = appendStringValues(enforcesDecisions, transformed);
             break;
           case 'apiRef':
             apiRef = appendStringValues(apiRef, transformed);
@@ -754,6 +755,7 @@ export function extractPatternTags(
     ...(implementsPatterns !== undefined ? { implementsPatterns } : {}),
     ...(extendsPattern !== undefined ? { extendsPattern } : {}),
     ...(seeAlso !== undefined ? { seeAlso } : {}),
+    ...(enforcesDecisions !== undefined ? { enforcesDecisions } : {}),
     ...(apiRef !== undefined ? { apiRef } : {}),
     ...(resolvedRole !== undefined ? { role: resolvedRole } : {}),
     ...(quarter !== undefined ? { quarter } : {}),

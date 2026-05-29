@@ -4,6 +4,7 @@ import type {
   ImplementationRef,
   RelationshipEntry,
 } from '../../validation-schemas/pattern-graph.js';
+import { resolveDecisionPattern } from '../../read-api/decision-resolution.js';
 import type { DanglingReference } from './transform-types.js';
 
 function getPatternName(pattern: ExtractedPattern): string {
@@ -105,6 +106,8 @@ export function createRelationshipEntry(pattern: ExtractedPattern): Relationship
     extendedBy: [],
     seeAlso: [...(pattern.seeAlso ?? [])],
     apiRef: [...(pattern.apiRef ?? [])],
+    enforcesDecisions: [...(pattern.enforcesDecisions ?? [])],
+    enforcedBy: [],
   };
 }
 
@@ -181,6 +184,16 @@ export function buildReverseLookups(
         target.usedBy.push(patternKey);
       }
     }
+
+    for (const decision of entry.enforcesDecisions) {
+      const decisionPattern = resolveDecisionPattern(patterns, decision);
+      const decisionKey =
+        decisionPattern !== undefined ? getPatternName(decisionPattern) : decision;
+      const target = relationshipIndex[decisionKey];
+      if (target && !target.enforcedBy.includes(patternKey)) {
+        target.enforcedBy.push(patternKey);
+      }
+    }
   }
 
   for (const entry of Object.values(relationshipIndex)) {
@@ -190,6 +203,7 @@ export function buildReverseLookups(
     entry.extendedBy.sort((a, b) => a.localeCompare(b));
     entry.enables.sort((a, b) => a.localeCompare(b));
     entry.usedBy.sort((a, b) => a.localeCompare(b));
+    entry.enforcedBy.sort((a, b) => a.localeCompare(b));
   }
 }
 

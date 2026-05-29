@@ -64,6 +64,7 @@ export const DocDirectiveSchema = z.strictObject({
   implements: z.array(z.string()).readonly().optional(),
   extends: z.string().optional(),
   seeAlso: z.array(z.string()).readonly().optional(),
+  enforcesDecisions: z.array(z.string()).readonly().optional(),
   apiRef: z.array(z.string()).readonly().optional(),
   quarter: z.string().optional(),
   completed: z.string().optional(),
