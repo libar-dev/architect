@@ -1,15 +1,21 @@
 import { readdir, readFile } from 'node:fs/promises';
-import { dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { resolve } from 'node:path';
 
-const scriptDir = dirname(fileURLToPath(import.meta.url));
-const packageRoot = resolve(scriptDir, '..');
-const srcRoot = resolve(packageRoot, 'src');
 const boilerplatePhrases = [
   'As a typed contract',
   'data shape consumed by projection or render layers',
   'Private helpers used exclusively',
 ];
+
+function resolveSrcRoot() {
+  const srcRootArg = process.argv[2];
+  if (srcRootArg === undefined || srcRootArg.length === 0) {
+    throw new Error(
+      'jsdoc-boilerplate-audit: missing required <srcRoot> argument (e.g. packages/architect-core/src).'
+    );
+  }
+  return resolve(process.cwd(), srcRootArg);
+}
 
 async function collectSourceFiles(rootDirectory) {
   const entries = await readdir(rootDirectory, { withFileTypes: true });
@@ -30,7 +36,7 @@ async function collectSourceFiles(rootDirectory) {
   return sourceFiles.sort();
 }
 
-export async function auditJsdocBoilerplate() {
+export async function auditJsdocBoilerplate(srcRoot) {
   const sourceFiles = await collectSourceFiles(srcRoot);
   const flaggedFiles = [];
 
@@ -43,6 +49,7 @@ export async function auditJsdocBoilerplate() {
   }
 
   return {
+    srcRoot,
     sourceFileCount: sourceFiles.length,
     flaggedFiles,
   };
@@ -51,6 +58,7 @@ export async function auditJsdocBoilerplate() {
 function formatFailure(summary) {
   return [
     'JSDoc boilerplate audit failed.',
+    `- src root: ${summary.srcRoot}`,
     `- scanned source files: ${summary.sourceFileCount}`,
     `- flagged files: ${summary.flaggedFiles.map((entry) => entry.filePath).join(', ') || '(none)'}`,
     ...summary.flaggedFiles.flatMap((entry) =>
@@ -60,7 +68,7 @@ function formatFailure(summary) {
 }
 
 async function main() {
-  const summary = await auditJsdocBoilerplate();
+  const summary = await auditJsdocBoilerplate(resolveSrcRoot());
 
   if (summary.flaggedFiles.length > 0) {
     throw new Error(formatFailure(summary));

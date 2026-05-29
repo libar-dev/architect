@@ -72,7 +72,7 @@
     "clean": "rm -rf dist *.tsbuildinfo",
     "test": "pnpm test:barrel-audit && pnpm test:jsdoc-boilerplate-audit && pnpm typecheck && vitest run --config vitest.config.ts",
     "test:barrel-audit": "node ./scripts/options-schema-barrel-audit.mjs",
-    "test:jsdoc-boilerplate-audit": "node ./scripts/jsdoc-boilerplate-audit.mjs",
+    "test:jsdoc-boilerplate-audit": "node ../../scripts/jsdoc-boilerplate-audit.mjs src",
     "test:perf": "vitest run --config vitest.perf-report.config.mjs",
     "test:perf:baseline": "pnpm test:perf && node ./tests/perf/compare-baseline.mjs",
     "prepack": "pnpm clean && pnpm build"

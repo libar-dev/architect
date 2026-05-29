@@ -6,10 +6,6 @@
  * @architect-uses FSMTransitions, FSMStates
  * @architect-role:decider
  * @architect-bounded-context:validation
- *
- * ### When to Use
- *
- * - As a typed contract / data shape consumed by projection or render layers.
  */
 
 import { PROCESS_STATUS_VALUES, type ProcessStatusValue } from '../../taxonomy/index.js';

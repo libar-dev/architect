@@ -5,10 +5,6 @@
  * @architect-status active
  * @architect-role:read-model
  * @architect-bounded-context:validation
- *
- * ### When to Use
- *
- * - As a typed contract / data shape consumed by projection or render layers.
  */
 
 import type { ProcessStatusValue } from '../../taxonomy/index.js';

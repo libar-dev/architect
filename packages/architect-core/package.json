@@ -39,7 +39,8 @@
     "build": "tsc -b",
     "typecheck": "tsc --noEmit -p tsconfig.test.json",
     "lint": "eslint src",
-    "test": "vitest run",
+    "test": "pnpm test:jsdoc-boilerplate-audit && vitest run",
+    "test:jsdoc-boilerplate-audit": "node ../../scripts/jsdoc-boilerplate-audit.mjs src",
     "clean": "rm -rf dist *.tsbuildinfo",
     "prepack": "pnpm build"
   },
