@@ -64,8 +64,11 @@ import {
   type TagUsageMatrix,
 } from '../../fragments/operational-insights/index.js';
 import type {
+  OrientationReference,
   OverviewArchitecture,
+  OverviewOrientation,
   RequirementEntry,
+  RoleCount,
 } from '../../fragments/operational-insights/supporting.js';
 import {
   assembleContextMap,
@@ -110,22 +113,56 @@ const SOURCE_TYPE_PRIORITY = new Map<string, number>([
 ]);
 
 const OVERVIEW_CLI_HINTS: readonly string[] = [
-  '=== DATA API — Use Instead of Explore Agents ===',
-  'pnpm architect:query -- <subcommand>',
+  '=== DATA API — your first read surface (use instead of grep / Explore agents) ===',
+  'pnpm -s architect:query <verb>      (-s suppresses the pnpm banner so JSON pipes cleanly)',
   '',
-  '  overview                             Project health (this output)',
-  '  context <pattern> --session <type>   Curated context bundle (planning/design/implement)',
-  '  scope-validate <pattern> <session>   Pre-flight check before starting work',
-  '  dep-tree <pattern>                   Dependency chains',
-  '  list --status roadmap                Available patterns to work on',
-  '  context <pattern> --session design   Includes stubs in the curated bundle',
-  '  files <pattern>                      File paths for a pattern',
-  '  rules                                Business rules from Gherkin',
-  '  arch blocking                        Patterns stuck on incomplete deps',
+  '  ORIENT',
+  '    documentation architecture            THE architecture map (bounded contexts + packages)',
+  '    taxonomy                              Canonical roles / statuses / tags',
+  '    search <fragment>                     Fuzzy pattern-name lookup',
+  '  INSPECT A PATTERN',
+  '    bundle <Pattern> --format json        Pre-flight: deps + rules + deliverables + open-questions',
+  '    pattern <Pattern>                     Full detail incl. role · bounded-context · level · product-area',
+  '    files <Pattern> [--related]           Implementation surface',
+  '    rules --pattern <Pattern>             Invariants + verified-by',
+  '  NAVIGATE',
+  '    dep-tree <Pattern>                    Relationship tree around a pattern',
+  '    arch neighborhood <Pattern>           Local subgraph',
+  '    arch blocking                         Patterns stuck on incomplete deps',
+  '  PLAN / GATE',
+  '    list --status roadmap                 Workable items (see START HERE above)',
+  '    open-questions [--parent <Pattern>]   Candidate-readiness signal',
+  '    scope-validate <Pattern> design|implement   Pre-flight verdict',
   '',
-  'Full reference: pnpm architect:query -- --help',
-  'Agent environments: load the `architect-data-api` skill for verb shapes, deterministic gates, and known quirks.',
+  'Full reference: pnpm -s architect:query --help',
+  'Load the `architect-data-api` skill for verb shapes, JSON envelopes, and known quirks.',
 ];
+
+/**
+ * The high-signal generated docs a cold-start agent should read first, by
+ * documentation-type key. The overview owns this curation (which subset counts
+ * as "orientation" is a presentation concern), but the reference CONTENT —
+ * title, verb — is derived from the canonical documentation-type registry, and
+ * `buildOrientationReferences` fails loud if a key here is absent from the
+ * registry, so the two cannot silently drift.
+ */
+const ORIENTATION_DOC_KEYS: readonly string[] = [
+  'decisions',
+  'taxonomy',
+  'validation-rules',
+  'business-rules',
+  'api-reference',
+];
+
+/**
+ * One-line note teaching the `--disclosure` drill-down mechanic on the
+ * `documentation` verb (the tier vocabulary the orientation docs accept).
+ */
+const OVERVIEW_DISCLOSURE_HINT =
+  'Each doc accepts --disclosure essential|important|useful|advanced to control depth.';
+
+/** Roadmap patterns to name in the "safe to start" sample before collapsing to a count. */
+const OVERVIEW_STARTABLE_SAMPLE_LIMIT = 8;
 
 /**
  * The generated documentation surfaces this graph projects, each fetchable via
@@ -148,6 +185,45 @@ const OVERVIEW_GENERATED_VIEWS: readonly { docType: string; verb: string; summar
  */
 const OVERVIEW_ARCHITECTURE_POINTER =
   'Explore via the API, not grep: `documentation architecture` (full map) · `arch neighborhood <Pattern>` · `dep-tree <Pattern>`';
+
+/**
+ * Resolves the curated orientation-doc keys against the canonical
+ * documentation-type registry, deriving each reference's verb + title from the
+ * single source. Fails loud if a key in `ORIENTATION_DOC_KEYS` is not a
+ * supported documentation type, so the curated subset cannot silently drift
+ * away from the registry.
+ */
+function buildOrientationReferences(): OrientationReference[] {
+  return ORIENTATION_DOC_KEYS.map((key) => {
+    const identity = SUPPORTED_DOCUMENTATION_TYPE_IDENTITIES.find(
+      (candidate) => candidate.key === key,
+    );
+    if (identity === undefined) {
+      throw new Error(
+        `Orientation doc key "${key}" is not a supported documentation type — ` +
+          'update ORIENTATION_DOC_KEYS or the documentation-type registry.',
+      );
+    }
+    return {
+      docType: identity.key,
+      verb: `documentation ${identity.key}`,
+      title: identity.displayTitle,
+    };
+  });
+}
+
+/** Tallies the precomputed `@architect-role` of each pattern into a sorted distribution. */
+function buildRoleDistribution(patterns: readonly ExtractedPattern[]): RoleCount[] {
+  const counts = new Map<string, number>();
+  for (const pattern of patterns) {
+    if (pattern.role !== undefined) {
+      counts.set(pattern.role, (counts.get(pattern.role) ?? 0) + 1);
+    }
+  }
+  return [...counts.entries()]
+    .map(([role, count]) => ({ role, count }))
+    .sort((left, right) => right.count - left.count || left.role.localeCompare(right.role));
+}
 
 /**
  * Builds the high-level architecture glimpse for the overview: a coarse
@@ -203,6 +279,42 @@ export function buildOverviewDigest(context: ProjectionContext): OverviewDigest 
   const total = counts.total - counts.candidate;
   const architecture = buildOverviewArchitecture(context);
 
+  const blocking = patterns.flatMap((pattern) => {
+    if (isPatternComplete(pattern.status)) {
+      return [];
+    }
+
+    const patternName = getPatternName(pattern);
+    const relationships = getRelationships(context, patternName);
+    if (relationships === undefined) {
+      return [];
+    }
+
+    const blockedBy = relationships.dependsOn.filter((dependencyName) => {
+      const dependency = findPatternByName(context.graph, dependencyName);
+      return dependency !== undefined && !isPatternComplete(dependency.status);
+    });
+
+    return blockedBy.length === 0
+      ? []
+      : [{ pattern: patternName, status: pattern.status, blockedBy }];
+  });
+
+  // "Safe to start": roadmap-status patterns that are NOT blocked (complement of
+  // BLOCKING). Surfaced with equal prominence to BLOCKING so a cold-start agent
+  // sees workable items, not only the wall of work it cannot begin.
+  const blockedNames = new Set(blocking.map((entry) => entry.pattern));
+  const startableNames = patterns
+    .filter((pattern) => pattern.status === 'roadmap' && !blockedNames.has(getPatternName(pattern)))
+    .map((pattern) => getPatternName(pattern));
+
+  const orientation: OverviewOrientation = {
+    references: buildOrientationReferences(),
+    disclosureHint: OVERVIEW_DISCLOSURE_HINT,
+    startableCount: startableNames.length,
+    startableSample: startableNames.slice(0, OVERVIEW_STARTABLE_SAMPLE_LIMIT),
+  };
+
   return {
     kind: 'OverviewDigest',
     progress: {
@@ -229,32 +341,9 @@ export function buildOverviewDigest(context: ProjectionContext): OverviewDigest 
         patternCount: group.phasePatterns.length,
         activeCount: group.counts.active,
       })),
-    blocking: patterns.flatMap((pattern) => {
-      if (isPatternComplete(pattern.status)) {
-        return [];
-      }
-
-      const patternName = getPatternName(pattern);
-      const relationships = getRelationships(context, patternName);
-      if (relationships === undefined) {
-        return [];
-      }
-
-      const blockedBy = relationships.dependsOn.filter((dependencyName) => {
-        const dependency = findPatternByName(context.graph, dependencyName);
-        return dependency !== undefined && !isPatternComplete(dependency.status);
-      });
-
-      return blockedBy.length === 0
-        ? []
-        : [
-            {
-              pattern: patternName,
-              status: pattern.status,
-              blockedBy,
-            },
-          ];
-    }),
+    blocking,
+    orientation,
+    roleDistribution: buildRoleDistribution(patterns),
     ...(architecture !== undefined ? { architecture } : {}),
     generatedViews: OVERVIEW_GENERATED_VIEWS.map((view) => ({ ...view })),
     cliHints: [...OVERVIEW_CLI_HINTS],

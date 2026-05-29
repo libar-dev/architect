@@ -27,6 +27,8 @@ export function buildArchitectureNeighborhood(
   usedBy: string[];
   dependsOn: string[];
   enables: string[];
+  seeAlso: string[];
+  enforcedBy: string[];
   sameContext: string[];
   implements: string[];
   implementedBy: ImplementationRef[];
@@ -51,6 +53,8 @@ export function buildArchitectureNeighborhood(
     usedBy: [...(relationships?.usedBy ?? [])],
     dependsOn: [...(relationships?.dependsOn ?? [])],
     enables: [...(relationships?.enables ?? [])],
+    seeAlso: [...(relationships?.seeAlso ?? [])],
+    enforcedBy: [...(relationships?.enforcedBy ?? [])],
     sameContext,
     implements: [...(relationships?.implementsPatterns ?? [])],
     implementedBy: (relationships?.implementedBy ?? []).map(normalizeImplementationRef),

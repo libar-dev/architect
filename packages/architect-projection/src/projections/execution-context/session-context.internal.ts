@@ -11,6 +11,7 @@ import {
   VALID_PROCESS_STATUS_SET,
   VALID_TRANSITIONS,
   findPatternByName,
+  resolveImplementingFeatures,
   SessionTypeSchema,
 } from '@libar-dev/architect-core';
 import { z } from 'zod';
@@ -94,7 +95,27 @@ export function buildSessionContextBundle(
       (sessionType === 'design' || sessionType === 'implement') &&
       pattern.source.file.endsWith('.feature')
     ) {
-      specFiles.push(pattern.source.file);
+      pushUnique(specFiles, pattern.source.file);
+    }
+
+    if (sessionType === 'design' || sessionType === 'implement') {
+      // The implementing `.feature` specs ARE the spec files for a TS pattern;
+      // follow the derived implementedBy reverse edge (ADR-002/ADR-003).
+      for (const implementerName of resolveImplementingFeatures(context.graph, patternName)) {
+        const implementer = findPatternByName(context.graph, implementerName);
+        if (implementer === undefined) {
+          continue;
+        }
+        pushUnique(specFiles, implementer.source.file);
+        if (sessionType === 'implement') {
+          if (implementer.source.file.endsWith('.feature')) {
+            pushUnique(testFiles, implementer.source.file);
+          }
+          for (const testFile of resolveTestFiles(implementer)) {
+            pushUnique(testFiles, testFile);
+          }
+        }
+      }
     }
 
     if (sessionType === 'design') {
@@ -132,7 +153,9 @@ export function buildSessionContextBundle(
       if (fsm !== undefined) {
         fsmByPattern.push({ pattern: patternName, fsm });
       }
-      testFiles.push(...resolveTestFiles(pattern));
+      for (const testFile of resolveTestFiles(pattern)) {
+        pushUnique(testFiles, testFile);
+      }
     }
   }
 
@@ -254,6 +277,12 @@ function flattenDependencies(perPatternDeps: ReadonlyMap<string, readonly DepEnt
       (dependency) => (dependencyCounts.get(dependency.name) ?? 0) > 1,
     ),
   };
+}
+
+function pushUnique(bucket: string[], value: string | undefined): void {
+  if (value !== undefined && value.length > 0 && !bucket.includes(value)) {
+    bucket.push(value);
+  }
 }
 
 function createFsmContext(status: string | undefined): FsmContext | undefined {

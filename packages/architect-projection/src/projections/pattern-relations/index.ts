@@ -19,7 +19,10 @@ export {
   projectPatternBundle,
 } from './bundle.js';
 export { projectDependencyEdges } from './dependency-edges.js';
-export { parseAndProjectDependencyTree, projectDependencyTree } from './dependency-tree.js';
+export {
+  parseAndProjectDependencyContext,
+  projectDependencyContext,
+} from './dependency-context.js';
 export {
   OpenQuestionListOptionsSchema,
   parseAndProjectOpenQuestionList,
@@ -27,7 +30,7 @@ export {
 } from './open-question-list.js';
 export { projectOrphanPatternList } from './orphan-pattern-list.js';
 export { parseAndProjectPatternCatalog, projectPatternCatalog } from './pattern-catalog.js';
-export type { DepTreeOptions } from './dependency-tree.js';
+export type { DepContextOptions } from './dependency-context.js';
 export type { OpenQuestionListOptions } from './open-question-list.js';
 export type { PatternBundleOptions } from './bundle.js';
 export { projectPatternDetail } from './pattern-detail.js';

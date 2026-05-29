@@ -56,7 +56,9 @@ import type {
 import {
   createPatternSummaryFragment,
   getPatternName,
+  getRelationships,
   normalizeDeliverables,
+  uniqueSortedStrings,
 } from '../_shared/pattern-helpers.internal.js';
 import { slugForFilename } from '../../_internal/slug.js';
 import type { EmbeddedDeliverable } from '../../fragments/pattern-relations/supporting.js';
@@ -244,7 +246,9 @@ function buildQuarterEntries(patterns: readonly ExtractedPattern[]): QuarterEntr
     .sort(([left], [right]) => compareQuarterLabels(left, right))
     .map(([quarter, quarterPatterns]) => ({
       quarter,
-      patterns: sortPatterns(quarterPatterns).map((pattern) => createPatternSummaryFragment(pattern)),
+      patterns: sortPatterns(quarterPatterns).map((pattern) =>
+        createPatternSummaryFragment(pattern),
+      ),
       counts: createStatusCounts(quarterPatterns),
     }));
 }
@@ -375,22 +379,39 @@ function deduplicateDeliverables(patterns: readonly ExtractedPattern[]): Embedde
 }
 
 function buildTraceRows(context: ProjectionContext): TraceRow[] {
-  return sortPatterns(
-    filterPatterns(context.graph.bySourceType.gherkin, context.projectionFilter).filter(
-      (pattern) => pattern.phase !== undefined,
-    ),
-  ).map((pattern) => ({
-    pattern: getPatternName(pattern),
-    status: pattern.status,
-    tests: deduplicateStrings([
-      ...(pattern.executableSpecs ?? []),
-      ...(pattern.behaviorFile !== undefined ? [pattern.behaviorFile] : []),
-    ]),
-    specs: [pattern.source.file],
-    deliverables: deduplicateStrings(
-      (pattern.deliverables ?? []).map((deliverable) => deliverable.location),
-    ),
-  }));
+  const realized = filterPatterns(context.graph.patterns, context.projectionFilter).filter(
+    (pattern) =>
+      (getRelationships(context, getPatternName(pattern))?.implementedBy.length ?? 0) > 0,
+  );
+
+  return sortPatterns(realized).map((pattern) => {
+    const relationships = getRelationships(context, getPatternName(pattern));
+    const implementedBy = relationships?.implementedBy ?? [];
+
+    return {
+      pattern: getPatternName(pattern),
+      status: pattern.status,
+      // `tests` is the executable-spec realization surface only: the `.feature`
+      // files that realize this pattern via `@architect-implements`. Production
+      // TS implementers (e.g. a `role:projection` source that realizes a CLI
+      // pattern) also appear on `implementedBy` but are NOT tests, so they are
+      // excluded from the traceability `tests` column.
+      tests: uniqueSortedStrings(
+        implementedBy
+          .map((reference) => reference.file)
+          .filter((file) => isExecutableFeatureFile(file)),
+      ),
+      specs: [pattern.source.file],
+      deliverables: deduplicateStrings(
+        (pattern.deliverables ?? []).map((deliverable) => deliverable.location),
+      ),
+    };
+  });
+}
+
+/** Executable-spec realization carriers are Gherkin `.feature` files. */
+function isExecutableFeatureFile(file: string): boolean {
+  return file.toLowerCase().endsWith('.feature');
 }
 
 function getTimelineRouting(
@@ -711,29 +732,32 @@ export function projectReleaseNotesDigest(
  *
  * ## Traceability matrix projection
  *
- * **Value:** Links each phased Gherkin-sourced pattern to its executable
- * tests, spec files, and deliverable locations in one
- * `TraceabilityMatrix` bundle, providing a ready-to-render audit surface
- * (`TRACEABILITY.md` + one child per row) without touching raw graph DTOs.
+ * **Value:** Links each production pattern that carries a realization edge
+ * (`@architect-implements`) to the executable features/steps that realize it,
+ * plus its spec file and deliverable locations, in one `TraceabilityMatrix`
+ * bundle — a ready-to-render audit surface (`TRACEABILITY.md` + one child per
+ * row) sourced from the read model's `implementedBy` edges, not raw DTOs.
  *
- * **Invariant:** Every row exposes `pattern`, `status`, `tests`, `specs`,
- * and `deliverables`; only patterns from `bySourceType.gherkin` with a
- * numeric phase appear; tests and deliverables are deduplicated; rows are
- * sorted by phase then pattern name; child keys are deterministic pattern
- * slugs.
+ * **Invariant:** Every row exposes `pattern`, `status`, `tests`, `specs`, and
+ * `deliverables`; exactly one row appears per pattern that has at least one
+ * `implementedBy` realization edge; `tests` are the deduplicated executable
+ * `.feature` realization files only (production TS implementers are excluded);
+ * `specs` is the pattern's own source file; deliverables are deduplicated; rows
+ * are sorted by pattern name; child keys are deterministic pattern slugs.
  *
  * **Behavior:**
- * - Filters `graph.bySourceType.gherkin` to patterns with a phase, then
- *   runs them through the shared pattern sort.
- * - Derives each row's tests from `executableSpecs` plus the optional
- *   `behaviorFile`, with deduplication on non-empty values.
+ * - Iterates `graph.patterns`, keeping only those whose `relationshipIndex`
+ *   entry carries one or more `implementedBy` refs (the realization edges).
+ * - Derives each row's `tests` from the realizing refs' `.feature` files
+ *   (deduped, sorted), dropping non-`.feature` (production TS) realizers, and
+ *   `specs` from the pattern's own source file.
  * - Routes the root to `TRACEABILITY.md` and children to
  *   `traceability/<slug>.md` so downstream renderers can deep-link a single
  *   pattern row.
  *
  * ### When to Use
  *
- * - Projects phased traceability rows as a TraceabilityMatrix bundle.
+ * - Projects realization-edge traceability rows as a TraceabilityMatrix bundle.
  */
 export function projectTraceabilityMatrix(
   context: ProjectionContext,

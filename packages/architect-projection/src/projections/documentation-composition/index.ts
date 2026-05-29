@@ -22,6 +22,7 @@ export {
   getSupportedDocumentationTypeMetadata,
 } from './documentation-type-registry.js';
 export { resolveProjectionFilter } from './projection-filter-resolver.js';
+export { assertGeneratorNotDegenerate, GeneratorDegenerateError } from './degenerate-guard.js';
 export type { ProjectPrChangeReviewOptions } from './pr-change-review.js';
 export type { ProjectConfigOptions, SourceGlobGroups } from './project-config.js';
 export type {

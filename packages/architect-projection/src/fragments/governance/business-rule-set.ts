@@ -25,8 +25,8 @@ const BusinessRuleGroupingEntrySchema = z.strictObject({
 
 /**
  * A scoped collection of business rules — discriminated on `scope` (all,
- * product-area, phase, feature, or package) with optional grouping metadata
- * describing how the rules are bucketed.
+ * product-area, phase, feature, package, or decision) with optional grouping
+ * metadata describing how the rules are bucketed.
  *
  * @architect-shape
  */
@@ -65,6 +65,14 @@ export const BusinessRuleSetSchema = z.discriminatedUnion('scope', [
   z.strictObject({
     kind: z.literal('BusinessRuleSet'),
     scope: z.literal('package'),
+    scopeValue: z.string(),
+    rules: z.array(BusinessRuleSchema),
+    groupedBy: BusinessRuleGroupingSchema.optional(),
+    groupingEntries: z.array(BusinessRuleGroupingEntrySchema).optional(),
+  }),
+  z.strictObject({
+    kind: z.literal('BusinessRuleSet'),
+    scope: z.literal('decision'),
     scopeValue: z.string(),
     rules: z.array(BusinessRuleSchema),
     groupedBy: BusinessRuleGroupingSchema.optional(),

@@ -30,6 +30,14 @@ import {
  */
 export const PatternDetailSchema = PatternIdentitySchema.extend({
   kind: z.literal('PatternDetail'),
+  // Classification axes beyond role (which PatternIdentity already carries):
+  // bounded-context, product-area, and the hierarchy level. The source
+  // ExtractedPattern carries all three; surfacing them here lets `pattern <Name>`
+  // answer the full role · bounded-context · layer · product-area classification
+  // in one call instead of forcing a stitch across `arch neighborhood` / `taxonomy`.
+  boundedContext: z.string().optional(),
+  productArea: z.string().optional(),
+  level: z.string().optional(),
   description: z.string().optional(),
   openQuestions: z.array(z.string()).optional(),
   deliverables: z.array(EmbeddedDeliverableSchema),

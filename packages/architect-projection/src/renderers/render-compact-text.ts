@@ -25,7 +25,7 @@ import {
 import { humanizeKey, isPrimitive, stableStringify } from '../_internal/format-utils.js';
 import {
   isBundle,
-  type DependencyTree,
+  type DependencyContext,
   type FileReadingList,
   type Fragment,
   type HandoffRecord,
@@ -47,7 +47,7 @@ const OVERVIEW_SUMMARY_BLOCKING_LIMIT = 5;
 const COMPACT_NORMALIZERS: KindTable<string, RenderCompactOptions | undefined> = {
   OverviewDigest: (f, o) => renderOverviewDigest(f, o),
   SessionContextBundle: (f, o) => renderSessionContextBundle(f, o),
-  DependencyTree: (f) => renderDependencyTree(f),
+  DependencyContext: (f, o) => renderDependencyContext(f, o),
   FileReadingList: (f, o) => renderFileReadingList(f, o),
   ScopeReadinessReport: (f, o) => renderScopeReadinessReport(f, o),
   HandoffRecord: (f, o) => renderHandoffRecord(f, o),
@@ -113,7 +113,7 @@ function renderOverviewDigest(
   sections.push(
     renderMarker('PROGRESS', options) +
       '\n' +
-      `${String(progress.total)} delivery patterns (${String(progress.completed)} completed, ${String(progress.active)} active, ${String(progress.planned)} planned) = ${String(progress.percentage)}%` +
+      `${String(progress.total)} delivery patterns (${String(progress.completed)} completed, ${String(progress.active)} active, ${String(progress.planned)} planned (roadmap+deferred)) = ${String(progress.percentage)}%` +
       (progress.candidate > 0
         ? `\n${String(progress.candidate)} candidate patterns excluded from delivery progress`
         : ''),
@@ -122,6 +122,13 @@ function renderOverviewDigest(
   // name-only = the progress line alone — the most compact heads-up signal.
   if (richness === 'name-only') {
     return sections.join('\n\n') + '\n';
+  }
+
+  // START HERE — the references tier (`summary-with-references` / `full`) leads
+  // with orientation: which generated docs to read first + the workable set.
+  const showReferences = richness === 'summary-with-references' || richness === 'full';
+  if (showReferences && overview.orientation !== undefined) {
+    sections.push(renderOverviewOrientation(overview.orientation, options));
   }
 
   if (overview.architecture !== undefined) {
@@ -149,6 +156,33 @@ function renderOverviewDigest(
       lines.push(`... and ${String(hidden)} more — run \`arch blocking\``);
     }
     sections.push(renderMarker('BLOCKING', options) + '\n' + lines.join('\n'));
+  }
+
+  // In the lean `summary` tier the full orientation block is suppressed, but the
+  // "safe to start" count is too actionable to hide — surface it as one line so
+  // BLOCKING is never the only call to action.
+  if (
+    !showReferences &&
+    overview.orientation !== undefined &&
+    overview.orientation.startableCount > 0
+  ) {
+    const { startableCount, startableSample } = overview.orientation;
+    const sample = startableSample.slice(0, 5);
+    const suffix = startableCount > sample.length ? ', …' : '';
+    const tail = sample.length > 0 ? `: ${sample.join(', ')}${suffix}` : '';
+    sections.push(
+      renderMarker('READY TO START', options) +
+        '\n' +
+        `${String(startableCount)} roadmap pattern(s) with dependencies satisfied${tail} — run \`list --status roadmap\``,
+    );
+  }
+
+  if (
+    overview.roleDistribution !== undefined &&
+    overview.roleDistribution.length > 0 &&
+    showReferences
+  ) {
+    sections.push(renderRoleDistribution(overview.roleDistribution, richness, options));
   }
 
   if (overview.generatedViews !== undefined && overview.generatedViews.length > 0) {
@@ -208,6 +242,56 @@ function renderGeneratedViews(
     '\n' +
     `${String(views.length)} docs via \`documentation <type>\`: ${views.map((view) => view.docType).join(', ')}`
   );
+}
+
+/**
+ * The "START HERE" orientation block (rendered at `summary-with-references` and
+ * `full`): the high-signal generated docs to read first, the `--disclosure`
+ * drill-down mechanic, and the count + sample of roadmap patterns ready to
+ * start. Steers a cold-start agent toward orientation + workable items.
+ */
+function renderOverviewOrientation(
+  orientation: NonNullable<OverviewDigest['orientation']>,
+  options: RenderCompactOptions | undefined,
+): string {
+  const lines: string[] = ['Read these generated docs first:'];
+  for (const ref of orientation.references) {
+    lines.push(`  ${ref.title} — \`${ref.verb}\``);
+  }
+  lines.push(orientation.disclosureHint);
+
+  if (orientation.startableCount > 0) {
+    const sample = orientation.startableSample;
+    const suffix = orientation.startableCount > sample.length ? ', …' : '';
+    const tail = sample.length > 0 ? `: ${sample.join(', ')}${suffix}` : '';
+    lines.push(
+      `Ready to start (deps satisfied): ${String(orientation.startableCount)} roadmap pattern(s)${tail} — run \`list --status roadmap\``,
+    );
+  } else {
+    lines.push('Ready to start: 0 roadmap patterns with all dependencies satisfied.');
+  }
+
+  return renderMarker('START HERE', options) + '\n' + lines.join('\n');
+}
+
+/**
+ * The `@architect-role` distribution: itemized at `full`, a single dotted line
+ * at `summary-with-references`. Sourced from the precomputed graph tally.
+ */
+function renderRoleDistribution(
+  roles: NonNullable<OverviewDigest['roleDistribution']>,
+  richness: ContentRichness,
+  options: RenderCompactOptions | undefined,
+): string {
+  const header = renderMarker('ROLE DISTRIBUTION', options);
+
+  if (richness === 'full') {
+    const width = Math.max(...roles.map((entry) => entry.role.length));
+    const lines = roles.map((entry) => `  ${entry.role.padEnd(width)}  ${String(entry.count)}`);
+    return header + '\n' + lines.join('\n');
+  }
+
+  return header + '\n' + roles.map((entry) => `${entry.role} ${String(entry.count)}`).join(' · ');
 }
 
 function renderSessionContextBundle(
@@ -319,27 +403,52 @@ function renderSessionContextBundle(
   return sections.join('\n\n') + '\n';
 }
 
-function renderDependencyTree(tree: DependencyTree): string {
-  const lines: string[] = [];
+function renderDependencyContext(
+  context: DependencyContext,
+  options: RenderCompactOptions | undefined,
+): string {
+  const { summary } = context;
+  const header =
+    `${context.focal} depends on ${String(summary.upstreamDirect)} ` +
+    `(${String(summary.upstreamTransitive)} transitive); ` +
+    `${String(summary.downstreamDirect)} depend on ${context.focal} ` +
+    `(${String(summary.downstreamTransitive)} transitive)`;
 
-  for (const node of tree.nodes) {
-    renderDependencyTreeNode(node, 0, lines);
+  const upstreamLines: string[] = [];
+  for (const node of context.upstream) {
+    renderDependencyContextNode(node, 0, upstreamLines);
+  }
+  if (upstreamLines.length === 0) {
+    upstreamLines.push('(none)');
   }
 
-  return lines.join('\n') + '\n';
+  const downstreamLines: string[] = [];
+  for (const node of context.downstream) {
+    renderDependencyContextNode(node, 0, downstreamLines);
+  }
+  if (downstreamLines.length === 0) {
+    downstreamLines.push('(none)');
+  }
+
+  const sections = [
+    header,
+    renderMarker('DEPENDS ON (upstream)', options) + '\n' + upstreamLines.join('\n'),
+    renderMarker('REQUIRED BY (downstream)', options) + '\n' + downstreamLines.join('\n'),
+  ];
+
+  return sections.join('\n\n') + '\n';
 }
 
-function renderDependencyTreeNode(
-  node: DependencyTree['nodes'][number],
+function renderDependencyContextNode(
+  node: DependencyContext['upstream'][number],
   depth: number,
   lines: string[],
 ): void {
   const indent = depth > 0 ? '  '.repeat(depth) + '-> ' : '';
   const phase = node.phase !== undefined ? `${String(node.phase)}, ` : '';
   const status = node.status ?? 'unknown';
-  const focal = node.isFocal ? ' <- YOU ARE HERE' : '';
 
-  lines.push(`${indent}${node.name} (${phase}${status})${focal}`);
+  lines.push(`${indent}${node.name} (${phase}${status})`);
 
   if (node.truncated) {
     const truncIndent = '  '.repeat(depth + 1) + '-> ';
@@ -348,7 +457,7 @@ function renderDependencyTreeNode(
   }
 
   for (const child of node.children) {
-    renderDependencyTreeNode(child, depth + 1, lines);
+    renderDependencyContextNode(child, depth + 1, lines);
   }
 }
 

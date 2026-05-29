@@ -5,7 +5,13 @@
  * Builds the filtered pattern catalog and its name-resolution helpers for list and search surfaces.
  */
 
-import { AcceptedStatusSchema, findPatternByName, MaturitySchema } from '@libar-dev/architect-core';
+import {
+  findPatternByName,
+  MaturitySchema,
+  normalizeStatus,
+  StatusFilterSchema,
+  type StatusFilterValue,
+} from '@libar-dev/architect-core';
 import { z } from 'zod';
 
 import type { ProjectionContext } from '../../context/projection-context.js';
@@ -19,7 +25,7 @@ import {
 
 export const PatternCatalogOptionsSchema = z
   .strictObject({
-    status: AcceptedStatusSchema.optional(),
+    status: StatusFilterSchema.optional(),
     maturity: MaturitySchema.optional(),
     phase: z.number().int().optional(),
     role: z.string().optional(),
@@ -43,12 +49,10 @@ export function buildPatternCatalog(
     byPackage !== undefined ? buildFileToPackageMap(byPackage) : new Map();
   const packageFilter = options.package;
   const items = filterPatterns(context.graph.patterns, context.projectionFilter)
-    .map((pattern) =>
-      createPatternSummaryFragment(pattern, fileToPackage.get(pattern.source.file)),
-    )
+    .map((pattern) => createPatternSummaryFragment(pattern, fileToPackage.get(pattern.source.file)))
     .filter(
       (summary) =>
-        (options.status === undefined || summary.status === options.status) &&
+        statusFilterMatches(summary.status, options.status) &&
         (options.maturity === undefined || summary.maturity === options.maturity) &&
         (options.phase === undefined || summary.phase === options.phase) &&
         (canonicalRole === undefined || summary.role.toLowerCase() === canonicalRole) &&
@@ -73,6 +77,25 @@ export function buildPatternCatalog(
     names: options.count === true ? [] : items.map((item) => item.patternName),
     items: options.count === true || options.namesOnly === true ? [] : items,
   };
+}
+
+/**
+ * Resolves an incoming `--status` filter against a pattern's authored status.
+ * The normalized bucket word `planned` matches the roadmap ∪ deferred union via
+ * `normalizeStatus`; every FSM-authored value (candidate/roadmap/active/
+ * completed/deferred) matches exactly. `undefined` matches everything.
+ */
+function statusFilterMatches(
+  patternStatus: string | undefined,
+  filter: StatusFilterValue | undefined,
+): boolean {
+  if (filter === undefined) {
+    return true;
+  }
+  if (filter === 'planned') {
+    return normalizeStatus(patternStatus) === 'planned';
+  }
+  return patternStatus === filter;
 }
 
 export function resolveParentChildNames(

@@ -59,6 +59,12 @@ export function buildFileReadingList(
   const relationships = getRelationships(context, canonicalName);
 
   if (relationships !== undefined) {
+    // The `.feature` specs that realize this pattern are PRIMARY reading (not
+    // "related"): follow the derived implementedBy reverse edge (ADR-002/ADR-003).
+    for (const implementationRef of relationships.implementedBy) {
+      pushUnique(primary, implementationRef.file);
+    }
+
     for (const dependencyName of relationships.dependsOn) {
       const dependencyPattern = findPatternByName(context.graph, dependencyName);
       if (dependencyPattern === undefined) {

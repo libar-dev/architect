@@ -15,6 +15,8 @@ import { type DecisionCatalog, type DecisionRecord } from '../../fragments/gover
 import { filterPatterns } from '../_shared/filter.js';
 import { createEntityRouteId, createIndexRouteId } from '../../routing/route-id.js';
 
+import { getRelationships } from '../_shared/pattern-helpers.internal.js';
+
 import {
   getPatternName,
   normalizeAnnotationText,
@@ -43,13 +45,19 @@ const DECISION_SECTION_PATTERN =
   /\*\*(Context|Decision|Consequences|Alternatives?):\*\*\s*([\s\S]*?)(?=\n\s*\*\*[A-Za-z][^*]*:\*\*|$)/gi;
 
 export function buildDecisionRecord(context: ProjectionContext, id: string): DecisionRecord {
-  return createDecisionRecord(requireDecisionPattern(context, id));
+  const decisionPatterns = collectDecisionPatterns(context);
+  const decisionIdByName = buildDecisionIdLookup(decisionPatterns);
+  return createDecisionRecord(context, requireDecisionPattern(context, id), decisionIdByName);
 }
 
 export function buildDecisionCatalog(
   context: ProjectionContext,
 ): ProjectionBundle<DecisionCatalog> {
-  const decisions = collectDecisionPatterns(context).map(createDecisionRecord);
+  const decisionPatterns = collectDecisionPatterns(context);
+  const decisionIdByName = buildDecisionIdLookup(decisionPatterns);
+  const decisions = decisionPatterns.map((pattern) =>
+    createDecisionRecord(context, pattern, decisionIdByName),
+  );
   const root: DecisionCatalog = {
     kind: 'DecisionCatalog',
     decisions,
@@ -97,7 +105,11 @@ function collectDecisionPatterns(context: ProjectionContext): ExtractedPattern[]
     .sort(compareDecisionPatterns);
 }
 
-function createDecisionRecord(pattern: ExtractedPattern): DecisionRecord {
+function createDecisionRecord(
+  context: ProjectionContext,
+  pattern: ExtractedPattern,
+  decisionIdByName: ReadonlyMap<string, string>,
+): DecisionRecord {
   const sections = extractDecisionSections(pattern);
 
   return {
@@ -110,9 +122,24 @@ function createDecisionRecord(pattern: ExtractedPattern): DecisionRecord {
     decision: sections.decision,
     consequences: sections.consequences,
     ...(sections.alternatives.length > 0 ? { alternatives: sections.alternatives } : {}),
-    relatedDecisions: getRelatedDecisionIds(pattern),
-    affectedPatterns: getAffectedPatterns(pattern),
+    relatedDecisions: getRelatedDecisionIds(pattern, decisionIdByName),
+    affectedPatterns: getAffectedPatterns(context, pattern),
   };
+}
+
+/**
+ * Maps each decision pattern's canonical name to its derived decision id (e.g.
+ * `ADR005CodecBasedMarkdownRendering` → `ADR-005`), so a focal decision can
+ * resolve which of its see-also cross-links are themselves decisions.
+ */
+function buildDecisionIdLookup(
+  decisionPatterns: readonly ExtractedPattern[],
+): ReadonlyMap<string, string> {
+  const lookup = new Map<string, string>();
+  for (const pattern of decisionPatterns) {
+    lookup.set(getPatternName(pattern), getDecisionId(pattern));
+  }
+  return lookup;
 }
 
 function extractDecisionSections(pattern: ExtractedPattern): DecisionSections {
@@ -233,21 +260,41 @@ function detectDecisionType(pattern: ExtractedPattern): DecisionType {
   return 'ADR';
 }
 
-function getRelatedDecisionIds(pattern: ExtractedPattern): string[] {
-  const type = detectDecisionType(pattern);
-  return [pattern.adrSupersedes, pattern.adrSupersededBy]
-    .filter((value): value is string => typeof value === 'string' && value.trim().length > 0)
-    .map((value) => `${type}-${padDecisionNumber(value)}`)
-    .filter((value, index, collection) => collection.indexOf(value) === index);
+/**
+ * The governance chain: the focal decision's see-also cross-links that are
+ * themselves decision records, resolved to their decision ids. This is live
+ * state — the related decisions this one stands beside — not a supersession
+ * "replaces" edge (history lives in git, never in the read model).
+ */
+function getRelatedDecisionIds(
+  pattern: ExtractedPattern,
+  decisionIdByName: ReadonlyMap<string, string>,
+): string[] {
+  const related: string[] = [];
+  for (const target of pattern.seeAlso ?? []) {
+    const relatedId = decisionIdByName.get(target);
+    if (relatedId !== undefined && !related.includes(relatedId)) {
+      related.push(relatedId);
+    }
+  }
+  return related.sort((left, right) => left.localeCompare(right, undefined, { numeric: true }));
 }
 
-function getAffectedPatterns(pattern: ExtractedPattern): string[] {
+/**
+ * The patterns this decision touches: its own forward links plus the computed
+ * `enforcedBy` reverse edge — every rule/pattern that authored
+ * `@architect-enforces-decision` against it. This makes the decision record
+ * navigable to the rules that enforce its invariants.
+ */
+function getAffectedPatterns(context: ProjectionContext, pattern: ExtractedPattern): string[] {
+  const relationships = getRelationships(context, getPatternName(pattern));
   const values = [
     ...(pattern.uses ?? []),
     ...(pattern.implementsPatterns ?? []),
     ...(pattern.seeAlso ?? []),
     ...(pattern.apiRef ?? []),
     ...(pattern.extendsPattern !== undefined ? [pattern.extendsPattern] : []),
+    ...(relationships?.enforcedBy ?? []),
   ];
 
   return [...new Set(values)].sort((left, right) => left.localeCompare(right));

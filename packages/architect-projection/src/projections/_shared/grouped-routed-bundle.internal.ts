@@ -37,10 +37,7 @@ export interface GroupedRoutedBundleSpec<TItem, TRoot extends Fragment> {
   /** Deterministic ordering of the grouped descriptors. */
   readonly compareGroups: (left: GroupDescriptor<TItem>, right: GroupDescriptor<TItem>) => number;
   /** Builds the root fragment from all items plus the ordered group descriptors. */
-  readonly buildRoot: (
-    items: readonly TItem[],
-    groups: readonly GroupDescriptor<TItem>[],
-  ) => TRoot;
+  readonly buildRoot: (items: readonly TItem[], groups: readonly GroupDescriptor<TItem>[]) => TRoot;
   /**
    * Builds the single child fragment for one group. The helper keys it by the
    * group's own `key`, which is globally unique by construction (one bucket per

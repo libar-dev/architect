@@ -85,6 +85,50 @@ export const OverviewArchitectureSchema = z.strictObject({
 });
 
 /**
+ * One orientation reference in the overview's "start here" tier — a generated
+ * doc the agent should read first (decisions, taxonomy, validation rules,
+ * business rules, API reference), the `documentation <type>` verb that emits
+ * it, and its display title. Derived from the documentation-type registry so
+ * the list never drifts from the supported set.
+ *
+ * @architect-shape
+ */
+export const OrientationReferenceSchema = z.strictObject({
+  docType: z.string(),
+  verb: z.string(),
+  title: z.string(),
+});
+
+/**
+ * The overview's "start here" orientation block — the high-signal generated
+ * docs to read first, a one-line note on the `--disclosure` drill-down
+ * mechanic, and the count + sample of roadmap patterns whose dependencies are
+ * all satisfied (the "safe to start" actionable set, the complement of
+ * BLOCKING). Rendered at `summary-with-references` and `full` richness so a
+ * cold-start agent is steered toward orientation + workable items rather than
+ * only the BLOCKING wall.
+ *
+ * @architect-shape
+ */
+export const OverviewOrientationSchema = z.strictObject({
+  references: z.array(OrientationReferenceSchema),
+  disclosureHint: z.string(),
+  startableCount: z.number().int().nonnegative(),
+  startableSample: z.array(z.string()),
+});
+
+/**
+ * One role-distribution entry — a canonical `@architect-role` value and how
+ * many patterns carry it. Sourced from the precomputed graph, not re-derived.
+ *
+ * @architect-shape
+ */
+export const RoleCountSchema = z.strictObject({
+  role: z.string(),
+  count: z.number().int().nonnegative(),
+});
+
+/**
  * Per-tag annotation gaps — maps each tag to the list of source files missing
  * that tag.
  *
@@ -120,6 +164,9 @@ export const RequirementEntrySchema = z.strictObject({
 export type OverviewProgress = z.infer<typeof OverviewProgressSchema>;
 export type ActivePhaseEntry = z.infer<typeof ActivePhaseEntrySchema>;
 export type BlockingEntry = z.infer<typeof BlockingEntrySchema>;
+export type OrientationReference = z.infer<typeof OrientationReferenceSchema>;
+export type OverviewOrientation = z.infer<typeof OverviewOrientationSchema>;
+export type RoleCount = z.infer<typeof RoleCountSchema>;
 export type OverviewArchitecture = z.infer<typeof OverviewArchitectureSchema>;
 export type GapsByTag = z.infer<typeof GapsByTagSchema>;
 export type TagValueCount = z.infer<typeof TagValueCountSchema>;

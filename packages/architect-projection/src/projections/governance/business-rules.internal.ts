@@ -6,7 +6,11 @@
  */
 
 import type { ExtractedPattern } from '@libar-dev/architect-core';
-import { findPatternByName } from '@libar-dev/architect-core';
+import {
+  canonicalDecisionKey,
+  findPatternByName,
+  resolveImplementingFeatures,
+} from '@libar-dev/architect-core';
 import { z } from 'zod';
 
 import type { ProjectionContext } from '../../context/projection-context.js';
@@ -76,6 +80,12 @@ export const BusinessRuleSetOptionsSchema = z
       groupedBy: BusinessRuleGroupingSchema.optional(),
       onlyInvariants: z.boolean().optional(),
     }),
+    z.strictObject({
+      scope: z.literal('decision'),
+      scopeValue: z.string(),
+      groupedBy: BusinessRuleGroupingSchema.optional(),
+      onlyInvariants: z.boolean().optional(),
+    }),
   ])
   .readonly();
 
@@ -120,7 +130,7 @@ export function buildBusinessRuleSet(
   options: BusinessRuleSetOptions = { scope: 'all' },
 ): ProjectionBundle<BusinessRuleSet> {
   const groupedBy = options.groupedBy;
-  const rules = filterBusinessRules(collectBusinessRules(context, options), options);
+  const rules = filterBusinessRules(context, collectBusinessRules(context, options), options);
 
   // Ungrouped: a single flat rule set with no child routing.
   if (groupedBy === undefined) {
@@ -143,11 +153,7 @@ export function buildBusinessRuleSet(
         businessRuleGroupFacets(right, groupedBy).sortKey,
       ),
     buildRoot: (items, groups) =>
-      createBusinessRuleSetRoot(
-        options,
-        items,
-        businessRuleGroupingEntries(groups, groupedBy),
-      ),
+      createBusinessRuleSetRoot(options, items, businessRuleGroupingEntries(groups, groupedBy)),
     buildGroupChild: (group) => createScopedBusinessRuleSet(group, groupedBy, options),
     buildRouting: businessRuleRouting,
   });
@@ -184,19 +190,71 @@ function patternMatchesRuleSetScope(
   options: BusinessRuleSetOptions,
 ): boolean {
   if (options.scope === 'package') {
-    const canonicalPackageName = inferWorkspacePackageName(pattern.source.file);
-    if (canonicalPackageName !== undefined) {
-      return canonicalPackageName === options.scopeValue;
-    }
-    const packageId = context.packageResolver(pattern.source.file).id;
-    return packageId.startsWith('@') && packageId === options.scopeValue;
+    return context.packageResolver(pattern.source.file).id === options.scopeValue;
   }
 
-  if (options.scope === 'feature' && options.featureMatch === 'path') {
-    return matchesFeaturePath(pattern.source.file, options.scopeValue);
+  if (options.scope === 'feature') {
+    if (options.featureMatch === 'path') {
+      return matchesFeaturePath(pattern.source.file, options.scopeValue);
+    }
+    return resolveFeatureScopeNames(context, options.scopeValue).has(
+      getPatternName(pattern).toLowerCase(),
+    );
+  }
+
+  if (options.scope === 'decision') {
+    return patternEnforcesDecision(context, pattern, options.scopeValue);
   }
 
   return true;
+}
+
+/**
+ * The set of lowercased canonical feature names a `--pattern` query resolves to:
+ * the named pattern itself plus every pattern that realizes it via the derived
+ * `implementedBy` reverse edge (ADR-002/ADR-003). This lets `rules --pattern
+ * <TsPattern>` aggregate the rules authored on the implementing `.feature`
+ * specs, not just the focal node's own rules.
+ */
+function resolveFeatureScopeNames(context: ProjectionContext, scopeValue: string): Set<string> {
+  const names = new Set<string>([scopeValue.toLowerCase()]);
+
+  const focal = findPatternByName(context.graph, scopeValue);
+  if (focal !== undefined) {
+    names.add(getPatternName(focal).toLowerCase());
+    for (const implementer of resolveImplementingFeatures(context.graph, getPatternName(focal))) {
+      names.add(implementer.toLowerCase());
+    }
+  }
+
+  return names;
+}
+
+/**
+ * A pattern is in a decision's rule set when it authors the decision in its
+ * `enforcesDecisions` forward edge, or when it IS the decision record (own
+ * `adr` tag), so the decision feature's own rules are included.
+ *
+ * Both the query input and each stored value are normalized to the canonical
+ * decision-pattern identity (ADR-006), so a human-typed ADR id (`ADR-009`,
+ * `009`), the canonical pattern name (`ADR009ProjectionTrustBoundary`), and a
+ * bare-id `@architect-enforces-decision:777` all resolve to the same key and
+ * match interchangeably.
+ */
+function patternEnforcesDecision(
+  context: ProjectionContext,
+  pattern: ExtractedPattern,
+  decision: string,
+): boolean {
+  const target = canonicalDecisionKey(context.graph, decision);
+
+  if (pattern.adr !== undefined && canonicalDecisionKey(context.graph, pattern.adr) === target) {
+    return true;
+  }
+
+  return (pattern.enforcesDecisions ?? []).some(
+    (value) => canonicalDecisionKey(context.graph, value) === target,
+  );
 }
 
 function createBusinessRuleFragment(
@@ -222,6 +280,7 @@ function createBusinessRuleFragment(
 }
 
 function filterBusinessRules(
+  context: ProjectionContext,
   rules: readonly BusinessRule[],
   options: BusinessRuleSetOptions,
 ): BusinessRule[] {
@@ -236,13 +295,15 @@ function filterBusinessRules(
       return [...rules];
     case 'phase':
       return rules.filter((rule) => rule.phase === options.scopeValue);
-    case 'feature':
+    case 'feature': {
       if (options.featureMatch === 'path') {
         return [...rules];
       }
-      return rules.filter(
-        (rule) => rule.feature.toLowerCase() === options.scopeValue.toLowerCase(),
-      );
+      const featureNames = resolveFeatureScopeNames(context, options.scopeValue);
+      return rules.filter((rule) => featureNames.has(rule.feature.toLowerCase()));
+    }
+    case 'decision':
+      return [...rules];
   }
 }
 
@@ -291,6 +352,15 @@ function createBusinessRuleSetRoot(
       return {
         kind: 'BusinessRuleSet',
         scope: 'feature',
+        scopeValue: options.scopeValue,
+        rules: [...rules],
+        ...(options.groupedBy !== undefined ? { groupedBy: options.groupedBy } : {}),
+        ...(groupingEntries !== undefined ? { groupingEntries } : {}),
+      };
+    case 'decision':
+      return {
+        kind: 'BusinessRuleSet',
+        scope: 'decision',
         scopeValue: options.scopeValue,
         rules: [...rules],
         ...(options.groupedBy !== undefined ? { groupedBy: options.groupedBy } : {}),
@@ -424,21 +494,6 @@ function compareBusinessRules(left: BusinessRule, right: BusinessRule): number {
       BASE_COLLATOR.compare(left.ruleName, right.ruleName),
     ].find((value) => value !== 0) ?? 0
   );
-}
-
-function inferWorkspacePackageName(sourceFile: string): string | undefined {
-  const normalized = normalizePosixPath(sourceFile);
-  const packageSegment =
-    /(?:^|\/)packages\/(architect(?:-[^/]+)?)\//u.exec(normalized)?.[1] ??
-    /^\.\.\/(architect(?:-[^/]+)?)\//u.exec(normalized)?.[1];
-
-  if (packageSegment === undefined) {
-    return undefined;
-  }
-
-  return packageSegment === 'architect'
-    ? '@libar-dev/architect-dev'
-    : `@libar-dev/${packageSegment}`;
 }
 
 function matchesFeaturePath(sourceFile: string, filter: string): boolean {

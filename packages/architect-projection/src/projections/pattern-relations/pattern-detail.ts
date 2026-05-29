@@ -68,6 +68,9 @@ export function projectPatternDetail(
   const detail: PatternDetail = {
     ...summary,
     kind: 'PatternDetail',
+    ...(pattern.boundedContext !== undefined ? { boundedContext: pattern.boundedContext } : {}),
+    ...(pattern.productArea !== undefined ? { productArea: pattern.productArea } : {}),
+    ...(pattern.level !== undefined ? { level: pattern.level } : {}),
     ...(description !== '' ? { description } : {}),
     ...(openQuestions.length > 0 ? { openQuestions } : {}),
     deliverables,

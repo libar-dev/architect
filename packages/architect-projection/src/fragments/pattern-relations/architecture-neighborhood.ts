@@ -16,7 +16,9 @@ import { ImplementationRefSchema } from './supporting.js';
 /**
  * The relationship neighborhood around a focal pattern — its context, role, and
  * layer, every typed relation edge (uses, usedBy, dependsOn, enables,
- * implements), its same-context peers, and the artifacts that implement it.
+ * implements), its see-also cross-links, the rules that enforce it (`enforcedBy`,
+ * the inverse of `@architect-enforces-decision`), its same-context peers, and
+ * the artifacts that implement it.
  *
  * @architect-shape
  */
@@ -30,6 +32,8 @@ export const ArchitectureNeighborhoodSchema = z.strictObject({
   usedBy: z.array(z.string()),
   dependsOn: z.array(z.string()),
   enables: z.array(z.string()),
+  seeAlso: z.array(z.string()),
+  enforcedBy: z.array(z.string()),
   sameContext: z.array(z.string()),
   implements: z.array(z.string()),
   implementedBy: z.array(ImplementationRefSchema),

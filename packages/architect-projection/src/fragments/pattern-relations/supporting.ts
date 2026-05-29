@@ -8,7 +8,7 @@
  *
  * ### When to Use
  *
- * - Houses the shared pattern-relations helper schemas for sources, relationships, hierarchy, deliverables, stubs, dependency kinds, and tree nodes.
+ * - Houses the shared pattern-relations helper schemas for sources, relationships, hierarchy, deliverables, stubs, dependency kinds, and dependency-context nodes.
  */
 import { z } from 'zod';
 
@@ -128,39 +128,39 @@ export const DependencyRelationKindSchema = z.enum([
 ]);
 
 /**
- * One node in a recursive dependency tree. Defined as an interface so the Zod
- * schema can reference it for its self-referential `children` type.
+ * One node in a recursive dependency-context forest. Defined as an interface so
+ * the Zod schema can reference it for its self-referential `children` type. The
+ * focal pattern is the root of both forests (named by the fragment's `focal`
+ * field) and is never represented as a node, so there is no per-node focal flag.
  *
  * @architect-shape
  */
-export interface DependencyTreeNode {
+export interface DependencyContextNode {
   /** The pattern name this node represents. */
   name: string;
   /** The pattern's lifecycle status, when known. */
   status?: string | undefined;
   /** The pattern's phase number, when assigned. */
   phase?: number | undefined;
-  /** Whether this node is the focal pattern the tree was rooted at. */
-  isFocal: boolean;
-  /** Whether traversal stopped here because the depth limit was reached. */
+  /** Whether traversal stopped here because the depth limit was reached and
+   * unexpanded edges remain in this direction. */
   truncated: boolean;
-  /** This node's direct dependency children. */
-  children: DependencyTreeNode[];
+  /** This node's direct children in the same direction. */
+  children: DependencyContextNode[];
 }
 
 /**
- * The recursive Zod schema for a dependency-tree node, validating the shape
- * described by {@link DependencyTreeNode} with lazily-evaluated children.
+ * The recursive Zod schema for a dependency-context node, validating the shape
+ * described by {@link DependencyContextNode} with lazily-evaluated children.
  *
  * @architect-shape
  */
-export const DependencyTreeNodeSchema: z.ZodType<DependencyTreeNode> = z.strictObject({
+export const DependencyContextNodeSchema: z.ZodType<DependencyContextNode> = z.strictObject({
   name: z.string(),
   status: z.string().optional(),
   phase: z.number().int().optional(),
-  isFocal: z.boolean(),
   truncated: z.boolean(),
-  children: z.array(z.lazy(() => DependencyTreeNodeSchema)),
+  children: z.array(z.lazy(() => DependencyContextNodeSchema)),
 });
 
 export type PatternSource = z.infer<typeof PatternSourceSchema>;
