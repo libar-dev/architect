@@ -30,6 +30,7 @@ import {
   getRelationships,
   resolveRoleDefinition,
 } from './pattern-helpers.js';
+import type { Deliverable } from '../validation-schemas/dual-source.js';
 import type {
   StatusCounts,
   StatusDistribution,
@@ -37,7 +38,6 @@ import type {
   PhaseGroup,
   PatternDependencies,
   PatternRelationships,
-  PatternDeliverable,
   QuarterGroup,
   TransitionCheck,
   ProtectionInfo,
@@ -66,7 +66,7 @@ export interface PatternGraphAPI {
   getPatternRelationships(name: string): PatternRelationships | undefined;
   getRelatedPatterns(name: string): readonly string[];
   getApiReferences(name: string): readonly string[];
-  getPatternDeliverables(name: string): PatternDeliverable[];
+  getPatternDeliverables(name: string): readonly Deliverable[];
   listRoles(): readonly RoleInfo[];
   getPatternsByRole(role: string): ExtractedPattern[];
   getRoleInfo(role: string): RoleInfo | null;
@@ -96,6 +96,18 @@ function deepFreeze<T>(value: T, seen = new WeakSet()): T {
   return Object.freeze(value);
 }
 
+/**
+ * Delivery-pipeline denominator: the grand total minus `candidate`. Candidates
+ * are pre-delivery and excluded from delivery-completion math. Returns a value
+ * clamped to a minimum of 1 so callers can divide without guarding for zero;
+ * when there are no delivery patterns every numerator is 0, so the resulting
+ * percentages are 0 regardless of the clamped denominator.
+ */
+function deliveryBase(counts: StatusCounts): number {
+  const base = counts.total - counts.candidate;
+  return base === 0 ? 1 : base;
+}
+
 export function createPatternGraphAPI(dataset: PatternGraph): PatternGraphAPI {
   const frozenGraph = deepFreeze(dataset);
 
@@ -122,25 +134,21 @@ export function createPatternGraphAPI(dataset: PatternGraph): PatternGraphAPI {
       return frozenGraph.counts;
     },
     getStatusDistribution() {
-      const deliveryTotal = frozenGraph.counts.total - frozenGraph.counts.candidate;
-      const total = deliveryTotal === 0 ? 1 : deliveryTotal;
+      const counts = frozenGraph.counts;
+      const base = deliveryBase(counts);
       return {
-        counts: frozenGraph.counts,
-        percentages: {
-          completed: Math.round((frozenGraph.counts.completed / total) * 100),
-          active: Math.round((frozenGraph.counts.active / total) * 100),
-          planned: Math.round((frozenGraph.counts.planned / total) * 100),
-          candidate:
-            frozenGraph.counts.total === 0
-              ? 0
-              : Math.round((frozenGraph.counts.candidate / frozenGraph.counts.total) * 100),
+        counts,
+        deliveryPercentages: {
+          completed: Math.round((counts.completed / base) * 100),
+          active: Math.round((counts.active / base) * 100),
+          planned: Math.round((counts.planned / base) * 100),
         },
+        candidateShare:
+          counts.total === 0 ? 0 : Math.round((counts.candidate / counts.total) * 100),
       };
     },
     getCompletionPercentage() {
-      const deliveryTotal = frozenGraph.counts.total - frozenGraph.counts.candidate;
-      const total = deliveryTotal === 0 ? 1 : deliveryTotal;
-      return Math.round((frozenGraph.counts.completed / total) * 100);
+      return Math.round((frozenGraph.counts.completed / deliveryBase(frozenGraph.counts)) * 100);
     },
     getPatternsByPhase(phase) {
       const phaseGroup = frozenGraph.byPhase.find((p) => p.phaseNumber === phase);
@@ -150,8 +158,6 @@ export function createPatternGraphAPI(dataset: PatternGraph): PatternGraphAPI {
       const phaseGroup = frozenGraph.byPhase.find((p) => p.phaseNumber === phase);
       if (!phaseGroup) return undefined;
 
-      const deliveryTotal = phaseGroup.counts.total - phaseGroup.counts.candidate;
-      const total = deliveryTotal === 0 ? 1 : deliveryTotal;
       return {
         phaseNumber: phaseGroup.phaseNumber,
         phaseName: phaseGroup.phaseName,
@@ -160,7 +166,9 @@ export function createPatternGraphAPI(dataset: PatternGraph): PatternGraphAPI {
         planned: phaseGroup.counts.planned,
         candidate: phaseGroup.counts.candidate,
         total: phaseGroup.counts.total,
-        completionPercentage: Math.round((phaseGroup.counts.completed / total) * 100),
+        completionPercentage: Math.round(
+          (phaseGroup.counts.completed / deliveryBase(phaseGroup.counts)) * 100,
+        ),
       };
     },
     getActivePhases() {
@@ -189,7 +197,7 @@ export function createPatternGraphAPI(dataset: PatternGraph): PatternGraphAPI {
       };
     },
     getPattern(name) {
-      return findPatternByName(frozenGraph.patterns, name);
+      return findPatternByName(frozenGraph, name);
     },
     getPatternParseFailure(name) {
       return findPatternParseFailure(frozenGraph, name);
@@ -234,16 +242,7 @@ export function createPatternGraphAPI(dataset: PatternGraph): PatternGraphAPI {
     },
     getPatternDeliverables(name) {
       const pattern = this.getPattern(name);
-      if (!pattern?.deliverables) return [];
-
-      return pattern.deliverables.map((d) => ({
-        name: d.name,
-        status: d.status,
-        tests: d.tests,
-        location: d.location,
-        finding: d.finding,
-        release: d.release,
-      }));
+      return pattern?.deliverables ?? [];
     },
     listRoles() {
       return configuredRoles.map(({ tag, domain, priority, description }) => ({

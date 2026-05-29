@@ -1,4 +1,3 @@
-import type { DeliverableStatus } from '../taxonomy/index.js';
 import type { ExtractedPattern } from '../validation-schemas/extracted-pattern.js';
 import type { ImplementationRef, StatusCounts } from '../validation-schemas/pattern-graph.js';
 import type { ProcessStatusValue } from '../taxonomy/index.js';
@@ -60,12 +59,22 @@ export type { PhaseGroup, StatusCounts } from '../validation-schemas/pattern-gra
 
 export interface StatusDistribution {
   counts: StatusCounts;
-  percentages: {
+  /**
+   * Percentages of the delivery pipeline (completed + active + planned), each
+   * over the delivery base `total - candidate`. These three fields share one
+   * denominator and sum to exactly 100 (when the delivery base is non-zero).
+   */
+  deliveryPercentages: {
     completed: number;
     active: number;
     planned: number;
-    candidate: number;
   };
+  /**
+   * Candidate share over the grand total (`total`). Kept structurally separate
+   * from {@link StatusDistribution.deliveryPercentages} because it uses a
+   * different denominator — the two groups must never be summed together.
+   */
+  candidateShare: number;
 }
 
 export interface PhaseProgress {
@@ -97,15 +106,6 @@ export interface PatternRelationships {
   extendedBy: readonly string[];
   seeAlso: readonly string[];
   apiRef: readonly string[];
-}
-
-export interface PatternDeliverable {
-  name: string;
-  status: DeliverableStatus;
-  tests: number;
-  location: string;
-  finding: string | undefined;
-  release: string | undefined;
 }
 
 export interface QuarterGroup {

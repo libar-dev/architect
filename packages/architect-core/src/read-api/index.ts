@@ -9,7 +9,6 @@ export type {
   PhaseProgress,
   PatternDependencies,
   PatternRelationships,
-  PatternDeliverable,
   QuarterGroup,
   TransitionCheck,
   ProtectionInfo,
@@ -25,14 +24,10 @@ export {
   getPatternName,
   findPatternByName,
   findPatternParseFailure,
-  getCanonicalRelationshipIndex,
   getRelationshipsForPattern,
   getRelationships,
-  allPatternNames,
   resolveRoleDefinition,
-  resolveCanonicalRole,
   suggestPattern,
-  firstImplements,
 } from './pattern-helpers.js';
 
 export type { NeighborhoodResult, ContextComparison } from './architecture-inspection.js';

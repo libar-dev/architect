@@ -16,7 +16,6 @@ import type {
   PatternParseFailure,
   RelationshipEntry,
 } from '../validation-schemas/pattern-graph.js';
-import { resolveCanonicalRole as resolveTagRegistryRole } from '../validation-schemas/tag-registry.js';
 import { findBestMatch } from '../utils/fuzzy-match.js';
 
 type RegistryRoleDefinition = NonNullable<PatternGraph['tagRegistry']['roles']>[number];
@@ -25,7 +24,7 @@ const lowercaseNameIndexCache = new WeakMap<PatternGraph, ReadonlyMap<string, Ex
 
 function createMissingCanonicalRelationshipEntryError(patternName: string): Error {
   return new Error(
-    `PatternGraphAPI invariant violated: canonical relationship entry missing for pattern ${patternName}`,
+    `read-api invariant violated: canonical relationship entry missing for pattern ${patternName}`,
   );
 }
 
@@ -98,7 +97,7 @@ export function findPatternParseFailure(
   );
 }
 
-export function getCanonicalRelationshipIndex(
+function getCanonicalRelationshipIndex(
   dataset: PatternGraph,
 ): Readonly<Record<string, RelationshipEntry>> {
   return dataset.relationshipIndex;
@@ -123,10 +122,6 @@ export function getRelationships(
   return getRelationshipsForPattern(dataset, pattern);
 }
 
-export function allPatternNames(dataset: PatternGraph): readonly string[] {
-  return dataset.patterns.map((p) => getPatternName(p));
-}
-
 export function resolveRoleDefinition(
   dataset: PatternGraph,
   role: string,
@@ -138,15 +133,7 @@ export function resolveRoleDefinition(
   );
 }
 
-export function resolveCanonicalRole(dataset: PatternGraph, role: string): string | undefined {
-  return resolveTagRegistryRole(dataset.tagRegistry, role);
-}
-
 export function suggestPattern(query: string, candidates: readonly string[]): string {
   const best = findBestMatch(query, candidates);
   return best !== undefined ? ` Did you mean: ${best.patternName}?` : '';
-}
-
-export function firstImplements(pattern: ExtractedPattern): string | undefined {
-  return pattern.implementsPatterns?.[0];
 }

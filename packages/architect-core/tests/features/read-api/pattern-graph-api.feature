@@ -38,7 +38,7 @@ Feature: PatternGraphAPI reverse lookups stay canonical
     Scenario: Foreign patterns trigger the canonical relationship invariant
       Given a foreign pattern named "GhostCore"
       When I resolve relationships for that foreign pattern through the shared helper
-      Then the invariant error equals "PatternGraphAPI invariant violated: canonical relationship entry missing for pattern GhostCore"
+      Then the invariant error equals "read-api invariant violated: canonical relationship entry missing for pattern GhostCore"
 
   Rule: Neighbor queries reuse the shared canonical relationship seam
 

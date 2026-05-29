@@ -20,8 +20,8 @@ import {
   getRelationshipsForPattern,
 } from './pattern-helpers.js';
 
-function resolveNeighborEntry(patterns: readonly ExtractedPattern[], name: string): NeighborEntry {
-  const pattern = findPatternByName(patterns, name);
+function resolveNeighborEntry(dataset: PatternGraph, name: string): NeighborEntry {
+  const pattern = findPatternByName(dataset, name);
   return {
     name,
     status: pattern?.status,
@@ -81,17 +81,13 @@ export function computeNeighborhood(
   const patternName = getPatternName(pattern);
   const relationships = getRelationships(dataset, patternName);
 
-  const uses = (relationships?.uses ?? []).map((entry) =>
-    resolveNeighborEntry(dataset.patterns, entry),
-  );
-  const usedBy = (relationships?.usedBy ?? []).map((entry) =>
-    resolveNeighborEntry(dataset.patterns, entry),
-  );
+  const uses = (relationships?.uses ?? []).map((entry) => resolveNeighborEntry(dataset, entry));
+  const usedBy = (relationships?.usedBy ?? []).map((entry) => resolveNeighborEntry(dataset, entry));
   const dependsOn = (relationships?.dependsOn ?? []).map((entry) =>
-    resolveNeighborEntry(dataset.patterns, entry),
+    resolveNeighborEntry(dataset, entry),
   );
   const enables = (relationships?.enables ?? []).map((entry) =>
-    resolveNeighborEntry(dataset.patterns, entry),
+    resolveNeighborEntry(dataset, entry),
   );
 
   const sameContext: NeighborEntry[] = [];
@@ -100,7 +96,7 @@ export function computeNeighborhood(
     if (contextPatterns !== undefined) {
       for (const sibling of contextPatterns) {
         if (getPatternName(sibling) !== patternName) {
-          sameContext.push(resolveNeighborEntry(dataset.patterns, getPatternName(sibling)));
+          sameContext.push(resolveNeighborEntry(dataset, getPatternName(sibling)));
         }
       }
     }
