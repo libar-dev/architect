@@ -34,10 +34,12 @@ artifacts are:
 Per the split-ownership policy in
 [`../../architect-base/references/annotation-ownership.md`](../../architect-base/references/annotation-ownership.md), the `.feature`
 file is the **canonical pattern definition**. Production-TS JSDoc
-annotations are **additive, not mandatory** — sampled completed patterns
-(`ConfigLoader`, `DefineConfig`) carry zero `@architect-*` JSDoc on the
-production source and are still legitimately complete because the
-executable feature carries the full surface.
+annotations are **additive, not mandatory** — a completed,
+feature-identity-owned pattern carries zero `@architect-*` identity JSDoc
+on its realizing production source and is still legitimately complete
+because the executable feature carries the full surface. (Confirm the
+current set live rather than trusting a frozen name — samples rot:
+`pnpm architect:query list --status completed`, then `files <Name>`.)
 
 The maximalist framing "value must transfer to BOTH surfaces" (executable
 Gherkin + JSDoc annotations) is a useful default goal, but it is **not**

@@ -37,7 +37,7 @@ In practice this means:
 
 - The same handful of verbs (`overview`, `pattern`, `bundle`, `dep-tree`, `files`, `rules`, `scope-validate`) covers every session shape above.
 - `bundle <Pattern>` is the default pre-flight; it returns deliverables + dependencies + rules + open questions + docstring in one call.
-- The `--mode <plan|design|implement|review>` flag on `bundle` / `context` exists and changes which blocks are included by default, but defaults are good and the variation in returned data is dominated by what the pattern actually _is_ on disk.
+- The `--mode <plan|design|implement|review>` flag on `bundle` changes which blocks are included by default (`context` instead takes `--session <planning|design|implement>` — no `review` value); but defaults are good and the variation in returned data is dominated by what the pattern actually _is_ on disk.
 - Expect intent flags to recede further over time. The skill leads with state-driven exploration; per-intent recipes are not authored here.
 
 ## Pattern exploration — the everyday verbs
@@ -91,14 +91,14 @@ Organized by purpose. Every CLI verb has an MCP twin (mapping in "MCP twins" bel
 
 ### Health & inventory
 
-- **`overview [--richness name-only|summary|summary-with-references|full]`** — the cold-start dashboard, depth controlled by `--richness` (default `summary`). The progress line is **delivery-only** — it counts the delivery base and excludes candidates (`266 delivery patterns (118 completed, 129 active, 19 planned) = 44%` + a `20 candidate patterns excluded from delivery progress` line). See "Status vocabulary" below for the delivery-total-vs-grand-total distinction. The four levels:
+- **`overview [--richness name-only|summary|summary-with-references|full]`** — the cold-start dashboard, depth controlled by `--richness` (default `summary`). The progress line is **delivery-only** — it counts the delivery base and excludes candidates (`272 delivery patterns (121 completed, 132 active, 19 planned (roadmap+deferred)) = 44%` + a `20 candidate patterns excluded from delivery progress` line; absolute counts drift every commit — re-verify live). See "Status vocabulary" below for the delivery-total-vs-grand-total distinction. The four levels:
   - **`name-only`** — the progress line alone.
   - **`summary`** (default) — lean dashboard: progress, an architecture mermaid glimpse, top-5 blocking (`X blocked by: Y, Z` then `… and N more — run arch blocking`), a one-line "READY TO START" count of roadmap patterns with satisfied deps, a one-line GENERATED VIEWS list, and the DATA API command hints.
   - **`summary-with-references`** — `summary` plus a **START HERE** orientation block: the high-signal docs to read first (Decisions / Taxonomy / Validation Rules / Business Rules / API Reference, each as a `documentation <type>` verb), the `--disclosure essential|important|useful|advanced` depth note, and the safe-to-start roadmap set.
   - **`full`** — itemizes the generated views (with one-line descriptions), adds the bounded-context architecture mermaid, and adds a **ROLE DISTRIBUTION** breakdown.
     An invalid `--richness` value errors with the accepted set enumerated. The Claude/Codex SessionStart hook injects the `summary-with-references` snapshot on `startup` / `clear` / `compact` (skipping only `resume`).
 - **`status`** — status distribution counts + percentages, no per-pattern detail.
-- **`list [--status v] [--role tag] [--parent X] [--count] [--names-only]`** — pattern catalog. `--status` accepts only the **accepted** FSM values (`candidate`, `roadmap`, `active`, `completed`, `deferred`) — the normalized bucket `planned` is **not** accepted here (an invalid value errors with the accepted set enumerated). `--parent` resolves strictly; unknown parent exits non-zero with `Parent pattern not found`. `--names-only` returns a JSON string array.
+- **`list [--status v] [--role tag] [--parent X] [--package <name>] [--count] [--names-only]`** — pattern catalog. `--status` accepts the five FSM values (`candidate`, `roadmap`, `active`, `completed`, `deferred`) **plus** the rollup alias `planned` (= roadmap+deferred) — an out-of-enum value errors with that full accepted set enumerated. `--package` takes the **short** workspace name (`architect-core`, `architect-cli`, `architect-guard`, `architect-mcp`, `architect-projection`, `architect-pkg-content`, `architect-dev`) — **not** the `@libar-dev/…` form — and fails loud on an unmatched value. `--parent` resolves strictly; unknown parent exits non-zero with `Parent pattern not found`. `--names-only` returns a JSON string array.
 - **`search <query>`** — fuzzy pattern-name search; JSON `[{patternName, score, matchType}]`.
 - **`taxonomy [--count]`** — `--count` prints a one-line summary; `--format json` returns the full taxonomy tree.
 - **`tags`** — `TagUsageMatrix`: pattern count + per-tag value distribution.
@@ -110,10 +110,10 @@ Organized by purpose. Every CLI verb has an MCP twin (mapping in "MCP twins" bel
 The CLI surfaces three status words that are easy to conflate:
 
 - **`roadmap`** — the **accepted FSM status** (`candidate → roadmap → active → completed`, with `deferred` off `roadmap`). This is what the source carries and what the FSM transitions move between.
-- **`planned`** — a **normalized reporting bucket** that collapses `roadmap` + `deferred` into one count. It is **not** an FSM status and **not** accepted by `list --status` / `getPatternsByStatus`. The normalized methods (`getStatusDistribution`, `getStatusCounts`, `getPatternsByNormalizedStatus planned`) report under `planned`; the accepted-status methods report under `roadmap` / `deferred` separately.
+- **`planned`** — a **normalized reporting bucket** that collapses `roadmap` + `deferred` into one count. It is **not** an FSM status, but `list --status planned` **does accept it** as a convenience alias (returns the roadmap+deferred set). The `query getPatternsByStatus` passthrough still **rejects** `planned` (accepts only `roadmap`/`deferred`) — so the alias is a `list` affordance, not an FSM-status target. The normalized methods (`getStatusDistribution`, `getStatusCounts`, `getPatternsByNormalizedStatus planned`) report under `planned`; the accepted-status methods report under `roadmap` / `deferred` separately.
 - **`candidate`** — a **pre-FSM acceptance state**. `candidate → roadmap` is a human acceptance gate (a maturity flip), **not** a process-guard FSM transition. Candidates are excluded from delivery progress.
 
-**Delivery total vs grand total** (the 266-vs-286 distinction): `overview` and `getStatusDistribution.deliveryPercentages` count the **delivery base** — every status except `candidate`. At the current state that is **266 delivery patterns** (118 completed / 129 active / 19 planned) out of a **286 grand total** (the extra 20 are candidates). So the overview's `= 44%` denominator is 266, not 286. `candidateShare` (7) is over the grand total and is structurally non-summable with the delivery percentages. Re-verify live numbers with `pnpm -s architect:query status` and `pnpm -s architect:query query getStatusDistribution`.
+**Delivery total vs grand total** (the delivery-vs-grand distinction): `overview` and `getStatusDistribution.deliveryPercentages` count the **delivery base** — every status except `candidate`. At the current state that is **272 delivery patterns** (121 completed / 132 active / 19 planned) out of a **292 grand total** (the extra 20 are candidates). So the overview's `= 44%` denominator is 272, not 292. `candidateShare` (7) is over the grand total and is structurally non-summable with the delivery percentages. Re-verify live numbers with `pnpm -s architect:query status` and `pnpm -s architect:query query getStatusDistribution`.
 
 ### Per-pattern detail
 
@@ -121,11 +121,11 @@ The CLI surfaces three status words that are easy to conflate:
 - **`context <Pattern> [--session planning|design|implement]`** — curated bundle: summary, dependencies, architecture neighbours. With `--session implement`, also includes an `=== FSM ===` line showing current status + valid transitions + protection level.
 - **`files <Pattern> [--related]`** — primary deliverable file. With `--related`, adds `=== COMPLETED DEPENDENCIES ===`, `=== ROADMAP DEPENDENCIES ===`, `=== ARCHITECTURE NEIGHBORS ===` sections.
 - **`dep-tree <Pattern> [--depth <n>]`** — dependency chain walk.
-- **`rules [--product-area n] [--pattern n] [--package n] [--feature glob] [--only-invariants] [--count] [--names-only]`** — business-rule catalog. `--package <workspace-name>` filters by canonical workspace name (e.g. `@libar-dev/architect-projection`). `--feature <path-or-glob>` matches against `pattern.source.file`.
+- **`rules [--product-area n] [--pattern n] [--package <name>] [--feature glob] [--decision <ADR>] [--only-invariants] [--count] [--names-only]`** — business-rule catalog. The scope filters (`--pattern` / `--product-area` / `--package` / `--feature` / `--decision`) are **mutually exclusive** — pass exactly one. `--pattern <TsPattern>` resolves through `implementedBy`, so it surfaces the rules of the implementing specs (a TS pattern with no own rules still returns its specs' rules). `--decision <ADR>` aggregates every rule enforcing that decision and accepts any id form (`ADR-009` / `ADR009` / the full `ADR009…` pattern name). `--package` takes the **short** workspace name (`architect-projection`, not `@libar-dev/architect-projection`) and fails loud on an unmatched value. `--feature <path-or-glob>` matches against `pattern.source.file`.
 
 ### Composite — the default pre-flight
 
-- **`bundle <Pattern> [--mode plan|design|implement|review] [--include <block[,block...]>] [--estimate-tokens] [--format json]`** — composite of deliverables + deps + rules + open-questions + docstring. Mode default-include sets apply only when `--include` is omitted. Token estimation is heuristic (`chars / 4`). Always use the comma-list form for `--include` (`rules,deps,open-questions`).
+- **`bundle <Pattern> [--mode plan|design|implement|review] [--include <block[,block...]>] [--estimate-tokens] [--format json]`** — composite of deliverables + deps + rules + open-questions + docstring. Mode default-include sets apply only when `--include` is omitted. Token estimation is heuristic (`chars / 4`). `--include` takes a comma list (`rules,deps,open-questions`); repeated `--include` flags also accumulate (equivalent), so neither form silently drops blocks.
 - **`open-questions [--parent <Pattern>] [--format compact|json]`** — `OpenQuestionList` fragment: per-pattern open questions lifted from each spec's `**Open Questions:**` block. Candidate-tier readiness signal. **Quirk:** `--parent <Epic>` returns the open questions of the epic's **member** patterns, **not** the epic's own — e.g. `open-questions --parent DocumentationProjection` returns questions for `GoalOrientedNavigation`, `OneSourceMultipleAudiences`, `SourceCanonical`, never `DocumentationProjection` itself.
 
 ### Architecture views
@@ -133,6 +133,8 @@ The CLI surfaces three status words that are easy to conflate:
 - **`arch blocking`** — global blocker view; `X blocked by: Y, Z`.
 - **`arch dangling [--baseline <path>] [--write-baseline] [--strict]`** — graph-integrity check; see "Gates" above.
 - **`arch neighborhood <Pattern>`** — local subgraph around the pattern.
+- **`arch graph`** — the full `ArchitectureGraph` (bounded contexts + packages + edges).
+- **`arch packages [name]`** — per-package pattern inventory; with a name (short workspace form, e.g. `architect-core`), that package's patterns.
 - **`arch coverage`** — annotation coverage rollup.
 - **`arch roles`** — role inventory.
 - **`arch bounded-context [name]`** — bounded-context inventory; with a name, the contents of that context.
@@ -149,15 +151,16 @@ The CLI surfaces three status words that are easy to conflate:
 
 ### `query` passthrough — the typed read kernel, fully traversable
 
-`query <method> [args...]` is a passthrough to the `PatternGraphAPI` typed read kernel. Returns `{success, data, metadata}` JSON (read **`.data`**). Almost the entire 29-method interface is reachable (only `getPatternGraph`, which returns the whole read model, is withheld to avoid payload overflow) — so the kernel is self-traversable and every accessor is CLI-verifiable. Grouped by argument shape:
+`query <method> [args...]` is a passthrough to the `PatternGraphAPI` typed read kernel. Returns `{success, data, metadata}` JSON (read **`.data`**). Almost the entire 34-method interface is reachable (only `getPatternGraph`, which returns the whole read model, is withheld to avoid payload overflow) — so the kernel is self-traversable and every accessor is CLI-verifiable. The live whitelist is authoritative: `query <typo>` echoes the full method set. Grouped by argument shape:
 
-- **No-arg:** `getStatusCounts` → `{completed, active, planned, candidate, total}` · `getStatusDistribution` → `{counts, deliveryPercentages:{completed,active,planned}, candidateShare}` (delivery shares sum to 100 over the delivery base; `candidateShare` is over the grand total — the two are structurally non-summable) · `getCompletionPercentage` · `getActivePhases` · `getAllPhases` · `listRoles` · `getQuarters` · `getCurrentWork` · `getRoadmapItems` · `getRecentlyCompleted [limit]`
-- **Pattern-name arg:** `getPattern <Name>` · `getPatternParseFailure <Name>` · `getPatternDependencies <Name>` · `getPatternRelationships <Name>` · `getRelatedPatterns <Name>` · `getApiReferences <Name>` · `getPatternDeliverables <Name>`
+- **No-arg:** `getStatusCounts` → `{completed, active, planned, candidate, total}` · `getStatusDistribution` → `{counts, deliveryPercentages:{completed,active,planned}, candidateShare}` (delivery shares sum to 100 over the delivery base; `candidateShare` is over the grand total — the two are structurally non-summable) · `getCompletionPercentage` · `getActivePhases` · `getAllPhases` · `listRoles` · `listDecisions` · `listPackages` · `getQuarters` · `getCurrentWork` · `getRoadmapItems` · `getRecentlyCompleted [limit]`
+- **Pattern-name arg:** `getPattern <Name>` · `getPatternParseFailure <Name>` · `getPatternDependencies <Name>` · `getDependencyContext <Name>` (bidirectional deps — what dep-tree renders) · `getPatternRelationships <Name>` · `getRelatedPatterns <Name>` · `getApiReferences <Name>` · `getPatternDeliverables <Name>` · `getRulesForPattern <Name>` (resolves through implementedBy)
 - **Role / quarter / phase arg:** `getPatternsByRole <role>` · `getRoleInfo <role>` · `getPatternsByQuarter <quarter>` · `getPatternsByPhase <phase>` · `getPhaseProgress <phase>`
-- **Status arg:** `getPatternsByStatus <accepted-status>` (accepts `roadmap`/`deferred`) · `getPatternsByNormalizedStatus <completed|active|planned|candidate>` (collapses `roadmap`/`deferred` → `planned`)
+- **Decision arg:** `getRulesByDecision <ADR>` · `getPatternsByDecision <ADR>` (both accept `ADR-009` / `ADR009` / the full `ADR009…` pattern name)
+- **Status arg:** `getPatternsByStatus <accepted-status>` (accepts `roadmap`/`deferred`, **rejects** `planned`) · `getPatternsByNormalizedStatus <completed|active|planned|candidate>` (collapses `roadmap`/`deferred` → `planned`)
 - **FSM (two args / status arg):** `query isValidTransition <from> <to>` → boolean gate · `checkTransition <from> <to>` → `TransitionCheck` · `getValidTransitionsFrom <status>` · `getProtectionInfo <status>`
 
-**Pattern-list methods return compact summaries, not full records.** The eight methods that resolve to a _list of patterns_ — `getCurrentWork`, `getRoadmapItems`, `getRecentlyCompleted`, `getPatternsByRole`, `getPatternsByQuarter`, `getPatternsByPhase`, `getPatternsByStatus`, `getPatternsByNormalizedStatus` — emit one compact `{patternName, status, role, file}` entry per pattern (the same shape `list` and `arch packages` use), **not** the kernel's full `ExtractedPattern` (which carries every scenario, rule, and directive). Returning the raw records would balloon a single `getCurrentWork` call to ~700 KB and drown the caller — the payload-overflow failure mode below. Single-pattern lookups (`getPattern <Name>`) and the scalar / object / FSM methods are unaffected and return their full shape. For inventory work, the dedicated verbs (`list --status …`, `overview`, `arch blocking`) remain the first reach; the passthrough list methods exist for kernel self-traversal and parity checks.
+**Pattern-list methods return compact summaries, not full records.** The methods that resolve to a _list of patterns_ — `getCurrentWork`, `getRoadmapItems`, `getRecentlyCompleted`, `getPatternsByRole`, `getPatternsByQuarter`, `getPatternsByPhase`, `getPatternsByStatus`, `getPatternsByNormalizedStatus` — emit one compact `{patternName, status, file}` entry per pattern, **not** the kernel's full `ExtractedPattern` (which carries every scenario, rule, and directive). (Note: `list --format json` returns a richer `PatternSummary` — `{kind, patternName, status, maturity, role, file, source, package}` — so the passthrough shape is leaner than `list`'s.) Returning the raw records would balloon a single `getCurrentWork` call to ~700 KB and drown the caller — the payload-overflow failure mode below. Single-pattern lookups (`getPattern <Name>`) and the scalar / object / FSM methods are unaffected and return their full shape. For inventory work, the dedicated verbs (`list --status …`, `overview`, `arch blocking`) remain the first reach; the passthrough list methods exist for kernel self-traversal and parity checks.
 
 An unknown method errors with the full whitelist, so `query <typo>` is self-documenting.
 
@@ -165,7 +168,7 @@ The FSM methods live **only** under the passthrough — `query isValidTransition
 
 ### Documentation projection
 
-- **`documentation <document-type> [--disclosure <level>] [--filter <status=csv>]...`** — emits projected docs. The verb accepts **13** document types: `architecture` / `api-reference` / `decisions` / `business-rules` / `patterns` / `roadmap` / `current-work` / `requirements-executable` / `requirements-specs` / `validation-rules` / `taxonomy` / `changelog` / `traceability` (plus `index`). `--disclosure <level>` controls verbosity and takes one of **`essential` / `important` / `useful` / `advanced`** — an invalid level errors `--disclosure: invalid value "<x>". Accepted: essential, important, useful, advanced`. An invalid document type errors with the full accepted-type enum, so both arguments are self-documenting. **Flag asymmetry, easy to confuse:** `overview` tunes depth with `--richness`, `documentation` tunes depth with `--disclosure` — two different flag names with two different enums.
+- **`documentation <document-type> [--disclosure <level>] [--filter <status=csv>]...`** — emits projected docs. The verb accepts **13** document types: `architecture` / `api-reference` / `decisions` / `business-rules` / `patterns` / `roadmap` / `current-work` / `requirements-executable` / `requirements-specs` / `validation-rules` / `taxonomy` / `changelog` / `traceability`. (`index` is **not** an accepted type — it errors with the 13-type enum.) `--disclosure <level>` controls verbosity and takes one of **`essential` / `important` / `useful` / `advanced`** — an invalid level errors `--disclosure: invalid value "<x>". Accepted: essential, important, useful, advanced`. An invalid document type errors with the full accepted-type enum, so both arguments are self-documenting. **Flag asymmetry, easy to confuse:** `overview` tunes depth with `--richness`, `documentation` tunes depth with `--disclosure` — two different flag names with two different enums.
 
 ### Interactive
 
@@ -192,7 +195,7 @@ pnpm -s architect:query arch neighborhood PatternGraph --format json | jq '.data
 
 Text output is for human review.
 
-**Value-validation errors are self-documenting — read the error, do not guess.** When a flag or positional gets an out-of-enum value, the CLI echoes the **accepted set** in the error: `--disclosure brief` → `Accepted: essential, important, useful, advanced`; `list --status planned` → `Accepted: candidate, roadmap, active, completed, deferred`; `documentation bogus` → the 13 supported document types; `query <typo>` → the full method whitelist; an invalid `--richness` → the four richness levels. A rejected value is therefore a discovery affordance, not a dead end — the correct value is in the message. (The skill's own past "flag broken" misreport came from guessing instead of reading the enumerated error.)
+**Value-validation errors are self-documenting — read the error, do not guess.** When a flag or positional gets an out-of-enum value, the CLI echoes the **accepted set** in the error: `--disclosure brief` → `Accepted: essential, important, useful, advanced`; `list --status zzz` → `Accepted: candidate, roadmap, active, completed, deferred, planned`; `documentation bogus` → the 13 supported document types; `query <typo>` → the full method whitelist; an invalid `--richness` → the four richness levels. A rejected value is therefore a discovery affordance, not a dead end — the correct value is in the message. (The skill's own past "flag broken" misreport came from guessing instead of reading the enumerated error.)
 
 Representative JSON shape — `query isValidTransition roadmap active`:
 
@@ -202,7 +205,7 @@ Representative JSON shape — `query isValidTransition roadmap active`:
   "data": true,
   "metadata": {
     "timestamp": "2026-05-29T05:52:16.268Z",
-    "patternCount": 286,
+    "patternCount": 292,
     "validation": {
       "danglingReferenceCount": 0,
       "unknownStatusCount": 0,
@@ -286,7 +289,7 @@ This loop is intentionally tighter than a typical API contract because the codeb
 - **Treating `pattern <Name>` "not found" as binary.** It can mean parse failure with provenance. Cross-check with `search` or `list --names-only`.
 - **Piping bare `pnpm architect:query … | jq`.** The pnpm banner on stdout breaks the pipe — use `pnpm -s`. Getting a `jq` parse error once and switching to `grep` is the #1 self-inflicted reason to abandon the API; the cost is ~10–15× more context per task.
 - **Parsing `--format json` shapes by regex.** Pipe to `jq` (with `-s`) or parse structurally.
-- **Chaining `--include` flags on `bundle`.** Repeated `--include` silently keeps only the last value. Use the comma-list form.
+- **Combining `rules` scope filters.** `--pattern` / `--product-area` / `--package` / `--feature` / `--decision` are mutually exclusive — pass exactly one, or the call errors.
 - **Stitching `overview` + `context` + `dep-tree` + `files` + `rules` manually.** Reach for `bundle <Pattern>` first; drop down to single verbs only when you need a single slice.
 
 ## Doctrine cross-references

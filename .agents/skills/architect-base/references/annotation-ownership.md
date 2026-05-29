@@ -37,7 +37,7 @@ This split is what lets the kernel state, definitively:
 | --------------------- | -------------------------------------------------- |
 | `@architect-usecase`  | When/how to use                                    |
 | `@architect-target`   | Stub's forward pointer to eventual production path |
-| `@architect-decision` | ADR / DD reference (additive)                      |
+| `@architect-enforces-decision` | ADR/DD reference — the structured pattern→ADR edge (additive); `@architect-decision` is a doc-aggregation tag, not this |
 | `@architect-role`     | Closed implementation-role enum                    |
 
 ## Code-originated patterns

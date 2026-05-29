@@ -50,6 +50,7 @@ When this package family is consumed by another project, the consumer wires thei
 
 | Folder                        | Role                                                                                                                                                                                     | Lifetime                                                        |
 | ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| `architect/ideations/`        | Dated pre-idea ideation / context captures (`YYYY-MM-DD-*.feature`) — parsed working state, distilled into ideas/candidates                                                              | Until distilled                                                 |
 | `architect/specs/ideas/`      | Idea-tier specs (lightest authored shape)                                                                                                                                                | Until promotion                                                 |
 | `architect/specs/candidates/` | Candidate-tier specs (open questions + 1-2 scenarios)                                                                                                                                    | Until promotion                                                 |
 | `architect/slices/`           | Slice-tier multi-pattern lateral views (idea-tier structural variant; `@architect-level:slice`, no `@architect-parent`)                                                                  | Reference                                                       |
@@ -77,7 +78,7 @@ A **pattern** is a named architectural unit (a feature, service, component, cont
 - **Product**: `@architect-product-area:<area>` (PRD grouping; **required** at idea tier)
 - **Edges**: `@architect-uses:<Pattern>` (dependency), `@architect-implements:<Pattern>` (realization, test → production), `@architect-parent:<Pattern>` (hierarchy)
 - **Hierarchy axis**: `@architect-level:<epic|phase|task|slice>` (independent of maturity)
-- **Implementation enrichment** (on production TS): `@architect-usecase`, `@architect-decision:<ADR>`, `@architect-target` (stub forward pointer)
+- **Implementation enrichment** (on production TS): `@architect-usecase`, `@architect-enforces-decision:<ADR>` (the structured pattern→ADR edge — distinct from `@architect-decision`, which is a doc-aggregation tag, not this), `@architect-target` (stub forward pointer)
 - **Forward link**: `@architect-executable-specs:<path>` (design spec → executable feature)
 - **Audit**: `@architect-unlock-reason:<reason>` (required for non-standard FSM transitions)
 
@@ -138,7 +139,7 @@ A pattern is **identified** by exactly one surface — the feature file for beha
 
 **Production-TS `@architect-*` JSDoc is additive, not mandatory.** A pattern can be `@architect-status:completed` with zero `@architect-*` JSDoc on its source, provided the executable feature carries the full surface (identity, status, deps, invariants, scenarios). Annotations enrich discoverability; they do not gate completion.
 
-Sampled completed patterns like `ConfigLoader` and `DefineConfig` carry zero JSDoc on the production source and are legitimately complete. A reviewer flagging "no annotations on `<file.ts>`" as a value-transfer blocker is mistaken.
+A completed, **feature-identity-owned** pattern carries no `@architect-*` identity JSDoc on its realizing production `.ts` at all — identity, status, deps, and invariants live entirely on its `.feature`. Confirm the current set live rather than trusting a frozen name (samples rot — §16): `pnpm architect:query list --status completed`, then `files <Name>` (a feature-owned pattern's primary file is its `.feature`). A reviewer flagging "no annotations on `<file.ts>`" as a value-transfer blocker is mistaken.
 
 > **Depth:** the per-tag ownership tables (what feature files own vs what production TS owns) + the code-originated-identity rules live in [`references/annotation-ownership.md`](references/annotation-ownership.md).
 
@@ -269,9 +270,9 @@ pnpm architect:query taxonomy [--count] [--format json]
 **Quirks worth knowing now** (full list in the dedicated data-API skill):
 
 - `scope-validate` only accepts `design` and `implement`. `planning` / `review` error with `Scope type must be design or implement`.
-- `bundle --include` keeps only the **last** repeated flag — use the comma form: `--include rules,deps,open-questions`.
+- `bundle --include` takes a comma list (`--include rules,deps,open-questions`); repeated `--include` flags also accumulate (equivalent), so neither form silently drops blocks.
 - `pattern <Name>` "not found" can mean parse failure (with provenance) OR doesn't exist — cross-check with `search` or `list --names-only`.
-- `list --status` accepts only the **accepted** FSM values (`candidate`/`roadmap`/`active`/`completed`/`deferred`); `planned` is the normalized reporting bucket, not accepted here. Out-of-enum values now error with the accepted set enumerated — read the error, don't guess. (Status-vocabulary detail: data-api skill.)
+- `list --status` accepts the five FSM values (`candidate`/`roadmap`/`active`/`completed`/`deferred`) **plus** the rollup alias `planned` (= roadmap+deferred). Out-of-enum values error with the accepted set enumerated — read the error, don't guess. (The `query getPatternsByStatus` passthrough still rejects `planned` — the alias is a `list` convenience, not an FSM status. Status-vocabulary detail: data-api skill.)
 
 ## 15. Bootstrap discipline (every session)
 

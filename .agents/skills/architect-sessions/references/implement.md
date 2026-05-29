@@ -14,7 +14,7 @@ If `scope-validate <pattern> implement` is not PASS, **stop**: either the design
 
 ## Implementation order (strict)
 
-1. **Transition FSM to `active` before any code change.** Verify first: `pnpm architect:query query isValidTransition <currentState> active` — proceed only on a confirming verdict. Then bump `@architect-status` `roadmap` → `active` in the spec. Unusual transitions need `@architect-unlock-reason:` (the FSM reference).
+1. **Transition FSM to `active` before any code change.** Verify first: `pnpm architect:query query isValidTransition <currentState> active` — proceed only on a confirming verdict. For a design spec entering implement, `<currentState>` is `roadmap`; `isValidTransition` speaks only the four process statuses (`roadmap`/`active`/`completed`/`deferred`), not tier words. Then bump `@architect-status` `roadmap` → `active` in the spec. Unusual transitions need `@architect-unlock-reason:` (the FSM reference).
 2. **Read all deliverable target files** listed in the spec's `Background:` table.
 3. **Read the stubs** — they encode design decisions (DD-N) and "When to Use" guidance.
 4. **Implement deliverables in the order listed**, guided by Rules + Scenarios.

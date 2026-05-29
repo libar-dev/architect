@@ -42,7 +42,7 @@ Tags fall into a handful of purpose categories. The per-tag detail lives in the 
 - **Relationship edges** — `@architect-uses` (dependency, csv), `@architect-implements` (realization, csv), `@architect-extends` (generalization), `@architect-see-also` (cross-reference, no dependency implied).
 - **Hierarchy** — `@architect-parent` (parent edge) + `@architect-level` (epic/phase/task/slice, enum), the hierarchy axis, independent of status.
 - **Forward link** — `@architect-executable-specs` (design spec → executable feature).
-- **Enrichment** (production TS, additive) — `@architect-usecase`, `@architect-decision`, `@architect-target` (stub pointer).
+- **Enrichment** (production TS, additive) — `@architect-usecase`, `@architect-enforces-decision` (the structured pattern→ADR edge), `@architect-target` (stub pointer), `@architect-shape` (marks an exported declaration — interface/type/enum/const/function — for API-reference extraction).
 - **Audit** — `@architect-unlock-reason` (≥10 chars, required for non-standard FSM transitions).
 - **ADR authoring** — the `@architect-adr*` family (`adr`, `adr-status`, `adr-category`, `adr-theme`, `adr-layer`, `adr-supersedes`, `adr-superseded-by`) on decision records.
 - **Aggregation** — doc-assembly tags (`@architect-overview`, `@architect-decision`, `@architect-intro`).
@@ -51,7 +51,7 @@ Tags fall into a handful of purpose categories. The per-tag detail lives in the 
 
 ## Two tag sources — one reason to always query live
 
-The generated `docs-live/TAXONOMY.md` and the `taxonomy` digest project the **validation registry** (30 tags: 8 roles + 19 metadata + 3 aggregation). But the scanner also recognizes tags that are **not** in that registry — notably `@architect-executable-specs` and `@architect-usecase`, parsed straight into pattern metadata. So neither the generated doc nor any hand-list is a complete view of _recognized_ tags. When unsure whether a tag is recognized, the live graph is the arbiter: author it and inspect the pattern's parsed metadata, or run the live query. (This two-source gap is logged in `FEEDBACK.md`.)
+The generated `docs-live/TAXONOMY.md` and the `taxonomy` digest project the **validation registry** (8 roles + a metadata set + 3 aggregation tags — read the live count from `docs-live/TAXONOMY.md`'s header rather than any number frozen here, since the registry grows as the product does). But the scanner also recognizes tags that are **not** in that registry — notably `@architect-executable-specs` and `@architect-usecase`, parsed straight into pattern metadata. So neither the generated doc nor any hand-list is a complete view of _recognized_ tags. When unsure whether a tag is recognized, the live graph is the arbiter: author it and inspect the pattern's parsed metadata, or run the live query. (This two-source gap is logged in `FEEDBACK.md`.)
 
 ## Authoring syntax — csv vs colon (lint-enforced)
 
