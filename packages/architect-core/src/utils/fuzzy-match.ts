@@ -7,6 +7,11 @@ export interface FuzzyMatch {
 const MIN_SCORE_THRESHOLD = 0.3;
 const MAX_LEVENSHTEIN_DISTANCE = 3;
 
+/** Lowercase and strip every non-alphanumeric character (hyphens, spaces, dots). */
+function normalizeToken(value: string): string {
+  return value.toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+
 export function levenshteinDistance(a: string, b: string): number {
   const m = a.length;
   const n = b.length;
@@ -48,6 +53,21 @@ function scoreMatch(
   }
 
   if (nameLower.includes(queryLower)) return { score: 0.7, matchType: 'substring' };
+
+  // Punctuation-insensitive fallback: bridge how an id is TYPED ("ADR-009") to how a
+  // pattern name SPELLS it ("ADR009ProjectionTrustBoundary"). Only consulted when the
+  // query actually carries punctuation (otherwise the literal checks above already
+  // covered it), and slightly discounted so literal matches always rank first.
+  const queryNorm = normalizeToken(query);
+  if (queryNorm.length > 0 && queryNorm !== queryLower) {
+    const nameNorm = normalizeToken(patternName);
+    if (nameNorm === queryNorm) return { score: 0.95, matchType: 'exact' };
+    if (nameNorm.startsWith(queryNorm)) {
+      const coverage = queryNorm.length / nameNorm.length;
+      return { score: Math.min(0.88 + coverage * 0.09, 0.97), matchType: 'prefix' };
+    }
+    if (nameNorm.includes(queryNorm)) return { score: 0.68, matchType: 'substring' };
+  }
 
   const distance = levenshteinDistance(queryLower, nameLower);
   if (distance <= MAX_LEVENSHTEIN_DISTANCE) {
