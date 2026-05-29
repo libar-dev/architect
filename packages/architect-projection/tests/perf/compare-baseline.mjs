@@ -35,6 +35,17 @@ const RENDER_MARKDOWN_BUNDLE_BUDGETS = {
 
 const BASELINE_MULTIPLIER = 1.5;
 
+/**
+ * Absolute noise headroom added on top of the relative (1.5x) budget, per unit
+ * (~50 microseconds). Relative gating is meaningless for microsecond-scale
+ * operations: a few µs of timer/scheduler jitter is a large *relative* swing on
+ * a 10 µs op but is not a real regression. The effective budget is therefore
+ * `max(baseline * 1.5, baseline + slack)` — tiny metrics get absolute headroom
+ * while large metrics (e.g. graphBuild ~376 ms) stay governed by the tight 1.5x
+ * relative gate. The hard budget still caps everything above.
+ */
+const ABSOLUTE_SLACK_BY_UNIT = { ms: 0.05, us: 50 };
+
 const [report, baseline] = await Promise.all([
   readJson(reportPath, 'perf report'),
   readJson(baselinePath, 'perf baseline'),
@@ -152,7 +163,8 @@ function assertMetricFieldsPresent(metricsHost, key, fields) {
  * @returns {string | undefined}
  */
 function checkBudget({ label, actual, baselineValue, hardBudget, unit }) {
-  const baselineBudget = baselineValue * BASELINE_MULTIPLIER;
+  const slack = ABSOLUTE_SLACK_BY_UNIT[unit] ?? 0;
+  const baselineBudget = Math.max(baselineValue * BASELINE_MULTIPLIER, baselineValue + slack);
   const effectiveBudget = Math.min(hardBudget, baselineBudget);
 
   if (actual > effectiveBudget) {

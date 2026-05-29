@@ -570,7 +570,12 @@ async function generateBusinessRuleSetPerfReport(): Promise<string> {
   const samples: PerfSample[] = [];
   const warmupIterations = 5;
   const iterations = 40;
-  const hotPathIterations = 30;
+  // Sub-millisecond hot paths: a single GC/scheduler pause inflates the mean,
+  // and the baseline gate's 1.5x relative budget cannot absorb that on a tiny
+  // sample. Average many iterations so one pause is diluted (~250 samples keeps
+  // run-to-run drift comfortably under 1.5x); the ops are microsecond-scale so
+  // the extra iterations cost only a few hundred ms.
+  const hotPathIterations = 250;
   const graphBuildIterations = 10;
   const repoRoot = path.resolve(import.meta.dirname, '../../../../..');
 

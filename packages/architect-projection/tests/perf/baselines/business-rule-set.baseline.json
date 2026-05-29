@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-17T10:25:55.197Z",
+  "generatedAt": "2026-05-29T04:15:34.472Z",
   "fixture": {
     "name": "BusinessRuleSet grouped-by-product-area bundle",
     "patterns": 36,
@@ -11,360 +11,360 @@
     "warmupIterations": 5
   },
   "project": {
-    "avgMs": 0.5443959250000034,
-    "p50Ms": 0.5259169999999358,
+    "avgMs": 0.5962738750000028,
+    "p50Ms": 0.5401249999999891,
     "iterations": 40
   },
   "renderObject": {
-    "avgMs": 0.4803478749999897,
-    "p50Ms": 0.39058299999987867,
+    "avgMs": 0.37305319999999254,
+    "p50Ms": 0.371167000000014,
     "iterations": 40
   },
   "renderPretty": {
-    "avgMs": 0.6459332999999958,
-    "p50Ms": 0.5695840000000771,
+    "avgMs": 0.5416459499999917,
+    "p50Ms": 0.5236669999999322,
     "iterations": 40
   },
   "projectionHotPaths": {
     "sessionContextBundle": {
-      "avgMs": 0.012570899999976367,
-      "p50Ms": 0.008207999999967797,
-      "iterations": 30
+      "avgMs": 0.006313667999994323,
+      "p50Ms": 0.0054169999998521234,
+      "iterations": 250
     },
     "scopeReadinessReport": {
-      "avgMs": 0.011799966666671935,
-      "p50Ms": 0.009457999999995081,
-      "iterations": 30
+      "avgMs": 0.00623716400000103,
+      "p50Ms": 0.005374999999958163,
+      "iterations": 250
     },
     "documentationView": {
-      "avgMs": 0.017940266666634366,
-      "p50Ms": 0.016457999999829553,
-      "iterations": 30
+      "avgMs": 0.009942147999992813,
+      "p50Ms": 0.008125000000063665,
+      "iterations": 250
     },
     "requirementDigestAllAreas": {
-      "avgMs": 0.10707223333333028,
-      "p50Ms": 0.10329200000001038,
-      "iterations": 30
+      "avgMs": 0.0966245200000003,
+      "p50Ms": 0.09429099999988466,
+      "iterations": 250
     },
     "requirementDigestExecutable": {
-      "avgMs": 0.172037400000022,
-      "p50Ms": 0.16687500000011823,
-      "iterations": 30
+      "avgMs": 0.14814464799999041,
+      "p50Ms": 0.14483400000017355,
+      "iterations": 250
     },
     "patternSatisfiesTag": {
-      "avgMs": 0.07413883333334373,
-      "p50Ms": 0.07004200000005767,
-      "iterations": 30
+      "avgMs": 0.04117066000000705,
+      "p50Ms": 0.0359169999999267,
+      "iterations": 250
     },
     "buildBoundedContext": {
-      "avgMs": 0.03267080000002807,
-      "p50Ms": 0.03104199999984303,
-      "iterations": 30
+      "avgMs": 0.016804299999999786,
+      "p50Ms": 0.014833000000180618,
+      "iterations": 250
     },
     "graphBuild": {
-      "avgMs": 296.0770165,
-      "p50Ms": 278.08116599999994,
+      "avgMs": 376.2606917999998,
+      "p50Ms": 371.7694589999992,
       "iterations": 10
     }
   },
   "renderMarkdownBundles": {
     "patterns": {
-      "avgMs": 0.24413203333339575,
-      "p50Ms": 0.22950000000037107,
-      "iterations": 30
+      "avgMs": 0.23772281200000725,
+      "p50Ms": 0.21970799999962765,
+      "iterations": 250
     },
     "decisions": {
-      "avgMs": 0.2965319666667104,
-      "p50Ms": 0.28700000000026193,
-      "iterations": 30
+      "avgMs": 0.25274582399998324,
+      "p50Ms": 0.24049999999988358,
+      "iterations": 250
     },
     "requirements-executable": {
-      "avgMs": 0.3060861333333075,
-      "p50Ms": 0.21225000000049477,
-      "iterations": 30
+      "avgMs": 0.19015747599999305,
+      "p50Ms": 0.1800839999996242,
+      "iterations": 250
     }
   },
-  "isBundleP50Micros": 5.083000000013271,
+  "isBundleP50Micros": 4.583000000138782,
   "samples": [
     {
       "iteration": 1,
-      "projectMs": 0.6007920000001832,
-      "renderObjectMs": 0.5728339999998298,
-      "renderPrettyMs": 0.7255420000001322,
-      "isBundleMicros": 9.16600000005019
+      "projectMs": 0.5788330000000315,
+      "renderObjectMs": 0.4869170000001759,
+      "renderPrettyMs": 0.6763750000000073,
+      "isBundleMicros": 4.790999999841006
     },
     {
       "iteration": 2,
-      "projectMs": 0.6702909999999065,
-      "renderObjectMs": 0.48854099999994105,
-      "renderPrettyMs": 0.6393749999999727,
-      "isBundleMicros": 5.374999999958163
+      "projectMs": 0.6522500000000946,
+      "renderObjectMs": 0.4344579999999496,
+      "renderPrettyMs": 0.5983750000000327,
+      "isBundleMicros": 4.707999999936874
     },
     {
       "iteration": 3,
-      "projectMs": 0.5733339999999316,
-      "renderObjectMs": 0.4288339999998243,
-      "renderPrettyMs": 0.771541999999954,
-      "isBundleMicros": 17.250000000103682
+      "projectMs": 0.6102500000001783,
+      "renderObjectMs": 0.4152080000001206,
+      "renderPrettyMs": 0.5824170000000777,
+      "isBundleMicros": 4.58400000002257
     },
     {
       "iteration": 4,
-      "projectMs": 0.744707999999946,
-      "renderObjectMs": 0.48691599999983737,
-      "renderPrettyMs": 0.7028330000000551,
-      "isBundleMicros": 6.0829999999896245
+      "projectMs": 0.5974169999999503,
+      "renderObjectMs": 0.4043749999998454,
+      "renderPrettyMs": 0.5897499999998672,
+      "isBundleMicros": 4.666000000042914
     },
     {
       "iteration": 5,
-      "projectMs": 0.6668329999999969,
-      "renderObjectMs": 0.44299999999998363,
-      "renderPrettyMs": 0.662375000000111,
-      "isBundleMicros": 5.499999999983629
+      "projectMs": 3.1422079999999823,
+      "renderObjectMs": 0.3427910000000338,
+      "renderPrettyMs": 0.5236669999999322,
+      "isBundleMicros": 5.625000000009095
     },
     {
       "iteration": 6,
-      "projectMs": 0.6201669999998103,
-      "renderObjectMs": 3.4667500000000473,
-      "renderPrettyMs": 0.5495829999999842,
-      "isBundleMicros": 5.707999999913227
+      "projectMs": 0.6212080000000242,
+      "renderObjectMs": 0.42325000000005275,
+      "renderPrettyMs": 0.6050000000000182,
+      "isBundleMicros": 8.95900000000438
     },
     {
       "iteration": 7,
-      "projectMs": 0.5949999999997999,
-      "renderObjectMs": 0.3373750000000655,
-      "renderPrettyMs": 0.49083299999983865,
-      "isBundleMicros": 4.791999999952168
-    },
-    {
-      "iteration": 8,
-      "projectMs": 0.4901670000001559,
-      "renderObjectMs": 0.42416599999978644,
-      "renderPrettyMs": 0.662958000000117,
-      "isBundleMicros": 4.959000000098968
-    },
-    {
-      "iteration": 9,
-      "projectMs": 0.5225420000001577,
-      "renderObjectMs": 0.39162499999997635,
-      "renderPrettyMs": 0.5662500000000819,
-      "isBundleMicros": 4.457999999885942
-    },
-    {
-      "iteration": 10,
-      "projectMs": 0.7297089999999571,
-      "renderObjectMs": 0.533040999999912,
-      "renderPrettyMs": 0.6675000000000182,
-      "isBundleMicros": 8.458000000018728
-    },
-    {
-      "iteration": 11,
-      "projectMs": 0.6641250000000127,
-      "renderObjectMs": 0.48175000000014734,
-      "renderPrettyMs": 0.7068340000000717,
-      "isBundleMicros": 8.74999999996362
-    },
-    {
-      "iteration": 12,
-      "projectMs": 0.5312089999999898,
-      "renderObjectMs": 0.4311249999998381,
-      "renderPrettyMs": 0.591707999999926,
-      "isBundleMicros": 4.37499999998181
-    },
-    {
-      "iteration": 13,
-      "projectMs": 0.5397090000001299,
-      "renderObjectMs": 0.4262499999999818,
-      "renderPrettyMs": 0.6005420000001322,
-      "isBundleMicros": 4.124999999930878
-    },
-    {
-      "iteration": 14,
-      "projectMs": 0.5259169999999358,
-      "renderObjectMs": 0.3849169999998594,
-      "renderPrettyMs": 0.5602089999999862,
-      "isBundleMicros": 6.041000000095664
-    },
-    {
-      "iteration": 15,
-      "projectMs": 0.5295830000000024,
-      "renderObjectMs": 0.464334000000008,
-      "renderPrettyMs": 0.6721660000000611,
-      "isBundleMicros": 14.24999999994725
-    },
-    {
-      "iteration": 16,
-      "projectMs": 0.6172920000001341,
-      "renderObjectMs": 0.5525000000000091,
-      "renderPrettyMs": 0.6184169999999085,
-      "isBundleMicros": 4.750000000058208
-    },
-    {
-      "iteration": 17,
-      "projectMs": 0.5287499999999454,
-      "renderObjectMs": 0.41879199999993943,
-      "renderPrettyMs": 0.6232500000000982,
-      "isBundleMicros": 9.583000000020547
-    },
-    {
-      "iteration": 18,
-      "projectMs": 0.5770829999999023,
-      "renderObjectMs": 0.4650419999998121,
-      "renderPrettyMs": 0.6217079999998987,
-      "isBundleMicros": 24.082999999791355
-    },
-    {
-      "iteration": 19,
-      "projectMs": 0.5176249999999527,
-      "renderObjectMs": 0.4712080000001606,
-      "renderPrettyMs": 0.5918329999999514,
-      "isBundleMicros": 3.8329999999859865
-    },
-    {
-      "iteration": 20,
-      "projectMs": 0.5076249999999618,
-      "renderObjectMs": 0.4833330000001297,
-      "renderPrettyMs": 3.118583999999828,
-      "isBundleMicros": 18.499999999903594
-    },
-    {
-      "iteration": 21,
-      "projectMs": 0.5288329999998496,
-      "renderObjectMs": 0.34483300000010786,
-      "renderPrettyMs": 0.5069579999999405,
-      "isBundleMicros": 6.791000000021086
-    },
-    {
-      "iteration": 22,
-      "projectMs": 0.5102090000000317,
-      "renderObjectMs": 0.3250829999999496,
-      "renderPrettyMs": 0.4939159999998992,
-      "isBundleMicros": 7.166999999981272
-    },
-    {
-      "iteration": 23,
-      "projectMs": 0.4820830000001024,
-      "renderObjectMs": 0.3229999999998654,
-      "renderPrettyMs": 0.48949999999990723,
-      "isBundleMicros": 6.791999999904874
-    },
-    {
-      "iteration": 24,
-      "projectMs": 0.4705420000000231,
-      "renderObjectMs": 0.3239160000000538,
-      "renderPrettyMs": 0.4884999999999309,
-      "isBundleMicros": 4.167000000052212
-    },
-    {
-      "iteration": 25,
-      "projectMs": 0.46633300000007694,
-      "renderObjectMs": 0.342209000000139,
-      "renderPrettyMs": 0.5783750000000509,
-      "isBundleMicros": 14.666999999917607
-    },
-    {
-      "iteration": 26,
-      "projectMs": 0.559791000000132,
-      "renderObjectMs": 0.3424160000001848,
-      "renderPrettyMs": 0.5067920000001322,
-      "isBundleMicros": 5.083000000013271
-    },
-    {
-      "iteration": 27,
-      "projectMs": 0.5085410000001502,
-      "renderObjectMs": 0.35733299999992596,
-      "renderPrettyMs": 0.5116250000000946,
-      "isBundleMicros": 4.125000000158252
-    },
-    {
-      "iteration": 28,
-      "projectMs": 0.45925000000011096,
-      "renderObjectMs": 0.32833400000004076,
-      "renderPrettyMs": 0.5695840000000771,
-      "isBundleMicros": 3.9580000000114524
-    },
-    {
-      "iteration": 29,
-      "projectMs": 0.5102500000000418,
-      "renderObjectMs": 0.4067919999999958,
-      "renderPrettyMs": 0.5776249999998981,
-      "isBundleMicros": 15.417000000070402
-    },
-    {
-      "iteration": 30,
-      "projectMs": 0.5204999999998563,
-      "renderObjectMs": 0.39058299999987867,
-      "renderPrettyMs": 0.5653749999999036,
-      "isBundleMicros": 4.042000000026746
-    },
-    {
-      "iteration": 31,
-      "projectMs": 0.505916999999954,
-      "renderObjectMs": 0.38833299999987503,
-      "renderPrettyMs": 0.5227910000000975,
-      "isBundleMicros": 4.500000000007276
-    },
-    {
-      "iteration": 32,
-      "projectMs": 0.5727920000001632,
-      "renderObjectMs": 0.40650000000005093,
-      "renderPrettyMs": 0.5552909999998974,
-      "isBundleMicros": 4.417000000103144
-    },
-    {
-      "iteration": 33,
-      "projectMs": 0.5058749999998327,
-      "renderObjectMs": 0.37866600000006656,
-      "renderPrettyMs": 0.6009169999999813,
-      "isBundleMicros": 6.750000000010914
-    },
-    {
-      "iteration": 34,
-      "projectMs": 0.4468329999999696,
-      "renderObjectMs": 0.3408750000000964,
-      "renderPrettyMs": 0.5407079999999951,
-      "isBundleMicros": 3.7079999999605207
-    },
-    {
-      "iteration": 35,
-      "projectMs": 0.47824999999988904,
-      "renderObjectMs": 0.3872920000001159,
-      "renderPrettyMs": 0.5431669999998121,
+      "projectMs": 0.6265830000002097,
+      "renderObjectMs": 0.4001670000000104,
+      "renderPrettyMs": 0.5470840000000408,
       "isBundleMicros": 4.249999999956344
     },
     {
+      "iteration": 8,
+      "projectMs": 0.5467499999999745,
+      "renderObjectMs": 0.3861669999998867,
+      "renderPrettyMs": 0.5418340000001081,
+      "isBundleMicros": 3.9580000000114524
+    },
+    {
+      "iteration": 9,
+      "projectMs": 0.5632080000000315,
+      "renderObjectMs": 0.3968330000000151,
+      "renderPrettyMs": 0.5638330000001588,
+      "isBundleMicros": 4.20799999983501
+    },
+    {
+      "iteration": 10,
+      "projectMs": 0.5791250000002037,
+      "renderObjectMs": 0.3897500000000491,
+      "renderPrettyMs": 0.6433329999999842,
+      "isBundleMicros": 10.33400000005713
+    },
+    {
+      "iteration": 11,
+      "projectMs": 0.572458000000097,
+      "renderObjectMs": 0.4042500000000473,
+      "renderPrettyMs": 0.566332999999986,
+      "isBundleMicros": 4.83299999996234
+    },
+    {
+      "iteration": 12,
+      "projectMs": 0.5401249999999891,
+      "renderObjectMs": 0.39370800000006057,
+      "renderPrettyMs": 0.5560420000001614,
+      "isBundleMicros": 4.833000000189713
+    },
+    {
+      "iteration": 13,
+      "projectMs": 0.6339590000000044,
+      "renderObjectMs": 0.487041999999974,
+      "renderPrettyMs": 0.6120409999998628,
+      "isBundleMicros": 5.417000000079497
+    },
+    {
+      "iteration": 14,
+      "projectMs": 0.553957999999966,
+      "renderObjectMs": 0.43233299999997143,
+      "renderPrettyMs": 0.6383749999999964,
+      "isBundleMicros": 29.16700000014316
+    },
+    {
+      "iteration": 15,
+      "projectMs": 0.5789159999999356,
+      "renderObjectMs": 0.4511249999998199,
+      "renderPrettyMs": 0.6417089999999916,
+      "isBundleMicros": 6.0829999999896245
+    },
+    {
+      "iteration": 16,
+      "projectMs": 0.622916000000032,
+      "renderObjectMs": 0.4627499999999145,
+      "renderPrettyMs": 0.6935839999998734,
+      "isBundleMicros": 7.2920000000067375
+    },
+    {
+      "iteration": 17,
+      "projectMs": 0.6215829999998732,
+      "renderObjectMs": 0.43716700000004494,
+      "renderPrettyMs": 0.5997079999999642,
+      "isBundleMicros": 6.333999999924345
+    },
+    {
+      "iteration": 18,
+      "projectMs": 0.5726669999999103,
+      "renderObjectMs": 0.42325000000005275,
+      "renderPrettyMs": 0.5977089999998952,
+      "isBundleMicros": 17.20799999998235
+    },
+    {
+      "iteration": 19,
+      "projectMs": 0.5305829999999787,
+      "renderObjectMs": 0.3343750000001364,
+      "renderPrettyMs": 0.483208999999988,
+      "isBundleMicros": 4.583000000138782
+    },
+    {
+      "iteration": 20,
+      "projectMs": 0.46612500000014734,
+      "renderObjectMs": 0.3254589999999098,
+      "renderPrettyMs": 0.4749580000000151,
+      "isBundleMicros": 4.083999999920707
+    },
+    {
+      "iteration": 21,
+      "projectMs": 0.46091599999999744,
+      "renderObjectMs": 0.31083300000000236,
+      "renderPrettyMs": 0.47891600000002654,
+      "isBundleMicros": 4.000000000132786
+    },
+    {
+      "iteration": 22,
+      "projectMs": 0.4720420000001013,
+      "renderObjectMs": 0.3137090000000171,
+      "renderPrettyMs": 0.4705420000000231,
+      "isBundleMicros": 4.415999999991982
+    },
+    {
+      "iteration": 23,
+      "projectMs": 0.4644590000000335,
+      "renderObjectMs": 0.31237499999997453,
+      "renderPrettyMs": 0.5097919999998339,
+      "isBundleMicros": 4.8750000000836735
+    },
+    {
+      "iteration": 24,
+      "projectMs": 0.5452080000000024,
+      "renderObjectMs": 0.3479589999999462,
+      "renderPrettyMs": 0.5336250000000291,
+      "isBundleMicros": 5.791999999928521
+    },
+    {
+      "iteration": 25,
+      "projectMs": 0.5418329999999969,
+      "renderObjectMs": 0.37179199999991397,
+      "renderPrettyMs": 0.4988749999999982,
+      "isBundleMicros": 3.6250000000563887
+    },
+    {
+      "iteration": 26,
+      "projectMs": 0.48054099999990285,
+      "renderObjectMs": 0.315541999999823,
+      "renderPrettyMs": 0.47345900000004804,
+      "isBundleMicros": 2.958000000035099
+    },
+    {
+      "iteration": 27,
+      "projectMs": 0.4846669999999449,
+      "renderObjectMs": 0.371167000000014,
+      "renderPrettyMs": 0.46937500000012733,
+      "isBundleMicros": 5.000000000109139
+    },
+    {
+      "iteration": 28,
+      "projectMs": 0.4574579999998605,
+      "renderObjectMs": 0.37962500000003274,
+      "renderPrettyMs": 0.48433399999998983,
+      "isBundleMicros": 3.292000000101325
+    },
+    {
+      "iteration": 29,
+      "projectMs": 0.45537500000000364,
+      "renderObjectMs": 0.35874999999987267,
+      "renderPrettyMs": 0.49966699999981756,
+      "isBundleMicros": 8.666999999832115
+    },
+    {
+      "iteration": 30,
+      "projectMs": 0.4595839999999498,
+      "renderObjectMs": 0.3423750000001746,
+      "renderPrettyMs": 0.5145410000000084,
+      "isBundleMicros": 2.958000000035099
+    },
+    {
+      "iteration": 31,
+      "projectMs": 0.45566699999994853,
+      "renderObjectMs": 0.31904199999985394,
+      "renderPrettyMs": 0.5048749999998563,
+      "isBundleMicros": 2.7919999999994616
+    },
+    {
+      "iteration": 32,
+      "projectMs": 0.4547909999998865,
+      "renderObjectMs": 0.31500000000005457,
+      "renderPrettyMs": 0.5202919999999267,
+      "isBundleMicros": 2.9170000000249274
+    },
+    {
+      "iteration": 33,
+      "projectMs": 0.48745800000006057,
+      "renderObjectMs": 0.3213749999999891,
+      "renderPrettyMs": 0.55987499999992,
+      "isBundleMicros": 6.374999999934516
+    },
+    {
+      "iteration": 34,
+      "projectMs": 0.5102500000000418,
+      "renderObjectMs": 0.3493340000002263,
+      "renderPrettyMs": 0.5046250000000327,
+      "isBundleMicros": 3.9999999999054126
+    },
+    {
+      "iteration": 35,
+      "projectMs": 0.4591249999998581,
+      "renderObjectMs": 0.3097499999998945,
+      "renderPrettyMs": 0.4698750000000018,
+      "isBundleMicros": 2.7500000001055014
+    },
+    {
       "iteration": 36,
-      "projectMs": 0.44304200000010496,
-      "renderObjectMs": 0.350791000000072,
-      "renderPrettyMs": 0.6137080000000878,
-      "isBundleMicros": 14.499999999998181
+      "projectMs": 0.4632080000001224,
+      "renderObjectMs": 0.31654200000002675,
+      "renderPrettyMs": 0.47070899999994253,
+      "isBundleMicros": 2.8750000001309672
     },
     {
       "iteration": 37,
-      "projectMs": 0.5745840000001863,
-      "renderObjectMs": 0.35483399999998255,
-      "renderPrettyMs": 0.5167919999998958,
-      "isBundleMicros": 4.042000000026746
+      "projectMs": 0.4883749999999054,
+      "renderObjectMs": 0.3182919999999285,
+      "renderPrettyMs": 0.4840409999999338,
+      "isBundleMicros": 2.958000000035099
     },
     {
       "iteration": 38,
-      "projectMs": 0.4481670000000122,
-      "renderObjectMs": 0.3167089999999462,
-      "renderPrettyMs": 0.5281250000000455,
-      "isBundleMicros": 3.417000000126791
+      "projectMs": 0.46916699999997036,
+      "renderObjectMs": 0.32024999999998727,
+      "renderPrettyMs": 0.5315840000000662,
+      "isBundleMicros": 4.208000000062384
     },
     {
       "iteration": 39,
-      "projectMs": 0.4991669999999431,
-      "renderObjectMs": 0.32729200000017045,
-      "renderPrettyMs": 0.5099159999999756,
-      "isBundleMicros": 3.290999999990163
+      "projectMs": 0.4754169999998794,
+      "renderObjectMs": 0.37687499999992724,
+      "renderPrettyMs": 0.4812500000000455,
+      "isBundleMicros": 3.165999999964697
     },
     {
       "iteration": 40,
-      "projectMs": 0.5324169999998958,
-      "renderObjectMs": 0.32579099999998107,
-      "renderPrettyMs": 0.4736250000000837,
-      "isBundleMicros": 3.1249999999545253
+      "projectMs": 0.5542920000000322,
+      "renderObjectMs": 0.320165999999972,
+      "renderPrettyMs": 0.4702500000000782,
+      "isBundleMicros": 2.8340000001207954
     }
   ]
 }

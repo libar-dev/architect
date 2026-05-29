@@ -34,5 +34,5 @@ jobs:
       # docs-live/ is committed; docs:all must regenerate it byte-identically.
       - run: git diff --exit-code docs-live
       - run: pnpm architect:query -- arch dangling --baseline packages/architect-guard/src/lint/dangling-baseline.json --strict
-      - run: pnpm --filter @libar-dev/architect-projection test:perf
+      - run: pnpm --filter @libar-dev/architect-projection test:perf:baseline
       - run: pnpm audit:subtractive
