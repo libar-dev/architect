@@ -1,7 +1,11 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 
-import type { DanglingReference, PatternGraphAPI } from '@libar-dev/architect-core';
+import type {
+  DanglingReference,
+  ExtractedPattern,
+  PatternGraphAPI,
+} from '@libar-dev/architect-core';
 import {
   compareDanglingBaseline,
   DANGLING_BASELINE_SOURCE_PATH,
@@ -21,13 +25,47 @@ import {
 import { z } from 'zod';
 import type { CliContext } from '../../pattern-graph-cli-types.js';
 import { createEnvelope, writeJson } from './output.js';
-import { parseAcceptedStatusValue, parseIntegerValue, parseProcessStatusValue } from './schemas.js';
+import {
+  parseAcceptedStatusValue,
+  parseIntegerValue,
+  parseNormalizedStatusValue,
+  parseProcessStatusValue,
+} from './schemas.js';
 
 const QUERY_METHODS = [
+  // No-arg state + roadmap queries
   'getStatusCounts',
-  'isValidTransition',
-  'getPatternsByStatus',
+  'getStatusDistribution',
+  'getCompletionPercentage',
+  'getActivePhases',
+  'getAllPhases',
+  'listRoles',
+  'getQuarters',
+  'getCurrentWork',
+  'getRoadmapItems',
+  'getRecentlyCompleted',
+  // Pattern-name lookups
+  'getPattern',
+  'getPatternParseFailure',
+  'getPatternDependencies',
+  'getPatternRelationships',
+  'getRelatedPatterns',
+  'getApiReferences',
+  'getPatternDeliverables',
+  // Role / quarter / phase lookups
+  'getPatternsByRole',
+  'getRoleInfo',
+  'getPatternsByQuarter',
   'getPatternsByPhase',
+  'getPhaseProgress',
+  // Status lookups
+  'getPatternsByNormalizedStatus',
+  'getPatternsByStatus',
+  // FSM transition + protection queries
+  'isValidTransition',
+  'checkTransition',
+  'getValidTransitionsFrom',
+  'getProtectionInfo',
 ] as const;
 type QueryMethod = (typeof QUERY_METHODS)[number];
 const QueryMethodSchema = z.enum(QUERY_METHODS);
@@ -109,6 +147,36 @@ export function validateStructuredCommandArgs(
   }
 }
 
+function requireArg(value: string | undefined, usage: string): string {
+  if (value === undefined) {
+    throw new Error(usage);
+  }
+  return value;
+}
+
+interface CompactPatternSummary {
+  readonly patternName: string;
+  readonly status: ExtractedPattern['status'];
+  readonly role: ExtractedPattern['role'];
+  readonly file: ExtractedPattern['source']['file'];
+}
+
+/**
+ * Maps full kernel patterns to the compact summary shape used by the CLI list
+ * passthroughs. Returning the raw `ExtractedPattern[]` (full scenarios + rules)
+ * blows an agent's context window; the compact shape matches the `list` verb.
+ */
+function toCompactSummaries(
+  patterns: readonly ExtractedPattern[],
+): readonly CompactPatternSummary[] {
+  return patterns.map((p) => ({
+    patternName: p.patternName ?? p.name,
+    status: p.status,
+    role: p.role,
+    file: p.source.file,
+  }));
+}
+
 function executeQueryMethod(api: PatternGraphAPI, args: readonly string[]): unknown {
   const rawMethod = args[0];
   if (rawMethod === undefined) {
@@ -117,8 +185,105 @@ function executeQueryMethod(api: PatternGraphAPI, args: readonly string[]): unkn
   const method = parseQueryMethod(rawMethod);
 
   switch (method) {
+    // ---- No-arg methods --------------------------------------------------
     case 'getStatusCounts':
       return api.getStatusCounts();
+    case 'getStatusDistribution':
+      return api.getStatusDistribution();
+    case 'getCompletionPercentage':
+      return api.getCompletionPercentage();
+    case 'getActivePhases':
+      return api.getActivePhases();
+    case 'getAllPhases':
+      return api.getAllPhases();
+    case 'listRoles':
+      return api.listRoles();
+    case 'getQuarters':
+      return api.getQuarters();
+    case 'getCurrentWork':
+      return toCompactSummaries(api.getCurrentWork());
+    case 'getRoadmapItems':
+      return toCompactSummaries(api.getRoadmapItems());
+    case 'getRecentlyCompleted': {
+      const limitArg = args[1];
+      if (limitArg === undefined) {
+        return toCompactSummaries(api.getRecentlyCompleted());
+      }
+      return toCompactSummaries(
+        api.getRecentlyCompleted(parseIntegerValue(limitArg, 'Limit must be an integer')),
+      );
+    }
+
+    // ---- Pattern-name lookups --------------------------------------------
+    case 'getPattern':
+      return api.getPattern(requireArg(args[1], 'Usage: architect query getPattern <name>'));
+    case 'getPatternParseFailure':
+      return api.getPatternParseFailure(
+        requireArg(args[1], 'Usage: architect query getPatternParseFailure <name>'),
+      );
+    case 'getPatternDependencies':
+      return api.getPatternDependencies(
+        requireArg(args[1], 'Usage: architect query getPatternDependencies <name>'),
+      );
+    case 'getPatternRelationships':
+      return api.getPatternRelationships(
+        requireArg(args[1], 'Usage: architect query getPatternRelationships <name>'),
+      );
+    case 'getRelatedPatterns':
+      return api.getRelatedPatterns(
+        requireArg(args[1], 'Usage: architect query getRelatedPatterns <name>'),
+      );
+    case 'getApiReferences':
+      return api.getApiReferences(
+        requireArg(args[1], 'Usage: architect query getApiReferences <name>'),
+      );
+    case 'getPatternDeliverables':
+      return api.getPatternDeliverables(
+        requireArg(args[1], 'Usage: architect query getPatternDeliverables <name>'),
+      );
+
+    // ---- Role / quarter / phase lookups ----------------------------------
+    case 'getPatternsByRole':
+      return toCompactSummaries(
+        api.getPatternsByRole(
+          requireArg(args[1], 'Usage: architect query getPatternsByRole <role>'),
+        ),
+      );
+    case 'getRoleInfo':
+      return api.getRoleInfo(requireArg(args[1], 'Usage: architect query getRoleInfo <role>'));
+    case 'getPatternsByQuarter':
+      return toCompactSummaries(
+        api.getPatternsByQuarter(
+          requireArg(args[1], 'Usage: architect query getPatternsByQuarter <quarter>'),
+        ),
+      );
+    case 'getPatternsByPhase': {
+      const phaseArg = requireArg(args[1], 'Usage: architect query getPatternsByPhase <phase>');
+      return toCompactSummaries(
+        api.getPatternsByPhase(parseIntegerValue(phaseArg, 'Phase must be an integer')),
+      );
+    }
+    case 'getPhaseProgress': {
+      const phaseArg = requireArg(args[1], 'Usage: architect query getPhaseProgress <phase>');
+      return api.getPhaseProgress(parseIntegerValue(phaseArg, 'Phase must be an integer'));
+    }
+
+    // ---- Status lookups --------------------------------------------------
+    case 'getPatternsByNormalizedStatus': {
+      const status = requireArg(
+        args[1],
+        'Usage: architect query getPatternsByNormalizedStatus <status>',
+      );
+      return toCompactSummaries(
+        api.getPatternsByNormalizedStatus(parseNormalizedStatusValue(status)),
+      );
+    }
+    case 'getPatternsByStatus': {
+      const status = requireArg(args[1], 'Usage: architect query getPatternsByStatus <status>');
+      return toCompactSummaries(api.getPatternsByStatus(parseAcceptedStatusValue(status)));
+    }
+
+    // ---- FSM transition + protection queries -----------------------------
     case 'isValidTransition': {
       const from = args[1];
       const to = args[2];
@@ -127,19 +292,24 @@ function executeQueryMethod(api: PatternGraphAPI, args: readonly string[]): unkn
       }
       return api.isValidTransition(parseProcessStatusValue(from), parseProcessStatusValue(to));
     }
-    case 'getPatternsByStatus': {
-      const status = args[1];
-      if (status === undefined) {
-        throw new Error('Usage: architect query getPatternsByStatus <status>');
+    case 'checkTransition': {
+      const from = args[1];
+      const to = args[2];
+      if (from === undefined || to === undefined) {
+        throw new Error('Usage: architect query checkTransition <from> <to>');
       }
-      return api.getPatternsByStatus(parseAcceptedStatusValue(status));
+      return api.checkTransition(from, to);
     }
-    case 'getPatternsByPhase': {
-      const phaseArg = args[1];
-      if (phaseArg === undefined) {
-        throw new Error('Usage: architect query getPatternsByPhase <phase>');
-      }
-      return api.getPatternsByPhase(parseIntegerValue(phaseArg, 'Phase must be an integer'));
+    case 'getValidTransitionsFrom': {
+      const status = requireArg(
+        args[1],
+        'Usage: architect query getValidTransitionsFrom <status>',
+      );
+      return api.getValidTransitionsFrom(parseProcessStatusValue(status));
+    }
+    case 'getProtectionInfo': {
+      const status = requireArg(args[1], 'Usage: architect query getProtectionInfo <status>');
+      return api.getProtectionInfo(parseProcessStatusValue(status));
     }
   }
 }
@@ -284,14 +454,7 @@ async function executeArchCommand(
       const packageName = args[1];
       if (packageName !== undefined) {
         const pkgPatterns = byPackage[packageName];
-        return pkgPatterns !== undefined
-          ? pkgPatterns.map((p) => ({
-              patternName: p.patternName ?? p.name,
-              status: p.status,
-              role: p.role,
-              file: p.source.file,
-            }))
-          : [];
+        return pkgPatterns !== undefined ? toCompactSummaries(pkgPatterns) : [];
       }
       const result: Record<string, { count: number; patterns: readonly string[] }> = {};
       for (const [pkgId, pkgPatterns] of Object.entries(byPackage).sort(([a], [b]) =>

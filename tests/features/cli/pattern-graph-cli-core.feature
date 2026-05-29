@@ -19,7 +19,7 @@ Feature: Pattern Graph CLI - Core Infrastructure
   Add a CLI command `pnpm architect:query` that exposes key PatternGraphAPI methods
   with JSON and text output formats, enabling direct programmatic access from AI sessions.
 
-  Core CLI infrastructure: help, version, input validation, status, query, pattern, arch basics, missing args, edge cases.
+  Core CLI infrastructure: help, version, input validation, status, pattern, arch basics, missing args, edge cases. The `query <method>` passthrough lives in pattern-graph-cli-query.feature.
 
   Background:
     Given a temporary working directory
@@ -122,51 +122,7 @@ Feature: Pattern Graph CLI - Core Infrastructure
       And stdout contains "StatusDistribution"
 
   # ============================================================================
-  # RULE 4: Query Subcommand
-  # ============================================================================
-
-  Rule: CLI query subcommand executes API methods
-
-    **Invariant:** The query subcommand must dispatch to any public Data API method by name, pass positional arguments through, and reject invalid enum arguments with a clear error.
-    **Rationale:** The CLI is the primary interface for ad-hoc queries; failing to resolve a valid method name or its arguments silently drops the user's request.
-
-    @acceptance-criteria @happy-path
-    Scenario: Query getStatusCounts returns count object
-      Given TypeScript files with pattern annotations
-      When running "pattern-graph-cli -i 'src/**/*.ts' query getStatusCounts"
-      Then exit code is 0
-      And stdout is valid JSON
-
-    @happy-path
-    Scenario: Query isValidTransition with arguments
-      Given TypeScript files with pattern annotations
-      When running "pattern-graph-cli -i 'src/**/*.ts' query isValidTransition roadmap active"
-      Then exit code is 0
-      And stdout is valid JSON
-
-    @validation
-    Scenario: Unknown API method shows error
-      Given TypeScript files with pattern annotations
-      When running "pattern-graph-cli -i 'src/**/*.ts' query nonExistentMethod"
-      Then exit code is 1
-      And output contains "Unknown"
-
-    @validation
-    Scenario: Invalid accepted status argument shows error
-      Given TypeScript files with pattern annotations
-      When running "pattern-graph-cli -i 'src/**/*.ts' query getPatternsByStatus invalid-status"
-      Then exit code is 1
-      And output contains "accepted status value"
-
-    @validation
-    Scenario: Invalid phase query argument shows error
-      Given TypeScript files with pattern annotations
-      When running "pattern-graph-cli -i 'src/**/*.ts' query getPatternsByPhase not-a-number"
-      Then exit code is 1
-      And output contains "Phase must be an integer"
-
-  # ============================================================================
-  # RULE 5: Pattern Subcommand
+  # RULE 4: Pattern Subcommand
   # ============================================================================
 
   Rule: CLI pattern subcommand shows pattern detail
@@ -206,7 +162,7 @@ Feature: Pattern Graph CLI - Core Infrastructure
       And output does not contain "spec-parse-failed"
 
   # ============================================================================
-  # RULE 6: Arch Subcommand
+  # RULE 5: Arch Subcommand
   # ============================================================================
 
   Rule: CLI arch subcommand queries architecture
@@ -237,7 +193,7 @@ Feature: Pattern Graph CLI - Core Infrastructure
       And output contains "Unknown arch subcommand: layer"
 
   # ============================================================================
-  # RULE 7: Error Handling for Missing Arguments
+  # RULE 6: Error Handling for Missing Arguments
   # ============================================================================
 
   Rule: CLI shows errors for missing subcommand arguments
@@ -267,7 +223,7 @@ Feature: Pattern Graph CLI - Core Infrastructure
       And output contains "Unknown subcommand"
 
   # ============================================================================
-  # RULE 8: Edge Cases
+  # RULE 7: Edge Cases
   # ============================================================================
 
   Rule: CLI handles argument edge cases

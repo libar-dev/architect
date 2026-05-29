@@ -1,6 +1,7 @@
 import {
   AcceptedStatusSchema,
   HandoffSessionTypeSchema,
+  NORMALIZED_STATUS_VALUES,
   ProcessStatusSchema,
   RenderFormatSchema,
   ScopeTypeSchema,
@@ -8,6 +9,7 @@ import {
   parseAtBoundary,
   type AcceptedStatusValue,
   type HandoffSessionType,
+  type NormalizedStatus,
   type ProcessStatusValue,
   type ScopeType,
   type SessionType,
@@ -17,6 +19,8 @@ import { ContentRichnessSchema, type ContentRichness } from '@libar-dev/architec
 import { z } from 'zod';
 
 const MAX_HANDOFF_MODIFIED_FILES = 200;
+
+const NormalizedStatusSchema = z.enum(NORMALIZED_STATUS_VALUES);
 
 export const EmptyObjectSchema = z.strictObject({});
 export const StringArraySchema = z.array(z.string()).readonly();
@@ -100,7 +104,7 @@ export const DocumentationFlagsSchema = z
 
 export const OverviewFlagsSchema = z
   .strictObject({
-    disclosure: ContentRichnessSchema.optional(),
+    richness: ContentRichnessSchema.optional(),
   })
   .readonly();
 
@@ -168,6 +172,14 @@ export function parseProcessStatusValue(value: string): ProcessStatusValue {
   );
 }
 
+export function parseNormalizedStatusValue(value: string): NormalizedStatus {
+  return parseSchemaValue(
+    NormalizedStatusSchema,
+    value,
+    `Expected normalized status value (one of ${NORMALIZED_STATUS_VALUES.join(', ')}), received: ${value}`,
+  );
+}
+
 export function parseRenderFormatValue(value: string): z.infer<typeof RenderFormatSchema> {
   return parseSchemaValue(RenderFormatSchema, value, '--format must be compact or json');
 }
@@ -176,7 +188,7 @@ export function parseContentRichnessValue(value: string): ContentRichness {
   return parseSchemaValue(
     ContentRichnessSchema,
     value,
-    '--disclosure must be name-only, summary, summary-with-references, or full',
+    '--richness must be name-only, summary, summary-with-references, or full',
   );
 }
 

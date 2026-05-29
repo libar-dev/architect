@@ -28,28 +28,30 @@ export const reportingCommands = {
     positional: StringArraySchema,
     flags: OverviewFlagsSchema,
     usage:
-      'Usage: architect overview [--disclosure <name-only|summary|summary-with-references|full>]',
-    helpSignature: 'overview [--disclosure <level>]',
+      'Usage: architect overview [--richness <name-only|summary|summary-with-references|full>]',
+    helpSignature: 'overview [--richness <level>]',
     helpDetail: {
       body: [
-        'Disclosure controls verbosity: name-only (progress only), summary (default —',
-        'top blockers + a generated-views pointer), full (all blockers + itemized views).',
+        'Richness controls per-entry content depth: name-only (progress only), summary',
+        '(default — top blockers + a generated-views pointer), full (all blockers + itemized',
+        'views). Distinct from `documentation --disclosure`, which selects the progressive-',
+        'disclosure tier (essential/important/useful/advanced) for generated documentation.',
       ],
     },
     treatUnknownFlagsAsPositionals: true,
     flagParsers: {
-      '--disclosure': {
+      '--richness': {
         kind: 'value',
-        key: 'disclosure',
+        key: 'richness',
         parse: parseContentRichnessValue,
       },
     },
     execute(context, parsed): void {
-      const flags = parsed.flags as { readonly disclosure?: ContentRichness };
+      const flags = parsed.flags as { readonly richness?: ContentRichness };
       writeProjectionOutput(
         context.args,
         projectOverviewDigest(requireCliContext(context).projection),
-        { richness: flags.disclosure ?? 'summary' },
+        { richness: flags.richness ?? 'summary' },
       );
     },
   },
