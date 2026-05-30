@@ -79,6 +79,44 @@ function scoreMatch(
   return undefined;
 }
 
+/** Split a query into whitespace-separated, non-empty tokens. */
+function tokenizeQuery(query: string): string[] {
+  return query.split(/\s+/).filter((token) => token.length > 0);
+}
+
+/**
+ * Per-token score for the multi-word degrade: a pattern is ranked by how many of
+ * the query's tokens it matches and how well. Discounted so these approximate
+ * multi-token hits read as weaker than any whole-query match.
+ */
+function scorePerToken(
+  tokens: readonly string[],
+  patternName: string,
+): { score: number; matchType: FuzzyMatch['matchType'] } | undefined {
+  let matchedCount = 0;
+  let scoreSum = 0;
+  for (const token of tokens) {
+    const result = scoreMatch(token, patternName);
+    if (result !== undefined) {
+      matchedCount += 1;
+      scoreSum += result.score;
+    }
+  }
+  if (matchedCount === 0) return undefined;
+  const coverage = matchedCount / tokens.length;
+  const averageScore = scoreSum / matchedCount;
+  return { score: coverage * averageScore * 0.6, matchType: 'fuzzy' };
+}
+
+function sortMatches(matches: FuzzyMatch[]): void {
+  matches.sort((a, b) => {
+    if (b.score !== a.score) return b.score - a.score;
+    if (a.patternName.length !== b.patternName.length)
+      return a.patternName.length - b.patternName.length;
+    return a.patternName.localeCompare(b.patternName);
+  });
+}
+
 export function fuzzyMatchPatterns(
   query: string,
   patternNames: readonly string[],
@@ -93,12 +131,25 @@ export function fuzzyMatchPatterns(
     }
   }
 
-  matches.sort((a, b) => {
-    if (b.score !== a.score) return b.score - a.score;
-    if (a.patternName.length !== b.patternName.length)
-      return a.patternName.length - b.patternName.length;
-    return a.patternName.localeCompare(b.patternName);
-  });
+  // Multi-word degrade: a natural concept query ("read model consistency") is not
+  // a contiguous substring of any single pattern NAME, so the whole-query pass
+  // comes back empty. Fall back to per-token matching — rank each pattern by how
+  // many query tokens it matches — so a multi-word miss surfaces the closest
+  // patterns instead of a bare []. Only when the whole query found nothing, so it
+  // never reorders a real whole-query hit.
+  if (matches.length === 0) {
+    const tokens = tokenizeQuery(query);
+    if (tokens.length > 1) {
+      for (const patternName of patternNames) {
+        const result = scorePerToken(tokens, patternName);
+        if (result !== undefined) {
+          matches.push({ patternName, score: result.score, matchType: result.matchType });
+        }
+      }
+    }
+  }
+
+  sortMatches(matches);
 
   return matches.slice(0, maxResults);
 }

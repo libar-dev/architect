@@ -35,3 +35,18 @@ describe('fuzzyMatchPatterns — punctuation-insensitive id resolution', () => {
     expect(fuzzyMatchPatterns('ZZZ-999', NAMES)).toHaveLength(0);
   });
 });
+
+describe('fuzzyMatchPatterns — multi-word concept degrade', () => {
+  it('degrades a multi-word concept query to per-token matching when the whole-query pass is empty', () => {
+    // "read model consistency" is no contiguous substring of any name, so the
+    // whole-query pass is empty; the per-token fallback surfaces the pattern that
+    // matches the most tokens instead of a bare [].
+    const results = fuzzyMatchPatterns('read model consistency', NAMES);
+    expect(results.length).toBeGreaterThan(0);
+    expect(results[0]?.patternName).toBe('ADR006SingleReadModelArchitecture');
+  });
+
+  it('keeps a single-token miss empty — the fallback is multi-word only', () => {
+    expect(fuzzyMatchPatterns('zzznotapattern', NAMES)).toHaveLength(0);
+  });
+});
