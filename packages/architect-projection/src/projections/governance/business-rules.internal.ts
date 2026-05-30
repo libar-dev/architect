@@ -9,6 +9,7 @@ import type { ExtractedPattern } from '@libar-dev/architect-core';
 import {
   canonicalDecisionKey,
   findPatternByName,
+  isDecisionPattern,
   resolveImplementingFeatures,
 } from '@libar-dev/architect-core';
 import { z } from 'zod';
@@ -232,14 +233,16 @@ function resolveFeatureScopeNames(context: ProjectionContext, scopeValue: string
 
 /**
  * A pattern is in a decision's rule set when it authors the decision in its
- * `enforcesDecisions` forward edge, or when it IS the decision record (own
- * `adr` tag), so the decision feature's own rules are included.
+ * `enforcesDecisions` forward edge, or when it IS the decision record itself
+ * (so the decision feature's own rules are included).
  *
- * Both the query input and each stored value are normalized to the canonical
- * decision-pattern identity (ADR-006), so a human-typed ADR id (`ADR-009`,
- * `009`), the canonical pattern name (`ADR009ProjectionTrustBoundary`), and a
- * bare-id `@architect-enforces-decision:777` all resolve to the same key and
- * match interchangeably.
+ * The query input and each `enforcesDecisions` value are normalized to the
+ * canonical decision-pattern identity (ADR-006), so a human-typed ADR id
+ * (`ADR-009`, `009`), the canonical pattern name (`ADR009ProjectionTrustBoundary`),
+ * and a bare-id `@architect-enforces-decision:777` all resolve to the same key.
+ * The decision-record self-match compares canonical pattern identity rather than
+ * the bare `adr` tag, because a numeric shared by an ADR and a PDR (`005` →
+ * `ADR-005` / `PDR-005`) makes the bare tag ambiguous and unresolvable.
  */
 function patternEnforcesDecision(
   context: ProjectionContext,
@@ -248,6 +251,19 @@ function patternEnforcesDecision(
 ): boolean {
   const target = canonicalDecisionKey(context.graph, decision);
 
+  // Self-match: the pattern IS the decision record. Compare by canonical pattern
+  // IDENTITY first — a bare numeric `adr` tag (e.g. "005") shared by an ADR and a
+  // PDR (`ADR-005` / `PDR-005`) is ambiguous, so re-canonicalizing the bare tag
+  // refuses (`resolveDecisionPattern` won't guess) and would never equal the
+  // resolved target. The kernel's `resolvePatternsByDecision` self-includes the
+  // decision pattern by identity for exactly this reason; mirror it here.
+  if (isDecisionPattern(pattern) && getPatternName(pattern).toLowerCase() === target) {
+    return true;
+  }
+
+  // Fallback self-match by the bare `adr` tag: an unresolvable fixture decision
+  // (e.g. bare `777` on both query and tag) has no canonical pattern name, so its
+  // target IS the raw value and only the tag comparison links it.
   if (pattern.adr !== undefined && canonicalDecisionKey(context.graph, pattern.adr) === target) {
     return true;
   }
