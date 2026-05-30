@@ -1144,6 +1144,33 @@ describeFeature(rulesSubcommandFeature, ({ Background, Rule, AfterEachScenario }
       },
     );
 
+    RuleScenario(
+      'Rules rejects an unknown product area with the accepted set',
+      ({ Given, When, Then, And }) => {
+        Given('TypeScript files with pattern annotations', async () => {
+          await writePatternFiles(state);
+        });
+
+        And('Gherkin feature files with business rules', async () => {
+          await writeFeatureFilesWithRules(state);
+        });
+
+        When('running {string}', async (_ctx: unknown, cmd: string) => {
+          await runCLICommand(state, cmd);
+        });
+
+        Then('exit code is {int}', (_ctx: unknown, code: number) => {
+          expect(getResult(state).exitCode).toBe(code);
+        });
+
+        And('output is a fail-loud product-area error enumerating the accepted set', () => {
+          const combined = getResult(state).stdout + getResult(state).stderr;
+          expect(combined).toContain('--product-area: invalid value');
+          expect(combined).toContain('Accepted:');
+        });
+      },
+    );
+
     RuleScenario('Rules package filter works with count', ({ Given, When, Then, And }) => {
       Given('TypeScript files with pattern annotations', async () => {
         await writePatternFiles(state);
@@ -1421,6 +1448,36 @@ describeFeature(rulesSubcommandFeature, ({ Background, Rule, AfterEachScenario }
         expect(getResult(state).stdout).not.toContain(text);
       });
     });
+
+    RuleScenario(
+      'Rules resolves a decision whose numeric id collides with another decision record',
+      ({ Given, When, Then, And }) => {
+        Given('Gherkin feature files enforcing a decision', async () => {
+          await writeDecisionEnforcingFeatureFiles(state);
+        });
+
+        When('running {string}', async (_ctx: unknown, cmd: string) => {
+          await runCLICommand(state, cmd);
+        });
+
+        Then('exit code is {int}', (_ctx: unknown, code: number) => {
+          expect(getResult(state).exitCode).toBe(code);
+        });
+
+        And('stdout is a JSON string array', () => {
+          const parsed = JSON.parse(getResult(state).stdout) as unknown;
+          expect(Array.isArray(parsed)).toBe(true);
+        });
+
+        And('stdout contains {string}', (_ctx: unknown, text: string) => {
+          expect(getResult(state).stdout).toContain(text);
+        });
+
+        And('stdout does not contain {string}', (_ctx: unknown, text: string) => {
+          expect(getResult(state).stdout).not.toContain(text);
+        });
+      },
+    );
 
     RuleScenario(
       'Rules rejects an unknown decision with the accepted set',

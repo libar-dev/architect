@@ -311,6 +311,51 @@ export function createDecisionEnforcingFeatureFiles(): Array<{ path: string; con
         '      Then nothing about ADR-777 applies',
       ].join('\n'),
     },
+    // Numeric-id collision: an ADR and a PDR that share the bare `adr` tag
+    // value (555), mirroring the real ADR-005 / PDR-005 pair. The decision-scope
+    // self-match must resolve `--decision ADR-555` to the ADR's OWN rules by
+    // pattern identity — re-canonicalizing the ambiguous bare `555` tag refuses
+    // and would drop them (the regressed bug).
+    {
+      path: 'architect/decisions/adr-555-collision.feature',
+      content: [
+        '@architect',
+        '@architect-adr:555',
+        '@architect-pattern:ADR555Collision',
+        '@architect-status:completed',
+        '@architect-product-area:Validation',
+        'Feature: ADR-555 Collision Decision',
+        '',
+        '  Rule: Collision ADR owns its rationale',
+        '',
+        '    **Invariant:** The ADR-555 record carries its own rule.',
+        '',
+        '    @acceptance-criteria',
+        '    Scenario: Own rule',
+        '      Given the colliding ADR record',
+        '      Then it owns a rule',
+      ].join('\n'),
+    },
+    {
+      path: 'architect/decisions/pdr-555-collision.feature',
+      content: [
+        '@architect',
+        '@architect-adr:555',
+        '@architect-pattern:PDR555Collision',
+        '@architect-status:completed',
+        '@architect-product-area:Process',
+        'Feature: PDR-555 Collision Decision',
+        '',
+        '  Rule: Sibling PDR owns an unrelated rationale',
+        '',
+        '    **Invariant:** The PDR-555 record is not the queried ADR.',
+        '',
+        '    @acceptance-criteria',
+        '    Scenario: Sibling rule',
+        '      Given the colliding PDR record',
+        '      Then it owns a different rule',
+      ].join('\n'),
+    },
   ];
 }
 
