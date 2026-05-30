@@ -16,6 +16,7 @@ import {
   TaxonomyFlagsSchema,
   resolveDecisionFilter,
   resolvePackageFilter,
+  resolveProductAreaFilter,
 } from './_shared/schemas.js';
 import {
   assertSingleRuleScopeFilter,
@@ -74,10 +75,12 @@ export const metaCommands = {
         readonly namesOnly?: boolean;
         readonly package?: string;
         readonly decision?: string;
+        readonly productArea?: string;
       };
       const cliContext = requireCliContext(context);
       // Reject combined scope filters before resolving any individual value, so
-      // the conflict error wins over a per-flag fail-loud (package / decision).
+      // the conflict error wins over a per-flag fail-loud (package / decision /
+      // product-area).
       assertSingleRuleScopeFilter(parsed.flags);
       let resolvedFlags: Readonly<Record<string, unknown>> = parsed.flags;
       if (flags.package !== undefined) {
@@ -90,6 +93,12 @@ export const metaCommands = {
         resolvedFlags = {
           ...resolvedFlags,
           decision: resolveDecisionFilter(cliContext.api.getPatternGraph(), flags.decision),
+        };
+      }
+      if (flags.productArea !== undefined) {
+        resolvedFlags = {
+          ...resolvedFlags,
+          productArea: resolveProductAreaFilter(cliContext.api.getPatternGraph(), flags.productArea),
         };
       }
       const ruleSet = projectBusinessRuleSet(

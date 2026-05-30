@@ -254,9 +254,9 @@ export const readCommands: Pick<Record<CommandName, CommandDef>, ReadCommandName
     positional: StringArraySchema,
     flags: ListFlagsSchema,
     usage:
-      'Usage: architect list [--status <value>] [--role <tag>] [--parent <PatternName>] [--package <workspace-name>] [--count] [--names-only]',
+      'Usage: architect list [--status <value>] [--role <tag>] [--parent <PatternName>] [--package <workspace-package-id>] [--count] [--names-only]',
     helpSignature:
-      'list [--status <value>] [--role <tag>] [--parent <PatternName>] [--package <workspace-name>] [--count] [--names-only]',
+      'list [--status <value>] [--role <tag>] [--parent <PatternName>] [--package <workspace-package-id>] [--count] [--names-only]',
     rejectBareValues: true,
     flagParsers: {
       '--status': {

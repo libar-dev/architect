@@ -208,6 +208,25 @@ export function resolveDecisionFilter(graph: PatternGraph, value: string): strin
   );
 }
 
+/**
+ * Fail-loud resolver for the `--product-area` filter — the product-area analogue
+ * of `resolvePackageFilter`. The accepted set is the graph's `byProductArea`
+ * keys; matching is case-insensitive (the projection scope-match lowercases both
+ * sides) and the canonical key is returned. An unmatched value throws an error
+ * enumerating the accepted areas — never a silent empty result (No-BC: a typo
+ * fails loud, it is not swallowed as zero rules).
+ */
+export function resolveProductAreaFilter(graph: PatternGraph, value: string): string {
+  const accepted = Object.keys(graph.byProductArea);
+  const match = accepted.find((area) => area.toLowerCase() === value.toLowerCase());
+  if (match !== undefined) {
+    return match;
+  }
+  throw new Error(
+    `--product-area: invalid value ${JSON.stringify(value)}. Accepted: ${[...accepted].sort().join(', ')}`,
+  );
+}
+
 export function parseSessionTypeValue(value: string): SessionType {
   return parseSchemaValue(
     SessionTypeSchema,
