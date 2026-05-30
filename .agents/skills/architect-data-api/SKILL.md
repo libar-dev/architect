@@ -36,7 +36,7 @@ The API is being shaped around a single principle: **what you get back is determ
 In practice this means:
 
 - The same handful of verbs (`overview`, `pattern`, `bundle`, `dep-tree`, `files`, `rules`, `scope-validate`) covers every session shape above.
-- `bundle <Pattern>` is the default pre-flight; it returns deliverables + dependencies + rules + open questions + docstring in one call.
+- `bundle <Pattern>` is the default pre-flight; it returns scenarios + dependencies + rules + open questions + docstring in one call.
 - The `--mode <plan|design|implement|review>` flag on `bundle` changes which blocks are included by default (`context` instead takes `--session <planning|design|implement>` — no `review` value); but defaults are good and the variation in returned data is dominated by what the pattern actually _is_ on disk.
 - Expect intent flags to recede further over time. The skill leads with state-driven exploration; per-intent recipes are not authored here.
 
@@ -52,7 +52,7 @@ pnpm architect:query overview                         # default summary; add --r
 pnpm architect:query search <fragment>
 pnpm architect:query list --status candidate --names-only
 
-# 3. Pre-flight — the default composite, returns deliverables + deps + rules + open-questions + docstring
+# 3. Pre-flight — the default composite, returns scenarios + deps + rules + open-questions + docstring
 pnpm architect:query bundle <Pattern> --format json
 
 # 4. Drop down to slices when bundle gave you enough to ask sharper questions
@@ -99,7 +99,7 @@ Organized by purpose. Every CLI verb has an MCP twin (mapping in "MCP twins" bel
     An invalid `--richness` value errors with the accepted set enumerated. The Claude/Codex SessionStart hook injects the `summary-with-references` snapshot on `startup` / `clear` / `compact` (skipping only `resume`).
 - **`status`** — status distribution counts + percentages, no per-pattern detail.
 - **`list [--status v] [--role tag] [--parent X] [--package <name>] [--count] [--names-only]`** — pattern catalog. `--status` accepts the five FSM values (`candidate`, `roadmap`, `active`, `completed`, `deferred`) **plus** the rollup alias `planned` (= roadmap+deferred) — an out-of-enum value errors with that full accepted set enumerated. `--package` takes the **short** workspace name (`architect-core`, `architect-cli`, `architect-guard`, `architect-mcp`, `architect-projection`, `architect-pkg-content`, `architect-dev`) — **not** the `@libar-dev/…` form — and fails loud on an unmatched value. `--parent` resolves strictly; unknown parent exits non-zero with `Parent pattern not found`. `--names-only` returns a JSON string array.
-- **`search <query>`** — fuzzy pattern-name search; JSON `[{patternName, score, matchType}]`.
+- **`search <query>`** — fuzzy pattern-**name** search; JSON `[{patternName, score, matchType}]`. Matches against pattern names (exact / prefix / substring / punctuation-insensitive / Levenshtein), **not** annotation prose. A multi-word concept query that is no contiguous substring of any name degrades to **per-token** matching (`search "read model consistency"` surfaces the patterns matching the most tokens, low-scored, instead of `[]`); a single-token miss still returns `[]`. For a concept with no name overlap, steer to `documentation decisions` / `rules --feature <glob>`.
 - **`taxonomy [--count]`** — `--count` prints a one-line summary; `--format json` returns the full taxonomy tree.
 - **`tags`** — `TagUsageMatrix`: pattern count + per-tag value distribution.
 - **`diagnostics`** — JSON array of structural warnings.
@@ -117,7 +117,7 @@ The CLI surfaces three status words that are easy to conflate:
 
 ### Per-pattern detail
 
-- **`pattern <Name>`** — full PatternDetail (deliverables, relationships, rules, maturity, file). `--format json` returns all four classification axes from ONE call — `role`, `boundedContext`, `productArea`, and `level` — each populated when the source declares it (an axis the source omits comes back `null`/`""`, e.g. `pattern PatternGraphApi` carries `role` + `boundedContext`; `pattern ArchitectureDelta` carries `productArea`). No separate verb is needed to recover an axis. When the underlying feature file fails to parse, this verb reports parse provenance `(kind, path, parser line:col)` instead of a flat "not found". A "not found" response is therefore not binary — it can mean _parse failure_ OR _truly absent_. Cross-check with `search` or `list --names-only` before concluding. **One trap:** the `=== Rules ===` block on `pattern <Name>` shows only the pattern's _own_ rules and is often **empty for a code/TS pattern whose invariants live on its implementing specs** (e.g. `pattern PatternGraphApi` → empty block, but `rules --pattern PatternGraphApi` → 8). Empty here is not "no rules" — if `relationships.implementedBy` is non-empty, run `rules --pattern <Name>` (it resolves through `implementedBy`).
+- **`pattern <Name>`** — full PatternDetail (deliverables, relationships, rules, maturity, file). `--format json` returns all four classification axes from ONE call — `role`, `boundedContext`, `productArea`, and `level` — each populated when the source declares it (an axis the source omits comes back `null`/`""`, e.g. `pattern PatternGraphApi` carries `role` + `boundedContext`; `pattern ArchitectureDelta` carries `productArea`). No separate verb is needed to recover an axis. When the underlying feature file fails to parse, this verb reports parse provenance `(kind, path, parser line:col)` instead of a flat "not found". A "not found" response is therefore not binary — it can mean _parse failure_ OR _truly absent_. Cross-check with `search` or `list --names-only` before concluding. **One trap:** the `=== Rules ===` block on `pattern <Name>` shows only the pattern's _own_ rules and is often **empty for a code/TS pattern whose invariants live on its implementing specs** (e.g. `pattern PatternGraphApi` → empty block, but `rules --pattern PatternGraphApi` → a non-empty set, 16 today). Empty here is not "no rules" — if `relationships.implementedBy` is non-empty, run `rules --pattern <Name>` (it resolves through `implementedBy`).
 - **`context <Pattern> [--session planning|design|implement]`** — curated bundle: summary, dependencies, architecture neighbours. With `--session implement`, also includes an `=== FSM ===` line showing current status + valid transitions + protection level.
 - **`files <Pattern> [--related]`** — primary deliverable file. With `--related`, adds `=== COMPLETED DEPENDENCIES ===`, `=== ROADMAP DEPENDENCIES ===`, `=== ARCHITECTURE NEIGHBORS ===` sections.
 - **`dep-tree <Pattern> [--depth <n>]`** — dependency chain walk.
@@ -125,7 +125,7 @@ The CLI surfaces three status words that are easy to conflate:
 
 ### Composite — the default pre-flight
 
-- **`bundle <Pattern> [--mode plan|design|implement|review] [--include <block[,block...]>] [--estimate-tokens] [--format json]`** — composite of deliverables + deps + rules + open-questions + docstring. Mode default-include sets apply only when `--include` is omitted. Token estimation is heuristic (`chars / 4`). `--include` takes a comma list (`rules,deps,open-questions`); repeated `--include` flags also accumulate (equivalent), so neither form silently drops blocks.
+- **`bundle <Pattern> [--mode plan|design|implement|review] [--include <block[,block...]>] [--estimate-tokens] [--format json]`** — composite of scenarios + deps + rules + open-questions + docstring (the JSON `.root.blocks` keys are `deps`, `docstring`, `openQuestions`, `rules`, `scenarios` — there is **no** `deliverables` block; deliverables/stubs surface via `context --session design`). Mode default-include sets apply only when `--include` is omitted. Token estimation is heuristic (`chars / 4`). `--include` takes a comma list (`rules,deps,open-questions`); repeated `--include` flags also accumulate (equivalent), so neither form silently drops blocks.
 - **`open-questions [--parent <Pattern>] [--format compact|json]`** — `OpenQuestionList` fragment: per-pattern open questions lifted from each spec's `**Open Questions:**` block. Candidate-tier readiness signal. **Quirk:** `--parent <Epic>` returns the open questions of the epic's **member** patterns, **not** the epic's own — e.g. `open-questions --parent DocumentationProjection` returns questions for `GoalOrientedNavigation`, `OneSourceMultipleAudiences`, `SourceCanonical`, never `DocumentationProjection` itself.
 
 ### Architecture views
@@ -151,7 +151,7 @@ The CLI surfaces three status words that are easy to conflate:
 
 ### `query` passthrough — the typed read kernel, fully traversable
 
-`query <method> [args...]` is a passthrough to the `PatternGraphAPI` typed read kernel. Returns `{success, data, metadata}` JSON (read **`.data`**). Almost the entire 34-method interface is reachable (only `getPatternGraph`, which returns the whole read model, is withheld to avoid payload overflow) — so the kernel is self-traversable and every accessor is CLI-verifiable. The live whitelist is authoritative: `query <typo>` echoes the full method set. Grouped by argument shape:
+`query <method> [args...]` is a passthrough to the `PatternGraphAPI` typed read kernel. Returns `{success, data, metadata}` JSON (read **`.data`**). 34 of the 35 interface methods are reachable (only `getPatternGraph`, which returns the whole read model, is withheld to avoid payload overflow) — so the kernel is self-traversable and every accessor is CLI-verifiable. The live whitelist is authoritative: `query <typo>` echoes the full method set. Grouped by argument shape:
 
 - **No-arg:** `getStatusCounts` → `{completed, active, planned, candidate, total}` · `getStatusDistribution` → `{counts, deliveryPercentages:{completed,active,planned}, candidateShare}` (delivery shares sum to 100 over the delivery base; `candidateShare` is over the grand total — the two are structurally non-summable) · `getCompletionPercentage` · `getActivePhases` · `getAllPhases` · `listRoles` · `listDecisions` · `listPackages` · `getQuarters` · `getCurrentWork` · `getRoadmapItems` · `getRecentlyCompleted [limit]`
 - **Pattern-name arg:** `getPattern <Name>` · `getPatternParseFailure <Name>` · `getPatternDependencies <Name>` · `getDependencyContext <Name>` (bidirectional deps — what dep-tree renders) · `getPatternRelationships <Name>` · `getRelatedPatterns <Name>` · `getApiReferences <Name>` · `getPatternDeliverables <Name>` · `getRulesForPattern <Name>` (resolves through implementedBy)
@@ -183,7 +183,7 @@ The FSM methods live **only** under the passthrough — `query isValidTransition
 | `query <method>`, `diagnostics`, `arch dangling`, `search`, `list --names-only`                                                                                                                                            | JSON           | already JSON    |
 | every other data verb — `overview` · `status` · `context` · `files` · `scope-validate` · `handoff` · `pattern` · `dep-tree` · `rules` · `tags` · `bundle` · `taxonomy` · `open-questions` · `arch blocking`/`neighborhood` | Text           | **yes**         |
 
-**Two envelope shapes** (this trips up `jq` paths): structured verbs (`query`, `arch neighborhood`/`blocking`/`dangling`, `diagnostics`) wrap as `{ success, data, metadata }` → read **`.data`**; bundle-style verbs (`bundle`, `overview`, `status`, `pattern`, `dep-tree`, …) return the bundle directly → read **`.root`** / top-level fields.
+**Three envelope shapes** (this trips up `jq` paths): structured verbs (`query`, `arch neighborhood`/`blocking`/`dangling`, `diagnostics`) wrap as `{ success, data, metadata }` → read **`.data`**; bundle-style verbs (`bundle`, `overview`, `status`, `pattern`, `dep-tree`, …) return the bundle directly → read **`.root`** / top-level fields; list-style verbs (`search`, `sources`, `list`, `list --names-only`) return a **bare JSON array** at top level → index with **`.[0]`**, _not_ `.data`/`.root` (`list --format json | jq '.root'` errors with `Cannot index array with string`). Under `--format json` an **error** is itself a `{ success: false, error: { message } }` envelope on **stderr** (stdout stays clean) — detect failure via the exit code or `2>&1 | jq '.success'`.
 
 Pipe JSON through `jq` — **but always via `pnpm -s`**. Without `-s`, pnpm writes its `> architect@0.0.0 …` / `> tsx …` banner to **stdout** before the JSON, so `pnpm architect:query <verb> --format json | jq` dies with `parse error: Invalid numeric literal at line 2`. The `-s` flag is the whole fix:
 

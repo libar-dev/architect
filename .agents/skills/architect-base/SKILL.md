@@ -182,10 +182,12 @@ Design-level specs do not always need stubs and full design details. Idea-tier s
             ┌─ (maturity flip, human acceptance gate, not process-guard)
             │
 candidate ──┴──► roadmap ──► active ──► completed
-                              │              │
-                              ▼              ▼
-                          deferred       (terminal — reopen requires unlock-reason)
+                  │ ▲                       (terminal — reopen
+                  ▼ │                         requires unlock-reason)
+               deferred
 ```
+
+`deferred` hangs off **`roadmap`**, not `active` — `roadmap ⇄ deferred` is the only deferred edge (`active → deferred` is rejected). `active → roadmap` is the back edge (see below).
 
 - `candidate → roadmap` is a **maturity flip** (acceptance gate, human judgment). NOT a process-guard transition.
 - `roadmap → active`, `active → completed`, `active → roadmap`, `roadmap → deferred`, `deferred → roadmap` are process-guard-validated. Invalid jumps are rejected.

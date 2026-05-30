@@ -121,7 +121,7 @@ const OVERVIEW_CLI_HINTS: readonly string[] = [
   '    taxonomy                              Canonical roles / statuses / tags',
   '    search <fragment>                     Fuzzy pattern-name lookup',
   '  INSPECT A PATTERN',
-  '    bundle <Pattern> --format json        Pre-flight: deps + rules + deliverables + open-questions',
+  '    bundle <Pattern> --format json        Pre-flight: deps + rules + scenarios + open-questions',
   '    pattern <Pattern>                     Full detail incl. role · bounded-context · level · product-area',
   '    files <Pattern> [--related]           Implementation surface',
   '    rules --pattern <Pattern>             Invariants + verified-by',

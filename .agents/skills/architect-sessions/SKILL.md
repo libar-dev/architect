@@ -37,7 +37,7 @@ In practice:
 
 - The same handful of verbs (`overview`, `bundle`, `pattern`, `dep-tree`, `files`, `rules`, `scope-validate`) covers every shape above. `bundle <Pattern>` is the default pre-flight.
 - The work shape tells you which reference to read and which gate to honor — not a different command set.
-- The `--mode` flag on `bundle` / `context` nudges which blocks are included by default, but defaults are good and the returned data is dominated by what the pattern actually _is_. Do not over-rely on intent flags; they are receding over time.
+- The `--mode` flag on `bundle` (and `--session` on `context` — `context` has no `--mode`; an unknown flag is silently ignored) nudges which blocks are included by default, but defaults are good and the returned data is dominated by what the pattern actually _is_. Do not over-rely on intent flags; they are receding over time.
 
 Run the pre-flight from [`architect-data-api`](../architect-data-api/SKILL.md) before any architect-scoped `Read` / `Glob` / `Grep`. File scanning to learn pattern state is a smell — there is a verb for it.
 

@@ -17,7 +17,7 @@ The detail level is **contextual** (`architect-base` §10): invest depth where t
 
 ## Pre-flight
 
-Run the pre-flight from [`../../architect-data-api/SKILL.md`](../../architect-data-api/SKILL.md): `overview`, then the `scope-validate <Pattern> design` gate, then `bundle <Pattern> --mode design --format json` (deliverables + stubs + deps + open questions), dropping to `dep-tree` / `rules` as needed. There is **no** `stubs` verb — `context --session design` or the design-mode bundle returns stubs.
+Run the pre-flight from [`../../architect-data-api/SKILL.md`](../../architect-data-api/SKILL.md): `overview`, then the `scope-validate <Pattern> design` gate, then `bundle <Pattern> --mode design --format json` (blocks: docstring + open-questions + rules + scenarios), dropping to `dep-tree` / `rules` as needed. The design-mode bundle carries **no** `stubs` / `deliverables` / `deps` block — and there is no `stubs` verb; the spec's deliverables and stubs surface through `context --session design` (its `=== SPEC ===` section), not the bundle.
 
 If `scope-validate` returns BLOCKED, **stop and surface the blocker.** Do not design around a blocked dependency chain. If the source spec is at idea or candidate tier, **stop** and route through [`plan.md`](plan.md) to promote through the missing rungs — skipping rungs is rejected (except the refactoring carve-out, which is [`architect-refactor-session`](../../architect-refactor-session/SKILL.md), not this).
 

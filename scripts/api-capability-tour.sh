@@ -45,27 +45,37 @@ s2() { Q query getStatusCounts | jq .; }
 # surfaces the whole core family ranked (the read-model schema, its API kernel, the CLIs)
 # and sets up the showcase pattern for the steps that follow.
 s3() { Q search PatternGraph | jq -r '.[0:8][] | "\(.score)  \(.patternName)"'; }
-# Bundle content lives under `.root` (deliverables/deps/rules/etc. selected by
-# `.root.includes`); `.children` is for routed sub-documents and is empty inline.
-s4() { Q bundle PatternGraphApi --format json \
-         | jq '{pattern: .root.pattern.patternName, includes: .root.includes, members: .root.memberCount}'; }
+# Name-it-then-locate-it: step 3 resolves the canonical name, `files` turns that name
+# into the implementation surface (primary .ts + the implementing .feature specs) in ONE
+# call — the structured answer to "where is X implemented?", the #1 reason to reach for grep.
+sfiles() { Q files PatternGraphApi; }
+# Bundle content lives under `.root.blocks` (deps/rules/scenarios/openQuestions/docstring,
+# selected by `.root.includes`); the envelope's TOP-LEVEL `.children` sibling of `.root` holds
+# routed sub-documents and is `{}` inline (a leaf pattern routes none).
+# Surface the CONTENT-bearing counts — not memberCount, which is 0 for a leaf pattern — so the
+# "everything in ONE call" claim lands, then quantify the saving with --estimate-tokens.
+s4() {
+  Q bundle PatternGraphApi --format json \
+    | jq '{pattern: .root.pattern.patternName, dependsOn: (.root.blocks.deps.dependsOn | length), usedBy: (.root.blocks.deps.usedBy | length), rules: (.root.blocks.rules | length), scenarios: (.root.blocks.scenarios | length)}' \
+    && Q bundle PatternGraphApi --estimate-tokens --format json \
+         | jq -r '"  -> this entire pre-flight = ~\(.root.bundleTokenEstimate.tokens) tokens, ONE call"'
+}
 # PatternGraphApi — the read-side kernel (ADR-006's read-model API that every CLI/MCP
 # verb calls) — is the tour's showcase pattern: it is what Architect IS. Its dep-tree is
 # deep in BOTH directions (3 upstream core types; 1 direct + 8 transitive downstream into
 # the MCP pipeline), so this one flagless call answers prerequisites AND blast radius.
 s5() { Q dep-tree PatternGraphApi; }
-# The 8 invariants live on PatternGraphApi's implementing specs (PatternGraphApi*Tests),
+# The invariants live on PatternGraphApi's implementing specs (PatternGraphApi*Tests),
 # not on its .ts — `rules --pattern` resolves through implementedBy to surface them, so
 # this both proves the read-kernel's consistency contract (FSM methods agree, status
 # partition is exact, reverse edges stay consistent) AND demonstrates reverse-trace
-# resolution. The text render is the showcase; the `--format json | jq -e` guard makes a
-# future implementedBy:[] regression (empty rules) FAIL the smoke check instead of
-# silently printing nothing — mirroring s8/s9's guards, so "all steps succeeded" can't
-# lie over a hollow rules block.
+# resolution. Rendered through jq as `• name / invariant` — far cheaper than the raw
+# minified-JSON-per-line text render — and the `jq -e ... select(length>0)` doubles as
+# the emptiness guard: a future implementedBy:[] regression (empty rules) FAILs the smoke
+# check instead of silently printing nothing, so "all steps succeeded" can't lie.
 s6() {
-  Q rules --pattern PatternGraphApi --only-invariants \
-    && Q rules --pattern PatternGraphApi --only-invariants --format json \
-         | jq -e '.root.rules | length > 0' >/dev/null
+  Q rules --pattern PatternGraphApi --only-invariants --format json \
+    | jq -e -r '.root.rules | select(length>0) | .[] | "• \(.ruleName)\n    \(.invariant)"'
 }
 # Governance navigability: an ADR -> the executable invariants that enforce it, shown as
 # a tight rule-name list (the full per-rule text is what step 6 demonstrates; here the
@@ -79,7 +89,13 @@ sgov() {
 # Pre-flight gate — the inspect -> "is it safe to start a session?" close. Step 1's
 # cheat-sheet advertises scope-validate under PLAN/GATE; here we actually exercise it.
 sgate() { Q scope-validate PatternGraphApi design; }
-s7() { Q query isValidTransition roadmap active | jq '{from:"roadmap", to:"active", allowed:.data}'; }
+# A lone `true` can't prove the gate actually decides — show a LEGAL and an ILLEGAL
+# transition side by side (roadmap->active allowed; completed->active rejected) so the
+# deterministic hard yes/no is visible.
+s7() {
+  Q query isValidTransition roadmap active | jq '{from:"roadmap", to:"active", allowed:.data}' \
+    && Q query isValidTransition completed active | jq '{from:"completed", to:"active", allowed:.data}'
+}
 # Neighborhood fields live under `.data` (like s9). `-e` + the non-null guard make a
 # future regression to all-null output FAIL the smoke check instead of passing on exit 0.
 s8() { Q arch neighborhood PatternGraph --format json \
@@ -92,15 +108,16 @@ s9() { Q arch dangling --baseline packages/architect-guard/src/lint/dangling-bas
 
 step "1. Health + inventory — START HERE every session (text, human-oriented)" s1
 step "2. Status distribution as JSON — proof that | jq works (note the -s)" s2
-step "3. Locate a pattern by fuzzy name (replaces guessing file paths)" s3
-step "4. The default composite pre-flight — everything for a pattern in ONE call" s4
-step "5. Dependency walk, both directions — replaces reading imports across many files" s5
-step "6. Invariants for a pattern — replaces grepping Rule: blocks (add --format json → .root is a BusinessRuleSet {kind, rules[], scope, scopeValue})" s6
-step "7. Invariants that enforce an ADR — governance navigability, not grep across decision records" sgov
-step "8. Pre-flight scope gate — is it safe to start a design session on this pattern?" sgate
-step "9. Deterministic FSM gate — is this transition legal?" s7
-step "10. Architecture neighborhood (PatternGraph — the read model itself) — the graph, not a guess" s8
-step "11. Graph-integrity gate — non-zero drift = stop and surface" s9
+step "3. Locate a pattern by fuzzy name (replaces guessing the canonical pattern name)" s3
+step "4. Locate the implementation surface — name it (step 3), then find it (replaces grep 'where is X?')" sfiles
+step "5. The default composite pre-flight — everything for a pattern in ONE call (+ token cost)" s4
+step "6. Dependency walk, both directions — replaces reading imports across many files" s5
+step "7. Invariants for a pattern — replaces grepping Rule: blocks (add --format json → .root is a BusinessRuleSet {kind, rules[], scope, scopeValue})" s6
+step "8. Invariants that enforce an ADR — governance navigability, not grep across decision records" sgov
+step "9. Pre-flight scope gate — is it safe to start a design session on this pattern?" sgate
+step "10. Deterministic FSM gate — a legal AND an illegal transition, side by side" s7
+step "11. Architecture neighborhood (PatternGraph — the read model itself) — the graph, not a guess" s8
+step "12. Graph-integrity gate — non-zero drift = stop and surface" s9
 
 if [ "$fail" -ne 0 ]; then
   printf '\n\033[31m✗ Capability tour: one or more steps FAILED (see [FAILED] above).\033[0m\n'

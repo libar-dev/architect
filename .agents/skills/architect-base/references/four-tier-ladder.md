@@ -96,6 +96,8 @@ executable tier. Never via plan-level. Rule: `formal-spec/08-spec-evolution.md`
 
 ## Worked example 1 — idea-tier minimum
 
+> The pattern names and `@architect-product-area:editor` below are **illustrative** — product-area values are repo-configured (this repo's live enum is `Annotation · Configuration · Generation · Validation · DataAPI · CoreTypes · Process · Projection`; verify with `pnpm architect:query taxonomy`). The example teaches the tag _shape_, not a value to copy.
+
 Location: `architect/specs/ideas/copilot-context-bundle.feature`
 
 ```gherkin
