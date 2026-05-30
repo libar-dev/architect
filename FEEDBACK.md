@@ -10,6 +10,22 @@ for anything that does not fit the verb's shape.
 
 ---
 
+## 2026-05-30 — Fixed: `rules --decision ADR-005` returned 0 (ADR/PDR numeric-id collision in the projection self-match)
+
+- **Verb / surface:** `pnpm -s architect:query rules --decision ADR-005` (and `ADR005CodecBasedMarkdownRendering`).
+- **Expected:** ADR-005's 5 own rules (every other ADR resolves: ADR-001→10, ADR-006→4, ADR-009→5).
+- **Got:** **0** — silently. The 5 rules were reachable via `rules --feature '**/*markdown*'` (5) and the kernel `query getRulesByDecision ADR005…` (5), but the CLI `rules --decision` verb (which routes through the business-rules projection's decision scope) returned empty for exactly ADR-005.
+- **Root cause:** `ADR005CodecBasedMarkdownRendering` and `PDR005ProcessGuardFSM` both carry `@architect-adr:005`. The projection's decision-record self-match (`patternEnforcesDecision`) re-canonicalized the pattern's **bare** `adr` tag (`"005"`), which is ambiguous across the ADR/PDR pair — `resolveDecisionPattern` refuses to guess and falls back to the raw `"005"`, which never equals the resolved target (`adr005codecbasedmarkdownrendering`). The kernel's `resolvePatternsByDecision` was immune because it self-includes the decision pattern by **identity**, not by re-canonicalizing the tag.
+- **Impact:** a renderer-debugger querying the markdown renderer's own governing ADR got a false-empty — the one ADR most likely to be queried in that workflow. Found by a blind renderer-governance dogfood probe; missed by prior regression (which only tested ADR-006/009, neither of which collides).
+- **Fix:** `business-rules.internal.ts` self-match now compares canonical pattern **identity** (`isDecisionPattern(p) && getPatternName(p) === target`) before the bare-tag fallback (kept for unresolvable fixture decisions). Regression: a new dogfood scenario seeds a colliding `ADR-555` / `PDR-555` pair and asserts `--decision ADR-555` returns the ADR's own rule and excludes the PDR's.
+
+## 2026-05-30 — Resolved: JSON error envelope on stderr; `--product-area` fails loud; multi-word `search` degrades
+
+- **Resolves:** ledger **#3** (JSON error envelope), the `--product-area` silent-zero, and the multi-word `search` → `[]` residual.
+- **#3 (chosen design — envelope on stderr):** under `--format json`, an error now emits `{success:false,error:{message}}` to **stderr** (stdout stays clean — the success-path pipe invariant is preserved), exit unchanged. `… 2>&1 | jq '.success'` → `false`; `… 2>&1 | jq -r '.error.message'` carries the accepted set. Detection is via exit code or `2>&1 | jq`. The argv is read directly in the `main().catch` (where `format` is out of scope). New executable scenario in `cli-output-formatting.feature`. Note: `.success` was never uniform on the success path — bundle verbs return `{root,children}` with no `.success` — so the envelope adds the discriminant only to the error path.
+- **`--product-area` fail-loud:** `rules --product-area NotARealArea` now errors with `Accepted: Annotation, Configuration, CoreTypes, DataAPI, Generation, Process, Projection, Validation` (was a silent `0`), matching `--package`/`--decision`. Case-insensitive valid values still resolve (`dataapi` → 98).
+- **Multi-word `search`:** a multi-word concept query that is no contiguous substring of any name now degrades to **per-token** matching (`search "read model consistency"` → 10 hits; `"markdown rendering"` → 1) instead of `[]`; a single-token miss still returns `[]` (no noise).
+
 ## 2026-05-29 — Resolved: self-documenting value errors close the `--disclosure` / flag-enum confusion
 
 - **Resolves:** "2026-05-27 — `documentation` help advertises rejected flags" and the underlying skill misreport that a flag was "broken."

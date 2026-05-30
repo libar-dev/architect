@@ -248,7 +248,31 @@ A validation pass (6 parallel blind-audit agents: 3 skills · demo hook · close
 
 **Still deferred (NEEDS-DESIGN / deliberate — re-confirmed real, not quick fixes):**
 
-- **#3 (JSON error envelope)** — enum-validation errors print a plain stderr line + exit 1 even under `--format json`. Real trust issue for JSON consumers. Deferred because it is a **global error-contract change**: `format` isn't in scope at the top-level `main().catch`, so the fix must thread `format` into `handleCliError` (or deliberately re-derive it from argv) AND decide the envelope shape (`{success:false,error:{message,acceptedValues}}`) and whether ALL errors or only enum errors emit it. Deserves its own focused commit.
+- **#3 (JSON error envelope)** — ✅ **RESOLVED 2026-05-30.** Chosen design: under `--format json` an error emits `{success:false,error:{message}}` on **stderr** (stdout stays clean — the success-path pipe invariant holds), exit unchanged; `2>&1 | jq '.success'` parses it. The fix reads argv directly in `main().catch` (where `format` is out of scope) and routes through `handleCliError`. Executable scenario added to `cli-output-formatting.feature`. (Grounding note for the record: the original framing was overstated — stdout was already clean/empty on error and exit code was 1, so only a defensive `2>&1 | jq` hard-broke; and `.success` was never uniform on the success path since bundle verbs return `{root,children}`.)
 - **#2 (planned/roadmap dual label)** — the `(roadmap+deferred)` parenthetical already signals it; cosmetic, churns the determinism gate.
 - **#4 (governance edge symmetry)** — `enforcedBy` is the computed reverse of authored `@architect-enforces-decision`; surfacing a forward `enforces` on the enforcer + a symmetric `seeAlso` is a graph-modeling decision against the "history lives in git / computed reverse edges only" doctrine.
 - **#7 (mutually-exclusive `rules` scope flags)** — deliberate constraint; intersecting `--pattern X` + `--decision Y` needs AND-composition design.
+
+---
+
+## Re-measure (effectiveness validation + fixes + skill/demo-hook polish, 2026-05-30)
+
+Validation session: re-ran every gate (all green at HEAD), then a blind effectiveness audit (19 agents: 3 skill drift-audits · demo-hook teaching-quality · closed-gap regression · deferred-scope · 6 blind dogfood probes, each skeptic-verified) → ranked synthesis → fix → **blind re-verification (8 agents, `allPass:true`)**.
+
+**Closed-gap regression: all 8 prior clusters (N1–N3, T1–T3, A1/A2) + residuals #1/#6 still hold.** Skeptics rejected 5 false frictions (agent misuse / by-design), confirming the API is a credible grep replacement for the prior targets.
+
+**New find + fix (the one real correctness bug):** `rules --decision ADR-005` returned **0** (every other ADR resolved) — an ADR/PDR numeric-id collision in the projection's decision-record self-match (re-canonicalized the ambiguous bare `005` tag instead of comparing pattern identity). Fixed + regression-tested with a seeded `ADR-555`/`PDR-555` collision. The renderer-debugger's own governing ADR was the false-empty — high effectiveness leverage.
+
+**Effectiveness gaps closed this session (all blind-re-verified live, grep-free):**
+
+| Gap | Before | After |
+| --- | --- | --- |
+| `rules --decision ADR-005` (ADR/PDR collision) | `0` silently | `5` (identity self-match); no other ADR regressed |
+| JSON error envelope (#3) | plain stderr line; `2>&1\|jq` breaks | `{success:false,error}` on stderr; parses; stdout clean |
+| `rules --product-area <bogus>` | silent `0` | fail-loud with the 8-value enum (matches `--package`) |
+| multi-word `search` | `[]` silently | per-token degrade (`"read model consistency"`→10) |
+| `list --help` `--package` label | `<workspace-name>` (implies rejected `@libar-dev/*`) | `<workspace-package-id>` (matches `rules --help`) |
+
+**Skill + demo-hook drift closed (the in-focus polish):** data-api — bundle blocks `deliverables`→`scenarios` (×3 + the generated overview cheat-sheet), own-rules count `8`→`16` (softened to drift-proof), `34`→`34-of-35` arithmetic, added the third (bare-array) envelope shape + the JSON-error contract, search multi-word note. architect-base — FSM diagram redrawn so `deferred` hangs off `roadmap` (was implying an illegal `active→deferred`), `product-area:editor` example marked illustrative. architect-sessions — `--mode` on bundle / `--session` on context, corrected the design-mode bundle block set. Demo hook — added a `files` step (name-then-locate, the #1 grep), step-5 bundle now shows the content payload + `~3279 tokens, ONE call`, step-7 renders a readable rule list (was 5KB raw JSON), step-10 shows a legal **and** illegal FSM transition.
+
+**Verdict:** the prior chunks made the API a grep replacement for state/dep/ADR/taxonomy/navigability; this session removed the last correctness false-empty (ADR-005), closed the JSON-consumer trust gap, and resynced the three skills + the demo hook to the live CLI so a cold-start agent is taught the API as it actually behaves. The remaining deferred items (#2/#4/#7) are cosmetic or doctrine-modeling, not effectiveness blockers.
