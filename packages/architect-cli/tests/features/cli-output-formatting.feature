@@ -7,10 +7,7 @@
 Feature: Architect CLI output formatting
 
   Verifies stdout / stderr behavior across the supported `--format`
-  values (json / text / markdown). This is a starter feature scaffold
-  authored by M4 Part E; step-definition wiring is deferred to a
-  follow-up PR that introduces vitest-cucumber to the architect-cli
-  package.
+  values (json / text / markdown), including the failure path.
 
   Rule: Format flag selects the renderer; stdout carries the payload, stderr carries diagnostics
 
@@ -18,15 +15,22 @@ Feature: Architect CLI output formatting
     and nothing on stderr for the success path. `--format text` (the
     default) emits human-readable lines. `--format markdown` emits a
     document with markdown headings. Diagnostics, warnings, and errors
-    always go to stderr regardless of format.
+    always go to stderr regardless of format — but under `--format json`
+    the error on stderr is itself a structured `{ success: false, error }`
+    envelope (mirroring the success envelope's `success` discriminant),
+    not a plain `Error:` line, so a consumer that merges streams parses it.
 
     **Rationale:** Pipe-friendliness depends on stdout staying clean for
     the chosen format. Any banner, deprecation notice, or warning leaking
     onto stdout in JSON mode would break downstream `jq` and any
-    automation that pipes the CLI output.
+    automation that pipes the CLI output. Keeping the JSON-mode error on
+    stderr preserves the clean-stdout invariant while still giving a
+    `2>&1 | jq` consumer a parseable, branchable failure signal.
 
     **Verified by:** `architect overview --format json` emits empty stderr
-    and JSON-parseable stdout; `architect overview --format markdown`
+    and JSON-parseable stdout; `architect list --status zzz --format json`
+    emits empty stdout and a `{ success: false, error }` JSON envelope on
+    stderr at a nonzero exit; `architect overview --format markdown`
     emits a markdown heading on stdout; deprecation warnings (when any)
     appear only on stderr.
 
@@ -36,6 +40,13 @@ Feature: Architect CLI output formatting
       Then the exit code is zero
       And stderr is empty
       And stdout parses as JSON
+
+    @error-path
+    Scenario: json format error emits a success:false envelope on stderr, clean stdout
+      When I run "architect list --status zzz --format json"
+      Then the exit code is nonzero
+      And stdout is empty
+      And stderr parses as JSON with success false
 
     # Skipped: current CLI accepts only --format compact|json. Markdown renderer is
     # aspirational; the projection package emits markdown but the CLI does not yet expose it.

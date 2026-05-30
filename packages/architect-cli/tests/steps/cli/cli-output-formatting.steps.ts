@@ -39,6 +39,32 @@ describeFeature(
             });
           },
         );
+
+        RuleScenario(
+          'json format error emits a success:false envelope on stderr, clean stdout',
+          ({ When, Then, And }) => {
+            When('I run "architect list --status zzz --format json"', async () => {
+              lastResult = await runCli('architect list --status zzz --format json');
+            });
+
+            Then('the exit code is nonzero', () => {
+              expect(lastResult?.exitCode ?? 0).not.toBe(0);
+            });
+
+            And('stdout is empty', () => {
+              expect(lastResult?.stdout ?? '').toBe('');
+            });
+
+            And('stderr parses as JSON with success false', () => {
+              const parsed = JSON.parse(lastResult?.stderr ?? '') as {
+                success?: unknown;
+                error?: { message?: unknown };
+              };
+              expect(parsed.success).toBe(false);
+              expect(typeof parsed.error?.message).toBe('string');
+            });
+          },
+        );
       },
     );
   },

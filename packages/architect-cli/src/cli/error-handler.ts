@@ -197,10 +197,55 @@ export function formatDocError(error: DocError): string {
 }
 
 /**
+ * Whether the invocation selected `--format json`.
+ *
+ * Read straight off `argv` rather than the parsed args: an error can be thrown
+ * from argument parsing itself (before a `ParsedArgs` exists) and the top-level
+ * `main().catch` has no `format` in scope. The CLI parses `--format json` as the
+ * space-separated form; the `=` form is accepted defensively.
+ */
+function argvSelectsJsonFormat(argv: readonly string[]): boolean {
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    if (arg === '--format=json') {
+      return true;
+    }
+    if (arg === '--format' && argv[index + 1] === 'json') {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * The structured `{ success: false, error }` envelope for `--format json` mode,
+ * mirroring the success envelope's `success` discriminant. A DocError contributes
+ * its `type`; the message already carries any enumerated accepted-value set.
+ */
+function toErrorEnvelope(error: unknown): {
+  success: false;
+  error: { message: string; type?: string };
+} {
+  if (isDocError(error)) {
+    return { success: false, error: { type: error.type, message: error.message } };
+  }
+  return {
+    success: false,
+    error: { message: error instanceof Error ? error.message : String(error) },
+  };
+}
+
+/**
  * Unified CLI error handler that formats and exits
  *
  * Handles both DocError instances and generic Error/unknown values.
  * Outputs structured error information and exits with specified code.
+ *
+ * Under `--format json`, the error is emitted as a `{ success: false, error }`
+ * JSON envelope on **stderr** (never stdout — the success-path pipe invariant
+ * keeps stdout clean for `jq`), exit code unchanged. A consumer that merges
+ * streams (`… 2>&1 | jq`) then parses the envelope instead of hitting the
+ * plain-text `Error:` line. Text mode keeps the human-readable stderr output.
  *
  * @param error - Error to handle (DocError, Error, or unknown)
  * @param exitCode - Process exit code (default: 1)
@@ -218,6 +263,10 @@ export function formatDocError(error: DocError): string {
  * ```
  */
 export function handleCliError(error: unknown, exitCode = 1): never {
+  if (argvSelectsJsonFormat(process.argv.slice(2))) {
+    return exitWithErrorMessage(JSON.stringify(toErrorEnvelope(error), null, 2), exitCode);
+  }
+
   if (isDocError(error)) {
     return exitWithErrorMessage(formatDocError(error), exitCode);
   }
