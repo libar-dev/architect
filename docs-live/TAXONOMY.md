@@ -7,14 +7,14 @@
 
 ## Overview
 
-**8 roles** | **21 metadata tags** | **3 aggregation tags** | **32 total**
+**8 roles** | **22 metadata tags** | **3 aggregation tags** | **33 total**
 
 | Component        | Count |
 | ---------------- | ----- |
 | Roles            | 8     |
-| Metadata Tags    | 21    |
+| Metadata Tags    | 22    |
 | Aggregation Tags | 3     |
-| Total            | 32    |
+| Total            | 33    |
 
 ## Roles
 
@@ -87,10 +87,11 @@
 
 ### Other Tags
 
-| Tag      | Format | Purpose                                                                                                      | Required | Repeatable | Values                   | Default Value | Example                            |
-| -------- | ------ | ------------------------------------------------------------------------------------------------------------ | -------- | ---------- | ------------------------ | ------------- | ---------------------------------- |
-| `level`  | enum   | Hierarchy-axis level (epic / phase / task / slice). Independent of lifecycle status (see @architect-status). | No       | No         | epic, phase, task, slice |               | @architect-level epic              |
-| `parent` | value  | Hierarchy-axis parent edge. Target must carry @architect-level at a strictly higher level.                   | No       | No         |                          |               | @architect-parent LifecycleMvpEpic |
+| Tag                | Format | Purpose                                                                                                                                  | Required | Repeatable | Values                   | Default Value | Example                                                              |
+| ------------------ | ------ | ---------------------------------------------------------------------------------------------------------------------------------------- | -------- | ---------- | ------------------------ | ------------- | -------------------------------------------------------------------- |
+| `executable-specs` | csv    | Forward link from a design-tier spec to the executable Gherkin feature(s) that realize it — the value-transfer / spec-deletion gate edge | No       | No         |                          |               | @architect-executable-specs:tests/features/cli/generate-docs.feature |
+| `level`            | enum   | Hierarchy-axis level (epic / phase / task / slice). Independent of lifecycle status (see @architect-status).                             | No       | No         | epic, phase, task, slice |               | @architect-level epic                                                |
+| `parent`           | value  | Hierarchy-axis parent edge. Target must carry @architect-level at a strictly higher level.                                               | No       | No         |                          |               | @architect-parent LifecycleMvpEpic                                   |
 
 ## Aggregation Tags
 
