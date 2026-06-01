@@ -37,6 +37,7 @@
     "docs:taxonomy": "pnpm exec architect-generate --base-dir . -g taxonomy -f",
     "docs:api-reference": "pnpm exec architect-generate --base-dir . -g api-reference -f",
     "docs:all": "pnpm check:build && pnpm exec architect-generate --base-dir . --all -f",
+    "docs:check": "pnpm check:build && pnpm exec architect-generate --base-dir . --all --check",
     "changeset": "changeset",
     "changeset:version": "changeset version",
     "changeset:publish": "changeset publish",

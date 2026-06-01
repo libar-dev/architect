@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { mkdir, stat, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import {
@@ -41,6 +41,7 @@ interface ParsedArgs {
   readonly version: boolean;
   readonly listGenerators: boolean;
   readonly all: boolean;
+  readonly check: boolean;
   readonly baseDir: string;
   readonly input: readonly string[];
   readonly generators: readonly string[];
@@ -217,6 +218,7 @@ function parseArgs(argv: readonly string[]): ParsedArgs {
   let version = false;
   let listGenerators = false;
   let all = false;
+  let check = false;
   let baseDir = invocationDir;
   const input: string[] = [];
   let outputDir: string | undefined;
@@ -246,6 +248,10 @@ function parseArgs(argv: readonly string[]): ParsedArgs {
         break;
       case '--all':
         all = true;
+        break;
+      case '--check':
+      case '--dry-run':
+        check = true;
         break;
       case '-b':
       case '--base-dir':
@@ -308,6 +314,7 @@ function parseArgs(argv: readonly string[]): ParsedArgs {
     version,
     listGenerators,
     all,
+    check,
     baseDir,
     input,
     generators,
@@ -334,6 +341,7 @@ function printHelp(): void {
       '  -g, --generators <id>  Run specific generator(s); repeatable and comma-separated\n' +
       '  -o, --output <dir>     Override the config output directory for this run\n' +
       '  -f, --overwrite        Overwrite existing files for this run\n' +
+      '      --check            Verify regenerated docs match the working tree; report drift, write nothing, exit non-zero on drift (alias --dry-run)\n' +
       '      --disclosure <level>  Override disclosure level: essential, important, useful, advanced\n' +
       '      --filter <status=csv> Filter generated projections; repeatable for status\n' +
       '      --list-generators  List generators available for the resolved project config\n' +
@@ -504,6 +512,46 @@ async function writeGeneratedFiles(
   }
 }
 
+async function reportDriftAndExit(
+  executions: ReadonlyArray<{ execution: GeneratorExecution; outputDir: string }>,
+): Promise<void> {
+  const drift: string[] = [];
+  let checked = 0;
+  for (const { execution, outputDir } of executions) {
+    for (const file of execution.files) {
+      checked += 1;
+      const absolute = path.resolve(outputDir, file.path);
+      let current: string | undefined;
+      try {
+        current = await readFile(absolute, 'utf8');
+      } catch {
+        current = undefined;
+      }
+      if (current === undefined) {
+        drift.push(`absent on disk: ${file.path}`);
+      } else if (current !== file.content) {
+        drift.push(`content drift: ${file.path}`);
+      }
+    }
+  }
+
+  if (drift.length > 0) {
+    process.stderr.write(
+      `docs:check found ${String(drift.length)} drifted file(s):\n` +
+        drift.map((entry) => `  - ${entry}`).join('\n') +
+        '\n',
+    );
+    throw new Error(
+      `Documentation is not up to date (${String(drift.length)} drifted file(s)); ` +
+        'regenerate with `architect-generate --all -f` and commit docs-live/.',
+    );
+  }
+
+  process.stdout.write(
+    `docs:check: ${String(checked)} generated file(s) match the working tree — no drift.\n`,
+  );
+}
+
 function renderGeneratorExecution(
   context: ProjectionContext,
   generator: GeneratorDescriptor,
@@ -610,6 +658,17 @@ async function main(): Promise<void> {
       }
       seenAbsolutePaths.set(absolute, execution.generator.name);
     }
+  }
+
+  // --check: prove idempotency without mutating the tree. Diff each freshly
+  // rendered file against its on-disk counterpart and report drift, mutating
+  // nothing. Unlike `git diff --exit-code docs-live`, this works mid-changeset
+  // (it compares regenerated content to the working tree, not to HEAD), so a
+  // dirty tree no longer conflates an uncommitted edit with a non-deterministic
+  // generator. Exits non-zero on drift via handleCliError.
+  if (args.check) {
+    await reportDriftAndExit(executions);
+    return;
   }
 
   // Phase 2: write files in parallel. Each generator's file set is disjoint

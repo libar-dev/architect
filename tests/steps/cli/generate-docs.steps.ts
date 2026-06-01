@@ -491,6 +491,68 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   });
 
   // ---------------------------------------------------------------------------
+  // Rule: CLI verifies determinism with --check
+  // ---------------------------------------------------------------------------
+
+  Rule('CLI verifies determinism with --check', ({ RuleScenario }) => {
+    RuleScenario(
+      'Check passes when generated docs match the working tree',
+      ({ Given, When, Then, And }) => {
+        Given(
+          'a TypeScript file {string} with pattern annotations',
+          async (_ctx: unknown, relativePath: string) => {
+            await writeTempFile(getTempDir(), relativePath, createPatternFile());
+          },
+        );
+
+        // First run generates; the second run (--check) overwrites result and is
+        // what the assertions below observe.
+        When('running {string}', async (_ctx: unknown, cmd: string) => {
+          await runCLICommand(cmd);
+        });
+
+        And('running {string}', async (_ctx: unknown, cmd: string) => {
+          await runCLICommand(cmd);
+        });
+
+        Then('exit code is {int}', (_ctx: unknown, code: number) => {
+          expect(getResult().exitCode).toBe(code);
+        });
+
+        And('output contains {string}', (_ctx: unknown, text: string) => {
+          const combined = getResult().stdout + getResult().stderr;
+          expect(combined).toContain(text);
+        });
+      },
+    );
+
+    RuleScenario(
+      'Check reports drift when a generated doc is absent',
+      ({ Given, When, Then, And }) => {
+        Given(
+          'a TypeScript file {string} with pattern annotations',
+          async (_ctx: unknown, relativePath: string) => {
+            await writeTempFile(getTempDir(), relativePath, createPatternFile());
+          },
+        );
+
+        When('running {string}', async (_ctx: unknown, cmd: string) => {
+          await runCLICommand(cmd);
+        });
+
+        Then('exit code is {int}', (_ctx: unknown, code: number) => {
+          expect(getResult().exitCode).toBe(code);
+        });
+
+        And('output contains {string}', (_ctx: unknown, text: string) => {
+          const combined = getResult().stdout + getResult().stderr;
+          expect(combined).toContain(text);
+        });
+      },
+    );
+  });
+
+  // ---------------------------------------------------------------------------
   // Rule: CLI rejects unknown options
   // ---------------------------------------------------------------------------
 
