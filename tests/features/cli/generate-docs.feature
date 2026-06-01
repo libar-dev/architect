@@ -154,9 +154,9 @@ Feature: generate-docs CLI
 
   Rule: CLI verifies determinism with --check
 
-    **Invariant:** With --check the CLI re-renders every requested generator and diffs the result against the on-disk files, writing nothing — it exits 0 when they match and non-zero (reporting drift) when an on-disk file is absent or stale.
-    **Rationale:** The git-based determinism gate (`docs:all && git diff --exit-code`) conflates an uncommitted changeset with a non-deterministic generator and is useless on a dirty tree; --check proves idempotency against the working tree independent of git state.
-    **Verified by:** Check passes when generated docs match the working tree, Check reports drift when a generated doc is absent
+    **Invariant:** With --check the CLI re-renders every requested generator and diffs the result against the on-disk files **and the generated-docs manifest**, writing nothing — it exits 0 when they match and non-zero (reporting drift) when an on-disk file or the manifest is absent or stale.
+    **Rationale:** The git-based determinism gate (`docs:all && git diff --exit-code`) conflates an uncommitted changeset with a non-deterministic generator and is useless on a dirty tree; --check proves idempotency against the working tree independent of git state. It must cover the manifest too, or a manifest-only drift (a changed root classification / file set) would pass --check yet fail the git gate.
+    **Verified by:** Check passes when generated docs match the working tree, Check reports drift when a generated doc is absent, Check reports drift when only the manifest is stale
 
     @happy-path
     Scenario: Check passes when generated docs match the working tree
@@ -172,6 +172,15 @@ Feature: generate-docs CLI
       When running "generate-docs -i src/pattern.ts -g patterns -o docs --check"
       Then exit code is 1
       And output contains "not up to date"
+
+    @validation
+    Scenario: Check reports drift when only the manifest is stale
+      Given a TypeScript file "src/pattern.ts" with pattern annotations
+      When running "generate-docs -i src/pattern.ts -g patterns -o docs -f"
+      And the generated docs manifest in "docs" is emptied
+      And running "generate-docs -i src/pattern.ts -g patterns -o docs --check"
+      Then exit code is 1
+      And output contains ".generated-docs-manifest.json"
 
   # ============================================================================
   # RULE 5: Unknown Options

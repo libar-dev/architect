@@ -31,7 +31,16 @@ import {
   type SupportedDocumentationType,
   type SupportedDocumentationTypeMetadata,
 } from '@libar-dev/architect-projection';
-import { createPublishedEntries, upsertGeneratedDocsManifest } from './generated-docs-manifest.js';
+import {
+  applyGeneratedDocsManifestUpsert,
+  createPublishedEntries,
+  EMPTY_GENERATED_DOCS_MANIFEST,
+  GENERATED_DOCS_MANIFEST_FILENAME,
+  loadGeneratedDocsManifest,
+  resolveGeneratedDocsManifestPath,
+  serializeGeneratedDocsManifest,
+  upsertGeneratedDocsManifest,
+} from './generated-docs-manifest.js';
 import { readCliPackageMetadata, resolveCliBaseDirArg } from './runtime-helpers.js';
 import { createCliProjectionContext } from './projection-context.js';
 import { handleCliError } from './error-handler.js';
@@ -532,6 +541,53 @@ async function reportDriftAndExit(
       } else if (current !== file.content) {
         drift.push(`content drift: ${file.path}`);
       }
+    }
+  }
+
+  // The rendered files are not the whole story: `docs:all` also rewrites the
+  // generated-docs manifest (Phase 3). A change that leaves every rendered file
+  // byte-identical but alters the manifest — a generator's root classification,
+  // documentType, or its file set (added / removed / orphaned files) — would slip
+  // past a files-only check yet fail CI's `git diff --exit-code docs-live`. Fold
+  // the same upserts the write path would and diff the resulting manifest, per
+  // outputDir, so `--check` is a faithful proxy for the determinism gate.
+  const executionsByOutputDir = new Map<string, GeneratorExecution[]>();
+  for (const { execution, outputDir } of executions) {
+    const group = executionsByOutputDir.get(outputDir);
+    if (group === undefined) {
+      executionsByOutputDir.set(outputDir, [execution]);
+    } else {
+      group.push(execution);
+    }
+  }
+  for (const [outputDir, group] of executionsByOutputDir) {
+    let expected = (await loadGeneratedDocsManifest(outputDir)) ?? EMPTY_GENERATED_DOCS_MANIFEST;
+    for (const execution of group) {
+      expected = applyGeneratedDocsManifestUpsert(expected, {
+        generatorName: execution.generator.name,
+        kind: execution.generator.kind,
+        rootPath: execution.rootDocument.path,
+        entries: createPublishedEntries(
+          execution.rootDocument.path,
+          execution.files.map((file) => file.path),
+        ),
+        ...(execution.generator.kind === 'projection'
+          ? { documentType: execution.generator.documentType }
+          : {}),
+      });
+    }
+    checked += 1;
+    const manifestPath = resolveGeneratedDocsManifestPath(outputDir);
+    let currentManifest: string | undefined;
+    try {
+      currentManifest = await readFile(manifestPath, 'utf8');
+    } catch {
+      currentManifest = undefined;
+    }
+    if (currentManifest === undefined) {
+      drift.push(`absent on disk: ${GENERATED_DOCS_MANIFEST_FILENAME}`);
+    } else if (currentManifest !== serializeGeneratedDocsManifest(expected)) {
+      drift.push(`content drift: ${GENERATED_DOCS_MANIFEST_FILENAME}`);
     }
   }
 

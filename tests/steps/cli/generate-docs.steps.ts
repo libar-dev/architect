@@ -550,6 +550,46 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         });
       },
     );
+
+    RuleScenario(
+      'Check reports drift when only the manifest is stale',
+      ({ Given, When, Then, And }) => {
+        Given(
+          'a TypeScript file {string} with pattern annotations',
+          async (_ctx: unknown, relativePath: string) => {
+            await writeTempFile(getTempDir(), relativePath, createPatternFile());
+          },
+        );
+
+        // After generation the rendered docs are in sync; emptying the manifest
+        // leaves every .md byte-identical but makes the manifest stale — drift the
+        // files-only check would miss.
+        When('running {string}', async (_ctx: unknown, cmd: string) => {
+          await runCLICommand(cmd);
+        });
+
+        And('the generated docs manifest in {string} is emptied', async (_ctx: unknown, dir: string) => {
+          await writeTempFile(
+            getTempDir(),
+            `${dir}/.generated-docs-manifest.json`,
+            '{\n  "version": 1,\n  "generators": {}\n}\n',
+          );
+        });
+
+        And('running {string}', async (_ctx: unknown, cmd: string) => {
+          await runCLICommand(cmd);
+        });
+
+        Then('exit code is {int}', (_ctx: unknown, code: number) => {
+          expect(getResult().exitCode).toBe(code);
+        });
+
+        And('output contains {string}', (_ctx: unknown, text: string) => {
+          const combined = getResult().stdout + getResult().stderr;
+          expect(combined).toContain(text);
+        });
+      },
+    );
   });
 
   // ---------------------------------------------------------------------------
