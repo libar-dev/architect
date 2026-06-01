@@ -33,11 +33,12 @@ Feature: Tag Registry Builder
     Scenario: Registry has required metadata tags
       When I build the tag registry
       Then the registry contains these metadata tags:
-        | tag             | format |
-        | pattern         | value  |
-        | status          | enum   |
-        | bounded-context | value  |
-        | role            | value  |
+        | tag              | format |
+        | pattern          | value  |
+        | status           | enum   |
+        | bounded-context  | value  |
+        | role             | value  |
+        | executable-specs | csv    |
 
   Rule: Metadata tags have correct configuration
 

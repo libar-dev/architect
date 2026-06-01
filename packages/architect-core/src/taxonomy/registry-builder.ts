@@ -308,6 +308,14 @@ export function buildRegistry(options: BuildRegistryOptions = {}): TagRegistry {
           '@architect-enforces-decision ADR009ProjectionTrustBoundary, ADR006SingleReadModelArchitecture',
       },
       {
+        tag: 'executable-specs',
+        format: 'csv',
+        purpose:
+          'Forward link from a design-tier spec to the executable Gherkin feature(s) that realize it — the value-transfer / spec-deletion gate edge',
+        metadataKey: 'executableSpecs',
+        example: '@architect-executable-specs:tests/features/cli/generate-docs.feature',
+      },
+      {
         tag: 'target',
         format: 'value',
         purpose: 'Target implementation path for stub files',

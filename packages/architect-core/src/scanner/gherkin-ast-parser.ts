@@ -148,7 +148,6 @@ export const FeatureTagMetadataSchema = z.strictObject({
   roadmapSpec: z.string().optional(),
   archRole: z.string().optional(),
   include: z.array(z.string()).readonly().optional(),
-  usecase: z.string().optional(),
   customMetadata: z.record(z.string(), CustomMetadataValueSchema).readonly().optional(),
   _deprecatedTags: z.array(z.string()).readonly().optional(),
   _roleTagValues: z.array(z.string()).readonly().optional(),
@@ -496,7 +495,6 @@ export function extractPatternTags(
   let roadmapSpec: string | undefined;
   let archRole: string | undefined;
   let include: readonly string[] | undefined;
-  let usecase: string | undefined;
   let customMetadata: Record<string, z.output<typeof CustomMetadataValueSchema>> | undefined;
 
   for (const tag of tags) {
@@ -731,9 +729,6 @@ export function extractPatternTags(
             case 'archRole':
               archRole = value;
               break;
-            case 'usecase':
-              usecase = value;
-              break;
             default:
               customMetadata = { ...(customMetadata ?? {}), [key]: value };
               break;
@@ -792,7 +787,6 @@ export function extractPatternTags(
     ...(roadmapSpec !== undefined ? { roadmapSpec } : {}),
     ...(archRole !== undefined ? { archRole } : {}),
     ...(include !== undefined ? { include } : {}),
-    ...(usecase !== undefined ? { usecase } : {}),
     ...(customMetadata !== undefined ? { customMetadata } : {}),
     ...(deprecatedTags.length > 0 ? { _deprecatedTags: deprecatedTags } : {}),
     ...(roleTagValues.length > 0 ? { _roleTagValues: roleTagValues } : {}),
