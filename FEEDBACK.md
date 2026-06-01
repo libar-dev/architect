@@ -10,6 +10,29 @@ for anything that does not fit the verb's shape.
 
 ---
 
+## 2026-06-01 — Landed: five effectiveness fixes from the dogfood-gap-ledger triage (A1 · A3 · A5 · A10 · D16)
+
+A blind 10-agent triage workflow re-verified the open FEEDBACK/ledger items against the live CLI (8 of 22 were already-closed ghosts — recorded below). The five genuinely-open, completable items landed this session, each gate-validated (typecheck · 1820 projection + 1211 dogfood tests · validate:all · docs-determinism · perf):
+
+- **A1 — `open-questions --parent <Epic> --include-self`** + a compounding regex FIX. `--parent X` excluded the focal epic's own `**Open Questions:**`; worse, the `extractOpenQuestions` regex required a literal `**Open Questions:**` and so silently dropped any heading with a qualifier (e.g. an epic's `**Open Questions (resolved per use-case):**`) from **both** entry points. Fix: tolerate `**Open Questions[^*\n]*:**`, and add an additive `--include-self` flag (projection + CLI). DocumentationProjection's gating questions are now reachable.
+- **A10 — `descriptionTruncated` / `docstringTruncated` flag** on `pattern` / `bundle`. The projected description is a head (first sentence or Problem+Solution summary); it silently dropped later design prose with **no marker** (the 2026-05-27 entry). Not a numeric 512-char cap as that entry guessed — a *semantic* first-sentence cut. Fix: an additive boolean (the dep-tree `truncated` precedent), string byte-identical so docs-live stays stable. Discriminates correctly (false for single-sentence / Problem-Solution-only directives, true when prose is dropped).
+- **A5 — `arch workable` verb** (complement of `arch blocking`). The roadmap-minus-blocking set was computed in the overview but only exposed as a capped 8-item sample; the full startable set was unretrievable and the overview hint mis-pointed at `list --status roadmap` (returns all 19, not the 16 startable). Fix: `arch workable` returns the full set as compact summaries (verified == overview `startableCount`, disjoint from `arch blocking`); the 3 overview hints repointed.
+- **A3 — taxonomy digest completeness.** ADD: the genuinely-recognized `@architect-executable-specs` forward-link tag was parsed by the scanner but absent from the registry the digest reads, so it never appeared in `taxonomy` / TAXONOMY.md (the 2026-05-26 entry). REMOVE (No-BC): deleted the orphan `usecase` parser code left behind by the 691da3c retirement. Digest total 32 → 33.
+- **D16 — `architect-generate --check` / `pnpm docs:check`** (Resolves the 2026-05-26 "no determinism `--check` for docs:all"). Re-renders to memory, diffs against the working tree, writes nothing, exits non-zero on drift — proves idempotency mid-changeset where `git diff --exit-code` conflates an uncommitted edit with a non-deterministic generator. Self-validated this session (caught the A1/A3/A10 doc regen, then went clean after `docs:all`).
+
+## 2026-06-01 — Deferred-with-finding: degenerate-generator guard wiring (C15) is blocked on a generator retire/re-scope decision
+
+Wiring `assertGeneratorNotDegenerate` into the docs runner (the shipped-but-unwired guard module) works — but it deterministically caught **3 degenerate generators that ship empty today**: `roadmap` + `current-work` (`0 quarters`) and `requirements-specs` (`0 requirements`), all orphaned from removed dimensions, all in `docs:all --all` and committed in `docs-live/`. So wiring the guard would hard-fail `docs:all` + the determinism gate until those 3 are retired or re-scoped onto a live dimension (status/level) — which is an **open gating question in the `DocumentationProjection` epic** (surfaced this session via `open-questions --parent DocumentationProjection --include-self`). Per "decisions recorded born-accepted after code proves them, never rushed ahead," the wiring is deferred (reverted) rather than pre-empting that decision; the guard module + its unit tests stay. The finding (the guard catches exactly these 3, named) is the value — it advances the open question with hard data.
+
+## 2026-06-01 — Resolved (doc hygiene): four stale-open items confirmed already-fixed by the triage
+
+The blind triage confirmed these earlier FEEDBACK items reproduce as **fixed** against the live CLI; recording closure so the ledger stops showing them open:
+
+- **`test:perf:baseline` soft-threshold jitter** (2026-05-27) — RESOLVED by `054b7f8`: `compare-baseline.mjs` now uses `effectiveBudget = min(hard, max(baseline×1.5, baseline+slack))` with `ABSOLUTE_SLACK_BY_UNIT = { ms: 0.05, us: 50 }` — the requested noise floor. All 15 metrics pass with absolute headroom on the micro-metrics.
+- **`architect:query` reflects last-built dist** (2026-05-29) — RESOLVED by `74f6730`: `architect:query` now runs `tsx --conditions=source` (resolves `architect-core`/`-projection` from `src`), and `scripts/check-build-fresh.mjs` (`pnpm check:build`) gates the still-dist-bound bins (generate/guard/validate) on an mtime freshness check.
+- **A tag's allowed values aren't queryable** (2026-05-27) — RESOLVED: `taxonomy --format json` now carries a per-tag `values` array (product-area/role/status/adr-* enums); no `*-values.ts` source read needed.
+- **Over-escaped backticks in flagship TAXONOMY.md** (2026-05-26) — RESOLVED by `06bfd91`: the taxonomy normalizer now emits renderer-authored backticks via the trusted-markdown hatch; `grep -c '\`' docs-live/TAXONOMY.md` → 0. (Sourced fragment text stays escaped — that is the ADR-009 trust boundary, not the defect.)
+
 ## 2026-06-01 — Fixed: `rules --product-area Platform` false-rejected 8 real rules (accepted-set ≠ filter-target)
 
 - **Verb / surface:** `pnpm -s architect:query rules --product-area Platform`.

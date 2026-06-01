@@ -40,7 +40,7 @@ The **canonical source of truth** is annotated production code + executable Gher
 | CLI              | `pnpm architect:query <verb>` (canonical script name across architect-managed repos)                             |
 | MCP              | `architect` server → `mcp__architect__*` callable tools                                                          |
 | Validation entry | `pnpm typecheck`, `pnpm test`, `pnpm validate:all`, `pnpm architect:guard --staged`                              |
-| Doc regeneration | `pnpm docs:all` → `docs-live/` (git-tracked, derived — determinism-gate diff target)                             |
+| Doc regeneration | `pnpm docs:all` → `docs-live/` (git-tracked, derived — determinism-gate diff target); `pnpm docs:check` verifies idempotency in place (re-renders, diffs the working tree, writes nothing, non-zero on drift) — usable mid-changeset where `git diff --exit-code` can't tell an uncommitted edit from a non-deterministic generator |
 
 When this package family is consumed by another project, the consumer wires their own `architect.config.ts` and exposes their own `architect:query` script — the contracts above are stable across architect-managed repos.
 
@@ -263,6 +263,7 @@ pnpm architect:query arch dangling --baseline <path> --strict         # non-zero
 
 # Architecture views
 pnpm architect:query arch blocking                          # global blocker view
+pnpm architect:query arch workable                          # roadmap items with deps satisfied (complement of blocking)
 pnpm architect:query arch neighborhood <Pattern>
 pnpm architect:query taxonomy [--count] [--format json]
 ```
