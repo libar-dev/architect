@@ -1,5 +1,5 @@
 @architect
-@architect-adr:004
+@architect-adr:001
 @architect-adr-status:accepted
 @architect-adr-category:process
 @architect-pattern:PDR001SessionWorkflowCommands
