@@ -116,7 +116,7 @@ step "7. Invariants for a pattern — replaces grepping Rule: blocks (add --form
 step "8. Invariants that enforce an ADR — governance navigability, not grep across decision records" sgov
 step "9. Pre-flight scope gate — is it safe to start a design session on this pattern?" sgate
 step "10. Deterministic FSM gate — a legal AND an illegal transition, side by side" s7
-step "11. Architecture neighborhood (PatternGraph — the read model itself) — the graph, not a guess" s8
+step "11. Architecture neighborhood (PatternGraph — the read-model contract/schema, not the kernel in step 5) — the graph, not a guess" s8
 step "12. Graph-integrity gate — non-zero drift = stop and surface" s9
 
 if [ "$fail" -ne 0 ]; then

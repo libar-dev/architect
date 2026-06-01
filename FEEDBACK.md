@@ -10,6 +10,23 @@ for anything that does not fit the verb's shape.
 
 ---
 
+## 2026-06-01 — Fixed: `rules --product-area Platform` false-rejected 8 real rules (accepted-set ≠ filter-target)
+
+- **Verb / surface:** `pnpm -s architect:query rules --product-area Platform`.
+- **Expected:** the 8 rules whose pattern declares no `@architect-product-area` (incl. governing ADR-009 / ADR-010 invariants) — they bucket under the projection's `DEFAULT_PRODUCT_AREA = 'Platform'`.
+- **Got:** fail-loud `--product-area: invalid value "Platform"`. The prior session's fail-loud commit (`fb7ca9d`) derived the accepted set from pattern-keyed `graph.byProductArea`, which **omits** the default bucket (a pattern with no `productArea` is absent from `byProductArea`, yet its rules still bucket under the default). So a valid area false-rejected as "invalid" — the same accepted-set-vs-filter-target divergence class as the ADR-005 false-empty, in reverse.
+- **Impact:** trust erosion — a real, populated area reads as a typo. Found by a blind false-empty dogfood probe.
+- **Fix:** new `collectBusinessRuleProductAreas(context)` projection helper returns the rule set's distinct areas (so accepted-set == filter-target by construction, incl. the default bucket); the CLI `resolveProductAreaFilter` now takes that precomputed set (matching `resolvePackageFilter(listPackages(), …)`). Regression: a new dogfood scenario with a no-area rule fixture asserts `--product-area Platform --names-only` returns it.
+
+## 2026-06-01 — Fixed: `PDR001SessionWorkflowCommands` mis-tagged `@architect-adr:004` (a latent ADR/PDR collision sibling)
+
+- **Verb / surface:** `pnpm -s architect:query rules --decision 001` / `--decision 1` / `--decision 004`.
+- **Expected (by the ADR-005 collision precedent):** `001`/`1` is ambiguous (ADR-001 + PDR-001 both name "001"), so it should fail loud like `005`/`5` does.
+- **Got:** `001`/`1` silently resolved to ADR-001 (10 rules), and `004` resolved to a pattern *named* PDR-001 — because `PDR001SessionWorkflowCommands` (file `pdr-001-…`, pattern name `PDR001`, Feature title "PDR-001 …") was tagged `@architect-adr:004`. Three identity signals said 001; one tag said 004. The resolver fix (2dffcfe) masked it — `001` "worked" only because the real PDR-001 was mis-numbered out of the collision.
+- **Root cause / scope:** source-data typo, wrong since the v1-monolith split. No ADR-004 pattern exists; no `@architect-enforces-decision:004`/`:001` references anywhere, so nothing depended on the wrong numeric.
+- **Fix:** corrected the tag to `001`. `001`/`1` now fail loud (ambiguous, consistent with `005`); `004` fails loud (no such decision); `ADR-001`/`PDR-001` still resolve by name. `docs-live/` **zero drift** (PDR-001 is excluded from the decisions projection by its `roadmap` status). The 2dffcfe identity self-match now handles the real 001 collision the same way it handles 005.
+- **Observation (not fixed, by-design at this phase):** PDR-001 is `@architect-status:roadmap` though its commands (`scope-validate`, `handoff`) ship — a possible status-staleness, left untouched per "expect incompleteness".
+
 ## 2026-05-30 — Fixed: `rules --decision ADR-005` returned 0 (ADR/PDR numeric-id collision in the projection self-match)
 
 - **Verb / surface:** `pnpm -s architect:query rules --decision ADR-005` (and `ADR005CodecBasedMarkdownRendering`).
