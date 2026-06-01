@@ -199,6 +199,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           'deps',
           'open-questions',
         ]);
+        // docstring carries its truncation signal whenever the block is included.
+        expect(typeof state!.bundle?.root.blocks.docstring).toBe('string');
+        expect(typeof state!.bundle?.root.blocks.docstringTruncated).toBe('boolean');
       });
 
       And('the bundle token estimates should use the char/4 heuristic', () => {

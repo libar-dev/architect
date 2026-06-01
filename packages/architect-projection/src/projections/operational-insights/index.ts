@@ -130,7 +130,7 @@ const OVERVIEW_CLI_HINTS: readonly string[] = [
   '    arch neighborhood <Pattern>           Local subgraph',
   '    arch blocking                         Patterns stuck on incomplete deps',
   '  PLAN / GATE',
-  '    list --status roadmap                 Workable items (see START HERE above)',
+  '    arch workable                         Roadmap items with deps satisfied (safe to start; complement of arch blocking)',
   '    open-questions [--parent <Pattern>]   Candidate-readiness signal',
   '    scope-validate <Pattern> design|implement   Pre-flight verdict',
   '',

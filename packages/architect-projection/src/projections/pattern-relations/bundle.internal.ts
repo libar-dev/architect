@@ -119,7 +119,12 @@ function buildBundleEntry(
         }).root.rules
       : [];
   const blocks: PatternBundleBlocks = {
-    ...(includes.includes('docstring') ? { docstring: detail.description ?? '' } : {}),
+    ...(includes.includes('docstring')
+      ? {
+          docstring: detail.description ?? '',
+          docstringTruncated: detail.descriptionTruncated ?? false,
+        }
+      : {}),
     ...(includes.includes('rules') ? { rules } : {}),
     ...(includes.includes('scenarios') ? { scenarios: buildScenarioDigests(rules) } : {}),
     ...(includes.includes('deps') ? { deps: relationships } : {}),

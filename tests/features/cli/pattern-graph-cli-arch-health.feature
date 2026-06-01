@@ -17,7 +17,7 @@ Feature: Pattern Graph CLI - Architecture Health Subcommands
 
     **Rationale:** Graph quality issues (broken references, isolated patterns, blocked dependencies) are relationship-level concerns that should be queryable even when no architecture metadata exists.
 
-    **Verified by:** Arch dangling returns broken references, Arch dangling baseline matches current references, Arch dangling strict baseline drift reports added and removed entries, Arch dangling write-baseline rewrites deterministic JSON, Arch orphans returns isolated patterns, Arch blocking returns blocked patterns
+    **Verified by:** Arch dangling returns broken references, Arch dangling baseline matches current references, Arch dangling strict baseline drift reports added and removed entries, Arch dangling write-baseline rewrites deterministic JSON, Arch orphans returns isolated patterns, Arch blocking returns blocked patterns, Arch workable returns startable roadmap patterns
 
     @happy-path
     Scenario: Arch dangling returns broken references
@@ -66,3 +66,11 @@ Feature: Pattern Graph CLI - Architecture Health Subcommands
       And stdout JSON data is an array
       And stdout JSON data contains an entry with field "pattern"
       And stdout JSON data contains a blocking entry with field "blockedBy"
+
+    @happy-path
+    Scenario: Arch workable returns startable roadmap patterns
+      Given TypeScript files with blocked pattern annotations
+      When running "pattern-graph-cli -i 'src/**/*.ts' arch workable"
+      Then exit code is 0
+      And stdout JSON data is an array
+      And stdout JSON data workable entries are roadmap patterns only

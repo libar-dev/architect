@@ -39,6 +39,11 @@ export const PatternDetailSchema = PatternIdentitySchema.extend({
   productArea: z.string().optional(),
   level: z.string().optional(),
   description: z.string().optional(),
+  // True when `description` is a head (first-sentence / Problem+Solution summary) and the
+  // source directive carries more design prose that was not projected — a signaled boundary
+  // (mirrors the dep-tree `truncated` precedent) so consumers know to read the source for full
+  // context rather than silently treating the head as the whole directive.
+  descriptionTruncated: z.boolean().optional(),
   openQuestions: z.array(z.string()).optional(),
   deliverables: z.array(EmbeddedDeliverableSchema),
   relationships: PatternRelationshipsSchema,

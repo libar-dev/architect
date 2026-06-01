@@ -17,6 +17,7 @@ import { resolveParentChildNames } from './pattern-catalog.internal.js';
 export const OpenQuestionListOptionsSchema = z
   .strictObject({
     parent: z.string().optional(),
+    includeSelf: z.boolean().optional(),
   })
   .readonly();
 
@@ -26,7 +27,11 @@ export function buildOpenQuestionList(
   context: ProjectionContext,
   options: OpenQuestionListOptions = {},
 ): OpenQuestionList {
-  const parentChildNames = resolveParentChildNames(context, options.parent);
+  const parentChildNames = resolveParentChildNames(
+    context,
+    options.parent,
+    options.includeSelf === true,
+  );
   const items = filterPatterns(context.graph.patterns, context.projectionFilter)
     .map((pattern) => {
       const patternName = getPatternName(pattern);

@@ -79,6 +79,7 @@ export const ListFlagsSchema = z
 export const OpenQuestionsFlagsSchema = z
   .strictObject({
     parent: z.string().optional(),
+    includeSelf: z.boolean().optional(),
     format: RenderFormatSchema.optional(),
   })
   .readonly();

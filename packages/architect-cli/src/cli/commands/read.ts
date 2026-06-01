@@ -320,13 +320,18 @@ export const readCommands: Pick<Record<CommandName, CommandDef>, ReadCommandName
     name: 'open-questions',
     positional: StringArraySchema,
     flags: OpenQuestionsFlagsSchema,
-    usage: 'Usage: architect open-questions [--parent <PatternName>] [--format compact|json]',
-    helpSignature: 'open-questions [--parent <PatternName>]',
+    usage:
+      'Usage: architect open-questions [--parent <PatternName>] [--include-self] [--format compact|json]',
+    helpSignature: 'open-questions [--parent <PatternName>] [--include-self]',
     rejectBareValues: true,
     flagParsers: {
       '--parent': {
         kind: 'value',
         key: 'parent',
+      },
+      '--include-self': {
+        kind: 'boolean',
+        key: 'includeSelf',
       },
       '--format': {
         kind: 'value',
@@ -337,12 +342,14 @@ export const readCommands: Pick<Record<CommandName, CommandDef>, ReadCommandName
     execute(context, parsed): void {
       const flags = parsed.flags as {
         readonly parent?: string;
+        readonly includeSelf?: boolean;
         readonly format?: 'compact' | 'json';
       };
       writeProjectionOutput(
         flags.format === undefined ? context.args : { ...context.args, format: flags.format },
         projectOpenQuestionList(requireCliContext(context).projection, {
           ...(flags.parent !== undefined ? { parent: flags.parent } : {}),
+          ...(flags.includeSelf === true ? { includeSelf: true } : {}),
         }),
       );
     },
@@ -371,9 +378,9 @@ export const readCommands: Pick<Record<CommandName, CommandDef>, ReadCommandName
     positional: StringArraySchema,
     flags: ArchFlagsSchema,
     usage:
-      'Usage: architect arch roles|bounded-context [name]|neighborhood <pattern>|graph|compare <bounded-context-a> <bounded-context-b>|coverage|dangling [--baseline <path>] [--write-baseline] [--strict]|orphans|blocking|packages [name]',
+      'Usage: architect arch roles|bounded-context [name]|neighborhood <pattern>|graph|compare <bounded-context-a> <bounded-context-b>|coverage|dangling [--baseline <path>] [--write-baseline] [--strict]|orphans|blocking|workable|packages [name]',
     helpSignature:
-      'arch roles|bounded-context [name]|neighborhood <pattern>|graph|compare <bounded-context-a> <bounded-context-b>|coverage|dangling [--baseline <path>] [--write-baseline] [--strict]|orphans|blocking|packages [name]',
+      'arch roles|bounded-context [name]|neighborhood <pattern>|graph|compare <bounded-context-a> <bounded-context-b>|coverage|dangling [--baseline <path>] [--write-baseline] [--strict]|orphans|blocking|workable|packages [name]',
     flagParsers: {
       '--baseline': {
         kind: 'value',

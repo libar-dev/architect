@@ -132,6 +132,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             patternName: 'PatternGraphAPI',
             description:
               'Problem: Query consumers need one stable read model. Solution: The PatternGraph API centralizes those reads.',
+            // Problem + Solution are each a single sentence with nothing after the
+            // Solution block, so the head is the whole directive — not truncated.
+            descriptionTruncated: false,
             deliverables: [
               {
                 name: 'PatternGraph API module',
@@ -271,6 +274,36 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         });
       });
     });
+
+    RuleScenario(
+      'detail projection flags a truncated description head',
+      ({ Given, When, Then }) => {
+        Given('a pattern detail context with prose beyond the description head', () => {
+          state!.context = createProjectionContext({
+            patterns: [
+              createPattern('TruncatedPattern', {
+                description:
+                  '**User Story:** As an agent I want a compact head. The directive then continues with extensive design prose that the projected head deliberately omits.',
+              }),
+            ],
+            relationshipIndex: {
+              TruncatedPattern: createRelationshipEntry(),
+            },
+          });
+        });
+
+        When('I project the pattern detail for "TruncatedPattern"', () => {
+          state!.bundle = projectPatternDetail(state!.context!, 'TruncatedPattern');
+        });
+
+        Then('the pattern detail head is flagged as truncated', () => {
+          expect(state!.bundle?.root.description).toBe(
+            '**User Story:** As an agent I want a compact head.',
+          );
+          expect(state!.bundle?.root.descriptionTruncated).toBe(true);
+        });
+      },
+    );
 
     RuleScenario(
       'detail projection extracts open questions from normalized prose',

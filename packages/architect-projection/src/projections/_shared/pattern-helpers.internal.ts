@@ -222,20 +222,48 @@ export function resolveStubRefs(context: ProjectionContext, patternName: string)
 }
 
 export function extractDescription(text: string): string {
+  return extractDescriptionWithMeta(text).description;
+}
+
+/**
+ * Projects the pattern directive into a compact description head and reports whether
+ * that head dropped design prose. The emitted `description` string is identical to
+ * {@link extractDescription}; `truncated` is the new signal so callers can surface a
+ * boundary marker (the dep-tree `truncated` precedent) instead of silently shipping a
+ * head as if it were the whole directive.
+ */
+export function extractDescriptionWithMeta(text: string): {
+  description: string;
+  truncated: boolean;
+} {
   if (!text) {
-    return '';
+    return { description: '', truncated: false };
   }
 
   const problemMatch = /\*\*Problem:\*\*\s*([\s\S]+?)(?=\*\*Solution:\*\*|$)/.exec(text);
   const solutionMatch = /\*\*Solution:\*\*\s*([\s\S]+?)(?=\n\s*\*\*[A-Z]|\n\n\s*\n|$)/.exec(text);
 
-  if (problemMatch?.[1] !== undefined && solutionMatch?.[1] !== undefined) {
-    const problem = extractFirstSentenceRaw(problemMatch[1].trim());
-    const solution = extractFirstSentenceRaw(solutionMatch[1].trim());
-    return `Problem: ${problem} Solution: ${solution}`;
+  if (
+    problemMatch?.[1] !== undefined &&
+    solutionMatch?.[1] !== undefined &&
+    solutionMatch.index !== undefined
+  ) {
+    const problemRaw = problemMatch[1].trim();
+    const solutionRaw = solutionMatch[1].trim();
+    const problem = extractFirstSentenceRaw(problemRaw);
+    const solution = extractFirstSentenceRaw(solutionRaw);
+    const description = `Problem: ${problem} Solution: ${solution}`;
+    // Truncated when either section carried more than its first sentence, or the
+    // directive holds further sections/prose after the matched Solution block.
+    const truncated =
+      problem.length < problemRaw.length ||
+      solution.length < solutionRaw.length ||
+      solutionMatch.index + solutionMatch[0].length < text.trimEnd().length;
+    return { description, truncated };
   }
 
-  return extractFirstSentenceRaw(text);
+  const description = extractFirstSentenceRaw(text);
+  return { description, truncated: description.length < text.trim().length };
 }
 
 export function extractOpenQuestions(text: string): string[] {
@@ -243,7 +271,11 @@ export function extractOpenQuestions(text: string): string[] {
     return [];
   }
 
-  const match = /\*\*Open Questions:\*\*\s*([\s\S]*?)(?=\n\s*\*\*[A-Za-z][^*]*:\*\*|$)/i.exec(text);
+  // Tolerate a qualifier between "Open Questions" and the colon, e.g.
+  // `**Open Questions (resolved iteratively, per use-case)...:**` on epic headings —
+  // [^*\n]* keeps the match on a single bold heading line.
+  const match =
+    /\*\*Open Questions[^*\n]*:\*\*\s*([\s\S]*?)(?=\n\s*\*\*[A-Za-z][^*]*:\*\*|$)/i.exec(text);
   const rawSection = match?.[1]?.trim();
   if (rawSection === undefined || rawSection.length === 0) {
     return [];

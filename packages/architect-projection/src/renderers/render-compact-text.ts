@@ -173,7 +173,7 @@ function renderOverviewDigest(
     sections.push(
       renderMarker('READY TO START', options) +
         '\n' +
-        `${String(startableCount)} roadmap pattern(s) with dependencies satisfied${tail} — run \`list --status roadmap\``,
+        `${String(startableCount)} roadmap pattern(s) with dependencies satisfied${tail} — run \`arch workable\``,
     );
   }
 
@@ -265,7 +265,7 @@ function renderOverviewOrientation(
     const suffix = orientation.startableCount > sample.length ? ', …' : '';
     const tail = sample.length > 0 ? `: ${sample.join(', ')}${suffix}` : '';
     lines.push(
-      `Ready to start (deps satisfied): ${String(orientation.startableCount)} roadmap pattern(s)${tail} — run \`list --status roadmap\``,
+      `Ready to start (deps satisfied): ${String(orientation.startableCount)} roadmap pattern(s)${tail} — run \`arch workable\``,
     );
   } else {
     lines.push('Ready to start: 0 roadmap patterns with all dependencies satisfied.');

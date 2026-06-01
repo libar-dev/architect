@@ -43,7 +43,7 @@ import {
   buildFileToPackageMap,
   buildPatternHierarchy,
   createPatternSummaryFragment,
-  extractDescription,
+  extractDescriptionWithMeta,
   extractOpenQuestions,
   normalizeDeliverables,
   normalizePatternRelationships,
@@ -62,7 +62,9 @@ export function projectPatternDetail(
     byPackage !== undefined ? buildFileToPackageMap(byPackage) : new Map();
   const summary = createPatternSummaryFragment(pattern, fileToPackage.get(pattern.source.file));
   const deliverables = normalizeDeliverables(pattern);
-  const description = extractDescription(pattern.directive.description);
+  const { description, truncated: descriptionTruncated } = extractDescriptionWithMeta(
+    pattern.directive.description,
+  );
   const openQuestions = extractOpenQuestions(pattern.directive.description);
   const hierarchy = buildPatternHierarchy(pattern);
   const detail: PatternDetail = {
@@ -71,7 +73,7 @@ export function projectPatternDetail(
     ...(pattern.boundedContext !== undefined ? { boundedContext: pattern.boundedContext } : {}),
     ...(pattern.productArea !== undefined ? { productArea: pattern.productArea } : {}),
     ...(pattern.level !== undefined ? { level: pattern.level } : {}),
-    ...(description !== '' ? { description } : {}),
+    ...(description !== '' ? { description, descriptionTruncated } : {}),
     ...(openQuestions.length > 0 ? { openQuestions } : {}),
     deliverables,
     relationships: normalizePatternRelationships(context, summary.patternName),

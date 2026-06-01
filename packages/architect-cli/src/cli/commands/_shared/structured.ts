@@ -89,6 +89,7 @@ const ARCH_SUBCOMMANDS = [
   'dangling',
   'orphans',
   'blocking',
+  'workable',
   'packages',
 ] as const;
 type ArchSubcommand = (typeof ARCH_SUBCOMMANDS)[number];
@@ -485,6 +486,21 @@ async function executeArchCommand(
       return projectOrphanPatternList(context.projection).root.items;
     case 'blocking':
       return projectOverviewDigest(context.projection).root.blocking;
+    case 'workable': {
+      // The complement of `blocking`: roadmap-status patterns whose dependencies
+      // are all complete (safe to start). The overview computes the same set but
+      // only exposes a capped sample (startableSample) + a count; this returns the
+      // full list as a first-class verb so "what can I start?" is one call instead
+      // of a `comm -23 <(list --status roadmap) <(arch blocking)` shell stitch.
+      const blockedNames = new Set(
+        projectOverviewDigest(context.projection).root.blocking.map((entry) => entry.pattern),
+      );
+      return toCompactSummaries(
+        context.api
+          .getPatternsByStatus(parseAcceptedStatusValue('roadmap'))
+          .filter((pattern) => !blockedNames.has(pattern.patternName ?? pattern.name)),
+      );
+    }
     case 'packages': {
       const byPackage = context.build.graph.archIndex?.byPackage;
       if (byPackage === undefined || Object.keys(byPackage).length === 0) {

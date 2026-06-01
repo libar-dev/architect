@@ -41,7 +41,7 @@ Feature: Pattern detail projection
     across every renderer, even for sparse patterns, without consumers probing
     graph internals or compensating for missing indices.
 
-    **Verified by:** projecting a full pattern detail bundle, detail relationships fall back to raw pattern arrays when the relationship index is missing, detail projection keeps empty arrays explicit, detail projection preserves hierarchy metadata, detail projection extracts open questions from normalized prose
+    **Verified by:** projecting a full pattern detail bundle, detail relationships fall back to raw pattern arrays when the relationship index is missing, detail projection keeps empty arrays explicit, detail projection preserves hierarchy metadata, detail projection flags a truncated description head, detail projection extracts open questions from normalized prose
 
     @acceptance-criteria
     Scenario: projecting a full pattern detail bundle
@@ -65,6 +65,11 @@ Feature: Pattern detail projection
       Given a pattern detail context with hierarchy metadata
       When I project the pattern detail for "LifecycleMvpEpic"
       Then the pattern detail should preserve hierarchy metadata
+
+    Scenario: detail projection flags a truncated description head
+      Given a pattern detail context with prose beyond the description head
+      When I project the pattern detail for "TruncatedPattern"
+      Then the pattern detail head is flagged as truncated
 
     Scenario: detail projection extracts open questions from normalized prose
       Given a pattern detail context with open questions prose

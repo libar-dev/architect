@@ -17,7 +17,7 @@ Feature: Pattern Graph CLI - Output Modifiers
 
     **Rationale:** Users should not need to memorize argument ordering rules; the CLI should be forgiving.
 
-    **Verified by:** Count modifier after list subcommand returns count, Names-only modifier after list subcommand returns names, Count modifier combined with list filter, Parent filter with names-only returns child names, Parent filter with count returns child count, Parent filter returns empty for parent without children, Open questions parent filter returns only descendants with questions, Open questions empty parent returns an empty document, Open questions unknown parent fails deterministically, Bundle include blocks return a composite payload, Bundle mode default include set returns heuristic token estimates, Bundle unknown root pattern fails deterministically, Bundle accumulates repeated include flags, Unknown parent filter fails deterministically
+    **Verified by:** Count modifier after list subcommand returns count, Names-only modifier after list subcommand returns names, Count modifier combined with list filter, Parent filter with names-only returns child names, Parent filter with count returns child count, Parent filter returns empty for parent without children, Open questions parent filter returns only descendants with questions, Open questions include-self adds the focal epic own questions, Open questions empty parent returns an empty document, Open questions unknown parent fails deterministically, Bundle include blocks return a composite payload, Bundle mode default include set returns heuristic token estimates, Bundle unknown root pattern fails deterministically, Bundle accumulates repeated include flags, Unknown parent filter fails deterministically
 
     @happy-path
     Scenario: Count modifier after list subcommand returns count
@@ -69,6 +69,14 @@ Feature: Pattern Graph CLI - Output Modifiers
       When running "pattern-graph-cli -i 'src/**/*.ts' -f 'tests/features/**/*.feature' --format json open-questions --parent ParentEpic"
       Then exit code is 0
       And the open question result contains patterns "ChildAlpha, ChildBeta"
+      And every open question result entry has at least one question
+
+    @happy-path
+    Scenario: Open questions include-self adds the focal epic own questions
+      Given Gherkin feature files with parent hierarchy
+      When running "pattern-graph-cli -i 'src/**/*.ts' -f 'tests/features/**/*.feature' --format json open-questions --parent ParentEpic --include-self"
+      Then exit code is 0
+      And the open question result contains patterns "ChildAlpha, ChildBeta, ParentEpic"
       And every open question result entry has at least one question
 
     @edge-case

@@ -322,6 +322,41 @@ describeFeature(outputModifiersFeature, ({ Background, Rule, AfterEachScenario }
     );
 
     RuleScenario(
+      'Open questions include-self adds the focal epic own questions',
+      ({ Given, When, Then, And }) => {
+        Given('Gherkin feature files with parent hierarchy', async () => {
+          await writeParentHierarchyFeatureFiles(state);
+        });
+
+        When('running {string}', async (_ctx: unknown, cmd: string) => {
+          await runCLICommand(state, cmd);
+        });
+
+        Then('exit code is {int}', (_ctx: unknown, code: number) => {
+          expect(getResult(state).exitCode).toBe(code);
+        });
+
+        And(
+          'the open question result contains patterns {string}',
+          (_ctx: unknown, names: string) => {
+            const root = parseProjectionRoot();
+            const items = root['items'] as Array<{ pattern: string }>;
+            expect(items.map((item) => item.pattern)).toEqual(
+              names.split(',').map((name) => name.trim()),
+            );
+          },
+        );
+
+        And('every open question result entry has at least one question', () => {
+          const root = parseProjectionRoot();
+          const items = root['items'] as Array<{ questions: string[] }>;
+          expect(items.length).toBeGreaterThan(0);
+          expect(items.every((item) => item.questions.length > 0)).toBe(true);
+        });
+      },
+    );
+
+    RuleScenario(
       'Open questions empty parent returns an empty document',
       ({ Given, When, Then, And }) => {
         Given('Gherkin feature files with parent hierarchy', async () => {
@@ -791,6 +826,39 @@ describeFeature(archHealthFeature, ({ Background, Rule, AfterEachScenario }) => 
         },
       );
     });
+
+    RuleScenario(
+      'Arch workable returns startable roadmap patterns',
+      ({ Given, When, Then, And }) => {
+        Given('TypeScript files with blocked pattern annotations', async () => {
+          await writeBlockedPatternFiles(state);
+        });
+
+        When('running {string}', async (_ctx: unknown, cmd: string) => {
+          await runCLICommand(state, cmd);
+        });
+
+        Then('exit code is {int}', (_ctx: unknown, code: number) => {
+          expect(getResult(state).exitCode).toBe(code);
+        });
+
+        And('stdout JSON data is an array', () => {
+          const parsed = JSON.parse(getResult(state).stdout) as { data: unknown };
+          expect(Array.isArray(parsed.data)).toBe(true);
+        });
+
+        And('stdout JSON data workable entries are roadmap patterns only', () => {
+          const parsed = JSON.parse(getResult(state).stdout) as {
+            data: Array<{ patternName: string; status: string }>;
+          };
+          // The unblocked roadmap pattern is present; active/completed patterns are
+          // excluded by status (the complement of arch blocking is roadmap-only).
+          expect(parsed.data.length).toBeGreaterThan(0);
+          expect(parsed.data.every((entry) => entry.status === 'roadmap')).toBe(true);
+          expect(parsed.data.map((entry) => entry.patternName)).toContain('RoadmapPattern');
+        });
+      },
+    );
   });
 });
 

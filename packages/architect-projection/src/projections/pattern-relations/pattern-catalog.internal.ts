@@ -21,6 +21,7 @@ import { filterPatterns } from '../_shared/filter.js';
 import {
   buildFileToPackageMap,
   createPatternSummaryFragment,
+  getPatternName,
 } from '../_shared/pattern-helpers.internal.js';
 
 export const PatternCatalogOptionsSchema = z
@@ -101,6 +102,7 @@ function statusFilterMatches(
 export function resolveParentChildNames(
   context: ProjectionContext,
   parent: string | undefined,
+  includeSelf = false,
 ): ReadonlySet<string> | undefined {
   if (parent === undefined) {
     return undefined;
@@ -111,7 +113,13 @@ export function resolveParentChildNames(
     throw new Error(`Parent pattern not found: ${parent}`);
   }
 
-  return new Set(parentPattern.children ?? []);
+  const childNames = new Set(parentPattern.children ?? []);
+  if (includeSelf) {
+    // Use the canonical name so the set matches getPatternName(pattern) during the
+    // candidate filter — the caller may have passed a punctuation-variant of the name.
+    childNames.add(getPatternName(parentPattern));
+  }
+  return childNames;
 }
 
 function resolveCanonicalRoleFilter(
