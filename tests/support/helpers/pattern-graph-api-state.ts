@@ -608,6 +608,58 @@ export async function writeDecisionEnforcingFeatureFiles(
   }
 }
 
+/**
+ * One feature whose pattern declares NO `@architect-product-area`, so its rule
+ * buckets under the projection's `DEFAULT_PRODUCT_AREA` ('Platform'). Fixture for
+ * the regression that `rules --product-area Platform` must ACCEPT the default
+ * bucket rather than fail-loud "invalid value": the accepted set is derived from
+ * the rule projection (`collectBusinessRuleProductAreas`), not the pattern-keyed
+ * `byProductArea` (which omits the default bucket and so false-rejected it).
+ */
+export function createDefaultProductAreaRuleFeatureFiles(): Array<{ path: string; content: string }> {
+  return [
+    {
+      path: 'packages/architect-core/specs/default-area-rule.feature',
+      content: [
+        '@architect',
+        '@architect-pattern:DefaultAreaRuleTest',
+        '@architect-status:completed',
+        'Feature: Default Area Rule Test',
+        '',
+        '  Rule: Default-area rule has no product area',
+        '',
+        '    **Invariant:** A rule whose pattern declares no product area buckets under the default product area.',
+        '',
+        '    @acceptance-criteria',
+        '    Scenario: Default bucket',
+        '      Given a pattern with no product area',
+        '      Then its rule buckets under the default product area',
+      ].join('\n'),
+    },
+  ];
+}
+
+export async function writeDefaultProductAreaRuleFeatureFiles(
+  state: CLITestState | null,
+): Promise<void> {
+  const dir = getTempDir(state);
+  await writeTempFile(
+    dir,
+    'architect.config.js',
+    [
+      'export default {',
+      '  packages: [',
+      "    { id: 'architect-core', displayName: 'Architect Core', match: 'packages/architect-core/' },",
+      '  ],',
+      '};',
+      '',
+    ].join('\n'),
+  );
+  for (const file of createDefaultProductAreaRuleFeatureFiles()) {
+    await writeTempFile(dir, file.path, file.content);
+  }
+}
+
 export async function writeParentHierarchyFeatureFiles(state: CLITestState | null): Promise<void> {
   const dir = getTempDir(state);
   await writeTempFile(

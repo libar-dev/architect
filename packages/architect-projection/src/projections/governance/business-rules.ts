@@ -44,6 +44,7 @@ import {
 import { parseAndProject } from '../_shared/parse-and-project.internal.js';
 
 export { BusinessRuleSetOptionsSchema } from './business-rules.internal.js';
+export { collectBusinessRuleProductAreas } from './business-rules.internal.js';
 
 export function projectBusinessRule(
   context: ProjectionContext,

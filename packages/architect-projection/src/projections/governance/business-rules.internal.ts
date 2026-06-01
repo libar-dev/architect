@@ -185,6 +185,24 @@ function collectBusinessRules(
     .sort(compareBusinessRules);
 }
 
+/**
+ * The distinct product areas the `rules --product-area` filter can match — every
+ * business rule's `productArea` (`pattern.productArea ?? DEFAULT_PRODUCT_AREA`),
+ * deduped and sorted. This is the fail-loud accepted set for the CLI
+ * `--product-area` filter: it INCLUDES the `DEFAULT_PRODUCT_AREA` bucket that the
+ * pattern-keyed `graph.byProductArea` omits (a pattern with no `productArea` is
+ * absent from `byProductArea`, yet its rules still bucket under the default), so
+ * the accepted set equals the filter target by construction — a valid area never
+ * false-rejects as "invalid".
+ */
+export function collectBusinessRuleProductAreas(context: ProjectionContext): readonly string[] {
+  const areas = new Set<string>();
+  for (const rule of collectBusinessRules(context, { scope: 'all' })) {
+    areas.add(rule.productArea ?? DEFAULT_PRODUCT_AREA);
+  }
+  return [...areas].sort((left, right) => left.localeCompare(right));
+}
+
 function patternMatchesRuleSetScope(
   context: ProjectionContext,
   pattern: ExtractedPattern,

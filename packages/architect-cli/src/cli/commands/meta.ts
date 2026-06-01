@@ -3,6 +3,7 @@ import {
   projectSourceInventoryDigest,
 } from '@libar-dev/architect-projection';
 import {
+  collectBusinessRuleProductAreas,
   projectBusinessRuleSet,
   projectTaxonomyDigest,
   summarizeTaxonomyDigest,
@@ -98,7 +99,10 @@ export const metaCommands = {
       if (flags.productArea !== undefined) {
         resolvedFlags = {
           ...resolvedFlags,
-          productArea: resolveProductAreaFilter(cliContext.api.getPatternGraph(), flags.productArea),
+          productArea: resolveProductAreaFilter(
+            collectBusinessRuleProductAreas(cliContext.projection),
+            flags.productArea,
+          ),
         };
       }
       const ruleSet = projectBusinessRuleSet(

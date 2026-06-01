@@ -41,6 +41,7 @@ export {
   projectTraceabilityMatrix,
 } from './delivery-reporting/index.js';
 export {
+  collectBusinessRuleProductAreas,
   projectBusinessRule,
   parseAndProjectBusinessRuleSet,
   projectBusinessRuleSet,

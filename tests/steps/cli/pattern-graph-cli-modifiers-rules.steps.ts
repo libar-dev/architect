@@ -27,6 +27,7 @@ import {
   writeDanglingRefFiles,
   writeFeatureFilesWithRules,
   writeDecisionEnforcingFeatureFiles,
+  writeDefaultProductAreaRuleFeatureFiles,
   writeParentHierarchyFeatureFiles,
   createTempDir,
 } from '../../support/helpers/pattern-graph-api-state.js';
@@ -1171,6 +1172,32 @@ describeFeature(rulesSubcommandFeature, ({ Background, Rule, AfterEachScenario }
       },
     );
 
+    RuleScenario(
+      'Rules accepts the default product area for rules whose pattern declares none',
+      ({ Given, When, Then, And }) => {
+        Given('Gherkin feature files with a rule that declares no product area', async () => {
+          await writeDefaultProductAreaRuleFeatureFiles(state);
+        });
+
+        When('running {string}', async (_ctx: unknown, cmd: string) => {
+          await runCLICommand(state, cmd);
+        });
+
+        Then('exit code is {int}', (_ctx: unknown, code: number) => {
+          expect(getResult(state).exitCode).toBe(code);
+        });
+
+        And('stdout is a JSON string array', () => {
+          const parsed = JSON.parse(getResult(state).stdout) as unknown;
+          expect(Array.isArray(parsed)).toBe(true);
+        });
+
+        And('stdout contains {string}', (_ctx: unknown, text: string) => {
+          expect(getResult(state).stdout).toContain(text);
+        });
+      },
+    );
+
     RuleScenario('Rules package filter works with count', ({ Given, When, Then, And }) => {
       Given('TypeScript files with pattern annotations', async () => {
         await writePatternFiles(state);
@@ -1451,6 +1478,36 @@ describeFeature(rulesSubcommandFeature, ({ Background, Rule, AfterEachScenario }
 
     RuleScenario(
       'Rules resolves a decision whose numeric id collides with another decision record',
+      ({ Given, When, Then, And }) => {
+        Given('Gherkin feature files enforcing a decision', async () => {
+          await writeDecisionEnforcingFeatureFiles(state);
+        });
+
+        When('running {string}', async (_ctx: unknown, cmd: string) => {
+          await runCLICommand(state, cmd);
+        });
+
+        Then('exit code is {int}', (_ctx: unknown, code: number) => {
+          expect(getResult(state).exitCode).toBe(code);
+        });
+
+        And('stdout is a JSON string array', () => {
+          const parsed = JSON.parse(getResult(state).stdout) as unknown;
+          expect(Array.isArray(parsed)).toBe(true);
+        });
+
+        And('stdout contains {string}', (_ctx: unknown, text: string) => {
+          expect(getResult(state).stdout).toContain(text);
+        });
+
+        And('stdout does not contain {string}', (_ctx: unknown, text: string) => {
+          expect(getResult(state).stdout).not.toContain(text);
+        });
+      },
+    );
+
+    RuleScenario(
+      'Rules resolves the sibling decision of a numeric-id collision by identity',
       ({ Given, When, Then, And }) => {
         Given('Gherkin feature files enforcing a decision', async () => {
           await writeDecisionEnforcingFeatureFiles(state);

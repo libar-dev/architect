@@ -17,7 +17,7 @@ Feature: Pattern Graph CLI - Rules Subcommand
 
     **Rationale:** Live business rule queries replace static generated markdown, enabling on-demand filtering by product area, pattern, package, feature path, and invariant presence.
 
-    **Verified by:** Rules returns business rules from feature files, Rules filters by product area, Rules with names-only returns flat array, Rules with count returns a JSON number, Rules filters by canonical package id, Rules package filter works with count, Rules rejects an unknown package with the accepted set, Rules rejects an unknown product area with the accepted set, Rules aggregates a decision across enforcing patterns, Rules decision filter accepts the ADR id form, Rules decision filter accepts the canonical pattern name, Rules decision filter excludes unrelated rules, Rules resolves a decision whose numeric id collides with another decision record, Rules rejects an unknown decision with the accepted set, Rules rejects conflicting decision and pattern filters, Rules feature path filter works with count, Rules feature glob filter works with names-only, Rules rejects retired phase filter
+    **Verified by:** Rules returns business rules from feature files, Rules filters by product area, Rules with names-only returns flat array, Rules with count returns a JSON number, Rules filters by canonical package id, Rules package filter works with count, Rules rejects an unknown package with the accepted set, Rules rejects an unknown product area with the accepted set, Rules accepts the default product area for rules whose pattern declares none, Rules aggregates a decision across enforcing patterns, Rules decision filter accepts the ADR id form, Rules decision filter accepts the canonical pattern name, Rules decision filter excludes unrelated rules, Rules resolves a decision whose numeric id collides with another decision record, Rules resolves the sibling decision of a numeric-id collision by identity, Rules rejects an unknown decision with the accepted set, Rules rejects conflicting decision and pattern filters, Rules feature path filter works with count, Rules feature glob filter works with names-only, Rules rejects retired phase filter
 
     @happy-path
     Scenario: Rules returns business rules from feature files
@@ -130,6 +130,14 @@ Feature: Pattern Graph CLI - Rules Subcommand
       And output is a fail-loud product-area error enumerating the accepted set
 
     @happy-path
+    Scenario: Rules accepts the default product area for rules whose pattern declares none
+      Given Gherkin feature files with a rule that declares no product area
+      When running "pattern-graph-cli -i 'src/**/*.ts' -f 'packages/**/specs/**/*.feature' rules --product-area Platform --names-only"
+      Then exit code is 0
+      And stdout is a JSON string array
+      And stdout contains "Default-area rule has no product area"
+
+    @happy-path
     Scenario: Rules feature path filter works with count
       Given TypeScript files with pattern annotations
       And Gherkin feature files with business rules
@@ -205,6 +213,14 @@ Feature: Pattern Graph CLI - Rules Subcommand
       And stdout is a JSON string array
       And stdout contains "Collision ADR owns its rationale"
       And stdout does not contain "Sibling PDR owns an unrelated rationale"
+
+    Scenario: Rules resolves the sibling decision of a numeric-id collision by identity
+      Given Gherkin feature files enforcing a decision
+      When running "pattern-graph-cli -i 'src/**/*.ts' -f 'packages/**/specs/**/*.feature' -f 'architect/decisions/**/*.feature' rules --decision PDR-555 --names-only"
+      Then exit code is 0
+      And stdout is a JSON string array
+      And stdout contains "Sibling PDR owns an unrelated rationale"
+      And stdout does not contain "Collision ADR owns its rationale"
 
     @validation
     Scenario: Rules rejects an unknown decision with the accepted set
