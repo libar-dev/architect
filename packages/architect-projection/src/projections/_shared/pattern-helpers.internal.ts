@@ -243,11 +243,7 @@ export function extractDescriptionWithMeta(text: string): {
   const problemMatch = /\*\*Problem:\*\*\s*([\s\S]+?)(?=\*\*Solution:\*\*|$)/.exec(text);
   const solutionMatch = /\*\*Solution:\*\*\s*([\s\S]+?)(?=\n\s*\*\*[A-Z]|\n\n\s*\n|$)/.exec(text);
 
-  if (
-    problemMatch?.[1] !== undefined &&
-    solutionMatch?.[1] !== undefined &&
-    solutionMatch.index !== undefined
-  ) {
+  if (problemMatch?.[1] !== undefined && solutionMatch?.[1] !== undefined) {
     const problemRaw = problemMatch[1].trim();
     const solutionRaw = solutionMatch[1].trim();
     const problem = extractFirstSentenceRaw(problemRaw);

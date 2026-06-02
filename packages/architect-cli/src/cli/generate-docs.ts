@@ -522,7 +522,7 @@ async function writeGeneratedFiles(
 }
 
 async function reportDriftAndExit(
-  executions: ReadonlyArray<{ execution: GeneratorExecution; outputDir: string }>,
+  executions: readonly { execution: GeneratorExecution; outputDir: string }[],
 ): Promise<void> {
   const drift: string[] = [];
   let checked = 0;

@@ -619,7 +619,10 @@ export async function writeDecisionEnforcingFeatureFiles(
  * the rule projection (`collectBusinessRuleProductAreas`), not the pattern-keyed
  * `byProductArea` (which omits the default bucket and so false-rejected it).
  */
-export function createDefaultProductAreaRuleFeatureFiles(): Array<{ path: string; content: string }> {
+export function createDefaultProductAreaRuleFeatureFiles(): Array<{
+  path: string;
+  content: string;
+}> {
   return [
     {
       path: 'packages/architect-core/specs/default-area-rule.feature',

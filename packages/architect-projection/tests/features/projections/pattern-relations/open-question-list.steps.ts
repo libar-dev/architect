@@ -147,16 +147,22 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           });
         });
 
-        Then('the open question list includes "ParentEpic" alongside its questioned descendants', () => {
-          expect(state!.bundle?.root).toMatchObject({
-            filters: { parent: 'ParentEpic' },
-            count: 2,
-            items: [
-              { pattern: 'ChildAlpha', questions: ['Who owns Alpha?', 'Which signal closes it?'] },
-              { pattern: 'ParentEpic', questions: ['What is the parent-level gating decision?'] },
-            ],
-          });
-        });
+        Then(
+          'the open question list includes "ParentEpic" alongside its questioned descendants',
+          () => {
+            expect(state!.bundle?.root).toMatchObject({
+              filters: { parent: 'ParentEpic' },
+              count: 2,
+              items: [
+                {
+                  pattern: 'ChildAlpha',
+                  questions: ['Who owns Alpha?', 'Which signal closes it?'],
+                },
+                { pattern: 'ParentEpic', questions: ['What is the parent-level gating decision?'] },
+              ],
+            });
+          },
+        );
       },
     );
 

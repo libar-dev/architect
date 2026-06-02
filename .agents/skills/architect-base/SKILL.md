@@ -32,14 +32,14 @@ The **canonical source of truth** is annotated production code + executable Gher
 
 ## 2. The delivery process in this repo
 
-| Aspect           | Value                                                                                                            |
-| ---------------- | ---------------------------------------------------------------------------------------------------------------- |
-| Config           | `architect.config.ts` at the repo root                                                                           |
-| Working state    | `architect/` (specs, decisions, releases, stubs, step-stubs, design-reviews)                                     |
-| Source of truth  | Annotated `packages/*/src/**/*.ts` + executable Gherkin under `tests/features/` and `packages/*/tests/features/` |
-| CLI              | `pnpm architect:query <verb>` (canonical script name across architect-managed repos)                             |
-| MCP              | `architect` server → `mcp__architect__*` callable tools                                                          |
-| Validation entry | `pnpm typecheck`, `pnpm test`, `pnpm validate:all`, `pnpm architect:guard --staged`                              |
+| Aspect           | Value                                                                                                                                                                                                                                                                                                                               |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Config           | `architect.config.ts` at the repo root                                                                                                                                                                                                                                                                                              |
+| Working state    | `architect/` (specs, decisions, releases, stubs, step-stubs, design-reviews)                                                                                                                                                                                                                                                        |
+| Source of truth  | Annotated `packages/*/src/**/*.ts` + executable Gherkin under `tests/features/` and `packages/*/tests/features/`                                                                                                                                                                                                                    |
+| CLI              | `pnpm architect:query <verb>` (canonical script name across architect-managed repos)                                                                                                                                                                                                                                                |
+| MCP              | `architect` server → `mcp__architect__*` callable tools                                                                                                                                                                                                                                                                             |
+| Validation entry | `pnpm typecheck`, `pnpm test`, `pnpm validate:all`, `pnpm architect:guard --staged`                                                                                                                                                                                                                                                 |
 | Doc regeneration | `pnpm docs:all` → `docs-live/` (git-tracked, derived — determinism-gate diff target); `pnpm docs:check` verifies idempotency in place (re-renders, diffs the working tree, writes nothing, non-zero on drift) — usable mid-changeset where `git diff --exit-code` can't tell an uncommitted edit from a non-deterministic generator |
 
 When this package family is consumed by another project, the consumer wires their own `architect.config.ts` and exposes their own `architect:query` script — the contracts above are stable across architect-managed repos.

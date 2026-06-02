@@ -99,7 +99,8 @@ export function serializeGeneratedDocsManifest(manifest: GeneratedDocsManifest):
 export async function upsertGeneratedDocsManifest(
   options: UpsertGeneratedDocManifestOptions,
 ): Promise<void> {
-  const existing = (await loadGeneratedDocsManifest(options.outputDir)) ?? EMPTY_GENERATED_DOCS_MANIFEST;
+  const existing =
+    (await loadGeneratedDocsManifest(options.outputDir)) ?? EMPTY_GENERATED_DOCS_MANIFEST;
 
   const previousEntries = existing.generators[options.generatorName]?.entries ?? [];
   if (options.pruneStaleFiles === true) {

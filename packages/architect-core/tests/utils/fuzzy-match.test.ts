@@ -28,7 +28,7 @@ describe('fuzzyMatchPatterns — punctuation-insensitive id resolution', () => {
     const normalized = fuzzyMatchPatterns('ADR-006', NAMES)[0];
     expect(literal?.patternName).toBe('ADR006SingleReadModelArchitecture');
     expect(normalized?.patternName).toBe('ADR006SingleReadModelArchitecture');
-    expect((literal?.score ?? 0)).toBeGreaterThanOrEqual(normalized?.score ?? 0);
+    expect(literal?.score ?? 0).toBeGreaterThanOrEqual(normalized?.score ?? 0);
   });
 
   it('does not match an unrelated query', () => {

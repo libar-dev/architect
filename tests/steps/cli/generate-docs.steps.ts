@@ -568,13 +568,16 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           await runCLICommand(cmd);
         });
 
-        And('the generated docs manifest in {string} is emptied', async (_ctx: unknown, dir: string) => {
-          await writeTempFile(
-            getTempDir(),
-            `${dir}/.generated-docs-manifest.json`,
-            '{\n  "version": 1,\n  "generators": {}\n}\n',
-          );
-        });
+        And(
+          'the generated docs manifest in {string} is emptied',
+          async (_ctx: unknown, dir: string) => {
+            await writeTempFile(
+              getTempDir(),
+              `${dir}/.generated-docs-manifest.json`,
+              '{\n  "version": 1,\n  "generators": {}\n}\n',
+            );
+          },
+        );
 
         And('running {string}', async (_ctx: unknown, cmd: string) => {
           await runCLICommand(cmd);
