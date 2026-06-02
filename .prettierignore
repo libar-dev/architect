@@ -16,3 +16,9 @@ docs-live/
 .cleanup-review/
 .full-review/
 .scratch/
+.pr-coordination/
+
+# Operational feedback log — append-only, and full of literal glob/tag patterns
+# (e.g. `*-values.ts`, `adr-*`) that prettier's markdown parser would silently
+# rewrite as emphasis (`_-values.ts`, `adr-_`), corrupting the recorded text.
+FEEDBACK.md

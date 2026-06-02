@@ -27,15 +27,18 @@ jobs:
           registry-url: https://registry.npmjs.org
 
       - run: pnpm install --frozen-lockfile
-      - run: pnpm build
-      - run: pnpm lint
-      - run: pnpm typecheck
-      - run: pnpm test
-      - run: pnpm validate:all
+      # Identical correctness gate to ci.yml — a release must not pass on a
+      # weaker set of checks than a PR. `ci:verify` is the shared composite; the
+      # docs-live determinism diff and perf baseline mirror ci.yml exactly.
+      - run: pnpm ci:verify
       - run: pnpm docs:all
-      - run: pnpm architect:query -- arch dangling --baseline packages/architect-guard/src/lint/dangling-baseline.json --strict
-      - run: pnpm --filter @libar-dev/architect-projection test:perf
-      - run: pnpm audit:subtractive
+      - run: git diff --exit-code docs-live
+      - run: pnpm --filter @libar-dev/architect-projection test:perf:baseline
+      # changeset:publish passes `--tag pre` so the current 2.0.0-pre.* versions
+      # land on the `pre` dist-tag, not `latest` (matches the registry: latest is
+      # the last stable line, `pre` is the prerelease channel). REVISIT before the
+      # first stable 2.0.0 release — a hardcoded `--tag pre` would mis-route a
+      # stable publish onto the prerelease channel.
       - run: pnpm changeset:publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

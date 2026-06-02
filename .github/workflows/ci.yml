@@ -22,17 +22,13 @@ jobs:
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
-      - run: pnpm build
-      - run: pnpm format:check
-      - run: pnpm lint
-      - run: pnpm typecheck
-      - run: pnpm typecheck:dogfood
-      - run: pnpm test
-      - run: pnpm test:dogfood
-      - run: pnpm validate:all
+      # Shared correctness gate (build, format:check, lint, typecheck[:dogfood],
+      # test[:dogfood], validate:all, guard:no-suppressions, check:skills, arch
+      # dangling --strict, umbrella bin smoke via `pnpm test`, audit:subtractive).
+      # The pre-push hook and publish.yml call the same composite — single source
+      # of truth so the gates never drift apart.
+      - run: pnpm ci:verify
       - run: pnpm docs:all
       # docs-live/ is committed; docs:all must regenerate it byte-identically.
       - run: git diff --exit-code docs-live
-      - run: pnpm architect:query -- arch dangling --baseline packages/architect-guard/src/lint/dangling-baseline.json --strict
       - run: pnpm --filter @libar-dev/architect-projection test:perf:baseline
-      - run: pnpm audit:subtractive

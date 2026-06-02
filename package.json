@@ -40,8 +40,13 @@
     "docs:check": "pnpm check:build && pnpm exec architect-generate --base-dir . --all --check",
     "changeset": "changeset",
     "changeset:version": "changeset version",
-    "changeset:publish": "changeset publish",
-    "release": "pnpm build && pnpm changeset:publish"
+    "changeset:publish": "changeset publish --tag pre",
+    "release": "pnpm build && pnpm changeset:publish",
+    "prepare": "husky",
+    "ci:verify": "pnpm build && pnpm format:check && pnpm lint && pnpm typecheck && pnpm typecheck:dogfood && pnpm test && pnpm test:dogfood && pnpm validate:all && pnpm guard:no-suppressions && pnpm check:skills && pnpm architect:query -- arch dangling --baseline packages/architect-guard/src/lint/dangling-baseline.json --strict && pnpm audit:subtractive",
+    "ci:lint-staged": "lint-staged",
+    "ci:pre-commit": "pnpm ci:lint-staged && pnpm check:build && pnpm exec architect-guard --base-dir . --staged",
+    "ci:pre-push": "pnpm ci:verify && pnpm docs:check"
   },
   "dependencies": {
     "@libar-dev/architect-core": "workspace:*",
@@ -59,6 +64,8 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-import-resolver-typescript": "^3.7.0",
     "eslint-plugin-import": "^2.31.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
     "prettier": "^3.8.1",
     "tsx": "^4.7.0",
     "typescript": "^5.8.2",

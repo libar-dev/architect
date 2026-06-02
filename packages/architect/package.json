@@ -30,6 +30,10 @@
     "architect-validate": "./bin/architect-validate.js",
     "architect-mcp": "./bin/architect-mcp.js"
   },
+  "scripts": {
+    "test": "node ../../scripts/architect-bin-smoke.mjs",
+    "prepack": "node ../../scripts/architect-bin-smoke.mjs"
+  },
   "dependencies": {
     "@libar-dev/architect-cli": "workspace:*",
     "@libar-dev/architect-core": "workspace:*",
