@@ -1,13 +1,13 @@
-# Architecture
+# Design Review — Package Lens
 
-**Purpose:** Auto-generated architecture diagrams from source annotations
-**Detail Level:** Context map plus per-group component diagrams
+**Purpose:** Design-review components grouped by workspace package, including not-yet-implemented specs.
+**Detail Level:** Working-state-inclusive context map plus per-lens component diagrams
 
 ---
 
 ## Overview
 
-This view captures 257 patterns across 8 diagrams in the Package architecture view.
+This view captures 214 patterns across 7 diagrams in the Package view.
 
 ## Diagrams
 
@@ -18,19 +18,20 @@ Each node is a group; each arrow is a cross-group dependency (`depends-on` / `us
 ```mermaid
 graph LR
   pkg_architect_cli["Architect CLI (4)"]
-  pkg_architect_core["Architect Core (59)"]
-  pkg_architect_guard["Architect Guard (21)"]
-  pkg_architect_host_dev["Architect Host (Dev) (23)"]
-  pkg_architect_mcp["Architect MCP (9)"]
-  pkg_architect_package_content["Architect Package Content (12)"]
-  pkg_architect_projection["Architect Projection (129)"]
+  pkg_architect_core["Architect Core (33)"]
+  pkg_architect_guard["Architect Guard (20)"]
+  pkg_architect_mcp["Architect MCP (5)"]
+  pkg_architect_package_content["Architect Package Content (46)"]
+  pkg_architect_projection["Architect Projection (106)"]
   pkg_architect_cli --> pkg_architect_core
   pkg_architect_cli --> pkg_architect_projection
   pkg_architect_guard --> pkg_architect_core
-  pkg_architect_host_dev --> pkg_architect_package_content
-  pkg_architect_host_dev --> pkg_architect_projection
   pkg_architect_mcp --> pkg_architect_core
   pkg_architect_mcp --> pkg_architect_projection
+  pkg_architect_package_content --> pkg_architect_core
+  pkg_architect_package_content --> pkg_architect_guard
+  pkg_architect_package_content --> pkg_architect_mcp
+  pkg_architect_package_content --> pkg_architect_projection
   pkg_architect_projection --> pkg_architect_core
 ```
 
@@ -38,78 +39,52 @@ graph LR
 
 ```mermaid
 graph TD
-  clierrorhandler["CLIErrorHandler<br/>(utility)"]
-  cliruntimepaths["CLIRuntimePaths<br/>(utility)"]
-  cliversionhelper["CLIVersionHelper<br/>(utility)"]
-  patterngraphcli["PatternGraphCLI<br/>(service)"]
+  clierrorhandler["CLIErrorHandler<br/>(utility · completed)"]
+  cliruntimepaths["CLIRuntimePaths<br/>(utility · completed)"]
+  cliversionhelper["CLIVersionHelper<br/>(utility · completed)"]
+  patterngraphcli["PatternGraphCLI<br/>(service · active)"]
   cliversionhelper -->|depends-on| cliruntimepaths
   patterngraphcli -->|depends-on| cliruntimepaths
   patterngraphcli -->|depends-on| cliversionhelper
 ```
 
-### Package: Architect Core (59 patterns)
+### Package: Architect Core (33 patterns)
 
 ```mermaid
 graph TD
-  architectureinspection["ArchitectureInspection<br/>(utility)"]
-  astparser["AstParser<br/>(service)"]
-  buildpipeline["BuildPipeline<br/>(service)"]
-  codecutils["CodecUtils<br/>(codec)"]
-  codecutilsvalidation["CodecUtilsValidation"]
-  configbasedworkflowdefinition["ConfigBasedWorkflowDefinition"]
-  configloader["ConfigLoader<br/>(service)"]
-  configresolution["ConfigResolution"]
-  configurationapi["ConfigurationAPI"]
-  crosspackageedgeclassification["CrossPackageEdgeClassification"]
-  decisionresolution["DecisionResolution<br/>(utility)"]
-  defineconfig["DefineConfig<br/>(utility)"]
-  defineconfigexecutabletests["DefineConfigExecutableTests"]
-  docextractor["DocExtractor<br/>(service)"]
-  docstringmediatype["DocStringMediaType"]
-  dualsourceextractor["DualSourceExtractor<br/>(service)"]
-  dualsourcemergeintegration["DualSourceMergeIntegration"]
-  errorfactorytypes["ErrorFactoryTypes<br/>(contract)"]
-  errorfactorytypesexecutabletests["ErrorFactoryTypesExecutableTests<br/>(contract)"]
-  extractedpattern["ExtractedPattern<br/>(contract)"]
-  extractiondiagnostics["ExtractionDiagnostics<br/>(contract)"]
-  filediscovery["FileDiscovery"]
-  fsmstates["FSMStates<br/>(read-model)"]
-  fsmtransitions["FSMTransitions<br/>(read-model)"]
-  fsmtransitionsexecutabletests["FSMTransitionsExecutableTests"]
-  fsmvalidator["FSMValidator<br/>(decider)"]
-  gherkinastparser["GherkinAstParser<br/>(service)"]
-  gherkinexternalrelationshiptagpropagation["GherkinExternalRelationshipTagPropagation"]
-  gherkinextractor["GherkinExtractor<br/>(service)"]
-  gherkinrulessupport["GherkinRulesSupport"]
-  gherkinscanner["GherkinScanner<br/>(service)"]
-  graphinventory["GraphInventory<br/>(utility)"]
-  layerinference["LayerInference<br/>(service)"]
-  markdownblockparser["MarkdownBlockParser<br/>(codec)"]
-  packageresolver["PackageResolver<br/>(utility)"]
-  packageresolverexecutabletests["PackageResolverExecutableTests"]
-  patternclassification["PatternClassification<br/>(utility)"]
-  patterngraph["PatternGraph<br/>(contract)"]
-  patterngraphapi["PatternGraphApi<br/>(utility)"]
-  patterngraphapiconsistencyexecutabletests["PatternGraphApiConsistencyExecutableTests<br/>(utility)"]
-  patterngraphapireverselookup["PatternGraphApiReverseLookup"]
-  patternhelpers["PatternHelpers<br/>(utility)"]
-  patternreferencevalidation["PatternReferenceValidation"]
-  patternscanner["PatternScanner<br/>(service)"]
-  projectconfigloader["ProjectConfigLoader"]
-  registrybuilder["RegistryBuilder<br/>(utility)"]
-  resultmonadtypes["ResultMonadTypes<br/>(contract)"]
-  resultmonadtypesexecutabletests["ResultMonadTypesExecutableTests<br/>(contract)"]
-  ruleaggregation["RuleAggregation<br/>(utility)"]
-  scannercore["ScannerCore"]
-  shapeextraction["ShapeExtraction"]
-  shapeextractor["ShapeExtractor<br/>(service)"]
-  sourcemerge["SourceMerge<br/>(utility)"]
-  sourcemerging["SourceMerging"]
-  tagregistryschemas["TagRegistrySchemas<br/>(contract)"]
-  tagregistryschemasvalidation["TagRegistrySchemasValidation"]
-  typescripttaxonomyimplementation["TypeScriptTaxonomyImplementation"]
-  valueformatcanonicalvaluesdispatch["ValueFormatCanonicalValuesDispatch"]
-  workflowconfigschemasvalidation["WorkflowConfigSchemasValidation"]
+  architectureinspection["ArchitectureInspection<br/>(utility · active)"]
+  astparser["AstParser<br/>(service · active)"]
+  buildpipeline["BuildPipeline<br/>(service · completed)"]
+  codecutils["CodecUtils<br/>(codec · active)"]
+  configloader["ConfigLoader<br/>(service · active)"]
+  decisionresolution["DecisionResolution<br/>(utility · active)"]
+  defineconfig["DefineConfig<br/>(utility · active)"]
+  docextractor["DocExtractor<br/>(service · active)"]
+  dualsourceextractor["DualSourceExtractor<br/>(service · active)"]
+  errorfactorytypes["ErrorFactoryTypes<br/>(contract · completed)"]
+  extractedpattern["ExtractedPattern<br/>(contract · active)"]
+  extractiondiagnostics["ExtractionDiagnostics<br/>(contract · active)"]
+  fsmstates["FSMStates<br/>(read-model · active)"]
+  fsmtransitions["FSMTransitions<br/>(read-model · active)"]
+  fsmvalidator["FSMValidator<br/>(decider · active)"]
+  gherkinastparser["GherkinAstParser<br/>(service · active)"]
+  gherkinextractor["GherkinExtractor<br/>(service · active)"]
+  gherkinscanner["GherkinScanner<br/>(service · active)"]
+  graphinventory["GraphInventory<br/>(utility · active)"]
+  layerinference["LayerInference<br/>(service · active)"]
+  markdownblockparser["MarkdownBlockParser<br/>(codec · active)"]
+  packageresolver["PackageResolver<br/>(utility · active)"]
+  patternclassification["PatternClassification<br/>(utility · active)"]
+  patterngraph["PatternGraph<br/>(contract · active)"]
+  patterngraphapi["PatternGraphApi<br/>(utility · active)"]
+  patternhelpers["PatternHelpers<br/>(utility · active)"]
+  patternscanner["PatternScanner<br/>(service · active)"]
+  registrybuilder["RegistryBuilder<br/>(utility · active)"]
+  resultmonadtypes["ResultMonadTypes<br/>(contract · completed)"]
+  ruleaggregation["RuleAggregation<br/>(utility · active)"]
+  shapeextractor["ShapeExtractor<br/>(service · active)"]
+  sourcemerge["SourceMerge<br/>(utility · active)"]
+  tagregistryschemas["TagRegistrySchemas<br/>(contract · active)"]
   architectureinspection -->|depends-on| extractedpattern
   architectureinspection -->|depends-on| patterngraph
   architectureinspection -->|depends-on| patternhelpers
@@ -128,7 +103,6 @@ graph TD
   dualsourceextractor -->|depends-on| patternhelpers
   fsmvalidator -->|depends-on| fsmstates
   fsmvalidator -->|depends-on| fsmtransitions
-  gherkinexternalrelationshiptagpropagation -. see-also .- gherkinrulessupport
   gherkinextractor -->|depends-on| gherkinastparser
   gherkinextractor -->|depends-on| layerinference
   graphinventory -->|depends-on| extractedpattern
@@ -147,31 +121,30 @@ graph TD
   ruleaggregation -->|depends-on| patternhelpers
 ```
 
-### Package: Architect Guard (21 patterns)
+### Package: Architect Guard (20 patterns)
 
 ```mermaid
 graph TD
-  antipatterndetector["AntiPatternDetector<br/>(service)"]
-  deriveprocessstate["DeriveProcessState<br/>(read-model)"]
-  detectchanges["DetectChanges<br/>(service)"]
-  dodvalidationtypes["DoDValidationTypes<br/>(contract)"]
-  dodvalidator["DoDValidator<br/>(service)"]
-  gitbranchdiff["GitBranchDiff<br/>(utility)"]
-  githelpers["GitHelpers<br/>(utility)"]
-  gitmodule["GitModule<br/>(barrel)"]
-  gitnamestatusparser["GitNameStatusParser<br/>(utility)"]
-  lintengine["LintEngine<br/>(service)"]
-  lintmodule["LintModule<br/>(barrel)"]
-  lintpatternscli["LintPatternsCLI<br/>(service)"]
-  lintprocesscli["LintProcessCLI<br/>(service)"]
-  lintrules["LintRules<br/>(service)"]
-  processguarddecider["ProcessGuardDecider<br/>(decider)"]
-  processguardlinter["ProcessGuardLinter<br/>(barrel)"]
-  processguardrulesexecutabletests["ProcessGuardRulesExecutableTests"]
-  processguardtypes["ProcessGuardTypes<br/>(contract)"]
-  sessionstatereader["SessionStateReader<br/>(service)"]
-  validatepatternscli["ValidatePatternsCLI<br/>(service)"]
-  validationmodule["ValidationModule<br/>(barrel)"]
+  antipatterndetector["AntiPatternDetector<br/>(service · completed)"]
+  deriveprocessstate["DeriveProcessState<br/>(read-model · active)"]
+  detectchanges["DetectChanges<br/>(service · active)"]
+  dodvalidationtypes["DoDValidationTypes<br/>(contract · completed)"]
+  dodvalidator["DoDValidator<br/>(service · completed)"]
+  gitbranchdiff["GitBranchDiff<br/>(utility · active)"]
+  githelpers["GitHelpers<br/>(utility · active)"]
+  gitmodule["GitModule<br/>(barrel · active)"]
+  gitnamestatusparser["GitNameStatusParser<br/>(utility · active)"]
+  lintengine["LintEngine<br/>(service · completed)"]
+  lintmodule["LintModule<br/>(barrel · completed)"]
+  lintpatternscli["LintPatternsCLI<br/>(service · completed)"]
+  lintprocesscli["LintProcessCLI<br/>(service · active)"]
+  lintrules["LintRules<br/>(service · completed)"]
+  processguarddecider["ProcessGuardDecider<br/>(decider · active)"]
+  processguardlinter["ProcessGuardLinter<br/>(barrel · active)"]
+  processguardtypes["ProcessGuardTypes<br/>(contract · active)"]
+  sessionstatereader["SessionStateReader<br/>(service · active)"]
+  validatepatternscli["ValidatePatternsCLI<br/>(service · completed)"]
+  validationmodule["ValidationModule<br/>(barrel · completed)"]
   antipatterndetector -->|depends-on| dodvalidationtypes
   deriveprocessstate -->|depends-on| sessionstatereader
   detectchanges -->|depends-on| deriveprocessstate
@@ -196,48 +169,15 @@ graph TD
   validationmodule -->|depends-on| dodvalidator
 ```
 
-### Package: Architect Host (Dev) (23 patterns)
+### Package: Architect MCP (5 patterns)
 
 ```mermaid
 graph TD
-  architectpubliccontract["ArchitectPublicContract"]
-  canonicalvaluessync["CanonicalValuesSync"]
-  compacttextrenderertests["CompactTextRendererTests"]
-  dataapicliergonomics["DataAPICLIErgonomics"]
-  dataapioutputshaping["DataAPIOutputShaping"]
-  documentationcommandparityboundarytests["DocumentationCommandParityBoundaryTests"]
-  generatedocscli["GenerateDocsCli"]
-  lintpatternsclibehavior["LintPatternsCliBehavior"]
-  lintprocessclibehavior["LintProcessCliBehavior"]
-  loadpreambleparser["LoadPreambleParser"]
-  mcptoolregistryboundarytests["MCPToolRegistryBoundaryTests"]
-  patterngraphapicli["PatternGraphAPICLI"]
-  patterngraphcliarchhealth["PatternGraphCliArchHealth"]
-  patterngraphclicache["PatternGraphCliCache"]
-  patterngraphclidryrun["PatternGraphCliDryRun"]
-  patterngraphclimetadata["PatternGraphCliMetadata"]
-  patterngraphclioutputmodifiers["PatternGraphCliOutputModifiers"]
-  patterngraphcliquerypassthrough["PatternGraphCliQueryPassthrough"]
-  patterngraphclirepl["PatternGraphCliRepl"]
-  patterngraphclirulessubcommand["PatternGraphCliRulesSubcommand"]
-  patterngraphclisubcommands["PatternGraphCliSubcommands"]
-  stubtaxonomytagtests["StubTaxonomyTagTests"]
-  validatorreadmodelconsolidation["ValidatorReadModelConsolidation"]
-```
-
-### Package: Architect MCP (9 patterns)
-
-```mermaid
-graph TD
-  mcpfilewatcher["MCPFileWatcher<br/>(utility)"]
-  mcppipelinesession["MCPPipelineSession<br/>(service)"]
-  mcpruntimehardeningexecutabletests["MCPRuntimeHardeningExecutableTests"]
-  mcpserver["MCPServer<br/>(service)"]
-  mcpserverbin["MCPServerBin<br/>(utility)"]
-  mcpserverlifecycleexecutabletests["MCPServerLifecycleExecutableTests"]
-  mcptoolinputvalidationexecutabletests["MCPToolInputValidationExecutableTests"]
-  mcptoolregistry["MCPToolRegistry<br/>(service)"]
-  mcptoolregistryintegrationtests["MCPToolRegistryIntegrationTests"]
+  mcpfilewatcher["MCPFileWatcher<br/>(utility · completed)"]
+  mcppipelinesession["MCPPipelineSession<br/>(service · completed)"]
+  mcpserver["MCPServer<br/>(service · completed)"]
+  mcpserverbin["MCPServerBin<br/>(utility · completed)"]
+  mcptoolregistry["MCPToolRegistry<br/>(service · completed)"]
   mcpfilewatcher -->|depends-on| mcppipelinesession
   mcppipelinesession -->|depends-on| mcpfilewatcher
   mcppipelinesession -->|depends-on| mcptoolregistry
@@ -248,22 +188,56 @@ graph TD
   mcptoolregistry -->|depends-on| mcppipelinesession
 ```
 
-### Package: Architect Package Content (12 patterns)
+### Package: Architect Package Content (46 patterns)
 
 ```mermaid
 graph TD
-  adr001taxonomycanonicalvalues["ADR001TaxonomyCanonicalValues"]
-  adr002gherkinonlytesting["ADR002GherkinOnlyTesting"]
-  adr003sourcefirstpatternarchitecture["ADR003SourceFirstPatternArchitecture"]
-  adr005codecbasedmarkdownrendering["ADR005CodecBasedMarkdownRendering"]
-  adr006singlereadmodelarchitecture["ADR006SingleReadModelArchitecture"]
-  adr007coordinatedtaxonomyredesign["ADR007CoordinatedTaxonomyRedesign"]
-  adr008stepdefinitionstubsconvention["ADR008StepDefinitionStubsConvention"]
-  adr009projectiontrustboundary["ADR009ProjectionTrustBoundary"]
-  adr010documentationcompositionhelpers["ADR010DocumentationCompositionHelpers"]
-  pdr005processguardfsm["PDR005ProcessGuardFSM"]
-  releasev100["ReleaseV100"]
-  releasevnext["ReleaseVNEXT"]
+  adr001taxonomycanonicalvalues["ADR001TaxonomyCanonicalValues<br/>(completed)"]
+  adr002gherkinonlytesting["ADR002GherkinOnlyTesting<br/>(completed)"]
+  adr003sourcefirstpatternarchitecture["ADR003SourceFirstPatternArchitecture<br/>(completed)"]
+  adr005codecbasedmarkdownrendering["ADR005CodecBasedMarkdownRendering<br/>(completed)"]
+  adr006singlereadmodelarchitecture["ADR006SingleReadModelArchitecture<br/>(completed)"]
+  adr007coordinatedtaxonomyredesign["ADR007CoordinatedTaxonomyRedesign<br/>(active)"]
+  adr008stepdefinitionstubsconvention["ADR008StepDefinitionStubsConvention<br/>(completed)"]
+  adr009projectiontrustboundary["ADR009ProjectionTrustBoundary<br/>(completed)"]
+  adr010documentationcompositionhelpers["ADR010DocumentationCompositionHelpers<br/>(completed)"]
+  apireferenceshapecoverage["ApiReferenceShapeCoverage<br/>(candidate)"]
+  architectbriefdeterministicbundle["ArchitectBriefDeterministicBundle<br/>(candidate)"]
+  architecturedelta["ArchitectureDelta<br/>(roadmap)"]
+  assistivecodeintelligence["AssistiveCodeIntelligence<br/>(epic · candidate)"]
+  codecbehaviorexecutabletests["CodecBehaviorExecutableTests<br/>(roadmap)"]
+  dataapirelationshipgraph["DataAPIRelationshipGraph<br/>(roadmap)"]
+  decisionrecordtemporalhygiene["DecisionRecordTemporalHygiene<br/>(candidate)"]
+  documentationprojection["DocumentationProjection<br/>(epic · candidate)"]
+  dodvalidation["DoDValidation<br/>(roadmap)"]
+  effortvariancetracking["EffortVarianceTracking<br/>(roadmap)"]
+  generatorinfrastructureexecutabletests["GeneratorInfrastructureExecutableTests<br/>(roadmap)"]
+  gherkinparsefailurediagnostics["GherkinParseFailureDiagnostics<br/>(candidate)"]
+  goalorientednavigation["GoalOrientedNavigation<br/>(candidate)"]
+  livingroadmapcli["LivingRoadmapCLI<br/>(roadmap)"]
+  mcpoutputschemavalidation["McpOutputSchemaValidation<br/>(candidate)"]
+  modelenricheddataapi["ModelEnrichedDataAPI<br/>(candidate)"]
+  monoreposupport["MonorepoSupport<br/>(roadmap)"]
+  multisourcecomposition["MultiSourceComposition<br/>(candidate)"]
+  onesourcemultipleaudiences["OneSourceMultipleAudiences<br/>(candidate)"]
+  pdr001sessionworkflowcommands["PDR001SessionWorkflowCommands<br/>(roadmap)"]
+  pdr005processguardfsm["PDR005ProcessGuardFSM<br/>(completed)"]
+  phasenumberingconventions["PhaseNumberingConventions<br/>(roadmap)"]
+  prdimplementationsection["PrdImplementationSection<br/>(roadmap)"]
+  progressivegovernance["ProgressiveGovernance<br/>(roadmap)"]
+  readmodelreflexivity["ReadModelReflexivity<br/>(candidate)"]
+  releasev100["ReleaseV100<br/>(completed)"]
+  releasevnext["ReleaseVNEXT<br/>(active)"]
+  sessionfilecleanup["SessionFileCleanup<br/>(roadmap)"]
+  setupcommand["SetupCommand<br/>(roadmap)"]
+  sourcecanonical["SourceCanonical<br/>(candidate)"]
+  statusawareeslintsuppression["StatusAwareEslintSuppression<br/>(roadmap)"]
+  stepdefinitioncompletion["StepDefinitionCompletion<br/>(roadmap)"]
+  streaminggitdiff["StreamingGitDiff<br/>(roadmap)"]
+  taxonomydocumentationcluster["TaxonomyDocumentationCluster<br/>(roadmap)"]
+  traceabilityenhancements["TraceabilityEnhancements<br/>(roadmap)"]
+  traceabilitygenerator["TraceabilityGenerator<br/>(roadmap)"]
+  valuetransferstate["ValueTransferState<br/>(candidate)"]
   adr001taxonomycanonicalvalues -. see-also .- adr007coordinatedtaxonomyredesign
   adr003sourcefirstpatternarchitecture -->|depends-on| adr001taxonomycanonicalvalues
   adr006singlereadmodelarchitecture -->|depends-on| adr005codecbasedmarkdownrendering
@@ -276,142 +250,136 @@ graph TD
   adr010documentationcompositionhelpers -. see-also .- adr005codecbasedmarkdownrendering
   adr010documentationcompositionhelpers -. see-also .- adr006singlereadmodelarchitecture
   adr010documentationcompositionhelpers -. see-also .- adr009projectiontrustboundary
+  architectbriefdeterministicbundle -. see-also .- adr005codecbasedmarkdownrendering
+  architectbriefdeterministicbundle -. see-also .- adr006singlereadmodelarchitecture
+  architectbriefdeterministicbundle -. see-also .- modelenricheddataapi
+  architectbriefdeterministicbundle -->|depends-on| valuetransferstate
+  decisionrecordtemporalhygiene -. see-also .- adr006singlereadmodelarchitecture
+  documentationprojection -->|depends-on| adr010documentationcompositionhelpers
+  mcpoutputschemavalidation -. see-also .- adr006singlereadmodelarchitecture
+  modelenricheddataapi -. see-also .- adr005codecbasedmarkdownrendering
+  modelenricheddataapi -. see-also .- adr006singlereadmodelarchitecture
+  modelenricheddataapi -->|depends-on| architectbriefdeterministicbundle
   pdr005processguardfsm -->|depends-on| adr001taxonomycanonicalvalues
+  stepdefinitioncompletion -->|depends-on| adr002gherkinonlytesting
+  taxonomydocumentationcluster -. see-also .- adr010documentationcompositionhelpers
+  taxonomydocumentationcluster -. see-also .- multisourcecomposition
+  taxonomydocumentationcluster -. see-also .- onesourcemultipleaudiences
+  traceabilityenhancements -->|depends-on| traceabilitygenerator
+  valuetransferstate -. see-also .- adr006singlereadmodelarchitecture
+  valuetransferstate -. see-also .- architectbriefdeterministicbundle
 ```
 
-### Package: Architect Projection (129 patterns)
+### Package: Architect Projection (106 patterns)
 
 ```mermaid
 graph TD
-  annotationcoverage["AnnotationCoverage<br/>(contract)"]
-  annotationcoverageprojection["AnnotationCoverageProjection<br/>(projection)"]
-  apireferencedigest["ApiReferenceDigest<br/>(contract)"]
-  apireferenceprojection["ApiReferenceProjection<br/>(projection)"]
-  apireferenceprojectionexecutabletests["ApiReferenceProjectionExecutableTests<br/>(projection)"]
-  architecturecomparison["ArchitectureComparison<br/>(contract)"]
-  architecturecomparisonprojection["ArchitectureComparisonProjection<br/>(projection)"]
-  architecturediagram["ArchitectureDiagram<br/>(contract)"]
-  architecturediagramprojection["ArchitectureDiagramProjection<br/>(projection)"]
-  architecturegraphprojection["ArchitectureGraphProjection<br/>(projection)"]
-  architecturenavigationprojectionexecutabletests["ArchitectureNavigationProjectionExecutableTests<br/>(projection)"]
-  architectureneighborhood["ArchitectureNeighborhood<br/>(contract)"]
-  architectureneighborhoodprojection["ArchitectureNeighborhoodProjection<br/>(projection)"]
-  blockschema["BlockSchema<br/>(contract)"]
-  boundedcontextfragmentcontract["BoundedContextFragmentContract<br/>(contract)"]
-  boundedcontextprojection["BoundedContextProjection<br/>(projection)"]
-  businessrule["BusinessRule<br/>(contract)"]
-  businessrulereference["BusinessRuleReference<br/>(contract)"]
-  businessruleset["BusinessRuleSet<br/>(contract)"]
-  businessrulesprojection["BusinessRulesProjection<br/>(projection)"]
-  businessrulesprojectionexecutabletests["BusinessRulesProjectionExecutableTests<br/>(projection)"]
-  compacttextrenderer["CompactTextRenderer<br/>(codec)"]
-  decisioncatalog["DecisionCatalog<br/>(contract)"]
-  decisioncatalogprojection["DecisionCatalogProjection<br/>(projection)"]
-  decisioncatalogprojectionexecutabletests["DecisionCatalogProjectionExecutableTests<br/>(projection)"]
-  decisionrecord["DecisionRecord<br/>(contract)"]
-  deliverable["Deliverable<br/>(contract)"]
-  deliverablemanifest["DeliverableManifest<br/>(contract)"]
-  deliverableprojection["DeliverableProjection<br/>(projection)"]
-  deliveryprogressprojectionexecutabletests["DeliveryProgressProjectionExecutableTests<br/>(projection)"]
-  deliveryreportingfragmentcontracts["DeliveryReportingFragmentContracts<br/>(contract)"]
-  deliveryreportingprojectionsupport["DeliveryReportingProjectionSupport<br/>(utility)"]
-  deliveryreportingprojectionsupportexecutabletests["DeliveryReportingProjectionSupportExecutableTests<br/>(projection)"]
-  deliveryreportingsupporting["DeliveryReportingSupporting<br/>(contract)"]
-  dependencycontext["DependencyContext<br/>(contract)"]
-  dependencycontextprojection["DependencyContextProjection<br/>(projection)"]
-  dependencycontextprojectionexecutabletests["DependencyContextProjectionExecutableTests<br/>(projection)"]
-  dependencyedge["DependencyEdge<br/>(contract)"]
-  dependencyedgeprojection["DependencyEdgeProjection<br/>(projection)"]
-  dependencyedgeprojectionexecutabletests["DependencyEdgeProjectionExecutableTests<br/>(projection)"]
-  dependencyedgeset["DependencyEdgeSet<br/>(contract)"]
-  designreviewprojection["DesignReviewProjection<br/>(projection)"]
-  designreviewprojectionexecutabletests["DesignReviewProjectionExecutableTests<br/>(projection)"]
-  documentationbundle["DocumentationBundle<br/>(projection)"]
-  documentationcompositionprojectionexecutabletests["DocumentationCompositionProjectionExecutableTests<br/>(projection)"]
-  documentationcompositionprojectionsupport["DocumentationCompositionProjectionSupport<br/>(utility)"]
-  documentationcompositionsupporting["DocumentationCompositionSupporting<br/>(contract)"]
-  documentationtyperegistry["DocumentationTypeRegistry<br/>(contract)"]
-  documentationtyperegistryexecutabletests["DocumentationTypeRegistryExecutableTests<br/>(contract)"]
-  executioncontextprojectionexecutabletests["ExecutionContextProjectionExecutableTests<br/>(projection)"]
-  executioncontextprojectionsupport["ExecutionContextProjectionSupport<br/>(utility)"]
-  executioncontextsupporting["ExecutionContextSupporting<br/>(contract)"]
-  filereadinglist["FileReadingList<br/>(contract)"]
-  filereadinglistprojection["FileReadingListProjection<br/>(projection)"]
-  fragmentrendererdispatch["FragmentRendererDispatch<br/>(codec)"]
-  generatordegeneracyguard["GeneratorDegeneracyGuard<br/>(utility)"]
-  generatordegeneracyguardexecutabletests["GeneratorDegeneracyGuardExecutableTests<br/>(projection)"]
-  governanceprojectionsupport["GovernanceProjectionSupport<br/>(utility)"]
-  governancesupporting["GovernanceSupporting<br/>(contract)"]
-  governancevalidationtaxonomyprojectionexecutabletests["GovernanceValidationTaxonomyProjectionExecutableTests<br/>(projection)"]
-  handoffprojection["HandoffProjection<br/>(projection)"]
-  handoffrecord["HandoffRecord<br/>(contract)"]
-  jsonrenderer["JsonRenderer<br/>(codec)"]
-  markdownrenderer["MarkdownRenderer<br/>(codec)"]
-  openquestionlistprojection["OpenQuestionListProjection<br/>(projection)"]
-  openquestionlistprojectionexecutabletests["OpenQuestionListProjectionExecutableTests<br/>(projection)"]
-  operationalinsightsprojectionexecutabletests["OperationalInsightsProjectionExecutableTests<br/>(projection)"]
-  operationalinsightsprojectionsupport["OperationalInsightsProjectionSupport<br/>(utility)"]
-  operationalinsightssupporting["OperationalInsightsSupporting<br/>(contract)"]
-  orphanpatternlist["OrphanPatternList<br/>(contract)"]
-  orphanpatternlistprojection["OrphanPatternListProjection<br/>(projection)"]
-  overviewdigest["OverviewDigest<br/>(contract)"]
-  overviewprojection["OverviewProjection<br/>(projection)"]
-  patternbundleprojection["PatternBundleProjection<br/>(projection)"]
-  patternbundleprojectionexecutabletests["PatternBundleProjectionExecutableTests<br/>(projection)"]
-  patterncatalog["PatternCatalog<br/>(contract)"]
-  patterncatalogprojection["PatternCatalogProjection<br/>(projection)"]
-  patterncatalogstatusfilterexecutabletests["PatternCatalogStatusFilterExecutableTests<br/>(projection)"]
-  patterndetail["PatternDetail<br/>(contract)"]
-  patterndetailprojection["PatternDetailProjection<br/>(projection)"]
-  patterndetailprojectionexecutabletests["PatternDetailProjectionExecutableTests<br/>(projection)"]
-  patternrelationsfragmentcontracts["PatternRelationsFragmentContracts<br/>(contract)"]
-  patternrelationsprojectionsupport["PatternRelationsProjectionSupport<br/>(utility)"]
-  patternrelationssupporting["PatternRelationsSupporting<br/>(contract)"]
-  patternsummary["PatternSummary<br/>(contract)"]
-  patternsummarycatalogprojectionexecutabletests["PatternSummaryCatalogProjectionExecutableTests<br/>(projection)"]
-  patternsummaryprojection["PatternSummaryProjection<br/>(projection)"]
-  phaseprogress["PhaseProgress<br/>(contract)"]
-  phaseprogressprojection["PhaseProgressProjection<br/>(projection)"]
-  prchangereview["PrChangeReview<br/>(contract)"]
-  prchangereviewprojection["PrChangeReviewProjection<br/>(projection)"]
-  projectconfigprojection["ProjectConfigProjection<br/>(projection)"]
-  projectconfigsnapshot["ProjectConfigSnapshot<br/>(contract)"]
-  projectionfragmentcontracts["ProjectionFragmentContracts<br/>(contract)"]
-  projectionfragmentschema["ProjectionFragmentSchema<br/>(contract)"]
-  projectionkernelrelationshipcontractexecutabletests["ProjectionKernelRelationshipContractExecutableTests<br/>(projection)"]
-  releasenotesdigest["ReleaseNotesDigest<br/>(contract)"]
-  releasenotesprojection["ReleaseNotesProjection<br/>(projection)"]
-  releasenotesprojectionexecutabletests["ReleaseNotesProjectionExecutableTests<br/>(projection)"]
-  requirementdigest["RequirementDigest<br/>(contract)"]
-  requirementdigestprojection["RequirementDigestProjection<br/>(projection)"]
-  requirementexecutabledigestprojection["RequirementExecutableDigestProjection<br/>(projection)"]
-  requirementspecsdigestprojection["RequirementSpecsDigestProjection<br/>(projection)"]
-  roadmaptimeline["RoadmapTimeline<br/>(contract)"]
-  roadmaptimelineprojection["RoadmapTimelineProjection<br/>(projection)"]
-  roleprofile["RoleProfile<br/>(contract)"]
-  roleprofilecollection["RoleProfileCollection<br/>(contract)"]
-  roleprofileprojection["RoleProfileProjection<br/>(projection)"]
-  scopereadinesscheck["ScopeReadinessCheck<br/>(contract)"]
-  scopereadinessprojection["ScopeReadinessProjection<br/>(projection)"]
-  scopereadinessreport["ScopeReadinessReport<br/>(contract)"]
-  sessioncontextbundle["SessionContextBundle<br/>(contract)"]
-  sessioncontextprojection["SessionContextProjection<br/>(projection)"]
-  sourceinventorydigest["SourceInventoryDigest<br/>(contract)"]
-  sourceinventoryentry["SourceInventoryEntry<br/>(contract)"]
-  sourceinventoryprojection["SourceInventoryProjection<br/>(projection)"]
-  statusdistribution["StatusDistribution<br/>(contract)"]
-  statusdistributionprojection["StatusDistributionProjection<br/>(projection)"]
-  tagusageentry["TagUsageEntry<br/>(contract)"]
-  tagusagematrix["TagUsageMatrix<br/>(contract)"]
-  tagusageprojection["TagUsageProjection<br/>(projection)"]
-  taxonomydigest["TaxonomyDigest<br/>(contract)"]
-  taxonomydigestprojection["TaxonomyDigestProjection<br/>(projection)"]
-  traceabilitymatrix["TraceabilityMatrix<br/>(contract)"]
-  traceabilitymatrixprojection["TraceabilityMatrixProjection<br/>(projection)"]
-  traceabilitymatrixprojectionexecutabletests["TraceabilityMatrixProjectionExecutableTests<br/>(projection)"]
-  uirenderer["UiRenderer<br/>(codec)"]
-  validationruledigest["ValidationRuleDigest<br/>(contract)"]
-  validationruledigestprojection["ValidationRuleDigestProjection<br/>(projection)"]
+  annotationcoverage["AnnotationCoverage<br/>(contract · active)"]
+  annotationcoverageprojection["AnnotationCoverageProjection<br/>(projection · completed)"]
+  apireferencedigest["ApiReferenceDigest<br/>(contract · active)"]
+  apireferenceprojection["ApiReferenceProjection<br/>(projection · active)"]
+  architecturecomparison["ArchitectureComparison<br/>(contract · active)"]
+  architecturecomparisonprojection["ArchitectureComparisonProjection<br/>(projection · completed)"]
+  architecturediagram["ArchitectureDiagram<br/>(contract · active)"]
+  architecturediagramprojection["ArchitectureDiagramProjection<br/>(projection · completed)"]
+  architecturegraphprojection["ArchitectureGraphProjection<br/>(projection · active)"]
+  architectureneighborhood["ArchitectureNeighborhood<br/>(contract · active)"]
+  architectureneighborhoodprojection["ArchitectureNeighborhoodProjection<br/>(projection · completed)"]
+  blockschema["BlockSchema<br/>(contract · active)"]
+  boundedcontextfragmentcontract["BoundedContextFragmentContract<br/>(contract · active)"]
+  boundedcontextprojection["BoundedContextProjection<br/>(projection · completed)"]
+  businessrule["BusinessRule<br/>(contract · active)"]
+  businessrulereference["BusinessRuleReference<br/>(contract · active)"]
+  businessruleset["BusinessRuleSet<br/>(contract · active)"]
+  businessrulesprojection["BusinessRulesProjection<br/>(projection · completed)"]
+  compacttextrenderer["CompactTextRenderer<br/>(codec · completed)"]
+  decisioncatalog["DecisionCatalog<br/>(contract · active)"]
+  decisioncatalogprojection["DecisionCatalogProjection<br/>(projection · completed)"]
+  decisionrecord["DecisionRecord<br/>(contract · active)"]
+  deliverable["Deliverable<br/>(contract · active)"]
+  deliverablemanifest["DeliverableManifest<br/>(contract · active)"]
+  deliverableprojection["DeliverableProjection<br/>(projection · completed)"]
+  deliveryreportingfragmentcontracts["DeliveryReportingFragmentContracts<br/>(contract · active)"]
+  deliveryreportingprojectionsupport["DeliveryReportingProjectionSupport<br/>(utility · completed)"]
+  deliveryreportingsupporting["DeliveryReportingSupporting<br/>(contract · active)"]
+  dependencycontext["DependencyContext<br/>(contract · active)"]
+  dependencycontextprojection["DependencyContextProjection<br/>(projection · completed)"]
+  dependencyedge["DependencyEdge<br/>(contract · active)"]
+  dependencyedgeprojection["DependencyEdgeProjection<br/>(projection · completed)"]
+  dependencyedgeset["DependencyEdgeSet<br/>(contract · active)"]
+  designreviewprojection["DesignReviewProjection<br/>(projection · active)"]
+  documentationbundle["DocumentationBundle<br/>(projection · completed)"]
+  documentationcompositionprojectionsupport["DocumentationCompositionProjectionSupport<br/>(utility · completed)"]
+  documentationcompositionsupporting["DocumentationCompositionSupporting<br/>(contract · active)"]
+  documentationtyperegistry["DocumentationTypeRegistry<br/>(contract · active)"]
+  executioncontextprojectionsupport["ExecutionContextProjectionSupport<br/>(utility · completed)"]
+  executioncontextsupporting["ExecutionContextSupporting<br/>(contract · active)"]
+  filereadinglist["FileReadingList<br/>(contract · active)"]
+  filereadinglistprojection["FileReadingListProjection<br/>(projection · completed)"]
+  fragmentrendererdispatch["FragmentRendererDispatch<br/>(codec · completed)"]
+  generatordegeneracyguard["GeneratorDegeneracyGuard<br/>(utility · completed)"]
+  governanceprojectionsupport["GovernanceProjectionSupport<br/>(utility · completed)"]
+  governancesupporting["GovernanceSupporting<br/>(contract · active)"]
+  handoffprojection["HandoffProjection<br/>(projection · completed)"]
+  handoffrecord["HandoffRecord<br/>(contract · active)"]
+  jsonrenderer["JsonRenderer<br/>(codec · completed)"]
+  markdownrenderer["MarkdownRenderer<br/>(codec · completed)"]
+  openquestionlistprojection["OpenQuestionListProjection<br/>(projection · active)"]
+  operationalinsightsprojectionsupport["OperationalInsightsProjectionSupport<br/>(utility · completed)"]
+  operationalinsightssupporting["OperationalInsightsSupporting<br/>(contract · active)"]
+  orphanpatternlist["OrphanPatternList<br/>(contract · active)"]
+  orphanpatternlistprojection["OrphanPatternListProjection<br/>(projection · completed)"]
+  overviewdigest["OverviewDigest<br/>(contract · active)"]
+  overviewprojection["OverviewProjection<br/>(projection · completed)"]
+  patternbundleprojection["PatternBundleProjection<br/>(projection · active)"]
+  patterncatalog["PatternCatalog<br/>(contract · active)"]
+  patterncatalogprojection["PatternCatalogProjection<br/>(projection · completed)"]
+  patterndetail["PatternDetail<br/>(contract · active)"]
+  patterndetailprojection["PatternDetailProjection<br/>(projection · completed)"]
+  patternrelationsfragmentcontracts["PatternRelationsFragmentContracts<br/>(contract · active)"]
+  patternrelationsprojectionsupport["PatternRelationsProjectionSupport<br/>(utility · completed)"]
+  patternrelationssupporting["PatternRelationsSupporting<br/>(contract · active)"]
+  patternsummary["PatternSummary<br/>(contract · active)"]
+  patternsummaryprojection["PatternSummaryProjection<br/>(projection · completed)"]
+  phaseprogress["PhaseProgress<br/>(contract · active)"]
+  phaseprogressprojection["PhaseProgressProjection<br/>(projection · completed)"]
+  prchangereview["PrChangeReview<br/>(contract · active)"]
+  prchangereviewprojection["PrChangeReviewProjection<br/>(projection · completed)"]
+  projectconfigprojection["ProjectConfigProjection<br/>(projection · completed)"]
+  projectconfigsnapshot["ProjectConfigSnapshot<br/>(contract · active)"]
+  projectionfragmentcontracts["ProjectionFragmentContracts<br/>(contract · active)"]
+  projectionfragmentschema["ProjectionFragmentSchema<br/>(contract · active)"]
+  releasenotesdigest["ReleaseNotesDigest<br/>(contract · active)"]
+  releasenotesprojection["ReleaseNotesProjection<br/>(projection · completed)"]
+  requirementdigest["RequirementDigest<br/>(contract · active)"]
+  requirementdigestprojection["RequirementDigestProjection<br/>(projection · completed)"]
+  requirementexecutabledigestprojection["RequirementExecutableDigestProjection<br/>(projection · completed)"]
+  requirementspecsdigestprojection["RequirementSpecsDigestProjection<br/>(projection · completed)"]
+  roadmaptimeline["RoadmapTimeline<br/>(contract · active)"]
+  roadmaptimelineprojection["RoadmapTimelineProjection<br/>(projection · completed)"]
+  roleprofile["RoleProfile<br/>(contract · active)"]
+  roleprofilecollection["RoleProfileCollection<br/>(contract · active)"]
+  roleprofileprojection["RoleProfileProjection<br/>(projection · completed)"]
+  scopereadinesscheck["ScopeReadinessCheck<br/>(contract · active)"]
+  scopereadinessprojection["ScopeReadinessProjection<br/>(projection · completed)"]
+  scopereadinessreport["ScopeReadinessReport<br/>(contract · active)"]
+  sessioncontextbundle["SessionContextBundle<br/>(contract · active)"]
+  sessioncontextprojection["SessionContextProjection<br/>(projection · completed)"]
+  sourceinventorydigest["SourceInventoryDigest<br/>(contract · active)"]
+  sourceinventoryentry["SourceInventoryEntry<br/>(contract · active)"]
+  sourceinventoryprojection["SourceInventoryProjection<br/>(projection · completed)"]
+  statusdistribution["StatusDistribution<br/>(contract · active)"]
+  statusdistributionprojection["StatusDistributionProjection<br/>(projection · completed)"]
+  tagusageentry["TagUsageEntry<br/>(contract · active)"]
+  tagusagematrix["TagUsageMatrix<br/>(contract · active)"]
+  tagusageprojection["TagUsageProjection<br/>(projection · completed)"]
+  taxonomydigest["TaxonomyDigest<br/>(contract · active)"]
+  taxonomydigestprojection["TaxonomyDigestProjection<br/>(projection · completed)"]
+  traceabilitymatrix["TraceabilityMatrix<br/>(contract · active)"]
+  traceabilitymatrixprojection["TraceabilityMatrixProjection<br/>(projection · completed)"]
+  uirenderer["UiRenderer<br/>(codec · completed)"]
+  validationruledigest["ValidationRuleDigest<br/>(contract · active)"]
+  validationruledigestprojection["ValidationRuleDigestProjection<br/>(projection · completed)"]
   annotationcoverageprojection -->|depends-on| annotationcoverage
   annotationcoverageprojection -->|depends-on| operationalinsightsprojectionsupport
   apireferenceprojection -->|depends-on| apireferencedigest
@@ -574,11 +542,15 @@ Most-depended-on patterns in this view, ranked by in-view dependant count.
 
 Bounded contexts whose patterns span more than one workspace package.
 
-| Bounded context | Packages                                      | Patterns |
-| --------------- | --------------------------------------------- | -------- |
-| cli             | Architect CLI, Architect Guard, Architect MCP | 6        |
-| rendering       | Architect Core, Architect Projection          | 7        |
-| validation      | Architect Core, Architect Guard               | 8        |
+| Bounded context | Packages                                        | Patterns |
+| --------------- | ----------------------------------------------- | -------- |
+| cli             | Architect CLI, Architect Guard, Architect MCP   | 6        |
+| api             | Architect MCP, Architect Package Content        | 7        |
+| extractor       | Architect Core, Architect Package Content       | 7        |
+| governance      | Architect Package Content, Architect Projection | 9        |
+| projection      | Architect Package Content, Architect Projection | 47       |
+| rendering       | Architect Core, Architect Projection            | 7        |
+| validation      | Architect Core, Architect Guard                 | 8        |
 
 ## Legend
 
@@ -603,17 +575,18 @@ Bounded contexts whose patterns span more than one workspace package.
 - AntiPatternDetector
 - ApiReferenceDigest
 - ApiReferenceProjection
-- ApiReferenceProjectionExecutableTests
-- ArchitectPublicContract
+- ApiReferenceShapeCoverage
+- ArchitectBriefDeterministicBundle
 - ArchitectureComparison
 - ArchitectureComparisonProjection
+- ArchitectureDelta
 - ArchitectureDiagram
 - ArchitectureDiagramProjection
 - ArchitectureGraphProjection
 - ArchitectureInspection
-- ArchitectureNavigationProjectionExecutableTests
 - ArchitectureNeighborhood
 - ArchitectureNeighborhoodProjection
+- AssistiveCodeIntelligence
 - AstParser
 - BlockSchema
 - BoundedContextFragmentContract
@@ -623,91 +596,69 @@ Bounded contexts whose patterns span more than one workspace package.
 - BusinessRuleReference
 - BusinessRuleSet
 - BusinessRulesProjection
-- BusinessRulesProjectionExecutableTests
-- CanonicalValuesSync
 - CLIErrorHandler
 - CLIRuntimePaths
 - CLIVersionHelper
+- CodecBehaviorExecutableTests
 - CodecUtils
-- CodecUtilsValidation
 - CompactTextRenderer
-- CompactTextRendererTests
-- ConfigBasedWorkflowDefinition
 - ConfigLoader
-- ConfigResolution
-- ConfigurationAPI
-- CrossPackageEdgeClassification
-- DataAPICLIErgonomics
-- DataAPIOutputShaping
+- DataAPIRelationshipGraph
 - DecisionCatalog
 - DecisionCatalogProjection
-- DecisionCatalogProjectionExecutableTests
 - DecisionRecord
+- DecisionRecordTemporalHygiene
 - DecisionResolution
 - DefineConfig
-- DefineConfigExecutableTests
 - Deliverable
 - DeliverableManifest
 - DeliverableProjection
-- DeliveryProgressProjectionExecutableTests
 - DeliveryReportingFragmentContracts
 - DeliveryReportingProjectionSupport
-- DeliveryReportingProjectionSupportExecutableTests
 - DeliveryReportingSupporting
 - DependencyContext
 - DependencyContextProjection
-- DependencyContextProjectionExecutableTests
 - DependencyEdge
 - DependencyEdgeProjection
-- DependencyEdgeProjectionExecutableTests
 - DependencyEdgeSet
 - DeriveProcessState
 - DesignReviewProjection
-- DesignReviewProjectionExecutableTests
 - DetectChanges
 - DocExtractor
-- DocStringMediaType
 - DocumentationBundle
-- DocumentationCommandParityBoundaryTests
-- DocumentationCompositionProjectionExecutableTests
 - DocumentationCompositionProjectionSupport
 - DocumentationCompositionSupporting
+- DocumentationProjection
 - DocumentationTypeRegistry
-- DocumentationTypeRegistryExecutableTests
+- DoDValidation
 - DoDValidationTypes
 - DoDValidator
 - DualSourceExtractor
-- DualSourceMergeIntegration
+- EffortVarianceTracking
 - ErrorFactoryTypes
-- ErrorFactoryTypesExecutableTests
-- ExecutionContextProjectionExecutableTests
 - ExecutionContextProjectionSupport
 - ExecutionContextSupporting
 - ExtractedPattern
 - ExtractionDiagnostics
-- FileDiscovery
 - FileReadingList
 - FileReadingListProjection
 - FragmentRendererDispatch
 - FSMStates
 - FSMTransitions
-- FSMTransitionsExecutableTests
 - FSMValidator
-- GenerateDocsCli
 - GeneratorDegeneracyGuard
-- GeneratorDegeneracyGuardExecutableTests
+- GeneratorInfrastructureExecutableTests
 - GherkinAstParser
-- GherkinExternalRelationshipTagPropagation
 - GherkinExtractor
-- GherkinRulesSupport
+- GherkinParseFailureDiagnostics
 - GherkinScanner
 - GitBranchDiff
 - GitHelpers
 - GitModule
 - GitNameStatusParser
+- GoalOrientedNavigation
 - GovernanceProjectionSupport
 - GovernanceSupporting
-- GovernanceValidationTaxonomyProjectionExecutableTests
 - GraphInventory
 - HandoffProjection
 - HandoffRecord
@@ -716,26 +667,22 @@ Bounded contexts whose patterns span more than one workspace package.
 - LintEngine
 - LintModule
 - LintPatternsCLI
-- LintPatternsCliBehavior
 - LintProcessCLI
-- LintProcessCliBehavior
 - LintRules
-- LoadPreambleParser
+- LivingRoadmapCLI
 - MarkdownBlockParser
 - MarkdownRenderer
 - MCPFileWatcher
+- McpOutputSchemaValidation
 - MCPPipelineSession
-- MCPRuntimeHardeningExecutableTests
 - MCPServer
 - MCPServerBin
-- MCPServerLifecycleExecutableTests
-- MCPToolInputValidationExecutableTests
 - MCPToolRegistry
-- MCPToolRegistryBoundaryTests
-- MCPToolRegistryIntegrationTests
+- ModelEnrichedDataAPI
+- MonorepoSupport
+- MultiSourceComposition
+- OneSourceMultipleAudiences
 - OpenQuestionListProjection
-- OpenQuestionListProjectionExecutableTests
-- OperationalInsightsProjectionExecutableTests
 - OperationalInsightsProjectionSupport
 - OperationalInsightsSupporting
 - OrphanPatternList
@@ -743,59 +690,42 @@ Bounded contexts whose patterns span more than one workspace package.
 - OverviewDigest
 - OverviewProjection
 - PackageResolver
-- PackageResolverExecutableTests
 - PatternBundleProjection
-- PatternBundleProjectionExecutableTests
 - PatternCatalog
 - PatternCatalogProjection
-- PatternCatalogStatusFilterExecutableTests
 - PatternClassification
 - PatternDetail
 - PatternDetailProjection
-- PatternDetailProjectionExecutableTests
 - PatternGraph
 - PatternGraphApi
-- PatternGraphAPICLI
-- PatternGraphApiConsistencyExecutableTests
-- PatternGraphApiReverseLookup
 - PatternGraphCLI
-- PatternGraphCliArchHealth
-- PatternGraphCliCache
-- PatternGraphCliDryRun
-- PatternGraphCliMetadata
-- PatternGraphCliOutputModifiers
-- PatternGraphCliQueryPassthrough
-- PatternGraphCliRepl
-- PatternGraphCliRulesSubcommand
-- PatternGraphCliSubcommands
 - PatternHelpers
-- PatternReferenceValidation
 - PatternRelationsFragmentContracts
 - PatternRelationsProjectionSupport
 - PatternRelationsSupporting
 - PatternScanner
 - PatternSummary
-- PatternSummaryCatalogProjectionExecutableTests
 - PatternSummaryProjection
+- PDR001SessionWorkflowCommands
 - PDR005ProcessGuardFSM
+- PhaseNumberingConventions
 - PhaseProgress
 - PhaseProgressProjection
 - PrChangeReview
 - PrChangeReviewProjection
+- PrdImplementationSection
 - ProcessGuardDecider
 - ProcessGuardLinter
-- ProcessGuardRulesExecutableTests
 - ProcessGuardTypes
-- ProjectConfigLoader
+- ProgressiveGovernance
 - ProjectConfigProjection
 - ProjectConfigSnapshot
 - ProjectionFragmentContracts
 - ProjectionFragmentSchema
-- ProjectionKernelRelationshipContractExecutableTests
+- ReadModelReflexivity
 - RegistryBuilder
 - ReleaseNotesDigest
 - ReleaseNotesProjection
-- ReleaseNotesProjectionExecutableTests
 - ReleaseV100
 - ReleaseVNEXT
 - RequirementDigest
@@ -803,50 +733,49 @@ Bounded contexts whose patterns span more than one workspace package.
 - RequirementExecutableDigestProjection
 - RequirementSpecsDigestProjection
 - ResultMonadTypes
-- ResultMonadTypesExecutableTests
 - RoadmapTimeline
 - RoadmapTimelineProjection
 - RoleProfile
 - RoleProfileCollection
 - RoleProfileProjection
 - RuleAggregation
-- ScannerCore
 - ScopeReadinessCheck
 - ScopeReadinessProjection
 - ScopeReadinessReport
 - SessionContextBundle
 - SessionContextProjection
+- SessionFileCleanup
 - SessionStateReader
-- ShapeExtraction
+- SetupCommand
 - ShapeExtractor
+- SourceCanonical
 - SourceInventoryDigest
 - SourceInventoryEntry
 - SourceInventoryProjection
 - SourceMerge
-- SourceMerging
+- StatusAwareEslintSuppression
 - StatusDistribution
 - StatusDistributionProjection
-- StubTaxonomyTagTests
+- StepDefinitionCompletion
+- StreamingGitDiff
 - TagRegistrySchemas
-- TagRegistrySchemasValidation
 - TagUsageEntry
 - TagUsageMatrix
 - TagUsageProjection
 - TaxonomyDigest
 - TaxonomyDigestProjection
+- TaxonomyDocumentationCluster
+- TraceabilityEnhancements
+- TraceabilityGenerator
 - TraceabilityMatrix
 - TraceabilityMatrixProjection
-- TraceabilityMatrixProjectionExecutableTests
-- TypeScriptTaxonomyImplementation
 - UiRenderer
 - ValidatePatternsCLI
 - ValidationModule
 - ValidationRuleDigest
 - ValidationRuleDigestProjection
-- ValidatorReadModelConsolidation
-- ValueFormatCanonicalValuesDispatch
-- WorkflowConfigSchemasValidation
+- ValueTransferState
 
 ---
 
-[← Back to Architecture](../ARCHITECTURE.md)
+[← Back to Design Review](../DESIGN-REVIEW.md)

@@ -19,6 +19,13 @@ export const SUPPORTED_DOCUMENTATION_TYPE_IDENTITIES = [
     rootRouteId: createIndexRouteId('architecture'),
   },
   {
+    key: 'design-review',
+    displayTitle: 'Design Review',
+    description:
+      'Component diagrams over the live graph including not-yet-implemented specs, for spec-driven design work.',
+    rootRouteId: createIndexRouteId('design-review'),
+  },
+  {
     key: 'api-reference',
     displayTitle: 'API Reference',
     description: 'Type and API surface (shapes) extracted from @architect-shape annotations.',

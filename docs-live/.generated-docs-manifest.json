@@ -342,6 +342,34 @@
         }
       ],
       "documentType": "api-reference"
+    },
+    "design-review": {
+      "generatorName": "design-review",
+      "kind": "projection",
+      "rootPath": "DESIGN-REVIEW.md",
+      "entries": [
+        {
+          "path": "DESIGN-REVIEW.md",
+          "role": "root",
+          "audience": "published",
+          "tracking": "commit"
+        },
+        {
+          "path": "design-review/by-layer.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "DESIGN-REVIEW.md"
+        },
+        {
+          "path": "design-review/by-package.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "DESIGN-REVIEW.md"
+        }
+      ],
+      "documentType": "design-review"
     }
   }
 }

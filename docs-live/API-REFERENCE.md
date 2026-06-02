@@ -7,7 +7,7 @@
 
 ## Overview
 
-This API reference covers 245 shapes across 3 packages, sourced from \`@architect-shape\` annotations.
+This API reference covers 246 shapes across 3 packages, sourced from \`@architect-shape\` annotations.
 
 ## Packages
 
@@ -15,7 +15,7 @@ This API reference covers 245 shapes across 3 packages, sourced from \`@architec
 | -------------------- | -------- | ------ |
 | architect-core       | 9        | 75     |
 | architect-guard      | 2        | 27     |
-| architect-projection | 51       | 143    |
+| architect-projection | 51       | 144    |
 
 ## Packages — detail
 

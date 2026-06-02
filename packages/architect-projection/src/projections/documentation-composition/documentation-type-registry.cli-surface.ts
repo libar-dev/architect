@@ -13,6 +13,10 @@ export const DOCUMENTATION_TYPE_CLI_SURFACE = {
     generatorName: 'architecture',
     generatorAliases: [],
   },
+  'design-review': {
+    generatorName: 'design-review',
+    generatorAliases: ['design'],
+  },
   'api-reference': {
     generatorName: 'api-reference',
     generatorAliases: ['api'],

@@ -14,6 +14,10 @@ export const DOCUMENTATION_TYPE_OUTPUT_ROUTING = {
     markdownRootTarget: 'ARCHITECTURE.md',
     childDirectory: 'architecture',
   },
+  'design-review': {
+    markdownRootTarget: 'DESIGN-REVIEW.md',
+    childDirectory: 'design-review',
+  },
   'api-reference': {
     markdownRootTarget: 'API-REFERENCE.md',
     childDirectory: 'api-reference',

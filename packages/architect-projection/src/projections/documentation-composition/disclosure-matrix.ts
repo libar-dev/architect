@@ -108,6 +108,18 @@ export const architectureDisclosureMatrix = disclosureMatrix({
   advanced: disclosureSpec('flat', 'summary', true, true),
 });
 
+// Design review fans out its working-state-inclusive lens children (by-layer,
+// by-package) at every level. It carries NO status filter at any level: the view
+// deliberately includes not-yet-implemented patterns, so it must NOT inherit the
+// committed-only default `disclosureMatrix` would substitute. Constructed directly
+// for that reason — `committed: false` marks it as spanning non-committed work.
+export const designReviewDisclosureMatrix: DocumentationDisclosureMatrix = {
+  essential: disclosureSpec('flat', 'summary', true, false),
+  important: disclosureSpec('flat', 'summary', true, false),
+  useful: disclosureSpec('flat', 'summary', true, false),
+  advanced: disclosureSpec('flat', 'summary', true, false),
+};
+
 // API reference always fans out its per-package child docs (like architecture), and the
 // root stays a navigation index (summary table + links) at every disclosure level.
 export const apiReferenceDisclosureMatrix = disclosureMatrix({

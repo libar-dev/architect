@@ -74,13 +74,46 @@ export type GroupingMode = ArchitectureDiagramScope | 'package';
 export interface ArchitectureGraphScopeOptions {
   readonly scope: ArchitectureDiagramScope;
   readonly scopeValue?: string | undefined;
+  /**
+   * Opt out of the component-scope working-state exclusion (D-16/D-18). The
+   * production `architecture` view omits patterns under `architect/` (specs,
+   * decisions, releases); the `design-review` view sets this `true` so a planned
+   * pattern's shape is reviewable before any implementation exists. Test features
+   * stay excluded either way — they are the verification surface, not a design
+   * subject. Defaults `false`, so the architecture doc is byte-identical.
+   */
+  readonly includeWorkingState?: boolean | undefined;
+  /**
+   * Exclude test-feature patterns (executable specs under `tests/features/`) at
+   * EVERY scope, not only `component`. The component scope already drops them, but
+   * the `layered` / `package` lenses do not — so a design view that fans out lens
+   * children sets this `true` to keep the verification surface out of all of them.
+   * Defaults `false`, so the architecture lenses are byte-identical.
+   */
+  readonly excludeTestFeatures?: boolean | undefined;
+  /**
+   * Append each node's lifecycle status (and `@architect-level`, when set) to its
+   * Mermaid label, alongside the existing role. The `design-review` view sets this
+   * `true` so a reviewer can tell at a glance which components are shipped vs still
+   * planned — the entire point of a view that includes not-yet-implemented specs.
+   * Defaults `false`, so the production `architecture` label stays role-only and
+   * byte-identical.
+   */
+  readonly annotateStatus?: boolean | undefined;
 }
 
 export function collectArchitectureNodes(
   context: ProjectionContext,
   options: ArchitectureGraphScopeOptions,
 ): NodeShape[] {
-  const filteredPatterns = filterPatterns(context.graph.patterns, context.projectionFilter);
+  const statusFilteredPatterns = filterPatterns(context.graph.patterns, context.projectionFilter);
+  // Drop the verification surface at every scope when requested (the design-review
+  // lenses). The `component` scope drops it again via
+  // `filterArchitecturallyInterestingPatterns` — a harmless no-op once removed here.
+  const filteredPatterns =
+    options.excludeTestFeatures === true
+      ? statusFilteredPatterns.filter((pattern) => !isTestFeaturePattern(pattern))
+      : statusFilteredPatterns;
   const scopedPatterns = filterPatternsForArchitecture(filteredPatterns, options);
   const withFallback = scopedPatterns.length > 0 ? [...scopedPatterns] : filteredPatterns;
   // For the component scope the architectural filter hard-excludes test
@@ -90,7 +123,7 @@ export function collectArchitectureNodes(
   // holds the excluded patterns). Other scopes keep `withFallback` as-is.
   const selectedPatterns =
     options.scope === 'component'
-      ? filterArchitecturallyInterestingPatterns(withFallback)
+      ? filterArchitecturallyInterestingPatterns(withFallback, options.includeWorkingState ?? false)
       : withFallback;
   const patterns = [...selectedPatterns].sort((left, right) =>
     getPatternName(left).localeCompare(getPatternName(right)),
@@ -102,9 +135,24 @@ export function collectArchitectureNodes(
     const baseId = slugify(name).replace(/-/g, '_') || `node_${String(index + 1)}`;
     const nodeId = ensureUniqueNodeId(seenNodeIds, baseId);
     const role = hasText(pattern.role) ? pattern.role.trim() : undefined;
-    // Sourced role/name go into a Mermaid node label; escape them while keeping the
-    // renderer-authored `<br/>` line break and `(…)` parens intact (ADR-009 raw-content seam).
-    const roleSuffix = role !== undefined ? `<br/>(${escapeMermaidLabel(role)})` : '';
+    // The Mermaid node label carries a parenthetical classifier. The production
+    // `architecture` view shows role only; the `design-review` view (annotateStatus)
+    // also appends lifecycle status — and `@architect-level` when set — so a planned
+    // pattern is visibly distinct from a shipped one. Sourced parts are escaped while
+    // the renderer-authored `<br/>`, `(…)`, and ` · ` separator are added around them
+    // (ADR-009 raw-content seam). Gating keeps the architecture label role-only and
+    // byte-identical.
+    const classifierParts =
+      options.annotateStatus === true
+        ? [hasText(pattern.level) ? pattern.level.trim() : undefined, role, pattern.status]
+        : [role];
+    const presentParts = classifierParts.filter(
+      (part): part is string => part !== undefined && part.length > 0,
+    );
+    const roleSuffix =
+      presentParts.length > 0
+        ? `<br/>(${presentParts.map((part) => escapeMermaidLabel(part)).join(' · ')})`
+        : '';
     const archContext = hasText(pattern.boundedContext) ? pattern.boundedContext.trim() : undefined;
     const archLayer = hasText(pattern.adrLayer) ? pattern.adrLayer.trim() : undefined;
     const packageLabel = resolvePackageLabel(context, pattern.source.file);
@@ -187,14 +235,19 @@ function isWorkingStatePattern(pattern: ExtractedPattern): boolean {
 
 function filterArchitecturallyInterestingPatterns(
   patterns: readonly ExtractedPattern[],
+  includeWorkingState: boolean,
 ): readonly ExtractedPattern[] {
-  // Hard exclusion — test features and working-state records (specs, decisions,
-  // releases) are never components, even when they are the ONLY patterns in the
-  // input. This must NOT fall back to the unfiltered set: a working-state-only
-  // or test-only context yields an empty component set (an empty view), not the
-  // excluded patterns re-included.
+  // Hard exclusion — test features are never components (they are the
+  // verification surface), even when they are the ONLY patterns in the input.
+  // Working-state records (specs, decisions, releases) are likewise excluded for
+  // the production architecture view (D-16/D-18) but KEPT when `includeWorkingState`
+  // is set, so the design-review view can render a planned pattern's shape before
+  // implementation. This must NOT fall back to the unfiltered set: a test-only
+  // context yields an empty component set (an empty view), not the excluded
+  // patterns re-included.
   const componentPatterns = patterns.filter(
-    (pattern) => !isTestFeaturePattern(pattern) && !isWorkingStatePattern(pattern),
+    (pattern) =>
+      !isTestFeaturePattern(pattern) && (includeWorkingState || !isWorkingStatePattern(pattern)),
   );
 
   // Graceful degradation applies ONLY to the classification filter: when

@@ -29,9 +29,11 @@
 | DeliveryReportingProjectionSupportExecutableTests     | completed |            |
 | DependencyContextProjectionExecutableTests            | completed |            |
 | DependencyEdgeProjectionExecutableTests               | completed |            |
+| DesignReviewProjectionExecutableTests                 | active    |            |
 | DocStringMediaType                                    | completed |            |
 | DocumentationCommandParityBoundaryTests               | active    |            |
 | DocumentationCompositionProjectionExecutableTests     | completed |            |
+| DocumentationTypeRegistryExecutableTests              | active    |            |
 | DualSourceMergeIntegration                            | completed |            |
 | ErrorFactoryTypes                                     | completed |            |
 | ErrorFactoryTypesExecutableTests                      | completed |            |

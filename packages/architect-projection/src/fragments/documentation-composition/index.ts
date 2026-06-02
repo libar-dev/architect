@@ -1,12 +1,14 @@
 export {
   ArchitectureDiagramSchema,
   ArchitectureDiagramSectionSchema,
+  ArchitectureDiagramPresentationSchema,
   CrossPackageContextEntrySchema,
   FanInEntrySchema,
 } from './architecture-diagram.js';
 export type {
   ArchitectureDiagram,
   ArchitectureDiagramSection,
+  ArchitectureDiagramPresentation,
   CrossPackageContextEntry,
   FanInEntry,
 } from './architecture-diagram.js';

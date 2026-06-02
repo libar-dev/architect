@@ -1,5 +1,25 @@
 /**
- * @architect-bounded-context:documentation-composition
+ * @architect
+ * @architect-pattern DocumentationTypeRegistry
+ * @architect-status active
+ * @architect-role:contract
+ * @architect-bounded-context:projection
+ *
+ * **Value:** The source-first registry star for documentation document types:
+ * one identity list drives the output-routing, disclosure, and cli-surface axis
+ * maps, assembled and frozen here so each doc type's contract — supported keys,
+ * route ids, markdown targets, disclosure defaults, generator names — is declared
+ * once and validated by Zod rather than scattered across the pipeline.
+ *
+ * **Invariant:** The registry exposes exactly the supported documentation types;
+ * every type resolves to one frozen metadata entry across all four axes (identity,
+ * output-routing, disclosure, cli-surface), and an unknown key resolves to
+ * `undefined` rather than a partial entry.
+ *
+ * ### When to Use
+ *
+ * - Resolve a documentation type's metadata, routing, disclosure level, or CLI
+ *   generator surface from its key.
  */
 import { z } from 'zod';
 

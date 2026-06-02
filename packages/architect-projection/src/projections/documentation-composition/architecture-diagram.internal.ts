@@ -23,6 +23,7 @@ import type {
   CrossPackageContextEntry,
   FanInEntry,
 } from '../../fragments/documentation-composition/index.js';
+import { ArchitectureDiagramPresentationSchema } from '../../fragments/documentation-composition/index.js';
 import {
   ArchitectureDiagramScopeSchema,
   type ArchitectureDiagramScope,
@@ -61,6 +62,20 @@ export const ProjectArchitectureDiagramOptionsSchema = z
   .strictObject({
     scope: ArchitectureDiagramScopeSchema,
     scopeValue: z.string().optional(),
+    // Include working-state specs under `architect/` in the component view (the
+    // `design-review` differentiator). Defaults off so `architecture` is unchanged.
+    includeWorkingState: z.boolean().optional(),
+    // Exclude test-feature patterns at every scope (the design-review lenses, which
+    // would otherwise leak the verification surface). Defaults off so `architecture`
+    // lenses are unchanged.
+    excludeTestFeatures: z.boolean().optional(),
+    // Annotate each node label with lifecycle status + level (the design-review
+    // differentiator). Defaults off so `architecture` labels stay role-only and
+    // byte-identical.
+    annotateStatus: z.boolean().optional(),
+    // Override the rendered H1 / purpose / detail-level (the `design-review` view
+    // reuses this fragment shape under its own heading). Defaults to the kind title.
+    presentation: ArchitectureDiagramPresentationSchema.optional(),
   })
   .readonly();
 
@@ -95,6 +110,7 @@ export function buildArchitectureDiagram(
     kind: 'ArchitectureDiagram',
     scope,
     ...(hasText(options.scopeValue) ? { scopeValue: options.scopeValue.trim() } : {}),
+    ...(options.presentation !== undefined ? { presentation: options.presentation } : {}),
     sections: buildArchitectureSections(nodes, edges, resolvedOptions),
     legend: [
       heading(3, 'Legend'),

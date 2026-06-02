@@ -6,7 +6,7 @@
 
 ## Overview
 
-143 shapes across 51 patterns in architect-projection.
+144 shapes across 51 patterns in architect-projection.
 
 ## AnnotationCoverage
 
@@ -80,6 +80,18 @@ IntegrationRelationshipSchema = z.enum(['uses', 'dependsOn'])
 
 ## ArchitectureDiagram
 
+### ArchitectureDiagramPresentationSchema
+
+Optional document-presentation override for a diagram fragment. When absent the renderer derives the H1 title / purpose / detail-level from the fragment kind (\`Architecture\`). The \`design-review\` view sets it so the same fragment shape renders under its own heading without a second fragment kind or normalizer.
+
+```ts
+ArchitectureDiagramPresentationSchema = z.strictObject({
+  title: z.string(),
+  purpose: z.string(),
+  detailLevel: z.string().optional(),
+})
+```
+
 ### ArchitectureDiagramSchema
 
 The architecture-diagram fragment — its scope, the ordered diagram sections, an optional legend, optional fan-in and cross-package-context rankings, and the overall pattern list.
@@ -89,6 +101,7 @@ ArchitectureDiagramSchema = z.strictObject({
   kind: z.literal('ArchitectureDiagram'),
   scope: ArchitectureDiagramScopeSchema,
   scopeValue: z.string().optional(),
+  presentation: ArchitectureDiagramPresentationSchema.optional(),
   sections: z.array(ArchitectureDiagramSectionSchema),
   legend: z.array(BlockSchema).optional(),
   fanIn: z.array(FanInEntrySchema).optional(),

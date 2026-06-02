@@ -1,3 +1,9 @@
+@architect
+@architect-pattern:DocumentationTypeRegistryExecutableTests
+@architect-implements:DocumentationTypeRegistry
+@architect-status:active
+@architect-product-area:Projection
+@architect-role:contract
 @documentation-composition
 Feature: Documentation type registry contract
 

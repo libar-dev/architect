@@ -11,6 +11,7 @@ import {
   changelogDisclosureMatrix,
   currentWorkDisclosureMatrix,
   decisionsDisclosureMatrix,
+  designReviewDisclosureMatrix,
   patternsDisclosureMatrix,
   requirementsDisclosureMatrix,
   roadmapDisclosureMatrix,
@@ -29,6 +30,10 @@ export const DOCUMENTATION_TYPE_DISCLOSURE = {
   architecture: {
     defaultDisclosureLevel: 'essential',
     disclosureMatrix: architectureDisclosureMatrix,
+  },
+  'design-review': {
+    defaultDisclosureLevel: 'essential',
+    disclosureMatrix: designReviewDisclosureMatrix,
   },
   'api-reference': {
     defaultDisclosureLevel: 'important',

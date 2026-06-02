@@ -54,11 +54,12 @@ Feature: Documentation Composition projection bodies
   Rule: Documentation dispatch only supports the retained Documentation Composition document types
 
     **Invariant:** `projectDocumentationBundle` dispatches only on the retained
-    Documentation Composition document types (architecture, decisions,
-    business-rules, patterns, roadmap, current-work, requirements-executable,
-    requirements-specs, validation-rules, taxonomy, changelog, traceability) and throws
-    `UnknownDocumentType` for both intentionally dropped types (reference,
-    product-areas, design-review, product-requirements) and any unknown type.
+    Documentation Composition document types (architecture, design-review,
+    api-reference, decisions, business-rules, patterns, roadmap, current-work,
+    requirements-executable, requirements-specs, validation-rules, taxonomy,
+    changelog, traceability) and throws `UnknownDocumentType` for both
+    intentionally dropped types (reference, product-areas, product-requirements)
+    and any unknown type.
 
     **Rationale:** The supported set is the durable contract between Studio and
     documentation consumers; silently accepting dropped or unknown types would

@@ -572,10 +572,15 @@ function normalizeArchitectureDiagram(
 ): MarkdownDocument {
   const metadata = resolveFragmentMetadata(fragment);
   const scopeLabel = humanizeKey(fragment.scope);
+  // A `presentation` override means this fragment renders under its own heading (the
+  // `design-review` view), so the body noun must not hard-code "architecture". The
+  // production `architecture` view carries no presentation, so its Overview text — and
+  // the docs:check byte-identity it is gated by — is unchanged.
+  const viewNoun = fragment.presentation !== undefined ? 'view.' : 'architecture view.';
   const scopeDescription =
     fragment.scopeValue !== undefined
       ? `${scopeLabel} scoped to ${fragment.scopeValue}.`
-      : `${scopeLabel} architecture view.`;
+      : `${scopeLabel} ${viewNoun}`;
 
   const diagramCount = fragment.sections.length;
   const blocks: MarkdownRenderableBlock[] = [
@@ -1474,6 +1479,15 @@ function resolveFragmentMetadata(fragment: Fragment): MarkdownMetadata {
       }
     }
     case 'ArchitectureDiagram':
+      if (fragment.presentation !== undefined) {
+        return {
+          title: fragment.presentation.title,
+          purpose: fragment.presentation.purpose,
+          ...(fragment.presentation.detailLevel !== undefined
+            ? { detailLevel: fragment.presentation.detailLevel }
+            : {}),
+        };
+      }
       return {
         title: 'Architecture',
         purpose: 'Auto-generated architecture diagrams from source annotations',

@@ -58,6 +58,20 @@ export const CrossPackageContextEntrySchema = z.strictObject({
 });
 
 /**
+ * Optional document-presentation override for a diagram fragment. When absent the
+ * renderer derives the H1 title / purpose / detail-level from the fragment kind
+ * (`Architecture`). The `design-review` view sets it so the same fragment shape
+ * renders under its own heading without a second fragment kind or normalizer.
+ *
+ * @architect-shape
+ */
+export const ArchitectureDiagramPresentationSchema = z.strictObject({
+  title: z.string(),
+  purpose: z.string(),
+  detailLevel: z.string().optional(),
+});
+
+/**
  * The architecture-diagram fragment — its scope, the ordered diagram sections,
  * an optional legend, optional fan-in and cross-package-context rankings, and
  * the overall pattern list.
@@ -68,6 +82,7 @@ export const ArchitectureDiagramSchema = z.strictObject({
   kind: z.literal('ArchitectureDiagram'),
   scope: ArchitectureDiagramScopeSchema,
   scopeValue: z.string().optional(),
+  presentation: ArchitectureDiagramPresentationSchema.optional(),
   sections: z.array(ArchitectureDiagramSectionSchema),
   legend: z.array(BlockSchema).optional(),
   fanIn: z.array(FanInEntrySchema).optional(),
@@ -75,6 +90,7 @@ export const ArchitectureDiagramSchema = z.strictObject({
   patterns: z.array(z.string()),
 });
 
+export type ArchitectureDiagramPresentation = z.infer<typeof ArchitectureDiagramPresentationSchema>;
 export type ArchitectureDiagramSection = z.infer<typeof ArchitectureDiagramSectionSchema>;
 export type FanInEntry = z.infer<typeof FanInEntrySchema>;
 export type CrossPackageContextEntry = z.infer<typeof CrossPackageContextEntrySchema>;

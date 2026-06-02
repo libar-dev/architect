@@ -87,12 +87,7 @@ const disclosureRichnessLevels = [
   'full',
 ] as const;
 
-const droppedDocumentTypes = [
-  'reference',
-  'product-areas',
-  'design-review',
-  'product-requirements',
-] as const;
+const droppedDocumentTypes = ['reference', 'product-areas', 'product-requirements'] as const;
 
 function assertRequirementDocumentationLinksResolve(
   requirementsView: ProjectionBundle<Fragment> | undefined,
@@ -352,6 +347,17 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               };
 
               for (const metadata of SUPPORTED_DOCUMENTATION_TYPE_REGISTRY) {
+                // Design review carries NO status/maturity filter at any level: it
+                // deliberately includes not-yet-implemented patterns, so it must not
+                // inherit the committed-only defaults the other types do.
+                if (metadata.key === 'design-review') {
+                  expect(metadata.disclosureMatrix.essential.filter).toBeUndefined();
+                  expect(metadata.disclosureMatrix.important.filter).toBeUndefined();
+                  expect(metadata.disclosureMatrix.useful.filter).toBeUndefined();
+                  expect(metadata.disclosureMatrix.advanced.filter).toBeUndefined();
+                  continue;
+                }
+
                 const expectedCommittedFilter =
                   metadata.key === 'roadmap' ? plannedFilter : committedFilter;
                 const expectedUsefulFilter =
@@ -378,6 +384,13 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'committed false disclosure levels should only appear on opt-in detail surfaces',
             () => {
               const optInDetailLevels = new Set([
+                // Design review is non-committed-inclusive at every level by design —
+                // it deliberately surfaces not-yet-implemented specs (its D-16/D-18
+                // differentiator from the production architecture view).
+                'design-review:essential',
+                'design-review:important',
+                'design-review:useful',
+                'design-review:advanced',
                 'business-rules:useful',
                 'business-rules:advanced',
                 'patterns:useful',

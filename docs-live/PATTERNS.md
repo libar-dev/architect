@@ -4,7 +4,7 @@
 
 | Field | Value |
 | ----- | ----- |
-| Count | 253   |
+| Count | 257   |
 
 ## Filters
 
@@ -90,6 +90,8 @@
 - DependencyEdgeProjectionExecutableTests
 - DependencyEdgeSet
 - DeriveProcessState
+- DesignReviewProjection
+- DesignReviewProjectionExecutableTests
 - DetectChanges
 - DocExtractor
 - DocStringMediaType
@@ -98,6 +100,8 @@
 - DocumentationCompositionProjectionExecutableTests
 - DocumentationCompositionProjectionSupport
 - DocumentationCompositionSupporting
+- DocumentationTypeRegistry
+- DocumentationTypeRegistryExecutableTests
 - DoDValidationTypes
 - DoDValidator
 - DualSourceExtractor
@@ -348,6 +352,8 @@
 | packages/architect-projection/tests/features/projections/pattern-relations/dependency-edges.feature                  | executable | DependencyEdgeProjectionExecutableTests               | projection | gherkin    | completed |
 | packages/architect-projection/src/fragments/pattern-relations/dependency-edge-set.ts                                 | design     | DependencyEdgeSet                                     | contract   | typescript | active    |
 | packages/architect-guard/src/lint/process-guard/derive-state.ts                                                      | design     | DeriveProcessState                                    | read-model | typescript | active    |
+| packages/architect-projection/src/projections/documentation-composition/design-review.ts                             | design     | DesignReviewProjection                                | projection | typescript | active    |
+| packages/architect-projection/tests/features/projections/documentation-composition/design-review.feature             | design     | DesignReviewProjectionExecutableTests                 | projection | gherkin    | active    |
 | packages/architect-guard/src/lint/process-guard/detect-changes.ts                                                    | design     | DetectChanges                                         | service    | typescript | active    |
 | packages/architect-core/src/extractor/doc-extractor.ts                                                               | design     | DocExtractor                                          | service    | typescript | active    |
 | packages/architect-core/tests/features/scanner/docstring-mediatype.feature                                           | executable | DocStringMediaType                                    |            | gherkin    | completed |
@@ -356,6 +362,8 @@
 | packages/architect-projection/tests/features/projections/documentation-composition/config-documentation.feature      | executable | DocumentationCompositionProjectionExecutableTests     | projection | gherkin    | completed |
 | packages/architect-projection/src/projections/documentation-composition/documentation-composition-shared.internal.ts | executable | DocumentationCompositionProjectionSupport             | utility    | typescript | completed |
 | packages/architect-projection/src/fragments/documentation-composition/supporting.ts                                  | design     | DocumentationCompositionSupporting                    | contract   | typescript | active    |
+| packages/architect-projection/src/projections/documentation-composition/documentation-type-registry.ts               | design     | DocumentationTypeRegistry                             | contract   | typescript | active    |
+| packages/architect-projection/tests/features/projections/documentation-composition/registry-contract.feature         | design     | DocumentationTypeRegistryExecutableTests              | contract   | gherkin    | active    |
 | packages/architect-guard/src/validation/types.ts                                                                     | executable | DoDValidationTypes                                    | contract   | typescript | completed |
 | packages/architect-guard/src/validation/dod-validator.ts                                                             | executable | DoDValidator                                          | service    | typescript | completed |
 | packages/architect-core/src/extractor/dual-source-extractor.ts                                                       | design     | DualSourceExtractor                                   | service    | typescript | active    |

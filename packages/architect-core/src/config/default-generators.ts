@@ -6,6 +6,7 @@
  */
 export const DEFAULT_GENERATORS = [
   'architecture',
+  'design-review',
   'decisions',
   'business-rules',
   'patterns',

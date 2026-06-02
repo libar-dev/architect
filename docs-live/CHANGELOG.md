@@ -52,10 +52,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - DependencyEdge
 - DependencyEdgeSet
 - DeriveProcessState
+- DesignReviewProjection
+- DesignReviewProjectionExecutableTests
 - DetectChanges
 - DocExtractor
 - DocumentationCommandParityBoundaryTests
 - DocumentationCompositionSupporting
+- DocumentationTypeRegistry
+- DocumentationTypeRegistryExecutableTests
 - DualSourceExtractor
 - ExecutionContextSupporting
 - ExtractedPattern

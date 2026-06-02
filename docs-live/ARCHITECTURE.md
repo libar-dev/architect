@@ -7,7 +7,7 @@
 
 ## Overview
 
-This view captures 166 patterns across 23 diagrams in the Component architecture view.
+This view captures 168 patterns across 23 diagrams in the Component architecture view.
 
 ## Related views
 
@@ -37,7 +37,7 @@ graph LR
   pattern_relations["pattern-relations (12)"]
   pipeline["pipeline (1)"]
   process_guard["process-guard (6)"]
-  projection["projection (44)"]
+  projection["projection (46)"]
   read_api["read-api (7)"]
   rendering["rendering (7)"]
   scanner["scanner (4)"]
@@ -295,7 +295,7 @@ graph TD
   processguardlinter -->|depends-on| detectchanges
 ```
 
-### Bounded context: projection (44 patterns)
+### Bounded context: projection (46 patterns)
 
 ```mermaid
 graph TD
@@ -311,8 +311,10 @@ graph TD
   deliveryreportingprojectionsupport["DeliveryReportingProjectionSupport<br/>(utility)"]
   dependencycontextprojection["DependencyContextProjection<br/>(projection)"]
   dependencyedgeprojection["DependencyEdgeProjection<br/>(projection)"]
+  designreviewprojection["DesignReviewProjection<br/>(projection)"]
   documentationbundle["DocumentationBundle<br/>(projection)"]
   documentationcompositionprojectionsupport["DocumentationCompositionProjectionSupport<br/>(utility)"]
+  documentationtyperegistry["DocumentationTypeRegistry<br/>(contract)"]
   executioncontextprojectionsupport["ExecutionContextProjectionSupport<br/>(utility)"]
   filereadinglistprojection["FileReadingListProjection<br/>(projection)"]
   governanceprojectionsupport["GovernanceProjectionSupport<br/>(utility)"]
@@ -353,6 +355,7 @@ graph TD
   deliverableprojection -->|depends-on| executioncontextprojectionsupport
   dependencycontextprojection -->|depends-on| patternrelationsprojectionsupport
   dependencyedgeprojection -->|depends-on| patternrelationsprojectionsupport
+  designreviewprojection -->|depends-on| architecturediagramprojection
   documentationbundle -->|depends-on| documentationcompositionprojectionsupport
   filereadinglistprojection -->|depends-on| executioncontextprojectionsupport
   handoffprojection -->|depends-on| executioncontextprojectionsupport
@@ -551,11 +554,13 @@ Bounded contexts whose patterns span more than one workspace package.
 - DependencyEdgeProjection
 - DependencyEdgeSet
 - DeriveProcessState
+- DesignReviewProjection
 - DetectChanges
 - DocExtractor
 - DocumentationBundle
 - DocumentationCompositionProjectionSupport
 - DocumentationCompositionSupporting
+- DocumentationTypeRegistry
 - DoDValidationTypes
 - DoDValidator
 - DualSourceExtractor
