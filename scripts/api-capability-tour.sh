@@ -4,8 +4,10 @@
 # ----------------------------------------------------------------------------
 # Run once at the start of a session to EXPERIENCE the Data API before reaching
 # for grep/Read. Most steps prove the API answers a question that would otherwise
-# cost an N-call loop + multiple file Reads + custom parsing (step 1 is the
-# human-oriented orient / cheat-sheet entry point, not an N-call replacement).
+# cost an N-call loop + multiple file Reads + custom parsing (step 1 is a lean
+# progress pulse that just proves the overview verb — the full cheat-sheet + map
+# are injected once at session start by .claude/hooks/architect-api-first.sh, not
+# re-dumped here).
 #
 # THE ONE IDIOM THAT MATTERS:  pnpm -s architect:query <verb> [--format json] | jq
 #   `-s` (silent) suppresses pnpm's `> architect@0.0.0 …` banner, which would
@@ -38,13 +40,17 @@ step() {
 
 # Each step is wrapped in a function so `step` can detect its exit status.
 # (Pipelines can't be passed as bare args; functions keep pipefail semantics.)
-s1() { Q overview; }
-s2() { Q query getStatusCounts | jq .; }
+s1() { Q overview --richness name-only; }
+# `jq .` would dump the full envelope incl. run-to-run-volatile noise (timestamp,
+# cache.ageMs, pipelineMs) — modeling dump-don't-slice. Slice to the real counts
+# (.data) + a preview of `.metadata.validation` (the exact block step 13's
+# integrity gate keys off), so step 2 foreshadows step 13 and the output is stable.
+s2() { Q query getStatusCounts | jq '{data, validation: .metadata.validation}'; }
 # jq slices to 8 instead of `| head` — `head` closing the pipe early would
 # SIGPIPE pnpm/jq and register a false failure under pipefail. Searching "PatternGraph"
 # surfaces the whole core family ranked (the read-model schema, its API kernel, the CLIs)
 # and sets up the showcase pattern for the steps that follow.
-s3() { Q search PatternGraph | jq -r '.[0:8][] | "\(.score)  \(.patternName)"'; }
+s3() { Q search PatternGraph | jq -r '.[0:8][] | ((((.score*100|round)/100)|tostring) + "      ")[0:6] + "  " + .patternName'; }
 # Name-it-then-locate-it: step 3 resolves the canonical name, `files` turns that name
 # into the implementation surface (primary .ts + the implementing .feature specs) in ONE
 # call — the structured answer to "where is X implemented?", the #1 reason to reach for grep.
@@ -86,8 +92,23 @@ sgov() {
   Q rules --decision ADR006SingleReadModelArchitecture --format json \
     | jq -e -r '.root.rules | select(length>0) | "\(length) invariants enforce ADR-006 (Single Read Model):", (.[] | "  • \(.ruleName)")'
 }
-# Pre-flight gate — the inspect -> "is it safe to start a session?" close. Step 1's
-# cheat-sheet advertises scope-validate under PLAN/GATE; here we actually exercise it.
+# `documentation architecture` fans out in ONE call into by-theme / layered / package-seam
+# lens children (75f5509). The by-theme lens synthesizes @architect-adr-theme into NAMED
+# decision clusters — "which decisions cluster around projections/taxonomy/testing?" is one
+# lens, never a grep over the decisions folder. The projections cluster contains ADR-006
+# (the showcase decision from the step above), so the tour stays one coherent read-model story.
+# `jq -e ... select(length>0)` is the emptiness guard so a dropped adr-theme grouping FAILs.
+stheme() {
+  Q documentation architecture --format json \
+    | jq -e -r '.children["architecture:by-theme"].sections
+                | map(select(.title|startswith("Theme:")))
+                | select(length>0)
+                | "ADRs cluster into \(length) decision themes (one lens, no decisions-folder grep):",
+                  (.[] | "  • \(.title)  →  \(.patterns|join(", "))")'
+}
+# Pre-flight gate — the inspect -> "is it safe to start a session?" close. The
+# session-start cheat-sheet (injected by the hook) advertises scope-validate under
+# PLAN/GATE; here we actually exercise it.
 sgate() { Q scope-validate PatternGraphApi design; }
 # A lone `true` can't prove the gate actually decides — show a LEGAL and an ILLEGAL
 # transition side by side (roadmap->active allowed; completed->active rejected) so the
@@ -106,18 +127,19 @@ s8() { Q arch neighborhood PatternGraph --format json \
 s9() { Q arch dangling --baseline packages/architect-guard/src/lint/dangling-baseline.json --strict \
          | jq '{drift: .data.drift, dangling: .metadata.validation.danglingReferenceCount}'; }
 
-step "1. Health + inventory — START HERE every session (text, human-oriented)" s1
-step "2. Status distribution as JSON — proof that | jq works (note the -s)" s2
+step "1. Progress pulse — the 'overview' verb live (full map + cheat-sheet already injected by the SessionStart hook)" s1
+step "2. Status distribution as JSON — proof that | jq works (note the -s); slice the envelope, don't dump it" s2
 step "3. Locate a pattern by fuzzy name (replaces guessing the canonical pattern name)" s3
 step "4. Locate the implementation surface — name it (step 3), then find it (replaces grep 'where is X?')" sfiles
 step "5. The default composite pre-flight — everything for a pattern in ONE call (+ token cost)" s4
 step "6. Dependency walk, both directions — replaces reading imports across many files" s5
-step "7. Invariants for a pattern — replaces grepping Rule: blocks (add --format json → .root is a BusinessRuleSet {kind, rules[], scope, scopeValue})" s6
+step "7. Invariants for a pattern — replaces grepping Rule: blocks (--format json envelope: .root is a BusinessRuleSet {kind, rules[], scope, scopeValue})" s6
 step "8. Invariants that enforce an ADR — governance navigability, not grep across decision records" sgov
-step "9. Pre-flight scope gate — is it safe to start a design session on this pattern?" sgate
-step "10. Deterministic FSM gate — a legal AND an illegal transition, side by side" s7
-step "11. Architecture neighborhood (PatternGraph — the read-model contract/schema, not the kernel in step 5) — the graph, not a guess" s8
-step "12. Graph-integrity gate — non-zero drift = stop and surface" s9
+step "9. Decision clusters by theme — one \`documentation architecture\` lens groups ADRs by theme (no decisions-folder grep)" stheme
+step "10. Pre-flight scope gate — is it safe to start a design session on this pattern?" sgate
+step "11. Deterministic FSM gate — a legal AND an illegal transition, side by side" s7
+step "12. Architecture neighborhood (PatternGraph — the read-model contract/schema, not the kernel in step 5) — the graph, not a guess" s8
+step "13. Graph-integrity gate — non-zero drift = stop and surface" s9
 
 if [ "$fail" -ne 0 ]; then
   printf '\n\033[31m✗ Capability tour: one or more steps FAILED (see [FAILED] above).\033[0m\n'
