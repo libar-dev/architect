@@ -29,6 +29,7 @@
 | DeliveryReportingProjectionSupportExecutableTests     | completed |            |
 | DependencyContextProjectionExecutableTests            | completed |            |
 | DependencyEdgeProjectionExecutableTests               | completed |            |
+| DesignReviewProjection                                | active    |            |
 | DesignReviewProjectionExecutableTests                 | active    |            |
 | DocStringMediaType                                    | completed |            |
 | DocumentationCommandParityBoundaryTests               | active    |            |

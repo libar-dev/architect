@@ -6,6 +6,8 @@
  * @architect-uses ArchitectureDiagramProjection, ArchitectureDiagram
  * @architect-enforces-decision ADR006SingleReadModelArchitecture, ADR009ProjectionTrustBoundary, ADR010DocumentationCompositionHelpers
  * @architect-bounded-context:projection
+ * @architect-parent:DocumentationProjection
+ * @architect-product-area:Generation
  *
  * **Value:** Projects a design-review document — component diagrams over the live
  * pattern graph that, unlike the production-only `architecture` view, INCLUDE

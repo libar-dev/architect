@@ -7,13 +7,15 @@ Feature: GoalOrientedNavigation - navigation surfaces are projections of the rea
 
   **User Story:** As a reader of the documentation read model, I want to state my goal in plain language and reach the relevant slice without knowing the filename, directory, or section structure of the output, so that the projected shape is not a prerequisite for finding what I need — the navigation surface itself is a projection over what the read model contains.
 
+  **Retires (No-BC):** when this navigation projection ships, the projected navigation index over the families that actually emitted supersedes and DELETES the static `DocumentationTypeRegistry` (and the empty-doc special-cases) — the epic's "the navigation index … retiring the static document-type registry" is owned here. Old→new is expressed by deletion, never a "replaces" graph edge (event-sourced doctrine — "what did we replace?" is a git-log question).
+
   **Open Questions:**
   - For single-document read models (sub-300-line topics), do we still project a goal-shaped navigation surface, or is the document alone enough?
   - A reader stating "my goal" — is that a literal text-search interface over the navigation projections, a fixed catalog of intents declared at the source, or both?
   - When two goals legitimately route to the same slice, do we deduplicate the listing or surface both intents pointing at it?
 
-  Rule: Nontrivial topics expose a projected goal-shaped navigation surface
-    **Invariant:** A documentation read model spanning multiple pages carries a navigation surface that is itself a projection — goal-to-page, named-thing-to-page, and a recommended reading order for common goals — so that a reader who knows their goal reaches the right page without traversing the file tree.
+  Rule: The goal-oriented navigation projection emits a goal-shaped surface for every multi-page topic it covers
+    **Invariant:** When the goal-oriented navigation projection is built, every multi-page documentation read model it covers carries a navigation surface that is itself a projection — goal-to-page, named-thing-to-page, and a recommended reading order for common goals — so a reader who knows their goal reaches the right page without traversing the file tree. This is the acceptance criterion of a built deliverable (the epic files GoalOrientedNavigation as a concrete artifact, not a standing capability-invariant like the three the epic upholds), satisfied once the navigation projection ships for the live multi-page corpus.
 
   @acceptance-criteria @happy-path
   Scenario: a reader names a goal and lands on the right page

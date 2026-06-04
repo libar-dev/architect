@@ -10,6 +10,13 @@ for anything that does not fit the verb's shape.
 
 ---
 
+## 2026-06-04 — API carried a full WIP-spec design review; one interpretation nuance on the `open-questions` gating count
+
+Reviewed the `DocumentationProjection` candidate family (epic + 8 members) entirely through the Data API (`list --parent`, `pattern`, `dep-tree`, `arch neighborhood`, `scope-validate`, `open-questions --parent … --include-self`, `documentation design-review`). Every verb worked first try and the capability tour passed all 13 steps. `documentation design-review` rendering the unbuilt members status-annotated — with the shipped `DesignReviewProjection` engine rendering its own parent epic's review — is the verb's intended use working as designed; it carried the review with zero spec-file scans for graph state.
+
+- **Nuance (not a defect):** the epic's durable architectural decisions are the **`[gating]`-prefixed** open questions (3). A naive substring match for "gating" over the `open-questions --parent … --include-self` items returns **4**, because a `TaxonomyDocumentationCluster` member question *cross-references* "the epic emission-mode gating question." Count the durable set by the `[gating]` prefix, not by a substring match — the extra hit is a pointer, not a fourth decision. Minor, but it cost a "3 vs 4" reconciliation.
+- **`jq`-shape reminder (already skill-documented):** `pattern --format json` puts the axes directly on `.root` (`.root.status`, not `.root.pattern.status`); `open-questions --format json` is `.root.items[].questions`. Guessing `.root.pattern.*` returns `null` silently — re-noting because it still bites.
+
 ## 2026-06-01 — Landed: five effectiveness fixes from the dogfood-gap-ledger triage (A1 · A3 · A5 · A10 · D16)
 
 A blind 10-agent triage workflow re-verified the open FEEDBACK/ledger items against the live CLI (8 of 22 were already-closed ghosts — recorded below). The five genuinely-open, completable items landed this session, each gate-validated (typecheck · 1820 projection + 1211 dogfood tests · validate:all · docs-determinism · perf):

@@ -26,15 +26,15 @@ Feature: TaxonomyDocumentationCluster - the MVP proof-point: one taxonomy source
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location |
-      | Reference shape (full enumeration) | shipped | docs-live/TAXONOMY.md (`projectTaxonomyDigest`) |
-      | Live-API taxonomy context | shipped | `architect:query taxonomy` |
-      | Skill shape (model + link-to-live) | planned | .agents/skills/architect-base/references/taxonomy.md |
-      | Formal-spec shape (enumeration in normative prose) | planned | formal-spec/04-tag-registry.md |
+      | Reference shape (full enumeration) | complete | docs-live/TAXONOMY.md (`projectTaxonomyDigest`) |
+      | Live-API taxonomy context | complete | `architect:query taxonomy` |
+      | Skill shape (model + link-to-live) | pending | .agents/skills/architect-base/references/taxonomy.md |
+      | Formal-spec shape (enumeration in normative prose) | pending | formal-spec/04-tag-registry.md |
 
   Rule: The taxonomy documents are one generation family from the tag registry
     **Invariant:** The skill, reference, formal-spec, and live-API taxonomy documents are all generated from the tag registry as one family; the tag set, counts, and per-tag metadata are emitted from the registry into each document rather than hand-restated, and the differences between documents are verbosity and style applied by progressive disclosure, not separately-authored content. A taxonomy fact cannot drift across the four because none of them is its independent author.
 
-    **Rationale:** A single canonical source (the tag registry) with audience-shaped emissions is the no-duplication guarantee (`MultiSourceComposition`) made concrete on the lowest-risk cluster; the determinism gate (`docs:all && git diff`) turns "no hand-restated fact" into an enforced invariant rather than a convention.
+    **Rationale:** A single canonical source (the tag registry) with audience-shaped read models is the no-duplication guarantee (`MultiSourceComposition`) made concrete on the lowest-risk cluster; the determinism gate (`docs:all && git diff`) turns "no hand-restated fact" into an enforced invariant rather than a convention.
 
     **Verified by:** `docs-live/TAXONOMY.md` regenerates from `projectTaxonomyDigest` under the determinism gate; the live `architect:query taxonomy` emits the same tag set and counts.
 
