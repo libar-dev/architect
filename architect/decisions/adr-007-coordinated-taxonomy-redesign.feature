@@ -2,6 +2,8 @@
 @architect-adr:007
 @architect-adr-status:accepted
 @architect-adr-category:architecture
+@architect-adr-layer:refinement
+@architect-adr-theme:taxonomy
 @architect-pattern:ADR007CoordinatedTaxonomyRedesign
 @architect-status:active
 @architect-product-area:Process

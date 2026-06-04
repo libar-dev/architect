@@ -2,8 +2,11 @@
 @architect-adr:005
 @architect-adr-status:accepted
 @architect-adr-category:process
+@architect-adr-layer:foundation
+@architect-adr-theme:coordination
 @architect-pattern:PDR005ProcessGuardFSM
 @architect-status:completed
+@architect-unlock-reason:Backfill-adr-layer-and-theme-classification-tags
 @architect-product-area:Validation
 @architect-uses:ADR001TaxonomyCanonicalValues
 Feature: PDR-005 - Process Guard FSM and Protection Levels

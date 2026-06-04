@@ -2,6 +2,8 @@
 @architect-adr:001
 @architect-adr-status:accepted
 @architect-adr-category:process
+@architect-adr-layer:refinement
+@architect-adr-theme:commands
 @architect-pattern:PDR001SessionWorkflowCommands
 @architect-status:roadmap
 @architect-product-area:DataAPI

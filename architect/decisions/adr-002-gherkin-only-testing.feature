@@ -2,6 +2,8 @@
 @architect-adr:002
 @architect-adr-status:accepted
 @architect-adr-category:testing
+@architect-adr-layer:foundation
+@architect-adr-theme:testing
 @architect-pattern:ADR002GherkinOnlyTesting
 @architect-status:completed
 @architect-unlock-reason:Add-process-workflow-include-tag

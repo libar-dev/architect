@@ -6,6 +6,7 @@ import {
   buildDesignReviewBundle,
   projectDesignReview,
 } from '../../../../src/projections/documentation-composition/design-review.js';
+import { createDesignReviewViewRouteId } from '../../../../src/projections/documentation-composition/design-review-routes.js';
 import { createPattern, createProjectionContext } from '../governance/support.js';
 
 interface DesignReviewState {
@@ -67,6 +68,35 @@ function nodeLabelLine(name: string): string | undefined {
   return allDiagramContents(state!.bundle!)
     .flatMap((content) => content.split('\n'))
     .find((line) => line.includes(`["${name}`));
+}
+
+/** The diagram sections of a named lens child (`by-layer` / `by-theme` / `by-package`). */
+function lensSections(view: string): readonly { title: string; patterns?: readonly string[] }[] {
+  const children = (state!.bundle!.children ?? {}) as Record<
+    string,
+    { sections?: readonly { title: string; patterns?: readonly string[] }[] }
+  >;
+  return children[createDesignReviewViewRouteId(view)]?.sections ?? [];
+}
+
+/**
+ * Assert a named lens fans out the expected group sections. `spec` is a compact
+ * `key=member,member;key=member` encoding; the section title is the lens's title
+ * prefix (`Layer: ` / `Theme: `) plus the key.
+ */
+function assertLensGroups(view: string, spec: string): void {
+  const sections = lensSections(view);
+  expect(sections.length, `no lens child for "${view}"`).toBeGreaterThan(0);
+  const titlePrefix = view === 'by-layer' ? 'Layer: ' : 'Theme: ';
+  for (const groupSpec of spec.split(';')) {
+    const [key, csv] = groupSpec.split('=');
+    const title = `${titlePrefix}${(key ?? '').trim()}`;
+    const section = sections.find((entry) => entry.title === title);
+    expect(section, `no group "${title}" in "${view}" lens`).toBeDefined();
+    for (const name of (csv ?? '').split(',').map((part) => part.trim())) {
+      expect(section!.patterns ?? []).toContain(name);
+    }
+  }
 }
 
 const feature = await loadFeature(
@@ -221,6 +251,59 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           },
         );
       });
+    },
+  );
+
+  Rule(
+    'A design review fans out decision-record lenses grouped by layer and by theme',
+    ({ RuleScenario }) => {
+      RuleScenario(
+        'the by-layer and by-theme lenses group decisions by their ADR classification',
+        ({ Given, When, Then, And }) => {
+          Given('a graph whose decision records carry layer and theme classification', () => {
+            state!.context = createProjectionContext({
+              patterns: [
+                createPattern('FoundationA', {
+                  status: 'completed',
+                  adrLayer: 'foundation',
+                  adrTheme: 'taxonomy',
+                  file: 'architect/decisions/adr-a.feature',
+                }),
+                createPattern('FoundationB', {
+                  status: 'completed',
+                  adrLayer: 'foundation',
+                  adrTheme: 'taxonomy',
+                  file: 'architect/decisions/adr-b.feature',
+                }),
+                createPattern('RefinementC', {
+                  status: 'active',
+                  adrLayer: 'refinement',
+                  adrTheme: 'projections',
+                  file: 'architect/decisions/adr-c.feature',
+                }),
+              ],
+            });
+          });
+
+          When('I build the design-review bundle', () => {
+            state!.bundle = buildDesignReviewBundle(state!.context);
+          });
+
+          Then(
+            'the {string} lens should group decisions as {string}',
+            (_ctx: unknown, view: string, spec: string) => {
+              assertLensGroups(view, spec);
+            },
+          );
+
+          And(
+            'the {string} lens should group decisions as {string}',
+            (_ctx: unknown, view: string, spec: string) => {
+              assertLensGroups(view, spec);
+            },
+          );
+        },
+      );
     },
   );
 });

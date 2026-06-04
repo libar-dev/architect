@@ -27,14 +27,20 @@ export const DocumentationSectionSchema = z.strictObject({
 });
 
 /**
- * The scope an architecture diagram is drawn at — by component, layer, bounded
- * context, product area, or package.
+ * The scope an architecture diagram is drawn at — by component, layer, theme,
+ * bounded context, product area, or package.
+ *
+ * `layered` and `theme` are the decision-record lenses: both group the patterns
+ * carrying the corresponding ADR classification (`@architect-adr-layer` /
+ * `@architect-adr-theme`) — the evolutionary layer vs the synthesis theme of a
+ * decision — and are structural twins driven by the same grouping engine.
  *
  * @architect-shape
  */
 export const ArchitectureDiagramScopeSchema = z.enum([
   'component',
   'layered',
+  'theme',
   'bounded-context',
   'product-area',
   'package',

@@ -2,6 +2,8 @@
 @architect-adr:005
 @architect-adr-status:accepted
 @architect-adr-category:architecture
+@architect-adr-layer:infrastructure
+@architect-adr-theme:projections
 @architect-pattern:ADR005CodecBasedMarkdownRendering
 @architect-status:completed
 @architect-unlock-reason:Retroactive-completion-during-rebrand

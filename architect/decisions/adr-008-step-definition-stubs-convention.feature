@@ -2,8 +2,11 @@
 @architect-adr:008
 @architect-adr-status:accepted
 @architect-adr-category:process
+@architect-adr-layer:infrastructure
+@architect-adr-theme:testing
 @architect-pattern:ADR008StepDefinitionStubsConvention
 @architect-status:completed
+@architect-unlock-reason:Backfill-adr-layer-and-theme-classification-tags
 @architect-product-area:Process
 @architect-uses:ADR003SourceFirstPatternArchitecture,ADR002GherkinOnlyTesting
 Feature: ADR-008 - Step Definition Stubs Live in Architect State Folder

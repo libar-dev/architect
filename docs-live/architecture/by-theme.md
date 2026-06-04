@@ -7,53 +7,67 @@
 
 ## Overview
 
-This view captures 10 patterns across 4 diagrams in the Layered architecture view.
+This view captures 10 patterns across 5 diagrams in the Theme architecture view.
 
 ## Diagrams
 
-### Layer Map
+### Theme Map
 
 Each node is a group; each arrow is a cross-group dependency (`depends-on` / `uses`, pointing from dependant to dependency). The per-group diagrams below detail each group’s internal dependencies and any see-also references.
 
 ```mermaid
 graph LR
-  foundation["foundation (4)"]
-  infrastructure["infrastructure (3)"]
-  refinement["refinement (3)"]
-  infrastructure --> foundation
-  refinement --> foundation
+  coordination["coordination (1)"]
+  projections["projections (4)"]
+  taxonomy["taxonomy (3)"]
+  testing["testing (2)"]
+  coordination --> taxonomy
+  taxonomy --> coordination
+  testing --> taxonomy
 ```
 
-### Layer: foundation (4 patterns)
+### Theme: coordination (1 pattern)
 
 ```mermaid
 graph TD
-  adr001taxonomycanonicalvalues["ADR001TaxonomyCanonicalValues"]
-  adr002gherkinonlytesting["ADR002GherkinOnlyTesting"]
-  adr003sourcefirstpatternarchitecture["ADR003SourceFirstPatternArchitecture"]
   pdr005processguardfsm["PDR005ProcessGuardFSM"]
-  adr003sourcefirstpatternarchitecture -->|depends-on| adr001taxonomycanonicalvalues
-  pdr005processguardfsm -->|depends-on| adr001taxonomycanonicalvalues
 ```
 
-### Layer: infrastructure (3 patterns)
+### Theme: projections (4 patterns)
 
 ```mermaid
 graph TD
   adr005codecbasedmarkdownrendering["ADR005CodecBasedMarkdownRendering"]
   adr006singlereadmodelarchitecture["ADR006SingleReadModelArchitecture"]
-  adr008stepdefinitionstubsconvention["ADR008StepDefinitionStubsConvention"]
+  adr009projectiontrustboundary["ADR009ProjectionTrustBoundary"]
+  adr010documentationcompositionhelpers["ADR010DocumentationCompositionHelpers"]
   adr006singlereadmodelarchitecture -->|depends-on| adr005codecbasedmarkdownrendering
+  adr009projectiontrustboundary -. see-also .- adr005codecbasedmarkdownrendering
+  adr009projectiontrustboundary -. see-also .- adr006singlereadmodelarchitecture
+  adr010documentationcompositionhelpers -. see-also .- adr005codecbasedmarkdownrendering
+  adr010documentationcompositionhelpers -. see-also .- adr006singlereadmodelarchitecture
+  adr010documentationcompositionhelpers -. see-also .- adr009projectiontrustboundary
 ```
 
-### Layer: refinement (3 patterns)
+### Theme: taxonomy (3 patterns)
 
 ```mermaid
 graph TD
+  adr001taxonomycanonicalvalues["ADR001TaxonomyCanonicalValues"]
+  adr003sourcefirstpatternarchitecture["ADR003SourceFirstPatternArchitecture"]
   adr007coordinatedtaxonomyredesign["ADR007CoordinatedTaxonomyRedesign"]
-  adr009projectiontrustboundary["ADR009ProjectionTrustBoundary"]
-  adr010documentationcompositionhelpers["ADR010DocumentationCompositionHelpers"]
-  adr010documentationcompositionhelpers -. see-also .- adr009projectiontrustboundary
+  adr001taxonomycanonicalvalues -. see-also .- adr007coordinatedtaxonomyredesign
+  adr003sourcefirstpatternarchitecture -->|depends-on| adr001taxonomycanonicalvalues
+  adr007coordinatedtaxonomyredesign -->|depends-on| adr001taxonomycanonicalvalues
+```
+
+### Theme: testing (2 patterns)
+
+```mermaid
+graph TD
+  adr002gherkinonlytesting["ADR002GherkinOnlyTesting"]
+  adr008stepdefinitionstubsconvention["ADR008StepDefinitionStubsConvention"]
+  adr008stepdefinitionstubsconvention -->|depends-on| adr002gherkinonlytesting
 ```
 
 ## Fan-in

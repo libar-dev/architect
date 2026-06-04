@@ -13,6 +13,7 @@ This view captures 212 patterns across 24 diagrams in the Component view.
 
 - [By Layer](design-review/by-layer.md)
 - [By Package](design-review/by-package.md)
+- [By Theme](design-review/by-theme.md)
 
 ## Diagrams
 
@@ -39,11 +40,11 @@ graph LR
   process_guard["process-guard (6)"]
   projection["projection (47)"]
   read_api["read-api (7)"]
-  rendering["rendering (7)"]
+  rendering["rendering (9)"]
   scanner["scanner (4)"]
   validation["validation (8)"]
   validation_schemas["validation-schemas (4)"]
-  role_contract["role: contract (4)"]
+  role_contract["role: contract (2)"]
   pkg_architect_package_content["Architect Package Content (38)"]
   api --> pipeline
   api --> projection
@@ -57,7 +58,6 @@ graph LR
   delivery_reporting --> execution_context
   delivery_reporting --> pattern_relations
   documentation_composition --> rendering
-  documentation_composition --> role_contract
   extractor --> read_api
   extractor --> scanner
   extractor --> validation_schemas
@@ -84,10 +84,9 @@ graph LR
   projection --> governance
   projection --> operational_insights
   projection --> pattern_relations
-  projection --> role_contract
+  projection --> rendering
   projection --> validation_schemas
   read_api --> validation_schemas
-  rendering --> role_contract
   validation --> extractor
   validation --> scanner
   validation --> validation_schemas
@@ -418,7 +417,7 @@ graph TD
   ruleaggregation -->|depends-on| patternhelpers
 ```
 
-### Bounded context: rendering (7 patterns)
+### Bounded context: rendering (9 patterns)
 
 ```mermaid
 graph TD
@@ -428,12 +427,19 @@ graph TD
   jsonrenderer["JsonRenderer<br/>(codec · completed)"]
   markdownblockparser["MarkdownBlockParser<br/>(codec · active)"]
   markdownrenderer["MarkdownRenderer<br/>(codec · completed)"]
+  projectionfragmentcontracts["ProjectionFragmentContracts<br/>(contract · active)"]
+  projectionfragmentschema["ProjectionFragmentSchema<br/>(contract · active)"]
   uirenderer["UiRenderer<br/>(codec · completed)"]
   compacttextrenderer -->|depends-on| fragmentrendererdispatch
+  compacttextrenderer -->|depends-on| projectionfragmentschema
+  fragmentrendererdispatch -->|depends-on| projectionfragmentschema
+  jsonrenderer -->|depends-on| projectionfragmentschema
   markdownrenderer -->|depends-on| blockschema
   markdownrenderer -->|depends-on| fragmentrendererdispatch
+  markdownrenderer -->|depends-on| projectionfragmentschema
   uirenderer -->|depends-on| blockschema
   uirenderer -->|depends-on| fragmentrendererdispatch
+  uirenderer -->|depends-on| projectionfragmentschema
 ```
 
 ### Bounded context: scanner (4 patterns)
@@ -478,13 +484,11 @@ graph TD
   patterngraph -->|depends-on| extractedpattern
 ```
 
-### Uncontextualized · role: contract (4 patterns)
+### Uncontextualized · role: contract (2 patterns)
 
 ```mermaid
 graph TD
   errorfactorytypes["ErrorFactoryTypes<br/>(contract · completed)"]
-  projectionfragmentcontracts["ProjectionFragmentContracts<br/>(contract · active)"]
-  projectionfragmentschema["ProjectionFragmentSchema<br/>(contract · active)"]
   resultmonadtypes["ResultMonadTypes<br/>(contract · completed)"]
 ```
 
@@ -579,7 +583,7 @@ Bounded contexts whose patterns span more than one workspace package.
 | extractor       | Architect Core, Architect Package Content       | 7        |
 | governance      | Architect Package Content, Architect Projection | 9        |
 | projection      | Architect Package Content, Architect Projection | 47       |
-| rendering       | Architect Core, Architect Projection            | 7        |
+| rendering       | Architect Core, Architect Projection            | 9        |
 | validation      | Architect Core, Architect Guard                 | 8        |
 
 ## Legend

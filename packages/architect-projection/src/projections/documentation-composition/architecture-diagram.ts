@@ -7,9 +7,9 @@
  * @architect-bounded-context:projection
  *
  * **Value:** Produces a schema-validated `ArchitectureDiagram` fragment for
- * any supported scope (component, layered, bounded-context, product-area) so
- * Studio and documentation surfaces render the same Mermaid diagram, legend,
- * and pattern list for a given scope request.
+ * any supported scope (component, layered, theme, bounded-context, product-area,
+ * package) so Studio and documentation surfaces render the same Mermaid diagram,
+ * legend, and pattern list for a given scope request.
  *
  * **Invariant:** The returned fragment preserves the requested `scope`, and
  * scoped filtering by `archContext` or `productArea` is applied inside the
@@ -59,19 +59,24 @@ export function projectArchitectureDiagram(
 
 /**
  * The architecture documentation tree: a component-view root plus one child doc per
- * additional lens (package-seam, layered). A lens is emitted only when it actually has
- * patterns, so a graph with no `@architect-layer` annotations does not produce an empty
- * `architecture/layered.md`. Reuses the generic bundle-routing machinery — the registry's
- * `childDirectory: 'architecture'` routes children to `architecture/<view>.md`.
+ * additional lens (package-seam, layered, by-theme). A lens is emitted only when it
+ * actually has patterns, so a graph with no `@architect-adr-layer` / `@architect-adr-theme`
+ * annotations does not produce an empty `architecture/layered.md` or `architecture/by-theme.md`.
+ * Reuses the generic bundle-routing machinery — the registry's `childDirectory: 'architecture'`
+ * routes children to `architecture/<view>.md`.
  */
 export function buildArchitectureBundle(
   context: ProjectionContext,
 ): ProjectionBundle<ArchitectureDiagram> {
   const root = buildArchitectureDiagram(context, { scope: 'component' });
 
-  const lenses: readonly { readonly view: string; readonly scope: 'package' | 'layered' }[] = [
+  const lenses: readonly {
+    readonly view: string;
+    readonly scope: 'package' | 'layered' | 'theme';
+  }[] = [
     { view: 'package-seam', scope: 'package' },
     { view: 'layered', scope: 'layered' },
+    { view: 'by-theme', scope: 'theme' },
   ];
 
   const children: Record<string, ArchitectureDiagram> = {};

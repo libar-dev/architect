@@ -2,8 +2,11 @@
 @architect-adr:001
 @architect-adr-status:accepted
 @architect-adr-category:process
+@architect-adr-layer:foundation
+@architect-adr-theme:taxonomy
 @architect-pattern:ADR001TaxonomyCanonicalValues
 @architect-status:completed
+@architect-unlock-reason:Backfill-adr-layer-and-theme-classification-tags
 @architect-product-area:Process
 @architect-see-also:ADR007CoordinatedTaxonomyRedesign
 Feature: ADR-001 - Taxonomy Canonical Values and Process Constants

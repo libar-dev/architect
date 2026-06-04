@@ -2,6 +2,8 @@
 @architect-adr:006
 @architect-adr-status:accepted
 @architect-adr-category:architecture
+@architect-adr-layer:infrastructure
+@architect-adr-theme:projections
 @architect-pattern:ADR006SingleReadModelArchitecture
 @architect-status:completed
 @architect-product-area:Generation

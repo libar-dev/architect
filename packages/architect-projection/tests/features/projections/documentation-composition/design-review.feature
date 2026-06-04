@@ -47,3 +47,16 @@ Feature: DesignReviewProjection - design reviews include not-yet-implemented spe
       When I project a design review scoped to product-area "Generation"
       Then the scoped diagram patterns should include "PlannedFeature"
       And the scoped diagram patterns should exclude "WidgetService"
+
+  Rule: A design review fans out decision-record lenses grouped by layer and by theme
+
+    The @architect-adr-layer and @architect-adr-theme classifications are structural
+    twins: each fans out its own whole-graph lens child that groups the decision
+    records carrying it. A lens is emitted only when at least one pattern carries its
+    classification, so the same graph drives both the layered and themed slices.
+
+    Scenario: the by-layer and by-theme lenses group decisions by their ADR classification
+      Given a graph whose decision records carry layer and theme classification
+      When I build the design-review bundle
+      Then the "by-layer" lens should group decisions as "foundation=FoundationA,FoundationB;refinement=RefinementC"
+      And the "by-theme" lens should group decisions as "taxonomy=FoundationA,FoundationB;projections=RefinementC"

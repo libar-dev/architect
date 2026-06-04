@@ -27,6 +27,13 @@
           "tracking": "commit"
         },
         {
+          "path": "architecture/by-theme.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "ARCHITECTURE.md"
+        },
+        {
           "path": "architecture/layered.md",
           "role": "progressive-child",
           "audience": "published",
@@ -363,6 +370,13 @@
         },
         {
           "path": "design-review/by-package.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "DESIGN-REVIEW.md"
+        },
+        {
+          "path": "design-review/by-theme.md",
           "role": "progressive-child",
           "audience": "published",
           "tracking": "commit",

@@ -41,8 +41,10 @@ export interface PatternStubOptions {
   readonly description?: string;
   readonly boundedContext?: ExtractedPattern['boundedContext'];
   readonly adrLayer?: ExtractedPattern['adrLayer'];
+  readonly adrTheme?: ExtractedPattern['adrTheme'];
   readonly archContext?: string;
   readonly archLayer?: string;
+  readonly archTheme?: string;
   readonly productArea?: ExtractedPattern['productArea'];
   readonly userRole?: ExtractedPattern['userRole'];
   readonly businessValue?: ExtractedPattern['businessValue'];
@@ -124,6 +126,9 @@ export function buildPatternStub(name: string, options: PatternStubOptions = {})
       : {}),
     ...(options.adrLayer !== undefined || options.archLayer !== undefined
       ? { adrLayer: options.adrLayer ?? options.archLayer }
+      : {}),
+    ...(options.adrTheme !== undefined || options.archTheme !== undefined
+      ? { adrTheme: options.adrTheme ?? options.archTheme }
       : {}),
     ...(options.productArea !== undefined ? { productArea: options.productArea } : {}),
     ...(options.userRole !== undefined ? { userRole: options.userRole } : {}),

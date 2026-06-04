@@ -2,6 +2,7 @@
  * @architect
  * @architect-pattern ProjectionFragmentContracts
  * @architect-role:contract
+ * @architect-bounded-context:rendering
  * @architect-status active
  *
  * ### When to Use

@@ -32,12 +32,12 @@
  *   shape must show. The production `architecture` view leaves it off and stays
  *   role-only / byte-identical.
  * - The doc-type bundle emits a working-state-inclusive component root plus
- *   `by-layer` and `by-package` lens children (each emitted only when non-empty),
- *   rendered under its own `Design Review` heading via the fragment's
+ *   `by-layer`, `by-theme`, and `by-package` lens children (each emitted only when
+ *   non-empty), rendered under its own `Design Review` heading via the fragment's
  *   `presentation` override — no second fragment kind or renderer normalizer.
  * - The scoped entry (`projectDesignReview`) narrows the review to a related set
- *   (a bounded-context / product-area / layer / package scope), lifting the prior
- *   generator's single-central-pattern limit.
+ *   (a bounded-context / product-area / layer / theme / package scope), lifting the
+ *   prior generator's single-central-pattern limit.
  *
  * ### When to Use
  *
@@ -85,7 +85,7 @@ export type ProjectDesignReviewOptions = z.infer<typeof ProjectDesignReviewOptio
  * Project a scoped design review (a single diagram for a related set), including
  * working-state specs. Lifts the removed generator's single-central-pattern limit
  * by accepting any architecture scope (`bounded-context` / `product-area` /
- * `layered` / `package` / `component`).
+ * `layered` / `theme` / `package` / `component`).
  */
 export function projectDesignReview(
   context: ProjectionContext,
@@ -104,11 +104,12 @@ export function projectDesignReview(
 
 /**
  * The design-review documentation tree: a working-state-inclusive component-view
- * root plus one child doc per additional lens (`by-layer`, `by-package`). A lens
- * is emitted only when it actually has patterns, so a graph with no
- * `@architect-layer` annotations does not produce an empty `design-review/by-layer.md`.
- * Reuses the generic bundle-routing machinery — the registry's
- * `childDirectory: 'design-review'` routes children to `design-review/<view>.md`.
+ * root plus one child doc per additional lens (`by-layer`, `by-theme`, `by-package`).
+ * A lens is emitted only when it actually has patterns, so a graph with no
+ * `@architect-adr-layer` / `@architect-adr-theme` annotations does not produce an
+ * empty `design-review/by-layer.md` or `design-review/by-theme.md`. Reuses the
+ * generic bundle-routing machinery — the registry's `childDirectory: 'design-review'`
+ * routes children to `design-review/<view>.md`.
  */
 export function buildDesignReviewBundle(
   context: ProjectionContext,
@@ -121,13 +122,13 @@ export function buildDesignReviewBundle(
     presentation: DESIGN_REVIEW_PRESENTATION,
   });
 
-  // `layered` and `package` carry no required scopeValue (unlike bounded-context /
-  // product-area), so they fan out as whole-graph lenses cleanly. Each carries its
-  // own presentation so the child doc renders under a design-review heading rather
-  // than the default `Architecture` kind title.
+  // `layered`, `theme`, and `package` carry no required scopeValue (unlike
+  // bounded-context / product-area), so they fan out as whole-graph lenses cleanly.
+  // Each carries its own presentation so the child doc renders under a design-review
+  // heading rather than the default `Architecture` kind title.
   const lenses: readonly {
     readonly view: string;
-    readonly scope: 'layered' | 'package';
+    readonly scope: 'layered' | 'theme' | 'package';
     readonly title: string;
     readonly purpose: string;
   }[] = [
@@ -137,6 +138,13 @@ export function buildDesignReviewBundle(
       title: 'Design Review — Layered Lens',
       purpose:
         'Design-review components grouped by architecture layer, including not-yet-implemented specs.',
+    },
+    {
+      view: 'by-theme',
+      scope: 'theme',
+      title: 'Design Review — Themed Lens',
+      purpose:
+        'Design-review components grouped by decision theme, including not-yet-implemented specs.',
     },
     {
       view: 'by-package',

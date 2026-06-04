@@ -577,7 +577,7 @@ Bounded contexts whose patterns span more than one workspace package.
 | Bounded context | Packages                                      | Patterns |
 | --------------- | --------------------------------------------- | -------- |
 | cli             | Architect CLI, Architect Guard, Architect MCP | 6        |
-| rendering       | Architect Core, Architect Projection          | 7        |
+| rendering       | Architect Core, Architect Projection          | 9        |
 | validation      | Architect Core, Architect Guard               | 8        |
 
 ## Legend

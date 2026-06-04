@@ -229,22 +229,23 @@ Feature: Documentation Composition projection bodies
   Rule: The architecture documentation projects a routed tree of lens views
 
     **Invariant:** The architecture documentation type projects a component-view root plus
-    one routed child doc per non-empty lens (package-seam, layered) under the architecture
-    child directory; a lens with no patterns is omitted and the root links each emitted lens.
+    one routed child doc per non-empty lens (package-seam, layered, by-theme) under the
+    architecture child directory; a lens with no patterns is omitted and the root links each
+    emitted lens.
 
-    **Rationale:** A single ARCHITECTURE.md cannot hold the component, package-seam, and
-    layered lenses legibly; routing them as child docs keeps each Mermaid view focused while
+    **Rationale:** A single ARCHITECTURE.md cannot hold the component, package-seam, layered,
+    and themed lenses legibly; routing them as child docs keeps each Mermaid view focused while
     the root stays the navigable overview.
 
     **Verified by:** projecting the architecture documentation bundle for a graph spanning
-    packages and layers, asserting a component root and routed package-seam + layered
-    children under the architecture directory.
+    packages, layers, and themes, asserting a component root and routed package-seam + layered
+    + by-theme children under the architecture directory.
 
     Scenario: the architecture bundle emits a component root and lens children
-      Given a documentation context with patterns spanning packages and layers
+      Given a documentation context with patterns spanning packages, layers, and themes
       When I project the architecture documentation bundle
       Then the architecture root should be the component view
-      And the architecture bundle should route the package-seam and layered lens docs
+      And the architecture bundle should route the package-seam, layered, and by-theme lens docs
       And only the root links the lens docs — children carry no related-view links
 
   Rule: Per-group detail diagrams draw only forward dependency edges

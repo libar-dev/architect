@@ -33,6 +33,7 @@ export interface NodeShape {
   readonly label: string;
   readonly archContext?: string;
   readonly archLayer?: string;
+  readonly archTheme?: string;
   readonly role?: string;
   readonly packageLabel: string;
 }
@@ -155,6 +156,7 @@ export function collectArchitectureNodes(
         : '';
     const archContext = hasText(pattern.boundedContext) ? pattern.boundedContext.trim() : undefined;
     const archLayer = hasText(pattern.adrLayer) ? pattern.adrLayer.trim() : undefined;
+    const archTheme = hasText(pattern.adrTheme) ? pattern.adrTheme.trim() : undefined;
     const packageLabel = resolvePackageLabel(context, pattern.source.file);
 
     return {
@@ -163,6 +165,7 @@ export function collectArchitectureNodes(
       label: `${escapeMermaidLabel(name)}${roleSuffix}`,
       ...(archContext !== undefined ? { archContext } : {}),
       ...(archLayer !== undefined ? { archLayer } : {}),
+      ...(archTheme !== undefined ? { archTheme } : {}),
       ...(role !== undefined ? { role } : {}),
       packageLabel,
     } satisfies NodeShape;
@@ -280,6 +283,12 @@ function filterPatternsForArchitecture(
       return patterns;
     case 'layered':
       return patterns.filter((pattern) => hasText(pattern.adrLayer));
+    case 'theme':
+      return patterns.filter(
+        (pattern) =>
+          hasText(pattern.adrTheme) &&
+          (scopeValue === undefined || pattern.adrTheme.trim().toLowerCase() === scopeValue),
+      );
     case 'bounded-context':
       return patterns.filter(
         (pattern) =>
@@ -538,6 +547,15 @@ function resolveNodeGroup(node: NodeShape, mode: GroupingMode): ResolvedGroup {
             rank: 0,
           }
         : { key: 'Unlayered', title: 'Unlayered', mapLabel: 'Unlayered', rank: 1 };
+    case 'theme':
+      return node.archTheme !== undefined
+        ? {
+            key: node.archTheme,
+            title: `Theme: ${node.archTheme}`,
+            mapLabel: node.archTheme,
+            rank: 0,
+          }
+        : { key: 'Unthemed', title: 'Unthemed', mapLabel: 'Unthemed', rank: 1 };
     case 'bounded-context':
       return node.archLayer !== undefined
         ? { key: node.archLayer, title: node.archLayer, mapLabel: node.archLayer, rank: 0 }

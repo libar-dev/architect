@@ -45,6 +45,7 @@ import { hasText } from './documentation-composition-shared.internal.js';
 const ARCHITECTURE_SCOPE_TITLES: Record<ArchitectureDiagramScope, string> = {
   component: 'Component View',
   layered: 'Layered View',
+  theme: 'Themed View',
   'bounded-context': 'Bounded Context View',
   'product-area': 'Product Area View',
   package: 'Package View',
@@ -53,6 +54,7 @@ const ARCHITECTURE_SCOPE_TITLES: Record<ArchitectureDiagramScope, string> = {
 const ARCHITECTURE_MAP_TITLES: Record<ArchitectureDiagramScope, string> = {
   component: 'Context Map',
   layered: 'Layer Map',
+  theme: 'Theme Map',
   'bounded-context': 'Context Map',
   'product-area': 'Product-area Map',
   package: 'Package Map',

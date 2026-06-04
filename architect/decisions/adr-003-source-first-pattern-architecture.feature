@@ -2,8 +2,11 @@
 @architect-adr:003
 @architect-adr-status:accepted
 @architect-adr-category:process
+@architect-adr-layer:foundation
+@architect-adr-theme:taxonomy
 @architect-pattern:ADR003SourceFirstPatternArchitecture
 @architect-status:completed
+@architect-unlock-reason:Backfill-adr-layer-and-theme-classification-tags
 @architect-product-area:Process
 @architect-uses:ADR001TaxonomyCanonicalValues
 Feature: ADR-003 - Source-First Pattern Architecture

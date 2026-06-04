@@ -31,6 +31,8 @@ interface PatternFixtureOptions {
   readonly adr?: string;
   readonly adrStatus?: ExtractedPattern['adrStatus'];
   readonly adrCategory?: ExtractedPattern['adrCategory'];
+  readonly adrLayer?: ExtractedPattern['adrLayer'];
+  readonly adrTheme?: ExtractedPattern['adrTheme'];
   readonly adrSupersedes?: ExtractedPattern['adrSupersedes'];
   readonly adrSupersededBy?: ExtractedPattern['adrSupersededBy'];
   readonly dependsOn?: readonly string[];

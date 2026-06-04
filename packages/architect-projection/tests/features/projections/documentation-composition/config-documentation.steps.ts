@@ -1036,25 +1036,29 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       RuleScenario(
         'the architecture bundle emits a component root and lens children',
         ({ Given, When, Then, And }) => {
-          Given('a documentation context with patterns spanning packages and layers', () => {
-            state!.context = createProjectionContext({
-              patterns: [
-                createPattern('CoreThing', {
-                  status: 'active',
-                  role: 'service',
-                  archContext: 'core',
-                  adrLayer: 'domain',
-                  file: 'packages/architect-core/src/core-thing.ts',
-                }),
-                createPattern('CliThing', {
-                  status: 'active',
-                  role: 'service',
-                  archContext: 'cli',
-                  file: 'packages/architect-cli/src/cli-thing.ts',
-                }),
-              ],
-            });
-          });
+          Given(
+            'a documentation context with patterns spanning packages, layers, and themes',
+            () => {
+              state!.context = createProjectionContext({
+                patterns: [
+                  createPattern('CoreThing', {
+                    status: 'active',
+                    role: 'service',
+                    archContext: 'core',
+                    adrLayer: 'domain',
+                    adrTheme: 'taxonomy',
+                    file: 'packages/architect-core/src/core-thing.ts',
+                  }),
+                  createPattern('CliThing', {
+                    status: 'active',
+                    role: 'service',
+                    archContext: 'cli',
+                    file: 'packages/architect-cli/src/cli-thing.ts',
+                  }),
+                ],
+              });
+            },
+          );
 
           When('I project the architecture documentation bundle', () => {
             state!.documentationViews['architecture'] = parseAndProjectDocumentationBundle(
@@ -1069,14 +1073,18 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             expect((bundle?.root as ArchitectureDiagram | undefined)?.scope).toBe('component');
           });
 
-          And('the architecture bundle should route the package-seam and layered lens docs', () => {
-            const bundle = state!.documentationViews['architecture'];
-            expect(Object.keys(bundle?.children ?? {}).sort()).toEqual([
-              'architecture:layered',
-              'architecture:package-seam',
-            ]);
-            expect(bundle?.routing?.markdownChildDirectory).toBe('architecture');
-          });
+          And(
+            'the architecture bundle should route the package-seam, layered, and by-theme lens docs',
+            () => {
+              const bundle = state!.documentationViews['architecture'];
+              expect(Object.keys(bundle?.children ?? {}).sort()).toEqual([
+                'architecture:by-theme',
+                'architecture:layered',
+                'architecture:package-seam',
+              ]);
+              expect(bundle?.routing?.markdownChildDirectory).toBe('architecture');
+            },
+          );
 
           And('only the root links the lens docs — children carry no related-view links', () => {
             const rendered = renderMarkdown(state!.documentationViews['architecture']!, {

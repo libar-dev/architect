@@ -1,60 +1,81 @@
-# Design Review — Layered Lens
+# Design Review — Themed Lens
 
-**Purpose:** Design-review components grouped by architecture layer, including not-yet-implemented specs.
+**Purpose:** Design-review components grouped by decision theme, including not-yet-implemented specs.
 **Detail Level:** Working-state-inclusive context map plus per-lens component diagrams
 
 ---
 
 ## Overview
 
-This view captures 11 patterns across 4 diagrams in the Layered view.
+This view captures 11 patterns across 6 diagrams in the Theme view.
 
 ## Diagrams
 
-### Layer Map
+### Theme Map
 
 Each node is a group; each arrow is a cross-group dependency (`depends-on` / `uses`, pointing from dependant to dependency). The per-group diagrams below detail each group’s internal dependencies and any see-also references.
 
 ```mermaid
 graph LR
-  foundation["foundation (4)"]
-  infrastructure["infrastructure (3)"]
-  refinement["refinement (4)"]
-  infrastructure --> foundation
-  refinement --> foundation
+  commands["commands (1)"]
+  coordination["coordination (1)"]
+  projections["projections (4)"]
+  taxonomy["taxonomy (3)"]
+  testing["testing (2)"]
+  coordination --> taxonomy
+  taxonomy --> coordination
+  testing --> taxonomy
 ```
 
-### Layer: foundation (4 patterns)
+### Theme: commands (1 pattern)
 
 ```mermaid
 graph TD
-  adr001taxonomycanonicalvalues["ADR001TaxonomyCanonicalValues<br/>(completed)"]
-  adr002gherkinonlytesting["ADR002GherkinOnlyTesting<br/>(completed)"]
-  adr003sourcefirstpatternarchitecture["ADR003SourceFirstPatternArchitecture<br/>(completed)"]
-  pdr005processguardfsm["PDR005ProcessGuardFSM<br/>(completed)"]
-  adr003sourcefirstpatternarchitecture -->|depends-on| adr001taxonomycanonicalvalues
-  pdr005processguardfsm -->|depends-on| adr001taxonomycanonicalvalues
+  pdr001sessionworkflowcommands["PDR001SessionWorkflowCommands<br/>(roadmap)"]
 ```
 
-### Layer: infrastructure (3 patterns)
+### Theme: coordination (1 pattern)
+
+```mermaid
+graph TD
+  pdr005processguardfsm["PDR005ProcessGuardFSM<br/>(completed)"]
+```
+
+### Theme: projections (4 patterns)
 
 ```mermaid
 graph TD
   adr005codecbasedmarkdownrendering["ADR005CodecBasedMarkdownRendering<br/>(completed)"]
   adr006singlereadmodelarchitecture["ADR006SingleReadModelArchitecture<br/>(completed)"]
-  adr008stepdefinitionstubsconvention["ADR008StepDefinitionStubsConvention<br/>(completed)"]
+  adr009projectiontrustboundary["ADR009ProjectionTrustBoundary<br/>(completed)"]
+  adr010documentationcompositionhelpers["ADR010DocumentationCompositionHelpers<br/>(completed)"]
   adr006singlereadmodelarchitecture -->|depends-on| adr005codecbasedmarkdownrendering
+  adr009projectiontrustboundary -. see-also .- adr005codecbasedmarkdownrendering
+  adr009projectiontrustboundary -. see-also .- adr006singlereadmodelarchitecture
+  adr010documentationcompositionhelpers -. see-also .- adr005codecbasedmarkdownrendering
+  adr010documentationcompositionhelpers -. see-also .- adr006singlereadmodelarchitecture
+  adr010documentationcompositionhelpers -. see-also .- adr009projectiontrustboundary
 ```
 
-### Layer: refinement (4 patterns)
+### Theme: taxonomy (3 patterns)
 
 ```mermaid
 graph TD
+  adr001taxonomycanonicalvalues["ADR001TaxonomyCanonicalValues<br/>(completed)"]
+  adr003sourcefirstpatternarchitecture["ADR003SourceFirstPatternArchitecture<br/>(completed)"]
   adr007coordinatedtaxonomyredesign["ADR007CoordinatedTaxonomyRedesign<br/>(active)"]
-  adr009projectiontrustboundary["ADR009ProjectionTrustBoundary<br/>(completed)"]
-  adr010documentationcompositionhelpers["ADR010DocumentationCompositionHelpers<br/>(completed)"]
-  pdr001sessionworkflowcommands["PDR001SessionWorkflowCommands<br/>(roadmap)"]
-  adr010documentationcompositionhelpers -. see-also .- adr009projectiontrustboundary
+  adr001taxonomycanonicalvalues -. see-also .- adr007coordinatedtaxonomyredesign
+  adr003sourcefirstpatternarchitecture -->|depends-on| adr001taxonomycanonicalvalues
+  adr007coordinatedtaxonomyredesign -->|depends-on| adr001taxonomycanonicalvalues
+```
+
+### Theme: testing (2 patterns)
+
+```mermaid
+graph TD
+  adr002gherkinonlytesting["ADR002GherkinOnlyTesting<br/>(completed)"]
+  adr008stepdefinitionstubsconvention["ADR008StepDefinitionStubsConvention<br/>(completed)"]
+  adr008stepdefinitionstubsconvention -->|depends-on| adr002gherkinonlytesting
 ```
 
 ## Fan-in

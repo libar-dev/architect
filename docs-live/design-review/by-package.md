@@ -549,7 +549,7 @@ Bounded contexts whose patterns span more than one workspace package.
 | extractor       | Architect Core, Architect Package Content       | 7        |
 | governance      | Architect Package Content, Architect Projection | 9        |
 | projection      | Architect Package Content, Architect Projection | 47       |
-| rendering       | Architect Core, Architect Projection            | 7        |
+| rendering       | Architect Core, Architect Projection            | 9        |
 | validation      | Architect Core, Architect Guard                 | 8        |
 
 ## Legend

@@ -32,8 +32,10 @@ interface PatternFixtureOptions {
   readonly description?: string;
   readonly boundedContext?: ExtractedPattern['boundedContext'];
   readonly adrLayer?: ExtractedPattern['adrLayer'];
+  readonly adrTheme?: ExtractedPattern['adrTheme'];
   readonly archContext?: string;
   readonly archLayer?: string;
+  readonly archTheme?: string;
   readonly productArea?: ExtractedPattern['productArea'];
   readonly userRole?: ExtractedPattern['userRole'];
   readonly businessValue?: ExtractedPattern['businessValue'];
