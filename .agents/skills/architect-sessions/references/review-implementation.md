@@ -14,7 +14,7 @@ Doctrine depth: the pre-deletion gate + transfer checklist + anti-patterns are i
 
 ## Pre-flight
 
-Run the implement-mode pre-flight from [`../../architect-data-api/SKILL.md`](../../architect-data-api/SKILL.md) (the reviewer's view of what shipped: `bundle` composite + `scope-validate` + `files` + `rules --only-invariants`), plus the global blocker view `pnpm architect:query arch blocking`. Then, per pattern in scope:
+Run the implement-mode pre-flight from [`../../architect-data-api/SKILL.md`](../../architect-data-api/SKILL.md) (the reviewer's view of what shipped: `bundle` composite + `scope-validate` + `files` + `rules --only-invariants`), plus the global blocker view `pnpm architect:query arch blocking`. For a batch orientation across the whole reviewed set, run `pnpm architect:query documentation design-review` — it renders every in-scope pattern status-annotated (`Name (role · status)`, e.g. `MCPServer (service · completed)`) grouped by layer / package / theme, so you can see which patterns are `completed` vs still `active` (and which deliverables are still unbuilt `candidate` / `roadmap` specs) at a glance instead of reconstructing it from per-pattern `context` calls. Then, per pattern in scope:
 
 ```bash
 pnpm architect:query context <pattern> --session implement

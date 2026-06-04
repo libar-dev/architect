@@ -30,7 +30,10 @@ The records are the authority; your recollection is anecdote (see [`../SKILL.md`
 ```bash
 pnpm architect:query documentation decisions          # the projected decision set
 pnpm architect:query pattern ADR006SingleReadModelArchitecture   # a specific record
+pnpm architect:query documentation architecture       # ADRs as theme/layer slices (by-theme / layered lenses)
 ```
+
+ADRs also carry `@architect-adr-theme` / `@architect-adr-layer` classification, so `documentation architecture` renders them grouped into named theme clusters (e.g. `Theme: projections` = ADR-005/006/009/010) with their depends-on/see-also web, and `documentation design-review` carries the same by-theme / by-layer lenses over working-state-inclusive patterns. **"Which decisions cluster around projections / persistence / taxonomy?"** is one lens query — never grep `architect/decisions/` for it.
 
 ## The load-bearing set (and the nuance each is most often gotten wrong on)
 

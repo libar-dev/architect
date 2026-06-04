@@ -39,7 +39,7 @@ CONTRACT_BLOCK="$(cat <<'EOF'
 Use `pnpm architect:query <verb>` as the first read surface for pattern state, dependencies, rules, decisions, and transitions.
 Prefer `pnpm -s` whenever piping or capturing JSON because bare `pnpm` writes a lifecycle banner to stdout.
 Default verbs: `overview`, `search <fragment>`, `bundle <Pattern> --format json`, `dep-tree <Pattern>`, `rules --pattern <Pattern>`, `scope-validate <Pattern> <design|implement>`, `arch blocking`, `list --status <status>`.
-Generated docs are themselves a projection verb: `documentation <type>` (architecture · api-reference · decisions · business-rules · patterns · taxonomy · roadmap · …) — query it instead of reading docs-live/ by hand.
+Generated docs are themselves a projection verb: `documentation <type>` (architecture · design-review · api-reference · decisions · business-rules · patterns · taxonomy · roadmap · …) — query it instead of reading docs-live/ by hand. `documentation architecture` fans out into by-theme / layered / package-seam lenses in one call (which decisions cluster around projections / taxonomy / testing? — one lens, not a grep); `documentation design-review` is the working-state-inclusive component view (planned/active/completed patterns, status-annotated, grouped by layer/package/theme) — review an unbuilt spec's shape before implementing instead of grepping feature files.
 Read load-bearing decisions through the API (`documentation decisions`, or `pattern ADR006SingleReadModelArchitecture`), never paraphrased from memory.
 If live CLI output disagrees with docs or memory, trust the live CLI; if a verb or workflow surprises you, append a short note to FEEDBACK.md at the repo root.
 For a full API demo run once: `bash scripts/api-capability-tour.sh`

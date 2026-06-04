@@ -16,7 +16,7 @@ Know what "complete" means for _this_ spec before scanning for gaps:
 
 ## Pre-flight
 
-Run the pre-flight from [`../../architect-data-api/SKILL.md`](../../architect-data-api/SKILL.md): `overview`, `scope-validate`, the review-mode `bundle`, `dep-tree`, `arch blocking`, `files --related`. The `scope-validate` verdict (PASS / WARN / BLOCKED) frames the rest.
+Run the pre-flight from [`../../architect-data-api/SKILL.md`](../../architect-data-api/SKILL.md): `overview`, `scope-validate`, the review-mode `bundle`, `dep-tree`, `arch blocking`, `files --related`. The `scope-validate` verdict (PASS / WARN / BLOCKED) frames the rest. For pre-implementation shape review, also run `pnpm architect:query documentation design-review` — it draws the live pattern graph _including this not-yet-built spec_ as a component map (by-layer / by-package / by-theme), classified nodes annotated `Name (role · status)` (e.g. `MCPServer (service · completed)`; unbuilt specs render status-only `(candidate)` / `(roadmap)`), so you see how the planned pattern slots into the existing graph instead of grepping feature files.
 
 **Tier note.** `scope-validate` accepts only `design` and `implement`. For idea/candidate reviews, skip the CLI gate and use the structural checklist below.
 
@@ -42,6 +42,7 @@ Run the pre-flight from [`../../architect-data-api/SKILL.md`](../../architect-da
 8. **Stub completeness.** Does every architecturally-relevant pattern in the deliverables have a stub? (Stubs are for shape decisions, not trivial functions.)
 9. **Overlap with concurrent specs.** Two specs in the same phase touching the same files is a sequencing hazard — surface it.
 10. **Ephemeral readiness.** When implemented and deleted, will value transfer cleanly? Does every rule have an `**Invariant:**`? Does every decision have enough rationale to become a JSDoc annotation? A spec that won't transfer cleanly will leave debt.
+11. **Graph fit (optional).** `pnpm architect:query documentation design-review` renders the in-scope spec status-annotated `(role · status)` in the live component graph (by-layer / by-package / by-theme); confirm its depends-on edges land in the expected layer/package cluster and no dependency is unexpectedly an unbuilt `(roadmap)` / `(candidate)` node.
 
 ## Output format (compact, no rewrites)
 

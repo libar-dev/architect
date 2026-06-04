@@ -35,7 +35,7 @@ The **canonical source of truth** is annotated production code + executable Gher
 | Aspect           | Value                                                                                                                                                                                                                                                                                                                               |
 | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Config           | `architect.config.ts` at the repo root                                                                                                                                                                                                                                                                                              |
-| Working state    | `architect/` (specs, decisions, releases, stubs, step-stubs, design-reviews)                                                                                                                                                                                                                                                        |
+| Working state    | `architect/` (specs, decisions, releases, stubs, step-stubs)                                                                                                                                                                                                                                                                        |
 | Source of truth  | Annotated `packages/*/src/**/*.ts` + executable Gherkin under `tests/features/` and `packages/*/tests/features/`                                                                                                                                                                                                                    |
 | CLI              | `pnpm architect:query <verb>` (canonical script name across architect-managed repos)                                                                                                                                                                                                                                                |
 | MCP              | `architect` server → `mcp__architect__*` callable tools                                                                                                                                                                                                                                                                             |
@@ -48,18 +48,17 @@ When this package family is consumed by another project, the consumer wires thei
 
 `architect/` holds **working state**, not the source of truth. It is parsed by `@cucumber/gherkin` for projection / extraction and is explicitly **excluded from TypeScript compile, ESLint, vitest**.
 
-| Folder                        | Role                                                                                                                                                                                     | Lifetime                                                        |
-| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
-| `architect/ideations/`        | Dated pre-idea ideation / context captures (`YYYY-MM-DD-*.feature`) — parsed working state, distilled into ideas/candidates                                                              | Until distilled                                                 |
-| `architect/specs/ideas/`      | Idea-tier specs (lightest authored shape)                                                                                                                                                | Until promotion                                                 |
-| `architect/specs/candidates/` | Candidate-tier specs (open questions + 1-2 scenarios)                                                                                                                                    | Until promotion                                                 |
-| `architect/slices/`           | Slice-tier multi-pattern lateral views (idea-tier structural variant; `@architect-level:slice`, no `@architect-parent`)                                                                  | Reference                                                       |
-| `architect/specs/`            | Plan- and design-tier specs (deliverables + full scenarios + stubs)                                                                                                                      | **Until value transferred to executable Gherkin, then deleted** |
-| `architect/stubs/`            | Design-tier TS contract scaffolds (one folder per pattern)                                                                                                                               | Ephemeral                                                       |
-| `architect/step-stubs/`       | Design-tier stub step definitions                                                                                                                                                        | Ephemeral                                                       |
-| `architect/decisions/`        | ADRs / PDRs — compact, durable, decisions-only (no operational or temporal context)                                                                                                      | **Permanent**                                                   |
-| `architect/releases/`         | Release notes, roadmap, phase plans                                                                                                                                                      | Permanent                                                       |
-| `architect/design-reviews/`   | **Auto-generated** architecture-slice review artifacts (sequence + component mermaid; scoped to specs incl. unimplemented) — generated output, **not** a home for hand-authored captures | Generated (derived)                                             |
+| Folder                        | Role                                                                                                                        | Lifetime                                                        |
+| ----------------------------- | --------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| `architect/ideations/`        | Dated pre-idea ideation / context captures (`YYYY-MM-DD-*.feature`) — parsed working state, distilled into ideas/candidates | Until distilled                                                 |
+| `architect/specs/ideas/`      | Idea-tier specs (lightest authored shape)                                                                                   | Until promotion                                                 |
+| `architect/specs/candidates/` | Candidate-tier specs (open questions + 1-2 scenarios)                                                                       | Until promotion                                                 |
+| `architect/slices/`           | Slice-tier multi-pattern lateral views (idea-tier structural variant; `@architect-level:slice`, no `@architect-parent`)     | Reference                                                       |
+| `architect/specs/`            | Plan- and design-tier specs (deliverables + full scenarios + stubs)                                                         | **Until value transferred to executable Gherkin, then deleted** |
+| `architect/stubs/`            | Design-tier TS contract scaffolds (one folder per pattern)                                                                  | Ephemeral                                                       |
+| `architect/step-stubs/`       | Design-tier stub step definitions                                                                                           | Ephemeral                                                       |
+| `architect/decisions/`        | ADRs / PDRs — compact, durable, decisions-only (no operational or temporal context)                                         | **Permanent**                                                   |
+| `architect/releases/`         | Release notes, roadmap, phase plans                                                                                         | Permanent                                                       |
 
 **Two Gherkin parsers, do not confuse them:**
 
@@ -266,7 +265,14 @@ pnpm architect:query arch blocking                          # global blocker vie
 pnpm architect:query arch workable                          # roadmap items with deps satisfied (complement of blocking)
 pnpm architect:query arch neighborhood <Pattern>
 pnpm architect:query taxonomy [--count] [--format json]
+
+# Documentation projections (composed views; architecture + design-review fan out into inline lenses)
+pnpm architect:query documentation <type>                   # 14 types: architecture, design-review, api-reference, decisions, business-rules, patterns, roadmap, current-work, requirements-executable, requirements-specs, validation-rules, taxonomy, changelog, traceability
+pnpm architect:query documentation architecture             # root map + by-theme / layered / package-seam lenses inline
+pnpm architect:query documentation design-review            # working-state-inclusive component view (by-layer/by-package/by-theme); nodes show (role · status), unbuilt specs as (candidate)/(roadmap) — review a planned pattern's shape before building
 ```
+
+Re-confirm the live type count from `pnpm architect:query documentation <bad-type>`, which enumerates the accepted set — counts drift as projections are added.
 
 **MCP twins** use snake_case end-to-end: `architect_overview`, `architect_scope_validate`, `architect_bundle`, etc. The canonical inventory is `packages/architect-mcp/src/tool-registry.ts` — read it for the current tool set rather than trusting a count cached here.
 
