@@ -103,6 +103,38 @@ function collectMarkers(host: string): MarkerOccurrence[] {
   return markers;
 }
 
+/**
+ * A managed-region marker must be alone on its line (only surrounding whitespace).
+ * This guarantees the begin/end pair sit on SEPARATE lines and the inter-sentinel
+ * span the rewrite targets is exactly the whole lines between them. A marker that
+ * shares its line with other content — including the case where begin and end are on
+ * the same physical line — is malformed and fails loud here: without this guard the
+ * line-based span math below can resolve a span that starts AFTER the end marker, so
+ * `applyManagedRegion` would splice generated content OUTSIDE the markers (or leave
+ * stale text inside) instead of aborting. Markers are write targets the projection
+ * never moves, so "marker shares a line" is a host-misconfiguration, not a rewrite.
+ */
+function assertMarkerOwnsLine(
+  host: string,
+  marker: MarkerOccurrence,
+  regionId: string,
+  hostFile: string | undefined,
+): void {
+  const lineStart = host.lastIndexOf('\n', marker.start - 1) + 1;
+  const newlineAfter = host.indexOf('\n', marker.end);
+  const lineEnd = newlineAfter === -1 ? host.length : newlineAfter;
+  if (
+    host.slice(lineStart, marker.start).trim() !== '' ||
+    host.slice(marker.end, lineEnd).trim() !== ''
+  ) {
+    throw new ManagedRegionError(
+      regionId,
+      `the ${marker.kind} marker must be alone on its line — a marker may not share a line with other content or with the other marker`,
+      hostFile,
+    );
+  }
+}
+
 function resolveRegion(
   host: string,
   regionId: string,
@@ -153,8 +185,13 @@ function resolveRegion(
     }
   }
 
+  // Each marker must own its line — this fails loud on same-line / content-sharing
+  // markers, and guarantees the span computed below stays strictly between them.
+  assertMarkerOwnsLine(host, begin, regionId, hostFile);
+  assertMarkerOwnsLine(host, end, regionId, hostFile);
+
   const newlineAfterBegin = host.indexOf('\n', begin.end);
-  // The end marker exists after the begin marker, so a line break always separates them.
+  // Markers are validated to own their lines, so a line break always separates them.
   const spanStart = newlineAfterBegin === -1 ? begin.end : newlineAfterBegin + 1;
   const newlineBeforeEnd = host.lastIndexOf('\n', end.start);
   const spanEnd = newlineBeforeEnd === -1 ? end.start : newlineBeforeEnd + 1;

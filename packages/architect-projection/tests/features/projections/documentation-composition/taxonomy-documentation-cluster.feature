@@ -42,6 +42,7 @@ Feature: TaxonomyDocumentationCluster — embedded-region generation into author
       And rewriting a region whose begin marker is duplicated throws
       And rewriting a region whose markers are unbalanced throws
       And rewriting a region whose markers are nested inside another region throws
+      And rewriting a region whose begin and end markers share a line throws
 
   Rule: Region rewrites are byte-deterministic (the normalization contract)
 

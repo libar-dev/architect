@@ -203,6 +203,14 @@ describeFeature(feature, ({ Background, Rule }) => {
             const source = [outer.begin, inner.begin, inner.end, outer.end].join('\n');
             expect(() => applyManagedRegion(source, 'outer', 'X')).toThrow(ManagedRegionError);
           });
+          And('rewriting a region whose begin and end markers share a line throws', () => {
+            const { begin, end } = managedRegionMarkers('inline');
+            // Begin and end on the SAME physical line: the line-based span math could
+            // otherwise place the rewrite after the end marker and write OUTSIDE the
+            // region — it must fail loud instead.
+            const source = `${begin} ${end}\ntrailing authored line\n`;
+            expect(() => applyManagedRegion(source, 'inline', 'X')).toThrow(ManagedRegionError);
+          });
         },
       );
     },
