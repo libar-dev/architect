@@ -151,20 +151,18 @@ Do not run `/start-work` yourself — it lives in OpenCode, not Claude Code.
 
 OmO is used almost exclusively for long-running work — typical runs are **12-24-48 hours, sometimes days**. Authoring plans for this needs three context pieces that Prometheus's upstream prompt does not state explicitly but which materially change plan shape.
 
-### 5.1 Atlas — the long-running executor
+### 5.1 The executor is a harness, not a hero model — and it is GPT, not Claude
 
-Atlas (Claude Sonnet 4.6, the `5.4` model variant — **NOT `5.5`**) is the executor of choice for plans that take days. Atlas is unusual:
+OmO runs multi-day work through three delegation levels: **Atlas** (read-only conductor — reads the plan, writes the detailed 50–200-line worker prompts, accumulates wisdom into `.sisyphus/notepads/{slug}/` and passes it forward, enforces gates, delegates all writes) → **category routing** (`ultrabrain` / `deep` / `writing` / `quick` / … → Sisyphus-Junior workers on intent-matched models + fallback chains) → **specialized subagents** (Oracle architecture, Librarian docs, Explore codebase, Hephaestus deep reasoning), gated before execution by Metis (gap-analysis) and Momus (plan review). _"Intelligence resides in the harness, not the single worker model."_
 
-- **Hundreds of compactions.** Atlas tolerates and benefits from aggressive compaction — the `5.4` compaction implementation is the only one that **sharpens** context rather than degrading it. Long runs do not erode Atlas's grasp.
-- **Exhaustive.** Atlas will surface every single occurrence of a pattern, issue, or scope item, no matter how many files or how many days the search takes. Exhaustiveness is its signature.
-- **Mechanical only.** Atlas cannot plan. Atlas cannot do creative work during execution. Atlas cannot make judgment calls when the plan is ambiguous.
+**Match plan shape to the executor's model family — selection is characteristic-driven and version-specific** ("a model isn't just smarter or dumber — it thinks differently"):
 
-What this means for the plan you author:
+- **Claude** wants mechanics — checklists, templates, step-by-step recipes.
+- **GPT** wants goals — _"state the goal and let it figure out the mechanics."_
 
-- **Exhaustive in scope statement and explicit in mechanism.** Anything Atlas has to "figure out" will stall or produce wrong output.
-- **Reference patterns must be concrete `file:line` citations.** "Use the existing auth pattern" → fail. `src/services/auth.ts:45-78 — JWT refresh-token handling` → succeeds.
-- **Every task's `What to do` must read as a recipe, not a goal.** Atlas does not infer recipes from goals.
-- **Never hesitate to author huge plans.** 50, 100, 200 TODOs is fine. The Single-Plan Mandate (§ 6.1) is a hard rule — one file, one plan, no matter the scope.
+OmO's executors are **GPT, not Claude** — Claude is off-limits for OmO execution (Max-subscription ToS), so write for the GPT characteristic. _Which_ GPT version runs each tier rotates as models ship and the harness matures, so **read `~/.config/opencode/oh-my-openagent.jsonc` for the live wiring rather than trusting any version named in a skill**. So author **goal-stated scope + verifiable completion criteria, not taxative recipes**: Atlas writes the worker recipes at runtime, and a taxative plan is impossible for discovery work anyway (you cannot pre-enumerate a sweep). This **inverts the old Claude-era "recipe, not goal" rule** — for GPT, state the goal and let exhaustiveness find every file. Pick **categories by the characteristics a task needs** (reasoning depth / exhaustiveness / prose / speed), not by model name; the config resolves the model.
+
+Still true regardless of family: exhaustiveness is the executor's signature; references must be concrete and verified (§6) but are **starting points, not the boundary**; huge plans are fine (50–200 TODOs; the Single-Plan Mandate §6.1 holds).
 
 ### 5.2 Execution modes — `single-shot` / `loop` / `hybrid-loop`
 
@@ -229,6 +227,10 @@ The `Estimated Effort` field in the TL;DR uses **scope/complexity buckets**, not
 | `XL`     | Multi-package / migration / repo-wide / dependency-bump-cascade, 50+ acceptance criteria |
 
 Use these as **organizing buckets** when sizing waves. Never as time estimates. Never write "this will take 2 hours" or "estimated 3 days" in a plan body.
+
+### 5.5 Gates are adversarial — author for proof, not assertion
+
+OmO's review gates are ruthless and iterative: Oracle / Momus and the Final Verification Wave **reject completion over and over — 50+ rounds is normal — until every claim is done and its proof is recorded**. Your leverage is up front: write every acceptance criterion as **evidence-producing** — a command whose captured output lands in `.sisyphus/evidence/task-{N}-…` — never as an assertion a reviewer must take on faith. A criterion that cannot emit a recorded proof bounces the whole completion. Front-load the proofs the gates will demand; the cost of a vague criterion is paid 50× at the end, not once.
 
 ---
 
