@@ -30,7 +30,7 @@
     "architect:guard:all": "pnpm check:build && pnpm exec architect-guard --base-dir . --all",
     "architect:lint-steps": "pnpm exec architect-lint-steps --base-dir .",
     "validate:patterns": "pnpm exec architect-validate --base-dir .",
-    "validate:all": "pnpm check:build && pnpm exec architect-validate --base-dir . --dod --anti-patterns",
+    "validate:all": "pnpm check:build && pnpm exec architect-validate --base-dir . --anti-patterns",
     "docs:patterns": "pnpm exec architect-generate --base-dir . -g patterns -f",
     "docs:architecture": "pnpm exec architect-generate --base-dir . -g architecture -f",
     "docs:roadmap": "pnpm exec architect-generate --base-dir . -g roadmap -f",

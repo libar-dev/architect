@@ -1,25 +1,24 @@
 /**
  * @architect
- * @architect-pattern DoDValidationTypes
+ * @architect-pattern AntiPatternValidationTypes
  * @architect-validation
  * @architect-status completed
  * @architect-role:contract
  * @architect-bounded-context:validation
  *
- * ## DoDValidationTypes - Type Definitions for DoD Validation
+ * ## AntiPatternValidationTypes - Type Definitions for Anti-Pattern Validation
  *
- * Types and schemas for Definition of Done (DoD) validation and anti-pattern detection.
- * Follows the project's schema-first pattern with Zod for runtime validation.
+ * Types and schemas for the anti-pattern detection contract — violation
+ * identifiers, thresholds, and result shapes. Follows the project's schema-first
+ * pattern with Zod for runtime validation.
  *
  * ### When to Use
  *
- * - When implementing DoD validation logic
  * - When extending anti-pattern detection rules
  * - When consuming validation results in CLI or reports
  */
 
 import { z } from 'zod';
-import type { Deliverable } from '@libar-dev/architect-core';
 import type { TagRegistry } from '@libar-dev/architect-core';
 
 // ============================================================================
@@ -128,62 +127,4 @@ export interface AntiPatternViolation {
   readonly severity: 'error' | 'warning';
   /** Fix guidance */
   readonly fix?: string;
-}
-
-/**
- * DoD validation result for a single phase/pattern.
- *
- * Reports whether a completed phase meets Definition of Done criteria:
- * 1. All deliverables must have "complete" status
- * 2. At least one @acceptance-criteria scenario must exist
- *
- * @architect-shape
- */
-export interface DoDValidationResult {
-  /** Pattern name being validated */
-  readonly patternName: string;
-  /** Phase number being validated */
-  readonly phase: number;
-  /** True if all DoD criteria are met */
-  readonly isDoDMet: boolean;
-  /** All deliverables from Background table */
-  readonly deliverables: readonly Deliverable[];
-  /** Deliverables that are not yet complete */
-  readonly incompleteDeliverables: readonly Deliverable[];
-  /** True if no @acceptance-criteria scenarios found */
-  readonly missingAcceptanceCriteria: boolean;
-  /** Human-readable validation messages */
-  readonly messages: readonly string[];
-}
-
-/**
- * Aggregate DoD validation summary.
- *
- * Summarizes validation across multiple phases for CLI output.
- *
- * @architect-shape
- */
-export interface DoDValidationSummary {
-  /** Per-phase validation results */
-  readonly results: readonly DoDValidationResult[];
-  /** Total phases validated */
-  readonly totalPhases: number;
-  /** Phases that passed DoD */
-  readonly passedPhases: number;
-  /** Phases that failed DoD */
-  readonly failedPhases: number;
-}
-
-/**
- * Get status emoji for phase-level aggregates.
- *
- * @architect-shape
- * @param allComplete - Whether all patterns in the phase are complete
- * @param anyActive - Whether any patterns in the phase are active/in-progress
- * @returns Status emoji: ✅ if all complete, 🚧 if any active, 📋 otherwise
- */
-export function getPhaseStatusEmoji(allComplete: boolean, anyActive: boolean): string {
-  if (allComplete) return '✅';
-  if (anyActive) return '🚧';
-  return '📋';
 }

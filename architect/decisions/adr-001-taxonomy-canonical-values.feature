@@ -6,16 +6,10 @@
 @architect-adr-theme:taxonomy
 @architect-pattern:ADR001TaxonomyCanonicalValues
 @architect-status:completed
-@architect-unlock-reason:Backfill-adr-layer-and-theme-classification-tags
+@architect-unlock-reason:Narrow-taxonomy-per-ADR-013-drop-quarter-phase-release-axis-and-completion-date-from-rule-6
 @architect-product-area:Process
-@architect-see-also:ADR007CoordinatedTaxonomyRedesign
+@architect-see-also:ADR007CoordinatedTaxonomyRedesign,ADR012DeliveryNavigation,ADR013TaxonomyRetirement
 Feature: ADR-001 - Taxonomy Canonical Values and Process Constants
-
-  > **Snapshot of pre-Wave-1 taxonomy.** Some example tags referenced in
-  > this ADR (e.g. `@architect-phase`) have been cut by Waves 1-4. The ADR
-  > is retained as the historical decision record for the canonical-values
-  > principle; for the live tag set consult `pnpm pkg:query -- taxonomy`
-  > or `packages/architect-core/src/taxonomy/registry-builder.ts`.
 
   **Context:**
   The annotation system requires well-defined canonical values for taxonomy
@@ -36,18 +30,6 @@ Feature: ADR-001 - Taxonomy Canonical Values and Process Constants
   | Negative | Migration effort for existing specs with non-canonical values |
 
   # ===========================================================================
-  # DELIVERABLES
-  # ===========================================================================
-
-  Background: Deliverables
-    Given the following deliverables:
-      | Deliverable | Status | Location |
-      | Decision spec | complete | architect/decisions/adr-001 |
-      | Migrate executable spec product-area tags | complete | tests/features/**/*.feature |
-      | Migrate tier 1 spec product-area tags | complete | architect/specs/*.feature |
-      | Fix adr-category on existing decisions | pending | architect/decisions/*.feature |
-
-  # ===========================================================================
   # RULE 1: Product Area Canonical Values
   # ===========================================================================
 
@@ -62,9 +44,7 @@ Feature: ADR-001 - Taxonomy Canonical Values and Process Constants
     tag accepts any value and no extraction diagnostic fires.
     **Rationale:** Organizational vocabulary varies per project. The package's
     list reflects its own subdomains; imposing a universal default would force
-    other projects to either adopt foreign vocabulary or override it. D-8 in
-    .full-review-execution/DECISIONS.md captures the "configurable, no universal
-    default" model in detail.
+    other projects to either adopt foreign vocabulary or override it.
     **Verified by:** Canonical values are enforced (when configured)
 
     | Value | Reader Question | Covers |
@@ -100,17 +80,27 @@ Feature: ADR-001 - Taxonomy Canonical Values and Process Constants
   Rule: FSM status values and protection levels
 
     **Invariant:** The FSM governs 4 delivery states with defined protection
-    levels, enforced by Process Guard at commit time. A 5th value (candidate)
-    is accepted at the extraction boundary and enters the PatternGraph but is
-    exempt from FSM enforcement and has no protection level. See ADR-007 for
-    the type separation design (AcceptedStatusValue vs ProcessStatusValue).
-    **Rationale:** Without protection levels, active specs accumulate scope creep and completed specs get silently modified, undermining delivery process integrity.
+    levels. Protection is a deterministic function of status, but enforcement of
+    the active and completed protection is advisory at commit time (PDR-006):
+    expanding active scope warns rather than blocks, and editing or reopening a
+    completed spec warns rather than blocks with `@architect-unlock-reason`
+    optional (it records intent and suppresses the warning when present). The
+    opt-in `--strict` mode (CI, not the commit path) may promote these warnings
+    to blocking. A 5th value (candidate) is accepted at the extraction boundary
+    and enters the PatternGraph but is exempt from FSM enforcement and has no
+    protection level. See ADR-007 for the type separation design
+    (AcceptedStatusValue vs ProcessStatusValue).
+    **Rationale:** A hard commit-time block on active scope or completed edits
+    forces reverting valuable work or faking status, corrupting the read model it
+    was meant to protect. Surfacing those changes as warnings keeps them visible
+    and intentional while letting them land; `--strict` leaves a hard CI gate
+    available. Candidate has no protection level because it precedes the FSM.
     **Verified by:** Canonical values are enforced
 
-    | Status | Protection | Can Add Deliverables | Allowed Actions |
+    | Status | Protection | Scope Expansion | Allowed Actions |
     | roadmap | None | Yes | Full editing |
-    | active | Scope-locked | No | Edit existing deliverables only |
-    | completed | Hard-locked | No | Requires unlock-reason tag |
+    | active | Scope-locked | Advisory (warns) | Edit freely; adding pending scope warns |
+    | completed | Hard-locked | Advisory (warns) | Edit/reopen freely; warns, unlock-reason optional |
     | deferred | None | Yes | Full editing |
     | candidate | Exempt | Yes | Exempt from FSM enforcement |
 
@@ -120,11 +110,11 @@ Feature: ADR-001 - Taxonomy Canonical Values and Process Constants
 
   Rule: Valid FSM transitions
 
-    **Invariant:** Only these FSM transitions are valid. All others are
-    rejected by Process Guard. Candidate-to-roadmap is not an FSM
-    transition — it is a promotion (lifecycle gate preceding the FSM),
-    validated separately by PDR-005.
-    **Rationale:** Allowing arbitrary transitions (e.g., roadmap to completed) bypasses the active phase where scope-lock and deliverable tracking provide quality assurance.
+    **Invariant:** Only these FSM transitions are valid. All others (e.g.
+    roadmap to completed, completed to deferred) are rejected by the FSM.
+    Candidate-to-roadmap is not an FSM transition — it is a promotion
+    (lifecycle gate preceding the FSM), validated separately by PDR-005.
+    **Rationale:** Allowing arbitrary transitions (e.g., roadmap to completed) bypasses the active phase where scope-lock and deliverable tracking provide quality assurance. Reopening completed work to active or roadmap (PDR-006) is first-class so finished specs can be revisited without faking status.
     **Verified by:** Canonical values are enforced
 
     | From | To | Trigger |
@@ -133,9 +123,13 @@ Feature: ADR-001 - Taxonomy Canonical Values and Process Constants
     | active | completed | All deliverables done |
     | active | roadmap | Blocked/regressed |
     | deferred | roadmap | Resume planning |
+    | completed | active | Reopen finished work for changes |
+    | completed | roadmap | Reopen finished work back to planning |
 
-    Completed is a terminal state. Modifications require
-    `@architect-unlock-reason` escape hatch.
+    Reopening a completed spec to active or roadmap is valid (PDR-006). The
+    reopen/edit surfaces an advisory warning at commit time, not a block;
+    `@architect-unlock-reason` is optional and suppresses the warning. Completed
+    never transitions to deferred and never re-enters itself.
 
   # ===========================================================================
   # RULE 5: Tag Format Types
@@ -153,7 +147,7 @@ Feature: ADR-001 - Taxonomy Canonical Values and Process Constants
     | value | Simple string | @architect-pattern MyPattern |
     | enum | Constrained to predefined list | @architect-status completed |
     | csv | Comma-separated values | @architect-uses A, B, C |
-    | number | Numeric value | @architect-phase 15 |
+    | number | Numeric value | @architect-adr 2 |
     | quoted-value | Preserves spaces | @architect-brief:'Multi word' |
 
   # ===========================================================================
@@ -170,20 +164,21 @@ Feature: ADR-001 - Taxonomy Canonical Values and Process Constants
     | Tag | Tag Type | Correct Source | Wrong Source | Rationale |
     | uses | relationship | TypeScript | Feature files | TS owns runtime dependencies |
     | depends-on | relationship | Feature files | TypeScript | Gherkin owns planning dependencies |
-    | quarter | feature-metadata | Feature files | TypeScript | Gherkin owns timeline metadata |
     | team | feature-metadata | Feature files | TypeScript | Gherkin owns ownership metadata |
 
     The canonical minimum feature-only tag set carried by every project is
-    `quarter` and `team` — exported as `CANONICAL_FEATURE_ONLY_TAG_SUFFIXES`
-    from `@libar-dev/architect-core`. Projects with richer requirement-doc
-    vocabulary may extend the feature-only set in their own taxonomy module.
-    For example, this package adds `effort`, `workflow`, `completed`, and
-    `effort-actual` (exported as `ARCHITECT_PACKAGE_FEATURE_ONLY_TAG_SUFFIXES`)
-    to enrich generated requirement documentation. Per-instance extensions
-    never narrow the canonical minimum; they only add to it. The sync test
-    asserts the canonical minimum matches this table; per-package extensions
-    are not sync-tested against any single ADR table because they are
-    project-specific by design.
+    `team` — exported as `CANONICAL_FEATURE_ONLY_TAG_SUFFIXES`
+    from `@libar-dev/architect-core`. (The `quarter` tag and the
+    `completed` completion-date field were both retired per ADR-013; the
+    taxonomy models no calendar or completion-date temporal axis — completion
+    order lives in git.) Projects with richer requirement-doc vocabulary may
+    extend the feature-only set in their own taxonomy module. For example, this
+    package adds `workflow` (exported as
+    `ARCHITECT_PACKAGE_FEATURE_ONLY_TAG_SUFFIXES`) to enrich generated
+    requirement documentation. Per-instance extensions never narrow the
+    canonical minimum; they only add to it. The sync test asserts the canonical
+    minimum matches this table; per-package extensions are not sync-tested
+    against any single ADR table because they are project-specific by design.
 
     Source-ownership *violation detection* — flagging `@architect-uses` in
     `.feature` files, or `@architect-depends-on` in TypeScript JSDoc — is
@@ -191,38 +186,13 @@ Feature: ADR-001 - Taxonomy Canonical Values and Process Constants
     `packages/architect/architect/specs/data-api-relationship-graph.feature`),
     not the guard pipeline. The right substrate for bidirectional anti-pattern
     detection is the relationship graph that already designs dangling-reference
-    and orphan-pattern checks (Pkg-D-5 deferral).
+    and orphan-pattern checks.
 
   # ===========================================================================
-  # RULE 7: Quarter Format Convention
+  # (Rules 7 and 8 — Quarter Format Convention and the 6-phase USDP Canonical
+  #  Phase Definitions — were retired per ADR-013. The taxonomy models no
+  #  calendar bucket and no canonical workflow-phase set; see git history.)
   # ===========================================================================
-
-  Rule: Quarter format convention
-
-    **Invariant:** The quarter tag uses `YYYY-QN` format (e.g., `2026-Q1`).
-    ISO-year-first sorting works lexicographically.
-    **Rationale:** Non-standard formats (e.g., Q1-2026) break lexicographic sorting, which roadmap generation and timeline queries depend on for correct ordering.
-    **Verified by:** Canonical values are enforced
-
-  # ===========================================================================
-  # RULE 8: Canonical Phase Definitions
-  # ===========================================================================
-
-  Rule: Canonical phase definitions (6-phase USDP standard)
-
-    **Invariant:** The default workflow defines exactly 6 phases in fixed
-    order. These are the canonical phase names and ordinals used by all
-    generated documentation.
-    **Rationale:** Ad-hoc phase names and ordering produce inconsistent roadmap grouping across packages and make cross-package progress tracking impossible.
-    **Verified by:** Canonical values are enforced
-
-    | Order | Phase | Purpose |
-    | 1 | Inception | Problem framing, scope definition |
-    | 2 | Elaboration | Design decisions, architecture exploration |
-    | 3 | Session | Planning and design session work |
-    | 4 | Construction | Implementation, testing, integration |
-    | 5 | Validation | Verification, acceptance criteria confirmation |
-    | 6 | Retrospective | Review, lessons learned, documentation |
 
   # ===========================================================================
   # RULE 9: Deliverable Status Canonical Values
@@ -252,7 +222,7 @@ Feature: ADR-001 - Taxonomy Canonical Values and Process Constants
     **Invariant:** The role tag uses one of these 8 canonical values for the
     architect package self-hosting registry. Each value names a kind of
     pattern that the architect runtime packages annotate. Other projects
-    declare their own role list — `DEFAULT_ROLES` mirrors the same Wave 1
+    declare their own role list — `BUILTIN_ROLES` mirrors the same
     locked vocabulary (`projection, service, decider, read-model, codec,
     contract, barrel, utility`) and is applied when a config omits `roles`.
     **Rationale:** A typed, finite role set is the source of truth for
@@ -261,9 +231,9 @@ Feature: ADR-001 - Taxonomy Canonical Values and Process Constants
     time so dead vocabulary cannot accumulate. The list is intentionally
     short — only roles that the package source actually annotates appear
     here. Decision rationale lives in this ADR; the TypeScript constant
-    `DEFAULT_ROLES` and the inline list in
+    `ARCHITECT_PACKAGE_ROLES` and the inline list in
     `packages/architect/architect.config.ts` are projections of this table.
-    **Verified by:** Canonical values are enforced, ADR table matches DEFAULT_ROLES constant
+    **Verified by:** Canonical values are enforced, ADR table matches ARCHITECT_PACKAGE_ROLES constant
 
     | Tag | Domain | Priority | Description |
     | projection | Projection | 1 | Fragment projection functions deriving outputs from PatternGraph |
@@ -275,8 +245,8 @@ Feature: ADR-001 - Taxonomy Canonical Values and Process Constants
     | barrel | Barrel | 7 | Re-export surfaces and curated entrypoints |
     | utility | Utility | 8 | Shared helpers and narrowly focused utilities |
 
-    The `DEFAULT_ROLES` constant exported from `@libar-dev/architect-core`
-    is the same Wave 1 locked vocabulary listed in the table above. Projects
+    The `BUILTIN_ROLES` constant exported from `@libar-dev/architect-core`
+    is the same locked vocabulary listed in the table above. Projects
     that omit a `roles` entry in their config inherit it. Projects with
     their own vocabulary declare a role list inline in their config or via
     a per-project ADR rule.

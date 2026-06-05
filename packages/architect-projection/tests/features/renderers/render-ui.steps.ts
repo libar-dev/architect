@@ -41,7 +41,6 @@ function createPatternDetailFixture(patternName = 'RenderUiProjection'): Pattern
     patternName,
     status: 'active',
     role: 'projection',
-    phase: 14,
     file: 'packages/architect-projection/src/renderers/render-ui.ts',
     source: 'typescript',
     description: 'Render UI data in a stable order for Studio consumers.',

@@ -93,19 +93,6 @@ export const StatusCountsSchema = z.strictObject({
 });
 
 /**
- * Schema for a single phase grouping — its number, optional name, member
- * patterns, and status counts.
- *
- * @architect-shape
- */
-export const PhaseGroupSchema = z.strictObject({
-  phaseNumber: z.number().int(),
-  phaseName: z.string().optional(),
-  patterns: z.array(ExtractedPatternSchema),
-  counts: StatusCountsSchema,
-});
-
-/**
  * Schema for patterns grouped by source type (TypeScript / Gherkin / roadmap /
  * PRD).
  *
@@ -168,8 +155,8 @@ export const ArchIndexSchema = z.strictObject({
 
 /**
  * Schema for the canonical read model (the PatternGraph) — every pattern, the
- * tag registry, the status/maturity/phase/role groupings, counts, the
- * relationship index, and the optional architecture index.
+ * tag registry, the status/maturity/role groupings, counts, the relationship
+ * index, and the optional architecture index.
  *
  * @architect-shape
  */
@@ -179,13 +166,10 @@ export const PatternGraphSchema = z.strictObject({
   byStatus: ExactStatusGroupsSchema,
   byNormalizedStatus: StatusGroupsSchema,
   byMaturity: z.record(z.string(), z.array(ExtractedPatternSchema)),
-  byPhase: z.array(PhaseGroupSchema),
-  byQuarter: z.record(z.string(), z.array(ExtractedPatternSchema)),
   byRole: z.record(z.string(), z.array(ExtractedPatternSchema)),
   bySourceType: SourceViewsSchema,
   byProductArea: z.record(z.string(), z.array(ExtractedPatternSchema)),
   counts: StatusCountsSchema,
-  phaseCount: z.number().int().nonnegative(),
   roleCount: z.number().int().nonnegative(),
   relationshipIndex: z.record(z.string(), RelationshipEntrySchema),
   archIndex: ArchIndexSchema.optional(),
@@ -195,7 +179,6 @@ export const PatternGraphSchema = z.strictObject({
 export type ExactStatusGroups = z.infer<typeof ExactStatusGroupsSchema>;
 export type StatusGroups = z.infer<typeof StatusGroupsSchema>;
 export type StatusCounts = z.infer<typeof StatusCountsSchema>;
-export type PhaseGroup = z.infer<typeof PhaseGroupSchema>;
 export type SourceViews = z.infer<typeof SourceViewsSchema>;
 export type ImplementationRef = z.infer<typeof ImplementationRefSchema>;
 export type RelationshipEntry = z.infer<typeof RelationshipEntrySchema>;

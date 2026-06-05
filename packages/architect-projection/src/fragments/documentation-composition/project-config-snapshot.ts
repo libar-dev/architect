@@ -25,7 +25,6 @@ export const ProjectConfigSnapshotSchema = z.strictObject({
   sourceGlobs: z.array(z.string()),
   buildTimeMs: z.number().int().nonnegative(),
   patternCount: z.number().int().nonnegative(),
-  phaseCount: z.number().int().nonnegative(),
   roleCount: z.number().int().nonnegative(),
   projectName: z.string().optional(),
 });

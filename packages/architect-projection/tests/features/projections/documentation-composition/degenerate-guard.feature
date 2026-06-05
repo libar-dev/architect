@@ -15,7 +15,7 @@ Feature: Documentation generator degeneracy guard
 
   **How It Works:** `assertGeneratorNotDegenerate(documentType, rootFragment)`
   looks the root fragment's kind up in a per-kind primary-collection map
-  (TraceabilityMatrix→rows, RoadmapTimeline→quarters, …) and throws
+  (TraceabilityMatrix→rows, RoadmapTimeline→patterns, …) and throws
   `GeneratorDegenerateError` naming the document type when that collection is
   empty. Fragment kinds with no registered primary collection are not
   collection-bearing and pass unconditionally.

@@ -13,14 +13,14 @@ Process Guard validates delivery workflow changes at commit time using a Decider
 
 ## Validation Rules
 
-| Rule ID                     | Severity | Description                                         | Applies To Roles |
-| --------------------------- | -------- | --------------------------------------------------- | ---------------- |
-| `completed-protection`      | error    | Completed specs require unlock-reason tag to modify |                  |
-| `invalid-status-transition` | error    | Status transitions must follow FSM path             |                  |
-| `scope-creep`               | error    | Active specs cannot add new deliverables            |                  |
-| `session-scope`             | warning  | File outside session scope                          |                  |
-| `session-excluded`          | error    | File explicitly excluded from session               |                  |
-| `deliverable-removed`       | warning  | Deliverable was removed from spec                   |                  |
+| Rule ID                     | Severity | Description                                                                   | Applies To Roles |
+| --------------------------- | -------- | ----------------------------------------------------------------------------- | ---------------- |
+| `completed-protection`      | warning  | Modifying a completed spec warns; unlock-reason is optional and suppresses it |                  |
+| `invalid-status-transition` | error    | Status transitions must follow FSM path                                       |                  |
+| `scope-creep`               | warning  | Adding pending scope to an active spec warns; unlock-reason suppresses it     |                  |
+| `session-scope`             | warning  | File outside session scope                                                    |                  |
+| `session-excluded`          | error    | File explicitly excluded from session                                         |                  |
+| `deliverable-removed`       | warning  | Deliverable was removed from spec                                             |                  |
 
 ## FSM State Diagram
 
@@ -33,15 +33,17 @@ stateDiagram-v2
     roadmap --> deferred: Defer work without completing it
     active --> completed: Finish implementation work
     active --> roadmap: Move active work back to planning
+    completed --> active: Reopen completed work for changes
+    completed --> roadmap: Reopen completed work back to planning
     deferred --> roadmap: Reactivate deferred work
     completed --> [*]: terminal
 ```
 
 ## Protection Levels
 
-| Status    | Protection | Can Add Deliverables | Needs Unlock | Meaning                                                                    |
-| --------- | ---------- | -------------------- | ------------ | -------------------------------------------------------------------------- |
-| roadmap   | none       | Yes                  | No           | Planning statuses remain editable.                                         |
-| deferred  | none       | Yes                  | No           | Planning statuses remain editable.                                         |
-| active    | scope      | No                   | No           | Active work is scope-locked against deliverable expansion.                 |
-| completed | hard       | No                   | Yes          | Completed work is hard-locked until an explicit unlock reason is provided. |
+| Status    | Protection | Can Add Deliverables | Unlock Suppresses Warning | Meaning                                                                                          |
+| --------- | ---------- | -------------------- | ------------------------- | ------------------------------------------------------------------------------------------------ |
+| roadmap   | none       | Yes                  | No                        | Planning statuses remain editable.                                                               |
+| deferred  | none       | Yes                  | No                        | Planning statuses remain editable.                                                               |
+| active    | scope      | No                   | Yes                       | Active work is scope-locked; adding pending deliverables warns (advisory).                       |
+| completed | hard       | No                   | Yes                       | Completed work is hard-locked; editing or reopening warns, unlock reason is optional (advisory). |

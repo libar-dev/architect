@@ -7,7 +7,7 @@
 
 ## Overview
 
-This view captures 261 patterns across 8 diagrams in the Package architecture view.
+This view captures 259 patterns across 8 diagrams in the Package architecture view.
 
 ## Diagrams
 
@@ -19,11 +19,11 @@ Each node is a group; each arrow is a cross-group dependency (`depends-on` / `us
 graph LR
   pkg_architect_cli["Architect CLI (4)"]
   pkg_architect_core["Architect Core (60)"]
-  pkg_architect_guard["Architect Guard (21)"]
+  pkg_architect_guard["Architect Guard (20)"]
   pkg_architect_host_dev["Architect Host (Dev) (23)"]
   pkg_architect_mcp["Architect MCP (9)"]
-  pkg_architect_package_content["Architect Package Content (13)"]
-  pkg_architect_projection["Architect Projection (131)"]
+  pkg_architect_package_content["Architect Package Content (15)"]
+  pkg_architect_projection["Architect Projection (128)"]
   pkg_architect_cli --> pkg_architect_core
   pkg_architect_cli --> pkg_architect_projection
   pkg_architect_guard --> pkg_architect_core
@@ -149,15 +149,14 @@ graph TD
   ruleaggregation -->|depends-on| patternhelpers
 ```
 
-### Package: Architect Guard (21 patterns)
+### Package: Architect Guard (20 patterns)
 
 ```mermaid
 graph TD
   antipatterndetector["AntiPatternDetector<br/>(service)"]
+  antipatternvalidationtypes["AntiPatternValidationTypes<br/>(contract)"]
   deriveprocessstate["DeriveProcessState<br/>(read-model)"]
   detectchanges["DetectChanges<br/>(service)"]
-  dodvalidationtypes["DoDValidationTypes<br/>(contract)"]
-  dodvalidator["DoDValidator<br/>(service)"]
   gitbranchdiff["GitBranchDiff<br/>(utility)"]
   githelpers["GitHelpers<br/>(utility)"]
   gitmodule["GitModule<br/>(barrel)"]
@@ -174,11 +173,10 @@ graph TD
   sessionstatereader["SessionStateReader<br/>(service)"]
   validatepatternscli["ValidatePatternsCLI<br/>(service)"]
   validationmodule["ValidationModule<br/>(barrel)"]
-  antipatterndetector -->|depends-on| dodvalidationtypes
+  antipatterndetector -->|depends-on| antipatternvalidationtypes
   deriveprocessstate -->|depends-on| sessionstatereader
   detectchanges -->|depends-on| deriveprocessstate
   detectchanges -->|depends-on| gitnamestatusparser
-  dodvalidator -->|depends-on| dodvalidationtypes
   gitbranchdiff -->|depends-on| gitnamestatusparser
   gitmodule -->|depends-on| gitbranchdiff
   gitmodule -->|depends-on| githelpers
@@ -194,8 +192,7 @@ graph TD
   processguardlinter -->|depends-on| detectchanges
   processguardlinter -->|depends-on| processguarddecider
   validationmodule -->|depends-on| antipatterndetector
-  validationmodule -->|depends-on| dodvalidationtypes
-  validationmodule -->|depends-on| dodvalidator
+  validationmodule -->|depends-on| antipatternvalidationtypes
 ```
 
 ### Package: Architect Host (Dev) (23 patterns)
@@ -250,7 +247,7 @@ graph TD
   mcptoolregistry -->|depends-on| mcppipelinesession
 ```
 
-### Package: Architect Package Content (13 patterns)
+### Package: Architect Package Content (15 patterns)
 
 ```mermaid
 graph TD
@@ -263,11 +260,15 @@ graph TD
   adr008stepdefinitionstubsconvention["ADR008StepDefinitionStubsConvention"]
   adr009projectiontrustboundary["ADR009ProjectionTrustBoundary"]
   adr010documentationcompositionhelpers["ADR010DocumentationCompositionHelpers"]
+  adr012deliverynavigation["ADR012DeliveryNavigation"]
+  adr013taxonomyretirement["ADR013TaxonomyRetirement"]
+  pdr001sessionworkflowcommands["PDR001SessionWorkflowCommands"]
   pdr005processguardfsm["PDR005ProcessGuardFSM"]
-  releasev100["ReleaseV100"]
-  releasevnext["ReleaseVNEXT"]
+  pdr006advisoryprocessguardprotection["PDR006AdvisoryProcessGuardProtection"]
   taxonomydocumentationcluster["TaxonomyDocumentationCluster"]
   adr001taxonomycanonicalvalues -. see-also .- adr007coordinatedtaxonomyredesign
+  adr001taxonomycanonicalvalues -. see-also .- adr012deliverynavigation
+  adr001taxonomycanonicalvalues -. see-also .- adr013taxonomyretirement
   adr003sourcefirstpatternarchitecture -->|depends-on| adr001taxonomycanonicalvalues
   adr006singlereadmodelarchitecture -->|depends-on| adr005codecbasedmarkdownrendering
   adr007coordinatedtaxonomyredesign -->|depends-on| adr001taxonomycanonicalvalues
@@ -279,11 +280,18 @@ graph TD
   adr010documentationcompositionhelpers -. see-also .- adr005codecbasedmarkdownrendering
   adr010documentationcompositionhelpers -. see-also .- adr006singlereadmodelarchitecture
   adr010documentationcompositionhelpers -. see-also .- adr009projectiontrustboundary
+  adr012deliverynavigation -->|depends-on| adr001taxonomycanonicalvalues
+  adr012deliverynavigation -->|depends-on| adr003sourcefirstpatternarchitecture
+  adr012deliverynavigation -. see-also .- adr013taxonomyretirement
+  adr013taxonomyretirement -->|depends-on| adr001taxonomycanonicalvalues
+  adr013taxonomyretirement -->|depends-on| adr007coordinatedtaxonomyredesign
   pdr005processguardfsm -->|depends-on| adr001taxonomycanonicalvalues
+  pdr006advisoryprocessguardprotection -->|depends-on| adr001taxonomycanonicalvalues
+  pdr006advisoryprocessguardprotection -->|depends-on| pdr005processguardfsm
   taxonomydocumentationcluster -. see-also .- adr010documentationcompositionhelpers
 ```
 
-### Package: Architect Projection (131 patterns)
+### Package: Architect Projection (128 patterns)
 
 ```mermaid
 graph TD
@@ -307,6 +315,8 @@ graph TD
   businessruleset["BusinessRuleSet<br/>(contract)"]
   businessrulesprojection["BusinessRulesProjection<br/>(projection)"]
   businessrulesprojectionexecutabletests["BusinessRulesProjectionExecutableTests<br/>(projection)"]
+  changelogprojection["ChangelogProjection<br/>(projection)"]
+  changelogprojectionexecutabletests["ChangelogProjectionExecutableTests<br/>(projection)"]
   compacttextrenderer["CompactTextRenderer<br/>(codec)"]
   decisioncatalog["DecisionCatalog<br/>(contract)"]
   decisioncatalogprojection["DecisionCatalogProjection<br/>(projection)"]
@@ -375,8 +385,6 @@ graph TD
   patternsummary["PatternSummary<br/>(contract)"]
   patternsummarycatalogprojectionexecutabletests["PatternSummaryCatalogProjectionExecutableTests<br/>(projection)"]
   patternsummaryprojection["PatternSummaryProjection<br/>(projection)"]
-  phaseprogress["PhaseProgress<br/>(contract)"]
-  phaseprogressprojection["PhaseProgressProjection<br/>(projection)"]
   prchangereview["PrChangeReview<br/>(contract)"]
   prchangereviewprojection["PrChangeReviewProjection<br/>(projection)"]
   projectconfigprojection["ProjectConfigProjection<br/>(projection)"]
@@ -384,9 +392,6 @@ graph TD
   projectionfragmentcontracts["ProjectionFragmentContracts<br/>(contract)"]
   projectionfragmentschema["ProjectionFragmentSchema<br/>(contract)"]
   projectionkernelrelationshipcontractexecutabletests["ProjectionKernelRelationshipContractExecutableTests<br/>(projection)"]
-  releasenotesdigest["ReleaseNotesDigest<br/>(contract)"]
-  releasenotesprojection["ReleaseNotesProjection<br/>(projection)"]
-  releasenotesprojectionexecutabletests["ReleaseNotesProjectionExecutableTests<br/>(projection)"]
   requirementdigest["RequirementDigest<br/>(contract)"]
   requirementdigestprojection["RequirementDigestProjection<br/>(projection)"]
   requirementexecutabledigestprojection["RequirementExecutableDigestProjection<br/>(projection)"]
@@ -437,6 +442,8 @@ graph TD
   businessrulesprojection -->|depends-on| governanceprojectionsupport
   businessrulesprojection -->|depends-on| governancesupporting
   businessrulesprojection -->|depends-on| projectionfragmentcontracts
+  changelogprojection -->|depends-on| deliveryreportingprojectionsupport
+  changelogprojection -->|depends-on| roadmaptimeline
   compacttextrenderer -->|depends-on| fragmentrendererdispatch
   compacttextrenderer -->|depends-on| projectionfragmentschema
   decisioncatalogprojection -->|depends-on| decisioncatalog
@@ -502,14 +509,10 @@ graph TD
   patternsummaryprojection -->|depends-on| patternrelationsfragmentcontracts
   patternsummaryprojection -->|depends-on| patternrelationsprojectionsupport
   patternsummaryprojection -->|depends-on| patternsummary
-  phaseprogressprojection -->|depends-on| deliveryreportingprojectionsupport
-  phaseprogressprojection -->|depends-on| phaseprogress
   prchangereviewprojection -->|depends-on| documentationcompositionprojectionsupport
   prchangereviewprojection -->|depends-on| projectionfragmentcontracts
   projectconfigprojection -->|depends-on| documentationcompositionprojectionsupport
   projectconfigprojection -->|depends-on| projectionfragmentcontracts
-  releasenotesprojection -->|depends-on| deliveryreportingprojectionsupport
-  releasenotesprojection -->|depends-on| releasenotesdigest
   requirementdigestprojection -->|depends-on| operationalinsightsprojectionsupport
   requirementdigestprojection -->|depends-on| requirementdigest
   requirementexecutabledigestprojection -->|depends-on| operationalinsightsprojectionsupport
@@ -560,14 +563,14 @@ Most-depended-on patterns in this view, ranked by in-view dependant count.
 | ------------------------------------ | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | ProjectionFragmentContracts          | 17         | ArchitectureDiagramProjection, BusinessRulesProjection, DecisionCatalogProjection, DeliverableProjection, DocumentationBundle                           |
 | ExtractedPattern                     | 14         | ArchitectureInspection, DecisionResolution, DeliveryReportingProjectionSupport, DualSourceExtractor, ExecutionContextProjectionSupport                  |
-| PatternGraph                         | 11         | ArchitectureInspection, BuildPipeline, DecisionResolution, DoDValidator, GraphInventory                                                                 |
 | PatternRelationsFragmentContracts    | 11         | ArchitectureComparisonProjection, ArchitectureNeighborhoodProjection, DependencyContextProjection, DependencyEdgeProjection, OpenQuestionListProjection |
 | PatternRelationsProjectionSupport    | 11         | ArchitectureComparisonProjection, ArchitectureNeighborhoodProjection, BoundedContextProjection, DependencyContextProjection, DependencyEdgeProjection   |
+| PatternGraph                         | 10         | ArchitectureInspection, BuildPipeline, DecisionResolution, GraphInventory, PatternClassification                                                        |
 | OperationalInsightsProjectionSupport | 8          | AnnotationCoverageProjection, OverviewProjection, RequirementDigestProjection, RequirementExecutableDigestProjection, RequirementSpecsDigestProjection  |
 | BlockSchema                          | 7          | ArchitectureDiagram, DecisionRecord, DocumentationCompositionSupporting, MarkdownRenderer, OperationalInsightsSupporting                                |
+| ADR001TaxonomyCanonicalValues        | 6          | ADR003SourceFirstPatternArchitecture, ADR007CoordinatedTaxonomyRedesign, ADR012DeliveryNavigation, ADR013TaxonomyRetirement, PDR005ProcessGuardFSM      |
 | PatternHelpers                       | 6          | ArchitectureInspection, DecisionResolution, DualSourceExtractor, GraphInventory, PatternGraphApi                                                        |
 | ProjectionFragmentSchema             | 6          | ApiReferenceProjection, CompactTextRenderer, FragmentRendererDispatch, JsonRenderer, MarkdownRenderer                                                   |
-| DeliveryReportingProjectionSupport   | 5          | PhaseProgressProjection, ReleaseNotesProjection, RoadmapTimelineProjection, StatusDistributionProjection, TraceabilityMatrixProjection                  |
 
 ## Cross-package bounded contexts
 
@@ -577,7 +580,7 @@ Bounded contexts whose patterns span more than one workspace package.
 | --------------- | --------------------------------------------- | -------- |
 | cli             | Architect CLI, Architect Guard, Architect MCP | 6        |
 | rendering       | Architect Core, Architect Projection          | 9        |
-| validation      | Architect Core, Architect Guard               | 8        |
+| validation      | Architect Core, Architect Guard               | 7        |
 
 ## Legend
 
@@ -597,9 +600,12 @@ Bounded contexts whose patterns span more than one workspace package.
 - ADR008StepDefinitionStubsConvention
 - ADR009ProjectionTrustBoundary
 - ADR010DocumentationCompositionHelpers
+- ADR012DeliveryNavigation
+- ADR013TaxonomyRetirement
 - AnnotationCoverage
 - AnnotationCoverageProjection
 - AntiPatternDetector
+- AntiPatternValidationTypes
 - ApiReferenceDigest
 - ApiReferenceProjection
 - ApiReferenceProjectionExecutableTests
@@ -624,6 +630,8 @@ Bounded contexts whose patterns span more than one workspace package.
 - BusinessRulesProjection
 - BusinessRulesProjectionExecutableTests
 - CanonicalValuesSync
+- ChangelogProjection
+- ChangelogProjectionExecutableTests
 - CLIErrorHandler
 - CLIRuntimePaths
 - CLIVersionHelper
@@ -673,8 +681,6 @@ Bounded contexts whose patterns span more than one workspace package.
 - DocumentationCompositionSupporting
 - DocumentationTypeRegistry
 - DocumentationTypeRegistryExecutableTests
-- DoDValidationTypes
-- DoDValidator
 - DualSourceExtractor
 - DualSourceMergeIntegration
 - EmissionDescriptor
@@ -778,9 +784,9 @@ Bounded contexts whose patterns span more than one workspace package.
 - PatternSummary
 - PatternSummaryCatalogProjectionExecutableTests
 - PatternSummaryProjection
+- PDR001SessionWorkflowCommands
 - PDR005ProcessGuardFSM
-- PhaseProgress
-- PhaseProgressProjection
+- PDR006AdvisoryProcessGuardProtection
 - PrChangeReview
 - PrChangeReviewProjection
 - ProcessGuardDecider
@@ -794,11 +800,6 @@ Bounded contexts whose patterns span more than one workspace package.
 - ProjectionFragmentSchema
 - ProjectionKernelRelationshipContractExecutableTests
 - RegistryBuilder
-- ReleaseNotesDigest
-- ReleaseNotesProjection
-- ReleaseNotesProjectionExecutableTests
-- ReleaseV100
-- ReleaseVNEXT
 - RequirementDigest
 - RequirementDigestProjection
 - RequirementExecutableDigestProjection

@@ -517,7 +517,10 @@ export function detectDeliverableChanges(
   // Matches: | Deliverable Name | Status | ... |
   const deliverablePattern = /^\s*\|([^|]+)\|([^|]+)\|/;
 
-  const fileChanges = new Map<string, { added: string[]; removed: string[]; modified: string[] }>();
+  const fileChanges = new Map<
+    string,
+    { added: string[]; addedPending: string[]; removed: string[]; modified: string[] }
+  >();
 
   for (const line of diff.split('\n')) {
     // Track current file
@@ -526,7 +529,7 @@ export function detectDeliverableChanges(
       currentFile = match?.[2] ?? '';
       inDeliverableTable = false;
       if (currentFile && !fileChanges.has(currentFile)) {
-        fileChanges.set(currentFile, { added: [], removed: [], modified: [] });
+        fileChanges.set(currentFile, { added: [], addedPending: [], removed: [], modified: [] });
       }
       continue;
     }
@@ -572,7 +575,15 @@ export function detectDeliverableChanges(
         const deliverable = match[1].trim();
         if (deliverable && !deliverable.includes('---')) {
           const fc = fileChanges.get(currentFile);
-          if (fc) fc.added.push(deliverable);
+          if (fc) {
+            fc.added.push(deliverable);
+            // A deliverable's status column drives the advisory scope-creep rule:
+            // only `pending` (unbuilt scope) — including the implicit default when
+            // the status cell is blank/absent — is warned on (PDR-006 Rule 3).
+            if (isPendingStatusCell(match[2])) {
+              fc.addedPending.push(deliverable);
+            }
+          }
         }
       }
     }
@@ -601,6 +612,7 @@ export function detectDeliverableChanges(
         // Same deliverable in both = status/path changed, not scope change
         change.modified.push(deliverable);
         change.added = change.added.filter((d) => d !== deliverable);
+        change.addedPending = change.addedPending.filter((d) => d !== deliverable);
         change.removed = change.removed.filter((d) => d !== deliverable);
       }
     }
@@ -614,6 +626,22 @@ export function detectDeliverableChanges(
   }
 
   return changes;
+}
+
+/**
+ * Classify a deliverable table's status cell as pending scope.
+ *
+ * A blank or absent status cell defaults to `pending` (the deliverable-status
+ * default), so it counts as pending too. Any recognized non-pending status
+ * (in-progress/complete/deferred/superseded/n/a) records real progress and is
+ * not pending (PDR-006 Rule 3).
+ */
+function isPendingStatusCell(rawStatusCell: string | undefined): boolean {
+  const status = rawStatusCell?.trim().toLowerCase() ?? '';
+  if (status === '') {
+    return true;
+  }
+  return status === 'pending';
 }
 
 // =============================================================================

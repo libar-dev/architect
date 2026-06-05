@@ -46,7 +46,6 @@ export interface CompletionMetadataValidationResult {
 
 export interface PatternMetadata {
   status: string;
-  completed?: string;
   effortActual?: string;
   effortPlanned?: string;
 }
@@ -76,7 +75,8 @@ export function validateStatus(
   const warnings: string[] = [];
   if (isTerminalState(status)) {
     warnings.push(
-      `Status 'completed' is a terminal state. Use ${tagPrefix}unlock-reason to modify.`,
+      `Status 'completed' is the settled end state; it reopens to active or roadmap. ` +
+        `Editing or reopening it warns (advisory) — ${tagPrefix}unlock-reason is optional and suppresses the warning.`,
     );
   }
 
@@ -131,10 +131,6 @@ export function validateCompletionMetadata(
     return { valid: true, warnings: [] };
   }
 
-  if (!pattern.completed) {
-    warnings.push(`Completed pattern missing ${tagPrefix}completed date.`);
-  }
-
   if (pattern.effortPlanned && !pattern.effortActual) {
     warnings.push(
       `Pattern has ${tagPrefix}effort but missing ${tagPrefix}effort-actual. ` +
@@ -166,6 +162,20 @@ export function validatePatternStatus(
   };
 }
 
+/**
+ * Summarize the protection a status carries, under the advisory model (PDR-006).
+ *
+ * Protection LEVEL (`none`/`scope`/`hard`) is the FSM-derived strength of
+ * guarding and is independent of ENFORCEMENT SEVERITY: on the commit path,
+ * scope-creep (active) and completed-spec edits surface advisory WARNINGS, not
+ * blocks. `${prefix}unlock-reason` is optional and, when present, suppresses the
+ * warning — it is never required. (`--strict`, used by CI, may promote these
+ * warnings to blocking, but that is a mode lever, not a property of the level.)
+ *
+ * `unlockSuppressesWarning` reports whether this level emits an advisory,
+ * unlock-suppressible warning — true for `scope` (active scope creep) and `hard`
+ * (completed edits), mirroring `ProcessGuardDecider` exactly.
+ */
 export function getProtectionSummary(
   status: ProcessStatusValue,
   options?: FSMValidationOptions,
@@ -173,21 +183,21 @@ export function getProtectionSummary(
   level: ProtectionLevel;
   description: string;
   canAddDeliverables: boolean;
-  requiresUnlock: boolean;
+  unlockSuppressesWarning: boolean;
 } {
   const tagPrefix = options?.registry?.tagPrefix ?? DEFAULT_TAG_PREFIX;
   const level = getProtectionLevel(status);
 
   const descriptions: Record<ProtectionLevel, string> = {
     none: 'Fully editable - no restrictions',
-    scope: 'Scope-locked - cannot add new deliverables',
-    hard: `Hard-locked - requires ${tagPrefix}unlock-reason to modify`,
+    scope: `Scope-locked (advisory) - adding pending deliverables warns; ${tagPrefix}unlock-reason suppresses it`,
+    hard: `Completed (advisory) - editing or reopening warns; ${tagPrefix}unlock-reason is optional and suppresses it`,
   };
 
   return {
     level,
     description: descriptions[level],
     canAddDeliverables: level === 'none',
-    requiresUnlock: level === 'hard',
+    unlockSuppressesWarning: level !== 'none',
   };
 }

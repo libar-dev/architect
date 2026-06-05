@@ -33,6 +33,41 @@ architect/
 
 The package family powers **Libar Studio** (Desktop / Web / CI-CD) surfaces covering Market Research & Product Validation, Product Strategy & Management, and Product Delivery & Maintenance.
 
+Here's a compact, paste-ready block. It slots naturally right after the **"Bigger picture"** section (or just above the **No-BC** doctrine, since it generalizes it):
+
+## Bootstrap state — clean slate, no history in the read model
+
+Architect was **extracted from a monorepo and is being re-architected significantly**:
+~50%+ of the code deleted, ~50% of the taxonomy tags removed, many
+intentional breaking changes, and the delivery process **bootstrapped clean for
+dogfooding**. This is the standing context for judging any change — assume it
+unless told otherwise.
+
+What it implies (these override the usual append-only instincts):
+
+- **No temporal or historical state in the read model.** History lives in git.
+  No dates, worklog, ETAs, "replaces"/superseded markers, deprecation notes, or
+  parallel implementations. Temporal axes (quarter, USDP phase, numeric phase,
+  release) are **not modeled unless populated and needed** — unpopulated
+  machinery is residue to delete, not maintain. "What did we replace?" is a
+  `git log` question.
+- **Consolidate in place; do not spawn amend-chains.** Because we keep no
+  historical records, edit/slim/delete records directly rather than authoring
+  "ADR-X amends ADR-Y" trails — an amend-chain manufactures the history we are
+  removing. The live-state philosophy takes precedence over append-only ADR
+  amendment _during bootstrap_. (Decision content still changes deliberately;
+  the point is no historical scaffolding.)
+- **No-BC, hard.** Pre-1.0; breakage is preferred over shims. Delete, don't
+  alias, flag, or `@deprecated`. Break consumers and document the migration.
+- **Incompleteness is the plan, not a defect.** Partial/unbuilt functionality
+  and un-wired top-down design are expected mid-states. Flag deviations from
+  _this direction_ and **dead context that should have been deleted** — not the
+  fact that something isn't built yet.
+- **Decisions are born-accepted after code proves them** (the ADR-010 pattern).
+  Don't record decisions ahead of the build; if a decision must be staged ahead
+  of code, mark it `@architect-adr-status:proposed` and treat the contradiction
+  as an explicit, temporary exception.
+
 ## Source of truth — event-sourced, projected
 
 - **Annotations are the source of truth.** Annotated production TS in `packages/*/src/**` and executable Gherkin under `tests/features/**` and `packages/*/tests/features/**` carry `@architect-*` tags.

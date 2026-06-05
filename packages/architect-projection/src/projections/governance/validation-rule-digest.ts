@@ -14,7 +14,7 @@
  * **Invariant:** The digest always reports `roadmap` as the initial state,
  * computes terminal states from `VALID_TRANSITIONS`, and exposes a
  * protection-level entry per `PROTECTION_LEVELS` bucket with matching
- * statuses plus `canAddDeliverables` and `needsUnlock` flags.
+ * statuses plus `canAddDeliverables` and `unlockSuppressesWarning` flags.
  *
  * **Behavior:**
  * - Materializes the fixed validation rule list (completed-protection,
@@ -24,7 +24,8 @@
  *   `VALID_TRANSITIONS[from]` entry to a `from → to` edge with a
  *   human-readable description.
  * - Describes protection levels explicitly: planning editable, scope-locked
- *   active work, hard-locked completed work requiring unlock reason.
+ *   active work (advisory warning), completed work whose edits warn — all
+ *   advisory and unlock-suppressible (PDR-006), never a commit block.
  *
  * ### When to Use
  *

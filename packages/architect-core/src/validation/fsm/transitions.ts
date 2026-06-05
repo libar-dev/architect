@@ -20,7 +20,7 @@ export const VALID_TRANSITIONS: Readonly<
 > = {
   roadmap: ['active', 'deferred'],
   active: ['completed', 'roadmap'],
-  completed: [],
+  completed: ['active', 'roadmap'],
   deferred: ['roadmap'],
 } as const;
 
@@ -39,8 +39,11 @@ export function getTransitionErrorMessage(
 ): string {
   const tagPrefix = options?.registry?.tagPrefix ?? DEFAULT_TAG_PREFIX;
 
+  // completed → active / completed → roadmap are valid reopen transitions (PDR-006),
+  // so this branch only fires for targets that remain invalid from completed
+  // (e.g. completed → completed, completed → deferred).
   if (from === 'completed') {
-    return `Cannot transition from 'completed' (terminal state). Use ${tagPrefix}unlock-reason to modify.`;
+    return `Cannot transition from 'completed' to '${to}'. Reopen to 'active' or 'roadmap'; use ${tagPrefix}unlock-reason to record intent.`;
   }
 
   if (from === 'roadmap' && to === 'completed') {

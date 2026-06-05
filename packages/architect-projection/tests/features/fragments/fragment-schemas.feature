@@ -18,9 +18,7 @@ Feature: Fragment schema mirror
 
       Examples:
         | kind                     |
-        | PhaseProgress            |
         | StatusDistribution       |
-        | ReleaseNotesDigest       |
         | TraceabilityMatrix       |
         | ProjectConfigSnapshot    |
         | ArchitectureDiagram      |
@@ -67,9 +65,7 @@ Feature: Fragment schema mirror
 
       Examples:
         | kind                     |
-        | PhaseProgress            |
         | StatusDistribution       |
-        | ReleaseNotesDigest       |
         | TraceabilityMatrix       |
         | ProjectConfigSnapshot    |
         | ArchitectureDiagram      |
@@ -116,9 +112,7 @@ Feature: Fragment schema mirror
 
       Examples:
         | kind                     |
-        | PhaseProgress            |
         | StatusDistribution       |
-        | ReleaseNotesDigest       |
         | TraceabilityMatrix       |
         | ProjectConfigSnapshot    |
         | ArchitectureDiagram      |

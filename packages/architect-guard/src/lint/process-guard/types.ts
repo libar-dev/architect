@@ -172,6 +172,13 @@ export interface StatusTransition {
 export interface DeliverableChange {
   /** Deliverable names added in the change. */
   readonly added: readonly string[];
+  /**
+   * Names of added deliverables whose status column is `pending` (unbuilt
+   * scope). A subset of `added`; the advisory scope-creep rule warns only on
+   * these, since adding a deliverable that records real progress
+   * (in-progress/complete/deferred/superseded/n/a) is silent (PDR-006 Rule 3).
+   */
+  readonly addedPending: readonly string[];
   /** Deliverable names removed in the change. */
   readonly removed: readonly string[];
   /** Deliverable names whose definition changed. */

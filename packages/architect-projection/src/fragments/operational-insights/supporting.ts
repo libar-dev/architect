@@ -29,19 +29,6 @@ export const OverviewProgressSchema = z.strictObject({
 });
 
 /**
- * One active-phase entry in the overview — the phase number, its optional
- * name, the total patterns in the phase, and how many are active.
- *
- * @architect-shape
- */
-export const ActivePhaseEntrySchema = z.strictObject({
-  phase: z.number().int(),
-  name: z.string().optional(),
-  patternCount: z.number().int().nonnegative(),
-  activeCount: z.number().int().nonnegative(),
-});
-
-/**
  * One blocking entry in the overview — a blocked pattern, its status, and the
  * patterns blocking it.
  *
@@ -162,7 +149,6 @@ export const RequirementEntrySchema = z.strictObject({
 });
 
 export type OverviewProgress = z.infer<typeof OverviewProgressSchema>;
-export type ActivePhaseEntry = z.infer<typeof ActivePhaseEntrySchema>;
 export type BlockingEntry = z.infer<typeof BlockingEntrySchema>;
 export type OrientationReference = z.infer<typeof OrientationReferenceSchema>;
 export type OverviewOrientation = z.infer<typeof OverviewOrientationSchema>;

@@ -7,7 +7,7 @@
 
 ## Overview
 
-This view captures 169 patterns across 23 diagrams in the Component architecture view.
+This view captures 165 patterns across 23 diagrams in the Component architecture view.
 
 ## Related views
 
@@ -26,7 +26,7 @@ graph LR
   api["api (4)"]
   cli["cli (6)"]
   configuration["configuration (4)"]
-  delivery_reporting["delivery-reporting (7)"]
+  delivery_reporting["delivery-reporting (5)"]
   documentation_composition["documentation-composition (8)"]
   domain["domain (1)"]
   execution_context["execution-context (8)"]
@@ -38,11 +38,11 @@ graph LR
   pattern_relations["pattern-relations (12)"]
   pipeline["pipeline (1)"]
   process_guard["process-guard (6)"]
-  projection["projection (46)"]
+  projection["projection (45)"]
   read_api["read-api (7)"]
   rendering["rendering (9)"]
   scanner["scanner (4)"]
-  validation["validation (8)"]
+  validation["validation (7)"]
   validation_schemas["validation-schemas (4)"]
   role_contract["role: contract (2)"]
   api --> pipeline
@@ -128,14 +128,12 @@ graph TD
   sourcemerge["SourceMerge<br/>(utility)"]
 ```
 
-### Bounded context: delivery-reporting (7 patterns)
+### Bounded context: delivery-reporting (5 patterns)
 
 ```mermaid
 graph TD
   deliveryreportingfragmentcontracts["DeliveryReportingFragmentContracts<br/>(contract)"]
   deliveryreportingsupporting["DeliveryReportingSupporting<br/>(contract)"]
-  phaseprogress["PhaseProgress<br/>(contract)"]
-  releasenotesdigest["ReleaseNotesDigest<br/>(contract)"]
   roadmaptimeline["RoadmapTimeline<br/>(contract)"]
   statusdistribution["StatusDistribution<br/>(contract)"]
   traceabilitymatrix["TraceabilityMatrix<br/>(contract)"]
@@ -295,7 +293,7 @@ graph TD
   processguardlinter -->|depends-on| detectchanges
 ```
 
-### Bounded context: projection (46 patterns)
+### Bounded context: projection (45 patterns)
 
 ```mermaid
 graph TD
@@ -306,6 +304,7 @@ graph TD
   architectureneighborhoodprojection["ArchitectureNeighborhoodProjection<br/>(projection)"]
   boundedcontextprojection["BoundedContextProjection<br/>(projection)"]
   businessrulesprojection["BusinessRulesProjection<br/>(projection)"]
+  changelogprojection["ChangelogProjection<br/>(projection)"]
   decisioncatalogprojection["DecisionCatalogProjection<br/>(projection)"]
   deliverableprojection["DeliverableProjection<br/>(projection)"]
   deliveryreportingprojectionsupport["DeliveryReportingProjectionSupport<br/>(utility)"]
@@ -328,10 +327,8 @@ graph TD
   patterndetailprojection["PatternDetailProjection<br/>(projection)"]
   patternrelationsprojectionsupport["PatternRelationsProjectionSupport<br/>(utility)"]
   patternsummaryprojection["PatternSummaryProjection<br/>(projection)"]
-  phaseprogressprojection["PhaseProgressProjection<br/>(projection)"]
   prchangereviewprojection["PrChangeReviewProjection<br/>(projection)"]
   projectconfigprojection["ProjectConfigProjection<br/>(projection)"]
-  releasenotesprojection["ReleaseNotesProjection<br/>(projection)"]
   requirementdigestprojection["RequirementDigestProjection<br/>(projection)"]
   requirementexecutabledigestprojection["RequirementExecutableDigestProjection<br/>(projection)"]
   requirementspecsdigestprojection["RequirementSpecsDigestProjection<br/>(projection)"]
@@ -351,6 +348,7 @@ graph TD
   architectureneighborhoodprojection -->|depends-on| patternrelationsprojectionsupport
   boundedcontextprojection -->|depends-on| patternrelationsprojectionsupport
   businessrulesprojection -->|depends-on| governanceprojectionsupport
+  changelogprojection -->|depends-on| deliveryreportingprojectionsupport
   decisioncatalogprojection -->|depends-on| governanceprojectionsupport
   deliverableprojection -->|depends-on| executioncontextprojectionsupport
   dependencycontextprojection -->|depends-on| patternrelationsprojectionsupport
@@ -366,10 +364,8 @@ graph TD
   patterncatalogprojection -->|depends-on| patternrelationsprojectionsupport
   patterndetailprojection -->|depends-on| patternrelationsprojectionsupport
   patternsummaryprojection -->|depends-on| patternrelationsprojectionsupport
-  phaseprogressprojection -->|depends-on| deliveryreportingprojectionsupport
   prchangereviewprojection -->|depends-on| documentationcompositionprojectionsupport
   projectconfigprojection -->|depends-on| documentationcompositionprojectionsupport
-  releasenotesprojection -->|depends-on| deliveryreportingprojectionsupport
   requirementdigestprojection -->|depends-on| operationalinsightsprojectionsupport
   requirementexecutabledigestprojection -->|depends-on| operationalinsightsprojectionsupport
   requirementspecsdigestprojection -->|depends-on| operationalinsightsprojectionsupport
@@ -438,25 +434,22 @@ graph TD
   patternscanner["PatternScanner<br/>(service)"]
 ```
 
-### Bounded context: validation (8 patterns)
+### Bounded context: validation (7 patterns)
 
 ```mermaid
 graph TD
   antipatterndetector["AntiPatternDetector<br/>(service)"]
-  dodvalidationtypes["DoDValidationTypes<br/>(contract)"]
-  dodvalidator["DoDValidator<br/>(service)"]
+  antipatternvalidationtypes["AntiPatternValidationTypes<br/>(contract)"]
   fsmstates["FSMStates<br/>(read-model)"]
   fsmtransitions["FSMTransitions<br/>(read-model)"]
   fsmvalidator["FSMValidator<br/>(decider)"]
   validatepatternscli["ValidatePatternsCLI<br/>(service)"]
   validationmodule["ValidationModule<br/>(barrel)"]
-  antipatterndetector -->|depends-on| dodvalidationtypes
-  dodvalidator -->|depends-on| dodvalidationtypes
+  antipatterndetector -->|depends-on| antipatternvalidationtypes
   fsmvalidator -->|depends-on| fsmstates
   fsmvalidator -->|depends-on| fsmtransitions
   validationmodule -->|depends-on| antipatterndetector
-  validationmodule -->|depends-on| dodvalidationtypes
-  validationmodule -->|depends-on| dodvalidator
+  validationmodule -->|depends-on| antipatternvalidationtypes
 ```
 
 ### Bounded context: validation-schemas (4 patterns)
@@ -486,14 +479,14 @@ Most-depended-on patterns in this view, ranked by in-view dependant count.
 | ------------------------------------ | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | ProjectionFragmentContracts          | 17         | ArchitectureDiagramProjection, BusinessRulesProjection, DecisionCatalogProjection, DeliverableProjection, DocumentationBundle                           |
 | ExtractedPattern                     | 14         | ArchitectureInspection, DecisionResolution, DeliveryReportingProjectionSupport, DualSourceExtractor, ExecutionContextProjectionSupport                  |
-| PatternGraph                         | 11         | ArchitectureInspection, BuildPipeline, DecisionResolution, DoDValidator, GraphInventory                                                                 |
 | PatternRelationsFragmentContracts    | 11         | ArchitectureComparisonProjection, ArchitectureNeighborhoodProjection, DependencyContextProjection, DependencyEdgeProjection, OpenQuestionListProjection |
 | PatternRelationsProjectionSupport    | 11         | ArchitectureComparisonProjection, ArchitectureNeighborhoodProjection, BoundedContextProjection, DependencyContextProjection, DependencyEdgeProjection   |
+| PatternGraph                         | 10         | ArchitectureInspection, BuildPipeline, DecisionResolution, GraphInventory, PatternClassification                                                        |
 | OperationalInsightsProjectionSupport | 8          | AnnotationCoverageProjection, OverviewProjection, RequirementDigestProjection, RequirementExecutableDigestProjection, RequirementSpecsDigestProjection  |
 | BlockSchema                          | 7          | ArchitectureDiagram, DecisionRecord, DocumentationCompositionSupporting, MarkdownRenderer, OperationalInsightsSupporting                                |
 | PatternHelpers                       | 6          | ArchitectureInspection, DecisionResolution, DualSourceExtractor, GraphInventory, PatternGraphApi                                                        |
 | ProjectionFragmentSchema             | 6          | ApiReferenceProjection, CompactTextRenderer, FragmentRendererDispatch, JsonRenderer, MarkdownRenderer                                                   |
-| DeliveryReportingProjectionSupport   | 5          | PhaseProgressProjection, ReleaseNotesProjection, RoadmapTimelineProjection, StatusDistributionProjection, TraceabilityMatrixProjection                  |
+| ExecutionContextProjectionSupport    | 5          | DeliverableProjection, FileReadingListProjection, HandoffProjection, ScopeReadinessProjection, SessionContextProjection                                 |
 
 ## Cross-package bounded contexts
 
@@ -503,7 +496,7 @@ Bounded contexts whose patterns span more than one workspace package.
 | --------------- | --------------------------------------------- | -------- |
 | cli             | Architect CLI, Architect Guard, Architect MCP | 6        |
 | rendering       | Architect Core, Architect Projection          | 9        |
-| validation      | Architect Core, Architect Guard               | 8        |
+| validation      | Architect Core, Architect Guard               | 7        |
 
 ## Legend
 
@@ -517,6 +510,7 @@ Bounded contexts whose patterns span more than one workspace package.
 - AnnotationCoverage
 - AnnotationCoverageProjection
 - AntiPatternDetector
+- AntiPatternValidationTypes
 - ApiReferenceDigest
 - ApiReferenceProjection
 - ArchitectureComparison
@@ -536,6 +530,7 @@ Bounded contexts whose patterns span more than one workspace package.
 - BusinessRuleReference
 - BusinessRuleSet
 - BusinessRulesProjection
+- ChangelogProjection
 - CLIErrorHandler
 - CLIRuntimePaths
 - CLIVersionHelper
@@ -566,8 +561,6 @@ Bounded contexts whose patterns span more than one workspace package.
 - DocumentationCompositionProjectionSupport
 - DocumentationCompositionSupporting
 - DocumentationTypeRegistry
-- DoDValidationTypes
-- DoDValidator
 - DualSourceExtractor
 - EmissionDescriptor
 - ErrorFactoryTypes
@@ -632,8 +625,6 @@ Bounded contexts whose patterns span more than one workspace package.
 - PatternScanner
 - PatternSummary
 - PatternSummaryProjection
-- PhaseProgress
-- PhaseProgressProjection
 - PrChangeReview
 - PrChangeReviewProjection
 - ProcessGuardDecider
@@ -644,8 +635,6 @@ Bounded contexts whose patterns span more than one workspace package.
 - ProjectionFragmentContracts
 - ProjectionFragmentSchema
 - RegistryBuilder
-- ReleaseNotesDigest
-- ReleaseNotesProjection
 - RequirementDigest
 - RequirementDigestProjection
 - RequirementExecutableDigestProjection

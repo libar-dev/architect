@@ -28,7 +28,6 @@ export const PatternCatalogOptionsSchema = z
   .strictObject({
     status: StatusFilterSchema.optional(),
     maturity: MaturitySchema.optional(),
-    phase: z.number().int().optional(),
     role: z.string().optional(),
     parent: z.string().optional(),
     package: z.string().optional(),
@@ -55,7 +54,6 @@ export function buildPatternCatalog(
       (summary) =>
         statusFilterMatches(summary.status, options.status) &&
         (options.maturity === undefined || summary.maturity === options.maturity) &&
-        (options.phase === undefined || summary.phase === options.phase) &&
         (canonicalRole === undefined || summary.role.toLowerCase() === canonicalRole) &&
         (parentChildNames === undefined || parentChildNames.has(summary.patternName)) &&
         (packageFilter === undefined || summary.package === packageFilter),
@@ -67,7 +65,6 @@ export function buildPatternCatalog(
     filters: {
       ...(options.status !== undefined ? { status: options.status } : {}),
       ...(options.maturity !== undefined ? { maturity: options.maturity } : {}),
-      ...(options.phase !== undefined ? { phase: options.phase } : {}),
       ...(canonicalRole !== undefined ? { role: canonicalRole } : {}),
       ...(options.parent !== undefined ? { parent: options.parent } : {}),
       ...(packageFilter !== undefined ? { package: packageFilter } : {}),

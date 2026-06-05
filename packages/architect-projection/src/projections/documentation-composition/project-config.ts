@@ -14,9 +14,9 @@
  * **Invariant:** `projectConfig` always flattens `input`, `features`, and
  * `exclude` globs into a single deduped `sourceGlobs` list (prefixing
  * exclude entries with `!`), preserves caller-supplied metadata, and carries
- * graph-derived `patternCount`, `phaseCount`, and `roleCount` from the
- * projection context; `parseAndProjectConfig` rejects malformed glob groups
- * via `ProjectConfigOptionsSchema`.
+ * graph-derived `patternCount` and `roleCount` from the projection context;
+ * `parseAndProjectConfig` rejects malformed glob groups via
+ * `ProjectConfigOptionsSchema`.
  *
  * **Behavior:**
  * - Resolves the project name from explicit options first, then from

@@ -10,11 +10,8 @@ import {
   ARCHITECT_PACKAGE_PRODUCT_AREAS,
   ARCHITECT_PACKAGE_ROLES,
   CANONICAL_FEATURE_ONLY_TAG_SUFFIXES,
-  CANONICAL_PHASE_NAMES,
-  CANONICAL_PHASE_ORDINALS,
   DELIVERABLE_STATUS_VALUES,
   FORMAT_TYPES,
-  QUARTER_PATTERN,
   VALID_TRANSITIONS,
   parseFeatureFile,
   parseMarkdownTableRows,
@@ -204,70 +201,9 @@ describeFeature(feature, ({ Rule }) => {
     },
   );
 
-  Rule('ADR-001 Rule 7 quarter format regex matches QUARTER_PATTERN', ({ RuleScenario }) => {
-    RuleScenario("QUARTER_PATTERN encodes ADR-001 Rule 7's format", ({ Given, Then, And }) => {
-      Given('the QUARTER_PATTERN regex', () => {});
-
-      Then('it accepts the canonical example "2026-Q1"', () => {
-        expect(QUARTER_PATTERN.test('2026-Q1')).toBe(true);
-      });
-
-      And('it rejects the anti-pattern "Q1-2026"', () => {
-        expect(QUARTER_PATTERN.test('Q1-2026')).toBe(false);
-      });
-    });
-  });
-
-  Rule('ADR-001 Rule 8 phase names match CANONICAL_PHASE_NAMES', ({ RuleScenario }) => {
-    RuleScenario(
-      'Phase names match between ADR-001 Rule 8 and CANONICAL_PHASE_NAMES',
-      ({ Given, When, And, Then }) => {
-        let adrNames: string[] = [];
-        let constantNames: string[] = [];
-
-        Given('the ADR-001 canonical values feature file', () => {});
-
-        When('I extract the phase names from Rule 8', () => {
-          adrNames = extractColumn('Canonical phase definitions (6-phase USDP standard)', 'Phase');
-        });
-
-        And('I list the names in CANONICAL_PHASE_NAMES', () => {
-          constantNames = [...CANONICAL_PHASE_NAMES];
-        });
-
-        Then('both phase-name lists contain the same names', () => {
-          expect([...adrNames].sort()).toEqual([...constantNames].sort());
-        });
-      },
-    );
-  });
-
-  Rule('ADR-001 Rule 8 phase ordinals match CANONICAL_PHASE_ORDINALS', ({ RuleScenario }) => {
-    RuleScenario(
-      'Phase ordinals match between ADR-001 Rule 8 and CANONICAL_PHASE_ORDINALS',
-      ({ Given, When, And, Then }) => {
-        let adrOrdinals: number[] = [];
-        let constantOrdinals: number[] = [];
-
-        Given('the ADR-001 canonical values feature file', () => {});
-
-        When('I extract the phase ordinals from Rule 8', () => {
-          adrOrdinals = extractColumn(
-            'Canonical phase definitions (6-phase USDP standard)',
-            'Order',
-          ).map((value) => Number.parseInt(value, 10));
-        });
-
-        And('I list the ordinals in CANONICAL_PHASE_ORDINALS', () => {
-          constantOrdinals = [...CANONICAL_PHASE_ORDINALS];
-        });
-
-        Then('both phase-ordinal lists contain the same ordinals', () => {
-          expect([...adrOrdinals].sort()).toEqual([...constantOrdinals].sort());
-        });
-      },
-    );
-  });
+  // ADR-001 Rule 7 (Quarter Format) and Rule 8 (6-phase USDP phase
+  // definitions) were retired per ADR-013, along with their QUARTER_PATTERN /
+  // CANONICAL_PHASE_NAMES / CANONICAL_PHASE_ORDINALS constants — sync rules removed.
 
   Rule('ADR-001 Rule 9 matches DELIVERABLE_STATUS_VALUES', ({ RuleScenario }) => {
     RuleScenario(

@@ -545,7 +545,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   // ---------------------------------------------------------------------------
 
   Rule('CLI handles argument edge cases', ({ RuleScenario }) => {
-    RuleScenario('Integer arguments are coerced for phase queries', ({ Given, When, Then }) => {
+    RuleScenario('Integer arguments are coerced for limit queries', ({ Given, When, Then }) => {
       Given('TypeScript files with pattern annotations', async () => {
         await writePatternFiles(state);
       });

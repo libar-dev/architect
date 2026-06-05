@@ -87,176 +87,129 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
     ({ RuleScenario }) => {
       RuleScenario(
         'projecting an overview digest for mixed delivery work',
-        ({ Given, When, Then, And }) => {
-          Given(
-            'a Operational Insights overview context with active phases and blocking dependencies',
-            () => {
-              const phaseOneDependency = createPattern('ProjectionBundleContract', {
-                status: 'roadmap',
-                phase: 7,
-                file: 'architect/specs/projection-bundle-contract.feature',
-              });
-              const phaseOnePattern = createPattern('OperationalInsightsSchemas', {
-                status: 'active',
-                phase: 7,
-                file: 'architect/specs/operational-insights-schemas.feature',
-                dependsOn: ['ProjectionBundleContract'],
-              });
-              const phaseTwoDependency = createPattern('CoverageGraphInput', {
-                status: 'active',
-                phase: 19,
-                file: 'packages/architect-query/src/api/coverage-analyzer.ts',
-              });
-              const phaseTwoPattern = createPattern('OperationalInsightsProjectionBodies', {
-                status: 'roadmap',
-                phase: 19,
-                file: 'packages/architect-projection/src/projections/operational-insights/support.ts',
-                dependsOn: ['OperationalInsightsSchemas', 'CoverageGraphInput'],
-              });
-              const completed = createPattern('ProjectionDeliveryReporting', {
-                status: 'completed',
-                phase: 18,
-              });
-              const unnamedActive = createPattern('OperationalInsightsUnnamedPhase', {
-                status: 'active',
-                phase: 18,
-              });
-              const candidate = createPattern('OperationalInsightsFutureIdeas', {
-                status: 'candidate',
-                phase: 20,
-              });
+        ({ Given, When, Then }) => {
+          Given('a Operational Insights overview context with blocking dependencies', () => {
+            const phaseOneDependency = createPattern('ProjectionBundleContract', {
+              status: 'roadmap',
+              file: 'architect/specs/projection-bundle-contract.feature',
+            });
+            const phaseOnePattern = createPattern('OperationalInsightsSchemas', {
+              status: 'active',
+              file: 'architect/specs/operational-insights-schemas.feature',
+              dependsOn: ['ProjectionBundleContract'],
+            });
+            const phaseTwoDependency = createPattern('CoverageGraphInput', {
+              status: 'active',
+              file: 'packages/architect-query/src/api/coverage-analyzer.ts',
+            });
+            const phaseTwoPattern = createPattern('OperationalInsightsProjectionBodies', {
+              status: 'roadmap',
+              file: 'packages/architect-projection/src/projections/operational-insights/support.ts',
+              dependsOn: ['OperationalInsightsSchemas', 'CoverageGraphInput'],
+            });
+            const completed = createPattern('ProjectionDeliveryReporting', {
+              status: 'completed',
+            });
+            const unnamedActive = createPattern('OperationalInsightsUnnamedPhase', {
+              status: 'active',
+            });
+            const candidate = createPattern('OperationalInsightsFutureIdeas', {
+              status: 'candidate',
+            });
 
-              state!.context = createProjectionContext({
-                patterns: [
-                  phaseOneDependency,
-                  phaseOnePattern,
-                  phaseTwoDependency,
-                  phaseTwoPattern,
-                  completed,
-                  unnamedActive,
-                  candidate,
-                ],
-                phaseNames: {
-                  7: 'Schema Lock',
-                  19: 'Projection Bodies',
-                  20: 'Future Work',
-                },
-                relationshipIndex: {
-                  OperationalInsightsSchemas: createRelationshipEntry({
-                    dependsOn: ['ProjectionBundleContract'],
-                  }),
-                  OperationalInsightsProjectionBodies: createRelationshipEntry({
-                    dependsOn: ['OperationalInsightsSchemas', 'CoverageGraphInput'],
-                  }),
-                },
-              });
-            },
-          );
+            state!.context = createProjectionContext({
+              patterns: [
+                phaseOneDependency,
+                phaseOnePattern,
+                phaseTwoDependency,
+                phaseTwoPattern,
+                completed,
+                unnamedActive,
+                candidate,
+              ],
+              relationshipIndex: {
+                OperationalInsightsSchemas: createRelationshipEntry({
+                  dependsOn: ['ProjectionBundleContract'],
+                }),
+                OperationalInsightsProjectionBodies: createRelationshipEntry({
+                  dependsOn: ['OperationalInsightsSchemas', 'CoverageGraphInput'],
+                }),
+              },
+            });
+          });
 
           When('I project the overview digest', () => {
             state!.overview = projectOverviewDigest(state!.context!);
           });
 
-          Then(
-            'the overview digest should expose delivery progress active phases and blocking entries',
-            () => {
-              // The architecture glimpse derives from a separate component-scope
-              // graph walk; its exact Mermaid is exercised in the disclosure rule
-              // below. The orientation block (registry-derived references + the
-              // graph-derived safe-to-start set), the role distribution, and the
-              // curated cliHints are asserted structurally afterwards (their exact
-              // wording is presentation copy that evolves with the Gap Ledger), so
-              // split them off and assert the stable structural fields exactly.
-              const { architecture, orientation, roleDistribution, cliHints, ...root } =
-                state!.overview!.root;
-              expect({ root, children: state!.overview!.children }).toEqual({
-                root: {
-                  kind: 'OverviewDigest',
-                  progress: {
-                    total: 6,
-                    completed: 1,
-                    active: 3,
-                    planned: 2,
-                    candidate: 1,
-                    percentage: 17,
-                  },
-                  activePhases: [
-                    {
-                      phase: 7,
-                      name: 'Schema Lock',
-                      patternCount: 2,
-                      activeCount: 1,
-                    },
-                    {
-                      phase: 18,
-                      name: undefined,
-                      patternCount: 2,
-                      activeCount: 1,
-                    },
-                    {
-                      phase: 19,
-                      name: 'Projection Bodies',
-                      patternCount: 2,
-                      activeCount: 1,
-                    },
-                  ],
-                  blocking: [
-                    {
-                      pattern: 'OperationalInsightsSchemas',
-                      status: 'active',
-                      blockedBy: ['ProjectionBundleContract'],
-                    },
-                    {
-                      pattern: 'OperationalInsightsProjectionBodies',
-                      status: 'roadmap',
-                      blockedBy: ['OperationalInsightsSchemas', 'CoverageGraphInput'],
-                    },
-                  ],
-                  // Derived from the canonical registry — same source the overview
-                  // projection uses — so this assertion never drifts from the supported set.
-                  generatedViews: SUPPORTED_DOCUMENTATION_TYPE_IDENTITIES.map((identity) => ({
-                    docType: identity.key,
-                    verb: `documentation ${identity.key}`,
-                    summary: identity.description,
-                  })),
+          Then('the overview digest should expose delivery progress and blocking entries', () => {
+            // The architecture glimpse derives from a separate component-scope
+            // graph walk; its exact Mermaid is exercised in the disclosure rule
+            // below. The orientation block (registry-derived references + the
+            // graph-derived safe-to-start set), the role distribution, and the
+            // curated cliHints are asserted structurally afterwards (their exact
+            // wording is presentation copy that evolves with the Gap Ledger), so
+            // split them off and assert the stable structural fields exactly.
+            const { architecture, orientation, roleDistribution, cliHints, ...root } =
+              state!.overview!.root;
+            expect({ root, children: state!.overview!.children }).toEqual({
+              root: {
+                kind: 'OverviewDigest',
+                progress: {
+                  total: 6,
+                  completed: 1,
+                  active: 3,
+                  planned: 2,
+                  candidate: 1,
+                  percentage: 17,
                 },
-                children: {},
-              });
-
-              expect(architecture).toBeDefined();
-              expect(architecture?.packageChart.type).toBe('mermaid');
-              expect(architecture?.contextMap?.type).toBe('mermaid');
-              expect(architecture?.pointer).toContain('not grep');
-
-              // Orientation references are the curated orientation-doc subset,
-              // derived from the registry (verb + title), in declared order.
-              expect(orientation?.references.map((reference) => reference.docType)).toEqual([
-                'decisions',
-                'taxonomy',
-                'validation-rules',
-                'business-rules',
-                'api-reference',
-              ]);
-              expect(orientation?.disclosureHint).toContain('--disclosure');
-              expect(typeof orientation?.startableCount).toBe('number');
-              // Role distribution tallies the canonical @architect-role of every
-              // pattern that declares one; sorted by count descending.
-              expect(Array.isArray(roleDistribution)).toBe(true);
-              // cliHints lead with the Data API banner and promote the map verb.
-              expect(cliHints?.[0]).toContain('DATA API');
-              expect(cliHints?.some((hint) => hint.includes('documentation architecture'))).toBe(
-                true,
-              );
-            },
-          );
-
-          And('the overview digest should preserve unnamed active phase parity', () => {
-            expect(state!.overview?.root.activePhases).toContainEqual({
-              phase: 18,
-              name: undefined,
-              patternCount: 2,
-              activeCount: 1,
+                blocking: [
+                  {
+                    pattern: 'OperationalInsightsSchemas',
+                    status: 'active',
+                    blockedBy: ['ProjectionBundleContract'],
+                  },
+                  {
+                    pattern: 'OperationalInsightsProjectionBodies',
+                    status: 'roadmap',
+                    blockedBy: ['OperationalInsightsSchemas', 'CoverageGraphInput'],
+                  },
+                ],
+                // Derived from the canonical registry — same source the overview
+                // projection uses — so this assertion never drifts from the supported set.
+                generatedViews: SUPPORTED_DOCUMENTATION_TYPE_IDENTITIES.map((identity) => ({
+                  docType: identity.key,
+                  verb: `documentation ${identity.key}`,
+                  summary: identity.description,
+                })),
+              },
+              children: {},
             });
+
+            expect(architecture).toBeDefined();
+            expect(architecture?.packageChart.type).toBe('mermaid');
+            expect(architecture?.contextMap?.type).toBe('mermaid');
+            expect(architecture?.pointer).toContain('not grep');
+
+            // Orientation references are the curated orientation-doc subset,
+            // derived from the registry (verb + title), in declared order.
+            expect(orientation?.references.map((reference) => reference.docType)).toEqual([
+              'decisions',
+              'taxonomy',
+              'validation-rules',
+              'business-rules',
+              'api-reference',
+            ]);
+            expect(orientation?.disclosureHint).toContain('--disclosure');
+            expect(typeof orientation?.startableCount).toBe('number');
+            // Role distribution tallies the canonical @architect-role of every
+            // pattern that declares one; sorted by count descending.
+            expect(Array.isArray(roleDistribution)).toBe(true);
+            // cliHints lead with the Data API banner and promote the map verb.
+            expect(cliHints?.[0]).toContain('DATA API');
+            expect(cliHints?.some((hint) => hint.includes('documentation architecture'))).toBe(
+              true,
+            );
 
             const rendered = renderJson(state!.overview!.root);
             expect(typeof rendered).toBe('object');
@@ -283,13 +236,11 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           ];
           const dependency = createPattern('SharedBlockingDependency', {
             status: 'roadmap',
-            phase: 7,
             file: 'architect/specs/shared-blocking-dependency.feature',
           });
           const blocked = blockedNames.map((name) =>
             createPattern(name, {
               status: 'active',
-              phase: 7,
               file: `packages/architect-projection/src/projections/${name.toLowerCase()}.ts`,
               dependsOn: ['SharedBlockingDependency'],
             }),
@@ -566,8 +517,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 role: 'service',
                 archContext: 'projection',
                 archLayer: 'application',
-                phase: 19,
-                quarter: '2026-Q2',
                 team: 'projection',
                 effort: 'm',
                 priority: 'high',
@@ -578,8 +527,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 role: 'service',
                 archContext: 'projection',
                 archLayer: 'application',
-                phase: 19,
-                quarter: '2026-Q2',
                 team: 'projection',
                 effort: 'm',
                 priority: 'high',
@@ -590,7 +537,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 role: 'cli',
                 archContext: 'tooling',
                 archLayer: 'application',
-                phase: 20,
                 team: 'tooling',
                 priority: 'medium',
                 file: 'packages/architect-cli/src/cli/pattern-graph-cli.ts',
@@ -661,15 +607,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 },
                 {
                   kind: 'TagUsageEntry',
-                  tag: 'phase',
-                  count: 3,
-                  values: [
-                    { value: '19', count: 2 },
-                    { value: '20', count: 1 },
-                  ],
-                },
-                {
-                  kind: 'TagUsageEntry',
                   tag: 'priority',
                   count: 3,
                   values: [
@@ -691,12 +628,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   tag: 'effort',
                   count: 2,
                   values: [{ value: 'm', count: 2 }],
-                },
-                {
-                  kind: 'TagUsageEntry',
-                  tag: 'quarter',
-                  count: 2,
-                  values: [{ value: '2026-Q2', count: 2 }],
                 },
               ],
               patternCount: 6,
@@ -1066,7 +997,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   createPattern('SharedRequirementRef', {
                     status: 'active',
                     productArea: 'Alpha',
-                    phase: 12,
                     file: 'packages/architect-core/src/shared-requirement-ref.ts',
                     description: 'First package owns one rule for the shared requirement.',
                     behaviorFile: 'tests/features/query/context.feature',
@@ -1083,7 +1013,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                     patternName: 'SharedRequirementRef',
                     status: 'completed',
                     productArea: 'Beta',
-                    phase: 18,
                     file: 'packages/architect-projection/src/shared-requirement-ref.ts',
                     description:
                       'Second package contributes another rule to the same feature name.',
@@ -1191,7 +1120,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   createPattern('SharedRequirementRef', {
                     status: 'active',
                     productArea: 'Alpha',
-                    phase: 12,
                     file: 'packages/architect-core/src/shared-requirement-ref.ts',
                     description: 'First package owns one rule for the shared requirement.',
                     behaviorFile: 'tests/features/query/context.feature',
@@ -1208,7 +1136,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                     patternName: 'SharedRequirementRef',
                     status: 'completed',
                     productArea: 'Beta',
-                    phase: 18,
                     file: 'packages/architect-projection/src/shared-requirement-ref.ts',
                     description:
                       'Second package contributes another rule to the same feature name.',

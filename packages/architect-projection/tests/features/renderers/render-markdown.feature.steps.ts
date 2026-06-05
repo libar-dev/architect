@@ -37,7 +37,6 @@ function documentationFixtureToFragment(view: SectionedDocumentFixture): Fragmen
     sourceGlobs: [],
     buildTimeMs: 0,
     patternCount: 0,
-    phaseCount: 0,
     roleCount: 0,
     title: view.title,
     sections: view.sections,
@@ -279,36 +278,6 @@ function createUnsafeMarkdownFixture(): Fragment {
   });
 }
 
-function createHostileReleaseNotesFixture(): Fragment {
-  return {
-    kind: 'ReleaseNotesDigest',
-    releases: [
-      {
-        release: 'v1.0](javascript:alert(1))',
-        date: '<script>alert(2)</script>',
-        patterns: [
-          {
-            kind: 'PatternSummary',
-            patternName: 'Pattern **bold** [trap](javascript:alert(3))',
-            role: 'Pattern',
-            file: 'packages/foo.ts',
-            source: 'typescript',
-          },
-        ],
-        deliverables: [
-          {
-            name: 'Deliverable [click](javascript:alert(4))',
-            status: 'active',
-            tests: [],
-            location: '<script>alert(5)</script>',
-          },
-        ],
-        notes: 'Release note [trap](javascript:alert(6))',
-      },
-    ],
-  } as unknown as Fragment;
-}
-
 function createHostileTaxonomyDigestFixture(): Fragment {
   return {
     kind: 'TaxonomyDigest',
@@ -515,7 +484,6 @@ function createBusinessRuleSetDisclosureBundle(): ProjectionBundle<BusinessRuleS
       verifiedBy: ['business-rule markdown richness is driven by disclosure policy'],
       scenarioCount: 1,
       pattern: 'ProjectionAPI',
-      phase: 49,
       productArea: 'Projection Platform',
     },
   ];
@@ -530,7 +498,6 @@ function createBusinessRuleSetDisclosureBundle(): ProjectionBundle<BusinessRuleS
       verifiedBy: ['business-rule markdown richness is driven by disclosure policy'],
       scenarioCount: 1,
       pattern: 'GenerateDocsCli',
-      phase: 49,
       productArea: 'CLI',
     },
   ];
@@ -654,7 +621,6 @@ function createBusinessRuleSetRichnessFixture(
             verifiedBy: ['BusinessRule table column count per richness'],
             scenarioCount: 1,
             pattern: 'ProjectionAPI',
-            phase: 49,
             productArea: 'Projection Platform',
           },
           {
@@ -667,7 +633,6 @@ function createBusinessRuleSetRichnessFixture(
             verifiedBy: ['BusinessRule table column count per richness'],
             scenarioCount: 1,
             pattern: 'GenerateDocsCli',
-            phase: 49,
             productArea: 'CLI',
           },
           {
@@ -680,7 +645,6 @@ function createBusinessRuleSetRichnessFixture(
             verifiedBy: ['BusinessRule table column count per richness'],
             scenarioCount: 1,
             pattern: 'ArchitectMcp',
-            phase: 49,
             productArea: 'MCP',
           },
         ],
@@ -1235,31 +1199,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           expect(markdown).toContain('Trailing Numeric NewLine HTTPS');
           expect(markdown).not.toContain('[Trailing Numeric NewLine HTTPS](');
           expect(markdown).toContain('[Safe Colonized Path](docs/&colonization-guide.md)');
-        });
-      },
-    );
-
-    RuleScenario(
-      'Release notes trusted markdown escapes interpolated fragment values',
-      ({ Given, When, Then }) => {
-        Given('a ReleaseNotesDigest fixture containing hostile release metadata', () => {
-          state!.input = createHostileReleaseNotesFixture();
-        });
-
-        When('I render the fragment as markdown', () => {
-          state!.rendered = renderMarkdown(state!.input!);
-        });
-
-        Then('the release notes markdown should escape trusted interpolation values', () => {
-          const markdown = assertRenderedString(state!.rendered);
-          expect(markdown).toContain(
-            '## [v1.0\\](javascript:alert(1))] - &lt;script&gt;alert(2)&lt;/script&gt;',
-          );
-          expect(markdown).toContain(
-            '- **Deliverable \\[click\\](javascript:alert(4))**: &lt;script&gt;alert(5)&lt;/script&gt;',
-          );
-          expect(markdown).toContain('- Pattern \\*\\*bold\\*\\* \\[trap\\](javascript:alert(3))');
-          expect(markdown).toContain('Release note \\[trap\\](javascript:alert(6))');
         });
       },
     );

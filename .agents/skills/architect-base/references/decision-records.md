@@ -11,7 +11,7 @@ How architectural decisions are recorded, what may and may not go in a record, a
 - The decision itself, stated plainly.
 - The rationale — why this option over the alternatives.
 - The durable constraint the decision imposes (the invariant future work must respect).
-- References to the patterns / ADRs it depends on or supersedes.
+- References to the patterns / ADRs it currently **depends on** — live edges only, never a "supersedes" / "replaces" marker. During bootstrap the replaced record is deleted in place; "what did we replace?" is a `git log` question, not a read-model edge.
 
 **Never belongs in a record:**
 
@@ -21,7 +21,7 @@ How architectural decisions are recorded, what may and may not go in a record, a
 
 That line — durable decision vs operational worklog — is the whole point. A record that accretes temporal context rots the moment the work moves on, and it poisons every projection (release notes, architecture docs) that reads it as ground truth.
 
-**Amendment rule:** a decision is amended by authoring a **new** ADR that supersedes the old one — never by editing the original. The history of _why we changed our mind_ is itself durable.
+**Amendment rule.** _Post-1.0:_ a decision is amended by authoring a **new** ADR that supersedes the old one — never by editing the original; the history of _why we changed our mind_ is itself durable. _**During bootstrap**_ (pre-1.0, live-state — the standing context; see the repo `CLAUDE.md` / `AGENTS.md` bootstrap doctrine): consolidate **in place** — edit / slim / delete the record directly, with **no supersession metadata** (no `@architect-adr-supersedes` / `adr-superseded-by` tags, no "replaces" / "superseded-by" prose — that is read-model history the bootstrap excludes; the replaced record is deleted, not linked). An amend-chain manufactures exactly the history the read model is built to exclude, so a "new superseding ADR" for a record nobody has built on yet is residue, not provenance. The deliberate change of mind is still recorded on its own terms; what is dropped is the append-only scaffolding around it.
 
 ## Read records through the Data API, not from memory
 
@@ -47,12 +47,12 @@ ADRs also carry `@architect-adr-theme` / `@architect-adr-layer` classification, 
 
 Two artifacts share the word "decisions" and have **opposite lifetimes** — keep them apart:
 
-|            | `architect/decisions/` (ADRs)               | `.pr-coordination/DECISIONS.md`             |
-| ---------- | ------------------------------------------- | ------------------------------------------- |
-| Lifetime   | **Permanent**                               | **Ephemeral** (one campaign)                |
-| Holds      | Durable architectural decisions + rationale | Judgment-calls a campaign needs before code |
-| Resolution | Superseded by a new ADR                     | Resolved-with-commit-sha, then archived     |
-| Audience   | All future work, all projections            | The workers in one campaign                 |
+|            | `architect/decisions/` (ADRs)                                       | `.pr-coordination/DECISIONS.md`             |
+| ---------- | ------------------------------------------------------------------- | ------------------------------------------- |
+| Lifetime   | **Permanent**                                                       | **Ephemeral** (one campaign)                |
+| Holds      | Durable architectural decisions + rationale                         | Judgment-calls a campaign needs before code |
+| Resolution | Consolidated in place (bootstrap); superseded by a new ADR post-1.0 | Resolved-with-commit-sha, then archived     |
+| Audience   | All future work, all projections                                    | The workers in one campaign                 |
 
 Filing durable architecture in the campaign log loses it when the campaign archives; filing campaign bookkeeping in an ADR poisons the permanent record. The campaign-log shape (tight `Question / Options / Recommendation / Consumed-by / Status` entries) lives in [`../../architect-refactor-session/references/multi-session-coordination.md`](../../architect-refactor-session/references/multi-session-coordination.md).
 

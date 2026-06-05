@@ -15,6 +15,8 @@ Before promoting, confirm the design has somewhere solid to stand. Extract from 
 
 The detail level is **contextual** (`architect-base` §10): invest depth where the work is architecturally significant or sensitive; skip stubs and exhaustive scenarios for routine, well-understood shapes. Too much detail rots; stripping hard-won nuance to "match the tier" destroys signal. Both fail.
 
+**Distill as you author — re-explanation won't survive value transfer.** Before writing rule or rationale prose, check §10's "skip detail" cases: if this is the Nth instance of an established shape, or an industry-standard piece (a CRUD endpoint, a standard codec, a barrel), **reference the established pattern / ADR and stop** — do not re-derive what it is or why it's shaped that way. A `**Rationale:**` that only restates its `**Invariant:**` is dead weight the implement-time transfer gate ([`ephemeral-spec-deletion.md`](ephemeral-spec-deletion.md) §"Transcription bloat") will strip anyway. Spend words where the work is genuinely novel; spend none re-narrating the standard.
+
 ## Pre-flight
 
 Run the pre-flight from [`../../architect-data-api/SKILL.md`](../../architect-data-api/SKILL.md): `overview`, then the `scope-validate <Pattern> design` gate, then `bundle <Pattern> --mode design --format json` (blocks: docstring + open-questions + rules + scenarios), dropping to `dep-tree` / `rules` as needed. The design-mode bundle carries **no** `stubs` / `deliverables` / `deps` block — and there is no `stubs` verb; the spec's deliverables and stubs surface through `context --session design` (its `=== SPEC ===` section), not the bundle.

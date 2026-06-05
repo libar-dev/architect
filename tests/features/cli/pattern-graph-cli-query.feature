@@ -3,7 +3,6 @@
 @architect-implements:PatternGraphAPICLI
 @architect-status:completed
 @architect-unlock-reason:Split-from-original
-@architect-phase:24
 @architect-product-area:DataAPI
 @cli @pattern-graph-cli
 Feature: Pattern Graph CLI - Query Passthrough
@@ -108,13 +107,6 @@ Feature: Pattern Graph CLI - Query Passthrough
       When running "pattern-graph-cli -i 'src/**/*.ts' query getPatternsByStatus invalid-status"
       Then exit code is 1
       And output contains "accepted status value"
-
-    @validation
-    Scenario: Invalid phase query argument shows error
-      Given TypeScript files with pattern annotations
-      When running "pattern-graph-cli -i 'src/**/*.ts' query getPatternsByPhase not-a-number"
-      Then exit code is 1
-      And output contains "Phase must be an integer"
 
   # ============================================================================
   # RULE 2: Compact List Output

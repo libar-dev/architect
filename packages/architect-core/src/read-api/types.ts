@@ -1,4 +1,3 @@
-import type { ExtractedPattern } from '../validation-schemas/extracted-pattern.js';
 import type { ImplementationRef, StatusCounts } from '../validation-schemas/pattern-graph.js';
 import type { ProcessStatusValue } from '../taxonomy/index.js';
 
@@ -37,8 +36,6 @@ export type QueryErrorCode =
   | 'INVALID_STATUS'
   | 'INVALID_TRANSITION'
   | 'PATTERN_NOT_FOUND'
-  | 'PHASE_NOT_FOUND'
-  | 'QUARTER_NOT_FOUND'
   | 'ROLE_NOT_FOUND'
   | 'CONTEXT_NOT_FOUND'
   | 'LAYER_NOT_FOUND'
@@ -55,7 +52,7 @@ export interface QueryError {
 
 export type QueryResult<T> = QuerySuccess<T> | QueryError;
 
-export type { PhaseGroup, StatusCounts } from '../validation-schemas/pattern-graph.js';
+export type { StatusCounts } from '../validation-schemas/pattern-graph.js';
 
 export interface StatusDistribution {
   counts: StatusCounts;
@@ -75,17 +72,6 @@ export interface StatusDistribution {
    * different denominator — the two groups must never be summed together.
    */
   candidateShare: number;
-}
-
-export interface PhaseProgress {
-  phaseNumber: number;
-  phaseName: string | undefined;
-  completed: number;
-  active: number;
-  planned: number;
-  candidate: number;
-  total: number;
-  completionPercentage: number;
 }
 
 export interface PatternDependencies {
@@ -118,7 +104,6 @@ export interface PatternRelationships {
 export interface DependencyContextNode {
   name: string;
   status?: string;
-  phase?: number;
   truncated: boolean;
   children: readonly DependencyContextNode[];
 }
@@ -146,12 +131,6 @@ export interface DependencyContext {
   };
 }
 
-export interface QuarterGroup {
-  quarter: string;
-  patterns: ExtractedPattern[];
-  counts: StatusCounts;
-}
-
 /**
  * A lightweight reference to a business rule that enforces a decision — the
  * owning pattern, the rule name, and an optional invariant string. Returned by
@@ -177,7 +156,13 @@ export interface ProtectionInfo {
   level: 'none' | 'scope' | 'hard';
   description: string;
   canAddDeliverables: boolean;
-  requiresUnlock: boolean;
+  /**
+   * Whether this protection level emits an advisory, unlock-suppressible warning
+   * on the commit path (PDR-006). True for `scope` (active scope creep) and
+   * `hard` (completed edits); `unlock-reason` is optional and suppresses it.
+   * Never a hard block on the commit path (CI `--strict` may promote it).
+   */
+  unlockSuppressesWarning: boolean;
 }
 
 export interface NeighborEntry {

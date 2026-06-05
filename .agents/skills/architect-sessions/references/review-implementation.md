@@ -31,7 +31,7 @@ For each pattern:
 1. **Forward link.** Does the design spec carry `@architect-executable-specs:<path>`? (Moot if the spec is already deleted.)
 2. **Forward link resolves.** Does that path point at a real file under `tests/features/`?
 3. **Reverse link.** Does that target feature carry `@architect-implements:<Pattern>` for the focal pattern?
-4. **Rich content landed.** Every Rule block in the design spec has a counterpart in the executable feature carrying `**Invariant:**` (and, where present in the source, `**Rationale:**` + `**Verified by:**`).
+4. **Rich content landed — and distilled.** Every Rule block in the design spec has a counterpart in the executable feature carrying `**Invariant:**` (and, where present in the source, `**Rationale:**` + `**Verified by:**`) — but **distilled, not transcribed**: a `**Rationale:**` that only restates its `**Invariant:**`, a `**Verified by:**` repeated verbatim across rules, or a step stub / JSDoc comment re-explaining the pattern (rather than its local how) is **Transcription bloat** ([`ephemeral-spec-deletion.md`](ephemeral-spec-deletion.md)). Remedy = slim the destination, not block deletion.
 5. **Production-TS rationale (judgment).** Architecturally significant rationale that doesn't fit in Gherkin lives in JSDoc — but **annotations are additive**, so absence is not a blocker; presence enriches discoverability.
 6. **Graph integrity.** `pnpm architect:query arch dangling --baseline packages/architect-guard/src/lint/dangling-baseline.json --strict` — exit 0 means no new dangling references; non-zero means the graph regressed (resolve the new edge, or deliberately rewrite the baseline with `--write-baseline` and explain why).
 

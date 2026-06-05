@@ -3,7 +3,6 @@
 @architect-implements:OperationalInsightsProjectionSupport,OverviewProjection,AnnotationCoverageProjection,TagUsageProjection,SourceInventoryProjection,RoleProfileProjection,RequirementDigestProjection
 @architect-status:completed
 @architect-unlock-reason:Add-overview-architecture-glimpse-rendering-WS3-S15
-@architect-phase:49
 @architect-product-area:Projection
 @architect-role:projection
 @operational-insights
@@ -17,8 +16,8 @@ Feature: Operational Insights reporting projections
   without reaching into the raw PatternGraph.
 
   **How It Works:** Each projection runs against the in-memory graph and tag
-  registry. Overview aggregates progress, active phases, and blocked
-  patterns; annotation coverage compares source files against required tags;
+  registry. Overview aggregates progress and blocked patterns; annotation
+  coverage compares source files against required tags;
   tag usage counts `(tag, value)` pairs across patterns; source inventory
   categorises files by type; role profiles normalize configured roles with
   their pattern examples; requirement digests structure product-area
@@ -33,11 +32,10 @@ Feature: Operational Insights reporting projections
   Rule: Overview ports the legacy progress and blocking semantics into the fragment shape
 
     **Invariant:** `OverviewDigest` always carries a `progress` block
-    (delivery-total counts and a percentage that excludes candidates),
-    `activePhases` limited to phases with active work, a `blocking` array of
-    incomplete patterns whose `dependsOn` targets are incomplete, an
-    `architecture` glimpse (a coarse package-level context map plus the
-    bounded-context map, both pre-rendered Mermaid, derived from a
+    (delivery-total counts and a percentage that excludes candidates), a
+    `blocking` array of incomplete patterns whose `dependsOn` targets are
+    incomplete, an `architecture` glimpse (a coarse package-level context map
+    plus the bounded-context map, both pre-rendered Mermaid, derived from a
     production-only component graph), a `generatedViews` index of the fetchable
     documentation surfaces, and the embedded CLI-hints list for session bootstrap.
 
@@ -48,10 +46,9 @@ Feature: Operational Insights reporting projections
 
     @acceptance-criteria
     Scenario: projecting an overview digest for mixed delivery work
-      Given a Operational Insights overview context with active phases and blocking dependencies
+      Given a Operational Insights overview context with blocking dependencies
       When I project the overview digest
-      Then the overview digest should expose delivery progress active phases and blocking entries
-      And the overview digest should preserve unnamed active phase parity
+      Then the overview digest should expose delivery progress and blocking entries
 
   Rule: Overview compact rendering honors disclosure richness
 

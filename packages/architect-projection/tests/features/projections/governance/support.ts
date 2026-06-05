@@ -23,7 +23,6 @@ interface PatternFixtureOptions {
   readonly status?: ExtractedPattern['status'];
   readonly maturity?: PatternMaturity;
   readonly role?: ExtractedPattern['role'];
-  readonly phase?: ExtractedPattern['phase'];
   readonly file?: string;
   readonly description?: string;
   readonly productArea?: ExtractedPattern['productArea'];

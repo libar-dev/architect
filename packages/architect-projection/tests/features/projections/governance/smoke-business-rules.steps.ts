@@ -46,7 +46,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 createPattern('AuthFeature', {
                   status: 'active',
                   role: 'service',
-                  phase: 1,
                   file: 'architect/specs/auth-feature.feature',
                   rules: [
                     createRule({
@@ -61,7 +60,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 createPattern('AuditFeature', {
                   status: 'active',
                   role: 'service',
-                  phase: 1,
                   file: 'architect/specs/audit-feature.feature',
                   rules: [
                     createRule({

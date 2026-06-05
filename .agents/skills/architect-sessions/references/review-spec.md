@@ -43,6 +43,7 @@ Run the pre-flight from [`../../architect-data-api/SKILL.md`](../../architect-da
 9. **Overlap with concurrent specs.** Two specs in the same phase touching the same files is a sequencing hazard — surface it.
 10. **Ephemeral readiness.** When implemented and deleted, will value transfer cleanly? Does every rule have an `**Invariant:**`? Does every decision have enough rationale to become a JSDoc annotation? A spec that won't transfer cleanly will leave debt.
 11. **Graph fit (optional).** `pnpm architect:query documentation design-review` renders the in-scope spec status-annotated `(role · status)` in the live component graph (by-layer / by-package / by-theme); confirm its depends-on edges land in the expected layer/package cluster and no dependency is unexpectedly an unbuilt `(roadmap)` / `(candidate)` node.
+12. **Re-explanation smell (density).** Flag prose that re-explains an established or industry-standard shape (a CRUD endpoint, a standard codec, a barrel) or re-derives a pattern already defined elsewhere — these are `architect-base` §10's "skip detail" cases, not design judgment. Flag a `**Rationale:**` that only restates its `**Invariant:**`, and any `**Verified by:**` string repeated verbatim across rules. Owner: "collapse to a reference / drop the restatement." Do **not** flag deliberate depth on architecturally significant or novel work (§10 "invest detail").
 
 ## Output format (compact, no rewrites)
 

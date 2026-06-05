@@ -185,6 +185,8 @@ When an ADR is superseded:
 
 The superseded ADR remains in the project as historical record — it is never deleted.
 
+> **Live-state deployments override this.** Under the event-sourced / No-BC model (this repo — see the `CLAUDE.md` / `AGENTS.md` bootstrap doctrine), the read model carries only live state: the superseded record is **consolidated in place or deleted**, not retained — "what did we replace?" is a `git log` question, with no `@architect-adr-supersedes` / `@architect-adr-superseded-by` edges. The supersession mechanism above is the append-only model; a live-state deployment deletes instead. Consistent with `08-spec-evolution.md`, which deletes ephemeral specs rather than marking them superseded.
+
 ## Quality Criteria
 
 ADRs MUST be:

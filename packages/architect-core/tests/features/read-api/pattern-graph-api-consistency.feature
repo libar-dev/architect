@@ -21,8 +21,8 @@ Feature: PatternGraphAPI tells a mutually-consistent story
   underlying truth, so the kernel becomes correct-by-guardrail instead of
   correct-by-accident. The fixture graph is built by the real
   `transformToPatternGraph` pipeline so every derived view (counts,
-  buckets, phases, quarters, roles, the relationship index) is genuinely
-  computed, not hand-rigged.
+  buckets, roles, the relationship index) is genuinely computed, not
+  hand-rigged.
 
   Background: A representative graph derived by the real pipeline
     Given a representative pattern graph derived through the transform pipeline
@@ -131,17 +131,17 @@ Feature: PatternGraphAPI tells a mutually-consistent story
       And the three transition methods agree on the transition
 
     @acceptance-criteria @happy-path
-    Scenario: Protection info reflects the terminal state as hard-locked
+    Scenario: Protection info reflects completed as advisory-warning protection
       When I read the protection info for "completed"
       Then the protection level is "hard"
-      And the protection info requires an unlock
+      And the protection info emits an unlock-suppressible warning
       And the protection info forbids adding deliverables
 
     @acceptance-criteria @happy-path
-    Scenario: Protection info reflects an editable state as unlocked
+    Scenario: Protection info reflects an editable state as warning-free
       When I read the protection info for "roadmap"
       Then the protection level is "none"
-      And the protection info does not require an unlock
+      And the protection info does not emit an unlock-suppressible warning
       And the protection info allows adding deliverables
 
   Rule: Relationship reverse edges stay consistent with the canonical index
@@ -174,50 +174,23 @@ Feature: PatternGraphAPI tells a mutually-consistent story
       Then the related patterns equal the relationship seeAlso edges
       And the api references equal the relationship apiRef edges
 
-  Rule: Phase and quarter rollups never exceed the whole
+  Rule: Completed-patterns returns only completed patterns within the limit
 
-    Active phases are a subset of all phases, every per-phase and
-    per-quarter count is bounded by the grand total, and `getPhaseProgress`
-    agrees with the patterns `getPatternsByPhase` returns.
+    `getCompletedPatterns` must return only completed patterns, respect the
+    requested limit, and order them deterministically by pattern name. The
+    completion-date field is retired (ADR-013) — completion order lives in git,
+    not the read model, so no calendar or ordinal recency is modeled; the
+    accessor name reflects name-order, not recency.
 
-    **Invariant:** getActivePhases() ⊆ getAllPhases(); phase/quarter totals ≤ grand total; getPhaseProgress(p).total == getPatternsByPhase(p).length.
-    **Verified by:** getActivePhases, getAllPhases, getPatternsByPhase, getPhaseProgress, getQuarters.
-
-    @acceptance-criteria @happy-path
-    Scenario: Active phases are a subset of all phases
-      When I read the active phases
-      Then every active phase appears among all phases
-      And every active phase has at least one active pattern
+    **Invariant:** every result is completed; length ≤ limit; ordered by pattern name ascending.
+    **Verified by:** getCompletedPatterns, getPatternsByNormalizedStatus.
 
     @acceptance-criteria @happy-path
-    Scenario: Phase and quarter rollups are bounded by the grand total
-      When I read the status counts
-      Then no phase total exceeds the grand total
-      And every phase bucket partitions its own total
-      And no quarter total exceeds the grand total
-      And every quarter total equals its pattern-list length
-
-    @acceptance-criteria @happy-path
-    Scenario: Phase progress agrees with the phase patterns
-      When I read the status counts
-      Then each phase progress total equals its pattern count
-      And each phase progress completed count equals its bucket completed count
-
-  Rule: Recently-completed returns only completed patterns within the limit
-
-    `getRecentlyCompleted` must return only completed patterns, respect the
-    requested limit, and order them by completion date descending.
-
-    **Invariant:** every result is completed; length ≤ limit; ordered by completed date descending.
-    **Verified by:** getRecentlyCompleted, getPatternsByNormalizedStatus.
-
-    @acceptance-criteria @happy-path
-    Scenario: Recently-completed respects the limit and reports only completed patterns
-      When I read the 2 most recently completed patterns
+    Scenario: Completed-patterns respects the limit and reports only completed patterns
+      When I read the first 2 completed patterns in name order
       Then at most 2 patterns are returned
       And every returned pattern is in the completed bucket
-      And every returned pattern has a completed date
-      And the returned patterns are ordered by completed date descending
+      And the returned patterns are ordered by pattern name ascending
 
   Rule: The tag-usage oracle agrees with the status counters
 

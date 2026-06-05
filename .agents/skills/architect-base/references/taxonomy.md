@@ -48,7 +48,7 @@ Tags fall into a handful of purpose categories. The per-tag detail lives in the 
 - **Forward link** — `@architect-executable-specs` (design spec → executable feature).
 - **Enrichment** (production TS, additive) — `@architect-usecase`, `@architect-enforces-decision` (the structured pattern→ADR edge), `@architect-target` (stub pointer), `@architect-shape` (marks an exported declaration — interface/type/enum/const/function — for API-reference extraction).
 - **Audit** — `@architect-unlock-reason` (≥10 chars, required for non-standard FSM transitions).
-- **ADR authoring** — the `@architect-adr*` family (`adr`, `adr-status`, `adr-category`, `adr-theme`, `adr-layer`, `adr-supersedes`, `adr-superseded-by`) on decision records. `@architect-adr-theme` (`persistence · isolation · commands · projections · coordination · taxonomy · testing`) and `@architect-adr-layer` (`foundation · infrastructure · refinement`) are constrained enums — confirm a legal value via `pnpm architect:query taxonomy --format json`, never guess. They are the synthesis input the `documentation architecture` (by-theme / layered) and `documentation design-review` (by-theme / by-layer) lenses group on, so "which decisions cluster around projections?" is one lens query, not a grep.
+- **ADR authoring** — the `@architect-adr*` family (`adr`, `adr-status`, `adr-category`, `adr-theme`, `adr-layer`, `adr-supersedes`, `adr-superseded-by`) on decision records. (The `adr-supersedes` / `adr-superseded-by` pair is supersession metadata — **not authored during bootstrap**: the replaced record is deleted in place, and "what did we replace?" is a `git log` question.) `@architect-adr-theme` (`persistence · isolation · commands · projections · coordination · taxonomy · testing`) and `@architect-adr-layer` (`foundation · infrastructure · refinement`) are constrained enums — confirm a legal value via `pnpm architect:query taxonomy --format json`, never guess. They are the synthesis input the `documentation architecture` (by-theme / layered) and `documentation design-review` (by-theme / by-layer) lenses group on, so "which decisions cluster around projections?" is one lens query, not a grep.
 - **Aggregation** — doc-assembly tags (`@architect-overview`, `@architect-decision`, `@architect-intro`).
 
 `@architect-maturity` is **derived from status** (ADR-007: `idea` = consideration, `plan` = delivery); an explicit value always wins (§04). The **one place an explicit tag is _required_** is the idea tier (`@architect-maturity:idea` — the guard's idea-tier opt-in; without it an `architect/specs/ideas/` file is not recognized as idea-tier). Promotion to candidate **drops** that explicit tag (maturity then derives to `idea` from `status:candidate` — still consideration); `roadmap`+ derives `plan`/`design`. Explicit overrides are permitted elsewhere but rarely needed. See [`./four-tier-ladder.md`](./four-tier-ladder.md) § "Effective maturity".
@@ -59,7 +59,7 @@ The generated `docs-live/TAXONOMY.md` and the `taxonomy` digest project the **va
 
 <!-- architect:gen taxonomy-tag-count begin -->
 
-The validation registry currently defines **8 roles**, **22 metadata tags**, and **3 aggregation tags** (**33 total**).
+The validation registry currently defines **8 roles**, **21 metadata tags**, and **3 aggregation tags** (**32 total**).
 
 <!-- architect:gen taxonomy-tag-count end -->
 

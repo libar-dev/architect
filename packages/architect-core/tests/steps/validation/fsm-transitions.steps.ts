@@ -53,12 +53,37 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
       });
     });
 
-    RuleScenario('Completed is terminal with no outgoing transition', ({ When, Then }) => {
+    RuleScenario('Completed reopens to active or roadmap', ({ Then, And }) => {
+      Then('the transition from "completed" to "active" is valid', () => {
+        expect(validateTransition('completed', 'active').valid).toBe(true);
+      });
+      And('the transition from "completed" to "roadmap" is valid', () => {
+        expect(validateTransition('completed', 'roadmap').valid).toBe(true);
+      });
+    });
+
+    RuleScenario('Completed reopen targets are active and roadmap', ({ When, Then }) => {
       When('I request the valid transitions from "completed"', () => {
         state!.validTransitions = getValidTransitionsFrom('completed');
       });
-      Then('there are no valid transitions', () => {
-        expect(state!.validTransitions).toEqual([]);
+      Then('the valid transitions are "active, roadmap"', () => {
+        expect(state!.validTransitions).toEqual(['active', 'roadmap']);
+      });
+    });
+
+    RuleScenario('Completed does not transition to deferred', ({ When, Then, And }) => {
+      When('I validate the transition from "completed" to "deferred"', () => {
+        state!.result = validateTransition('completed', 'deferred');
+      });
+      Then('the transition result is invalid', () => {
+        expect(state!.result!.valid).toBe(false);
+      });
+      And('the valid alternatives equal the valid transitions from "completed"', () => {
+        expect(state!.result!.valid).toBe(false);
+        if (state!.result!.valid) {
+          return;
+        }
+        expect(state!.result!.validAlternatives).toEqual(getValidTransitionsFrom('completed'));
       });
     });
   });

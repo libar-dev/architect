@@ -44,9 +44,6 @@ export type { GherkinRule, GherkinScenario } from './validation-schemas/feature.
 export type { ScenarioDataTable, ScenarioStep } from './validation-schemas/scenario-ref.js';
 export type { PropertyDoc } from './validation-schemas/extracted-shape.js';
 export {
-  CANONICAL_PHASES,
-  CANONICAL_PHASE_NAMES,
-  CANONICAL_PHASE_ORDINALS,
   formatWorkflowLoadError,
   loadDefaultWorkflow,
   loadWorkflowFromPath,
@@ -115,7 +112,6 @@ export {
   PATTERN_LIST_FORMAT,
   PRIORITY_VALUES,
   PROCESS_STATUS_VALUES,
-  QUARTER_PATTERN,
   PRD_FEATURES_GROUP_BY,
   PR_CHANGES_SORT_BY,
   REMAINING_WORK_GROUP_BY,
@@ -124,7 +120,6 @@ export {
   SEVERITY_TYPES,
   SESSION_FINDINGS_GROUP_BY,
   STATUS_NORMALIZATION_MAP,
-  TIMELINE_GROUP_BY,
   VALID_DELIVERABLE_STATUS_SET,
   VALID_ACCEPTED_STATUS_SET,
   VALID_PROCESS_STATUS_SET,
@@ -184,7 +179,6 @@ export {
   type SeverityType,
   type SessionFindingsGroupBy,
   type TagRegistry as CoreTagRegistry,
-  type TimelineGroupBy,
   type WorkflowValue,
 } from './taxonomy/index.js';
 export {

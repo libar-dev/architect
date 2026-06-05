@@ -2,7 +2,6 @@
 @architect-pattern:DataAPICLIErgonomics
 @architect-status:completed
 @architect-unlock-reason:Value-transfer-from-spec
-@architect-phase:25d
 @architect-product-area:DataAPI
 @cli @pattern-graph-cli @help
 Feature: Data API CLI Ergonomics - Performance and Interactive Mode

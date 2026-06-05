@@ -111,11 +111,11 @@ stheme() {
 # PLAN/GATE; here we actually exercise it.
 sgate() { Q scope-validate PatternGraphApi design; }
 # A lone `true` can't prove the gate actually decides — show a LEGAL and an ILLEGAL
-# transition side by side (roadmap->active allowed; completed->active rejected) so the
-# deterministic hard yes/no is visible.
+# transition side by side (roadmap->active allowed; roadmap->completed rejected, must go
+# through active) so the deterministic hard yes/no is visible.
 s7() {
   Q query isValidTransition roadmap active | jq '{from:"roadmap", to:"active", allowed:.data}' \
-    && Q query isValidTransition completed active | jq '{from:"completed", to:"active", allowed:.data}'
+    && Q query isValidTransition roadmap completed | jq '{from:"roadmap", to:"completed", allowed:.data}'
 }
 # Neighborhood fields live under `.data` (like s9). `-e` + the non-null guard make a
 # future regression to all-null output FAIL the smoke check instead of passing on exit 0.

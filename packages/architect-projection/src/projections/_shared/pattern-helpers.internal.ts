@@ -113,7 +113,6 @@ export function createPatternSummaryFragment(
     role: pattern.role ?? '',
     file: pattern.source.file,
     source: deriveSource(pattern.source.file),
-    ...(pattern.phase !== undefined ? { phase: pattern.phase } : {}),
     ...(packageId !== undefined ? { package: packageId } : {}),
   };
 
@@ -171,7 +170,6 @@ export function normalizeDeliverables(pattern: ExtractedPattern): EmbeddedDelive
     tests: [...testRefs],
     location: deliverable.location,
     ...(deliverable.finding !== undefined ? { finding: deliverable.finding } : {}),
-    ...(deliverable.release !== undefined ? { release: deliverable.release } : {}),
   }));
 }
 

@@ -116,7 +116,6 @@ describeFeature(feature, ({ Rule }) => {
             createTestPattern({
               name: 'OrderSaga',
               status: 'roadmap',
-              phase: 22,
               role: 'agent',
               filePath: 'architect/specs/order-saga.feature',
               description: 'Orchestrates order lifecycle.',
@@ -169,7 +168,6 @@ describeFeature(feature, ({ Rule }) => {
             createTestPattern({
               name: 'ProcessGuard',
               status: 'active',
-              phase: 14,
               role: 'validation',
               filePath: 'architect/specs/process-guard.feature',
               description: 'Validates delivery workflow.',

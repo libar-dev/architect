@@ -43,7 +43,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               createPattern('CoreModule', {
                 status: 'active',
                 role: 'service',
-                phase: 1,
                 file: 'architect/specs/core-module.feature',
                 deliverables: [
                   {
@@ -57,7 +56,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               createPattern('HelperModule', {
                 status: 'active',
                 role: 'utility',
-                phase: 1,
                 file: 'architect/specs/helper-module.feature',
                 dependsOn: ['CoreModule'],
               }),

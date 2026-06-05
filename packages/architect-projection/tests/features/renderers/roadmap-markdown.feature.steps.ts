@@ -16,7 +16,7 @@ import {
 interface RoadmapMarkdownState {
   context: ProjectionContext | null;
   bundle: ProjectionBundle<Fragment> | null;
-  rendered: Record<string, string> | null;
+  rendered: string | null;
 }
 
 const feature = await loadFeature('tests/features/renderers/roadmap-markdown.feature');
@@ -42,78 +42,52 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
     });
   });
 
-  Rule('Roadmap documentation bundles stay routed and quarter-grouped', ({ RuleScenario }) => {
+  Rule('Roadmap documentation bundles stay routed as a flat pattern list', ({ RuleScenario }) => {
     RuleScenario(
       'roadmap documentation bundle renders routed markdown files',
       ({ Given, When, Then, And }) => {
-        Given(
-          'a documentation projection context with roadmap and deferred quarter entries',
-          () => {
-            state!.context = createProjectionContext({
-              patterns: [
-                createPattern('RoadmapAlpha', {
-                  status: 'roadmap',
-                  phase: 16,
-                  quarter: 'Q1 2026',
-                }),
-                createPattern('RoadmapBeta', {
-                  status: 'deferred',
-                  phase: 17,
-                  quarter: 'Q2 2026',
-                }),
-                createPattern('ActiveNoise', {
-                  status: 'active',
-                  phase: 18,
-                  quarter: 'Q3 2026',
-                }),
-              ],
-            });
-          },
-        );
+        Given('a documentation projection context with roadmap and deferred patterns', () => {
+          state!.context = createProjectionContext({
+            patterns: [
+              createPattern('RoadmapAlpha', {
+                status: 'roadmap',
+              }),
+              createPattern('RoadmapBeta', {
+                status: 'deferred',
+              }),
+              createPattern('ActiveNoise', {
+                status: 'active',
+              }),
+            ],
+          });
+        });
 
         When('I project and render the roadmap documentation bundle as markdown', () => {
           state!.bundle = parseAndProjectDocumentationBundle(state!.context!, {
             documentType: 'roadmap',
           });
           const rendered = renderMarkdown(state!.bundle!);
-          expect(typeof rendered).toBe('object');
-          expect(rendered).not.toBeNull();
+          expect(typeof rendered).toBe('string');
 
-          if (typeof rendered === 'string') {
-            throw new Error('Expected roadmap markdown rendering to return routed files.');
+          if (typeof rendered !== 'string') {
+            throw new Error('Expected roadmap markdown rendering to return a single document.');
           }
 
           state!.rendered = rendered;
         });
 
-        Then(
-          'the routed markdown output should include the roadmap root and quarter child files',
-          () => {
-            expect(Object.keys(state!.rendered ?? {})).toEqual([
-              'ROADMAP.md',
-              'roadmap/q1-2026.md',
-              'roadmap/q2-2026.md',
-            ]);
-          },
-        );
+        Then('the routed markdown output should include the roadmap root file', () => {
+          expect(typeof state!.rendered).toBe('string');
+          expect(state!.rendered).toContain('# Roadmap');
+        });
 
-        And('the roadmap root markdown should summarize the roadmap quarters', () => {
-          const root = state!.rendered?.['ROADMAP.md'];
-          expect(root).toContain('# Roadmap');
-          expect(root).toContain('Quarter-grouped roadmap timeline covering 2 quarters.');
-          expect(root).toContain('## Q1 2026');
-          expect(root).toContain('## Q2 2026');
+        And('the roadmap root markdown should summarize the roadmap patterns', () => {
+          const root = state!.rendered ?? '';
+          expect(root).toContain('Roadmap timeline covering 2 patterns.');
           expect(root).toContain('RoadmapAlpha');
           expect(root).toContain('RoadmapBeta');
           expect(root).not.toContain('ActiveNoise');
-        });
-
-        And('the roadmap child markdown should retain the quarter pattern details', () => {
-          const child = state!.rendered?.['roadmap/q1-2026.md'];
-          expect(child).toContain('# Roadmap');
-          expect(child).toContain('## Q1 2026');
-          expect(child).toContain('RoadmapAlpha');
-          expect(child).toContain('packages/architect-projection/fixtures/RoadmapAlpha.ts');
+          expect(root).toContain('packages/architect-projection/fixtures/RoadmapAlpha.ts');
         });
       },
     );

@@ -2,7 +2,6 @@
 @architect-pattern:PatternGraphAPICLI
 @architect-status:completed
 @architect-unlock-reason:Split-from-original
-@architect-phase:24
 @architect-product-area:DataAPI
 @cli @pattern-graph-cli
 Feature: Pattern Graph CLI - Core Infrastructure
@@ -232,9 +231,9 @@ Feature: Pattern Graph CLI - Core Infrastructure
     **Rationale:** Real-world invocations via pnpm pass `--` separators and numeric strings; mishandling these causes silent data loss or crashes in automated workflows.
 
     @edge-case
-    Scenario: Integer arguments are coerced for phase queries
+    Scenario: Integer arguments are coerced for limit queries
       Given TypeScript files with pattern annotations
-      When running "pattern-graph-cli -i 'src/**/*.ts' query getPatternsByPhase 1"
+      When running "pattern-graph-cli -i 'src/**/*.ts' query getCompletedPatterns 1"
       Then exit code is 0
 
     @edge-case

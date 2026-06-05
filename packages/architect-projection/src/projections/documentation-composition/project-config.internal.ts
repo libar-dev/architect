@@ -52,7 +52,6 @@ export function buildProjectConfigSnapshot(
     ]),
     buildTimeMs: options.buildTimeMs,
     patternCount: context.graph.patterns.length,
-    phaseCount: context.graph.phaseCount,
     roleCount: context.graph.roleCount,
     ...(resolveProjectName(context, options.projectName) !== undefined
       ? { projectName: resolveProjectName(context, options.projectName) }

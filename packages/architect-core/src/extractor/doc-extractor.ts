@@ -243,7 +243,6 @@ export function buildPattern(
     ...(directive.boundedContext !== undefined && { boundedContext: directive.boundedContext }),
     ...(directive.whenToUse !== undefined && { whenToUse: directive.whenToUse }),
     ...(directive.uses !== undefined && directive.uses.length > 0 && { uses: directive.uses }),
-    ...(directive.phase !== undefined && { phase: directive.phase }),
     ...(directive.level !== undefined && { level: directive.level }),
     ...(directive.parent !== undefined && { parent: directive.parent }),
     ...(directive.implements !== undefined &&

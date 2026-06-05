@@ -7,13 +7,12 @@
 @architect-pattern:ADR002GherkinOnlyTesting
 @architect-status:completed
 @architect-unlock-reason:Add-process-workflow-include-tag
-@architect-completed:2026-01-07
 @architect-product-area:Process
 Feature: ADR-002 - Gherkin-Only Testing Policy
 
   **Context:**
   A package that generates documentation from `.feature` files had dual
-  test approaches: 97 legacy `.test.ts` files alongside Gherkin features.
+  test approaches: legacy `.test.ts` files alongside Gherkin features.
   This undermined the core thesis that Gherkin IS sufficient for all testing.
 
   **Decision:**
@@ -29,15 +28,6 @@ Feature: ADR-002 - Gherkin-Only Testing Policy
   | Positive | Living documentation always matches test coverage |
   | Positive | Forces better scenario design with Examples tables |
   | Negative | Scenario Outline syntax more verbose than parameterized tests |
-
-  # ===========================================================================
-  # DELIVERABLES
-  # ===========================================================================
-
-  Background: Deliverables
-    Given the following deliverables:
-      | Deliverable | Status | Location |
-      | Policy definition in CLAUDE.md | complete | CLAUDE.md |
 
   # ===========================================================================
   # RULE 1: Source-Driven Process Benefit

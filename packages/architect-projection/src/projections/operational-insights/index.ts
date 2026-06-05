@@ -325,22 +325,6 @@ export function buildOverviewDigest(context: ProjectionContext): OverviewDigest 
       candidate: counts.candidate,
       percentage: total > 0 ? Math.round((counts.completed / total) * 100) : 0,
     },
-    activePhases: context.graph.byPhase
-      .map((group) => {
-        const phasePatterns = filterPatterns(group.patterns, context.projectionFilter);
-        return {
-          group,
-          phasePatterns,
-          counts: createStatusCounts(phasePatterns),
-        };
-      })
-      .filter(({ counts }) => counts.active > 0)
-      .map((group) => ({
-        phase: group.group.phaseNumber,
-        name: group.group.phaseName,
-        patternCount: group.phasePatterns.length,
-        activeCount: group.counts.active,
-      })),
     blocking,
     orientation,
     roleDistribution: buildRoleDistribution(patterns),
@@ -405,9 +389,7 @@ export function buildTagUsageMatrix(context: ProjectionContext): TagUsageMatrix 
     if (pattern.boundedContext !== undefined)
       incrementTagUsage(tagMap, 'arch-context', pattern.boundedContext);
     if (pattern.adrLayer !== undefined) incrementTagUsage(tagMap, 'arch-layer', pattern.adrLayer);
-    if (pattern.phase !== undefined) incrementTagUsage(tagMap, 'phase', String(pattern.phase));
     if (pattern.priority !== undefined) incrementTagUsage(tagMap, 'priority', pattern.priority);
-    if (pattern.quarter !== undefined) incrementTagUsage(tagMap, 'quarter', pattern.quarter);
     if (pattern.team !== undefined) incrementTagUsage(tagMap, 'team', pattern.team);
     if (pattern.effort !== undefined) incrementTagUsage(tagMap, 'effort', pattern.effort);
   }
@@ -561,12 +543,8 @@ function patternSatisfiesTag(
     case 'arch-layer':
     case 'layer':
       return hasNonEmptyString(pattern.adrLayer);
-    case 'phase':
-      return pattern.phase !== undefined;
     case 'priority':
       return hasNonEmptyString(pattern.priority);
-    case 'quarter':
-      return hasNonEmptyString(pattern.quarter);
     case 'team':
       return hasNonEmptyString(pattern.team);
     case 'effort':
@@ -583,10 +561,6 @@ function patternSatisfiesTag(
       return hasNonEmptyString(pattern.workflow);
     case 'risk':
       return hasNonEmptyString(pattern.risk);
-    case 'release':
-      return hasNonEmptyString(pattern.release);
-    case 'completed':
-      return hasNonEmptyString(pattern.completed);
     case 'target-path':
       return hasNonEmptyString(pattern.targetPath);
     case 'since':
@@ -942,16 +916,15 @@ export function projectAnnotationCoverage(
  * ## Overview projection
  *
  * **Value:** Assembles the canonical `architect_overview` payload — delivery
- * progress, active phases, blocked patterns, a high-level architecture glimpse,
- * and the CLI-hints block — as an `OverviewDigest` fragment that session-start
+ * progress, blocked patterns, a high-level architecture glimpse, and the
+ * CLI-hints block — as an `OverviewDigest` fragment that session-start
  * workflows consume directly.
  *
  * **Invariant:** `progress` always excludes candidates from the total;
- * `activePhases` only lists phases with `active > 0`; `blocking` only lists
- * non-complete patterns whose `dependsOn` targets are themselves not
- * complete; the `architecture` glimpse derives from one component-scope graph
- * walk (test-features + decision-records excluded); `cliHints` is a copy of the
- * shared bootstrap list.
+ * `blocking` only lists non-complete patterns whose `dependsOn` targets are
+ * themselves not complete; the `architecture` glimpse derives from one
+ * component-scope graph walk (test-features + decision-records excluded);
+ * `cliHints` is a copy of the shared bootstrap list.
  *
  * **Behavior:**
  * - Pulls `graph.counts` for the delivery-total progress block, rounding the
@@ -1350,8 +1323,8 @@ export function projectSourceInventoryDigest(
  *
  * **Value:** Produces a `TagUsageMatrix` that counts every metadata-tag
  * value across the pattern graph — status, role, arch-context, arch-layer,
- * phase, priority, quarter, team, effort — so dashboards can surface
- * dominant conventions and outliers at a glance.
+ * priority, team, effort — so dashboards can surface dominant conventions
+ * and outliers at a glance.
  *
  * **Invariant:** Every pattern contributes exactly one increment per
  * populated tag; tag entries and per-value lists are sorted by count
@@ -1361,9 +1334,7 @@ export function projectSourceInventoryDigest(
  * **Behavior:**
  * - Walks `graph.patterns` once, incrementing the `(tag, value)` counter
  *   only when a field is populated (e.g. skipping a pattern with no
- *   `quarter`).
- * - Stringifies numeric phase values so the matrix stays homogeneous,
- *   allowing renderers to treat every tag value as a string key.
+ *   `team`).
  * - Sorts tag and value lists with a deterministic
  *   count-then-alphabetical comparator so outputs are reproducible across
  *   runs.

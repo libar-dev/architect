@@ -38,7 +38,6 @@ type ExtractedRule = NonNullable<ExtractedPattern['rules']>[number];
 type ScopedRuleSet =
   | Extract<BusinessRuleSet, { scope: 'package' }>
   | Extract<BusinessRuleSet, { scope: 'product-area' }>
-  | Extract<BusinessRuleSet, { scope: 'phase' }>
   | Extract<BusinessRuleSet, { scope: 'feature' }>;
 
 type BusinessRuleGrouping = NonNullable<BusinessRuleSetOptions['groupedBy']>;
@@ -65,12 +64,6 @@ export const BusinessRuleSetOptionsSchema = z
     z.strictObject({
       scope: z.literal('product-area'),
       scopeValue: z.string(),
-      groupedBy: BusinessRuleGroupingSchema.optional(),
-      onlyInvariants: z.boolean().optional(),
-    }),
-    z.strictObject({
-      scope: z.literal('phase'),
-      scopeValue: z.number().int(),
       groupedBy: BusinessRuleGroupingSchema.optional(),
       onlyInvariants: z.boolean().optional(),
     }),
@@ -136,13 +129,6 @@ export function buildBusinessRuleSet(
   // Ungrouped: a single flat rule set with no child routing.
   if (groupedBy === undefined) {
     return projectSingle(createBusinessRuleSetRoot(options, rules));
-  }
-
-  if (groupedBy === 'phase' && rules.some((rule) => rule.phase === undefined)) {
-    throw new ProjectionError(
-      'INVALID_SCOPE',
-      'Cannot group business rules by phase when one or more projected rules have no phase.',
-    );
   }
 
   return buildGroupedRoutedBundle<BusinessRule, BusinessRuleSet>({
@@ -308,7 +294,6 @@ function createBusinessRuleFragment(
     verifiedBy: deduplicateScenarioNames(rule.scenarioNames, annotations.verifiedBy),
     scenarioCount: rule.scenarioCount,
     pattern: getPatternName(pattern),
-    ...(pattern.phase !== undefined ? { phase: pattern.phase } : {}),
     productArea: pattern.productArea ?? DEFAULT_PRODUCT_AREA,
   };
 }
@@ -327,8 +312,6 @@ function filterBusinessRules(
       );
     case 'package':
       return [...rules];
-    case 'phase':
-      return rules.filter((rule) => rule.phase === options.scopeValue);
     case 'feature': {
       if (options.featureMatch === 'path') {
         return [...rules];
@@ -373,15 +356,6 @@ function createBusinessRuleSetRoot(
         ...(options.groupedBy !== undefined ? { groupedBy: options.groupedBy } : {}),
         ...(groupingEntries !== undefined ? { groupingEntries } : {}),
       };
-    case 'phase':
-      return {
-        kind: 'BusinessRuleSet',
-        scope: 'phase',
-        scopeValue: options.scopeValue,
-        rules: [...rules],
-        ...(options.groupedBy !== undefined ? { groupedBy: options.groupedBy } : {}),
-        ...(groupingEntries !== undefined ? { groupingEntries } : {}),
-      };
     case 'feature':
       return {
         kind: 'BusinessRuleSet',
@@ -410,8 +384,6 @@ function businessRuleGroupKey(rule: BusinessRule, groupedBy: BusinessRuleGroupin
       return slugify(rule.package);
     case 'product-area':
       return slugify(rule.productArea ?? DEFAULT_PRODUCT_AREA);
-    case 'phase':
-      return `phase-${String(rule.phase)}`;
     case 'feature':
       return slugify(rule.feature);
   }
@@ -419,9 +391,7 @@ function businessRuleGroupKey(rule: BusinessRule, groupedBy: BusinessRuleGroupin
 
 /**
  * The group's deterministic ordering key and human-facing label, both derived
- * from its first-seen rule. They coincide for every axis except `phase`, where
- * the sort key is the stable `phase-N` route segment but the label is the bare
- * phase number.
+ * from its first-seen rule.
  */
 function businessRuleGroupFacets(
   group: GroupDescriptor<BusinessRule>,
@@ -437,8 +407,6 @@ function businessRuleGroupFacets(
       const value = first?.productArea ?? DEFAULT_PRODUCT_AREA;
       return { sortKey: value, label: value };
     }
-    case 'phase':
-      return { sortKey: group.key, label: String(first?.phase ?? 0) };
     case 'feature': {
       const value = first?.feature ?? '';
       return { sortKey: value, label: value };
@@ -471,14 +439,6 @@ function createScopedBusinessRuleSet(
         kind: 'BusinessRuleSet',
         scope: 'product-area',
         scopeValue: first?.productArea ?? DEFAULT_PRODUCT_AREA,
-        rules,
-        ...groupedByField,
-      };
-    case 'phase':
-      return {
-        kind: 'BusinessRuleSet',
-        scope: 'phase',
-        scopeValue: first?.phase ?? 0,
         rules,
         ...groupedByField,
       };
@@ -523,7 +483,6 @@ function compareBusinessRules(left: BusinessRule, right: BusinessRule): number {
         left.productArea ?? DEFAULT_PRODUCT_AREA,
         right.productArea ?? DEFAULT_PRODUCT_AREA,
       ),
-      (left.phase ?? Number.MAX_SAFE_INTEGER) - (right.phase ?? Number.MAX_SAFE_INTEGER),
       BASE_COLLATOR.compare(left.feature, right.feature),
       BASE_COLLATOR.compare(left.ruleName, right.ruleName),
     ].find((value) => value !== 0) ?? 0

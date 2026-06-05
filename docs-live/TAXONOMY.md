@@ -7,14 +7,14 @@
 
 ## Overview
 
-**8 roles** | **22 metadata tags** | **3 aggregation tags** | **33 total**
+**8 roles** | **21 metadata tags** | **3 aggregation tags** | **32 total**
 
 | Component        | Count |
 | ---------------- | ----- |
 | Roles            | 8     |
-| Metadata Tags    | 22    |
+| Metadata Tags    | 21    |
 | Aggregation Tags | 3     |
-| Total            | 33    |
+| Total            | 32    |
 
 ## Roles
 
@@ -54,12 +54,6 @@
 | ----------------- | ------ | ----------------------------------------------------------------------- | -------- | ---------- | -------------------------------------------------------------------------- | ------------- | --------------------------------------------- |
 | `bounded-context` | value  | Canonical bounded-context grouping for structural and subgraph views    | No       | No         |                                                                            |               | @architect-bounded-context delivery-reporting |
 | `role`            | value  | Canonical role tag for pattern classification and architecture grouping | No       | No         | barrel, codec, contract, decider, projection, read-model, service, utility |               | @architect-role projection                    |
-
-### Timeline Tags
-
-| Tag         | Format | Purpose                             | Required | Repeatable | Values | Default Value | Example                         |
-| ----------- | ------ | ----------------------------------- | -------- | ---------- | ------ | ------------- | ------------------------------- |
-| `completed` | value  | Completion date (YYYY-MM-DD format) | No       | No         |        |               | @architect-completed 2026-01-08 |
 
 ### PRD Tags
 

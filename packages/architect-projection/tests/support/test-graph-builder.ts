@@ -33,10 +33,6 @@ export interface PatternStubOptions {
   readonly status?: ExtractedPattern['status'];
   readonly maturity?: PatternMaturity;
   readonly role?: ExtractedPattern['role'];
-  readonly phase?: ExtractedPattern['phase'];
-  readonly quarter?: ExtractedPattern['quarter'];
-  readonly release?: ExtractedPattern['release'];
-  readonly completed?: ExtractedPattern['completed'];
   readonly file?: string;
   readonly description?: string;
   readonly boundedContext?: ExtractedPattern['boundedContext'];
@@ -80,7 +76,6 @@ export interface PatternStubOptions {
 export interface GraphBuilderOptions {
   readonly patterns: readonly ExtractedPattern[];
   readonly tagRegistry: TagRegistry;
-  readonly phaseNames?: Record<number, string> | undefined;
   readonly relationshipIndex?: Record<string, RelationshipEntry> | undefined;
   readonly includeArchIndex?: boolean;
 }
@@ -117,10 +112,6 @@ export function buildPatternStub(name: string, options: PatternStubOptions = {})
     exports: [],
     extractedAt: '2026-04-19T00:00:00.000Z',
     status: options.status ?? 'active',
-    ...(options.phase !== undefined ? { phase: options.phase } : {}),
-    ...(options.quarter !== undefined ? { quarter: options.quarter } : {}),
-    ...(options.release !== undefined ? { release: options.release } : {}),
-    ...(options.completed !== undefined ? { completed: options.completed } : {}),
     ...(options.boundedContext !== undefined || options.archContext !== undefined
       ? { boundedContext: options.boundedContext ?? options.archContext }
       : {}),
@@ -178,21 +169,12 @@ export function buildPatternStub(name: string, options: PatternStubOptions = {})
 }
 
 export function buildGraphFromPatterns(options: GraphBuilderOptions): PatternGraph {
-  const {
-    patterns,
-    tagRegistry,
-    phaseNames = {},
-    relationshipIndex,
-    includeArchIndex = false,
-  } = options;
+  const { patterns, tagRegistry, relationshipIndex, includeArchIndex = false } = options;
   const completed = patterns.filter((pattern) => pattern.status === 'completed');
   const active = patterns.filter((pattern) => pattern.status === 'active');
   const roadmap = patterns.filter((pattern) => pattern.status === 'roadmap');
   const deferred = patterns.filter((pattern) => pattern.status === 'deferred');
   const candidate = patterns.filter((pattern) => pattern.status === 'candidate');
-  const phases = patterns
-    .map((pattern) => pattern.phase)
-    .filter((phase): phase is number => phase !== undefined);
   const roles = patterns
     .map((pattern) => pattern.role)
     .filter((role): role is string => role !== undefined && role.length > 0);
@@ -217,8 +199,6 @@ export function buildGraphFromPatterns(options: GraphBuilderOptions): PatternGra
       candidate: [...candidate],
     },
     byMaturity,
-    byPhase: buildPhaseGroups(patterns, phaseNames),
-    byQuarter: buildQuarterGroups(patterns),
     byRole: buildRoleGroups(patterns),
     bySourceType: {
       typescript: patterns.filter((pattern) => !pattern.source.file.endsWith('.feature')),
@@ -240,7 +220,6 @@ export function buildGraphFromPatterns(options: GraphBuilderOptions): PatternGra
       candidate: patterns.filter((pattern) => pattern.status === 'candidate').length,
       total: patterns.length,
     },
-    phaseCount: new Set(phases).size,
     roleCount: new Set(roles).size,
     relationshipIndex: derivedRelationshipIndex,
     ...(includeArchIndex ? { archIndex: createArchIndex(patterns) } : {}),
@@ -261,55 +240,6 @@ function buildMaturityGroups(patterns: readonly ExtractedPattern[]): PatternGrap
   }
 
   return groups;
-}
-
-function buildPhaseGroups(
-  patterns: readonly ExtractedPattern[],
-  phaseNames: Record<number, string>,
-): PatternGraph['byPhase'] {
-  const grouped = new Map<number, ExtractedPattern[]>();
-
-  for (const pattern of patterns) {
-    if (pattern.phase === undefined) {
-      continue;
-    }
-
-    const bucket = grouped.get(pattern.phase) ?? [];
-    bucket.push(pattern);
-    grouped.set(pattern.phase, bucket);
-  }
-
-  return [...grouped.entries()]
-    .sort(([left], [right]) => left - right)
-    .map(([phaseNumber, phasePatterns]) => ({
-      phaseNumber,
-      phaseName: phaseNames[phaseNumber],
-      patterns: [...phasePatterns],
-      counts: {
-        completed: phasePatterns.filter((pattern) => isPatternComplete(pattern.status)).length,
-        active: phasePatterns.filter((pattern) => isPatternActive(pattern.status)).length,
-        planned: phasePatterns.filter((pattern) => isPatternPlanned(pattern.status)).length,
-        candidate: phasePatterns.filter((pattern) => pattern.status === 'candidate').length,
-        total: phasePatterns.length,
-      },
-    })) as PatternGraph['byPhase'];
-}
-
-function buildQuarterGroups(patterns: readonly ExtractedPattern[]): PatternGraph['byQuarter'] {
-  const grouped: Record<string, ExtractedPattern[]> = {};
-
-  for (const pattern of patterns) {
-    const quarter = pattern.quarter?.trim();
-    if (!quarter) {
-      continue;
-    }
-
-    const bucket = grouped[quarter] ?? [];
-    bucket.push(pattern);
-    grouped[quarter] = bucket;
-  }
-
-  return grouped;
 }
 
 function buildRoleGroups(patterns: readonly ExtractedPattern[]): PatternGraph['byRole'] {

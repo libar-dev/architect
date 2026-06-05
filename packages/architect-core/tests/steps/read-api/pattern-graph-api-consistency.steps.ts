@@ -32,11 +32,8 @@ const USED_PATTERN = 'BetaCore';
 interface PatternSpec {
   readonly name: string;
   readonly status: string;
-  readonly phase?: number;
-  readonly quarter?: string;
   readonly role?: string;
   readonly uses?: readonly string[];
-  readonly completed?: string;
   readonly seeAlso?: readonly string[];
   readonly apiRef?: readonly string[];
 }
@@ -66,11 +63,8 @@ function makePattern(spec: PatternSpec): ExtractedPattern {
     exports: [],
     extractedAt: '2026-01-01T00:00:00.000Z',
     status: spec.status,
-    ...(spec.phase !== undefined ? { phase: spec.phase } : {}),
-    ...(spec.quarter !== undefined ? { quarter: spec.quarter } : {}),
     ...(spec.role !== undefined ? { role: spec.role } : {}),
     ...(spec.uses !== undefined ? { uses: [...spec.uses] } : {}),
-    ...(spec.completed !== undefined ? { completed: spec.completed } : {}),
     ...(spec.seeAlso !== undefined ? { seeAlso: [...spec.seeAlso] } : {}),
     ...(spec.apiRef !== undefined ? { apiRef: [...spec.apiRef] } : {}),
   });
@@ -84,10 +78,7 @@ const REPRESENTATIVE_SPECS: readonly PatternSpec[] = [
   {
     name: USING_PATTERN,
     status: 'completed',
-    phase: 1,
-    quarter: '2026-Q1',
     role: 'service',
-    completed: '2026-01-10',
     uses: [USED_PATTERN],
     seeAlso: [USED_PATTERN],
     apiRef: ['AlphaCore.run'],
@@ -95,47 +86,33 @@ const REPRESENTATIVE_SPECS: readonly PatternSpec[] = [
   {
     name: USED_PATTERN,
     status: 'completed',
-    phase: 1,
-    quarter: '2026-Q1',
     role: 'utility',
-    completed: '2026-02-15',
   },
   {
     name: 'GammaCore',
     status: 'completed',
-    phase: 1,
-    quarter: '2026-Q1',
     role: 'utility',
-    completed: '2026-03-20',
   },
   {
     name: 'DeltaCore',
     status: 'completed',
-    phase: 2,
-    quarter: '2026-Q2',
     role: 'codec',
-    completed: '2026-04-01',
   },
   {
     name: 'EpsilonCore',
     status: 'completed',
-    phase: 2,
-    quarter: '2026-Q2',
     role: 'codec',
-    completed: '2026-05-05',
   },
   {
     name: 'ZetaCore',
     status: 'active',
-    phase: 2,
-    quarter: '2026-Q2',
     role: 'decider',
     uses: [USING_PATTERN],
   },
-  { name: 'EtaCore', status: 'active', phase: 3, quarter: '2026-Q3', role: 'decider' },
-  { name: 'ThetaCore', status: 'active', phase: 3, quarter: '2026-Q3', role: 'projection' },
-  { name: 'IotaCore', status: 'roadmap', phase: 3, quarter: '2026-Q3', role: 'projection' },
-  { name: 'KappaCore', status: 'deferred', phase: 4, quarter: '2026-Q4', role: 'contract' },
+  { name: 'EtaCore', status: 'active', role: 'decider' },
+  { name: 'ThetaCore', status: 'active', role: 'projection' },
+  { name: 'IotaCore', status: 'roadmap', role: 'projection' },
+  { name: 'KappaCore', status: 'deferred', role: 'contract' },
   { name: 'LambdaCore', status: 'candidate', role: 'barrel' },
   { name: 'MuCore', status: 'candidate', role: 'barrel' },
 ];
@@ -167,7 +144,7 @@ interface State {
   protection: ProtectionInfo | null;
   relationships: Map<string, PatternRelationships>;
   dependencies: Map<string, PatternDependencies>;
-  recentlyCompleted: ExtractedPattern[] | null;
+  completedPatterns: ExtractedPattern[] | null;
 }
 
 let state: State;
@@ -182,7 +159,7 @@ function freshState(specs: readonly PatternSpec[]): State {
     protection: null,
     relationships: new Map(),
     dependencies: new Map(),
-    recentlyCompleted: null,
+    completedPatterns: null,
   };
 }
 
@@ -456,7 +433,7 @@ describeFeature(feature, ({ Background, Rule }) => {
     );
 
     RuleScenario(
-      'Protection info reflects the terminal state as hard-locked',
+      'Protection info reflects completed as advisory-warning protection',
       ({ When, Then, And }) => {
         When('I read the protection info for {string}', (_ctx: unknown, status: string) => {
           state.protection = state.api.getProtectionInfo(status as ProcessStatusValue);
@@ -464,8 +441,8 @@ describeFeature(feature, ({ Background, Rule }) => {
         Then('the protection level is {string}', (_ctx: unknown, level: string) => {
           expect(state.protection?.level).toBe(level);
         });
-        And('the protection info requires an unlock', () => {
-          expect(state.protection?.requiresUnlock).toBe(true);
+        And('the protection info emits an unlock-suppressible warning', () => {
+          expect(state.protection?.unlockSuppressesWarning).toBe(true);
         });
         And('the protection info forbids adding deliverables', () => {
           expect(state.protection?.canAddDeliverables).toBe(false);
@@ -474,7 +451,7 @@ describeFeature(feature, ({ Background, Rule }) => {
     );
 
     RuleScenario(
-      'Protection info reflects an editable state as unlocked',
+      'Protection info reflects an editable state as warning-free',
       ({ When, Then, And }) => {
         When('I read the protection info for {string}', (_ctx: unknown, status: string) => {
           state.protection = state.api.getProtectionInfo(status as ProcessStatusValue);
@@ -482,8 +459,8 @@ describeFeature(feature, ({ Background, Rule }) => {
         Then('the protection level is {string}', (_ctx: unknown, level: string) => {
           expect(state.protection?.level).toBe(level);
         });
-        And('the protection info does not require an unlock', () => {
-          expect(state.protection?.requiresUnlock).toBe(false);
+        And('the protection info does not emit an unlock-suppressible warning', () => {
+          expect(state.protection?.unlockSuppressesWarning).toBe(false);
         });
         And('the protection info allows adding deliverables', () => {
           expect(state.protection?.canAddDeliverables).toBe(true);
@@ -559,105 +536,33 @@ describeFeature(feature, ({ Background, Rule }) => {
     },
   );
 
-  Rule('Phase and quarter rollups never exceed the whole', ({ RuleScenario }) => {
-    RuleScenario('Active phases are a subset of all phases', ({ When, Then, And }) => {
-      When('I read the active phases', () => undefined);
-      Then('every active phase appears among all phases', () => {
-        const allNumbers = new Set(state.api.getAllPhases().map((phase) => phase.phaseNumber));
-        for (const phase of state.api.getActivePhases()) {
-          expect(allNumbers.has(phase.phaseNumber)).toBe(true);
-        }
-      });
-      And('every active phase has at least one active pattern', () => {
-        for (const phase of state.api.getActivePhases()) {
-          expect(phase.counts.active).toBeGreaterThan(0);
-        }
-      });
-    });
-
-    RuleScenario(
-      'Phase and quarter rollups are bounded by the grand total',
-      ({ When, Then, And }) => {
-        When('I read the status counts', () => {
-          state.counts = state.api.getStatusCounts();
-        });
-        Then('no phase total exceeds the grand total', () => {
-          const total = requireCounts().total;
-          for (const phase of state.api.getAllPhases()) {
-            expect(phase.counts.total).toBeLessThanOrEqual(total);
-          }
-        });
-        And('every phase bucket partitions its own total', () => {
-          for (const phase of state.api.getAllPhases()) {
-            const { completed, active, planned, candidate, total } = phase.counts;
-            expect(completed + active + planned + candidate).toBe(total);
-          }
-        });
-        And('no quarter total exceeds the grand total', () => {
-          const total = requireCounts().total;
-          for (const quarter of state.api.getQuarters()) {
-            expect(quarter.counts.total).toBeLessThanOrEqual(total);
-          }
-        });
-        And('every quarter total equals its pattern-list length', () => {
-          for (const quarter of state.api.getQuarters()) {
-            expect(quarter.counts.total).toBe(quarter.patterns.length);
-          }
-        });
-      },
-    );
-
-    RuleScenario('Phase progress agrees with the phase patterns', ({ When, Then, And }) => {
-      When('I read the status counts', () => {
-        state.counts = state.api.getStatusCounts();
-      });
-      Then('each phase progress total equals its pattern count', () => {
-        for (const phase of state.api.getAllPhases()) {
-          const progress = state.api.getPhaseProgress(phase.phaseNumber);
-          expect(progress?.total).toBe(state.api.getPatternsByPhase(phase.phaseNumber).length);
-        }
-      });
-      And('each phase progress completed count equals its bucket completed count', () => {
-        for (const phase of state.api.getAllPhases()) {
-          const progress = state.api.getPhaseProgress(phase.phaseNumber);
-          expect(progress?.completed).toBe(phase.counts.completed);
-        }
-      });
-    });
-  });
-
   Rule(
-    'Recently-completed returns only completed patterns within the limit',
+    'Completed-patterns returns only completed patterns within the limit',
     ({ RuleScenario }) => {
       RuleScenario(
-        'Recently-completed respects the limit and reports only completed patterns',
+        'Completed-patterns respects the limit and reports only completed patterns',
         ({ When, Then, And }) => {
           When(
-            'I read the {number} most recently completed patterns',
+            'I read the first {number} completed patterns in name order',
             (_ctx: unknown, limit: number) => {
-              state.recentlyCompleted = state.api.getRecentlyCompleted(limit);
+              state.completedPatterns = state.api.getCompletedPatterns(limit);
             },
           );
           Then('at most {number} patterns are returned', (_ctx: unknown, limit: number) => {
-            expect(state.recentlyCompleted?.length ?? 0).toBeLessThanOrEqual(limit);
+            expect(state.completedPatterns?.length ?? 0).toBeLessThanOrEqual(limit);
           });
           And('every returned pattern is in the completed bucket', () => {
             const completedNames = new Set(
               state.api.getPatternsByNormalizedStatus('completed').map(patternName),
             );
-            for (const pattern of state.recentlyCompleted ?? []) {
+            for (const pattern of state.completedPatterns ?? []) {
               expect(completedNames.has(patternName(pattern))).toBe(true);
             }
           });
-          And('every returned pattern has a completed date', () => {
-            for (const pattern of state.recentlyCompleted ?? []) {
-              expect(pattern.completed).toBeDefined();
-            }
-          });
-          And('the returned patterns are ordered by completed date descending', () => {
-            const dates = (state.recentlyCompleted ?? []).map((pattern) => pattern.completed ?? '');
-            for (let index = 1; index < dates.length; index += 1) {
-              expect(dates[index - 1]! >= dates[index]!).toBe(true);
+          And('the returned patterns are ordered by pattern name ascending', () => {
+            const names = (state.completedPatterns ?? []).map((pattern) => pattern.name);
+            for (let index = 1; index < names.length; index += 1) {
+              expect(names[index - 1]!.localeCompare(names[index]!) <= 0).toBe(true);
             }
           });
         },

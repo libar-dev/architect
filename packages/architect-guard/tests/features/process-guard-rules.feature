@@ -6,10 +6,17 @@
 
 Feature: Process guard rule expressions
 
-  Process guard's decider enforces four rules over the change set produced by
+  Process guard's decider enforces rules over the change set produced by
   the file-change detector. Each rule has an invariant (what must hold), a
   rationale (why), and an existing executable scenario in this package's test
   suite that verifies the rule against the decider runtime.
+
+  The protection that gates iterative work — modifying a completed spec and
+  expanding active-spec scope — is advisory on the commit path (PDR-006): it
+  surfaces warnings rather than commit-blocking errors, an
+  `@architect-unlock-reason` suppresses the warning, and `--strict` (CI, not
+  the commit path) promotes the warning to blocking via the shared severity
+  model.
 
   These rule blocks were previously authored as inline `// Rule:` JSDoc banners
   in `packages/architect-guard/src/lint/process-guard/decider.ts` (M4 Part C.1).
@@ -19,29 +26,36 @@ Feature: Process guard rule expressions
 
   Rule: Protection Level
 
-    **Invariant:** Hard-protected (completed) files cannot be modified
-    without an `@architect-unlock-reason` tag, except when the modification
-    itself is the transition to a terminal status (the act of completing).
+    **Invariant:** Modifying a hard-protected (completed) spec surfaces a
+    `completed-protection` warning, never a commit-blocking error, except when
+    the modification itself is the transition to a terminal status (the act of
+    completing), which is silent. An `@architect-unlock-reason` tag is optional
+    and suppresses the warning when present.
 
-    **Rationale:** Completed specs are the durable record of finished work.
-    Editing them post-completion silently rewrites that record; the unlock
-    tag forces an explicit, reviewable acknowledgement. The completion-edit
-    carve-out exists because the very edit that sets `status:completed`
-    must be allowed.
+    **Rationale:** Small, planned-related changes to finished work are normal
+    maintenance, not process violations (PDR-006). A hard block forces reverting
+    valuable work or faking status; a warning keeps the change visible and
+    intentional while letting it land. The unlock tag remains a real audit
+    signal, now opt-in rather than a friction wall. The completion-edit carve
+    -out exists because the very edit that sets `status:completed` must be
+    allowed silently.
 
-    **Verified by:** `guard-runtime.feature` scenario "Block completed spec
-    edits without unlock reason".
+    **Verified by:** `guard-runtime.feature` scenario "Warn on completed spec
+    edits without unlock reason" and "Suppress completed-protection warning with
+    unlock reason".
 
   Rule: Status Transitions
 
     **Invariant:** Status transitions follow the FSM defined in
-    `phase-state-machine`. The only sanctioned bypass is a retroactive
-    transition to `completed` accompanied by a validated unlock reason.
+    `phase-state-machine`. Reopening completed work to `active` or `roadmap` is a
+    valid transition (PDR-006). The only sanctioned bypass for `-> completed` is
+    a retroactive transition accompanied by a validated unlock reason.
 
     **Rationale:** The FSM encodes the delivery process; arbitrary jumps
-    (e.g., `idea -> completed`) skip planning gates. The retroactive-unlock
-    bypass exists for reconciling specs that were completed out-of-process
-    and need to be re-aligned with the FSM.
+    (e.g., `idea -> completed`) skip planning gates. Reopening completed work is
+    first-class so legitimate maintenance is not walled. The retroactive-unlock
+    bypass exists for reconciling specs that were completed out-of-process and
+    need to be re-aligned with the FSM.
 
     **Verified by:** `guard-runtime.feature` scenario "Detect status
     transitions for added files in files mode" exercises the detection
@@ -50,17 +64,23 @@ Feature: Process guard rule expressions
 
   Rule: Scope Creep
 
-    **Invariant:** Scope-locked (active) specs cannot have new deliverables
-    added; removing deliverables emits a warning, not an error.
+    **Invariant:** Expanding the scope of a scope-locked (active) spec is
+    advisory: adding a deliverable whose status is `pending` (unbuilt scope)
+    emits a `scope-creep` warning; adding a deliverable that records real
+    progress (in-progress/complete/deferred/superseded/n/a) is silent; removing
+    a deliverable emits a `deliverable-removed` warning. An
+    `@architect-unlock-reason` suppresses these warnings. No deliverable change
+    to an active spec blocks a commit.
 
-    **Rationale:** Active specs are mid-implementation; adding deliverables
-    silently expands committed scope. Removed deliverables may be legitimate
-    (descoped or completed) but warrant author attention, hence warning,
-    not block.
+    **Rationale:** Scope crystallizes during implementation (PDR-006). Surfacing
+    the addition of unbuilt scope keeps it intentional; blocking it only invites
+    a revert or a status lie. Recording real progress is reality and needs no
+    signal.
 
-    **Verified by:** existing scope-creep step bindings in `guard-runtime`
-    fixtures exercise the deliverable-addition rejection and
-    deliverable-removal warning paths.
+    **Verified by:** `guard-runtime.feature` scenario "Warn on pending scope
+    added to an active spec" and the existing scope-creep step bindings that
+    exercise the deliverable-addition warning and deliverable-removal warning
+    paths.
 
   Rule: Session Scope
 
@@ -93,7 +113,8 @@ Feature: Process guard rule expressions
   Rule: Deliverable Removal
 
     **Invariant:** Removing a deliverable from a scope-locked (active) spec
-    emits a `deliverable-removed` warning, never an error.
+    emits a `deliverable-removed` warning, never an error. An
+    `@architect-unlock-reason` suppresses the warning.
 
     **Rationale:** Removal may be legitimate -- the deliverable was descoped
     or completed elsewhere -- but it warrants author attention so the commit
@@ -103,3 +124,17 @@ Feature: Process guard rule expressions
     **Verified by:** the guard-runtime deliverable-removal path: when a change
     set reports removed deliverables on an active spec, `validateChanges` emits
     a warning-severity `deliverable-removed` violation.
+
+  Rule: Strict Mode Promotion
+
+    **Invariant:** Under `--strict`, advisory warnings (completed-protection,
+    scope-creep, deliverable-removed) are promoted to blocking errors via the
+    shared severity model; on the default commit path they remain warnings.
+
+    **Rationale:** The advisory model keeps the commit path unblocked (PDR-006)
+    while leaving a hard gate available to CI. `--strict` is the opt-in lever
+    that restores prevention where it is wanted, without re-walling everyday
+    commits.
+
+    **Verified by:** `guard-runtime.feature` scenario "Strict mode promotes the
+    completed-protection warning to a blocking error".

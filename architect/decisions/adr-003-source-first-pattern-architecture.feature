@@ -14,10 +14,10 @@ Feature: ADR-003 - Source-First Pattern Architecture
   **Context:**
   The original annotation architecture assumed pattern definitions live
   in tier 1 feature specs, with TypeScript code limited to `@architect-implements`.
-  At scale this creates three problems: tier 1 specs become stale after implementation
-  (only 39% of 44 specs have traceability to executable specs), retroactive annotation
-  of existing code triggers merge conflicts, and duplicated Rules/Scenarios in tier 1
-  specs average 200-400 lines that exist in better form in executable specs.
+  At scale this creates three problems: tier 1 specs become stale after
+  implementation, retroactive annotation of existing code triggers merge
+  conflicts, and duplicated Rules/Scenarios in tier 1 specs exist in better
+  form in executable specs.
 
   **Decision:**
   Invert the ownership model: TypeScript source code is the canonical pattern
@@ -32,18 +32,6 @@ Feature: ADR-003 - Source-First Pattern Architecture
   | Positive | Retroactive annotation works without merge conflicts |
   | Negative | Migration effort for existing tier 1 specs |
   | Negative | Requires updating CLAUDE.md annotation ownership guidance |
-
-  # ===========================================================================
-  # DELIVERABLES
-  # ===========================================================================
-
-  Background: Deliverables
-    Given the following deliverables:
-      | Deliverable | Status | Location |
-      | Decision spec | complete | architect/decisions/adr-003 |
-      | Update CLAUDE.md annotation ownership | complete | CLAUDE.md |
-      | Update monorepo source-annotations.md | superseded | monorepo _claude-md/ |
-      | Reframe tag-duplication anti-pattern | superseded | src/validation/anti-patterns.ts |
 
   # ===========================================================================
   # RULE 1: TypeScript Source Owns Pattern Identity
@@ -76,7 +64,7 @@ Feature: ADR-003 - Source-First Pattern Architecture
     **Invariant:** Tier 1 roadmap specs serve planning and delivery tracking.
     They are not the source of truth for pattern identity, invariants, or
     acceptance criteria. After completion, they may be archived.
-    **Rationale:** Treating tier 1 specs as durable creates a maintenance burden — at scale only 39% maintain traceability, and duplicated Rules/Scenarios average 200-400 stale lines.
+    **Rationale:** Treating tier 1 specs as durable creates a maintenance burden — they go stale and duplicate Rules/Scenarios that exist in better form in executable specs.
     **Verified by:** TypeScript source is canonical pattern definition
 
     **Value by lifecycle phase:**
@@ -125,8 +113,8 @@ Feature: ADR-003 - Source-First Pattern Architecture
   Rule: Single-definition constraint
 
     **Invariant:** `@architect-pattern:X` may appear in exactly one file
-    across the entire codebase. The `mergePatterns()` conflict check in
-    `orchestrator.ts` correctly enforces this.
+    across the entire codebase. The `mergePatterns()` conflict check
+    correctly enforces this.
     **Rationale:** Duplicate pattern definitions cause merge conflicts in the PatternGraph and produce ambiguous ownership in generated documentation.
     **Verified by:** TypeScript source is canonical pattern definition
 

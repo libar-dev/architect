@@ -6,7 +6,7 @@
 
 ## Overview
 
-118 shapes across 50 patterns in architect-projection.
+113 shapes across 48 patterns in architect-projection.
 
 ## AnnotationCoverage
 
@@ -204,7 +204,7 @@ BoundedContextSchema = z.strictObject({
 
 ### BusinessRuleSchema
 
-A single governance business rule — its owning feature and package, the invariant it enforces, the scenarios that verify it, and optional pattern, phase, and product-area scope metadata.
+A single governance business rule — its owning feature and package, the invariant it enforces, the scenarios that verify it, and optional pattern and product-area scope metadata.
 
 ```ts
 BusinessRuleSchema = z.strictObject({
@@ -218,7 +218,6 @@ BusinessRuleSchema = z.strictObject({
   verifiedBy: z.array(z.string()),
   scenarioCount: z.number().int().nonnegative(),
   pattern: z.string().optional(),
-  phase: z.number().int().optional(),
   productArea: z.string().optional(),
 })
 ```
@@ -242,7 +241,7 @@ BusinessRuleReferenceSchema = z.strictObject({
 
 ### BusinessRuleSetSchema
 
-A scoped collection of business rules — discriminated on \`scope\` (all, product-area, phase, feature, package, or decision) with optional grouping metadata describing how the rules are bucketed.
+A scoped collection of business rules — discriminated on \`scope\` (all, product-area, feature, package, or decision) with optional grouping metadata describing how the rules are bucketed.
 
 ```ts
 BusinessRuleSetSchema = z.discriminatedUnion('scope', [
@@ -257,14 +256,6 @@ BusinessRuleSetSchema = z.discriminatedUnion('scope', [
     kind: z.literal('BusinessRuleSet'),
     scope: z.literal('product-area'),
     scopeValue: z.string(),
-    rules: z.array(BusinessRuleSchema),
-    groupedBy: BusinessRuleGroupingSchema.optional(),
-    groupingEntries: z.array(BusinessRuleGroupingEntrySchema).optional(),
-  }),
-  z.strictObject({
-    kind: z.literal('BusinessRuleSet'),
-    scope: z.literal('phase'),
-    scopeValue: z.number().int(),
     rules: z.array(BusinessRuleSchema),
     groupedBy: BusinessRuleGroupingSchema.optional(),
     groupingEntries: z.array(BusinessRuleGroupingEntrySchema).optional(),
@@ -354,7 +345,7 @@ DecisionRecordSchema = z.strictObject({
 
 ### DeliverableSchema
 
-Fragment shape for one execution-context deliverable record — its name, status, the tests that cover it, its source location, and optional finding and release metadata.
+Fragment shape for one execution-context deliverable record — its name, status, the tests that cover it, its source location, and optional finding.
 
 ```ts
 DeliverableSchema = z.strictObject({
@@ -364,7 +355,6 @@ DeliverableSchema = z.strictObject({
   tests: z.array(z.string()),
   location: z.string(),
   finding: z.string().optional(),
-  release: z.string().optional(),
 })
 ```
 
@@ -383,32 +373,6 @@ DeliverableManifestSchema = z.strictObject({
 ```
 
 ## DeliveryReportingSupporting
-
-### QuarterEntrySchema
-
-One quarter of a roadmap — its label, the patterns scheduled in it, and their status counts.
-
-```ts
-QuarterEntrySchema = z.strictObject({
-  quarter: z.string(),
-  patterns: z.array(PatternSummarySchema),
-  counts: StatusCountsSchema,
-})
-```
-
-### ReleaseEntrySchema
-
-One release in a notes digest — its label, optional date, member patterns, deliverables, and optional free-form notes.
-
-```ts
-ReleaseEntrySchema = z.strictObject({
-  release: z.string(),
-  date: z.string().optional(),
-  patterns: z.array(PatternSummarySchema),
-  deliverables: z.array(EmbeddedDeliverableSchema),
-  notes: z.string().optional(),
-})
-```
 
 ### StatusCountsSchema
 
@@ -592,13 +556,12 @@ NeighborEntrySchema = z.strictObject({
 
 ### PatternContextMetaSchema
 
-Per-pattern metadata carried in a session context bundle — the pattern's name, status, phase, role, source file, and a short summary.
+Per-pattern metadata carried in a session context bundle — the pattern's name, status, role, source file, and a short summary.
 
 ```ts
 PatternContextMetaSchema = z.strictObject({
   name: z.string(),
   status: z.string().optional(),
-  phase: z.number().int().optional(),
   role: z.string(),
   file: z.string(),
   summary: z.string(),
@@ -716,7 +679,7 @@ type StrictKindTable<Out, Options, Kinds extends FragmentKind> = {
 The dimension a business-rule set is grouped by.
 
 ```ts
-BusinessRuleGroupingSchema = z.enum(['package', 'product-area', 'phase', 'feature'])
+BusinessRuleGroupingSchema = z.enum(['package', 'product-area', 'feature'])
 ```
 
 ### BusinessRuleScopeSchema
@@ -724,13 +687,7 @@ BusinessRuleGroupingSchema = z.enum(['package', 'product-area', 'phase', 'featur
 The scope a business-rule set is gathered over.
 
 ```ts
-BusinessRuleScopeSchema = z.enum([
-  'all',
-  'package',
-  'product-area',
-  'phase',
-  'feature',
-])
+BusinessRuleScopeSchema = z.enum(['all', 'package', 'product-area', 'feature'])
 ```
 
 ### DecisionStatusSchema
@@ -802,7 +759,7 @@ FsmTransitionSchema = z.strictObject({
 
 ### ProtectionLevelEntrySchema
 
-Maps a protection level to the statuses it covers and what it permits — whether deliverables may be added and whether an explicit unlock is required.
+Maps a protection level to the statuses it covers and what it permits — whether deliverables may be added and whether the level emits an advisory, unlock-suppressible warning on the commit path (PDR-006).
 
 ```ts
 ProtectionLevelEntrySchema = z.strictObject({
@@ -810,7 +767,7 @@ ProtectionLevelEntrySchema = z.strictObject({
   statuses: z.array(z.string()),
   meaning: z.string().optional(),
   canAddDeliverables: z.boolean(),
-  needsUnlock: z.boolean(),
+  unlockSuppressesWarning: z.boolean(),
 })
 ```
 
@@ -907,19 +864,6 @@ HandoffRecordSchema = z.strictObject({
 ```
 
 ## OperationalInsightsSupporting
-
-### ActivePhaseEntrySchema
-
-One active-phase entry in the overview — the phase number, its optional name, the total patterns in the phase, and how many are active.
-
-```ts
-ActivePhaseEntrySchema = z.strictObject({
-  phase: z.number().int(),
-  name: z.string().optional(),
-  patternCount: z.number().int().nonnegative(),
-  activeCount: z.number().int().nonnegative(),
-})
-```
 
 ### BlockingEntrySchema
 
@@ -1072,13 +1016,12 @@ OrphanPatternListSchema = z.strictObject({
 
 ### OverviewDigestSchema
 
-Fragment shape for the delivery overview — progress totals, active-phase counts, blocking patterns, an optional "start here" orientation block (orientation doc references + the safe-to-start roadmap set), an optional role distribution, an optional high-level architecture glimpse, an optional generated-views index, and optional CLI hints.
+Fragment shape for the delivery overview — progress totals, blocking patterns, an optional "start here" orientation block (orientation doc references + the safe-to-start roadmap set), an optional role distribution, an optional high-level architecture glimpse, an optional generated-views index, and optional CLI hints.
 
 ```ts
 OverviewDigestSchema = z.strictObject({
   kind: z.literal('OverviewDigest'),
   progress: OverviewProgressSchema,
-  activePhases: z.array(ActivePhaseEntrySchema),
   blocking: z.array(BlockingEntrySchema),
   orientation: OverviewOrientationSchema.optional(),
   roleDistribution: z.array(RoleCountSchema).optional(),
@@ -1092,12 +1035,11 @@ OverviewDigestSchema = z.strictObject({
 
 ### PatternCatalogFilterSchema
 
-The filter criteria applied to a pattern catalog — status, phase, role, parent, and package narrowing plus the names-only and count-only output modes.
+The filter criteria applied to a pattern catalog — status, role, parent, and package narrowing plus the names-only and count-only output modes.
 
 ```ts
 PatternCatalogFilterSchema = z.strictObject({
   status: z.string().optional(),
-  phase: z.number().int().optional(),
   role: z.string().optional(),
   parent: z.string().optional(),
   package: z.string().optional(),
@@ -1165,8 +1107,6 @@ interface DependencyContextNode {
   name: string;
   /** The pattern's lifecycle status, when known. */
   status?: string | undefined;
-  /** The pattern's phase number, when assigned. */
-  phase?: number | undefined;
   /** Whether traversal stopped here because the depth limit was reached and
    * unexpanded edges remain in this direction. */
   truncated: boolean;
@@ -1181,7 +1121,6 @@ interface DependencyContextNode {
 | --------- | ----------------------------------------------------------------------------------------------------------------- |
 | name      | The pattern name this node represents.                                                                            |
 | status    | The pattern's lifecycle status, when known.                                                                       |
-| phase     | The pattern's phase number, when assigned.                                                                        |
 | truncated | Whether traversal stopped here because the depth limit was reached and unexpanded edges remain in this direction. |
 | children  | This node's direct children in the same direction.                                                                |
 
@@ -1326,7 +1265,7 @@ type PatternSummary = z.infer<typeof PatternSummarySchema>;
 
 ### PatternSummarySchema
 
-The canonical short summary of a pattern — its name, status, maturity, role, phase, source file and origin, and owning package. Reused by catalog and detail projections.
+The canonical short summary of a pattern — its name, status, maturity, role, source file and origin, and owning package. Reused by catalog and detail projections.
 
 ```ts
 PatternSummarySchema = z.strictObject({
@@ -1335,30 +1274,9 @@ PatternSummarySchema = z.strictObject({
   status: z.string().optional(),
   maturity: MaturitySchema.optional(),
   role: z.string(),
-  phase: z.number().int().optional(),
   file: z.string(),
   source: PatternSourceSchema,
   package: z.string().optional(),
-})
-```
-
-## PhaseProgress
-
-### PhaseProgressSchema
-
-Delivery totals for a single phase — counts per status plus the derived completion percentage.
-
-```ts
-PhaseProgressSchema = z.strictObject({
-  kind: z.literal('PhaseProgress'),
-  phaseNumber: z.number().int(),
-  phaseName: z.string().optional(),
-  completed: z.number().int().nonnegative(),
-  active: z.number().int().nonnegative(),
-  planned: z.number().int().nonnegative(),
-  candidate: z.number().int().nonnegative(),
-  total: z.number().int().nonnegative(),
-  completionPercentage: z.number().min(0).max(100),
 })
 ```
 
@@ -1392,22 +1310,8 @@ ProjectConfigSnapshotSchema = z.strictObject({
   sourceGlobs: z.array(z.string()),
   buildTimeMs: z.number().int().nonnegative(),
   patternCount: z.number().int().nonnegative(),
-  phaseCount: z.number().int().nonnegative(),
   roleCount: z.number().int().nonnegative(),
   projectName: z.string().optional(),
-})
-```
-
-## ReleaseNotesDigest
-
-### ReleaseNotesDigestSchema
-
-A changelog-style digest bundling one or more release entries.
-
-```ts
-ReleaseNotesDigestSchema = z.strictObject({
-  kind: z.literal('ReleaseNotesDigest'),
-  releases: z.array(ReleaseEntrySchema),
 })
 ```
 
@@ -1454,13 +1358,14 @@ REQUIREMENTS_SPECS_AREA_LABEL = 'Specs (Pending Implementation)'
 
 ### RoadmapTimelineSchema
 
-A roadmap view — one of \`roadmap\`, \`milestones\`, or \`current\` — over a set of quarter entries.
+A roadmap view — one of \`roadmap\`, \`milestones\`, or \`current\` — over a flat, deterministically ordered set of pattern summaries plus their status counts.
 
 ```ts
 RoadmapTimelineSchema = z.strictObject({
   kind: z.literal('RoadmapTimeline'),
   view: z.enum(['roadmap', 'milestones', 'current']),
-  quarters: z.array(QuarterEntrySchema),
+  patterns: z.array(PatternSummarySchema),
+  counts: StatusCountsSchema,
 })
 ```
 

@@ -28,12 +28,16 @@
  *
  * ### Rules Implemented
  *
- * 1. **Protection Level** - Completed files require unlock-reason
- * 2. **Status Transition** - Transitions must follow PDR-005 FSM
- * 3. **Scope Creep** - Active specs cannot add new deliverables
+ * 1. **Protection Level** - Modifying a completed spec warns (advisory);
+ *    unlock-reason suppresses it (PDR-006)
+ * 2. **Status Transition** - Transitions must follow the FSM (PDR-005, as
+ *    revised by PDR-006: completed reopens to active/roadmap)
+ * 3. **Scope Creep** - Adding pending scope to an active spec warns (advisory);
+ *    adding real-progress scope is silent; unlock-reason suppresses (PDR-006)
  * 4. **Session Scope** - Modifications outside session scope warn
  * 5. **Session Exclusion** - Explicitly excluded files are a hard error
- * 6. **Deliverable Removal** - Removing a deliverable from an active spec warns
+ * 6. **Deliverable Removal** - Removing a deliverable from an active spec warns;
+ *    unlock-reason suppresses (PDR-006)
  *
  * The invariants and rationale for each rule are the load-bearing narrative
  * in `tests/features/process-guard-rules.feature`
@@ -159,10 +163,13 @@ export function validateChanges(input: DeciderInput): DeciderOutput {
 }
 
 /**
- * Check protection level violations.
+ * Check protection level (completed-spec) advisory.
  *
- * - Completed (hard) files require unlock-reason tag
- * - Returns error if modified without unlock
+ * Modifying or reopening a completed (hard-protected) spec surfaces a warning,
+ * never a commit-blocking error (PDR-006 Rule 1/2). `@architect-unlock-reason`
+ * is optional: when present it records intent and suppresses the warning; when
+ * absent the guard warns but does not block. `--strict` promotes the warning to
+ * blocking via the shared severity model in `validateChanges`.
  *
  * @param state - Current process state
  * @param changes - Detected changes
@@ -180,7 +187,7 @@ function checkProtectionLevel(
     const fileState = state.files.get(file);
     if (!fileState) continue;
 
-    // Check hard protection (completed)
+    // Check hard protection (completed) — unlock-reason suppresses the warning
     if (fileState.protection === 'hard' && !fileState.hasUnlockReason) {
       // Exempt files transitioning TO a terminal state — this is a completion, not a post-completion edit
       const transition = changes.statusTransitions.get(file);
@@ -190,10 +197,10 @@ function checkProtectionLevel(
       violations.push(
         createViolation(
           'completed-protection',
-          'error',
-          `Cannot modify completed spec '${file}' without unlock reason`,
+          'warning',
+          `Modifying completed spec '${file}'`,
           file,
-          `Add ${tagPrefix}unlock-reason:'your reason' to proceed`,
+          `Add ${tagPrefix}unlock-reason:'your reason' to record intent and suppress this warning`,
         ),
       );
     }
@@ -261,9 +268,15 @@ function checkStatusTransitions(state: ProcessState, changes: ChangeDetection): 
 }
 
 /**
- * Check for scope creep (new deliverables in active specs).
+ * Check active-spec scope changes (advisory).
  *
- * Active specs cannot add new deliverables.
+ * Expanding the scope of an active (scope-locked) spec is advisory (PDR-006
+ * Rule 3): adding a deliverable whose status is `pending` (unbuilt scope)
+ * warns; adding a deliverable that records real progress
+ * (in-progress/complete/deferred/superseded/n/a) is silent; removing a
+ * deliverable warns. `@architect-unlock-reason` suppresses these warnings, and
+ * `--strict` promotes them to blocking. No deliverable change to an active spec
+ * blocks a commit on the commit path.
  */
 function checkScopeCreep(state: ProcessState, changes: ChangeDetection): ProcessViolation[] {
   const violations: ProcessViolation[] = [];
@@ -272,15 +285,20 @@ function checkScopeCreep(state: ProcessState, changes: ChangeDetection): Process
     const fileState = state.files.get(file);
     if (!fileState) continue;
 
-    // Only check active specs (scope-locked)
-    if (fileState.protection === 'scope' && deliverableChange.added.length > 0) {
+    // Only active specs (scope-locked) are advised on; unlock-reason suppresses.
+    if (fileState.protection !== 'scope' || fileState.hasUnlockReason) {
+      continue;
+    }
+
+    // Adding pending (unbuilt) scope warns; adding real-progress scope is silent.
+    if (deliverableChange.addedPending.length > 0) {
       violations.push(
         createViolation(
           'scope-creep',
-          'error',
-          `Cannot add deliverables to active spec '${file}': ${deliverableChange.added.join(', ')}`,
+          'warning',
+          `Adding pending scope to active spec '${file}': ${deliverableChange.addedPending.join(', ')}`,
           file,
-          'Create new spec or revert to roadmap status first',
+          'Confirm this scope is intentional, or add @architect-unlock-reason to suppress this warning.',
         ),
       );
     }

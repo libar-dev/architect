@@ -2,7 +2,6 @@
 @architect-pattern:DependencyEdgeProjectionExecutableTests
 @architect-implements:DependencyEdgeProjection
 @architect-status:completed
-@architect-phase:49
 @architect-product-area:Projection
 @architect-role:projection
 @pattern-relations

@@ -1,7 +1,7 @@
 @projection @governance @package
 Feature: BusinessRuleSet — package scope branch
   The BusinessRuleSet discriminated union gains a `'package'` branch
-  alongside the existing `all | product-area | phase | feature` branches
+  alongside the existing `all | product-area | feature` branches
   so projections can group business rules by workspace package
   (`architect-core`, `architect-projection`, `desktop`, …) without a
   schema rewrite later.
@@ -36,13 +36,13 @@ Feature: BusinessRuleSet — package scope branch
   Rule: Supporting scope schema lists the new literal in canonical order
 
     **Invariant:** `BusinessRuleScopeSchema` exposes literals in the
-    order `all | package | product-area | phase | feature`; this is the
+    order `all | package | product-area | feature`; this is the
     enum the CLI uses to validate `--scope` flag inputs once S9 lands.
     **Verified by:** scope schema lists package literal
 
     @validation
     Scenario: BusinessRuleScopeSchema includes the canonical literals in order
-      Then the BusinessRuleScope literals should equal "all,package,product-area,phase,feature"
+      Then the BusinessRuleScope literals should equal "all,package,product-area,feature"
 
   Rule: Runtime package config swap changes grouping without changing source patterns
 

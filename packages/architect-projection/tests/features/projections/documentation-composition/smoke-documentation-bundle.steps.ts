@@ -43,13 +43,11 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               createPattern('AuthService', {
                 status: 'active',
                 role: 'service',
-                phase: 1,
                 description: 'Handles user authentication.',
               }),
               createPattern('SessionStore', {
                 status: 'active',
                 role: 'service',
-                phase: 1,
                 description: 'Manages user sessions.',
                 dependsOn: ['AuthService'],
               }),

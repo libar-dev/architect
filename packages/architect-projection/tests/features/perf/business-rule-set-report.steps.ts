@@ -53,7 +53,6 @@ const BOUNDED_CONTEXTS = [
 const ARCH_LAYERS = ['domain', 'application', 'interface', 'infrastructure'] as const;
 const STATUSES = ['active', 'completed', 'roadmap'] as const;
 const PRIORITIES = ['P0', 'P1', 'P2'] as const;
-const QUARTERS = ['2026-Q1', '2026-Q2', '2026-Q3', '2026-Q4'] as const;
 const TEAMS = ['core-platform', 'projection-runtime', 'docs-foundation'] as const;
 const EFFORTS = ['small', 'medium', 'large'] as const;
 const EFFORT_ACTUALS = ['small', 'medium', 'large'] as const;
@@ -83,21 +82,9 @@ const COVERAGE_REQUIRED_TAGS: TagRegistry['metadataTags'] = [
     values: [...ARCH_LAYERS],
   },
   {
-    tag: 'phase',
-    format: 'number',
-    purpose: 'Tracks phase coverage.',
-    required: true,
-  },
-  {
     tag: 'priority',
     format: 'value',
     purpose: 'Records priority coverage.',
-    required: true,
-  },
-  {
-    tag: 'quarter',
-    format: 'value',
-    purpose: 'Records roadmap quarter coverage.',
     required: true,
   },
   {
@@ -148,18 +135,6 @@ const COVERAGE_REQUIRED_TAGS: TagRegistry['metadataTags'] = [
     purpose: 'Records risk coverage.',
     required: true,
     values: [...RISKS],
-  },
-  {
-    tag: 'release',
-    format: 'value',
-    purpose: 'Records release coverage.',
-    required: true,
-  },
-  {
-    tag: 'completed',
-    format: 'value',
-    purpose: 'Records completion timestamp coverage.',
-    required: true,
   },
   {
     tag: 'target-path',
@@ -264,14 +239,10 @@ interface PerfPatternOptions {
   readonly title?: string;
   readonly status: ExtractedPattern['status'];
   readonly role: ExtractedPattern['role'];
-  readonly phase: ExtractedPattern['phase'];
   readonly file: string;
   readonly productArea: ExtractedPattern['productArea'];
   readonly boundedContext: ExtractedPattern['boundedContext'];
   readonly adrLayer: ExtractedPattern['adrLayer'];
-  readonly quarter: ExtractedPattern['quarter'];
-  readonly release: ExtractedPattern['release'];
-  readonly completed: ExtractedPattern['completed'];
   readonly userRole: ExtractedPattern['userRole'];
   readonly businessValue: ExtractedPattern['businessValue'];
   readonly team: ExtractedPattern['team'];
@@ -319,7 +290,6 @@ function createBusinessRuleSetPerfContext(): BusinessRuleSetPerfFixture {
     const productArea = PRODUCT_AREAS[patternIndex % PRODUCT_AREAS.length]!;
     const boundedContext = BOUNDED_CONTEXTS[patternIndex % BOUNDED_CONTEXTS.length]!;
     const adrLayer = ARCH_LAYERS[patternIndex % ARCH_LAYERS.length]!;
-    const quarter = QUARTERS[patternIndex % QUARTERS.length]!;
     const relatedPattern = patternNames[(patternIndex + 1) % patternNames.length]!;
     const dependencyPattern =
       patternNames[(patternIndex + patternNames.length - 1) % patternNames.length]!;
@@ -337,15 +307,11 @@ function createBusinessRuleSetPerfContext(): BusinessRuleSetPerfFixture {
           }
         : {}),
       status: STATUSES[patternIndex % STATUSES.length]!,
-      role: patternIndex % 2 === 0 ? 'projection' : 'service',
-      phase: 49 + (patternIndex % 4),
+      role: patternIndex % 2 === 0 ? 'projection' : 'service' + (patternIndex % 4),
       file: `packages/architect-projection/fixtures/perf/${patternName}.feature`,
       productArea,
       boundedContext,
       adrLayer,
-      quarter,
-      release: `2026.${String((patternIndex % 6) + 1).padStart(2, '0')}`,
-      completed: `2026-04-${String((patternIndex % 28) + 1).padStart(2, '0')}`,
       userRole: USER_ROLES[patternIndex % USER_ROLES.length]!,
       businessValue: `Keep ${boundedContext} perf coverage deterministic for ${patternName}.`,
       team: TEAMS[patternIndex % TEAMS.length]!,
@@ -434,14 +400,10 @@ function createPerfPattern(name: string, options: PerfPatternOptions): Extracted
     ...(options.title !== undefined ? { title: options.title } : {}),
     status: options.status,
     role: options.role,
-    phase: options.phase,
     file: options.file,
     productArea: options.productArea,
     boundedContext: options.boundedContext,
     adrLayer: options.adrLayer,
-    quarter: options.quarter,
-    release: options.release,
-    completed: options.completed,
     userRole: options.userRole,
     businessValue: options.businessValue,
     team: options.team,

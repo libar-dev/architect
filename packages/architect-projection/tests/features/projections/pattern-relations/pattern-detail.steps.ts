@@ -66,7 +66,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               tests: 2,
               location: 'packages/architect-query/src/pattern-graph-api.ts',
               finding: 'Keeps read operations centralized.',
-              release: '2026-Q2',
             },
           ],
           rules: [

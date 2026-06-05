@@ -3,7 +3,6 @@
 @architect-implements:DocumentationCompositionProjectionSupport,ProjectConfigProjection,DocumentationBundle,ArchitectureDiagramProjection,PrChangeReviewProjection
 @architect-status:completed
 @architect-unlock-reason:Evolve-architecture-diagram-invariant-for-WS3-restructure-D14
-@architect-phase:49
 @architect-product-area:Projection
 @architect-role:projection
 @documentation-composition

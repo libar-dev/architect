@@ -18,32 +18,8 @@ export interface WorkflowLoadError {
   validationErrors?: string[];
 }
 
-/**
- * Canonical USDP phases per ADR-001 Rule 8.
- *
- * Edit the ADR-001 Rule 8 markdown table and this constant together. The
- * canonical-values-sync test asserts equality between both surfaces.
- *
- * NOTE: This is the *workflow* phase abstraction (Inception → Retrospective,
- * ordinals 1-6). It is distinct from the `@architect-phase` annotation tag,
- * which uses arbitrary roadmap phase numbers (1-100+) and is NOT validated
- * against this list. See SESSION-REPORTS-AND-LEARNINGS.md (Session 2, D2-A)
- * for the semantic-mismatch finding deferred to the holistic review.
- */
-export const CANONICAL_PHASES = [
-  { ordinal: 1, name: 'Inception', purpose: 'Problem framing, scope definition' },
-  { ordinal: 2, name: 'Elaboration', purpose: 'Design decisions, architecture exploration' },
-  { ordinal: 3, name: 'Session', purpose: 'Planning and design session work' },
-  { ordinal: 4, name: 'Construction', purpose: 'Implementation, testing, integration' },
-  { ordinal: 5, name: 'Validation', purpose: 'Verification, acceptance criteria confirmation' },
-  { ordinal: 6, name: 'Retrospective', purpose: 'Review, lessons learned, documentation' },
-] as const;
-
-export const CANONICAL_PHASE_NAMES = CANONICAL_PHASES.map((p) => p.name);
-export const CANONICAL_PHASE_ORDINALS = CANONICAL_PHASES.map((p) => p.ordinal);
-
 const DEFAULT_WORKFLOW_CONFIG: WorkflowConfig = Object.freeze({
-  name: '6-phase-standard',
+  name: 'fsm-status-standard',
   version: '1.0.0',
   statuses: [
     { name: 'roadmap', emoji: '📋' },
@@ -51,7 +27,6 @@ const DEFAULT_WORKFLOW_CONFIG: WorkflowConfig = Object.freeze({
     { name: 'completed', emoji: '✅' },
     { name: 'deferred', emoji: '⏸️' },
   ],
-  phases: CANONICAL_PHASES.map((p) => ({ name: p.name, order: p.ordinal })),
   defaultStatus: 'roadmap',
 });
 

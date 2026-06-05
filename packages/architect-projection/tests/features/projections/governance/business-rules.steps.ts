@@ -46,7 +46,6 @@ function createBusinessRuleContext(): ProjectionContext {
     patterns: [
       createPattern('ProjectionMigration', {
         patternName: 'ProjectionMigration',
-        phase: 49,
         productArea: 'Delivery Process',
         rules: [
           createRule({
@@ -69,7 +68,6 @@ function createBusinessRuleContext(): ProjectionContext {
       }),
       createPattern('RulesQueryAPI', {
         patternName: 'RulesQueryAPI',
-        phase: 49,
         productArea: 'Data API',
         rules: [
           createRule({
@@ -235,36 +233,6 @@ function createPackageGroupedBusinessRuleContext(): ProjectionContext {
             name: 'Core rules stay package-owned',
             description: '**Invariant:** Core rules stay with architect-core.',
             scenarioNames: ['Grouping business rules by package'],
-            scenarioCount: 1,
-          }),
-        ],
-      }),
-    ],
-  });
-}
-
-function createPhaseGroupedBusinessRuleContextWithUnphasedRule(): ProjectionContext {
-  return createProjectionContext({
-    patterns: [
-      createPattern('PhasedRules', {
-        phase: 49,
-        productArea: 'Projection',
-        rules: [
-          createRule({
-            name: 'Phased rule',
-            description: '**Invariant:** Phase grouping keeps phased rules visible.',
-            scenarioNames: ['Phase grouping rejects unphased rules loudly'],
-            scenarioCount: 1,
-          }),
-        ],
-      }),
-      createPattern('UnphasedRules', {
-        productArea: 'Projection',
-        rules: [
-          createRule({
-            name: 'Unphased rule',
-            description: '**Invariant:** Unphased rules must not disappear during grouping.',
-            scenarioNames: ['Phase grouping rejects unphased rules loudly'],
             scenarioCount: 1,
           }),
         ],
@@ -458,7 +426,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             ],
             scenarioCount: 2,
             pattern: 'ProjectionMigration',
-            phase: 49,
             productArea: 'Delivery Process',
           });
         },
@@ -814,32 +781,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           });
         },
       );
-    });
-  });
-
-  Rule('Phase grouping requires every grouped rule to expose a phase', ({ RuleScenario }) => {
-    RuleScenario('Phase grouping rejects unphased rules loudly', ({ Given, When, Then }) => {
-      Given('a business rule projection context with at least one unphased rule', () => {
-        state!.context = createPhaseGroupedBusinessRuleContextWithUnphasedRule();
-      });
-
-      When('I project the business rule set grouped by phase', () => {
-        try {
-          state!.bundle = parseAndProjectBusinessRuleSet(state!.context!, {
-            scope: 'all',
-            groupedBy: 'phase',
-          });
-          state!.invalidOptionsError = null;
-        } catch (error) {
-          state!.invalidOptionsError = error instanceof Error ? error.message : String(error);
-        }
-      });
-
-      Then('grouping business rules by phase should fail loudly', () => {
-        expect(state!.invalidOptionsError).toBe(
-          'Cannot group business rules by phase when one or more projected rules have no phase.',
-        );
-      });
     });
   });
 

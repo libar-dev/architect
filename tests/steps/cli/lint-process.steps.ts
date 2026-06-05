@@ -55,12 +55,7 @@ function initGitRepo(dir: string): void {
 // =============================================================================
 
 function createFeatureFile(status: string, unlockReason?: string): string {
-  const lines = [
-    '@architect',
-    '@architect-pattern:TestPattern',
-    '@architect-phase:1',
-    `@architect-status:${status}`,
-  ];
+  const lines = ['@architect', '@architect-pattern:TestPattern', `@architect-status:${status}`];
 
   if (unlockReason) {
     lines.push(`@architect-unlock-reason:${unlockReason}`);

@@ -103,8 +103,6 @@ const CustomMetadataValueSchema = z.union([
 export const FeatureTagMetadataSchema = z.strictObject({
   pattern: z.string().optional(),
   boundedContext: z.string().optional(),
-  phase: z.number().int().positive().optional(),
-  release: z.string().optional(),
   status: z.enum(ACCEPTED_STATUS_VALUES).optional(),
   unlockReason: z.string().optional(),
   uses: z.array(z.string()).readonly().optional(),
@@ -114,8 +112,6 @@ export const FeatureTagMetadataSchema = z.strictObject({
   enforcesDecisions: z.array(z.string()).readonly().optional(),
   apiRef: z.array(z.string()).readonly().optional(),
   role: z.string().optional(),
-  quarter: z.string().optional(),
-  completed: z.string().optional(),
   effort: z.string().optional(),
   effortActual: z.string().optional(),
   team: z.string().optional(),
@@ -451,8 +447,6 @@ export function extractPatternTags(
   let resolvedRole: string | undefined;
   let pattern: string | undefined;
   let boundedContext: string | undefined;
-  let phase: number | undefined;
-  let release: string | undefined;
   let status: AcceptedStatusValue | undefined;
   let unlockReason: string | undefined;
   let uses: readonly string[] | undefined;
@@ -461,8 +455,6 @@ export function extractPatternTags(
   let seeAlso: readonly string[] | undefined;
   let enforcesDecisions: readonly string[] | undefined;
   let apiRef: readonly string[] | undefined;
-  let quarter: string | undefined;
-  let completed: string | undefined;
   let effort: string | undefined;
   let effortActual: string | undefined;
   let team: string | undefined;
@@ -533,11 +525,7 @@ export function extractPatternTags(
       case 'number': {
         const num = Number.parseInt(rawValue, 10);
         if (!Number.isNaN(num)) {
-          if (key === 'phase') {
-            phase = num;
-          } else {
-            customMetadata = { ...(customMetadata ?? {}), [key]: num };
-          }
+          customMetadata = { ...(customMetadata ?? {}), [key]: num };
         }
         break;
       }
@@ -654,20 +642,11 @@ export function extractPatternTags(
             case 'boundedContext':
               boundedContext = value;
               break;
-            case 'release':
-              release = value;
-              break;
             case 'unlockReason':
               unlockReason = value;
               break;
             case 'extendsPattern':
               extendsPattern = value;
-              break;
-            case 'quarter':
-              quarter = value;
-              break;
-            case 'completed':
-              completed = value;
               break;
             case 'effort':
               effort = value;
@@ -742,8 +721,6 @@ export function extractPatternTags(
   return FeatureTagMetadataSchema.parse({
     ...(pattern !== undefined ? { pattern } : {}),
     ...(boundedContext !== undefined ? { boundedContext } : {}),
-    ...(phase !== undefined ? { phase } : {}),
-    ...(release !== undefined ? { release } : {}),
     ...(status !== undefined ? { status } : {}),
     ...(unlockReason !== undefined ? { unlockReason } : {}),
     ...(uses !== undefined ? { uses } : {}),
@@ -753,8 +730,6 @@ export function extractPatternTags(
     ...(enforcesDecisions !== undefined ? { enforcesDecisions } : {}),
     ...(apiRef !== undefined ? { apiRef } : {}),
     ...(resolvedRole !== undefined ? { role: resolvedRole } : {}),
-    ...(quarter !== undefined ? { quarter } : {}),
-    ...(completed !== undefined ? { completed } : {}),
     ...(effort !== undefined ? { effort } : {}),
     ...(effortActual !== undefined ? { effortActual } : {}),
     ...(team !== undefined ? { team } : {}),

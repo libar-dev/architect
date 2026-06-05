@@ -2,7 +2,6 @@
 @architect-pattern:ExecutionContextProjectionExecutableTests
 @architect-implements:ExecutionContextProjectionSupport,ScopeReadinessProjection,SessionContextProjection,FileReadingListProjection,DeliverableProjection,HandoffProjection
 @architect-status:completed
-@architect-phase:49
 @architect-product-area:Projection
 @architect-role:projection
 @execution-context

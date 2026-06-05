@@ -22,7 +22,6 @@ import type {
   RelationshipEntry,
 } from '../validation-schemas/pattern-graph.js';
 import type { AcceptedStatusValue, ProcessStatusValue } from '../taxonomy/index.js';
-import { isPatternComplete, isPatternActive, isPatternPlanned } from '../taxonomy/index.js';
 import {
   validateTransition,
   getProtectionSummary,
@@ -43,11 +42,8 @@ import type { Deliverable } from '../validation-schemas/dual-source.js';
 import type {
   StatusCounts,
   StatusDistribution,
-  PhaseProgress,
-  PhaseGroup,
   PatternDependencies,
   PatternRelationships,
-  QuarterGroup,
   TransitionCheck,
   ProtectionInfo,
   RoleInfo,
@@ -64,10 +60,6 @@ export interface PatternGraphAPI {
   getStatusCounts(): StatusCounts;
   getStatusDistribution(): StatusDistribution;
   getCompletionPercentage(): number;
-  getPatternsByPhase(phase: number): ExtractedPattern[];
-  getPhaseProgress(phase: number): PhaseProgress | undefined;
-  getActivePhases(): PhaseGroup[];
-  getAllPhases(): PhaseGroup[];
   isValidTransition(from: ProcessStatusValue, to: ProcessStatusValue): boolean;
   checkTransition(from: string, to: string): TransitionCheck;
   getValidTransitionsFrom(status: ProcessStatusValue): readonly ProcessStatusValue[];
@@ -88,11 +80,9 @@ export interface PatternGraphAPI {
   listRoles(): readonly RoleInfo[];
   getPatternsByRole(role: string): ExtractedPattern[];
   getRoleInfo(role: string): RoleInfo | null;
-  getPatternsByQuarter(quarter: string): ExtractedPattern[];
-  getQuarters(): QuarterGroup[];
   getCurrentWork(): ExtractedPattern[];
   getRoadmapItems(): ExtractedPattern[];
-  getRecentlyCompleted(limit?: number): ExtractedPattern[];
+  getCompletedPatterns(limit?: number): ExtractedPattern[];
   getPatternGraph(): PatternGraph;
 }
 
@@ -192,7 +182,6 @@ export function createPatternGraphAPI(dataset: PatternGraph): PatternGraphAPI {
         nodes.push({
           name: target,
           ...(pattern?.status !== undefined ? { status: pattern.status } : {}),
-          ...(pattern?.phase !== undefined ? { phase: pattern.phase } : {}),
           truncated: reachedCap && hasFurther,
           children,
         });
@@ -258,33 +247,6 @@ export function createPatternGraphAPI(dataset: PatternGraph): PatternGraphAPI {
     getCompletionPercentage() {
       return Math.round((frozenGraph.counts.completed / deliveryBase(frozenGraph.counts)) * 100);
     },
-    getPatternsByPhase(phase) {
-      const phaseGroup = frozenGraph.byPhase.find((p) => p.phaseNumber === phase);
-      return phaseGroup?.patterns ?? [];
-    },
-    getPhaseProgress(phase) {
-      const phaseGroup = frozenGraph.byPhase.find((p) => p.phaseNumber === phase);
-      if (!phaseGroup) return undefined;
-
-      return {
-        phaseNumber: phaseGroup.phaseNumber,
-        phaseName: phaseGroup.phaseName,
-        completed: phaseGroup.counts.completed,
-        active: phaseGroup.counts.active,
-        planned: phaseGroup.counts.planned,
-        candidate: phaseGroup.counts.candidate,
-        total: phaseGroup.counts.total,
-        completionPercentage: Math.round(
-          (phaseGroup.counts.completed / deliveryBase(phaseGroup.counts)) * 100,
-        ),
-      };
-    },
-    getActivePhases() {
-      return frozenGraph.byPhase.filter((p) => p.counts.active > 0);
-    },
-    getAllPhases() {
-      return frozenGraph.byPhase;
-    },
     isValidTransition(from, to) {
       return isValidTransition(from, to);
     },
@@ -301,7 +263,7 @@ export function createPatternGraphAPI(dataset: PatternGraph): PatternGraphAPI {
         level: summary.level,
         description: summary.description,
         canAddDeliverables: summary.canAddDeliverables,
-        requiresUnlock: summary.requiresUnlock,
+        unlockSuppressesWarning: summary.unlockSuppressesWarning,
       };
     },
     getPattern(name) {
@@ -431,23 +393,6 @@ export function createPatternGraphAPI(dataset: PatternGraph): PatternGraphAPI {
         ...(description !== undefined ? { description } : {}),
       };
     },
-    getPatternsByQuarter(quarter) {
-      return frozenGraph.byQuarter[quarter] ?? [];
-    },
-    getQuarters() {
-      return Object.entries(frozenGraph.byQuarter)
-        .map(([quarter, patterns]) => {
-          const counts = {
-            completed: patterns.filter((p) => isPatternComplete(p.status)).length,
-            active: patterns.filter((p) => isPatternActive(p.status)).length,
-            planned: patterns.filter((p) => isPatternPlanned(p.status)).length,
-            candidate: patterns.filter((p) => p.status === 'candidate').length,
-            total: patterns.length,
-          };
-          return { quarter, patterns, counts };
-        })
-        .sort((a, b) => a.quarter.localeCompare(b.quarter));
-    },
     getCurrentWork() {
       return filterByExactStatus('active');
     },
@@ -456,15 +401,14 @@ export function createPatternGraphAPI(dataset: PatternGraph): PatternGraphAPI {
       const deferred = filterByExactStatus('deferred');
       return [...roadmap, ...deferred];
     },
-    getRecentlyCompleted(limit = 10) {
-      const completed = filterByExactStatus('completed');
-      return completed
-        .filter((p) => p.completed)
-        .sort((a, b) => {
-          const dateA = a.completed ?? '';
-          const dateB = b.completed ?? '';
-          return dateB.localeCompare(dateA);
-        })
+    getCompletedPatterns(limit = 10) {
+      // The completion-date field is retired (ADR-013); completion order lives in
+      // git, not the read model. The set is returned in deterministic name order,
+      // capped by the limit — no calendar or ordinal recency is modeled, so the
+      // name (not "recently") is the honest contract.
+      return filterByExactStatus('completed')
+        .slice()
+        .sort((a, b) => a.name.localeCompare(b.name))
         .slice(0, limit);
     },
     getPatternGraph() {

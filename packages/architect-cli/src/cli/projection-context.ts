@@ -36,13 +36,10 @@ export function createCliTaxonomyProjectionContext(tagRegistry: TagRegistry): Pr
     byStatus: { candidate: [], roadmap: [], active: [], completed: [], deferred: [] },
     byNormalizedStatus: { completed: [], active: [], planned: [], candidate: [] },
     byMaturity: {},
-    byPhase: [],
-    byQuarter: {},
     byRole: {},
     bySourceType: { typescript: [], gherkin: [], roadmap: [], prd: [] },
     byProductArea: {},
     counts: { completed: 0, active: 0, planned: 0, candidate: 0, total: 0 },
-    phaseCount: 0,
     roleCount: 0,
     relationshipIndex: {},
   };

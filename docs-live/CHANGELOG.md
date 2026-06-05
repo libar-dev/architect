@@ -1,342 +1,143 @@
 # Changelog
 
-**Purpose:** Project changelog in Keep a Changelog format
+**Purpose:** Completed patterns in completion order.
 
 ---
 
-All notable changes to this project will be documented in this file.
+## Overview
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
+Completed milestones timeline covering 123 patterns.
 
-## [Unreleased]
+| Metric    | Value |
+| --------- | ----- |
+| Patterns  | 123   |
+| Completed | 123   |
+| Active    | 0     |
+| Planned   | 0     |
+| Candidate | 0     |
 
-### Added
-
-- **StatusMaturityExtraction spec**: architect/specs/status-maturity-extraction.feature
-- **UnifiedRoleSystem spec**: architect/specs/unified-role-system.feature
-- **ProcessGuardPatternGraphMigration spec**: architect/specs/process-guard-patterngraph-migration.feature
-- **ValidatePatternsPipelineConsolidation spec**: architect/specs/validate-patterns-pipeline-consolidation.feature
-- **McpOutputSchemaValidation spec**: architect/specs/mcp-output-schema-validation.feature
-- **Reference shape (full enumeration)**: docs-live/TAXONOMY.md (\`projectTaxonomyDigest\`)
-- **Live-API taxonomy context**: \`architect:query taxonomy\`
-- **Skill shape (model + link-to-live)**: .agents/skills/architect-base/references/taxonomy.md (\`taxonomy-role-enum\` + \`taxonomy-tag-count\` regions, \`taxonomy-skill\` generator)
-- **Formal-spec shape (enumeration in normative prose)**: formal-spec/04-tag-registry.md — design resolved per epic 2026-06-05, pending one proof-slice implement (modality is a projected source fact; the RFC function grouping is an audience-shaped View read; projecting modality dissolves the column-span blocker). Per-group table rendering + N-regions-per-host capability is built and tested; remaining work is wiring one function group (\`Classification\`) end-to-end as the proof slice — an implement session, not a design call.
-- **Emission descriptor (BundleRouting split)**: packages/architect-projection/src/fragments/emission-descriptor.ts
-- **Managed-region engine (marker scan + rewrite + normalization)**: packages/architect-projection/src/renderers/managed-region.ts (pure; loud on malformed/missing/duplicate/nested markers)
-- **Multi-target write path**: \`architect-cli\`'s \`cli/generate-docs.ts\` embedded-generator track: reads the host, applies regions via the managed-region engine, writes the host outside the single output dir; re-checks repo containment after resolution
-- **Region-aware determinism gate**: \`reportDriftAndExit\` (\`architect-cli\`'s \`cli/generate-docs.ts\`) diffs each embedded host's regenerated regions against the on-disk host (region-scoped because only inter-marker spans change); closes the docs-live-only coverage hole
-- ADR007CoordinatedTaxonomyRedesign
-- AnnotationCoverage
-- ApiReferenceDigest
-- ApiReferenceProjection
-- ApiReferenceProjectionExecutableTests
-- ArchitectPublicContract
-- ArchitectureComparison
-- ArchitectureDiagram
-- ArchitectureGraphProjection
-- ArchitectureInspection
-- ArchitectureNeighborhood
-- AstParser
-- BlockSchema
-- BoundedContextFragmentContract
-- BusinessRule
-- BusinessRuleReference
-- BusinessRuleSet
-- CanonicalValuesSync
-- CodecUtils
-- CodecUtilsValidation
-- CompactTextRendererTests
-- ConfigLoader
-- CrossPackageEdgeClassification
-- DecisionCatalog
-- DecisionRecord
-- DecisionResolution
-- DefineConfig
-- Deliverable
-- DeliverableManifest
-- DeliveryReportingFragmentContracts
-- DeliveryReportingSupporting
-- DependencyContext
-- DependencyEdge
-- DependencyEdgeSet
-- DeriveProcessState
-- DesignReviewProjection
-- DesignReviewProjectionExecutableTests
-- DetectChanges
-- DocExtractor
-- DocumentationCommandParityBoundaryTests
-- DocumentationCompositionSupporting
-- DocumentationTypeRegistry
-- DocumentationTypeRegistryExecutableTests
-- DualSourceExtractor
-- EmissionDescriptor
-- EmissionDescriptorTesting
-- ExecutionContextSupporting
-- ExtractedPattern
-- ExtractionDiagnostics
-- FileReadingList
-- FSMStates
-- FSMTransitions
-- FSMTransitionsExecutableTests
-- FSMValidator
-- GherkinAstParser
-- GherkinExternalRelationshipTagPropagation
-- GherkinExtractor
-- GherkinScanner
-- GitBranchDiff
-- GitHelpers
-- GitModule
-- GitNameStatusParser
-- GovernanceSupporting
-- GraphInventory
-- HandoffRecord
-- LayerInference
-- LintProcessCLI
-- LoadPreambleParser
-- MarkdownBlockParser
-- MCPRuntimeHardeningExecutableTests
-- MCPServerLifecycleExecutableTests
-- MCPToolInputValidationExecutableTests
-- MCPToolRegistryBoundaryTests
-- MCPToolRegistryIntegrationTests
-- OpenQuestionListProjection
-- OpenQuestionListProjectionExecutableTests
-- OperationalInsightsSupporting
-- OrphanPatternList
-- OverviewDigest
-- PackageResolver
-- PackageResolverExecutableTests
-- PatternBundleProjection
-- PatternBundleProjectionExecutableTests
-- PatternCatalog
-- PatternClassification
-- PatternDetail
-- PatternGraph
-- PatternGraphApi
-- PatternGraphApiConsistencyExecutableTests
-- PatternGraphApiReverseLookup
-- PatternGraphCLI
-- PatternGraphCliCache
-- PatternGraphCliDryRun
-- PatternGraphCliMetadata
-- PatternGraphCliRepl
-- PatternHelpers
-- PatternReferenceValidation
-- PatternRelationsFragmentContracts
-- PatternRelationsSupporting
-- PatternScanner
-- PatternSummary
-- PhaseProgress
-- PrChangeReview
-- ProcessGuardDecider
-- ProcessGuardLinter
-- ProcessGuardRulesExecutableTests
-- ProcessGuardTypes
-- ProjectConfigSnapshot
-- ProjectionFragmentContracts
-- ProjectionFragmentSchema
-- ProjectionKernelRelationshipContractExecutableTests
-- RegistryBuilder
-- ReleaseNotesDigest
-- ReleaseVNEXT
-- RequirementDigest
-- RoadmapTimeline
-- RoleProfile
-- RoleProfileCollection
-- RuleAggregation
-- ScopeReadinessCheck
-- ScopeReadinessReport
-- SessionContextBundle
-- SessionStateReader
-- ShapeExtractor
-- SourceInventoryDigest
-- SourceInventoryEntry
-- SourceMerge
-- StatusDistribution
-- StubTaxonomyTagTests
-- TagRegistrySchemas
-- TagRegistrySchemasValidation
-- TagUsageEntry
-- TagUsageMatrix
-- TaxonomyDigest
-- TaxonomyDocumentationCluster
-- TaxonomyDocumentationClusterTesting
-- TraceabilityMatrix
-- ValidationRuleDigest
-- ValueFormatCanonicalValuesDispatch
-- WorkflowConfigSchemasValidation
-
-## [Earlier] - 2026-01-07
-
-### Added
-
-- **Decision spec**: architect/decisions/adr-001
-- **Migrate executable spec product-area tags**: tests/features/\*\*/\*.feature
-- **Migrate tier 1 spec product-area tags**: architect/specs/\*.feature
-- **Fix adr-category on existing decisions**: architect/decisions/\*.feature
-- **Policy definition in CLAUDE.md**: CLAUDE.md
-- **Decision spec**: architect/decisions/adr-003
-- **Update CLAUDE.md annotation ownership**: CLAUDE.md
-- **Update monorepo source-annotations.md**: monorepo \_claude-md/
-- **Reframe tag-duplication anti-pattern**: src/validation/anti-patterns.ts
-- **RenderableDocument schema**: src/renderable/renderable-document.ts
-- **Section block types (heading, table, paragraph, code, list)**: src/renderable/renderable-document.ts
-- **Markdown renderer**: src/renderable/markdown-renderer.ts
-- **PatternCodec (pattern detail pages)**: src/renderable/codecs/pattern.ts
-- **RoadmapCodec (phase-grouped roadmap)**: src/renderable/codecs/roadmap.ts
-- **ReferenceCodec (composite reference docs)**: src/renderable/codecs/reference.ts
-- **CompositeCodec (codec composition)**: src/renderable/codecs/composite.ts
-- **ADR codec (decision records)**: src/renderable/codecs/adr.ts
-- **Decision spec**: architect/decisions/adr-008
-- **Decision spec**: architect/decisions/adr-009-projection-trust-boundary.feature
-- **Decision spec**: architect/decisions/adr-010-documentation-composition-helpers.feature
-- **Executable test feature**: packages/architect-projection/tests/features/projections/pattern-relations/architecture-neighborhood.feature
-- **Executable test feature**: packages/architect-projection/tests/features/projections/governance/business-rules.feature
-- **Per-subcommand help contract**: packages/architect-cli/src/cli/pattern-graph-cli.ts
-- **Public command and flag inventory**: packages/architect/tests/features/cli/data-api-help.feature
-- **Structured JSON format compatibility**: packages/architect/tests/steps/cli/data-api-help.steps.ts
-- **Output modifier pipeline**: packages/architect-core/src/read-api/output-pipeline.ts
-- **Output modifier CLI behavior**: packages/architect/tests/features/api/output-shaping/output-pipeline.feature
-- **Output shaping step coverage**: packages/architect/tests/steps/api/output-shaping/output-pipeline.steps.ts
-- **Executable test feature**: packages/architect-projection/tests/features/projections/governance/decision-records.feature
-- **Executable test feature**: packages/architect-projection/tests/features/projections/delivery-reporting/phase-progress-status.feature
-- **Executable test feature**: packages/architect-projection/tests/features/projections/delivery-reporting/roadmap-timeline.feature
-- **Executable test feature**: packages/architect-projection/tests/features/projections/pattern-relations/dependency-context.feature
-- **Executable test feature**: packages/architect-projection/tests/features/projections/pattern-relations/dependency-edges.feature
-- **Executable test feature**: packages/architect-projection/tests/features/projections/documentation-composition/config-documentation.feature
-- **Executable test feature**: packages/architect-projection/tests/features/projections/execution-context/context-session.feature
-- **Executable test feature**: packages/architect-projection/tests/features/projections/governance/validation-taxonomy.feature
-- **Executable test feature**: packages/architect-projection/tests/features/projections/operational-insights/reporting.feature
-- **Executable test feature**: packages/architect-projection/tests/features/projections/pattern-relations/pattern-detail.feature
-- **PatternGraph CLI core routing**: packages/architect-cli/src/cli/pattern-graph-cli.ts
-- **CLI core behavior specification**: packages/architect/tests/features/cli/pattern-graph-cli-core.feature
-- **CLI core step coverage**: packages/architect/tests/steps/cli/pattern-graph-cli-core.steps.ts
-- **Query passthrough compaction**: packages/architect-cli/src/cli/commands/\_shared/structured.ts
-- **CLI query behavior specification**: tests/features/cli/pattern-graph-cli-query.feature
-- **CLI query step coverage**: tests/steps/cli/pattern-graph-cli-query.steps.ts
-- **Executable test feature**: packages/architect-projection/tests/features/projections/pattern-relations/pattern-summary.feature
-- **Executable test feature**: packages/architect-projection/tests/features/projections/delivery-reporting/release-notes.feature
-- **PatternGraph-backed validation read model**: packages/architect-guard/src/cli/validate-patterns.ts
-- **DoD validation integration**: packages/architect-guard/src/validation/dod-validator.ts
-- **validate-patterns CLI behavior**: packages/architect/tests/features/cli/validate-patterns.feature
-- ADR001TaxonomyCanonicalValues
-- ADR002GherkinOnlyTesting
-- ADR003SourceFirstPatternArchitecture
-- ADR005CodecBasedMarkdownRendering
-- ADR006SingleReadModelArchitecture
-- ADR008StepDefinitionStubsConvention
-- ADR009ProjectionTrustBoundary
-- ADR010DocumentationCompositionHelpers
-- AnnotationCoverageProjection
-- AntiPatternDetector
-- ArchitectureComparisonProjection
-- ArchitectureDiagramProjection
-- ArchitectureNavigationProjectionExecutableTests
-- ArchitectureNeighborhoodProjection
-- BoundedContextProjection
-- BuildPipeline
-- BusinessRulesProjection
-- BusinessRulesProjectionExecutableTests
-- CLIErrorHandler
-- CLIRuntimePaths
-- CLIVersionHelper
-- CompactTextRenderer
-- ConfigBasedWorkflowDefinition
-- ConfigResolution
-- ConfigurationAPI
-- DataAPICLIErgonomics
-- DataAPIOutputShaping
-- DecisionCatalogProjection
-- DecisionCatalogProjectionExecutableTests
-- DefineConfigExecutableTests
-- DeliverableProjection
-- DeliveryProgressProjectionExecutableTests
-- DeliveryReportingProjectionSupport
-- DeliveryReportingProjectionSupportExecutableTests
-- DependencyContextProjection
-- DependencyContextProjectionExecutableTests
-- DependencyEdgeProjection
-- DependencyEdgeProjectionExecutableTests
-- DocStringMediaType
-- DocumentationBundle
-- DocumentationCompositionProjectionExecutableTests
-- DocumentationCompositionProjectionSupport
-- DoDValidationTypes
-- DoDValidator
-- DualSourceMergeIntegration
-- ErrorFactoryTypes
-- ErrorFactoryTypesExecutableTests
-- ExecutionContextProjectionExecutableTests
-- ExecutionContextProjectionSupport
-- FileDiscovery
-- FileReadingListProjection
-- FragmentRendererDispatch
-- GenerateDocsCli
-- GeneratorDegeneracyGuard
-- GeneratorDegeneracyGuardExecutableTests
-- GherkinRulesSupport
-- GovernanceProjectionSupport
-- GovernanceValidationTaxonomyProjectionExecutableTests
-- HandoffProjection
-- JsonRenderer
-- LintEngine
-- LintModule
-- LintPatternsCLI
-- LintPatternsCliBehavior
-- LintProcessCliBehavior
-- LintRules
-- MarkdownRenderer
-- MCPFileWatcher
-- MCPPipelineSession
-- MCPServer
-- MCPServerBin
-- MCPToolRegistry
-- OperationalInsightsProjectionExecutableTests
-- OperationalInsightsProjectionSupport
-- OrphanPatternListProjection
-- OverviewProjection
-- PatternCatalogProjection
-- PatternCatalogStatusFilterExecutableTests
-- PatternDetailProjection
-- PatternDetailProjectionExecutableTests
-- PatternGraphAPICLI
-- PatternGraphCliArchHealth
-- PatternGraphCliOutputModifiers
-- PatternGraphCliQueryPassthrough
-- PatternGraphCliRulesSubcommand
-- PatternGraphCliSubcommands
-- PatternRelationsProjectionSupport
-- PatternSummaryCatalogProjectionExecutableTests
-- PatternSummaryProjection
-- PDR005ProcessGuardFSM
-- PhaseProgressProjection
-- PrChangeReviewProjection
-- ProjectConfigLoader
-- ProjectConfigProjection
-- ReleaseNotesProjection
-- ReleaseNotesProjectionExecutableTests
-- ReleaseV100
-- RequirementDigestProjection
-- RequirementExecutableDigestProjection
-- RequirementSpecsDigestProjection
-- ResultMonadTypes
-- ResultMonadTypesExecutableTests
-- RoadmapTimelineProjection
-- RoleProfileProjection
-- ScannerCore
-- ScopeReadinessProjection
-- SessionContextProjection
-- ShapeExtraction
-- SourceInventoryProjection
-- SourceMerging
-- StatusDistributionProjection
-- TagUsageProjection
-- TaxonomyDigestProjection
-- TraceabilityMatrixProjection
-- TraceabilityMatrixProjectionExecutableTests
-- TypeScriptTaxonomyImplementation
-- UiRenderer
-- ValidatePatternsCLI
-- ValidationModule
-- ValidationRuleDigestProjection
-- ValidatorReadModelConsolidation
+| Pattern                                               | Status    | Role       | Source File                                                                                                          |
+| ----------------------------------------------------- | --------- | ---------- | -------------------------------------------------------------------------------------------------------------------- |
+| ADR001TaxonomyCanonicalValues                         | completed |            | architect/decisions/adr-001-taxonomy-canonical-values.feature                                                        |
+| ADR002GherkinOnlyTesting                              | completed |            | architect/decisions/adr-002-gherkin-only-testing.feature                                                             |
+| ADR003SourceFirstPatternArchitecture                  | completed |            | architect/decisions/adr-003-source-first-pattern-architecture.feature                                                |
+| ADR005CodecBasedMarkdownRendering                     | completed |            | architect/decisions/adr-005-codec-based-markdown-rendering.feature                                                   |
+| ADR006SingleReadModelArchitecture                     | completed |            | architect/decisions/adr-006-single-read-model-architecture.feature                                                   |
+| ADR007CoordinatedTaxonomyRedesign                     | completed |            | architect/decisions/adr-007-coordinated-taxonomy-redesign.feature                                                    |
+| ADR008StepDefinitionStubsConvention                   | completed |            | architect/decisions/adr-008-step-definition-stubs-convention.feature                                                 |
+| ADR009ProjectionTrustBoundary                         | completed |            | architect/decisions/adr-009-projection-trust-boundary.feature                                                        |
+| ADR010DocumentationCompositionHelpers                 | completed |            | architect/decisions/adr-010-documentation-composition-helpers.feature                                                |
+| ADR012DeliveryNavigation                              | completed |            | architect/decisions/adr-012-delivery-navigation.feature                                                              |
+| ADR013TaxonomyRetirement                              | completed |            | architect/decisions/adr-013-taxonomy-retirement.feature                                                              |
+| AnnotationCoverageProjection                          | completed | projection | packages/architect-projection/src/projections/operational-insights/index.ts                                          |
+| AntiPatternDetector                                   | completed | service    | packages/architect-guard/src/validation/anti-patterns.ts                                                             |
+| AntiPatternValidationTypes                            | completed | contract   | packages/architect-guard/src/validation/types.ts                                                                     |
+| ArchitectureComparisonProjection                      | completed | projection | packages/architect-projection/src/projections/pattern-relations/architecture-comparison.ts                           |
+| ArchitectureDiagramProjection                         | completed | projection | packages/architect-projection/src/projections/documentation-composition/architecture-diagram.ts                      |
+| ArchitectureNavigationProjectionExecutableTests       | completed | projection | packages/architect-projection/tests/features/projections/pattern-relations/architecture-neighborhood.feature         |
+| ArchitectureNeighborhoodProjection                    | completed | projection | packages/architect-projection/src/projections/pattern-relations/architecture-neighborhood.ts                         |
+| BoundedContextProjection                              | completed | projection | packages/architect-projection/src/projections/pattern-relations/architecture-context.ts                              |
+| BuildPipeline                                         | completed | service    | packages/architect-core/src/generators/pipeline/build-pipeline.ts                                                    |
+| BusinessRulesProjection                               | completed | projection | packages/architect-projection/src/projections/governance/business-rules.ts                                           |
+| BusinessRulesProjectionExecutableTests                | completed | projection | packages/architect-projection/tests/features/projections/governance/business-rules.feature                           |
+| ChangelogProjection                                   | completed | projection | packages/architect-projection/src/projections/delivery-reporting/index.ts                                            |
+| ChangelogProjectionExecutableTests                    | completed | projection | packages/architect-projection/tests/features/projections/delivery-reporting/changelog.feature                        |
+| CLIErrorHandler                                       | completed | utility    | packages/architect-cli/src/cli/error-handler.ts                                                                      |
+| CLIRuntimePaths                                       | completed | utility    | packages/architect-cli/src/cli/runtime-helpers.ts                                                                    |
+| CLIVersionHelper                                      | completed | utility    | packages/architect-cli/src/cli/version.ts                                                                            |
+| CompactTextRenderer                                   | completed | codec      | packages/architect-projection/src/renderers/render-compact-text.ts                                                   |
+| ConfigBasedWorkflowDefinition                         | completed |            | packages/architect-core/tests/features/config/config-loader.feature                                                  |
+| ConfigResolution                                      | completed |            | packages/architect-core/tests/features/config/config-resolution.feature                                              |
+| ConfigurationAPI                                      | completed |            | packages/architect-core/tests/features/config/configuration-api.feature                                              |
+| DataAPICLIErgonomics                                  | completed |            | tests/features/cli/data-api-help.feature                                                                             |
+| DataAPIOutputShaping                                  | completed |            | tests/features/api/output-shaping/output-pipeline.feature                                                            |
+| DecisionCatalogProjection                             | completed | projection | packages/architect-projection/src/projections/governance/decision-records.ts                                         |
+| DecisionCatalogProjectionExecutableTests              | completed | projection | packages/architect-projection/tests/features/projections/governance/decision-records.feature                         |
+| DefineConfigExecutableTests                           | completed |            | packages/architect-core/tests/features/config/define-config.feature                                                  |
+| DeliverableProjection                                 | completed | projection | packages/architect-projection/src/projections/execution-context/deliverables.ts                                      |
+| DeliveryProgressProjectionExecutableTests             | completed | projection | packages/architect-projection/tests/features/projections/delivery-reporting/phase-progress-status.feature            |
+| DeliveryReportingProjectionSupport                    | completed | utility    | packages/architect-projection/src/projections/delivery-reporting/index.ts                                            |
+| DeliveryReportingProjectionSupportExecutableTests     | completed | projection | packages/architect-projection/tests/features/projections/delivery-reporting/roadmap-timeline.feature                 |
+| DependencyContextProjection                           | completed | projection | packages/architect-projection/src/projections/pattern-relations/dependency-context.ts                                |
+| DependencyContextProjectionExecutableTests            | completed | projection | packages/architect-projection/tests/features/projections/pattern-relations/dependency-context.feature                |
+| DependencyEdgeProjection                              | completed | projection | packages/architect-projection/src/projections/pattern-relations/dependency-edges.ts                                  |
+| DependencyEdgeProjectionExecutableTests               | completed | projection | packages/architect-projection/tests/features/projections/pattern-relations/dependency-edges.feature                  |
+| DocStringMediaType                                    | completed |            | packages/architect-core/tests/features/scanner/docstring-mediatype.feature                                           |
+| DocumentationBundle                                   | completed | projection | packages/architect-projection/src/projections/documentation-composition/documentation-bundle.ts                      |
+| DocumentationCompositionProjectionExecutableTests     | completed | projection | packages/architect-projection/tests/features/projections/documentation-composition/config-documentation.feature      |
+| DocumentationCompositionProjectionSupport             | completed | utility    | packages/architect-projection/src/projections/documentation-composition/documentation-composition-shared.internal.ts |
+| DualSourceMergeIntegration                            | completed |            | packages/architect-core/tests/features/extractor/dual-source-merge.feature                                           |
+| ErrorFactoryTypes                                     | completed | contract   | packages/architect-core/src/types/errors.ts                                                                          |
+| ErrorFactoryTypesExecutableTests                      | completed | contract   | packages/architect-core/tests/features/types/error-factories.feature                                                 |
+| ExecutionContextProjectionExecutableTests             | completed | projection | packages/architect-projection/tests/features/projections/execution-context/context-session.feature                   |
+| ExecutionContextProjectionSupport                     | completed | utility    | packages/architect-projection/src/projections/execution-context/execution-context-shared.internal.ts                 |
+| FileDiscovery                                         | completed |            | packages/architect-core/tests/features/scanner/file-discovery.feature                                                |
+| FileReadingListProjection                             | completed | projection | packages/architect-projection/src/projections/execution-context/file-reading-list.ts                                 |
+| FragmentRendererDispatch                              | completed | codec      | packages/architect-projection/src/renderers/\_shared/dispatch.ts                                                     |
+| GenerateDocsCli                                       | completed |            | tests/features/cli/generate-docs.feature                                                                             |
+| GeneratorDegeneracyGuard                              | completed | utility    | packages/architect-projection/src/projections/documentation-composition/degenerate-guard.ts                          |
+| GeneratorDegeneracyGuardExecutableTests               | completed | projection | packages/architect-projection/tests/features/projections/documentation-composition/degenerate-guard.feature          |
+| GherkinRulesSupport                                   | completed |            | packages/architect-core/tests/features/scanner/gherkin-parser.feature                                                |
+| GovernanceProjectionSupport                           | completed | utility    | packages/architect-projection/src/projections/governance/governance-shared.internal.ts                               |
+| GovernanceValidationTaxonomyProjectionExecutableTests | completed | projection | packages/architect-projection/tests/features/projections/governance/validation-taxonomy.feature                      |
+| HandoffProjection                                     | completed | projection | packages/architect-projection/src/projections/execution-context/handoff.ts                                           |
+| JsonRenderer                                          | completed | codec      | packages/architect-projection/src/renderers/render-json.ts                                                           |
+| LintEngine                                            | completed | service    | packages/architect-guard/src/lint/engine.ts                                                                          |
+| LintModule                                            | completed | barrel     | packages/architect-guard/src/lint/index.ts                                                                           |
+| LintPatternsCLI                                       | completed | service    | packages/architect-guard/src/cli/lint-patterns.ts                                                                    |
+| LintPatternsCliBehavior                               | completed |            | tests/features/cli/lint-patterns.feature                                                                             |
+| LintProcessCliBehavior                                | completed |            | tests/features/cli/lint-process.feature                                                                              |
+| LintRules                                             | completed | service    | packages/architect-guard/src/lint/rules.ts                                                                           |
+| MarkdownRenderer                                      | completed | codec      | packages/architect-projection/src/renderers/render-markdown.ts                                                       |
+| MCPFileWatcher                                        | completed | utility    | packages/architect-mcp/src/file-watcher.ts                                                                           |
+| MCPPipelineSession                                    | completed | service    | packages/architect-mcp/src/pipeline-session.ts                                                                       |
+| MCPServer                                             | completed | service    | packages/architect-mcp/src/server.ts                                                                                 |
+| MCPServerBin                                          | completed | utility    | packages/architect-mcp/src/cli/mcp-server.ts                                                                         |
+| MCPToolRegistry                                       | completed | service    | packages/architect-mcp/src/tool-registry.ts                                                                          |
+| OperationalInsightsProjectionExecutableTests          | completed | projection | packages/architect-projection/tests/features/projections/operational-insights/reporting.feature                      |
+| OperationalInsightsProjectionSupport                  | completed | utility    | packages/architect-projection/src/projections/operational-insights/index.ts                                          |
+| OrphanPatternListProjection                           | completed | projection | packages/architect-projection/src/projections/pattern-relations/orphan-pattern-list.ts                               |
+| OverviewProjection                                    | completed | projection | packages/architect-projection/src/projections/operational-insights/index.ts                                          |
+| PatternCatalogProjection                              | completed | projection | packages/architect-projection/src/projections/pattern-relations/pattern-catalog.ts                                   |
+| PatternCatalogStatusFilterExecutableTests             | completed | projection | packages/architect-projection/tests/features/projections/pattern-relations/pattern-catalog-status-filter.feature     |
+| PatternDetailProjection                               | completed | projection | packages/architect-projection/src/projections/pattern-relations/pattern-detail.ts                                    |
+| PatternDetailProjectionExecutableTests                | completed | projection | packages/architect-projection/tests/features/projections/pattern-relations/pattern-detail.feature                    |
+| PatternGraphAPICLI                                    | completed |            | tests/features/cli/pattern-graph-cli-core.feature                                                                    |
+| PatternGraphCliArchHealth                             | completed |            | tests/features/cli/pattern-graph-cli-arch-health.feature                                                             |
+| PatternGraphCliOutputModifiers                        | completed |            | tests/features/cli/pattern-graph-cli-output-modifiers.feature                                                        |
+| PatternGraphCliQueryPassthrough                       | completed |            | tests/features/cli/pattern-graph-cli-query.feature                                                                   |
+| PatternGraphCliRulesSubcommand                        | completed |            | tests/features/cli/pattern-graph-cli-rules-subcommand.feature                                                        |
+| PatternGraphCliSubcommands                            | completed |            | tests/features/cli/pattern-graph-cli-subcommands.feature                                                             |
+| PatternRelationsProjectionSupport                     | completed | utility    | packages/architect-projection/src/projections/\_shared/pattern-helpers.internal.ts                                   |
+| PatternSummaryCatalogProjectionExecutableTests        | completed | projection | packages/architect-projection/tests/features/projections/pattern-relations/pattern-summary.feature                   |
+| PatternSummaryProjection                              | completed | projection | packages/architect-projection/src/projections/pattern-relations/pattern-summary.ts                                   |
+| PDR001SessionWorkflowCommands                         | completed |            | architect/decisions/pdr-001-session-workflow-commands.feature                                                        |
+| PDR005ProcessGuardFSM                                 | completed |            | architect/decisions/pdr-005-process-guard-fsm.feature                                                                |
+| PDR006AdvisoryProcessGuardProtection                  | completed |            | architect/decisions/pdr-006-advisory-process-guard-protection.feature                                                |
+| PrChangeReviewProjection                              | completed | projection | packages/architect-projection/src/projections/documentation-composition/pr-change-review.ts                          |
+| ProjectConfigLoader                                   | completed |            | packages/architect-core/tests/features/config/project-config-loader.feature                                          |
+| ProjectConfigProjection                               | completed | projection | packages/architect-projection/src/projections/documentation-composition/project-config.ts                            |
+| RequirementDigestProjection                           | completed | projection | packages/architect-projection/src/projections/operational-insights/index.ts                                          |
+| RequirementExecutableDigestProjection                 | completed | projection | packages/architect-projection/src/projections/operational-insights/index.ts                                          |
+| RequirementSpecsDigestProjection                      | completed | projection | packages/architect-projection/src/projections/operational-insights/index.ts                                          |
+| ResultMonadTypes                                      | completed | contract   | packages/architect-core/src/types/result.ts                                                                          |
+| ResultMonadTypesExecutableTests                       | completed | contract   | packages/architect-core/tests/features/types/result-monad.feature                                                    |
+| RoadmapTimelineProjection                             | completed | projection | packages/architect-projection/src/projections/delivery-reporting/index.ts                                            |
+| RoleProfileProjection                                 | completed | projection | packages/architect-projection/src/projections/operational-insights/index.ts                                          |
+| ScannerCore                                           | completed |            | packages/architect-core/tests/features/behavior/scanner-core.feature                                                 |
+| ScopeReadinessProjection                              | completed | projection | packages/architect-projection/src/projections/execution-context/scope-readiness.ts                                   |
+| SessionContextProjection                              | completed | projection | packages/architect-projection/src/projections/execution-context/session-context.ts                                   |
+| ShapeExtraction                                       | completed |            | packages/architect-core/tests/features/extractor/shape-extraction-types.feature                                      |
+| SourceInventoryProjection                             | completed | projection | packages/architect-projection/src/projections/operational-insights/index.ts                                          |
+| SourceMerging                                         | completed |            | packages/architect-core/tests/features/config/source-merging.feature                                                 |
+| StatusDistributionProjection                          | completed | projection | packages/architect-projection/src/projections/delivery-reporting/index.ts                                            |
+| TagUsageProjection                                    | completed | projection | packages/architect-projection/src/projections/operational-insights/index.ts                                          |
+| TaxonomyDigestProjection                              | completed | projection | packages/architect-projection/src/projections/governance/taxonomy-digest.ts                                          |
+| TraceabilityMatrixProjection                          | completed | projection | packages/architect-projection/src/projections/delivery-reporting/index.ts                                            |
+| TraceabilityMatrixProjectionExecutableTests           | completed | projection | packages/architect-projection/tests/features/projections/delivery-reporting/traceability-matrix.feature              |
+| TypeScriptTaxonomyImplementation                      | completed |            | packages/architect-core/tests/features/types/tag-registry-builder.feature                                            |
+| UiRenderer                                            | completed | codec      | packages/architect-projection/src/renderers/render-ui.ts                                                             |
+| ValidatePatternsCLI                                   | completed | service    | packages/architect-guard/src/cli/validate-patterns.ts                                                                |
+| ValidationModule                                      | completed | barrel     | packages/architect-guard/src/validation/index.ts                                                                     |
+| ValidationRuleDigestProjection                        | completed | projection | packages/architect-projection/src/projections/governance/validation-rule-digest.ts                                   |
+| ValidatorReadModelConsolidation                       | completed |            | tests/features/cli/validate-patterns.feature                                                                         |

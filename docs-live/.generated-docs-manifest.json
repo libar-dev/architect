@@ -181,7 +181,35 @@
           "parentPath": "DECISIONS.md"
         },
         {
+          "path": "decisions/adr-012.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "DECISIONS.md"
+        },
+        {
+          "path": "decisions/adr-013.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "DECISIONS.md"
+        },
+        {
+          "path": "decisions/pdr-001.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "DECISIONS.md"
+        },
+        {
           "path": "decisions/pdr-005.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "DECISIONS.md"
+        },
+        {
+          "path": "decisions/pdr-006.md",
           "role": "progressive-child",
           "audience": "published",
           "tracking": "commit",

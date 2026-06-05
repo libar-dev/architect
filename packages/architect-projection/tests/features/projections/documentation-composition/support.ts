@@ -24,10 +24,6 @@ interface PatternFixtureOptions {
   readonly status?: ExtractedPattern['status'];
   readonly maturity?: PatternMaturity;
   readonly role?: ExtractedPattern['role'];
-  readonly phase?: ExtractedPattern['phase'];
-  readonly quarter?: ExtractedPattern['quarter'];
-  readonly release?: ExtractedPattern['release'];
-  readonly completed?: ExtractedPattern['completed'];
   readonly file?: string;
   readonly description?: string;
   readonly boundedContext?: ExtractedPattern['boundedContext'];
@@ -54,7 +50,6 @@ interface PatternFixtureOptions {
 
 interface ProjectionContextOptions {
   readonly patterns: readonly ExtractedPattern[];
-  readonly phaseNames?: Record<number, string>;
   readonly relationshipIndex?: Record<string, RelationshipEntry>;
   readonly tagRegistry?: TagRegistry;
   readonly projectMetadata?: ProjectMetadata;
@@ -101,7 +96,6 @@ export function createProjectionContext(options: ProjectionContextOptions): Proj
   return {
     graph: buildGraphFromPatterns({
       patterns: options.patterns,
-      phaseNames: options.phaseNames,
       relationshipIndex: options.relationshipIndex,
       tagRegistry: options.tagRegistry ?? createTagRegistry(),
     }),

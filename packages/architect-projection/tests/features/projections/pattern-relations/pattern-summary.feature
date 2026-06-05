@@ -2,24 +2,23 @@
 @architect-pattern:PatternSummaryCatalogProjectionExecutableTests
 @architect-implements:PatternRelationsProjectionSupport,PatternSummaryProjection,PatternCatalogProjection
 @architect-status:completed
-@architect-phase:49
 @architect-product-area:Projection
 @architect-role:projection
 @pattern-relations
 Feature: Pattern summary projection
 
   **Business Value:** Consumers obtain the canonical short description of any
-  pattern — name, status, role, phase, file, and source (`typescript` or
+  pattern — name, status, role, file, and source (`typescript` or
   `gherkin`) — as a stable `PatternSummary` fragment, and can list or filter
-  the whole graph through the `PatternCatalog` projection by status, phase,
-  and role alias, with `namesOnly` and `count` flags for compact responses.
+  the whole graph through the `PatternCatalog` projection by status and role
+  alias, with `namesOnly` and `count` flags for compact responses.
 
   **How It Works:** Summary projection resolves the pattern
   (case-insensitively) via `requirePattern`, derives the source from the file
   extension, and returns the stable shape; unknown names fail with a fuzzy
   suggestion. Catalog projection resolves role aliases against the tag
-  registry, filters pattern summaries by status, phase, and canonical role,
-  sorts them alphabetically, and omits `names` and `items` according to the
+  registry, filters pattern summaries by status and canonical role, sorts
+  them alphabetically, and omits `names` and `items` according to the
   `count` and `namesOnly` flags.
 
   Background:
@@ -31,9 +30,8 @@ Feature: Pattern summary projection
   Rule: Pattern summaries keep the stable fragment contract
 
     **Invariant:** A `PatternSummary` always exposes `patternName`, `status`,
-    `role`, optional `phase`, `file`, and `source` fields, lookup is
-    case-insensitive, and unknown names produce a `PATTERN_NOT_FOUND` error
-    with a fuzzy suggestion.
+    `role`, `file`, and `source` fields, lookup is case-insensitive, and
+    unknown names produce a `PATTERN_NOT_FOUND` error with a fuzzy suggestion.
 
     **Rationale:** Summary is the foundational fragment reused by catalog,
     detail, and every renderer — any shape drift or silent miss would
@@ -60,7 +58,7 @@ Feature: Pattern summary projection
   Rule: Pattern catalogs own list filtering semantics
 
     **Invariant:** Role filters are resolved to canonical tags through the tag
-    registry before matching, status/phase/role filters combine with AND
+    registry before matching, status/role filters combine with AND
     semantics, results are sorted alphabetically by pattern name, and the
     `namesOnly` and `count` flags omit `items` (and `names` when `count` is
     true) from the payload while still reporting the full `count`.
@@ -70,7 +68,7 @@ Feature: Pattern summary projection
     or sorting logic — and must be able to request just a count or just
     names when the full summaries would be wasteful.
 
-    **Verified by:** role aliases resolve before catalog filtering, status filter selects matching patterns, phase filter selects matching patterns, status phase and role filters combine, count flag returns only the matching count, namesOnly flag returns names without item details
+    **Verified by:** role aliases resolve before catalog filtering, status filter selects matching patterns, status and role filters combine, count flag returns only the matching count, namesOnly flag returns names without item details
 
     Scenario: role aliases resolve before catalog filtering
       Given a catalog projection context with canonical and non-matching roles
@@ -79,29 +77,24 @@ Feature: Pattern summary projection
       And the projected catalog should include only "InfraPattern"
 
     Scenario: status filter selects matching patterns
-      Given a catalog projection context with mixed status phase and role variants
+      Given a catalog projection context with mixed status and role variants
       When I project the pattern catalog with status "active"
       Then the projected catalog names should be "ActiveInfraPhase50, ActiveService"
 
-    Scenario: phase filter selects matching patterns
-      Given a catalog projection context with mixed status phase and role variants
-      When I project the pattern catalog with phase 50
-      Then the projected catalog names should be "ActiveInfraPhase50, RoadmapUiPhase50"
-
-    Scenario: status phase and role filters combine
-      Given a catalog projection context with mixed status phase and role variants
-      When I project the pattern catalog with status "active" phase 50 and role alias "infrastructure"
+    Scenario: status and role filters combine
+      Given a catalog projection context with mixed status and role variants
+      When I project the pattern catalog with status "active" and role alias "infrastructure"
       Then the projected catalog should resolve the canonical role filter
       And the projected catalog names should be "ActiveInfraPhase50"
 
     Scenario: count flag returns only the matching count
-      Given a catalog projection context with mixed status phase and role variants
+      Given a catalog projection context with mixed status and role variants
       When I project the pattern catalog with count true
       Then the projected catalog count should be 4
       And the projected catalog should omit names and items
 
     Scenario: namesOnly flag returns names without item details
-      Given a catalog projection context with mixed status phase and role variants
+      Given a catalog projection context with mixed status and role variants
       When I project the pattern catalog with namesOnly true
       Then the projected catalog names should be "ActiveInfraPhase50, ActiveService, CompletedService, RoadmapUiPhase50"
       And the projected catalog should omit item details

@@ -5,7 +5,7 @@
  * @architect-status completed
  * @architect-role:service
  * @architect-bounded-context:validation
- * @architect-uses DoDValidationTypes
+ * @architect-uses AntiPatternValidationTypes
  *
  * ## AntiPatternDetector - Documentation Anti-Pattern Detection
  *
@@ -49,25 +49,31 @@ export type { AntiPatternViolation, AntiPatternThresholds } from './types.js';
  * Tag suffixes that should only appear in feature files, not TypeScript code.
  * These are process metadata tags that track delivery workflow state.
  *
- * Per ADR-001 Rule 6 (D-3 hybrid model): the canonical minimum is `quarter`
- * and `team`; this package extends with `effort`, `workflow`, `completed`,
- * `effort-actual` for its requirement-doc enrichment. Source of truth lives
- * in `@libar-dev/architect-core`'s taxonomy module.
+ * Per ADR-001 Rule 6 (D-3 hybrid model): the canonical minimum is `team`;
+ * this package extends with `workflow` and `completed` for its
+ * requirement-doc enrichment. Source of truth lives in
+ * `@libar-dev/architect-core`'s taxonomy module.
  */
 const FEATURE_ONLY_TAG_SUFFIXES = ARCHITECT_PACKAGE_FEATURE_ONLY_TAG_SUFFIXES;
 
 /**
  * Tag suffixes that have been removed from the registry.
  * Using these tags causes silent data loss — the scanner skips unrecognized tags.
+ *
+ * `quarter`, `phase`, `release`, and `completed` were retired by ADR-013 (the
+ * temporal/release/completion-date dimensions). Matching is on the full
+ * `<prefix><suffix>` token (exact or `<prefix><suffix>:`), so `completed` flags
+ * `@architect-completed` but NOT `@architect-status:completed`, and `phase`
+ * flags `@architect-phase` but NOT `@architect-level:phase`.
  */
-const REMOVED_TAG_SUFFIXES = ['brief'] as const;
+const REMOVED_TAG_SUFFIXES = ['brief', 'quarter', 'phase', 'release', 'completed'] as const;
 
 /**
  * Builds feature-only annotation list from the tag prefix.
  * These tags should appear in feature files, not TypeScript code.
  *
  * @param tagPrefix - The tag prefix (e.g., "@architect-" or "@acme-")
- * @returns Array of full annotation strings (e.g., ["@architect-quarter", "@architect-team", ...])
+ * @returns Array of full annotation strings (e.g., ["@architect-team", "@architect-workflow", ...])
  */
 function buildFeatureOnlyAnnotations(tagPrefix: string): readonly string[] {
   return FEATURE_ONLY_TAG_SUFFIXES.map((suffix) => `${tagPrefix}${suffix}`);
@@ -94,7 +100,7 @@ export interface AntiPatternDetectionOptions extends WithTagRegistry {
 /**
  * Detect process metadata in code anti-pattern
  *
- * Finds process tracking annotations (e.g., @architect-quarter, @architect-team, etc.)
+ * Finds process tracking annotations (e.g., @architect-team, @architect-workflow, etc.)
  * in TypeScript files. Process metadata belongs in feature files.
  *
  * @param scannedFiles - Array of scanned TypeScript files

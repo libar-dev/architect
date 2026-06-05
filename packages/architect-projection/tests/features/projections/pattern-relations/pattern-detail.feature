@@ -2,7 +2,6 @@
 @architect-pattern:PatternDetailProjectionExecutableTests
 @architect-implements:PatternDetailProjection
 @architect-status:completed
-@architect-phase:49
 @architect-product-area:Projection
 @architect-role:projection
 @pattern-relations

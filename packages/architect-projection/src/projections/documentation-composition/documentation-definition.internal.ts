@@ -6,8 +6,8 @@ import type { ProjectionBundle } from '../../fragments/base.js';
 import type { Fragment } from '../../fragments/index.js';
 import { projectPatternCatalog } from '../pattern-relations/pattern-catalog.js';
 import {
+  projectChangelog,
   projectCurrentWork,
-  projectReleaseNotesDigest,
   projectRoadmapTimeline,
   projectTraceabilityMatrix,
 } from '../delivery-reporting/index.js';
@@ -56,7 +56,7 @@ const DOCUMENTATION_PROJECTIONS = {
   'requirements-specs': (context) => projectRequirementSpecsDigest(context),
   'validation-rules': (context) => projectValidationRuleDigest(context),
   taxonomy: (context) => projectTaxonomyDigest(context),
-  changelog: (context) => projectReleaseNotesDigest(context),
+  changelog: (context) => projectChangelog(context),
   traceability: (context) => projectTraceabilityMatrix(context),
 } satisfies Record<SupportedDocumentationType, DocumentationProjectionFactory>;
 

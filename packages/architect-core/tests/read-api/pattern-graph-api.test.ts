@@ -84,8 +84,6 @@ function makeGraph(patterns: readonly ExtractedPattern[]): PatternGraph {
     byStatus: { candidate: [], roadmap: [], active: patterns, completed: [], deferred: [] },
     byNormalizedStatus: { completed: [], active: patterns, planned: [], candidate: [] },
     byMaturity: {},
-    byPhase: [],
-    byQuarter: {},
     byRole: {},
     bySourceType: { typescript: patterns, gherkin: [], roadmap: [], prd: [] },
     byProductArea: {},
@@ -96,7 +94,6 @@ function makeGraph(patterns: readonly ExtractedPattern[]): PatternGraph {
       candidate: 0,
       total: patterns.length,
     },
-    phaseCount: 0,
     roleCount: 0,
     relationshipIndex: buildRelationshipIndex(patterns),
   });

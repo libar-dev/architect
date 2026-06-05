@@ -2,7 +2,6 @@
 @architect-pattern:BusinessRulesProjectionExecutableTests
 @architect-implements:GovernanceProjectionSupport,BusinessRulesProjection
 @architect-status:completed
-@architect-phase:49
 @architect-product-area:Projection
 @architect-role:projection
 @governance
@@ -12,7 +11,7 @@ Feature: Governance business rule projections
   **Business Value:** Consumers receive business rules as normalized
   `BusinessRule` fragments — with invariant, rationale, and verified-by lifted
   out of the rule description — and grouped `BusinessRuleSet` bundles scoped by
-  feature, phase, or product area, including projection-owned grouping summary
+  feature, package, or product area, including projection-owned grouping summary
   entries that downstream renderers can format without recomputing semantic counts.
 
   **How It Works:** The projection walks `context.graph.patterns`, parses each
@@ -88,25 +87,6 @@ Feature: Governance business rule projections
       Given a business rule projection context with Delivery Process and Data API rules
       When I parse-and-project the business rule set with an invalid grouping option
       Then parsing business-rule-set options should fail loudly
-
-  Rule: Phase grouping requires every grouped rule to expose a phase
-
-    **Invariant:** When `groupedBy: 'phase'` is requested, every collected rule
-    must carry a numeric `phase`; otherwise the projection rejects the grouping
-    request rather than silently dropping unphased rules from child routes and
-    grouping summaries.
-
-    **Rationale:** Projection-owned grouping semantics must remain lossless. A
-    partially grouped root would make navigation-oriented documentation omit
-    valid rules before any renderer has a chance to recover them.
-
-    **Verified by:** Phase grouping rejects unphased rules loudly
-
-    @validation
-    Scenario: Phase grouping rejects unphased rules loudly
-      Given a business rule projection context with at least one unphased rule
-      When I project the business rule set grouped by phase
-      Then grouping business rules by phase should fail loudly
 
   Rule: Package grouping reuses the package axis at runtime
 

@@ -14,9 +14,9 @@ Feature: Dual-source merge integration
 
   Rule: Dual-source merge outcomes stay explicit across roadmap and validation paths
 
-    **Invariant:** Annotation-only and spec-only roadmap patterns remain visible as unmatched sources, matching names merge into one combined pattern, and phase conflicts surface validation errors without dropping the combined pattern.
+    **Invariant:** Annotation-only and spec-only roadmap patterns remain visible as unmatched sources, and matching names merge into one combined pattern carrying its process metadata and deliverables.
     **Rationale:** The dual-source pipeline is useful only if it preserves source provenance and reports drift instead of silently hiding it.
-    **Verified by:** Annotation-only roadmap pattern warns about missing feature coverage, Spec-only roadmap pattern warns about missing code coverage, Matching code and feature merge process metadata and deliverables, Phase mismatch reports a validation error while keeping the merged pattern
+    **Verified by:** Annotation-only roadmap pattern warns about missing feature coverage, Spec-only roadmap pattern warns about missing code coverage, Matching code and feature merge process metadata and deliverables
 
     @happy-path
     Scenario: Annotation-only roadmap pattern warns about missing feature coverage
@@ -28,7 +28,7 @@ Feature: Dual-source merge integration
 
     @happy-path
     Scenario: Spec-only roadmap pattern warns about missing code coverage
-      Given a spec-only roadmap feature for pattern "PaymentSaga" in phase 22
+      Given a spec-only roadmap feature for pattern "PaymentSaga"
       When I combine and validate the dual-source inputs
       Then 0 combined patterns are produced
       And 1 spec-only patterns remain
@@ -36,19 +36,10 @@ Feature: Dual-source merge integration
 
     @happy-path
     Scenario: Matching code and feature merge process metadata and deliverables
-      Given a code pattern "SharedKernel" in phase 14
-      And a feature file for pattern "SharedKernel" in phase 14 with deliverable "Integrate shared abstractions"
+      Given a code pattern "SharedKernel"
+      And a feature file for pattern "SharedKernel" with deliverable "Integrate shared abstractions"
       When I combine and validate the dual-source inputs
       Then 1 combined patterns are produced
-      And combined pattern "SharedKernel" has process phase 14
+      And combined pattern "SharedKernel" has process metadata
       And combined pattern "SharedKernel" has 1 deliverable
       And validation passes without errors
-
-    @edge-case
-    Scenario: Phase mismatch reports a validation error while keeping the merged pattern
-      Given a code pattern "MismatchSaga" in phase 10
-      And a feature file for pattern "MismatchSaga" in phase 20
-      When I combine and validate the dual-source inputs
-      Then 1 combined patterns are produced
-      And 1 phase validation error exists
-      And validation fails with 1 error

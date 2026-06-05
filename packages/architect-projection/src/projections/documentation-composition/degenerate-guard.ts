@@ -14,12 +14,12 @@
  * trust failure — the gate refuses to let such a degenerate root ship.
  *
  * **Invariant:** For every collection-bearing fragment kind the guard knows
- * about (TraceabilityMatrix→`rows`, RoadmapTimeline→`quarters`,
- * ReleaseNotesDigest→`releases`, PatternCatalog→`items`,
- * BusinessRuleSet→`rules`, RequirementDigest→`requirements`), an empty primary
- * collection throws `GeneratorDegenerateError` naming the document type and the
- * reason; fragment kinds with no registered primary collection are not
- * collection-bearing and pass unconditionally.
+ * about (TraceabilityMatrix→`rows`, RoadmapTimeline→`patterns`,
+ * PatternCatalog→`items`, BusinessRuleSet→`rules`,
+ * RequirementDigest→`requirements`), an empty primary collection throws
+ * `GeneratorDegenerateError` naming the document type and the reason; fragment
+ * kinds with no registered primary collection are not collection-bearing and
+ * pass unconditionally.
  *
  * **Behavior:**
  * - Looks the root fragment's `kind` up in a per-kind primary-collection map;
@@ -43,8 +43,7 @@ import type { SupportedDocumentationType } from './documentation-type-registry.i
  */
 const PRIMARY_COLLECTION_BY_KIND = {
   TraceabilityMatrix: 'rows',
-  RoadmapTimeline: 'quarters',
-  ReleaseNotesDigest: 'releases',
+  RoadmapTimeline: 'patterns',
   PatternCatalog: 'items',
   BusinessRuleSet: 'rules',
   RequirementDigest: 'requirements',
@@ -78,7 +77,7 @@ function isCollectionBearingKind(kind: FragmentKind): kind is CollectionBearingK
  * Asserts that a documentation generator's root fragment is not degenerate.
  *
  * For collection-bearing fragment kinds, throws {@link GeneratorDegenerateError}
- * when the primary collection (e.g. `rows`, `quarters`, `releases`) is empty.
+ * when the primary collection (e.g. `rows`, `patterns`, `items`) is empty.
  * Fragment kinds with no registered primary collection are not collection-
  * bearing and pass unconditionally.
  */

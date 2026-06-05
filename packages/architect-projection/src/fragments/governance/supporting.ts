@@ -36,20 +36,14 @@ export const DecisionStatusSchema = z.enum([
  *
  * @architect-shape
  */
-export const BusinessRuleScopeSchema = z.enum([
-  'all',
-  'package',
-  'product-area',
-  'phase',
-  'feature',
-]);
+export const BusinessRuleScopeSchema = z.enum(['all', 'package', 'product-area', 'feature']);
 
 /**
  * The dimension a business-rule set is grouped by.
  *
  * @architect-shape
  */
-export const BusinessRuleGroupingSchema = z.enum(['package', 'product-area', 'phase', 'feature']);
+export const BusinessRuleGroupingSchema = z.enum(['package', 'product-area', 'feature']);
 
 /**
  * Severity assigned to a validation rule.
@@ -105,7 +99,8 @@ export const ProtectionLevelSchema = z.enum(['none', 'scope', 'hard']);
 
 /**
  * Maps a protection level to the statuses it covers and what it permits —
- * whether deliverables may be added and whether an explicit unlock is required.
+ * whether deliverables may be added and whether the level emits an advisory,
+ * unlock-suppressible warning on the commit path (PDR-006).
  *
  * @architect-shape
  */
@@ -114,7 +109,7 @@ export const ProtectionLevelEntrySchema = z.strictObject({
   statuses: z.array(z.string()),
   meaning: z.string().optional(),
   canAddDeliverables: z.boolean(),
-  needsUnlock: z.boolean(),
+  unlockSuppressesWarning: z.boolean(),
 });
 
 /**

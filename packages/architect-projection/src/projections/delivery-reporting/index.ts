@@ -9,9 +9,9 @@
  * ## Delivery reporting projection support
  *
  * **Value:** Centralises the pure helpers that every delivery-reporting
- * projection depends on — phase/status counting, quarter grouping, release
- * bucketing, traceability-row shaping, slug generation, and deterministic
- * pattern sorting — so each `project*` entry point stays a one-liner.
+ * projection depends on — status counting, traceability-row shaping, slug
+ * generation, and deterministic pattern sorting — so each `project*` entry
+ * point stays a one-liner.
  *
  * **Invariant:** Helpers never touch the filesystem, renderable docs, or the
  * raw PatternGraph beyond `ProjectionContext`; percentage math always excludes
@@ -22,17 +22,13 @@
  * - Classifies patterns with `isPatternComplete`, `isPatternActive`, and
  *   `isPatternPlanned` from `@libar-dev/architect-core`, then folds the
  *   results into a `StatusCounts` summary reused across projections.
- * - Groups patterns into quarter buckets with year-then-quarter ordering and
- *   locale-aware label comparison, falling back to a lexical sort when no
- *   quarter metadata is parseable.
- * - Builds release entries in canonical changelog order (Unreleased → tagged
- *   releases descending → quarter fallbacks descending → Earlier) and
- *   deduplicates deliverables across patterns within an entry.
+ * - Selects the per-view pattern set for roadmap, current-work, and changelog
+ *   (completed) timelines and folds it into a flat, name-sorted summary list.
  *
  * ### When to Use
  *
- * - Provides shared delivery-reporting helpers for phase, status, timeline,
- *   release, and traceability projections.
+ * - Provides shared delivery-reporting helpers for status, timeline,
+ *   changelog, and traceability projections.
  */
 
 import type { ExtractedPattern } from '@libar-dev/architect-core';
@@ -41,50 +37,20 @@ import { isPatternActive, isPatternComplete, isPatternPlanned } from '@libar-dev
 import type { ProjectionContext } from '../../context/projection-context.js';
 import { projectSingle, type ProjectionBundle } from '../../fragments/base.js';
 import {
-  type PhaseProgress,
   type RoadmapTimeline,
-  type ReleaseNotesDigest,
   type StatusDistribution,
   type TraceabilityMatrix,
 } from '../../fragments/delivery-reporting/index.js';
-import type {
-  QuarterEntry,
-  ReleaseEntry,
-  StatusCounts,
-  TraceRow,
-} from '../../fragments/delivery-reporting/supporting.js';
+import type { StatusCounts, TraceRow } from '../../fragments/delivery-reporting/supporting.js';
 import {
   createPatternSummaryFragment,
   getPatternName,
   getRelationships,
-  normalizeDeliverables,
   uniqueSortedStrings,
 } from '../_shared/pattern-helpers.internal.js';
 import { slugForFilename } from '../../_internal/slug.js';
-import type { EmbeddedDeliverable } from '../../fragments/pattern-relations/supporting.js';
 import { filterPatterns } from '../_shared/filter.js';
 import { createEntityRouteId, createIndexRouteId } from '../../routing/route-id.js';
-
-export function buildPhaseProgress(
-  context: ProjectionContext,
-  phase: number,
-): PhaseProgress | undefined {
-  const phaseGroup = context.graph.byPhase.find((entry) => entry.phaseNumber === phase);
-  if (phaseGroup === undefined) {
-    return undefined;
-  }
-
-  const patterns = filterPatterns(phaseGroup.patterns, context.projectionFilter);
-  const counts = createStatusCounts(patterns);
-
-  return {
-    kind: 'PhaseProgress',
-    phaseNumber: phaseGroup.phaseNumber,
-    ...(phaseGroup.phaseName !== undefined ? { phaseName: phaseGroup.phaseName } : {}),
-    ...counts,
-    completionPercentage: calculateDeliveryPercentage(counts.completed, getDeliveryTotal(counts)),
-  };
-}
 
 export function buildStatusDistribution(context: ProjectionContext): StatusDistribution {
   const counts = createStatusCounts(
@@ -116,45 +82,38 @@ export function buildTimelineBundle(
   context: ProjectionContext,
   view: RoadmapTimeline['view'],
 ): ProjectionBundle<RoadmapTimeline> {
-  const patterns =
+  const selected =
     view === 'roadmap'
       ? [...context.graph.byStatus.roadmap, ...context.graph.byStatus.deferred]
       : view === 'milestones'
         ? context.graph.byNormalizedStatus.completed
         : context.graph.byNormalizedStatus.active;
 
-  return createTimelineBundle(
-    view,
-    buildQuarterEntries(filterPatterns(patterns, context.projectionFilter)),
-  );
+  const patterns = filterPatterns(selected, context.projectionFilter);
+
+  return createTimelineBundle(view, patterns);
 }
 
-export function buildReleaseNotes(
-  context: ProjectionContext,
-  release?: string,
-): ProjectionBundle<ReleaseNotesDigest> {
-  const entries = buildReleaseEntries(context, release);
-  const children = createChildren(
-    entries,
-    (entry) => entry.release,
-    (entry): ReleaseNotesDigest => ({
-      kind: 'ReleaseNotesDigest',
-      releases: [entry],
-    }),
+export function buildChangelog(context: ProjectionContext): ProjectionBundle<RoadmapTimeline> {
+  const completed = filterPatterns(
+    context.graph.byNormalizedStatus.completed,
+    context.projectionFilter,
   );
-  const root: ReleaseNotesDigest = {
-    kind: 'ReleaseNotesDigest',
-    releases: entries,
+  const sorted = sortPatterns(completed);
+
+  const root: RoadmapTimeline = {
+    kind: 'RoadmapTimeline',
+    view: 'milestones',
+    patterns: sorted.map((pattern) => createPatternSummaryFragment(pattern)),
+    counts: createStatusCounts(sorted),
   };
 
   return {
     root,
-    children,
+    children: {},
     routing: {
       rootRouteId: createIndexRouteId('changelog'),
-      childRouteIds: Object.fromEntries(
-        Object.keys(children).map((key) => [key, createEntityRouteId('changelog', key)]),
-      ),
+      childRouteIds: {},
       childPathStrategy: 'nested',
       anchorStrategy: 'heading-slug',
     },
@@ -194,27 +153,20 @@ export function buildTraceabilityMatrix(
 
 function createTimelineBundle(
   view: RoadmapTimeline['view'],
-  quarters: QuarterEntry[],
+  patterns: readonly ExtractedPattern[],
 ): ProjectionBundle<RoadmapTimeline> {
-  const children = createChildren(
-    quarters,
-    (entry) => entry.quarter,
-    (entry): RoadmapTimeline => ({
-      kind: 'RoadmapTimeline',
-      view,
-      quarters: [entry],
-    }),
-  );
+  const sorted = sortPatterns(patterns);
   const root: RoadmapTimeline = {
     kind: 'RoadmapTimeline',
     view,
-    quarters,
+    patterns: sorted.map((pattern) => createPatternSummaryFragment(pattern)),
+    counts: createStatusCounts(sorted),
   };
 
   return {
     root,
-    children,
-    routing: getTimelineRouting(view, Object.keys(children)),
+    children: {},
+    routing: getTimelineRouting(view, []),
   };
 }
 
@@ -226,156 +178,6 @@ function createStatusCounts(patterns: readonly ExtractedPattern[]): StatusCounts
     candidate: patterns.filter((pattern) => pattern.status === 'candidate').length,
     total: patterns.length,
   };
-}
-
-function buildQuarterEntries(patterns: readonly ExtractedPattern[]): QuarterEntry[] {
-  const grouped = new Map<string, ExtractedPattern[]>();
-
-  for (const pattern of patterns) {
-    const quarter = pattern.quarter?.trim();
-    if (!quarter) {
-      continue;
-    }
-
-    const bucket = grouped.get(quarter) ?? [];
-    bucket.push(pattern);
-    grouped.set(quarter, bucket);
-  }
-
-  return [...grouped.entries()]
-    .sort(([left], [right]) => compareQuarterLabels(left, right))
-    .map(([quarter, quarterPatterns]) => ({
-      quarter,
-      patterns: sortPatterns(quarterPatterns).map((pattern) =>
-        createPatternSummaryFragment(pattern),
-      ),
-      counts: createStatusCounts(quarterPatterns),
-    }));
-}
-
-function buildReleaseEntries(context: ProjectionContext, release?: string): ReleaseEntry[] {
-  const entries = [
-    ...buildUnreleasedEntries(context),
-    ...buildTaggedReleaseEntries(context),
-    ...buildQuarterFallbackEntries(context),
-    ...buildEarlierFallbackEntries(context),
-  ];
-
-  if (release === undefined) {
-    return entries;
-  }
-
-  return entries.filter((entry) => entry.release === release);
-}
-
-function buildUnreleasedEntries(context: ProjectionContext): ReleaseEntry[] {
-  const unreleasedCandidates = filterPatterns(
-    [
-      ...context.graph.byNormalizedStatus.active,
-      ...context.graph.patterns.filter((pattern) => pattern.release === 'vNEXT'),
-    ],
-    context.projectionFilter,
-  );
-  const patterns = deduplicatePatterns(unreleasedCandidates);
-
-  return patterns.length === 0 ? [] : [createReleaseEntry('Unreleased', patterns)];
-}
-
-function buildTaggedReleaseEntries(context: ProjectionContext): ReleaseEntry[] {
-  const grouped = new Map<string, ExtractedPattern[]>();
-
-  for (const pattern of filterPatterns(
-    context.graph.byNormalizedStatus.completed,
-    context.projectionFilter,
-  )) {
-    const release = pattern.release?.trim();
-    if (!release || release === 'vNEXT') {
-      continue;
-    }
-
-    const bucket = grouped.get(release) ?? [];
-    bucket.push(pattern);
-    grouped.set(release, bucket);
-  }
-
-  return [...grouped.entries()]
-    .sort(([left], [right]) =>
-      right.localeCompare(left, undefined, { numeric: true, sensitivity: 'base' }),
-    )
-    .map(([release, patterns]) => createReleaseEntry(release, patterns));
-}
-
-function buildQuarterFallbackEntries(context: ProjectionContext): ReleaseEntry[] {
-  const grouped = new Map<string, ExtractedPattern[]>();
-
-  for (const pattern of filterPatterns(
-    context.graph.byNormalizedStatus.completed,
-    context.projectionFilter,
-  )) {
-    if (pattern.release?.trim()) {
-      continue;
-    }
-
-    const quarter = pattern.quarter?.trim();
-    if (!quarter) {
-      continue;
-    }
-
-    const bucket = grouped.get(quarter) ?? [];
-    bucket.push(pattern);
-    grouped.set(quarter, bucket);
-  }
-
-  return [...grouped.entries()]
-    .sort(([left], [right]) => compareQuarterLabels(right, left))
-    .map(([quarter, patterns]) => createReleaseEntry(quarter, patterns));
-}
-
-function buildEarlierFallbackEntries(context: ProjectionContext): ReleaseEntry[] {
-  const patterns = filterPatterns(
-    context.graph.byNormalizedStatus.completed,
-    context.projectionFilter,
-  ).filter((pattern) => {
-    const release = pattern.release?.trim();
-    const quarter = pattern.quarter?.trim();
-    return !release && !quarter;
-  });
-
-  return patterns.length === 0 ? [] : [createReleaseEntry('Earlier', patterns)];
-}
-
-function createReleaseEntry(release: string, patterns: readonly ExtractedPattern[]): ReleaseEntry {
-  const sortedPatterns = sortPatterns(patterns);
-  const dates = sortedPatterns
-    .map((pattern) => pattern.completed?.trim())
-    .filter((value): value is string => value !== undefined && value.length > 0)
-    .sort((left, right) => right.localeCompare(left));
-
-  return {
-    release,
-    ...(dates[0] !== undefined ? { date: dates[0] } : {}),
-    patterns: sortedPatterns.map((pattern) => createPatternSummaryFragment(pattern)),
-    deliverables: deduplicateDeliverables(sortedPatterns),
-  };
-}
-
-function deduplicateDeliverables(patterns: readonly ExtractedPattern[]): EmbeddedDeliverable[] {
-  const seen = new Set<string>();
-  const deliverables: EmbeddedDeliverable[] = [];
-
-  for (const pattern of patterns) {
-    for (const deliverable of normalizeDeliverables(pattern)) {
-      const key = `${deliverable.name}::${deliverable.location}::${deliverable.release ?? ''}`;
-      if (seen.has(key)) {
-        continue;
-      }
-
-      seen.add(key);
-      deliverables.push(deliverable);
-    }
-  }
-
-  return deliverables;
 }
 
 function buildTraceRows(context: ProjectionContext): TraceRow[] {
@@ -431,10 +233,7 @@ function getTimelineRouting(
   };
 }
 
-function createChildren<
-  TEntry,
-  TFragment extends RoadmapTimeline | ReleaseNotesDigest | TraceabilityMatrix,
->(
+function createChildren<TEntry, TFragment extends RoadmapTimeline | TraceabilityMatrix>(
   entries: readonly TEntry[],
   label: (entry: TEntry) => string,
   createFragment: (entry: TEntry) => TFragment,
@@ -455,35 +254,12 @@ function createChildren<
 }
 
 function sortPatterns(patterns: readonly ExtractedPattern[]): ExtractedPattern[] {
-  return [...patterns].sort((left, right) => {
-    const phaseDelta =
-      (left.phase ?? Number.MAX_SAFE_INTEGER) - (right.phase ?? Number.MAX_SAFE_INTEGER);
-    if (phaseDelta !== 0) {
-      return phaseDelta;
-    }
-
-    return getPatternName(left).localeCompare(getPatternName(right), undefined, {
+  return [...patterns].sort((left, right) =>
+    getPatternName(left).localeCompare(getPatternName(right), undefined, {
       numeric: true,
       sensitivity: 'base',
-    });
-  });
-}
-
-function deduplicatePatterns(patterns: readonly ExtractedPattern[]): ExtractedPattern[] {
-  const seen = new Set<string>();
-  const unique: ExtractedPattern[] = [];
-
-  for (const pattern of patterns) {
-    const key = getPatternName(pattern).toLowerCase();
-    if (seen.has(key)) {
-      continue;
-    }
-
-    seen.add(key);
-    unique.push(pattern);
-  }
-
-  return sortPatterns(unique);
+    }),
+  );
 }
 
 function deduplicateStrings(values: readonly string[]): string[] {
@@ -506,92 +282,12 @@ function calculateDeliveryPercentage(value: number, total: number): number {
   return total === 0 ? 0 : Math.round((value / total) * 100);
 }
 
-function compareQuarterLabels(left: string, right: string): number {
-  const parsedLeft = parseQuarterLabel(left);
-  const parsedRight = parseQuarterLabel(right);
-
-  if (parsedLeft !== undefined && parsedRight !== undefined) {
-    if (parsedLeft.year !== parsedRight.year) {
-      return parsedLeft.year - parsedRight.year;
-    }
-
-    if (parsedLeft.quarter !== parsedRight.quarter) {
-      return parsedLeft.quarter - parsedRight.quarter;
-    }
-  } else if (parsedLeft !== undefined) {
-    return -1;
-  } else if (parsedRight !== undefined) {
-    return 1;
-  }
-
-  return left.localeCompare(right, undefined, { numeric: true, sensitivity: 'base' });
-}
-
-function parseQuarterLabel(value: string): { year: number; quarter: number } | undefined {
-  const normalized = value.trim();
-  const quarterFirst = /^Q(\d+)[\s-]+(\d{4})$/i.exec(normalized);
-  if (quarterFirst !== null) {
-    return {
-      quarter: Number(quarterFirst[1]),
-      year: Number(quarterFirst[2]),
-    };
-  }
-
-  const yearFirst = /^(\d{4})[\s-]+Q(\d+)$/i.exec(normalized);
-  if (yearFirst !== null) {
-    return {
-      year: Number(yearFirst[1]),
-      quarter: Number(yearFirst[2]),
-    };
-  }
-
-  return undefined;
-}
-
 // ===========================================================================
 // Public projection API for the delivery-reporting subdomain.
 // Each exported projectX function has its own @architect-pattern annotation
 // so the PatternGraph extractor registers them separately; implementation
 // delegates to the build* helpers above.
 // ===========================================================================
-
-/**
- * @architect
- * @architect-pattern PhaseProgressProjection
- * @architect-status completed
- * @architect-role:projection
- * @architect-uses DeliveryReportingProjectionSupport, PhaseProgress
- * @architect-bounded-context:projection
- *
- * ## Phase progress projection
- *
- * **Value:** Gives a consumer a single phase's delivery progress — counts of
- * completed/active/planned/candidate patterns plus a rounded completion
- * percentage — as a stable `PhaseProgress` fragment.
- *
- * **Invariant:** Fragment carries phase number, optional phase name, all four
- * status counts, total, and a `completionPercentage` computed against the
- * delivery total (`total - candidate`); an unknown phase yields `undefined`.
- *
- * **Behavior:**
- * - Resolves the phase group from `graph.byPhase` and returns `undefined`
- *   when no matching phase exists, rather than emitting an empty fragment.
- * - Computes counts via the shared `createStatusCounts` helper so classification
- *   stays consistent with `StatusDistributionProjection`.
- * - Rounds the delivery percentage to an integer and reports `0` when the
- *   delivery total is zero (i.e. candidate-only phases).
- *
- * ### When to Use
- *
- * - Projects one phase's delivery progress as a PhaseProgress bundle.
- */
-export function projectPhaseProgress(
-  context: ProjectionContext,
-  phase: number,
-): ProjectionBundle<PhaseProgress> | undefined {
-  const fragment = buildPhaseProgress(context, phase);
-  return fragment === undefined ? undefined : projectSingle(fragment);
-}
 
 /**
  * @architect
@@ -642,41 +338,31 @@ export function projectStatusDistribution(
  *
  * ## Roadmap timeline projection
  *
- * **Value:** Exposes three specialised views of the pattern graph — roadmap
- * (planned + deferred), completed milestones, and current work (active) —
- * each as a `RoadmapTimeline` bundle with quarter-grouped entries, per-bucket
- * status counts, and deterministic routing to its own markdown file.
+ * **Value:** Exposes specialised views of the pattern graph — roadmap (planned
+ * + deferred) and current work (active) — each as a `RoadmapTimeline` bundle
+ * with a flat, name-sorted pattern list, overall status counts, and
+ * deterministic routing to its own markdown file.
  *
  * **Invariant:** Every bundle sets its `view` field to the requested
- * entrypoint, orders quarters chronologically (year then quarter, lexical
- * fallback), excludes patterns without a quarter, and emits one child per
- * quarter with a slug-based routing key.
+ * entrypoint, lists every selected pattern (deterministically name-sorted),
+ * and reports the overall status counts for the view.
  *
  * **Behavior:**
  * - Selects the pattern set per view: `byStatus.roadmap + byStatus.deferred`
- *   for roadmap, `byNormalizedStatus.completed` for milestones, and
- *   `byNormalizedStatus.active` for current work.
- * - Groups patterns into `QuarterEntry` buckets with sorted pattern summaries
- *   and per-bucket status counts for in-place rendering.
- * - Supplies view-specific `outputPath` routing so renderers emit
- *   `ROADMAP.md`, `COMPLETED-MILESTONES.md`, or `CURRENT-WORK.md` with a
- *   matching child directory.
+ *   for roadmap and `byNormalizedStatus.active` for current work.
+ * - Sorts the patterns by name and folds them into `PatternSummary` fragments
+ *   with overall status counts.
+ * - Supplies view-specific `outputPath` routing so renderers emit `ROADMAP.md`
+ *   or `CURRENT-WORK.md`.
  *
  * ### When to Use
  *
- * - Projects roadmap, milestone, or current-work views as RoadmapTimeline
- *   bundles.
+ * - Projects roadmap or current-work views as RoadmapTimeline bundles.
  */
 export function projectRoadmapTimeline(
   context: ProjectionContext,
 ): ProjectionBundle<RoadmapTimeline> {
   return buildTimelineBundle(context, 'roadmap');
-}
-
-export function projectCompletedMilestones(
-  context: ProjectionContext,
-): ProjectionBundle<RoadmapTimeline> {
-  return buildTimelineBundle(context, 'milestones');
 }
 
 export function projectCurrentWork(context: ProjectionContext): ProjectionBundle<RoadmapTimeline> {
@@ -685,41 +371,37 @@ export function projectCurrentWork(context: ProjectionContext): ProjectionBundle
 
 /**
  * @architect
- * @architect-pattern ReleaseNotesProjection
+ * @architect-pattern ChangelogProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses DeliveryReportingProjectionSupport, ReleaseNotesDigest
+ * @architect-uses DeliveryReportingProjectionSupport, RoadmapTimeline
  * @architect-bounded-context:projection
  *
- * ## Release notes projection
+ * ## Changelog projection
  *
- * **Value:** Emits a changelog-shaped `ReleaseNotesDigest` bundle whose root
- * lists every release in canonical order and whose children split one digest
- * per release, so renderers can produce `CHANGELOG.md` plus a file per
- * release without re-deriving grouping.
+ * **Value:** Emits the release-free changelog — the set of `completed` patterns
+ * in completion (name) order as a `RoadmapTimeline` milestones bundle — so the
+ * renderer can produce `CHANGELOG.md` without any release tag or calendar date.
+ * Per ADR-013 the release axis and completion-date field are retired; releases,
+ * when first practiced, are derived from git tags, never annotated.
  *
- * **Invariant:** Entries are ordered Unreleased → tagged releases (numeric
- * descending) → quarter fallbacks (descending) → Earlier; each entry carries
- * the latest completion date, sorted pattern summaries, and deduplicated
- * deliverables; a release filter returns at most the matching entry.
+ * **Invariant:** The root lists every `completed` pattern (deterministically
+ * name-sorted) with overall status counts; there is no release grouping, no
+ * completion-date column, and no fallback bucket. The changelog never carries
+ * a child split.
  *
  * **Behavior:**
- * - Collects Unreleased work from `byNormalizedStatus.active` plus any pattern
- *   explicitly tagged `release: vNEXT`, deduplicating by name.
- * - Groups completed patterns by their release tag, or falls back to their
- *   quarter, or to Earlier when neither is set.
- * - Sets up routing so the root emits `CHANGELOG.md` and children emit
- *   `releases/<slug>.md` with deterministic collision-safe keys.
+ * - Selects `byNormalizedStatus.completed`, applies the projection filter, and
+ *   sorts by pattern name.
+ * - Folds the set into a `RoadmapTimeline` (`view: 'milestones'`) with status
+ *   counts and routes the root to `CHANGELOG.md`.
  *
  * ### When to Use
  *
- * - Projects changelog-shaped release notes as a ReleaseNotesDigest bundle.
+ * - Projects the completed-patterns changelog as a RoadmapTimeline bundle.
  */
-export function projectReleaseNotesDigest(
-  context: ProjectionContext,
-  release?: string,
-): ProjectionBundle<ReleaseNotesDigest> {
-  return buildReleaseNotes(context, release);
+export function projectChangelog(context: ProjectionContext): ProjectionBundle<RoadmapTimeline> {
+  return buildChangelog(context);
 }
 
 /**

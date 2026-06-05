@@ -46,20 +46,16 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   createPattern('ActivePattern', {
                     status: 'active',
                     role: 'service',
-                    phase: 1,
                   }),
                   createPattern('CompletedPattern', {
                     status: 'completed',
                     role: 'service',
-                    phase: 1,
                   }),
                   createPattern('PlannedPattern', {
                     status: 'roadmap',
                     role: 'utility',
-                    phase: 2,
                   }),
                 ],
-                phaseNames: { 1: 'Foundation', 2: 'Extension' },
               });
             },
           );

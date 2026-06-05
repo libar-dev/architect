@@ -9,12 +9,9 @@
  * ### When to Use
  *
  * - Defines shared delivery-reporting support schemas for counts,
- *   percentages, quarter entries, release entries, and trace rows.
+ *   percentages, and trace rows.
  */
 import { z } from 'zod';
-
-import { PatternSummarySchema } from '../pattern-relations/index.js';
-import { EmbeddedDeliverableSchema } from '../pattern-relations/supporting.js';
 
 /**
  * Absolute pattern counts per delivery status, plus their total.
@@ -42,32 +39,6 @@ export const StatusPercentagesSchema = z.strictObject({
 });
 
 /**
- * One quarter of a roadmap — its label, the patterns scheduled in it, and their
- * status counts.
- *
- * @architect-shape
- */
-export const QuarterEntrySchema = z.strictObject({
-  quarter: z.string(),
-  patterns: z.array(PatternSummarySchema),
-  counts: StatusCountsSchema,
-});
-
-/**
- * One release in a notes digest — its label, optional date, member patterns,
- * deliverables, and optional free-form notes.
- *
- * @architect-shape
- */
-export const ReleaseEntrySchema = z.strictObject({
-  release: z.string(),
-  date: z.string().optional(),
-  patterns: z.array(PatternSummarySchema),
-  deliverables: z.array(EmbeddedDeliverableSchema),
-  notes: z.string().optional(),
-});
-
-/**
  * One row of a traceability matrix — a pattern with its optional status and the
  * tests, specs, and deliverables that trace to it.
  *
@@ -83,6 +54,4 @@ export const TraceRowSchema = z.strictObject({
 
 export type StatusCounts = z.infer<typeof StatusCountsSchema>;
 export type StatusPercentages = z.infer<typeof StatusPercentagesSchema>;
-export type QuarterEntry = z.infer<typeof QuarterEntrySchema>;
-export type ReleaseEntry = z.infer<typeof ReleaseEntrySchema>;
 export type TraceRow = z.infer<typeof TraceRowSchema>;

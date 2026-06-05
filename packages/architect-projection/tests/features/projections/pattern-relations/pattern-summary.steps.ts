@@ -40,22 +40,18 @@ function createMixedCatalogContext(): ProjectionContext {
       createPattern('ActiveService', {
         status: 'active',
         role: 'service',
-        phase: 49,
       }),
       createPattern('CompletedService', {
         status: 'completed',
         role: 'service',
-        phase: 49,
       }),
       createPattern('ActiveInfraPhase50', {
         status: 'active',
         role: 'infra',
-        phase: 50,
       }),
       createPattern('RoadmapUiPhase50', {
         status: 'roadmap',
         role: 'ui',
-        phase: 50,
       }),
     ],
   });
@@ -84,7 +80,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           patterns: [
             createPattern('PatternGraphAPI', {
               role: 'service',
-              phase: 49,
               file: 'packages/architect-query/src/pattern-graph-api.ts',
             }),
           ],
@@ -102,7 +97,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           status: 'active',
           maturity: 'design',
           role: 'service',
-          phase: 49,
           file: 'packages/architect-query/src/pattern-graph-api.ts',
           source: 'typescript',
         });
@@ -192,7 +186,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
     });
 
     RuleScenario('status filter selects matching patterns', ({ Given, When, Then }) => {
-      Given('a catalog projection context with mixed status phase and role variants', () => {
+      Given('a catalog projection context with mixed status and role variants', () => {
         state!.context = createMixedCatalogContext();
       });
 
@@ -207,33 +201,16 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       });
     });
 
-    RuleScenario('phase filter selects matching patterns', ({ Given, When, Then }) => {
-      Given('a catalog projection context with mixed status phase and role variants', () => {
-        state!.context = createMixedCatalogContext();
-      });
-
-      When('I project the pattern catalog with phase {int}', (_ctx: unknown, phase: number) => {
-        state!.catalog = parseAndProjectPatternCatalog(state!.context!, {
-          phase,
-        }).root;
-      });
-
-      Then('the projected catalog names should be {string}', (_ctx: unknown, names: string) => {
-        expectCatalogNames(names);
-      });
-    });
-
-    RuleScenario('status phase and role filters combine', ({ Given, When, Then, And }) => {
-      Given('a catalog projection context with mixed status phase and role variants', () => {
+    RuleScenario('status and role filters combine', ({ Given, When, Then, And }) => {
+      Given('a catalog projection context with mixed status and role variants', () => {
         state!.context = createMixedCatalogContext();
       });
 
       When(
-        'I project the pattern catalog with status {string} phase {int} and role alias {string}',
-        (_ctx: unknown, status: AcceptedStatusValue, phase: number, role: string) => {
+        'I project the pattern catalog with status {string} and role alias {string}',
+        (_ctx: unknown, status: AcceptedStatusValue, role: string) => {
           state!.catalog = parseAndProjectPatternCatalog(state!.context!, {
             status,
-            phase,
             role,
           }).root;
         },
@@ -249,7 +226,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
     });
 
     RuleScenario('count flag returns only the matching count', ({ Given, When, Then, And }) => {
-      Given('a catalog projection context with mixed status phase and role variants', () => {
+      Given('a catalog projection context with mixed status and role variants', () => {
         state!.context = createMixedCatalogContext();
       });
 
@@ -272,7 +249,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
     RuleScenario(
       'namesOnly flag returns names without item details',
       ({ Given, When, Then, And }) => {
-        Given('a catalog projection context with mixed status phase and role variants', () => {
+        Given('a catalog projection context with mixed status and role variants', () => {
           state!.context = createMixedCatalogContext();
         });
 

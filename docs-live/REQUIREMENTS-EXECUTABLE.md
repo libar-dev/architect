@@ -14,6 +14,7 @@
 | ArchitectureNavigationProjectionExecutableTests       | completed |            |
 | BusinessRulesProjectionExecutableTests                | completed |            |
 | CanonicalValuesSync                                   | active    |            |
+| ChangelogProjectionExecutableTests                    | completed |            |
 | CLIRuntimePaths                                       | completed |            |
 | CodecUtilsValidation                                  | active    |            |
 | CompactTextRendererTests                              | active    |            |
@@ -84,7 +85,6 @@
 | PatternSummaryCatalogProjectionExecutableTests        | completed |            |
 | ProjectConfigLoader                                   | completed |            |
 | ProjectionKernelRelationshipContractExecutableTests   | active    |            |
-| ReleaseNotesProjectionExecutableTests                 | completed |            |
 | ResultMonadTypes                                      | completed |            |
 | ResultMonadTypesExecutableTests                       | completed |            |
 | ScannerCore                                           | completed |            |

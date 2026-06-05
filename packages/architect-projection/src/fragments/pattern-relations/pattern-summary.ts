@@ -16,8 +16,8 @@ import { PatternSourceSchema } from './supporting.js';
 
 /**
  * The canonical short summary of a pattern — its name, status, maturity, role,
- * phase, source file and origin, and owning package. Reused by catalog and
- * detail projections.
+ * source file and origin, and owning package. Reused by catalog and detail
+ * projections.
  *
  * @architect-shape
  */
@@ -27,7 +27,6 @@ export const PatternSummarySchema = z.strictObject({
   status: z.string().optional(),
   maturity: MaturitySchema.optional(),
   role: z.string(),
-  phase: z.number().int().optional(),
   file: z.string(),
   source: PatternSourceSchema,
   package: z.string().optional(),

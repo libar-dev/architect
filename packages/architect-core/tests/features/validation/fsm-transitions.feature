@@ -10,16 +10,18 @@ Feature: FSM Transition Legality
   completed, with deferred as a parking state), preserves unknown status values
   verbatim instead of coercing them, guides authors toward legal alternatives
   for well-typed-but-illegal jumps, and derives protection level as a pure
-  function of status.
+  function of status. Completed is a settled end state, not a one-way trap:
+  reopening it to active or roadmap is a first-class transition (PDR-006) so
+  that legitimate maintenance on finished work is permitted rather than walled.
 
   Background:
     Given an FSM transition test context
 
   Rule: Lifecycle transitions follow the four-state FSM
 
-    **Invariant:** validateTransition is valid only for roadmap→active, roadmap→deferred, active→completed, active→roadmap, and deferred→roadmap; every other (from, to) over real status values is rejected, and completed is terminal with no outgoing transition.
-    **Rationale:** The FSM encodes the delivery process — planning (roadmap) → implementation (active) → verified terminal (completed), with deferred as a parking state re-entered via roadmap; skipping states would bypass the planning and scope gates the process guard keys off.
-    **Verified by:** Legal lifecycle transitions are accepted, Completed is terminal with no outgoing transition
+    **Invariant:** validateTransition is valid only for roadmap→active, roadmap→deferred, active→completed, active→roadmap, deferred→roadmap, completed→active, and completed→roadmap; every other (from, to) over real status values is rejected. Completed is reopenable to active or roadmap but never settles into deferred and never re-enters itself.
+    **Rationale:** The FSM encodes the delivery process — planning (roadmap) → implementation (active) → verified end state (completed), with deferred as a parking state re-entered via roadmap; skipping states would bypass the planning and scope gates the process guard keys off. Reopening completed to active/roadmap (PDR-006) lets finished work be revisited without faking status, while completed→deferred and completed→completed stay rejected because deferral and self-loops are not reopen paths.
+    **Verified by:** Legal lifecycle transitions are accepted, Completed reopens to active or roadmap, Completed does not transition to deferred
 
     @function:validateTransition @happy-path
     Scenario: Legal lifecycle transitions are accepted
@@ -29,10 +31,21 @@ Feature: FSM Transition Legality
       And the transition from "active" to "roadmap" is valid
       And the transition from "deferred" to "roadmap" is valid
 
+    @function:validateTransition @happy-path
+    Scenario: Completed reopens to active or roadmap
+      Then the transition from "completed" to "active" is valid
+      And the transition from "completed" to "roadmap" is valid
+
     @function:getValidTransitionsFrom
-    Scenario: Completed is terminal with no outgoing transition
+    Scenario: Completed reopen targets are active and roadmap
       When I request the valid transitions from "completed"
-      Then there are no valid transitions
+      Then the valid transitions are "active, roadmap"
+
+    @function:validateTransition
+    Scenario: Completed does not transition to deferred
+      When I validate the transition from "completed" to "deferred"
+      Then the transition result is invalid
+      And the valid alternatives equal the valid transitions from "completed"
 
   Rule: Unknown status values are preserved, not coerced
 
@@ -75,7 +88,7 @@ Feature: FSM Transition Legality
   Rule: Protection level is a pure function of status
 
     **Invariant:** getProtectionLevel maps roadmap and deferred to none, active to scope, and completed to hard; isTerminalState is true if and only if the status is completed.
-    **Rationale:** Protection level is what ProcessGuardDecider keys enforcement off (completed→hard→unlock required; active→scope→no new deliverables); it must be a stable total function of status.
+    **Rationale:** Protection level is what ProcessGuardDecider keys advisory enforcement off (completed→hard→reopen/edit warns and an unlock reason suppresses the warning; active→scope→adding pending scope warns); per PDR-006 these are warnings on the commit path, promotable to blocking only under --strict. The mapping must still be a stable total function of status.
     **Verified by:** Protection level is derived deterministically from status
 
     @function:getProtectionLevel @function:isTerminalState

@@ -135,14 +135,6 @@ function renderOverviewDigest(
     sections.push(renderOverviewArchitecture(overview.architecture, richness, options));
   }
 
-  if (overview.activePhases.length > 0) {
-    const lines = overview.activePhases.map((phase) => {
-      const name = phase.name !== undefined ? `: ${phase.name}` : '';
-      return `Phase ${String(phase.phase)}${name} (${String(phase.activeCount)} active)`;
-    });
-    sections.push(renderMarker('ACTIVE PHASES', options) + '\n' + lines.join('\n'));
-  }
-
   if (overview.blocking.length > 0) {
     const showAll = richness === 'full';
     const shown = showAll
@@ -303,7 +295,6 @@ function renderSessionContextBundle(
   for (const meta of bundle.metadata) {
     const parts: string[] = [];
     if (meta.status !== undefined) parts.push(`Status: ${meta.status}`);
-    if (meta.phase !== undefined) parts.push(`Phase: ${String(meta.phase)}`);
     parts.push(`Role: ${meta.role}`);
 
     sections.push(
@@ -445,10 +436,9 @@ function renderDependencyContextNode(
   lines: string[],
 ): void {
   const indent = depth > 0 ? '  '.repeat(depth) + '-> ' : '';
-  const phase = node.phase !== undefined ? `${String(node.phase)}, ` : '';
   const status = node.status ?? 'unknown';
 
-  lines.push(`${indent}${node.name} (${phase}${status})`);
+  lines.push(`${indent}${node.name} (${status})`);
 
   if (node.truncated) {
     const truncIndent = '  '.repeat(depth + 1) + '-> ';

@@ -177,9 +177,6 @@ function renderPatternDetail(
     metadataRows.push(['Status', fragment.status]);
   }
   metadataRows.push(['Role', fragment.role]);
-  if (fragment.phase !== undefined) {
-    metadataRows.push(['Phase', String(fragment.phase)]);
-  }
   metadataRows.push(['File', fragment.file], ['Source', fragment.source]);
 
   const overviewBlocks: Block[] = [];

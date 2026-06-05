@@ -20,7 +20,7 @@
  */
 import { z } from 'zod';
 
-import { ADR_CATEGORY_VALUES, ADR_STATUS_VALUES, QUARTER_PATTERN } from '../taxonomy/index.js';
+import { ADR_CATEGORY_VALUES, ADR_STATUS_VALUES } from '../taxonomy/index.js';
 import { asPatternId, asSourceFilePath } from '../types/branded.js';
 import { slugify } from '../utils/string-utils.js';
 import { DocDirectiveSchema, PatternStatusSchema } from './doc-directive.js';
@@ -110,8 +110,6 @@ const ExtractedPatternBaseSchema = z.strictObject({
   whenToUse: z.array(z.string()).readonly().optional(),
   uses: z.array(PatternReferenceSchema).readonly().optional(),
   scenarios: z.array(ScenarioRefSchema).readonly().optional(),
-  phase: z.number().int().positive().optional(),
-  release: z.string().optional(),
   implementsPatterns: z.array(z.string()).readonly().optional(),
   extendsPattern: z.string().optional(),
   targetPath: z.string().optional(),
@@ -121,8 +119,6 @@ const ExtractedPatternBaseSchema = z.strictObject({
   seeAlso: z.array(z.string()).readonly().optional(),
   enforcesDecisions: z.array(z.string()).readonly().optional(),
   apiRef: z.array(z.string()).readonly().optional(),
-  quarter: z.string().regex(QUARTER_PATTERN).optional(),
-  completed: z.string().optional(),
   effort: z.string().optional(),
   effortActual: z.string().optional(),
   team: z.string().optional(),

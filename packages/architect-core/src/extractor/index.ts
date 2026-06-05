@@ -12,7 +12,6 @@ export {
   extractDeliverables,
   combineSources,
   validateDualSource,
-  type CrossValidationError,
   type Deliverable,
   type DualSourcePattern,
   type DualSourceResults,

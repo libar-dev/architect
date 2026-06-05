@@ -49,7 +49,6 @@ function toFragmentNode(node: KernelDependencyContextNode): DependencyContextNod
   return {
     name: node.name,
     ...(node.status !== undefined ? { status: node.status } : {}),
-    ...(node.phase !== undefined ? { phase: node.phase } : {}),
     truncated: node.truncated,
     children: node.children.map(toFragmentNode),
   };
@@ -108,7 +107,6 @@ function walkGovernanceChain(
       nodes.push({
         name: target,
         ...(targetPattern?.status !== undefined ? { status: targetPattern.status } : {}),
-        ...(targetPattern?.phase !== undefined ? { phase: targetPattern.phase } : {}),
         truncated: reachedCap && hasFurther,
         children,
       });

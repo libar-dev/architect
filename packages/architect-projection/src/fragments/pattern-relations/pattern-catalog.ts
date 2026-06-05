@@ -14,14 +14,13 @@ import { z } from 'zod';
 import { PatternSummarySchema } from './pattern-summary.js';
 
 /**
- * The filter criteria applied to a pattern catalog — status, phase, role,
- * parent, and package narrowing plus the names-only and count-only output modes.
+ * The filter criteria applied to a pattern catalog — status, role, parent, and
+ * package narrowing plus the names-only and count-only output modes.
  *
  * @architect-shape
  */
 export const PatternCatalogFilterSchema = z.strictObject({
   status: z.string().optional(),
-  phase: z.number().int().optional(),
   role: z.string().optional(),
   parent: z.string().optional(),
   package: z.string().optional(),

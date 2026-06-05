@@ -24,10 +24,8 @@ import {
   PatternCatalogSchema,
   PatternDetailSchema,
   PatternSummarySchema,
-  PhaseProgressSchema,
   PrChangeReviewSchema,
   ProjectConfigSnapshotSchema,
-  ReleaseNotesDigestSchema,
   RequirementDigestSchema,
   RoleProfileCollectionSchema,
   RoleProfileSchema,
@@ -46,9 +44,7 @@ import {
 } from '../../src/index.js';
 
 export type PublicFragmentKind =
-  | 'PhaseProgress'
   | 'StatusDistribution'
-  | 'ReleaseNotesDigest'
   | 'TraceabilityMatrix'
   | 'ProjectConfigSnapshot'
   | 'BusinessRuleReference'
@@ -98,7 +94,6 @@ const validDeliverable: Fragment = {
   location:
     'packages/architect-projection/src/fragments/execution-context/session-context-bundle.ts',
   finding: 'Keeps context/session projection contracts strict and JSON-safe.',
-  release: '2026-Q2',
 };
 
 const validScopeReadinessCheck: Fragment = {
@@ -121,7 +116,6 @@ const validBusinessRule: Fragment = {
   verifiedBy: ['governance schema feature', 'package typecheck'],
   scenarioCount: 2,
   pattern: 'ProjectionMigration',
-  phase: 5,
   productArea: 'DeliveryProcess',
 };
 
@@ -173,17 +167,6 @@ const validArchitectureDiagramFixture: Fragment = {
 };
 
 export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
-  PhaseProgress: {
-    kind: 'PhaseProgress',
-    phaseNumber: 4,
-    phaseName: 'Projection Cutover',
-    completed: 6,
-    active: 2,
-    planned: 3,
-    candidate: 1,
-    total: 12,
-    completionPercentage: 50,
-  },
   StatusDistribution: {
     kind: 'StatusDistribution',
     counts: {
@@ -199,39 +182,6 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
       planned: 16.7,
       candidate: 5.5,
     },
-  },
-  ReleaseNotesDigest: {
-    kind: 'ReleaseNotesDigest',
-    releases: [
-      {
-        release: 'v4.7.0',
-        date: '2026-04-19',
-        patterns: [
-          {
-            kind: 'PatternSummary',
-            patternName: 'ProjectionMigration',
-            status: 'completed',
-            role: 'service',
-            phase: 4,
-            file: 'packages/architect-projection/src/index.ts',
-            source: 'typescript',
-          },
-        ],
-        deliverables: [
-          {
-            name: 'Projection package',
-            status: 'completed',
-            tests: [
-              'packages/architect-projection/tests/features/fragments/delivery-reporting-schemas.feature',
-            ],
-            location: 'packages/architect-projection/src/index.ts',
-            finding: 'Consolidates fragment schemas behind one package boundary.',
-            release: 'v4.7.0',
-          },
-        ],
-        notes: 'Introduces strict Delivery Reporting fragments for timeline and reporting outputs.',
-      },
-    ],
   },
   TraceabilityMatrix: {
     kind: 'TraceabilityMatrix',
@@ -256,7 +206,6 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
     sourceGlobs: ['src/**/*.ts', 'tests/features/**/*.feature', '!dist/**'],
     buildTimeMs: 184,
     patternCount: 47,
-    phaseCount: 7,
     roleCount: 6,
     projectName: 'architect-studio',
   },
@@ -290,7 +239,6 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
       {
         name: 'SessionContextProjection',
         status: 'completed',
-        phase: 49,
         role: 'projection',
         file: 'packages/architect-projection/src/projections/execution-context/session-context.ts',
         summary:
@@ -564,14 +512,15 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
         statuses: ['roadmap', 'deferred'],
         meaning: 'Planning statuses remain editable.',
         canAddDeliverables: true,
-        needsUnlock: false,
+        unlockSuppressesWarning: false,
       },
       {
         level: 'hard',
         statuses: ['completed'],
-        meaning: 'Completed work is locked without an explicit unlock reason.',
+        meaning:
+          'Completed work is hard-locked; editing or reopening warns, unlock reason is optional (advisory).',
         canAddDeliverables: false,
-        needsUnlock: true,
+        unlockSuppressesWarning: true,
       },
     ],
   },
@@ -642,19 +591,6 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
       candidate: 1,
       percentage: 46,
     },
-    activePhases: [
-      {
-        phase: 4,
-        name: 'Projection Cutover',
-        patternCount: 5,
-        activeCount: 2,
-      },
-      {
-        phase: 5,
-        patternCount: 3,
-        activeCount: 2,
-      },
-    ],
     blocking: [
       {
         pattern: 'OperationalInsightsProjectionBodies',
@@ -694,7 +630,7 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
       },
       {
         kind: 'TagUsageEntry',
-        tag: 'quarter',
+        tag: 'bounded-context',
         count: 0,
         values: null,
       },
@@ -815,7 +751,6 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
         patternName: 'PatternGraphAPI',
         status: 'active',
         role: 'infra',
-        phase: 2,
         file: 'packages/architect-query/src/pattern-graph-api.ts',
         source: 'typescript',
       },
@@ -865,7 +800,6 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
     patternName: 'PatternGraphAPI',
     status: 'active',
     role: 'service',
-    phase: 2,
     file: 'packages/architect-query/src/pattern-graph-api.ts',
     source: 'typescript',
   },
@@ -874,7 +808,6 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
     patternName: 'PatternGraphAPI',
     status: 'active',
     role: 'service',
-    phase: 2,
     file: 'packages/architect-query/src/pattern-graph-api.ts',
     source: 'typescript',
     description: 'Primary query facade over the PatternGraph read model.',
@@ -885,7 +818,6 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
         tests: ['tests/features/query/pattern-graph.feature'],
         location: 'packages/architect-query/src/pattern-graph-api.ts',
         finding: 'Keeps read operations centralized.',
-        release: '2026-Q2',
       },
     ],
     relationships: {
@@ -931,7 +863,6 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
           tests: ['tests/features/query/pattern-graph.feature'],
           location: 'packages/architect-query/src/pattern-graph-api.ts',
           finding: 'Keeps read operations centralized.',
-          release: '2026-Q2',
         },
       ],
     },
@@ -961,13 +892,11 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
       {
         name: 'PatternGraph',
         status: 'completed',
-        phase: 1,
         truncated: false,
         children: [
           {
             name: 'PatternHelpers',
             status: 'active',
-            phase: 2,
             truncated: true,
             children: [],
           },
@@ -978,7 +907,6 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
       {
         name: 'ApiReferenceProjection',
         status: 'active',
-        phase: 3,
         truncated: false,
         children: [],
       },
@@ -1041,18 +969,6 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
 };
 
 export const FRAGMENT_INVALID_FIXTURES: Record<PublicFragmentKind, unknown> = {
-  PhaseProgress: {
-    kind: 'PhaseProgress',
-    phaseNumber: 4,
-    phaseName: 'Projection Cutover',
-    completed: 6,
-    active: 2,
-    planned: 3,
-    candidate: 1,
-    total: 12,
-    completionPercentage: 50,
-    extraField: true,
-  },
   StatusDistribution: {
     kind: 'StatusDistribution',
     counts: {
@@ -1069,18 +985,6 @@ export const FRAGMENT_INVALID_FIXTURES: Record<PublicFragmentKind, unknown> = {
       candidate: 5.5,
       total: 100,
     },
-  },
-  ReleaseNotesDigest: {
-    kind: 'ReleaseNotesDigest',
-    releases: [
-      {
-        release: 'v4.7.0',
-        patterns: [],
-        deliverables: [],
-        notes: 'strict schema should reject unknown properties',
-        markdown: '### forbidden presentation field',
-      },
-    ],
   },
   TraceabilityMatrix: {
     kind: 'TraceabilityMatrix',
@@ -1106,7 +1010,6 @@ export const FRAGMENT_INVALID_FIXTURES: Record<PublicFragmentKind, unknown> = {
     },
     buildTimeMs: 184,
     patternCount: 47,
-    phaseCount: 7,
     roleCount: 6,
   },
   BusinessRuleReference: {
@@ -1319,7 +1222,6 @@ export const FRAGMENT_INVALID_FIXTURES: Record<PublicFragmentKind, unknown> = {
       candidate: 1,
       percentage: 101,
     },
-    activePhases: [],
     blocking: [],
   },
   AnnotationCoverage: {
@@ -1482,7 +1384,6 @@ export const FRAGMENT_INVALID_FIXTURES: Record<PublicFragmentKind, unknown> = {
       {
         name: 'PatternGraph',
         status: 'active',
-        phase: 2,
         truncated: false,
         children: [],
         extraField: 'not allowed',
@@ -1539,9 +1440,7 @@ export const FRAGMENT_INVALID_FIXTURES: Record<PublicFragmentKind, unknown> = {
 };
 
 export const FRAGMENT_SCHEMAS: Record<PublicFragmentKind, ZodType<Fragment>> = {
-  PhaseProgress: PhaseProgressSchema,
   StatusDistribution: StatusDistributionSchema,
-  ReleaseNotesDigest: ReleaseNotesDigestSchema,
   TraceabilityMatrix: TraceabilityMatrixSchema,
   ProjectConfigSnapshot: ProjectConfigSnapshotSchema,
   ArchitectureDiagram: ArchitectureDiagramSchema,

@@ -20,5 +20,4 @@ export * from './lint/steps/types.js';
 export * from './lint/idea-tier/index.js';
 export * from './validation/index.js';
 export * from './validation/types.js';
-export * from './validation/dod-validator.js';
 export * from './validation/anti-patterns.js';

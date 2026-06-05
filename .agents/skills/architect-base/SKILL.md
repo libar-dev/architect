@@ -112,7 +112,7 @@ All of these are CI-enforced. Failing gates are stop-and-surface; never `--no-ve
 
 ## 7. Key decision records (load-bearing, decisions-only)
 
-ADRs / PDRs in `architect/decisions/` are **permanent and decisions-only**. They record a _decision_ + its rationale and **only durable, non-execution-related facts**. Operational or temporal context — status, work-in-progress, ETAs, who is doing what this week — **never** belongs here; that is the difference between a decision record and a worklog. Decisions are amended via a **new** ADR, never by editing the old one. Read the relevant record before changing anything in its area — through the Data API (`pnpm architect:query documentation decisions`, or `pattern ADR006SingleReadModelArchitecture`), never paraphrased from memory.
+ADRs / PDRs in `architect/decisions/` are **permanent and decisions-only**. They record a _decision_ + its rationale and **only durable, non-execution-related facts**. Operational or temporal context — status, work-in-progress, ETAs, who is doing what this week — **never** belongs here; that is the difference between a decision record and a worklog. Decisions are amended via a **new** ADR, never by editing the old one — _except during bootstrap_ (pre-1.0, live-state), when records are consolidated **in place** (edit / slim / delete directly; no amend-chains and no supersedes / superseded-by edges — they manufacture the history the read model excludes; see [`references/decision-records.md`](references/decision-records.md) §"Amendment rule" and the repo bootstrap doctrine). Read the relevant record before changing anything in its area — through the Data API (`pnpm architect:query documentation decisions`, or `pattern ADR006SingleReadModelArchitecture`), never paraphrased from memory.
 
 The load-bearing set:
 
@@ -174,6 +174,8 @@ The two failure modes to refuse:
 - **Skip detail** when the pattern is the Nth instance of a well-understood shape, a CRUD endpoint, or an industry-standard piece with no novel decisions.
 
 Design-level specs do not always need stubs and full design details. Idea-tier specs are not required to be terse. Use judgment — too much content is worse than not enough; both extremes erode the signal.
+
+**The skip-detail cases are a reviewable smell, not just a judgment cue.** The "skip detail" list above — the Nth instance of an established shape, a CRUD endpoint, an industry-standard piece with no novel decisions — is Architect's standing decision about where prose adds nothing. So re-explaining those shapes, or re-deriving a pattern already defined elsewhere, is a **flaggable redundancy** at spec review ([`../architect-sessions/references/review-spec.md`](../architect-sessions/references/review-spec.md)), not something left to per-session memory. This does **not** narrow the "invest detail" half: deliberate depth on architecturally significant, sensitive, or novel work is design judgment and is never trimmed by this rule. The gate enforces a decision §10 already made; it does not make a new one.
 
 ## 11. FSM lifecycle (high level)
 

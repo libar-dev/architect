@@ -43,7 +43,6 @@ function createDecisionContext(): ProjectionContext {
       createPattern('ADR005CodecBasedMarkdownRendering', {
         title: 'Codec-based Markdown Rendering',
         status: 'completed',
-        phase: 49,
         productArea: 'Generation',
         file: 'architect/decisions/adr-005-codec-based-markdown-rendering.feature',
         adr: '005',
@@ -54,7 +53,6 @@ function createDecisionContext(): ProjectionContext {
       createPattern('ADR006SingleReadModelArchitecture', {
         title: 'Single Read Model Architecture',
         status: 'completed',
-        phase: 49,
         productArea: 'Generation',
         file: 'architect/decisions/adr-006-single-read-model-architecture.feature',
         adr: '006',
@@ -92,7 +90,6 @@ All read paths should project from the PatternGraph instead of rebuilding their 
       createPattern('PDR001SessionWorkflowCommands', {
         title: 'Session Workflow Commands Design Decisions',
         status: 'completed',
-        phase: 49,
         productArea: 'DeliveryProcess',
         file: 'architect/decisions/pdr-001-session-workflow-commands.feature',
         adr: '001',

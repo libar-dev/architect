@@ -204,7 +204,6 @@ function buildGherkinPatternDraft(input: {
       status: metadata.status,
       ...(unlockReason !== undefined ? { unlockReason } : {}),
       ...(metadata.boundedContext !== undefined ? { boundedContext: metadata.boundedContext } : {}),
-      ...(metadata.phase !== undefined ? { phase: metadata.phase } : {}),
       ...(metadata.role !== undefined ? { role: metadata.role } : {}),
       ...(metadata.uses !== undefined && metadata.uses.length > 0 ? { uses: metadata.uses } : {}),
       ...(metadata.level !== undefined ? { level: metadata.level } : {}),
@@ -224,8 +223,6 @@ function buildGherkinPatternDraft(input: {
     ...(metadata.pattern !== undefined ? { patternName: metadata.pattern } : {}),
     ...(metadata.boundedContext !== undefined ? { boundedContext: metadata.boundedContext } : {}),
     ...(unlockReason !== undefined ? { unlockReason } : {}),
-    ...(metadata.phase !== undefined ? { phase: metadata.phase } : {}),
-    ...(metadata.release !== undefined ? { release: metadata.release } : {}),
     ...(metadata.uses !== undefined && metadata.uses.length > 0 ? { uses: metadata.uses } : {}),
     ...(metadata.implementsPatterns !== undefined && metadata.implementsPatterns.length > 0
       ? { implementsPatterns: metadata.implementsPatterns }
@@ -245,8 +242,6 @@ function buildGherkinPatternDraft(input: {
     ...(metadata.executableSpecs !== undefined && metadata.executableSpecs.length > 0
       ? { executableSpecs: metadata.executableSpecs }
       : {}),
-    ...(metadata.quarter !== undefined ? { quarter: metadata.quarter } : {}),
-    ...(metadata.completed !== undefined ? { completed: metadata.completed } : {}),
     ...(metadata.effort !== undefined ? { effort: metadata.effort } : {}),
     ...(metadata.effortActual !== undefined ? { effortActual: metadata.effortActual } : {}),
     ...(metadata.team !== undefined ? { team: metadata.team } : {}),

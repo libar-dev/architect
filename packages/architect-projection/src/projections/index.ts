@@ -32,11 +32,9 @@ export {
 export { ProjectionError } from './errors.js';
 export type { ProjectionErrorCode } from './errors.js';
 export {
-  projectCompletedMilestones,
   projectCurrentWork,
-  projectPhaseProgress,
   projectRoadmapTimeline,
-  projectReleaseNotesDigest,
+  projectChangelog,
   projectStatusDistribution,
   projectTraceabilityMatrix,
 } from './delivery-reporting/index.js';

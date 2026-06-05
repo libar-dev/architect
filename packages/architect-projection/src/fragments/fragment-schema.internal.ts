@@ -26,12 +26,7 @@ import {
   PatternDetailSchema,
   PatternSummarySchema,
 } from './pattern-relations/index.js';
-import {
-  PhaseProgressSchema,
-  ReleaseNotesDigestSchema,
-  StatusDistributionSchema,
-  TraceabilityMatrixSchema,
-} from './delivery-reporting/index.js';
+import { StatusDistributionSchema, TraceabilityMatrixSchema } from './delivery-reporting/index.js';
 import { RoadmapTimelineSchema as InternalRoadmapTimelineSchema } from './delivery-reporting/roadmap-timeline.js';
 import {
   BusinessRuleReferenceSchema,
@@ -81,10 +76,8 @@ export const FragmentSchema = z.discriminatedUnion('kind', [
   ArchitectureNeighborhoodSchema,
   OpenQuestionListSchema,
   OrphanPatternListSchema,
-  PhaseProgressSchema,
   StatusDistributionSchema,
   InternalRoadmapTimelineSchema,
-  ReleaseNotesDigestSchema,
   TraceabilityMatrixSchema,
   DecisionRecordSchema,
   DecisionCatalogSchema,

@@ -52,15 +52,15 @@ authority for which surface is mandatory vs additive.
 
 ## Transfer checklist
 
-| From (ephemeral)                        | To (durable carrier)                                                                                                            |
-| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| Plan-level rule with invariant          | `Rule:` block in `tests/features/**/*.feature` carrying `**Invariant:**` (+ `**Rationale:**` + `**Verified by:**` at plan tier) |
-| Stub's "When to Use" comment            | `@architect-usecase` JSDoc on the implementation (additive)                                                                     |
-| Stub's DD-N decision                    | `@architect-decision:DD-N` JSDoc referencing the ADR (additive)                                                                 |
-| Design Scenario                         | Executable `Scenario:` block in `tests/features/`                                                                               |
-| Scenario without a production-code home | Executable scenario alone — no annotation target exists                                                                         |
-| Architectural rationale                 | Either Gherkin Rule block `**Rationale:**` OR JSDoc free text — pick whichever is more discoverable for the reader              |
-| Deliverables list                       | Verified by test coverage + (where annotations exist) `@architect-target` resolution                                            |
+| From (ephemeral)                        | To (durable carrier)                                                                                                                                                                                                                                                                                                                                  |
+| --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Plan-level rule with invariant          | `Rule:` block in `tests/features/**/*.feature` carrying `**Invariant:**` verbatim. Carry `**Rationale:**` **only where it states a why beyond the invariant** (drop it when it merely restates); `**Verified by:**` names the **actual** executable `Scenario:` titles — never a boilerplate string repeated across rules. Distill, don't transcribe. |
+| Stub's "When to Use" comment            | `@architect-usecase` JSDoc on the implementation (additive)                                                                                                                                                                                                                                                                                           |
+| Stub's DD-N decision                    | `@architect-decision:DD-N` JSDoc referencing the ADR (additive)                                                                                                                                                                                                                                                                                       |
+| Design Scenario                         | Executable `Scenario:` block in `tests/features/`                                                                                                                                                                                                                                                                                                     |
+| Scenario without a production-code home | Executable scenario alone — no annotation target exists                                                                                                                                                                                                                                                                                               |
+| Architectural rationale                 | Either Gherkin Rule block `**Rationale:**` OR JSDoc free text — pick whichever is more discoverable for the reader                                                                                                                                                                                                                                    |
+| Deliverables list                       | Verified by test coverage + (where annotations exist) `@architect-target` resolution                                                                                                                                                                                                                                                                  |
 
 For the bipartite production↔test pattern naming convention (test
 patterns carry `@architect-pattern:<Name>Testing` or
@@ -84,6 +84,18 @@ For the optional 4-field Rule template see
   _planned_ work — conjuring one back to "cover" shipped behavior
   inverts the pipeline. Use the `*ExecutableTests` escape hatch in
   [`../../architect-base/references/spec-pattern-relationships.md`](../../architect-base/references/spec-pattern-relationships.md).
+- **Transcription bloat.** Copying rule prose across the transfer
+  instead of distilling it. Symptoms: a `**Rationale:**` that inverts
+  its own `**Invariant:**`; the **same** `**Verified by:**` string on
+  every rule (the backfill smell — e.g. ADR-003's six identical
+  copies); a step stub or production-JSDoc comment that re-states what
+  the pattern _is_ rather than its local wiring / how (see
+  [`../../architect-base/references/annotation-ownership.md`](../../architect-base/references/annotation-ownership.md)
+  §"Critical: do not duplicate explanation"); a house-motif phrase
+  where a concrete path / field / ADR ref would be exact. The fix is to
+  **slim the destination** (executable feature, stub, or JSDoc), then
+  delete the spec — never to keep the scaffold because its successor
+  reads long.
 
 ## Pre-deletion gate
 
@@ -105,6 +117,15 @@ A design spec is safe to delete only when **all** of these hold:
 
 When all five hold, deletion is safe. When any fails, fix that surface
 before deletion.
+
+**Distillation is a transfer-quality check, not a sixth deletion
+blocker.** The five criteria gate _whether value landed_;
+**Transcription bloat** (above) gates _whether it landed clean_. A
+verbose destination never justifies keeping the scaffold — the remedy is
+always to slim the executable feature / stub / JSDoc, then delete.
+Verify distillation at review sign-off
+([`review-implementation.md`](review-implementation.md)), not by
+retaining the spec.
 
 ## Mechanical check (when shipped)
 

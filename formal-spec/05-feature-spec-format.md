@@ -247,11 +247,11 @@ Every Level 2+ rule MUST contain these three metadata blocks:
     **Verified by:** Registration with existing email, case-insensitive check.
 ```
 
-| Block              | Required | Description                                                     |
-| ------------------ | -------- | --------------------------------------------------------------- |
-| `**Invariant:**`   | MUST     | A single sentence stating the non-negotiable constraint         |
-| `**Rationale:**`   | MUST     | 1-3 sentences explaining WHY — what breaks if violated          |
-| `**Verified by:**` | MUST     | Comma-separated list of scenario names that prove the invariant |
+| Block              | Required | Description                                                                                   |
+| ------------------ | -------- | --------------------------------------------------------------------------------------------- |
+| `**Invariant:**`   | MUST     | A single sentence stating the non-negotiable constraint                                       |
+| `**Rationale:**`   | MUST     | 1-3 sentences explaining WHY — what breaks if violated; must NOT merely restate the Invariant |
+| `**Verified by:**` | MUST     | Comma-separated list of scenario names that prove the invariant                               |
 
 ### Design-Level Rule Additions
 

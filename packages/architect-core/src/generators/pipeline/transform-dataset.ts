@@ -4,7 +4,6 @@ import type {
   ExactStatusGroups,
   StatusGroups,
   StatusCounts,
-  PhaseGroup,
   SourceViews,
   RelationshipEntry,
   ArchIndex,
@@ -96,7 +95,7 @@ export function transformToPatternGraphWithValidation(
   raw: RawDataset,
   packageResolver?: PackageResolver,
 ): TransformResult {
-  const { patterns: rawPatterns, tagRegistry, workflow, contextInferenceRules } = raw;
+  const { patterns: rawPatterns, tagRegistry, contextInferenceRules } = raw;
   const roleDefinitions: readonly RegistryRoleDefinition[] = tagRegistry.roles;
   const canonicalRoleByValue = buildCanonicalRoleLookup(roleDefinitions);
 
@@ -136,8 +135,6 @@ export function transformToPatternGraphWithValidation(
     design: [],
     executable: [],
   };
-  const byPhaseMap = new Map<number, ExtractedPattern[]>();
-  const byQuarter: Record<string, ExtractedPattern[]> = {};
   const bySourceType: SourceViews = {
     typescript: [],
     gherkin: [],
@@ -163,19 +160,6 @@ export function transformToPatternGraphWithValidation(
     const maturityBucket = byMaturity[inferMaturity(pattern.status)];
     if (maturityBucket !== undefined) {
       maturityBucket.push(pattern);
-    }
-
-    if (pattern.phase !== undefined) {
-      const existing = byPhaseMap.get(pattern.phase) ?? [];
-      existing.push(pattern);
-      byPhaseMap.set(pattern.phase, existing);
-      bySourceType.roadmap.push(pattern);
-    }
-
-    if (pattern.quarter) {
-      const quarterPatterns = byQuarter[pattern.quarter] ?? [];
-      quarterPatterns.push(pattern);
-      byQuarter[pattern.quarter] = quarterPatterns;
     }
 
     if (pattern.source.file.endsWith('.feature') || pattern.source.file.endsWith('.feature.md')) {
@@ -249,17 +233,6 @@ export function transformToPatternGraphWithValidation(
   buildReverseLookups(patterns, relationshipIndex);
   const danglingReferences = detectDanglingReferences(patterns, allPatternNames);
 
-  const byPhase: PhaseGroup[] = Array.from(byPhaseMap.entries())
-    .sort(([a], [b]) => a - b)
-    .map(([phaseNumber, phasePatterns]) => ({
-      phaseNumber,
-      phaseName:
-        workflow?.config.phases.find((phase) => phase.order === phaseNumber)?.name ??
-        phasePatterns[0]?.name,
-      patterns: phasePatterns,
-      counts: computeCounts(phasePatterns),
-    }));
-
   const byRole = populateByRoleView(patterns, roleDefinitions);
   const counts: StatusCounts = {
     completed: byNormalizedStatus.completed.length,
@@ -282,13 +255,10 @@ export function transformToPatternGraphWithValidation(
     byStatus,
     byNormalizedStatus,
     byMaturity,
-    byPhase,
-    byQuarter,
     byRole,
     bySourceType,
     byProductArea: byProductAreaMap,
     counts,
-    phaseCount: byPhaseMap.size,
     roleCount: Object.keys(byRole).length,
     relationshipIndex,
     ...(raw.featureParseFailures !== undefined
@@ -298,21 +268,4 @@ export function transformToPatternGraphWithValidation(
   };
 
   return { dataset, validation };
-}
-
-function computeCounts(patterns: readonly ExtractedPattern[]): StatusCounts {
-  let completed = 0;
-  let active = 0;
-  let planned = 0;
-  let candidate = 0;
-
-  for (const pattern of patterns) {
-    const status = normalizeStatus(pattern.status);
-    if (status === 'completed') completed++;
-    else if (status === 'active') active++;
-    else if (status === 'candidate') candidate++;
-    else planned++;
-  }
-
-  return { completed, active, planned, candidate, total: patterns.length };
 }

@@ -24,7 +24,7 @@ Feature: ADR-008 - Step Definition Stubs Live in Architect State Folder
   - **Gherkin comments in spec files** — Not parsable. Studio cannot track,
     render, or query comment-based stubs. Eliminated because every stage of
     spec refinement must produce machine-parsable artifacts for Studio.
-  - **`tests/planning-stubs/`** (new-convex-es pattern) — Places design
+  - **`tests/planning-stubs/`** (a prior convention) — Places design
     artifacts inside the execution folder (`tests/`). Works but violates the
     separation between architect state (design surface) and package tests
     (execution surface). Requires vitest exclude config.
@@ -33,8 +33,8 @@ Feature: ADR-008 - Step Definition Stubs Live in Architect State Folder
     test execution. Symmetric with `architect/stubs/` for code. Queryable
     via the extraction pipeline.
 
-  The first option was used organically in new-convex-es before code stubs
-  had a proper home. The learning from code stubs — design artifacts must
+  The first option was used organically before code stubs had a proper home.
+  The learning from code stubs — design artifacts must
   live outside compiled/linted/executed paths — applies equally to step
   definition stubs.
 
@@ -68,13 +68,8 @@ Feature: ADR-008 - Step Definition Stubs Live in Architect State Folder
   | Positive | `stubs --unresolved` tracks both code stubs and step stubs uniformly |
   | Positive | Real vitest-cucumber structure prevents Two-Pattern Problem errors during implementation |
   | Positive | Symmetric with code stubs — same lifecycle, same annotations, same resolution tracking |
-  | Negative | Migration from new-convex-es `tests/planning-stubs/` convention |
+  | Negative | Migration from a prior `tests/planning-stubs/` convention |
   | Negative | Step stubs reference feature files that may not yet exist (acceptable — code stubs reference src/ files that don't exist either) |
-
-  Background: Deliverables
-    Given the following deliverables:
-      | Deliverable | Status | Location |
-      | Decision spec | complete | architect/decisions/adr-008 |
 
   # ===========================================================================
   # RULE 1: Step Stubs Live in Architect State Folder
@@ -166,11 +161,10 @@ Feature: ADR-008 - Step Definition Stubs Live in Architect State Folder
     The choice depends on project scale and team preference. The only
     constraint is the per-file annotation requirements (Rule 2).
 
-    **Rationale:** Rigid folder structure creates unnecessary friction.
-    new-convex-es organizes specs by product area (`specs/platform/`,
-    `specs/example-app/`). The architect package organizes specs flat.
-    Both are valid. The annotations provide machine-readable traceability
-    regardless of folder structure.
+    **Rationale:** Rigid folder structure creates unnecessary friction. One
+    project may organize specs by product area while the architect package
+    organizes specs flat. Both are valid. The annotations provide
+    machine-readable traceability regardless of folder structure.
 
     **Verified by:** Different organization patterns are valid
 

@@ -3,7 +3,6 @@
 @architect-implements:ValidationRuleDigestProjection,TaxonomyDigestProjection
 @architect-status:completed
 @architect-unlock-reason:Strengthen-count-summary-invariant-pin-derivation-from-digest-entries
-@architect-phase:49
 @architect-product-area:Projection
 @architect-role:projection
 @governance
@@ -37,7 +36,7 @@ Feature: Governance validation and taxonomy projections
     `fsm` reflects `VALID_TRANSITIONS` (with initial state `roadmap` and
     terminal states computed from transitions), and whose `protectionLevels`
     expose each `PROTECTION_LEVELS` bucket with `canAddDeliverables` and
-    `needsUnlock` flags.
+    `unlockSuppressesWarning` flags.
 
     **Rationale:** Validation surfaces must render a deterministic, core-driven
     view of the lifecycle so FSM changes propagate through one projection

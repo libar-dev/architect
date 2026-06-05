@@ -75,7 +75,6 @@ function createPatternSummary(
     patternName,
     status,
     role: 'service',
-    phase: 10,
     file: `packages/architect-projection/src/projections/${patternName}.ts`,
     source: 'typescript',
   };
@@ -376,7 +375,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           });
 
           When('I inspect the delivery-reporting splitting decision', () => {
-            expect(state!.documentation).toContain('projectCompletedMilestones');
+            expect(state!.documentation).toContain('projectChangelog');
             expect(state!.documentation).toContain('projectCurrentWork');
           });
 

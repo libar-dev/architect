@@ -4,7 +4,7 @@
 
 | Field | Value |
 | ----- | ----- |
-| Count | 261   |
+| Count | 259   |
 
 ## Filters
 
@@ -26,9 +26,12 @@
 - ADR008StepDefinitionStubsConvention
 - ADR009ProjectionTrustBoundary
 - ADR010DocumentationCompositionHelpers
+- ADR012DeliveryNavigation
+- ADR013TaxonomyRetirement
 - AnnotationCoverage
 - AnnotationCoverageProjection
 - AntiPatternDetector
+- AntiPatternValidationTypes
 - ApiReferenceDigest
 - ApiReferenceProjection
 - ApiReferenceProjectionExecutableTests
@@ -53,6 +56,8 @@
 - BusinessRulesProjection
 - BusinessRulesProjectionExecutableTests
 - CanonicalValuesSync
+- ChangelogProjection
+- ChangelogProjectionExecutableTests
 - CLIErrorHandler
 - CLIRuntimePaths
 - CLIVersionHelper
@@ -102,8 +107,6 @@
 - DocumentationCompositionSupporting
 - DocumentationTypeRegistry
 - DocumentationTypeRegistryExecutableTests
-- DoDValidationTypes
-- DoDValidator
 - DualSourceExtractor
 - DualSourceMergeIntegration
 - EmissionDescriptor
@@ -207,9 +210,9 @@
 - PatternSummary
 - PatternSummaryCatalogProjectionExecutableTests
 - PatternSummaryProjection
+- PDR001SessionWorkflowCommands
 - PDR005ProcessGuardFSM
-- PhaseProgress
-- PhaseProgressProjection
+- PDR006AdvisoryProcessGuardProtection
 - PrChangeReview
 - PrChangeReviewProjection
 - ProcessGuardDecider
@@ -223,11 +226,6 @@
 - ProjectionFragmentSchema
 - ProjectionKernelRelationshipContractExecutableTests
 - RegistryBuilder
-- ReleaseNotesDigest
-- ReleaseNotesProjection
-- ReleaseNotesProjectionExecutableTests
-- ReleaseV100
-- ReleaseVNEXT
 - RequirementDigest
 - RequirementDigestProjection
 - RequirementExecutableDigestProjection
@@ -288,13 +286,16 @@
 | architect/decisions/adr-003-source-first-pattern-architecture.feature                                                     | executable | ADR003SourceFirstPatternArchitecture                  |            | gherkin    | completed |
 | architect/decisions/adr-005-codec-based-markdown-rendering.feature                                                        | executable | ADR005CodecBasedMarkdownRendering                     |            | gherkin    | completed |
 | architect/decisions/adr-006-single-read-model-architecture.feature                                                        | executable | ADR006SingleReadModelArchitecture                     |            | gherkin    | completed |
-| architect/decisions/adr-007-coordinated-taxonomy-redesign.feature                                                         | design     | ADR007CoordinatedTaxonomyRedesign                     |            | gherkin    | active    |
+| architect/decisions/adr-007-coordinated-taxonomy-redesign.feature                                                         | executable | ADR007CoordinatedTaxonomyRedesign                     |            | gherkin    | completed |
 | architect/decisions/adr-008-step-definition-stubs-convention.feature                                                      | executable | ADR008StepDefinitionStubsConvention                   |            | gherkin    | completed |
 | architect/decisions/adr-009-projection-trust-boundary.feature                                                             | executable | ADR009ProjectionTrustBoundary                         |            | gherkin    | completed |
 | architect/decisions/adr-010-documentation-composition-helpers.feature                                                     | executable | ADR010DocumentationCompositionHelpers                 |            | gherkin    | completed |
+| architect/decisions/adr-012-delivery-navigation.feature                                                                   | executable | ADR012DeliveryNavigation                              |            | gherkin    | completed |
+| architect/decisions/adr-013-taxonomy-retirement.feature                                                                   | executable | ADR013TaxonomyRetirement                              |            | gherkin    | completed |
 | packages/architect-projection/src/fragments/operational-insights/annotation-coverage.ts                                   | design     | AnnotationCoverage                                    | contract   | typescript | active    |
 | packages/architect-projection/src/projections/operational-insights/index.ts                                               | executable | AnnotationCoverageProjection                          | projection | typescript | completed |
 | packages/architect-guard/src/validation/anti-patterns.ts                                                                  | executable | AntiPatternDetector                                   | service    | typescript | completed |
+| packages/architect-guard/src/validation/types.ts                                                                          | executable | AntiPatternValidationTypes                            | contract   | typescript | completed |
 | packages/architect-projection/src/fragments/documentation-composition/api-reference.ts                                    | design     | ApiReferenceDigest                                    | contract   | typescript | active    |
 | packages/architect-projection/src/projections/documentation-composition/api-reference.ts                                  | design     | ApiReferenceProjection                                | projection | typescript | active    |
 | packages/architect-projection/tests/features/projections/documentation-composition/api-reference.feature                  | design     | ApiReferenceProjectionExecutableTests                 | projection | gherkin    | active    |
@@ -319,6 +320,8 @@
 | packages/architect-projection/src/projections/governance/business-rules.ts                                                | executable | BusinessRulesProjection                               | projection | typescript | completed |
 | packages/architect-projection/tests/features/projections/governance/business-rules.feature                                | executable | BusinessRulesProjectionExecutableTests                | projection | gherkin    | completed |
 | tests/features/api/canonical-values-sync.feature                                                                          | design     | CanonicalValuesSync                                   |            | gherkin    | active    |
+| packages/architect-projection/src/projections/delivery-reporting/index.ts                                                 | executable | ChangelogProjection                                   | projection | typescript | completed |
+| packages/architect-projection/tests/features/projections/delivery-reporting/changelog.feature                             | executable | ChangelogProjectionExecutableTests                    | projection | gherkin    | completed |
 | packages/architect-cli/src/cli/error-handler.ts                                                                           | executable | CLIErrorHandler                                       | utility    | typescript | completed |
 | packages/architect-cli/src/cli/runtime-helpers.ts                                                                         | executable | CLIRuntimePaths                                       | utility    | typescript | completed |
 | packages/architect-cli/src/cli/version.ts                                                                                 | executable | CLIVersionHelper                                      | utility    | typescript | completed |
@@ -368,8 +371,6 @@
 | packages/architect-projection/src/fragments/documentation-composition/supporting.ts                                       | design     | DocumentationCompositionSupporting                    | contract   | typescript | active    |
 | packages/architect-projection/src/projections/documentation-composition/documentation-type-registry.ts                    | design     | DocumentationTypeRegistry                             | contract   | typescript | active    |
 | packages/architect-projection/tests/features/projections/documentation-composition/registry-contract.feature              | design     | DocumentationTypeRegistryExecutableTests              | contract   | gherkin    | active    |
-| packages/architect-guard/src/validation/types.ts                                                                          | executable | DoDValidationTypes                                    | contract   | typescript | completed |
-| packages/architect-guard/src/validation/dod-validator.ts                                                                  | executable | DoDValidator                                          | service    | typescript | completed |
 | packages/architect-core/src/extractor/dual-source-extractor.ts                                                            | design     | DualSourceExtractor                                   | service    | typescript | active    |
 | packages/architect-core/tests/features/extractor/dual-source-merge.feature                                                | executable | DualSourceMergeIntegration                            |            | gherkin    | completed |
 | packages/architect-projection/src/fragments/emission-descriptor.ts                                                        | design     | EmissionDescriptor                                    | contract   | typescript | active    |
@@ -473,9 +474,9 @@
 | packages/architect-projection/src/fragments/pattern-relations/pattern-summary.ts                                          | design     | PatternSummary                                        | contract   | typescript | active    |
 | packages/architect-projection/tests/features/projections/pattern-relations/pattern-summary.feature                        | executable | PatternSummaryCatalogProjectionExecutableTests        | projection | gherkin    | completed |
 | packages/architect-projection/src/projections/pattern-relations/pattern-summary.ts                                        | executable | PatternSummaryProjection                              | projection | typescript | completed |
+| architect/decisions/pdr-001-session-workflow-commands.feature                                                             | executable | PDR001SessionWorkflowCommands                         |            | gherkin    | completed |
 | architect/decisions/pdr-005-process-guard-fsm.feature                                                                     | executable | PDR005ProcessGuardFSM                                 |            | gherkin    | completed |
-| packages/architect-projection/src/fragments/delivery-reporting/phase-progress.ts                                          | design     | PhaseProgress                                         | contract   | typescript | active    |
-| packages/architect-projection/src/projections/delivery-reporting/index.ts                                                 | executable | PhaseProgressProjection                               | projection | typescript | completed |
+| architect/decisions/pdr-006-advisory-process-guard-protection.feature                                                     | executable | PDR006AdvisoryProcessGuardProtection                  |            | gherkin    | completed |
 | packages/architect-projection/src/fragments/documentation-composition/pr-change-review.ts                                 | design     | PrChangeReview                                        | contract   | typescript | active    |
 | packages/architect-projection/src/projections/documentation-composition/pr-change-review.ts                               | executable | PrChangeReviewProjection                              | projection | typescript | completed |
 | packages/architect-guard/src/lint/process-guard/decider.ts                                                                | design     | ProcessGuardDecider                                   | decider    | typescript | active    |
@@ -489,11 +490,6 @@
 | packages/architect-projection/src/fragments/fragment-schema.internal.ts                                                   | design     | ProjectionFragmentSchema                              | contract   | typescript | active    |
 | packages/architect-projection/tests/features/projections/pattern-relations/kernel-relationship-contract.feature           | design     | ProjectionKernelRelationshipContractExecutableTests   | projection | gherkin    | active    |
 | packages/architect-core/src/taxonomy/registry-builder.ts                                                                  | design     | RegistryBuilder                                       | utility    | typescript | active    |
-| packages/architect-projection/src/fragments/delivery-reporting/release-notes-digest.ts                                    | design     | ReleaseNotesDigest                                    | contract   | typescript | active    |
-| packages/architect-projection/src/projections/delivery-reporting/index.ts                                                 | executable | ReleaseNotesProjection                                | projection | typescript | completed |
-| packages/architect-projection/tests/features/projections/delivery-reporting/release-notes.feature                         | executable | ReleaseNotesProjectionExecutableTests                 | projection | gherkin    | completed |
-| architect/releases/v1.0.0.feature                                                                                         | executable | ReleaseV100                                           |            | gherkin    | completed |
-| architect/releases/vNEXT.feature                                                                                          | design     | ReleaseVNEXT                                          |            | gherkin    | active    |
 | packages/architect-projection/src/fragments/operational-insights/requirement-digest.ts                                    | design     | RequirementDigest                                     | contract   | typescript | active    |
 | packages/architect-projection/src/projections/operational-insights/index.ts                                               | executable | RequirementDigestProjection                           | projection | typescript | completed |
 | packages/architect-projection/src/projections/operational-insights/index.ts                                               | executable | RequirementExecutableDigestProjection                 | projection | typescript | completed |

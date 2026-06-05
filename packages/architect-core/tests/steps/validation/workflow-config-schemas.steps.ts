@@ -29,7 +29,6 @@ function createMinimalWorkflowConfig(overrides: Partial<WorkflowConfig> = {}): W
     name: overrides.name ?? 'test-workflow',
     version: overrides.version ?? '1.0.0',
     statuses: overrides.statuses ?? [{ name: 'roadmap', emoji: '📋' }],
-    phases: overrides.phases ?? [{ name: 'Inception' }],
     ...('description' in overrides ? { description: overrides.description } : {}),
     ...('defaultStatus' in overrides ? { defaultStatus: overrides.defaultStatus } : {}),
     ...('metadata' in overrides ? { metadata: overrides.metadata } : {}),
@@ -52,13 +51,12 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
   Rule('WorkflowConfigSchema validates workflow configurations', ({ RuleScenario }) => {
     RuleScenario('Valid workflow config passes schema validation', ({ When, Then }) => {
       When(
-        'I validate a workflow config with name "standard" and version "1.0.0" with 1 status and 1 phase',
+        'I validate a workflow config with name "standard" and version "1.0.0" with 1 status',
         () => {
           state!.validationResult = WorkflowConfigSchema.safeParse({
             name: 'standard',
             version: '1.0.0',
             statuses: [{ name: 'roadmap', emoji: '📋' }],
-            phases: [{ name: 'Inception' }],
           });
         },
       );
@@ -72,7 +70,6 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
         state!.validationResult = WorkflowConfigSchema.safeParse({
           version: '1.0.0',
           statuses: [{ name: 'roadmap', emoji: '📋' }],
-          phases: [{ name: 'Inception' }],
         });
       });
       Then('the workflow config should be invalid', () => {
@@ -86,7 +83,6 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
           name: 'standard',
           version: 'not-semver',
           statuses: [{ name: 'roadmap', emoji: '📋' }],
-          phases: [{ name: 'Inception' }],
         });
       });
       Then('the workflow config should be invalid', () => {
@@ -102,24 +98,6 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
             name: 'standard',
             version: '1.0.0',
             statuses: [],
-            phases: [{ name: 'Inception' }],
-          });
-        },
-      );
-      Then('the workflow config should be invalid', () => {
-        expect(state!.validationResult!.success).toBe(false);
-      });
-    });
-
-    RuleScenario('Config without phases is rejected', ({ When, Then }) => {
-      When(
-        'I validate a workflow config with name "standard" and version "1.0.0" with 0 phases',
-        () => {
-          state!.validationResult = WorkflowConfigSchema.safeParse({
-            name: 'standard',
-            version: '1.0.0',
-            statuses: [{ name: 'roadmap', emoji: '📋' }],
-            phases: [],
           });
         },
       );
@@ -172,43 +150,6 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
         expect(state!.loadedWorkflow!.statusMap.has('active')).toBe(true);
       });
     });
-
-    RuleScenario('Loaded workflow has phase lookup map', ({ Given, When, Then, And }) => {
-      Given('a valid workflow config with phase "Inception" and phase "Construction"', () => {
-        state!.config = createMinimalWorkflowConfig({
-          phases: [{ name: 'Inception' }, { name: 'Construction' }],
-        });
-      });
-      When('I create a loaded workflow', () => {
-        state!.loadedWorkflow = createLoadedWorkflow(state!.config!);
-      });
-      Then('the phase map should contain "inception"', () => {
-        expect(state!.loadedWorkflow!.phaseMap.has('inception')).toBe(true);
-      });
-      And('the phase map should contain "construction"', () => {
-        expect(state!.loadedWorkflow!.phaseMap.has('construction')).toBe(true);
-      });
-      And('the phase map should have 2 entries', () => {
-        expect(state!.loadedWorkflow!.phaseMap.size).toBe(2);
-      });
-    });
-
-    RuleScenario('Phase lookup is case-insensitive', ({ Given, When, Then, And }) => {
-      Given('a valid workflow config with phase "Inception" and phase "Construction"', () => {
-        state!.config = createMinimalWorkflowConfig({
-          phases: [{ name: 'Inception' }, { name: 'Construction' }],
-        });
-      });
-      When('I create a loaded workflow', () => {
-        state!.loadedWorkflow = createLoadedWorkflow(state!.config!);
-      });
-      Then('the phase map should contain "inception"', () => {
-        expect(state!.loadedWorkflow!.phaseMap.has('inception')).toBe(true);
-      });
-      And('the phase map should contain "construction"', () => {
-        expect(state!.loadedWorkflow!.phaseMap.has('construction')).toBe(true);
-      });
-    });
   });
 
   Rule('isWorkflowConfig type guard validates at runtime', ({ RuleScenario }) => {
@@ -235,7 +176,6 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
         state!.typeGuardResult = isWorkflowConfig({
           name: 'test',
           version: '1.0.0',
-          phases: [{ name: 'Inception' }],
         });
       });
       Then('isWorkflowConfig should return false', () => {

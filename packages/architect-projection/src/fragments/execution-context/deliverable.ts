@@ -11,8 +11,7 @@ import { z } from 'zod';
 
 /**
  * Fragment shape for one execution-context deliverable record — its name,
- * status, the tests that cover it, its source location, and optional finding
- * and release metadata.
+ * status, the tests that cover it, its source location, and optional finding.
  *
  * @architect-shape
  */
@@ -23,7 +22,6 @@ export const DeliverableSchema = z.strictObject({
   tests: z.array(z.string()),
   location: z.string(),
   finding: z.string().optional(),
-  release: z.string().optional(),
 });
 
 export type Deliverable = z.infer<typeof DeliverableSchema>;

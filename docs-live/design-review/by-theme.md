@@ -7,7 +7,7 @@
 
 ## Overview
 
-This view captures 11 patterns across 6 diagrams in the Theme view.
+This view captures 14 patterns across 6 diagrams in the Theme view.
 
 ## Diagrams
 
@@ -18,9 +18,9 @@ Each node is a group; each arrow is a cross-group dependency (`depends-on` / `us
 ```mermaid
 graph LR
   commands["commands (1)"]
-  coordination["coordination (1)"]
+  coordination["coordination (2)"]
   projections["projections (4)"]
-  taxonomy["taxonomy (3)"]
+  taxonomy["taxonomy (5)"]
   testing["testing (2)"]
   coordination --> taxonomy
   taxonomy --> coordination
@@ -31,14 +31,16 @@ graph LR
 
 ```mermaid
 graph TD
-  pdr001sessionworkflowcommands["PDR001SessionWorkflowCommands<br/>(roadmap)"]
+  pdr001sessionworkflowcommands["PDR001SessionWorkflowCommands<br/>(completed)"]
 ```
 
-### Theme: coordination (1 pattern)
+### Theme: coordination (2 patterns)
 
 ```mermaid
 graph TD
   pdr005processguardfsm["PDR005ProcessGuardFSM<br/>(completed)"]
+  pdr006advisoryprocessguardprotection["PDR006AdvisoryProcessGuardProtection<br/>(completed)"]
+  pdr006advisoryprocessguardprotection -->|depends-on| pdr005processguardfsm
 ```
 
 ### Theme: projections (4 patterns)
@@ -57,16 +59,25 @@ graph TD
   adr010documentationcompositionhelpers -. see-also .- adr009projectiontrustboundary
 ```
 
-### Theme: taxonomy (3 patterns)
+### Theme: taxonomy (5 patterns)
 
 ```mermaid
 graph TD
   adr001taxonomycanonicalvalues["ADR001TaxonomyCanonicalValues<br/>(completed)"]
   adr003sourcefirstpatternarchitecture["ADR003SourceFirstPatternArchitecture<br/>(completed)"]
-  adr007coordinatedtaxonomyredesign["ADR007CoordinatedTaxonomyRedesign<br/>(active)"]
+  adr007coordinatedtaxonomyredesign["ADR007CoordinatedTaxonomyRedesign<br/>(completed)"]
+  adr012deliverynavigation["ADR012DeliveryNavigation<br/>(completed)"]
+  adr013taxonomyretirement["ADR013TaxonomyRetirement<br/>(completed)"]
   adr001taxonomycanonicalvalues -. see-also .- adr007coordinatedtaxonomyredesign
+  adr001taxonomycanonicalvalues -. see-also .- adr012deliverynavigation
+  adr001taxonomycanonicalvalues -. see-also .- adr013taxonomyretirement
   adr003sourcefirstpatternarchitecture -->|depends-on| adr001taxonomycanonicalvalues
   adr007coordinatedtaxonomyredesign -->|depends-on| adr001taxonomycanonicalvalues
+  adr012deliverynavigation -->|depends-on| adr001taxonomycanonicalvalues
+  adr012deliverynavigation -->|depends-on| adr003sourcefirstpatternarchitecture
+  adr012deliverynavigation -. see-also .- adr013taxonomyretirement
+  adr013taxonomyretirement -->|depends-on| adr001taxonomycanonicalvalues
+  adr013taxonomyretirement -->|depends-on| adr007coordinatedtaxonomyredesign
 ```
 
 ### Theme: testing (2 patterns)
@@ -82,13 +93,14 @@ graph TD
 
 Most-depended-on patterns in this view, ranked by in-view dependant count.
 
-| Pattern                              | Dependants | Top dependants                                                                                 |
-| ------------------------------------ | ---------- | ---------------------------------------------------------------------------------------------- |
-| ADR001TaxonomyCanonicalValues        | 3          | ADR003SourceFirstPatternArchitecture, ADR007CoordinatedTaxonomyRedesign, PDR005ProcessGuardFSM |
-| ADR002GherkinOnlyTesting             | 1          | ADR008StepDefinitionStubsConvention                                                            |
-| ADR003SourceFirstPatternArchitecture | 1          | ADR008StepDefinitionStubsConvention                                                            |
-| ADR005CodecBasedMarkdownRendering    | 1          | ADR006SingleReadModelArchitecture                                                              |
-| PDR005ProcessGuardFSM                | 1          | ADR007CoordinatedTaxonomyRedesign                                                              |
+| Pattern                              | Dependants | Top dependants                                                                                                                                     |
+| ------------------------------------ | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ADR001TaxonomyCanonicalValues        | 6          | ADR003SourceFirstPatternArchitecture, ADR007CoordinatedTaxonomyRedesign, ADR012DeliveryNavigation, ADR013TaxonomyRetirement, PDR005ProcessGuardFSM |
+| ADR003SourceFirstPatternArchitecture | 2          | ADR008StepDefinitionStubsConvention, ADR012DeliveryNavigation                                                                                      |
+| PDR005ProcessGuardFSM                | 2          | ADR007CoordinatedTaxonomyRedesign, PDR006AdvisoryProcessGuardProtection                                                                            |
+| ADR002GherkinOnlyTesting             | 1          | ADR008StepDefinitionStubsConvention                                                                                                                |
+| ADR005CodecBasedMarkdownRendering    | 1          | ADR006SingleReadModelArchitecture                                                                                                                  |
+| ADR007CoordinatedTaxonomyRedesign    | 1          | ADR013TaxonomyRetirement                                                                                                                           |
 
 ## Legend
 
@@ -108,8 +120,11 @@ Most-depended-on patterns in this view, ranked by in-view dependant count.
 - ADR008StepDefinitionStubsConvention
 - ADR009ProjectionTrustBoundary
 - ADR010DocumentationCompositionHelpers
+- ADR012DeliveryNavigation
+- ADR013TaxonomyRetirement
 - PDR001SessionWorkflowCommands
 - PDR005ProcessGuardFSM
+- PDR006AdvisoryProcessGuardProtection
 
 ---
 

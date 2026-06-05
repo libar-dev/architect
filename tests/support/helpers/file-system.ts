@@ -265,17 +265,13 @@ export interface RegularType {
  * @example
  * ```typescript
  * const content = createFeatureFile({
- *   phase: 1,
  *   status: "completed",
- *   quarter: "Q4-2025",
  *   name: "Foundation Types",
  * });
  * ```
  */
 export function createFeatureFile(options: {
-  phase?: number;
   status?: string;
-  quarter?: string;
   effort?: string;
   team?: string;
   name?: string;
@@ -283,9 +279,7 @@ export function createFeatureFile(options: {
   deliverables?: Array<{ name: string; status: string; tests: number; location?: string }>;
 }): string {
   const {
-    phase = 1,
     status = 'completed',
-    quarter = 'Q4-2025',
     effort = '1w',
     team = 'platform',
     name = 'Test Feature',
@@ -296,9 +290,7 @@ export function createFeatureFile(options: {
   const lines: string[] = [];
 
   // Process tags (using @architect-* prefix per PDR-004)
-  lines.push(`@architect-phase:${phase}`);
   lines.push(`@architect-status:${status}`);
-  lines.push(`@architect-quarter:${quarter}`);
   lines.push(`@architect-effort:${effort}`);
   lines.push(`@architect-team:${team}`);
   lines.push(`Feature: ${name}`);

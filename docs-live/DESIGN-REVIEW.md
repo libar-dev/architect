@@ -7,7 +7,7 @@
 
 ## Overview
 
-This view captures 213 patterns across 24 diagrams in the Component view.
+This view captures 208 patterns across 24 diagrams in the Component view.
 
 ## Related views
 
@@ -26,7 +26,7 @@ graph LR
   api["api (7)"]
   cli["cli (6)"]
   configuration["configuration (4)"]
-  delivery_reporting["delivery-reporting (7)"]
+  delivery_reporting["delivery-reporting (5)"]
   documentation_composition["documentation-composition (8)"]
   domain["domain (1)"]
   execution_context["execution-context (8)"]
@@ -38,14 +38,14 @@ graph LR
   pattern_relations["pattern-relations (12)"]
   pipeline["pipeline (1)"]
   process_guard["process-guard (6)"]
-  projection["projection (47)"]
+  projection["projection (46)"]
   read_api["read-api (7)"]
   rendering["rendering (9)"]
   scanner["scanner (4)"]
-  validation["validation (8)"]
+  validation["validation (7)"]
   validation_schemas["validation-schemas (4)"]
   role_contract["role: contract (2)"]
-  pkg_architect_package_content["Architect Package Content (38)"]
+  pkg_architect_package_content["Architect Package Content (37)"]
   api --> pipeline
   api --> projection
   api --> read_api
@@ -140,14 +140,12 @@ graph TD
   sourcemerge["SourceMerge<br/>(utility · active)"]
 ```
 
-### Bounded context: delivery-reporting (7 patterns)
+### Bounded context: delivery-reporting (5 patterns)
 
 ```mermaid
 graph TD
   deliveryreportingfragmentcontracts["DeliveryReportingFragmentContracts<br/>(contract · active)"]
   deliveryreportingsupporting["DeliveryReportingSupporting<br/>(contract · active)"]
-  phaseprogress["PhaseProgress<br/>(contract · active)"]
-  releasenotesdigest["ReleaseNotesDigest<br/>(contract · active)"]
   roadmaptimeline["RoadmapTimeline<br/>(contract · active)"]
   statusdistribution["StatusDistribution<br/>(contract · active)"]
   traceabilitymatrix["TraceabilityMatrix<br/>(contract · active)"]
@@ -309,7 +307,7 @@ graph TD
   processguardlinter -->|depends-on| detectchanges
 ```
 
-### Bounded context: projection (47 patterns)
+### Bounded context: projection (46 patterns)
 
 ```mermaid
 graph TD
@@ -320,6 +318,7 @@ graph TD
   architectureneighborhoodprojection["ArchitectureNeighborhoodProjection<br/>(projection · completed)"]
   boundedcontextprojection["BoundedContextProjection<br/>(projection · completed)"]
   businessrulesprojection["BusinessRulesProjection<br/>(projection · completed)"]
+  changelogprojection["ChangelogProjection<br/>(projection · completed)"]
   decisioncatalogprojection["DecisionCatalogProjection<br/>(projection · completed)"]
   deliverableprojection["DeliverableProjection<br/>(projection · completed)"]
   deliveryreportingprojectionsupport["DeliveryReportingProjectionSupport<br/>(utility · completed)"]
@@ -342,10 +341,8 @@ graph TD
   patterndetailprojection["PatternDetailProjection<br/>(projection · completed)"]
   patternrelationsprojectionsupport["PatternRelationsProjectionSupport<br/>(utility · completed)"]
   patternsummaryprojection["PatternSummaryProjection<br/>(projection · completed)"]
-  phaseprogressprojection["PhaseProgressProjection<br/>(projection · completed)"]
   prchangereviewprojection["PrChangeReviewProjection<br/>(projection · completed)"]
   projectconfigprojection["ProjectConfigProjection<br/>(projection · completed)"]
-  releasenotesprojection["ReleaseNotesProjection<br/>(projection · completed)"]
   requirementdigestprojection["RequirementDigestProjection<br/>(projection · completed)"]
   requirementexecutabledigestprojection["RequirementExecutableDigestProjection<br/>(projection · completed)"]
   requirementspecsdigestprojection["RequirementSpecsDigestProjection<br/>(projection · completed)"]
@@ -366,6 +363,7 @@ graph TD
   architectureneighborhoodprojection -->|depends-on| patternrelationsprojectionsupport
   boundedcontextprojection -->|depends-on| patternrelationsprojectionsupport
   businessrulesprojection -->|depends-on| governanceprojectionsupport
+  changelogprojection -->|depends-on| deliveryreportingprojectionsupport
   decisioncatalogprojection -->|depends-on| governanceprojectionsupport
   deliverableprojection -->|depends-on| executioncontextprojectionsupport
   dependencycontextprojection -->|depends-on| patternrelationsprojectionsupport
@@ -381,10 +379,8 @@ graph TD
   patterncatalogprojection -->|depends-on| patternrelationsprojectionsupport
   patterndetailprojection -->|depends-on| patternrelationsprojectionsupport
   patternsummaryprojection -->|depends-on| patternrelationsprojectionsupport
-  phaseprogressprojection -->|depends-on| deliveryreportingprojectionsupport
   prchangereviewprojection -->|depends-on| documentationcompositionprojectionsupport
   projectconfigprojection -->|depends-on| documentationcompositionprojectionsupport
-  releasenotesprojection -->|depends-on| deliveryreportingprojectionsupport
   requirementdigestprojection -->|depends-on| operationalinsightsprojectionsupport
   requirementexecutabledigestprojection -->|depends-on| operationalinsightsprojectionsupport
   requirementspecsdigestprojection -->|depends-on| operationalinsightsprojectionsupport
@@ -453,25 +449,22 @@ graph TD
   patternscanner["PatternScanner<br/>(service · active)"]
 ```
 
-### Bounded context: validation (8 patterns)
+### Bounded context: validation (7 patterns)
 
 ```mermaid
 graph TD
   antipatterndetector["AntiPatternDetector<br/>(service · completed)"]
-  dodvalidationtypes["DoDValidationTypes<br/>(contract · completed)"]
-  dodvalidator["DoDValidator<br/>(service · completed)"]
+  antipatternvalidationtypes["AntiPatternValidationTypes<br/>(contract · completed)"]
   fsmstates["FSMStates<br/>(read-model · active)"]
   fsmtransitions["FSMTransitions<br/>(read-model · active)"]
   fsmvalidator["FSMValidator<br/>(decider · active)"]
   validatepatternscli["ValidatePatternsCLI<br/>(service · completed)"]
   validationmodule["ValidationModule<br/>(barrel · completed)"]
-  antipatterndetector -->|depends-on| dodvalidationtypes
-  dodvalidator -->|depends-on| dodvalidationtypes
+  antipatterndetector -->|depends-on| antipatternvalidationtypes
   fsmvalidator -->|depends-on| fsmstates
   fsmvalidator -->|depends-on| fsmtransitions
   validationmodule -->|depends-on| antipatterndetector
-  validationmodule -->|depends-on| dodvalidationtypes
-  validationmodule -->|depends-on| dodvalidator
+  validationmodule -->|depends-on| antipatternvalidationtypes
 ```
 
 ### Bounded context: validation-schemas (4 patterns)
@@ -493,7 +486,7 @@ graph TD
   resultmonadtypes["ResultMonadTypes<br/>(contract · completed)"]
 ```
 
-### Unclassified · Architect Package Content (38 patterns)
+### Unclassified · Architect Package Content (37 patterns)
 
 ```mermaid
 graph TD
@@ -502,27 +495,26 @@ graph TD
   adr003sourcefirstpatternarchitecture["ADR003SourceFirstPatternArchitecture<br/>(completed)"]
   adr005codecbasedmarkdownrendering["ADR005CodecBasedMarkdownRendering<br/>(completed)"]
   adr006singlereadmodelarchitecture["ADR006SingleReadModelArchitecture<br/>(completed)"]
-  adr007coordinatedtaxonomyredesign["ADR007CoordinatedTaxonomyRedesign<br/>(active)"]
+  adr007coordinatedtaxonomyredesign["ADR007CoordinatedTaxonomyRedesign<br/>(completed)"]
   adr008stepdefinitionstubsconvention["ADR008StepDefinitionStubsConvention<br/>(completed)"]
   adr009projectiontrustboundary["ADR009ProjectionTrustBoundary<br/>(completed)"]
   adr010documentationcompositionhelpers["ADR010DocumentationCompositionHelpers<br/>(completed)"]
+  adr012deliverynavigation["ADR012DeliveryNavigation<br/>(completed)"]
+  adr013taxonomyretirement["ADR013TaxonomyRetirement<br/>(completed)"]
   apireferenceshapecoverage["ApiReferenceShapeCoverage<br/>(candidate)"]
   architecturedelta["ArchitectureDelta<br/>(roadmap)"]
   assistivecodeintelligence["AssistiveCodeIntelligence<br/>(epic · candidate)"]
   codecbehaviorexecutabletests["CodecBehaviorExecutableTests<br/>(roadmap)"]
   dataapirelationshipgraph["DataAPIRelationshipGraph<br/>(roadmap)"]
   documentationprojection["DocumentationProjection<br/>(epic · candidate)"]
-  dodvalidation["DoDValidation<br/>(roadmap)"]
-  effortvariancetracking["EffortVarianceTracking<br/>(roadmap)"]
   generatorinfrastructureexecutabletests["GeneratorInfrastructureExecutableTests<br/>(roadmap)"]
   goalorientednavigation["GoalOrientedNavigation<br/>(roadmap)"]
-  livingroadmapcli["LivingRoadmapCLI<br/>(roadmap)"]
   monoreposupport["MonorepoSupport<br/>(roadmap)"]
   multisourcecomposition["MultiSourceComposition<br/>(candidate)"]
   onesourcemultipleaudiences["OneSourceMultipleAudiences<br/>(candidate)"]
-  pdr001sessionworkflowcommands["PDR001SessionWorkflowCommands<br/>(roadmap)"]
+  pdr001sessionworkflowcommands["PDR001SessionWorkflowCommands<br/>(completed)"]
   pdr005processguardfsm["PDR005ProcessGuardFSM<br/>(completed)"]
-  phasenumberingconventions["PhaseNumberingConventions<br/>(roadmap)"]
+  pdr006advisoryprocessguardprotection["PDR006AdvisoryProcessGuardProtection<br/>(completed)"]
   prdimplementationsection["PrdImplementationSection<br/>(roadmap)"]
   progressivegovernance["ProgressiveGovernance<br/>(roadmap)"]
   readmodelreflexivity["ReadModelReflexivity<br/>(candidate)"]
@@ -536,6 +528,8 @@ graph TD
   traceabilityenhancements["TraceabilityEnhancements<br/>(roadmap)"]
   traceabilitygenerator["TraceabilityGenerator<br/>(roadmap)"]
   adr001taxonomycanonicalvalues -. see-also .- adr007coordinatedtaxonomyredesign
+  adr001taxonomycanonicalvalues -. see-also .- adr012deliverynavigation
+  adr001taxonomycanonicalvalues -. see-also .- adr013taxonomyretirement
   adr003sourcefirstpatternarchitecture -->|depends-on| adr001taxonomycanonicalvalues
   adr006singlereadmodelarchitecture -->|depends-on| adr005codecbasedmarkdownrendering
   adr007coordinatedtaxonomyredesign -->|depends-on| adr001taxonomycanonicalvalues
@@ -547,12 +541,19 @@ graph TD
   adr010documentationcompositionhelpers -. see-also .- adr005codecbasedmarkdownrendering
   adr010documentationcompositionhelpers -. see-also .- adr006singlereadmodelarchitecture
   adr010documentationcompositionhelpers -. see-also .- adr009projectiontrustboundary
+  adr012deliverynavigation -->|depends-on| adr001taxonomycanonicalvalues
+  adr012deliverynavigation -->|depends-on| adr003sourcefirstpatternarchitecture
+  adr012deliverynavigation -. see-also .- adr013taxonomyretirement
+  adr013taxonomyretirement -->|depends-on| adr001taxonomycanonicalvalues
+  adr013taxonomyretirement -->|depends-on| adr007coordinatedtaxonomyredesign
   documentationprojection -->|depends-on| adr010documentationcompositionhelpers
   goalorientednavigation -. see-also .- adr006singlereadmodelarchitecture
   goalorientednavigation -. see-also .- adr009projectiontrustboundary
   goalorientednavigation -. see-also .- adr010documentationcompositionhelpers
   goalorientednavigation -. see-also .- taxonomydocumentationcluster
   pdr005processguardfsm -->|depends-on| adr001taxonomycanonicalvalues
+  pdr006advisoryprocessguardprotection -->|depends-on| adr001taxonomycanonicalvalues
+  pdr006advisoryprocessguardprotection -->|depends-on| pdr005processguardfsm
   stepdefinitioncompletion -->|depends-on| adr002gherkinonlytesting
   taxonomydocumentationcluster -. see-also .- adr010documentationcompositionhelpers
   taxonomydocumentationcluster -. see-also .- multisourcecomposition
@@ -568,14 +569,14 @@ Most-depended-on patterns in this view, ranked by in-view dependant count.
 | ------------------------------------ | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | ProjectionFragmentContracts          | 17         | ArchitectureDiagramProjection, BusinessRulesProjection, DecisionCatalogProjection, DeliverableProjection, DocumentationBundle                           |
 | ExtractedPattern                     | 14         | ArchitectureInspection, DecisionResolution, DeliveryReportingProjectionSupport, DualSourceExtractor, ExecutionContextProjectionSupport                  |
-| PatternGraph                         | 11         | ArchitectureInspection, BuildPipeline, DecisionResolution, DoDValidator, GraphInventory                                                                 |
 | PatternRelationsFragmentContracts    | 11         | ArchitectureComparisonProjection, ArchitectureNeighborhoodProjection, DependencyContextProjection, DependencyEdgeProjection, OpenQuestionListProjection |
 | PatternRelationsProjectionSupport    | 11         | ArchitectureComparisonProjection, ArchitectureNeighborhoodProjection, BoundedContextProjection, DependencyContextProjection, DependencyEdgeProjection   |
+| PatternGraph                         | 10         | ArchitectureInspection, BuildPipeline, DecisionResolution, GraphInventory, PatternClassification                                                        |
 | OperationalInsightsProjectionSupport | 8          | AnnotationCoverageProjection, OverviewProjection, RequirementDigestProjection, RequirementExecutableDigestProjection, RequirementSpecsDigestProjection  |
 | BlockSchema                          | 7          | ArchitectureDiagram, DecisionRecord, DocumentationCompositionSupporting, MarkdownRenderer, OperationalInsightsSupporting                                |
+| ADR001TaxonomyCanonicalValues        | 6          | ADR003SourceFirstPatternArchitecture, ADR007CoordinatedTaxonomyRedesign, ADR012DeliveryNavigation, ADR013TaxonomyRetirement, PDR005ProcessGuardFSM      |
 | PatternHelpers                       | 6          | ArchitectureInspection, DecisionResolution, DualSourceExtractor, GraphInventory, PatternGraphApi                                                        |
 | ProjectionFragmentSchema             | 6          | ApiReferenceProjection, CompactTextRenderer, FragmentRendererDispatch, JsonRenderer, MarkdownRenderer                                                   |
-| DeliveryReportingProjectionSupport   | 5          | PhaseProgressProjection, ReleaseNotesProjection, RoadmapTimelineProjection, StatusDistributionProjection, TraceabilityMatrixProjection                  |
 
 ## Cross-package bounded contexts
 
@@ -587,9 +588,9 @@ Bounded contexts whose patterns span more than one workspace package.
 | api             | Architect MCP, Architect Package Content        | 7        |
 | extractor       | Architect Core, Architect Package Content       | 7        |
 | governance      | Architect Package Content, Architect Projection | 9        |
-| projection      | Architect Package Content, Architect Projection | 47       |
+| projection      | Architect Package Content, Architect Projection | 46       |
 | rendering       | Architect Core, Architect Projection            | 9        |
-| validation      | Architect Core, Architect Guard                 | 8        |
+| validation      | Architect Core, Architect Guard                 | 7        |
 
 ## Legend
 
@@ -609,9 +610,12 @@ Bounded contexts whose patterns span more than one workspace package.
 - ADR008StepDefinitionStubsConvention
 - ADR009ProjectionTrustBoundary
 - ADR010DocumentationCompositionHelpers
+- ADR012DeliveryNavigation
+- ADR013TaxonomyRetirement
 - AnnotationCoverage
 - AnnotationCoverageProjection
 - AntiPatternDetector
+- AntiPatternValidationTypes
 - ApiReferenceDigest
 - ApiReferenceProjection
 - ApiReferenceShapeCoverage
@@ -635,6 +639,7 @@ Bounded contexts whose patterns span more than one workspace package.
 - BusinessRuleReference
 - BusinessRuleSet
 - BusinessRulesProjection
+- ChangelogProjection
 - CLIErrorHandler
 - CLIRuntimePaths
 - CLIVersionHelper
@@ -669,11 +674,7 @@ Bounded contexts whose patterns span more than one workspace package.
 - DocumentationCompositionSupporting
 - DocumentationProjection
 - DocumentationTypeRegistry
-- DoDValidation
-- DoDValidationTypes
-- DoDValidator
 - DualSourceExtractor
-- EffortVarianceTracking
 - EmissionDescriptor
 - ErrorFactoryTypes
 - ExecutionContextProjectionSupport
@@ -709,7 +710,6 @@ Bounded contexts whose patterns span more than one workspace package.
 - LintPatternsCLI
 - LintProcessCLI
 - LintRules
-- LivingRoadmapCLI
 - MarkdownBlockParser
 - MarkdownRenderer
 - MCPFileWatcher
@@ -748,9 +748,7 @@ Bounded contexts whose patterns span more than one workspace package.
 - PatternSummaryProjection
 - PDR001SessionWorkflowCommands
 - PDR005ProcessGuardFSM
-- PhaseNumberingConventions
-- PhaseProgress
-- PhaseProgressProjection
+- PDR006AdvisoryProcessGuardProtection
 - PrChangeReview
 - PrChangeReviewProjection
 - PrdImplementationSection
@@ -764,8 +762,6 @@ Bounded contexts whose patterns span more than one workspace package.
 - ProjectionFragmentSchema
 - ReadModelReflexivity
 - RegistryBuilder
-- ReleaseNotesDigest
-- ReleaseNotesProjection
 - RequirementDigest
 - RequirementDigestProjection
 - RequirementExecutableDigestProjection

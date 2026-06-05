@@ -42,9 +42,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             () => {
               state!.context = createProjectionContext({
                 patterns: [
-                  createPattern('ActiveService', { status: 'active', phase: 1 }),
-                  createPattern('CompletedService', { status: 'completed', phase: 1 }),
-                  createPattern('PlannedService', { status: 'roadmap', phase: 2 }),
+                  createPattern('ActiveService', { status: 'active' }),
+                  createPattern('CompletedService', { status: 'completed' }),
+                  createPattern('PlannedService', { status: 'roadmap' }),
                 ],
               });
             },

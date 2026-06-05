@@ -6,7 +6,7 @@
 
 ## Overview
 
-101 shapes across 10 patterns in architect-core.
+100 shapes across 10 patterns in architect-core.
 
 ## BlockSchema
 
@@ -1447,7 +1447,7 @@ ImplementationRefSchema = z.strictObject({
 
 ### PatternGraphSchema
 
-Schema for the canonical read model (the PatternGraph) — every pattern, the tag registry, the status/maturity/phase/role groupings, counts, the relationship index, and the optional architecture index.
+Schema for the canonical read model (the PatternGraph) — every pattern, the tag registry, the status/maturity/role groupings, counts, the relationship index, and the optional architecture index.
 
 ```ts
 PatternGraphSchema = z.strictObject({
@@ -1456,13 +1456,10 @@ PatternGraphSchema = z.strictObject({
   byStatus: ExactStatusGroupsSchema,
   byNormalizedStatus: StatusGroupsSchema,
   byMaturity: z.record(z.string(), z.array(ExtractedPatternSchema)),
-  byPhase: z.array(PhaseGroupSchema),
-  byQuarter: z.record(z.string(), z.array(ExtractedPatternSchema)),
   byRole: z.record(z.string(), z.array(ExtractedPatternSchema)),
   bySourceType: SourceViewsSchema,
   byProductArea: z.record(z.string(), z.array(ExtractedPatternSchema)),
   counts: StatusCountsSchema,
-  phaseCount: z.number().int().nonnegative(),
   roleCount: z.number().int().nonnegative(),
   relationshipIndex: z.record(z.string(), RelationshipEntrySchema),
   archIndex: ArchIndexSchema.optional(),
@@ -1481,19 +1478,6 @@ PatternParseFailureSchema = z.strictObject({
   path: z.string(),
   message: z.string(),
   parseError: FeatureParseErrorSchema,
-})
-```
-
-### PhaseGroupSchema
-
-Schema for a single phase grouping — its number, optional name, member patterns, and status counts.
-
-```ts
-PhaseGroupSchema = z.strictObject({
-  phaseNumber: z.number().int(),
-  phaseName: z.string().optional(),
-  patterns: z.array(ExtractedPatternSchema),
-  counts: StatusCountsSchema,
 })
 ```
 

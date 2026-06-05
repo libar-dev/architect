@@ -185,7 +185,6 @@ function createPatternContextMeta(pattern: ExtractedPattern): PatternContextMeta
   return {
     name: getPatternName(pattern),
     status: pattern.status,
-    ...(pattern.phase !== undefined ? { phase: pattern.phase } : {}),
     role: pattern.role ?? '',
     file: pattern.source.file,
     summary: extractDescription(pattern.directive.description),

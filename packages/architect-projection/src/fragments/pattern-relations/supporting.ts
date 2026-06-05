@@ -140,8 +140,6 @@ export interface DependencyContextNode {
   name: string;
   /** The pattern's lifecycle status, when known. */
   status?: string | undefined;
-  /** The pattern's phase number, when assigned. */
-  phase?: number | undefined;
   /** Whether traversal stopped here because the depth limit was reached and
    * unexpanded edges remain in this direction. */
   truncated: boolean;
@@ -158,7 +156,6 @@ export interface DependencyContextNode {
 export const DependencyContextNodeSchema: z.ZodType<DependencyContextNode> = z.strictObject({
   name: z.string(),
   status: z.string().optional(),
-  phase: z.number().int().optional(),
   truncated: z.boolean(),
   children: z.array(z.lazy(() => DependencyContextNodeSchema)),
 });

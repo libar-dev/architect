@@ -273,25 +273,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         expect(combined).toContain(text);
       });
     });
-
-    RuleScenario('Invalid phase query argument shows error', ({ Given, When, Then, And }) => {
-      Given('TypeScript files with pattern annotations', async () => {
-        await writePatternFiles(state);
-      });
-
-      When('running {string}', async (_ctx: unknown, cmd: string) => {
-        await runCLICommand(state, cmd);
-      });
-
-      Then('exit code is {int}', (_ctx: unknown, code: number) => {
-        expect(getResult(state).exitCode).toBe(code);
-      });
-
-      And('output contains {string}', (_ctx: unknown, text: string) => {
-        const combined = getResult(state).stdout + getResult(state).stderr;
-        expect(combined).toContain(text);
-      });
-    });
   });
 
   // ---------------------------------------------------------------------------

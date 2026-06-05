@@ -2,18 +2,13 @@ Feature: Architect guard runtime
 
   Rule: Guard runtime APIs preserve process enforcement behavior
 
-    Scenario: Validate DoD deliverables and acceptance criteria
-      When I validate DoD deliverables and acceptance criteria
-      Then the DoD result should be met
-      And the DoD result should not report missing acceptance criteria
-
     Scenario: Detect process metadata leaking into TypeScript annotations
       When I detect process metadata in TypeScript annotations
       Then one process metadata violation should be reported
 
     Scenario: Pass custom tag prefixes through anti-pattern detection
       When I detect anti-patterns with a custom tag prefix
-      Then one custom-prefix violation should mention "@acme-quarter"
+      Then one custom-prefix violation should mention "@acme-team"
 
     Scenario: Do not emit the removed historical tag-duplication anti-pattern id
       When I detect anti-patterns for architect process metadata
@@ -27,9 +22,34 @@ Feature: Architect guard runtime
       When I detect anti-patterns for two features with distinct pattern identities
       Then no duplicate-pattern-identity violation is reported
 
-    Scenario: Block completed spec edits without unlock reason
+    Scenario: Flag retired temporal and release tags as removed tags
+      When I detect removed tags in a feature using retired ADR-013 tags
+      Then a removed-tag violation is reported for each retired tag
+      And no removed-tag violation is reported for the status or level look-alikes
+
+    Scenario: Warn on completed spec edits without unlock reason
       When I validate a completed spec edit without unlock reason
-      Then the process guard should reject the change for completed protection
+      Then the process guard should warn for completed protection
+      And the process guard should not block the change
+
+    Scenario: Suppress completed-protection warning with unlock reason
+      When I validate a completed spec edit with an unlock reason
+      Then the process guard should not warn for completed protection
+      And the process guard should not block the change
+
+    Scenario: Warn on pending scope added to an active spec
+      When I validate a pending deliverable added to an active spec
+      Then the process guard should warn for scope creep
+      And the process guard should not block the change
+
+    Scenario: Stay silent on real-progress scope added to an active spec
+      When I validate an in-progress deliverable added to an active spec
+      Then the process guard should not warn for scope creep
+      And the process guard should not block the change
+
+    Scenario: Strict mode promotes the completed-protection warning to a blocking error
+      When I validate a completed spec edit without unlock reason in strict mode
+      Then the process guard should block the change for completed protection
 
     Scenario: Run step lint from the guard package
       When I run step lint against a temporary feature pair

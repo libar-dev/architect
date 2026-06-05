@@ -13,9 +13,6 @@ export type DeliverablesFormat = (typeof DELIVERABLES_FORMAT)[number];
 export const ACCEPTANCE_CRITERIA_FORMAT = ['gherkin', 'bullet-points', 'table'] as const;
 export type AcceptanceCriteriaFormat = (typeof ACCEPTANCE_CRITERIA_FORMAT)[number];
 
-export const TIMELINE_GROUP_BY = ['quarter', 'phase'] as const;
-export type TimelineGroupBy = (typeof TIMELINE_GROUP_BY)[number];
-
 export const DELIVERABLES_GROUP_BY = ['status', 'phase', 'location', 'none'] as const;
 export type DeliverablesGroupBy = (typeof DELIVERABLES_GROUP_BY)[number];
 
@@ -31,10 +28,10 @@ export type ConstraintsGroupBy = (typeof CONSTRAINTS_GROUP_BY)[number];
 export const ADR_LIST_GROUP_BY = ['status', 'category'] as const;
 export type AdrListGroupBy = (typeof ADR_LIST_GROUP_BY)[number];
 
-export const REMAINING_WORK_GROUP_BY = ['quarter', 'priority', 'level', 'none'] as const;
+export const REMAINING_WORK_GROUP_BY = ['priority', 'level', 'none'] as const;
 export type RemainingWorkGroupBy = (typeof REMAINING_WORK_GROUP_BY)[number];
 
-export const REMAINING_WORK_SORT_BY = ['phase', 'priority', 'effort', 'quarter'] as const;
+export const REMAINING_WORK_SORT_BY = ['priority', 'effort'] as const;
 export type RemainingWorkSortBy = (typeof REMAINING_WORK_SORT_BY)[number];
 
 export const PR_CHANGES_SORT_BY = ['phase', 'priority', 'workflow'] as const;

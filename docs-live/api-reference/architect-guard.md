@@ -6,9 +6,9 @@
 
 ## Overview
 
-27 shapes across 2 patterns in architect-guard.
+24 shapes across 2 patterns in architect-guard.
 
-## DoDValidationTypes
+## AntiPatternValidationTypes
 
 ### AntiPatternId
 
@@ -78,86 +78,6 @@ Default thresholds applied when none are supplied to anti-pattern detection.
 ```ts
 const DEFAULT_THRESHOLDS: AntiPatternThresholds;
 ```
-
-### DoDValidationResult
-
-DoD validation result for a single phase/pattern. Reports whether a completed phase meets Definition of Done criteria: 1. All deliverables must have "complete" status 2. At least one @acceptance-criteria scenario must exist
-
-```ts
-interface DoDValidationResult {
-  /** Pattern name being validated */
-  readonly patternName: string;
-  /** Phase number being validated */
-  readonly phase: number;
-  /** True if all DoD criteria are met */
-  readonly isDoDMet: boolean;
-  /** All deliverables from Background table */
-  readonly deliverables: readonly Deliverable[];
-  /** Deliverables that are not yet complete */
-  readonly incompleteDeliverables: readonly Deliverable[];
-  /** True if no @acceptance-criteria scenarios found */
-  readonly missingAcceptanceCriteria: boolean;
-  /** Human-readable validation messages */
-  readonly messages: readonly string[];
-}
-```
-
-#### Properties
-
-| Property                  | Description                                     |
-| ------------------------- | ----------------------------------------------- |
-| patternName               | Pattern name being validated                    |
-| phase                     | Phase number being validated                    |
-| isDoDMet                  | True if all DoD criteria are met                |
-| deliverables              | All deliverables from Background table          |
-| incompleteDeliverables    | Deliverables that are not yet complete          |
-| missingAcceptanceCriteria | True if no @acceptance-criteria scenarios found |
-| messages                  | Human-readable validation messages              |
-
-### DoDValidationSummary
-
-Aggregate DoD validation summary. Summarizes validation across multiple phases for CLI output.
-
-```ts
-interface DoDValidationSummary {
-  /** Per-phase validation results */
-  readonly results: readonly DoDValidationResult[];
-  /** Total phases validated */
-  readonly totalPhases: number;
-  /** Phases that passed DoD */
-  readonly passedPhases: number;
-  /** Phases that failed DoD */
-  readonly failedPhases: number;
-}
-```
-
-#### Properties
-
-| Property     | Description                  |
-| ------------ | ---------------------------- |
-| results      | Per-phase validation results |
-| totalPhases  | Total phases validated       |
-| passedPhases | Phases that passed DoD       |
-| failedPhases | Phases that failed DoD       |
-
-### getPhaseStatusEmoji
-
-Get status emoji for phase-level aggregates.
-
-```ts
-function getPhaseStatusEmoji(allComplete: boolean, anyActive: boolean): string;
-```
-
-#### Parameters
-
-| Parameter   | Type | Description                                              |
-| ----------- | ---- | -------------------------------------------------------- |
-| allComplete |      | Whether all patterns in the phase are complete           |
-| anyActive   |      | Whether any patterns in the phase are active/in-progress |
-
-#### Returns
-
-Status emoji: ✅ if all complete, 🚧 if any active, 📋 otherwise
 
 ### WithTagRegistry
 
@@ -292,6 +212,13 @@ Deliverable changes detected in a file's Background table.
 interface DeliverableChange {
   /** Deliverable names added in the change. */
   readonly added: readonly string[];
+  /**
+   * Names of added deliverables whose status column is `pending` (unbuilt
+   * scope). A subset of `added`; the advisory scope-creep rule warns only on
+   * these, since adding a deliverable that records real progress
+   * (in-progress/complete/deferred/superseded/n/a) is silent (PDR-006 Rule 3).
+   */
+  readonly addedPending: readonly string[];
   /** Deliverable names removed in the change. */
   readonly removed: readonly string[];
   /** Deliverable names whose definition changed. */
@@ -301,11 +228,12 @@ interface DeliverableChange {
 
 #### Properties
 
-| Property | Description                                 |
-| -------- | ------------------------------------------- |
-| added    | Deliverable names added in the change.      |
-| removed  | Deliverable names removed in the change.    |
-| modified | Deliverable names whose definition changed. |
+| Property     | Description                                                                                                                                                                                                                                                                                |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| added        | Deliverable names added in the change.                                                                                                                                                                                                                                                     |
+| addedPending | Names of added deliverables whose status column is \`pending\` (unbuilt scope). A subset of \`added\`; the advisory scope-creep rule warns only on these, since adding a deliverable that records real progress (in-progress/complete/deferred/superseded/n/a) is silent (PDR-006 Rule 3). |
+| removed      | Deliverable names removed in the change.                                                                                                                                                                                                                                                   |
+| modified     | Deliverable names whose definition changed.                                                                                                                                                                                                                                                |
 
 ### FileState
 

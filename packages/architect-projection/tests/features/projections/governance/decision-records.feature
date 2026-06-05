@@ -2,7 +2,6 @@
 @architect-pattern:DecisionCatalogProjectionExecutableTests
 @architect-implements:DecisionCatalogProjection
 @architect-status:completed
-@architect-phase:49
 @architect-product-area:Projection
 @architect-role:projection
 @governance

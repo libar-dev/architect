@@ -26,9 +26,7 @@ export {
   PatternSummarySchema,
 } from './pattern-relations/index.js';
 export {
-  PhaseProgressSchema,
   RoadmapTimelineSchema,
-  ReleaseNotesDigestSchema,
   StatusDistributionSchema,
   TraceabilityMatrixSchema,
 } from './delivery-reporting/index.js';
@@ -90,9 +88,7 @@ export type {
   PatternSummary,
 } from './pattern-relations/index.js';
 export type {
-  PhaseProgress,
   RoadmapTimeline,
-  ReleaseNotesDigest,
   StatusDistribution,
   TraceabilityMatrix,
 } from './delivery-reporting/index.js';

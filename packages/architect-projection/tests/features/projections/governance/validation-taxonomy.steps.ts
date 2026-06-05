@@ -127,8 +127,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             expect(state!.validation?.kind).toBe('ValidationRuleDigest');
             expect(state!.validation?.rules).toContainEqual({
               id: 'completed-protection',
-              description: 'Completed specs require unlock-reason tag to modify',
-              severity: 'error',
+              description:
+                'Modifying a completed spec warns; unlock-reason is optional and suppresses it',
+              severity: 'warning',
             });
             expect(state!.validation?.rules).toContainEqual({
               id: 'session-scope',
@@ -148,6 +149,16 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 },
                 { from: 'active', to: 'completed', description: 'Finish implementation work' },
                 { from: 'active', to: 'roadmap', description: 'Move active work back to planning' },
+                {
+                  from: 'completed',
+                  to: 'active',
+                  description: 'Reopen completed work for changes',
+                },
+                {
+                  from: 'completed',
+                  to: 'roadmap',
+                  description: 'Reopen completed work back to planning',
+                },
                 { from: 'deferred', to: 'roadmap', description: 'Reactivate deferred work' },
               ],
             });
@@ -157,22 +168,23 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 statuses: ['roadmap', 'deferred'],
                 meaning: 'Planning statuses remain editable.',
                 canAddDeliverables: true,
-                needsUnlock: false,
+                unlockSuppressesWarning: false,
               },
               {
                 level: 'scope',
                 statuses: ['active'],
-                meaning: 'Active work is scope-locked against deliverable expansion.',
+                meaning:
+                  'Active work is scope-locked; adding pending deliverables warns (advisory).',
                 canAddDeliverables: false,
-                needsUnlock: false,
+                unlockSuppressesWarning: true,
               },
               {
                 level: 'hard',
                 statuses: ['completed'],
                 meaning:
-                  'Completed work is hard-locked until an explicit unlock reason is provided.',
+                  'Completed work is hard-locked; editing or reopening warns, unlock reason is optional (advisory).',
                 canAddDeliverables: false,
-                needsUnlock: true,
+                unlockSuppressesWarning: true,
               },
             ]);
           },

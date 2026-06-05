@@ -147,12 +147,10 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 patterns: [
                   createPattern('ProjectionDocs', {
                     status: 'active',
-                    phase: 20,
                     role: 'projection',
                   }),
                   createPattern('ProjectionCli', {
                     status: 'roadmap',
-                    phase: 21,
                     role: 'service',
                   }),
                 ],
@@ -186,7 +184,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               ],
               buildTimeMs: 184,
               patternCount: 2,
-              phaseCount: 2,
               roleCount: 2,
               projectName: 'Architect Studio',
             });
@@ -209,7 +206,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             () => {
               state!.context = createProjectionContext({
                 projectMetadata,
-                patterns: [createPattern('ProjectionDocs', { status: 'active', phase: 20 })],
+                patterns: [createPattern('ProjectionDocs', { status: 'active' })],
               });
             },
           );
@@ -1353,7 +1350,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 function createDocumentationContext(): ProjectionContext {
   const projectionApi = createPattern('ProjectionAPI', {
     status: 'active',
-    phase: 20,
     role: 'projection',
     file: 'packages/architect-projection/src/projections/documentation-composition/support.ts',
     description:
@@ -1363,7 +1359,6 @@ function createDocumentationContext(): ProjectionContext {
     productArea: 'Projection Platform',
     userRole: 'AI engineer',
     businessValue: 'Deterministic projections for Studio and MCP consumers.',
-    quarter: '2026-Q2',
     deliverables: [
       {
         name: 'Documentation Composition projection support',
@@ -1371,7 +1366,6 @@ function createDocumentationContext(): ProjectionContext {
         tests: 2,
         location:
           'packages/architect-projection/src/projections/documentation-composition/support.ts',
-        release: 'v0.5.0',
       },
     ],
     executableSpecs: [
@@ -1394,7 +1388,6 @@ function createDocumentationContext(): ProjectionContext {
   });
   const projectionDocs = createPattern('ProjectionDocs', {
     status: 'roadmap',
-    phase: 21,
     role: 'projection',
     file: 'apps/desktop/src/views/Documentation.tsx',
     description:
@@ -1404,14 +1397,12 @@ function createDocumentationContext(): ProjectionContext {
     productArea: 'Studio UI',
     userRole: 'Architect reviewer',
     businessValue: 'Structured documentation rendering inside Studio.',
-    quarter: '2026-Q3',
     deliverables: [
       {
         name: 'Documentation view wiring',
         status: 'pending',
         tests: 1,
         location: 'apps/desktop/src/views/Documentation.tsx',
-        release: 'v0.6.0',
       },
     ],
     executableSpecs: ['apps/desktop/tests/features/documentation-view.feature'],
@@ -1427,7 +1418,6 @@ function createDocumentationContext(): ProjectionContext {
   });
   const studioSettings = createPattern('StudioSettings', {
     status: 'completed',
-    phase: 19,
     role: 'service',
     file: 'apps/desktop/src/views/Settings.tsx',
     description:
@@ -1437,21 +1427,18 @@ function createDocumentationContext(): ProjectionContext {
     productArea: 'Studio UI',
     userRole: 'Architect reviewer',
     businessValue: 'Project diagnostics stay readable in the Studio shell.',
-    quarter: '2026-Q2',
     deliverables: [
       {
         name: 'Settings config card',
         status: 'complete',
         tests: 1,
         location: 'apps/desktop/src/views/Settings.tsx',
-        release: 'v0.4.0',
       },
     ],
     executableSpecs: ['apps/desktop/tests/features/settings.feature'],
   });
   const ruleMatrix = createPattern('RuleMatrix', {
     status: 'completed',
-    phase: 20,
     role: 'projection',
     file: 'packages/architect-projection/src/projections/documentation-composition/rule-matrix.ts',
     description: 'Requirement details link to bounded business-rule detail documents.',
@@ -1489,7 +1476,6 @@ function createDocumentationContext(): ProjectionContext {
   });
   const decision = createPattern('ADR006SingleReadModel', {
     status: 'completed',
-    phase: 10,
     role: 'service',
     file: 'architect/decisions/adr-006-single-read-model.feature',
     description:
@@ -1499,7 +1485,6 @@ function createDocumentationContext(): ProjectionContext {
   const ideaActiveRules = createPattern('IdeaActiveRules', {
     status: 'active',
     maturity: 'idea',
-    phase: 22,
     role: 'projection',
     file: 'architect/specs/idea-active-rules.feature',
     productArea: 'Projection Platform',
@@ -1517,7 +1502,6 @@ function createDocumentationContext(): ProjectionContext {
   const candidateRules = createPattern('CandidateRules', {
     status: 'candidate',
     maturity: 'idea',
-    phase: 22,
     role: 'projection',
     file: 'architect/specs/candidate-rules.feature',
     productArea: 'Projection Platform',
@@ -1542,12 +1526,6 @@ function createDocumentationContext(): ProjectionContext {
       ideaActiveRules,
       candidateRules,
     ],
-    phaseNames: {
-      10: 'Architecture Decisions',
-      19: 'Studio Integration',
-      20: 'Projection Bodies',
-      21: 'Documentation Cutover',
-    },
     relationshipIndex: {
       ProjectionAPI: createRelationshipEntry({
         dependsOn: ['ADR006SingleReadModel'],
@@ -1691,7 +1669,6 @@ function createBoundedContextScopeContext(): ProjectionContext {
       createPattern('ProjectionAPI', {
         status: 'active',
         role: 'projection',
-        phase: 20,
         archContext: 'projection',
         archLayer: 'application',
         productArea: 'Projection Platform',
@@ -1700,7 +1677,6 @@ function createBoundedContextScopeContext(): ProjectionContext {
       createPattern('ProjectionDocs', {
         status: 'roadmap',
         role: 'projection',
-        phase: 21,
         archContext: 'projection',
         archLayer: 'infrastructure',
         productArea: 'Studio UI',
@@ -1709,7 +1685,6 @@ function createBoundedContextScopeContext(): ProjectionContext {
       createPattern('StudioSettings', {
         status: 'completed',
         role: 'service',
-        phase: 19,
         archContext: 'studio',
         archLayer: 'application',
         productArea: 'Studio UI',

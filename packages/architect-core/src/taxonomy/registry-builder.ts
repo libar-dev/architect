@@ -81,7 +81,7 @@ export const BOUNDED_CONTEXT_TAG = 'bounded-context';
 export const METADATA_TAGS_BY_GROUP = {
   core: ['pattern', 'status'] as const,
   relationship: ['uses', 'implements', 'extends', 'see-also', 'enforces-decision'] as const,
-  process: ['completed'] as const,
+  process: [] as const,
   prd: ['product-area'] as const,
   adr: [
     'adr',
@@ -221,12 +221,6 @@ export function buildRegistry(options: BuildRegistryOptions = {}): TagRegistry {
         purpose: 'Base pattern this pattern extends (generalization relationship)',
         metadataKey: 'extendsPattern',
         example: '@architect-extends ProjectionCategories',
-      },
-      {
-        tag: 'completed',
-        format: 'value',
-        purpose: 'Completion date (YYYY-MM-DD format)',
-        example: '@architect-completed 2026-01-08',
       },
       {
         tag: 'product-area',

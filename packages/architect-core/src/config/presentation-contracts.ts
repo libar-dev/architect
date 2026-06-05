@@ -58,7 +58,6 @@ export interface IndexCodecOptionsContract {
   readonly includePackageMetadata?: boolean;
   readonly documentEntries?: readonly DocumentEntry[];
   readonly includeProductAreaStats?: boolean;
-  readonly includePhaseProgress?: boolean;
   readonly includeDocumentInventory?: boolean;
   readonly purposeText?: string;
   readonly epilogue?: readonly Block[];

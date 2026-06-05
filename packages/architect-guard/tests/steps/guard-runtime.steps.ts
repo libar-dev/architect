@@ -11,10 +11,10 @@ import {
   detectDuplicateFeatureIdentities,
   detectFileChanges,
   detectProcessInCode,
+  detectRemovedTags,
   runIdeaTierLint,
   runStepLint,
   validateChanges,
-  validateDoDForPhase,
   IDEA_TIER_LINT_RULES,
   type ChangeDetection,
   type ProcessState,
@@ -25,10 +25,10 @@ const feature = await loadFeature('tests/features/guard-runtime.feature');
 interface GuardRuntimeState {
   antiPatternViolations: ReturnType<typeof detectAntiPatterns> | null;
   changeDetectionResult: ReturnType<typeof detectFileChanges> | null;
-  dodResult: ReturnType<typeof validateDoDForPhase> | null;
   ideaTierSummary: ReturnType<typeof runIdeaTierLint> | null;
   processGuardOutput: ReturnType<typeof validateChanges> | null;
   processViolations: ReturnType<typeof detectProcessInCode> | null;
+  removedTagViolations: ReturnType<typeof detectRemovedTags> | null;
   stepLintSummary: ReturnType<typeof runStepLint> | null;
   tempDirs: string[];
 }
@@ -39,10 +39,10 @@ function createState(): GuardRuntimeState {
   return {
     antiPatternViolations: null,
     changeDetectionResult: null,
-    dodResult: null,
     ideaTierSummary: null,
     processGuardOutput: null,
     processViolations: null,
+    removedTagViolations: null,
     stepLintSummary: null,
     tempDirs: [],
   };
@@ -52,6 +52,80 @@ function createTempDir(prefix: string): string {
   const tempDir = mkdtempSync(path.join(os.tmpdir(), prefix));
   state.tempDirs.push(tempDir);
   return tempDir;
+}
+
+const COMPLETED_SPEC = 'architect/specs/example.feature';
+const ACTIVE_SPEC = 'architect/specs/active.feature';
+
+function completedSpecState({ hasUnlockReason }: { hasUnlockReason: boolean }): ProcessState {
+  return {
+    derivedAt: '2026-01-01T00:00:00.000Z',
+    files: new Map([
+      [
+        COMPLETED_SPEC,
+        {
+          path: '/tmp/example.feature',
+          relativePath: COMPLETED_SPEC,
+          status: 'completed',
+          normalizedStatus: 'completed',
+          protection: 'hard',
+          deliverables: [],
+          hasUnlockReason,
+        },
+      ],
+    ]),
+  };
+}
+
+function modifyCompletedSpecChanges(): ChangeDetection {
+  return {
+    modifiedFiles: [COMPLETED_SPEC],
+    addedFiles: [],
+    deletedFiles: [],
+    statusTransitions: new Map(),
+    deliverableChanges: new Map(),
+  };
+}
+
+function activeSpecState(): ProcessState {
+  return {
+    derivedAt: '2026-01-01T00:00:00.000Z',
+    files: new Map([
+      [
+        ACTIVE_SPEC,
+        {
+          path: '/tmp/active.feature',
+          relativePath: ACTIVE_SPEC,
+          status: 'active',
+          normalizedStatus: 'active',
+          protection: 'scope',
+          deliverables: [],
+          hasUnlockReason: false,
+        },
+      ],
+    ]),
+  };
+}
+
+function addDeliverableChanges({ pending }: { pending: boolean }): ChangeDetection {
+  const added = ['src/new.ts'];
+  return {
+    modifiedFiles: [ACTIVE_SPEC],
+    addedFiles: [],
+    deletedFiles: [],
+    statusTransitions: new Map(),
+    deliverableChanges: new Map([
+      [
+        ACTIVE_SPEC,
+        {
+          added,
+          addedPending: pending ? added : [],
+          removed: [],
+          modified: [],
+        },
+      ],
+    ]),
+  };
 }
 
 describeFeature(feature, ({ AfterEachScenario, Rule }) => {
@@ -64,32 +138,6 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
 
   Rule('Guard runtime APIs preserve process enforcement behavior', ({ RuleScenario }): void => {
     RuleScenario(
-      'Validate DoD deliverables and acceptance criteria',
-      ({ When, Then, And }): void => {
-        When('I validate DoD deliverables and acceptance criteria', () => {
-          state.dodResult = validateDoDForPhase('ExamplePattern', 9, {
-            deliverables: [{ name: 'src/example.ts', status: 'complete' }],
-            scenarios: [
-              {
-                scenarioName: 'happy path',
-                semanticTags: ['acceptance-criteria'],
-                tags: [],
-              },
-            ],
-          } as never);
-        });
-
-        Then('the DoD result should be met', () => {
-          expect(state.dodResult?.isDoDMet).toBe(true);
-        });
-
-        And('the DoD result should not report missing acceptance criteria', () => {
-          expect(state.dodResult?.missingAcceptanceCriteria).toBe(false);
-        });
-      },
-    );
-
-    RuleScenario(
       'Detect process metadata leaking into TypeScript annotations',
       ({ When, Then }): void => {
         When('I detect process metadata in TypeScript annotations', () => {
@@ -99,7 +147,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
               directives: [
                 {
                   directive: {
-                    tags: ['@architect-quarter'],
+                    tags: ['@architect-team'],
                     position: { startLine: 12 },
                   },
                 },
@@ -126,7 +174,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
                 directives: [
                   {
                     directive: {
-                      tags: ['@acme-quarter'],
+                      tags: ['@acme-team'],
                       position: { startLine: 5 },
                     },
                   },
@@ -158,7 +206,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
                 directives: [
                   {
                     directive: {
-                      tags: ['@architect-quarter'],
+                      tags: ['@architect-team'],
                       position: { startLine: 12 },
                     },
                   },
@@ -182,12 +230,12 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
       'Flag the same @architect-pattern identity declared in two feature files',
       ({ When, Then }): void => {
         When('I detect anti-patterns for two features sharing one pattern identity', () => {
-          // extractProcessMetadata reads feature.feature.tags (pattern: + phase: required),
+          // extractProcessMetadata reads feature.feature.tags (pattern: required),
           // so these fixtures exercise feature-LEVEL identity only — the same path the graph
           // builder uses, immune to @architect-pattern tokens inside scenario docstrings.
           state.antiPatternViolations = detectDuplicateFeatureIdentities([
-            { filePath: 'cli/core.feature', feature: { tags: ['pattern:DupCli', 'phase:24'] } },
-            { filePath: 'cli/query.feature', feature: { tags: ['pattern:DupCli', 'phase:24'] } },
+            { filePath: 'cli/core.feature', feature: { tags: ['pattern:DupCli'] } },
+            { filePath: 'cli/query.feature', feature: { tags: ['pattern:DupCli'] } },
           ] as never);
         });
 
@@ -210,8 +258,8 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
       ({ When, Then }): void => {
         When('I detect anti-patterns for two features with distinct pattern identities', () => {
           state.antiPatternViolations = detectDuplicateFeatureIdentities([
-            { filePath: 'cli/core.feature', feature: { tags: ['pattern:AlphaCli', 'phase:24'] } },
-            { filePath: 'cli/query.feature', feature: { tags: ['pattern:BetaCli', 'phase:24'] } },
+            { filePath: 'cli/core.feature', feature: { tags: ['pattern:AlphaCli'] } },
+            { filePath: 'cli/query.feature', feature: { tags: ['pattern:BetaCli'] } },
           ] as never);
         });
 
@@ -225,45 +273,166 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
       },
     );
 
-    RuleScenario('Block completed spec edits without unlock reason', ({ When, Then }): void => {
-      When('I validate a completed spec edit without unlock reason', () => {
-        const processState: ProcessState = {
-          derivedAt: '2026-01-01T00:00:00.000Z',
-          files: new Map([
+    RuleScenario(
+      'Flag retired temporal and release tags as removed tags',
+      ({ When, Then, And }): void => {
+        When('I detect removed tags in a feature using retired ADR-013 tags', () => {
+          const baseDir = createTempDir('architect-guard-removed-tags-');
+          const filePath = path.join(baseDir, 'retired.feature');
+          // The retired ADR-013 tags must flag; the status/level look-alikes
+          // (@architect-status:completed, @architect-level:phase) must NOT —
+          // matching is on the full <prefix><suffix> token, not a substring.
+          writeFileSync(
+            filePath,
             [
-              'architect/specs/example.feature',
-              {
-                path: '/tmp/example.feature',
-                relativePath: 'architect/specs/example.feature',
-                status: 'completed',
-                normalizedStatus: 'completed',
-                protection: 'hard',
-                deliverables: [],
-                hasUnlockReason: false,
-              },
-            ],
-          ]),
-        };
-        const changes: ChangeDetection = {
-          modifiedFiles: ['architect/specs/example.feature'],
-          addedFiles: [],
-          deletedFiles: [],
-          statusTransitions: new Map(),
-          deliverableChanges: new Map(),
-        };
+              '@architect-quarter:2026-Q1',
+              '@architect-phase:2',
+              '@architect-release:v1.0.0',
+              '@architect-completed:2026-01-07',
+              '@architect-status:completed',
+              '@architect-level:phase',
+              'Feature: Retired tag usage',
+              '',
+              '  Scenario: Placeholder',
+              '    Given a step',
+            ].join('\n'),
+          );
 
+          state.removedTagViolations = detectRemovedTags([{ filePath }] as never);
+        });
+
+        Then('a removed-tag violation is reported for each retired tag', () => {
+          const flaggedTokens = (state.removedTagViolations ?? []).map((v) =>
+            v.message.split('"')[1]?.toLowerCase(),
+          );
+          expect(state.removedTagViolations?.every((v) => v.id === 'removed-tag')).toBe(true);
+          expect(flaggedTokens).toContain('@architect-quarter:2026-q1');
+          expect(flaggedTokens).toContain('@architect-phase:2');
+          expect(flaggedTokens).toContain('@architect-release:v1.0.0');
+          expect(flaggedTokens).toContain('@architect-completed:2026-01-07');
+        });
+
+        And('no removed-tag violation is reported for the status or level look-alikes', () => {
+          const flaggedTokens = (state.removedTagViolations ?? []).map((v) =>
+            v.message.split('"')[1]?.toLowerCase(),
+          );
+          expect(flaggedTokens).not.toContain('@architect-status:completed');
+          expect(flaggedTokens).not.toContain('@architect-level:phase');
+        });
+      },
+    );
+
+    RuleScenario(
+      'Warn on completed spec edits without unlock reason',
+      ({ When, Then, And }): void => {
+        When('I validate a completed spec edit without unlock reason', () => {
+          state.processGuardOutput = validateChanges({
+            state: completedSpecState({ hasUnlockReason: false }),
+            changes: modifyCompletedSpecChanges(),
+            options: { strict: false, ignoreSession: false },
+          });
+        });
+
+        Then('the process guard should warn for completed protection', () => {
+          expect(state.processGuardOutput?.result.warnings[0]?.rule).toBe('completed-protection');
+          expect(state.processGuardOutput?.result.warnings[0]?.severity).toBe('warning');
+        });
+
+        And('the process guard should not block the change', () => {
+          expect(state.processGuardOutput?.result.valid).toBe(true);
+          expect(state.processGuardOutput?.result.violations).toHaveLength(0);
+        });
+      },
+    );
+
+    RuleScenario(
+      'Suppress completed-protection warning with unlock reason',
+      ({ When, Then, And }): void => {
+        When('I validate a completed spec edit with an unlock reason', () => {
+          state.processGuardOutput = validateChanges({
+            state: completedSpecState({ hasUnlockReason: true }),
+            changes: modifyCompletedSpecChanges(),
+            options: { strict: false, ignoreSession: false },
+          });
+        });
+
+        Then('the process guard should not warn for completed protection', () => {
+          expect(
+            state.processGuardOutput?.result.warnings.some(
+              (w) => w.rule === 'completed-protection',
+            ),
+          ).toBe(false);
+        });
+
+        And('the process guard should not block the change', () => {
+          expect(state.processGuardOutput?.result.valid).toBe(true);
+          expect(state.processGuardOutput?.result.violations).toHaveLength(0);
+        });
+      },
+    );
+
+    RuleScenario('Warn on pending scope added to an active spec', ({ When, Then, And }): void => {
+      When('I validate a pending deliverable added to an active spec', () => {
         state.processGuardOutput = validateChanges({
-          state: processState,
-          changes,
+          state: activeSpecState(),
+          changes: addDeliverableChanges({ pending: true }),
           options: { strict: false, ignoreSession: false },
         });
       });
 
-      Then('the process guard should reject the change for completed protection', () => {
-        expect(state.processGuardOutput?.result.valid).toBe(false);
-        expect(state.processGuardOutput?.result.violations[0]?.rule).toBe('completed-protection');
+      Then('the process guard should warn for scope creep', () => {
+        expect(state.processGuardOutput?.result.warnings[0]?.rule).toBe('scope-creep');
+        expect(state.processGuardOutput?.result.warnings[0]?.severity).toBe('warning');
+      });
+
+      And('the process guard should not block the change', () => {
+        expect(state.processGuardOutput?.result.valid).toBe(true);
+        expect(state.processGuardOutput?.result.violations).toHaveLength(0);
       });
     });
+
+    RuleScenario(
+      'Stay silent on real-progress scope added to an active spec',
+      ({ When, Then, And }): void => {
+        When('I validate an in-progress deliverable added to an active spec', () => {
+          state.processGuardOutput = validateChanges({
+            state: activeSpecState(),
+            changes: addDeliverableChanges({ pending: false }),
+            options: { strict: false, ignoreSession: false },
+          });
+        });
+
+        Then('the process guard should not warn for scope creep', () => {
+          expect(
+            state.processGuardOutput?.result.warnings.some((w) => w.rule === 'scope-creep'),
+          ).toBe(false);
+        });
+
+        And('the process guard should not block the change', () => {
+          expect(state.processGuardOutput?.result.valid).toBe(true);
+          expect(state.processGuardOutput?.result.violations).toHaveLength(0);
+        });
+      },
+    );
+
+    RuleScenario(
+      'Strict mode promotes the completed-protection warning to a blocking error',
+      ({ When, Then }): void => {
+        When('I validate a completed spec edit without unlock reason in strict mode', () => {
+          state.processGuardOutput = validateChanges({
+            state: completedSpecState({ hasUnlockReason: false }),
+            changes: modifyCompletedSpecChanges(),
+            options: { strict: true, ignoreSession: false },
+          });
+        });
+
+        Then('the process guard should block the change for completed protection', () => {
+          expect(state.processGuardOutput?.result.valid).toBe(false);
+          expect(state.processGuardOutput?.result.violations[0]?.rule).toBe('completed-protection');
+          expect(state.processGuardOutput?.result.violations[0]?.severity).toBe('error');
+        });
+      },
+    );
 
     RuleScenario('Run step lint from the guard package', ({ When, Then }): void => {
       When('I run step lint against a temporary feature pair', () => {

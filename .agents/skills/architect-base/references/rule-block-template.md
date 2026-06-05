@@ -49,6 +49,26 @@ appears intact but resolves to nothing.
 When you rename a scenario, grep for the old name in `**Verified by:**`
 lines and update.
 
+## Distillation (no transcription)
+
+The `**Rationale:**` and `**Verified by:**` fields are where redundancy
+accretes — guard them:
+
+- A `**Rationale:**` that inverts or re-states its `**Invariant:**`
+  carries no information; drop it (the field is optional). Keep it only
+  when it gives a **why** the invariant doesn't — an ADR link, a
+  business constraint, a rejected alternative.
+- A `**Verified by:**` repeated **verbatim across multiple rules** is a
+  boilerplate smell (the backfill failure mode — e.g. an ADR with the
+  same string on every rule). Each rule's Verified-by names the
+  scenarios that prove **that** rule, so identical strings mean the
+  back-link is fake.
+
+This is the rule-authoring sibling of the value-transfer
+**Transcription bloat** anti-pattern
+([`../../architect-sessions/references/ephemeral-spec-deletion.md`](../../architect-sessions/references/ephemeral-spec-deletion.md))
+and the `review-spec.md` density check.
+
 ## Tier guidance
 
 | Tier       | Rule-block fields                                                                               |

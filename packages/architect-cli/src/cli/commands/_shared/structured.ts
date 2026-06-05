@@ -38,13 +38,10 @@ const QUERY_METHODS = [
   'getStatusCounts',
   'getStatusDistribution',
   'getCompletionPercentage',
-  'getActivePhases',
-  'getAllPhases',
   'listRoles',
-  'getQuarters',
   'getCurrentWork',
   'getRoadmapItems',
-  'getRecentlyCompleted',
+  'getCompletedPatterns',
   // Pattern-name lookups
   'getPattern',
   'getPatternParseFailure',
@@ -61,12 +58,9 @@ const QUERY_METHODS = [
   'listDecisions',
   // Package inventory
   'listPackages',
-  // Role / quarter / phase lookups
+  // Role lookups
   'getPatternsByRole',
   'getRoleInfo',
-  'getPatternsByQuarter',
-  'getPatternsByPhase',
-  'getPhaseProgress',
   // Status lookups
   'getPatternsByNormalizedStatus',
   'getPatternsByStatus',
@@ -202,25 +196,19 @@ function executeQueryMethod(api: PatternGraphAPI, args: readonly string[]): unkn
       return api.getStatusDistribution();
     case 'getCompletionPercentage':
       return api.getCompletionPercentage();
-    case 'getActivePhases':
-      return api.getActivePhases();
-    case 'getAllPhases':
-      return api.getAllPhases();
     case 'listRoles':
       return api.listRoles();
-    case 'getQuarters':
-      return api.getQuarters();
     case 'getCurrentWork':
       return toCompactSummaries(api.getCurrentWork());
     case 'getRoadmapItems':
       return toCompactSummaries(api.getRoadmapItems());
-    case 'getRecentlyCompleted': {
+    case 'getCompletedPatterns': {
       const limitArg = args[1];
       if (limitArg === undefined) {
-        return toCompactSummaries(api.getRecentlyCompleted());
+        return toCompactSummaries(api.getCompletedPatterns());
       }
       return toCompactSummaries(
-        api.getRecentlyCompleted(parseIntegerValue(limitArg, 'Limit must be an integer')),
+        api.getCompletedPatterns(parseIntegerValue(limitArg, 'Limit must be an integer')),
       );
     }
 
@@ -285,7 +273,7 @@ function executeQueryMethod(api: PatternGraphAPI, args: readonly string[]): unkn
     case 'listPackages':
       return api.listPackages();
 
-    // ---- Role / quarter / phase lookups ----------------------------------
+    // ---- Role lookups ----------------------------------------------------
     case 'getPatternsByRole':
       return toCompactSummaries(
         api.getPatternsByRole(
@@ -294,22 +282,6 @@ function executeQueryMethod(api: PatternGraphAPI, args: readonly string[]): unkn
       );
     case 'getRoleInfo':
       return api.getRoleInfo(requireArg(args[1], 'Usage: architect query getRoleInfo <role>'));
-    case 'getPatternsByQuarter':
-      return toCompactSummaries(
-        api.getPatternsByQuarter(
-          requireArg(args[1], 'Usage: architect query getPatternsByQuarter <quarter>'),
-        ),
-      );
-    case 'getPatternsByPhase': {
-      const phaseArg = requireArg(args[1], 'Usage: architect query getPatternsByPhase <phase>');
-      return toCompactSummaries(
-        api.getPatternsByPhase(parseIntegerValue(phaseArg, 'Phase must be an integer')),
-      );
-    }
-    case 'getPhaseProgress': {
-      const phaseArg = requireArg(args[1], 'Usage: architect query getPhaseProgress <phase>');
-      return api.getPhaseProgress(parseIntegerValue(phaseArg, 'Phase must be an integer'));
-    }
 
     // ---- Status lookups --------------------------------------------------
     case 'getPatternsByNormalizedStatus': {

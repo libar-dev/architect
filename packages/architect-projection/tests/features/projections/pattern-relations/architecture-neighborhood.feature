@@ -2,7 +2,6 @@
 @architect-pattern:ArchitectureNavigationProjectionExecutableTests
 @architect-implements:ArchitectureNeighborhoodProjection,BoundedContextProjection,ArchitectureComparisonProjection,OrphanPatternListProjection
 @architect-status:completed
-@architect-phase:49
 @architect-product-area:Projection
 @architect-role:projection
 @pattern-relations

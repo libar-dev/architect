@@ -47,14 +47,13 @@ export const ProtectionLevelSchema = z.enum(['none', 'scope', 'hard']);
 
 /**
  * Per-pattern metadata carried in a session context bundle — the pattern's
- * name, status, phase, role, source file, and a short summary.
+ * name, status, role, source file, and a short summary.
  *
  * @architect-shape
  */
 export const PatternContextMetaSchema = z.strictObject({
   name: z.string(),
   status: z.string().optional(),
-  phase: z.number().int().optional(),
   role: z.string(),
   file: z.string(),
   summary: z.string(),

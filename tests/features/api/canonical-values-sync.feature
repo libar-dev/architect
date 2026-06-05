@@ -122,55 +122,10 @@ Feature: Canonical values stay in sync between ADR-001 and TypeScript constants
       And I list the values in CANONICAL_FEATURE_ONLY_TAG_SUFFIXES
       Then both canonical feature-only tag lists contain the same values
 
-  Rule: ADR-001 Rule 7 quarter format regex matches QUARTER_PATTERN
-
-    **Invariant:** The quarter format declared in ADR-001 Rule 7
-    (`YYYY-QN`, e.g. `2026-Q1`) is the format that the `QUARTER_PATTERN`
-    regex exported from `@libar-dev/architect-core` accepts.
-    **Rationale:** Rule 7 has no values table — the rule is the regex
-    contract itself. The sync test asserts the canonical example accepts
-    and the previous (anti-pattern) format rejects, proving the regex
-    encodes Rule 7's contract.
-    **Verified by:** QUARTER_PATTERN encodes ADR-001 Rule 7's format
-
-    @acceptance-criteria @happy-path
-    Scenario: QUARTER_PATTERN encodes ADR-001 Rule 7's format
-      Given the QUARTER_PATTERN regex
-      Then it accepts the canonical example "2026-Q1"
-      And it rejects the anti-pattern "Q1-2026"
-
-  Rule: ADR-001 Rule 8 phase names match CANONICAL_PHASE_NAMES
-
-    **Invariant:** The 6 phase names in ADR-001 Rule 8 list the same
-    names as `CANONICAL_PHASE_NAMES` exported from `@libar-dev/architect-core`.
-    **Rationale:** Workflow config consumers and roadmap generation read
-    phase names from the canonical list. Renaming a phase in the ADR
-    without updating the constant breaks roadmap rendering.
-    **Verified by:** Phase names match between ADR-001 Rule 8 and CANONICAL_PHASE_NAMES
-
-    @acceptance-criteria @happy-path
-    Scenario: Phase names match between ADR-001 Rule 8 and CANONICAL_PHASE_NAMES
-      Given the ADR-001 canonical values feature file
-      When I extract the phase names from Rule 8
-      And I list the names in CANONICAL_PHASE_NAMES
-      Then both phase-name lists contain the same names
-
-  Rule: ADR-001 Rule 8 phase ordinals match CANONICAL_PHASE_ORDINALS
-
-    **Invariant:** The 6 phase ordinals in ADR-001 Rule 8 list the same
-    integers as `CANONICAL_PHASE_ORDINALS` exported from
-    `@libar-dev/architect-core`.
-    **Rationale:** Ordinals drive sort order in roadmap rendering; an
-    ordinal shift in the ADR without updating the constant produces
-    silently misordered output.
-    **Verified by:** Phase ordinals match between ADR-001 Rule 8 and CANONICAL_PHASE_ORDINALS
-
-    @acceptance-criteria @happy-path
-    Scenario: Phase ordinals match between ADR-001 Rule 8 and CANONICAL_PHASE_ORDINALS
-      Given the ADR-001 canonical values feature file
-      When I extract the phase ordinals from Rule 8
-      And I list the ordinals in CANONICAL_PHASE_ORDINALS
-      Then both phase-ordinal lists contain the same ordinals
+  # ADR-001 Rule 7 (Quarter Format Convention) and Rule 8 (6-phase USDP
+  # Canonical Phase Definitions) were retired per ADR-013, along with their
+  # `QUARTER_PATTERN` / `CANONICAL_PHASE_NAMES` / `CANONICAL_PHASE_ORDINALS`
+  # constants — so their sync rules are removed here.
 
   Rule: ADR-001 Rule 9 matches DELIVERABLE_STATUS_VALUES
 

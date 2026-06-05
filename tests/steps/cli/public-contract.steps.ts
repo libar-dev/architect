@@ -62,7 +62,7 @@ describeFeature(feature, ({ Rule }) => {
             ] as const;
 
             expect(typeof architectProjection.projectOverviewDigest).toBe('function');
-            expect(typeof architectProjection.projectReleaseNotesDigest).toBe('function');
+            expect(typeof architectProjection.projectChangelog).toBe('function');
             for (const exportName of parseAndProjectExports) {
               expect(typeof architectProjection[exportName]).toBe('function');
             }

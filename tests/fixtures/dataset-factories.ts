@@ -60,13 +60,13 @@ export interface TestPatternGraphOptions {
   withRelationships?: boolean;
 
   /**
-   * Include timeline metadata (phase, quarter, completed, deliverables)
+   * Include timeline metadata (effort, team, deliverables)
    * @default false
    */
   withTimeline?: boolean;
 
   /**
-   * Include roadmap phases
+   * Include a multi-status roadmap (completed/active/roadmap, dependencies)
    * @default false
    */
   withRoadmap?: boolean;
@@ -136,10 +136,10 @@ export function createTestPatternGraph(options: TestPatternGraphOptions = {}): R
     // Use dependency graph patterns
     patterns = createDependencyGraph();
   } else if (withTimeline) {
-    // Use timeline patterns (with deliverables, quarters, etc.)
+    // Use timeline patterns (with deliverables, effort, team)
     patterns = createTimelinePatterns();
   } else if (withRoadmap) {
-    // Use roadmap patterns (with phases, dependencies)
+    // Use roadmap patterns (multi-status, with dependencies)
     patterns = createRoadmapPatterns();
   } else if (patternCount > 0) {
     // Generate specified number of patterns
@@ -218,7 +218,7 @@ export function createPatternGraphWithRelationships(): RuntimePatternGraph {
 /**
  * Create a PatternGraph with timeline metadata
  *
- * Includes patterns with phases, quarters, completion dates, and deliverables.
+ * Includes patterns with effort, team, and deliverables.
  *
  * @returns PatternGraph with timeline-enriched patterns
  */
@@ -227,11 +227,11 @@ export function createPatternGraphWithTimeline(): RuntimePatternGraph {
 }
 
 /**
- * Create a PatternGraph with roadmap phases
+ * Create a PatternGraph with a multi-status roadmap
  *
- * Includes patterns across multiple phases with dependencies.
+ * Includes patterns across completed/active/roadmap with dependencies.
  *
- * @returns PatternGraph with phase-structured patterns
+ * @returns PatternGraph with a multi-status roadmap
  */
 export function createPatternGraphWithRoadmap(): RuntimePatternGraph {
   return createTestPatternGraph({ withRoadmap: true });

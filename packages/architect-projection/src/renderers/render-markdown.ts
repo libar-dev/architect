@@ -53,7 +53,6 @@ import {
   type Fragment,
   type MarkdownFileRoute,
   type ProjectionBundle,
-  type ReleaseNotesDigest,
   type RequirementDigest,
   type RoadmapTimeline,
   type TaxonomyDigest,
@@ -189,7 +188,6 @@ type MarkdownNormalizerKind =
   | 'DecisionCatalog'
   | 'DecisionRecord'
   | 'RoadmapTimeline'
-  | 'ReleaseNotesDigest'
   | 'RequirementDigest'
   | 'TaxonomyDigest'
   | 'TraceabilityMatrix'
@@ -222,7 +220,6 @@ const MARKDOWN_NORMALIZERS = {
   DecisionCatalog: normalizeDecisionCatalog,
   DecisionRecord: normalizeDecisionRecord,
   RoadmapTimeline: normalizeRoadmapTimeline,
-  ReleaseNotesDigest: normalizeReleaseNotesDigest,
   RequirementDigest: (fragment, options) => normalizeRequirementDigest(fragment, options),
   TaxonomyDigest: normalizeTaxonomyDigest,
   TraceabilityMatrix: normalizeTraceabilityMatrix,
@@ -925,7 +922,6 @@ function createBusinessRuleTable(
       'Verified By',
       'Scenarios',
       'Pattern',
-      'Phase',
       'Product Area',
     ],
     rules.map((rule): string[] => [
@@ -936,10 +932,9 @@ function createBusinessRuleTable(
       rule.verifiedBy.join(', '),
       String(rule.scenarioCount),
       rule.pattern ?? '',
-      rule.phase === undefined ? '' : String(rule.phase),
       rule.productArea ?? '',
     ]),
-    ['left', 'left', 'left', 'left', 'left', 'left', 'left', 'left', 'left'],
+    ['left', 'left', 'left', 'left', 'left', 'left', 'left', 'left'],
   );
 }
 
@@ -1031,84 +1026,44 @@ function normalizeRoadmapTimeline(fragment: RoadmapTimeline): MarkdownDocument {
   const sections: MarkdownRenderableBlock[] = [
     heading(2, 'Overview'),
     paragraph(
-      `Quarter-grouped ${viewLabel} timeline covering ${String(fragment.quarters.length)} ${fragment.quarters.length === 1 ? 'quarter' : 'quarters'}.`,
+      `${capitalize(viewLabel)} timeline covering ${String(fragment.patterns.length)} ${fragment.patterns.length === 1 ? 'pattern' : 'patterns'}.`,
     ),
   ];
 
-  if (fragment.quarters.length === 0) {
-    sections.push(paragraph('No quarter entries were recorded.'));
+  if (fragment.patterns.length === 0) {
+    sections.push(paragraph('No patterns were recorded.'));
     return createMarkdownDocument(metadata, sections);
   }
 
-  for (const entry of fragment.quarters) {
-    sections.push(
-      heading(2, entry.quarter),
-      table(
-        ['Metric', 'Value'],
-        [
-          ['Patterns', String(entry.patterns.length)],
-          ['Completed', String(entry.counts.completed)],
-          ['Active', String(entry.counts.active)],
-          ['Planned', String(entry.counts.planned)],
-          ['Candidate', String(entry.counts.candidate)],
-        ],
-        ['left', 'left'],
-      ),
-      table(
-        ['Pattern', 'Status', 'Role', 'Phase', 'Source File'],
-        entry.patterns.map((pattern) => [
-          pattern.patternName,
-          pattern.status ?? '',
-          pattern.role,
-          pattern.phase === undefined ? '' : String(pattern.phase),
-          pattern.file,
-        ]),
-        ['left', 'left', 'left', 'left', 'left'],
-      ),
-    );
-  }
+  sections.push(
+    table(
+      ['Metric', 'Value'],
+      [
+        ['Patterns', String(fragment.patterns.length)],
+        ['Completed', String(fragment.counts.completed)],
+        ['Active', String(fragment.counts.active)],
+        ['Planned', String(fragment.counts.planned)],
+        ['Candidate', String(fragment.counts.candidate)],
+      ],
+      ['left', 'left'],
+    ),
+    table(
+      ['Pattern', 'Status', 'Role', 'Source File'],
+      fragment.patterns.map((pattern) => [
+        pattern.patternName,
+        pattern.status ?? '',
+        pattern.role,
+        pattern.file,
+      ]),
+      ['left', 'left', 'left', 'left'],
+    ),
+  );
 
   return createMarkdownDocument(metadata, sections);
 }
 
-function normalizeReleaseNotesDigest(fragment: ReleaseNotesDigest): MarkdownDocument {
-  const metadata = resolveFragmentMetadata(fragment);
-  const sections: MarkdownRenderableBlock[] = [
-    paragraph('All notable changes to this project will be documented in this file.'),
-    trustedMarkdownParagraph(
-      'The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).',
-    ),
-  ];
-
-  for (const release of fragment.releases) {
-    const addedEntries = dedupeStrings([
-      ...release.deliverables.map(
-        (deliverable) =>
-          `**${escapePlainMarkdownText(deliverable.name)}**${deliverable.location.length > 0 ? `: ${escapePlainMarkdownText(deliverable.location)}` : ''}`,
-      ),
-      ...release.patterns.map((pattern) => escapePlainMarkdownText(pattern.patternName)),
-    ]);
-
-    sections.push(
-      trustedMarkdownHeading(
-        2,
-        `[${escapePlainMarkdownText(release.release)}]${release.date !== undefined ? ` - ${escapePlainMarkdownText(release.date)}` : ''}`,
-      ),
-    );
-
-    if (release.notes !== undefined && release.notes.trim().length > 0) {
-      sections.push(paragraph(release.notes));
-    }
-
-    sections.push(
-      heading(3, 'Added'),
-      ...(addedEntries.length > 0
-        ? [trustedMarkdownList(addedEntries)]
-        : [paragraph('No release additions were recorded.')]),
-    );
-  }
-
-  return createMarkdownDocument(metadata, sections);
+function capitalize(value: string): string {
+  return value.length === 0 ? value : value.charAt(0).toUpperCase() + value.slice(1);
 }
 
 function normalizeRequirementDigest(
@@ -1295,7 +1250,7 @@ function normalizeValidationRuleDigest(fragment: ValidationRuleDigest): Markdown
       status,
       level.level,
       level.canAddDeliverables ? 'Yes' : 'No',
-      level.needsUnlock ? 'Yes' : 'No',
+      level.unlockSuppressesWarning ? 'Yes' : 'No',
       level.meaning ?? '',
     ]),
   );
@@ -1325,13 +1280,11 @@ function normalizeValidationRuleDigest(fragment: ValidationRuleDigest): Markdown
     paragraph('Valid transitions for the delivery workflow FSM:'),
     mermaid(buildFsmStateDiagram(fragment)),
     heading(2, 'Protection Levels'),
-    table(['Status', 'Protection', 'Can Add Deliverables', 'Needs Unlock', 'Meaning'], rows, [
-      'left',
-      'left',
-      'left',
-      'left',
-      'left',
-    ]),
+    table(
+      ['Status', 'Protection', 'Can Add Deliverables', 'Unlock Suppresses Warning', 'Meaning'],
+      rows,
+      ['left', 'left', 'left', 'left', 'left'],
+    ),
   ]);
 }
 
@@ -1517,8 +1470,6 @@ function resolveFragmentMetadata(fragment: Fragment): MarkdownMetadata {
             purpose: 'Domain constraints and invariants extracted from feature files',
             detailLevel: 'Overview with links to detailed business rules by package',
           };
-        case 'phase':
-          return { title: `Phase ${String(fragment.scopeValue)} Business Rules` };
         case 'package':
         case 'product-area':
         case 'feature':
@@ -1534,15 +1485,18 @@ function resolveFragmentMetadata(fragment: Fragment): MarkdownMetadata {
         detailLevel: 'Summary with links to category details',
       };
     case 'RoadmapTimeline':
-      return {
-        title: getRoadmapViewTitle(fragment.view),
-        purpose: `Quarter-grouped ${getRoadmapViewTitle(fragment.view).toLowerCase()} timeline.`,
-      };
-    case 'ReleaseNotesDigest':
-      return {
-        title: 'Changelog',
-        purpose: 'Project changelog in Keep a Changelog format',
-      };
+      // The `milestones` view is the release-free changelog (ADR-013): the set of
+      // completed patterns in completion (name) order, with no release or date
+      // grouping. It renders to CHANGELOG.md, so its H1 is the changelog title.
+      return fragment.view === 'milestones'
+        ? {
+            title: 'Changelog',
+            purpose: 'Completed patterns in completion order.',
+          }
+        : {
+            title: getRoadmapViewTitle(fragment.view),
+            purpose: `${getRoadmapViewTitle(fragment.view)} timeline.`,
+          };
     case 'RequirementDigest': {
       const knownTitles: Record<string, string> = {
         [REQUIREMENTS_ALL_AREAS_LABEL]: 'Product Requirements',
@@ -1668,26 +1622,10 @@ function buildBusinessRuleGroupingSummary(
     };
   }
 
-  if (groupedBy === 'package') {
-    return {
-      heading: 'Packages',
-      table: table(
-        ['Package', 'Features', 'Rules', 'With Invariants'],
-        groupingEntries.map((entry) => [
-          entry.label,
-          String(entry.featureCount),
-          String(entry.ruleCount),
-          String(entry.invariantCount),
-        ]),
-        ['left', 'left', 'left', 'left'],
-      ),
-    };
-  }
-
   return {
-    heading: 'Phases',
+    heading: 'Packages',
     table: table(
-      ['Phase', 'Features', 'Rules', 'With Invariants'],
+      ['Package', 'Features', 'Rules', 'With Invariants'],
       groupingEntries.map((entry) => [
         entry.label,
         String(entry.featureCount),
@@ -1719,9 +1657,7 @@ function buildBusinessRuleGroupingLinks(
       ? 'Product Area Detail'
       : groupedBy === 'feature'
         ? 'Feature Detail'
-        : groupedBy === 'package'
-          ? 'Package Detail'
-          : 'Phase Detail';
+        : 'Package Detail';
 
   return {
     heading,
@@ -1925,23 +1861,6 @@ function splitPathSegments(filePath: string): string[] {
 
 function hasText(value: string | undefined): value is string {
   return value !== undefined && value.trim().length > 0;
-}
-
-function dedupeStrings(values: readonly string[]): string[] {
-  const seen = new Set<string>();
-  const unique: string[] = [];
-
-  for (const value of values) {
-    const normalized = value.trim();
-    if (normalized.length === 0 || seen.has(normalized)) {
-      continue;
-    }
-
-    seen.add(normalized);
-    unique.push(normalized);
-  }
-
-  return unique;
 }
 
 function isBlockArray(value: unknown): value is Block[] {
@@ -2258,14 +2177,6 @@ function trustedMarkdownParagraph(text: string): TrustedParagraphBlock {
 
 function trustedMarkdownHeading(level: 1 | 2 | 3 | 4 | 5 | 6, text: string): TrustedHeadingBlock {
   return { type: 'heading', level, text: trustedMarkdown(text) };
-}
-
-function trustedMarkdownList(items: readonly string[], ordered = false): TrustedListBlock {
-  return {
-    type: 'list',
-    ordered,
-    items: items.map((item) => trustedMarkdown(item)),
-  };
 }
 
 function markdownTable(

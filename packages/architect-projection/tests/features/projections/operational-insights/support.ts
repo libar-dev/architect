@@ -29,7 +29,6 @@ interface PatternFixtureOptions {
   readonly status?: ExtractedPattern['status'];
   readonly maturity?: PatternMaturity;
   readonly role?: ExtractedPattern['role'];
-  readonly phase?: ExtractedPattern['phase'];
   readonly file?: string;
   readonly description?: string;
   readonly boundedContext?: ExtractedPattern['boundedContext'];
@@ -43,7 +42,6 @@ interface PatternFixtureOptions {
   readonly userRole?: ExtractedPattern['userRole'];
   readonly businessValue?: ExtractedPattern['businessValue'];
   readonly adr?: ExtractedPattern['adr'];
-  readonly quarter?: ExtractedPattern['quarter'];
   readonly team?: ExtractedPattern['team'];
   readonly effort?: ExtractedPattern['effort'];
   readonly priority?: ExtractedPattern['priority'];
@@ -52,7 +50,6 @@ interface PatternFixtureOptions {
 
 interface ProjectionContextOptions {
   readonly patterns: readonly ExtractedPattern[];
-  readonly phaseNames?: Record<number, string>;
   readonly relationshipIndex?: Record<string, RelationshipEntry>;
   readonly tagRegistry?: TagRegistry;
   readonly packageResolver?: PackageResolver;
@@ -67,7 +64,6 @@ export function createPattern(name: string, options: PatternFixtureOptions = {})
     ...(options.status !== undefined ? { status: options.status } : {}),
     ...(options.maturity !== undefined ? { maturity: options.maturity } : {}),
     ...(options.role !== undefined ? { role: options.role } : {}),
-    ...(options.phase !== undefined ? { phase: options.phase } : {}),
     ...(options.description !== undefined ? { description: options.description } : {}),
     ...(options.boundedContext !== undefined ? { boundedContext: options.boundedContext } : {}),
     ...(options.adrLayer !== undefined ? { adrLayer: options.adrLayer } : {}),
@@ -80,7 +76,6 @@ export function createPattern(name: string, options: PatternFixtureOptions = {})
     ...(options.userRole !== undefined ? { userRole: options.userRole } : {}),
     ...(options.businessValue !== undefined ? { businessValue: options.businessValue } : {}),
     ...(options.adr !== undefined ? { adr: options.adr } : {}),
-    ...(options.quarter !== undefined ? { quarter: options.quarter } : {}),
     ...(options.team !== undefined ? { team: options.team } : {}),
     ...(options.effort !== undefined ? { effort: options.effort } : {}),
     ...(options.priority !== undefined ? { priority: options.priority } : {}),
@@ -132,7 +127,6 @@ export function createProjectionContext(options: ProjectionContextOptions): Proj
 function createPatternGraph(options: ProjectionContextOptions): PatternGraph {
   return buildGraphFromPatterns({
     patterns: options.patterns,
-    phaseNames: options.phaseNames,
     relationshipIndex: options.relationshipIndex,
     tagRegistry: options.tagRegistry ?? createTagRegistry(),
   });

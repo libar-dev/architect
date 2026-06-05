@@ -19,9 +19,7 @@ Feature: Every renderer accepts every fragment kind without throwing
 
       Examples:
         | kind                     |
-        | PhaseProgress            |
         | StatusDistribution       |
-        | ReleaseNotesDigest       |
         | TraceabilityMatrix       |
         | ProjectConfigSnapshot    |
         | ArchitectureDiagram      |

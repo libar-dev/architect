@@ -56,14 +56,11 @@ import {
 import { normalizeStatus } from '@libar-dev/architect-core';
 import type { DanglingReference, RuntimePatternGraph } from '@libar-dev/architect-core';
 import {
-  validateDoD,
-  formatDoDSummary,
   detectAntiPatterns,
   formatAntiPatternReport,
   toValidationIssues,
   DEFAULT_THRESHOLDS,
 } from '../validation/index.js';
-import { getDeliverableWorkflowPatterns } from '../validation/dod-validator.js';
 import {
   DANGLING_BASELINE_SOURCE_PATH,
   compareDanglingBaseline,
@@ -133,10 +130,6 @@ export interface ValidateCLIConfig {
   format: 'pretty' | 'json';
   /** Show help */
   help: boolean;
-  /** Enable DoD validation mode */
-  dod: boolean;
-  /** Specific phases to validate (empty = all completed phases) */
-  phases: number[];
   /** Enable anti-pattern detection */
   antiPatterns: boolean;
   /** Override scenario bloat threshold */
@@ -165,8 +158,6 @@ export function parseArgs(argv: string[] = process.argv.slice(2)): ValidateCLICo
     strict: false,
     format: 'pretty',
     help: false,
-    dod: false,
-    phases: [],
     antiPatterns: false,
     scenarioBloatThreshold: DEFAULT_THRESHOLDS.scenarioBloatThreshold,
     megaFeatureLineThreshold: DEFAULT_THRESHOLDS.megaFeatureLineThreshold,
@@ -216,18 +207,6 @@ export function parseArgs(argv: string[] = process.argv.slice(2)): ValidateCLICo
         throw new Error(`Invalid format: ${nextArg}. Use "pretty" or "json"`);
       }
       config.format = nextArg;
-    } else if (arg === '--dod') {
-      config.dod = true;
-    } else if (arg === '--phase') {
-      const nextArg = argv[++i];
-      if (!nextArg) {
-        throw new Error(`Missing value for ${arg} flag`);
-      }
-      const phaseNum = parseInt(nextArg, 10);
-      if (isNaN(phaseNum) || phaseNum < 1) {
-        throw new Error(`Invalid phase number: ${nextArg}. Must be a positive integer.`);
-      }
-      config.phases.push(phaseNum);
     } else if (arg === '--anti-patterns') {
       config.antiPatterns = true;
     } else if (arg === '--scenario-threshold') {
@@ -296,10 +275,6 @@ Options:
   -h, --help                  Show this help message
   -v, --version               Show version number
 
-DoD Validation:
-  --dod                       Enable Definition of Done validation
-  --phase <N>                 Validate specific phase (repeatable, default: all completed)
-
 Anti-Pattern Detection:
   --anti-patterns             Enable anti-pattern detection
   --scenario-threshold <N>    Max scenarios per feature (default: 30)
@@ -312,17 +287,9 @@ Exit Codes:
   2  Warnings found (with --strict)
 
 Cross-Source Validation Checks:
-  error    phase-mismatch               Phase number differs between sources
   error    status-mismatch              Status differs between sources
-  warning  missing-pattern-in-gherkin   Pattern in TypeScript has no matching feature
-  warning  missing-deliverables         Completed phase has no deliverables defined
-  warning  deliverable-missing-fields   Deliverable missing required fields
   info     missing-pattern-in-ts        Pattern in Gherkin has no matching TypeScript
   info     unmatched-dependency         Dependency references non-existent pattern
-
-DoD Validation Checks (--dod):
-  error    incomplete-deliverables      Completed phase has incomplete deliverables
-  error    missing-acceptance-criteria  Completed phase has no @acceptance-criteria scenarios
 
 Anti-Pattern Detection (--anti-patterns):
   error    process-in-code              Process metadata in code (should be features-only)
@@ -335,17 +302,11 @@ Examples:
   # Cross-source validation
   architect-validate -i "src/**/*.ts" -F "tests/features/**/*.feature"
 
-  # DoD validation for all completed phases
-  architect-validate -i "src/**/*.ts" -F "features/**/*.feature" --dod
-
-  # DoD validation for specific phase
-  architect-validate -i "src/**/*.ts" -F "features/**/*.feature" --dod --phase 14
-
   # Anti-pattern detection
   architect-validate -i "src/**/*.ts" -F "features/**/*.feature" --anti-patterns
 
-  # Full validation (cross-source + DoD + anti-patterns)
-  architect-validate -i "src/**/*.ts" -F "features/**/*.feature" --dod --anti-patterns --strict
+  # Full validation (cross-source + anti-patterns)
+  architect-validate -i "src/**/*.ts" -F "features/**/*.feature" --anti-patterns --strict
 
   # JSON output for tooling
   architect-validate -i "src/**/*.ts" -F "features/**/*.feature" --format json
@@ -409,9 +370,7 @@ function hasCrossSourceRelationshipMatch(
  *
  * Compares TypeScript patterns against Gherkin patterns to find:
  * - Missing patterns in either source (with implements-aware resolution)
- * - Phase number mismatches
  * - Status mismatches (after normalization)
- * - Missing deliverables for completed phases
  * - Invalid dependencies
  *
  * DD-2: Consumes RuntimePatternGraph instead of raw scanner/extractor output.
@@ -438,7 +397,7 @@ export function validatePatterns(dataset: RuntimePatternGraph): ValidationSummar
   }
 
   let matched = 0;
-  let missingInGherkinCount = 0;
+  const missingInGherkinCount = 0;
 
   // Check TypeScript patterns against Gherkin
   for (const tsPattern of tsPatterns) {
@@ -449,34 +408,12 @@ export function validatePatterns(dataset: RuntimePatternGraph): ValidationSummar
       : undefined;
 
     if (!gherkinMatch) {
-      // Phase 2: Check implements relationships before reporting
+      // Phase 2: Check implements relationships before counting as matched.
       if (hasCrossSourceRelationshipMatch(tsName, gherkinByName, dataset)) {
         matched++;
-      } else if (tsPattern.phase !== undefined) {
-        // Only report for roadmap patterns (those with phase numbers)
-        missingInGherkinCount++;
-        issues.push({
-          severity: 'warning',
-          message: `Pattern "${tsName}" in TypeScript has no matching Gherkin feature`,
-          source: 'cross-source',
-          pattern: tsName,
-          file: tsPattern.source.file,
-        });
       }
     } else {
       matched++;
-
-      // Check phase consistency
-      if (tsPattern.phase !== undefined && gherkinMatch.phase !== undefined) {
-        if (tsPattern.phase !== gherkinMatch.phase) {
-          issues.push({
-            severity: 'error',
-            message: `Phase mismatch for "${tsName}": TypeScript=${String(tsPattern.phase)}, Gherkin=${String(gherkinMatch.phase)}`,
-            source: 'cross-source',
-            pattern: tsName,
-          });
-        }
-      }
 
       // Check status consistency
       const tsStatus = normalizeStatus(tsPattern.status);
@@ -515,34 +452,6 @@ export function validatePatterns(dataset: RuntimePatternGraph): ValidationSummar
           pattern: gherkinName,
           file: gherkinPattern.source.file,
         });
-      }
-    }
-  }
-
-  // Check deliverables for completed roadmap patterns (those with phase numbers).
-  // Test features and ADRs are completed but don't participate in the deliverables workflow.
-  for (const gherkinPattern of getDeliverableWorkflowPatterns(dataset)) {
-    const deliverables = gherkinPattern.deliverables ?? [];
-    const name = getPatternName(gherkinPattern);
-    if (deliverables.length === 0) {
-      issues.push({
-        severity: 'warning',
-        message: `Completed pattern "${name}" has no deliverables defined`,
-        source: 'gherkin',
-        pattern: name,
-        file: gherkinPattern.source.file,
-      });
-    } else {
-      // Validate deliverable fields
-      for (const d of deliverables) {
-        if (!d.name || d.name.trim() === '') {
-          issues.push({
-            severity: 'warning',
-            message: `Deliverable in "${name}" missing name`,
-            source: 'gherkin',
-            pattern: name,
-          });
-        }
       }
     }
   }
@@ -824,33 +733,6 @@ async function main(): Promise<void> {
       process.stdout.write(`${formatPretty({ ...summary, diagnostics }, config.verbose)}\n`);
     }
 
-    // Run DoD validation if enabled
-    let dodHasErrors = false;
-    if (config.dod) {
-      const dodSummary = validateDoD(dataset, config.phases);
-
-      if (config.format === 'pretty') {
-        process.stdout.write(`${formatDoDSummary(dodSummary)}\n`);
-      }
-
-      // Add DoD failures to issues
-      for (const result of dodSummary.results) {
-        if (!result.isDoDMet) {
-          dodHasErrors = true;
-          for (const msg of result.messages) {
-            if (!msg.startsWith('DoD met')) {
-              summary.issues.push({
-                severity: 'error',
-                message: `[DoD] Phase ${String(result.phase)} (${result.patternName}): ${msg}`,
-                source: 'gherkin',
-                pattern: result.patternName,
-              });
-            }
-          }
-        }
-      }
-    }
-
     // Run anti-pattern detection if enabled.
     // Anti-pattern rules still operate on raw scanned sources because they inspect
     // file-level text/layout concerns that are intentionally not preserved in PatternGraph.
@@ -907,8 +789,7 @@ async function main(): Promise<void> {
     }
 
     // Determine exit code based on all validation results
-    const hasErrors =
-      summary.issues.some((i) => i.severity === 'error') || dodHasErrors || antiPatternHasErrors;
+    const hasErrors = summary.issues.some((i) => i.severity === 'error') || antiPatternHasErrors;
     const hasWarnings = summary.issues.some((i) => i.severity === 'warning');
 
     if (hasErrors) {

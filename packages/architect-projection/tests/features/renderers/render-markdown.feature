@@ -23,12 +23,6 @@ Feature: renderMarkdown renders canonical markdown blocks
       And the markdown output should block unsafe link targets
 
     @security
-    Scenario: Release notes trusted markdown escapes interpolated fragment values
-      Given a ReleaseNotesDigest fixture containing hostile release metadata
-      When I render the fragment as markdown
-      Then the release notes markdown should escape trusted interpolation values
-
-    @security
     Scenario: Requirement digests escape interpolated trusted markdown values
       Given a RequirementDigest fixture containing hostile requirement values
       When I render the hostile requirement bundle as markdown without H2 splitting
@@ -94,7 +88,7 @@ Feature: renderMarkdown renders canonical markdown blocks
         | essential | 2       |
         | important | 3       |
         | useful    | 5       |
-        | advanced  | 9       |
+        | advanced  | 8       |
 
     @routing
     Scenario: Duplicate routed child paths are disambiguated by stable child ids

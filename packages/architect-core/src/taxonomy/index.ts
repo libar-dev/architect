@@ -39,7 +39,6 @@ export {
   type CanonicalFeatureOnlyTag,
 } from './source-ownership.js';
 export { ADR_CATEGORY_VALUES, type AdrCategoryValue } from './adr-category-values.js';
-export { QUARTER_PATTERN } from './quarter-format.js';
 export {
   NORMALIZED_STATUS_VALUES,
   NORMALIZED_ONLY_STATUS_VALUES,
@@ -80,7 +79,6 @@ export {
   REMAINING_WORK_GROUP_BY,
   REMAINING_WORK_SORT_BY,
   SESSION_FINDINGS_GROUP_BY,
-  TIMELINE_GROUP_BY,
   WORKFLOW_VALUES,
   type AcceptanceCriteriaFormat,
   type AdrLayerValue,
@@ -100,7 +98,6 @@ export {
   type RemainingWorkGroupBy,
   type RemainingWorkSortBy,
   type SessionFindingsGroupBy,
-  type TimelineGroupBy,
   type WorkflowValue,
 } from './generator-options.js';
 export { CONVENTION_VALUES, type ConventionValue } from './conventions.js';
