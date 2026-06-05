@@ -50,10 +50,12 @@ Load [`architect-base`](../architect-base/SKILL.md) (vocabulary) and [`architect
   — `<Pattern>ExecutableTests` is the formal escape hatch when shipped
   code lacks a `tests/features/<pattern>.feature`. Bipartite naming applies.
 - [`../architect-base/references/annotation-ownership.md`](../architect-base/references/annotation-ownership.md)
-  — split-ownership policy: production code MUST NOT add
-  `@architect-pattern`. Add `@architect-uses` /
+  — split-ownership policy: production code realizing a feature-owned
+  pattern uses `@architect-implements`, not a duplicate `@architect-pattern`
+  (but a code-originated pattern — codec / contract / utility — owns its
+  `@architect-pattern` on the `.ts`). Add `@architect-uses` /
   `@architect-usecase` / `@architect-decision` /
-  `@architect-role` / `@architect-bounded-context` as additive enrichment only.
+  `@architect-role` / `@architect-bounded-context` as additive enrichment.
 - [`../architect-base/references/rule-block-template.md`](../architect-base/references/rule-block-template.md)
   — 4-field `Rule:` template (`**Invariant:**` / `**Rationale:**` /
   `**Verified by:**`) for any new or modified Rule block in the
@@ -126,8 +128,10 @@ pnpm test && pnpm validate:all`. Do not batch verification to the
    use" guidance shifted; add or update `@architect-decision:DD-N`,
    `@architect-role`, and `@architect-bounded-context` where the refactor
    changed those semantics. Reverse edges derive from `@architect-uses`,
-   they are not authored directly. Production code MUST NOT add
-   `@architect-pattern` (per
+   they are not authored directly. Do not add a duplicate
+   `@architect-pattern` for a feature-owned pattern (use
+   `@architect-implements`); a code-originated pattern keeps its own
+   `@architect-pattern` on the `.ts` (per
    [`../architect-base/references/annotation-ownership.md`](../architect-base/references/annotation-ownership.md)).
 
 ## Adapted invariant-carrier gate
@@ -150,8 +154,11 @@ five must hold before declaring the refactor done.
    record).
 4. **Annotations refreshed.** Every production file touched carries
    the additive `@architect-*` annotations expected by split
-   ownership. No new `@architect-pattern` on production code; no
-   stale `@architect-uses` referencing removed dependencies.
+   ownership. No `@architect-pattern` that _duplicates_ a feature-owned
+   pattern's identity (use `@architect-implements`) — though an extracted
+   code-originated pattern (codec / contract / utility) does own its
+   `@architect-pattern` on the `.ts`; no stale `@architect-uses`
+   referencing removed dependencies.
 5. **Graph integrity.** `dep-tree <pattern>` after-state matches the
    refactor's intent — no surprise edges. `arch blocking` shows no
    new blockers introduced by the refactor. (Run both verbs again
@@ -199,11 +206,15 @@ When `.pr-coordination/` carries an active campaign (per
   updated, or vice versa. Both surfaces must move together — running
   only targeted slices, or only `pnpm typecheck`, is not a substitute
   for updating the carrier.
-- **Pattern identity in code.** Adding `@architect-pattern` to a
-  production-TS file. Pattern identity belongs to the feature file
-  per
-  [`../architect-base/references/annotation-ownership.md`](../architect-base/references/annotation-ownership.md);
-  refactor never moves it.
+- **Duplicating feature-owned identity in code.** Adding
+  `@architect-pattern:X` to production-TS for a pattern `X` a feature
+  file already owns — use `@architect-implements:X` instead; a refactor
+  never _moves_ a behavioral pattern's identity off its feature
+  (per
+  [`../architect-base/references/annotation-ownership.md`](../architect-base/references/annotation-ownership.md)).
+  This does **not** bar a code-originated pattern — codec / contract /
+  utility, including one an `extract` refactor creates — from owning its
+  own `@architect-pattern` on the `.ts`, as such patterns always have.
 - **Zombie executable feature.** Stripping every Scenario from a
   feature without removing the file. Either the pattern still ships
   (the feature stays rich) or the pattern is being retired (the

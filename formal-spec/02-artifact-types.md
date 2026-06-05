@@ -75,13 +75,13 @@ natural grouping for related specs.
 
 A key distinction in the directory layout:
 
-| Location               | Lifecycle                                     | Purpose                                    |
-| ---------------------- | --------------------------------------------- | ------------------------------------------ |
-| `architect/specs/`     | **Ephemeral** — deleted during implementation | Candidate, plan, and design specs          |
-| `architect/stubs/`     | **Ephemeral** — deleted during implementation | Design-level interface definitions         |
-| `architect/decisions/` | **Permanent**                                 | Architecture decisions (historical record) |
-| `architect/releases/`  | **Permanent**                                 | Release tracking                           |
-| `tests/features/`      | **Permanent** — created during implementation | Executable specs (living tests)            |
+| Location               | Lifecycle                                                                                                                  | Purpose                                                                         |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `architect/specs/`     | **Ephemeral** — deleted during implementation                                                                              | Candidate, plan, and design specs                                               |
+| `architect/stubs/`     | **Promoted** — code/contract stub moves to `src/` during implementation (identity persists, ADR-003); staging copy removed | Design-level interface definitions, embryos of shipped code-originated patterns |
+| `architect/decisions/` | **Permanent**                                                                                                              | Architecture decisions (historical record)                                      |
+| `architect/releases/`  | **Permanent**                                                                                                              | Release tracking                                                                |
+| `tests/features/`      | **Permanent** — created during implementation                                                                              | Executable specs (living tests)                                                 |
 
 During implementation, value transfers from ephemeral artifacts to permanent ones:
 
@@ -197,8 +197,8 @@ plan-level to design-level. They MUST NOT be created for plan-level specs.
 
 1. Stub created in `architect/stubs/<name>/` during design-level spec work
 2. Stub used as reference during implementation
-3. Implementation created in `src/` (or equivalent) following the stub's contracts
-4. Stub deleted after implementation is complete and tests pass
+3. Implementation created in `src/` (or equivalent) at `@architect-target`, following the stub's contracts
+4. Stub **promoted**, not discarded: its `@architect-pattern` identity (role, decisions, use-cases) travels with the code to `src/` and persists there as a code-originated pattern (ADR-003), its `@architect-status` advancing `roadmap → completed`; only the now-redundant staging copy under `architect/stubs/` is removed once tests pass. (A _step-definition_ stub carries no `@architect-pattern` and is deleted outright — §08.)
 
 **Full format specification:** §07 — Stub Format.
 

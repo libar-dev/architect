@@ -8,19 +8,25 @@
 ## The Core Principle: Design Artifacts Are Ephemeral
 
 Specifications mature through distinct stages. Plan-level specs evolve into design-level
-specs (same file, enriched). But when implementation begins, value transfers to **executable
-specs** — and the design-level spec is **deleted**, just as stubs are deleted when
-implementation code exists.
+specs (same file, enriched). But when implementation begins, value transfers to durable
+carriers and the redundant scaffold is removed — **deletion is cleanup of a copy after its
+value has moved, never loss of information.** Two artifacts move differently: the behavioral
+design-level `.feature` is **deleted** (its invariants now live in the **executable spec**),
+while a **code/contract stub is _promoted_** to its `src/` implementation — its
+`@architect-pattern` identity persists with the code (ADR-003), only the staging copy under
+`architect/stubs/` is removed.
 
-The executable spec is the permanent artifact. The design-level spec was scaffolding.
+The executable spec and the promoted `src/` code are the permanent artifacts. The design-level
+`.feature` was scaffolding; the code/contract stub was the embryo of the shipped pattern, not
+throwaway.
 
 ```
-candidate.feature → plan-level.feature → design-level.feature → (deleted)
+candidate.feature → plan-level.feature → design-level.feature → (deleted; value in executable.feature)
                                               ↓                      ↓
-                                         stubs/*.ts → (deleted)    implementation
-                                                                       ↓
-                                                              executable.feature + step-defs
-                                                              (permanent living tests)
+                              code stubs/*.ts ──promoted──→  src/ implementation
+                              (@architect-pattern identity         ↓
+                               persists, ADR-003; staging      executable.feature + step-defs
+                               copy removed)                   (permanent living tests)
 ```
 
 This is the same principle as construction: you don't keep the blueprints taped to the
@@ -55,7 +61,7 @@ REFINEMENT TRACK                    DELIVERY TRACK
        │                                 │
        │  reject / defer                 ▼
        ▼                            Implementation
-   (archived or                          │  stubs deleted → code exists
+   (archived or                          │  code stubs promoted → identity lives in src/ code
     deleted)                             │  design spec deleted → executable spec exists
                                          │
                                          ▼
@@ -373,7 +379,11 @@ For each design-level spec being retired:
 5. **Transfer the Feature description** — if the test file lacks a Problem/Solution
    narrative, prepend the design spec's narrative
 6. **Delete the design spec** from `architect/specs/`
-7. **Delete the stubs** from `architect/stubs/`
+7. **Promote or remove the stubs** — a **code/contract stub** (`architect/stubs/`) is
+   _promoted_: its code and `@architect-pattern` identity now live at `@architect-target` in
+   `src/` (ADR-003), so only the now-redundant staging copy is removed, not the pattern. A
+   **step-definition stub** (`architect/step-stubs/`) is _deleted_ once its wiring lives in the
+   executable feature's step definitions.
 
 ### What Survives the Transfer
 
@@ -435,8 +445,8 @@ no permanent form to transfer to.
 ### File Locations After Transfer
 
 ```
-architect/specs/identity/user-registration.feature     ← DELETED
-architect/stubs/user-registration/                     ← DELETED
+architect/specs/identity/user-registration.feature     ← DELETED (value in executable spec)
+architect/stubs/user-registration/                     ← staging copy removed (promoted to src/; @architect-pattern identity persists, ADR-003)
 tests/features/identity/user-registration.feature      ← PERMANENT (promoted to canonical)
 tests/features/identity/user-registration.steps.ts     ← PERMANENT (step definitions)
 src/identity/registration-service.ts                   ← PERMANENT (implementation)
@@ -454,12 +464,13 @@ src/identity/registration-service.ts                   ← PERMANENT (implementa
 Implementation is a structured transfer of value from ephemeral design artifacts to
 permanent production artifacts:
 
-| Ephemeral Artifact        | Permanent Replacement                | Transfer Mechanism                             |
-| ------------------------- | ------------------------------------ | ---------------------------------------------- |
-| Design-level spec         | Test file promoted to canonical name | Pattern name + phase + deps transferred        |
-| Stubs                     | Implementation source code           | Contracts fulfilled, stubs deleted             |
-| Deliverables table        | Implementation files at paths        | Table dropped — the files ARE the deliverables |
-| Design notes / wireframes | Implementation + executable spec     | Archived or deleted                            |
+| Ephemeral Artifact        | Permanent Replacement                | Transfer Mechanism                                                                                          |
+| ------------------------- | ------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
+| Design-level spec         | Test file promoted to canonical name | Pattern name + phase + deps transferred                                                                     |
+| Code/contract stubs       | Implementation source code           | **Promoted** to `src/` — `@architect-pattern` identity persists (ADR-003); only the staging copy is removed |
+| Step-definition stubs     | Executable feature step definitions  | Wiring lives in `tests/steps/`; the stub is deleted                                                         |
+| Deliverables table        | Implementation files at paths        | Table dropped — the files ARE the deliverables                                                              |
+| Design notes / wireframes | Implementation + executable spec     | Archived or deleted                                                                                         |
 
 **No architectural value is lost.** The pattern graph retains the same canonical names,
 dependency relationships, and phase assignments — but sourced from executable specs
@@ -518,20 +529,20 @@ dependency relationships, and phase assignments — but sourced from executable 
 
 ## Comparison: Plan vs. Design vs. Executable
 
-| Aspect             | Plan (Level 2)                | Design (Level 3)                       | Executable (Level 4)                                                                              |
-| ------------------ | ----------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| Location           | `architect/specs/<group>/`    | `architect/specs/<group>/` (same file) | `tests/features/<group>/`                                                                         |
-| Status             | `roadmap`                     | `roadmap`                              | `completed`                                                                                       |
-| Description        | Business Value + How It Works | Problem + Solution                     | Narrative transferred from design                                                                 |
-| Rules              | 4-6                           | 6-9                                    | 6-9 (from design)                                                                                 |
-| Scenarios          | 9-15 (intent)                 | 20-40 (behavior)                       | 20-40 (executable)                                                                                |
-| Deliverables table | 5-column, all `pending`       | 5-column, statuses updated             | **Dropped** (implementation IS the deliverable)                                                   |
-| Input/Output       | —                             | Present                                | **Dropped** (in implementation code)                                                              |
-| Surviving tags     | All present                   | All present                            | Pattern, status, uses, implements, product-area, bounded-context, arch-layer, role, level, parent |
-| Stubs              | —                             | Created alongside                      | **Deleted**                                                                                       |
-| Step definitions   | —                             | —                                      | Present                                                                                           |
-| N:1 mapping        | —                             | —                                      | Primary gets canonical name; siblings get `@architect-implements`                                 |
-| Permanent?         | Evolves into design           | **Deleted** at implementation          | **Yes**                                                                                           |
+| Aspect             | Plan (Level 2)                | Design (Level 3)                       | Executable (Level 4)                                                                                                           |
+| ------------------ | ----------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| Location           | `architect/specs/<group>/`    | `architect/specs/<group>/` (same file) | `tests/features/<group>/`                                                                                                      |
+| Status             | `roadmap`                     | `roadmap`                              | `completed`                                                                                                                    |
+| Description        | Business Value + How It Works | Problem + Solution                     | Narrative transferred from design                                                                                              |
+| Rules              | 4-6                           | 6-9                                    | 6-9 (from design)                                                                                                              |
+| Scenarios          | 9-15 (intent)                 | 20-40 (behavior)                       | 20-40 (executable)                                                                                                             |
+| Deliverables table | 5-column, all `pending`       | 5-column, statuses updated             | **Dropped** (implementation IS the deliverable)                                                                                |
+| Input/Output       | —                             | Present                                | **Dropped** (in implementation code)                                                                                           |
+| Surviving tags     | All present                   | All present                            | Pattern, status, uses, implements, product-area, bounded-context, arch-layer, role, level, parent                              |
+| Stubs              | —                             | Created alongside                      | **Promoted** to `src/` (code/contract stub — identity persists, ADR-003; staging copy removed). Step-definition stubs deleted. |
+| Step definitions   | —                             | —                                      | Present                                                                                                                        |
+| N:1 mapping        | —                             | —                                      | Primary gets canonical name; siblings get `@architect-implements`                                                              |
+| Permanent?         | Evolves into design           | **Deleted** at implementation          | **Yes**                                                                                                                        |
 
 ## Folder Organization
 

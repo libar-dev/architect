@@ -11,10 +11,13 @@ five-criterion pre-deletion gate, and deletion timing.
 
 ## Concept
 
-Design-level specs and stubs are **scaffolds, not permanent
-documentation**. Once implementation completes, the spec's value must
-transfer to surfaces that survive the spec's deletion. The durable
-artifacts are:
+Design-level specs and step-definition stubs are **scaffolds, not
+permanent documentation**. Once implementation completes, the spec's
+value must transfer to surfaces that survive the spec's deletion. (A
+**code/contract stub** is the exception: it is not deleted but
+_promoted_ — it carries its own `@architect-pattern` identity to `src/`
+per ADR-003, where it persists as a code-originated pattern; only the
+behavioral design `.feature` is deleted.) The durable artifacts are:
 
 1. **Executable Gherkin** in `tests/features/**/*.feature` — the
    primary carrier. Carries pattern identity (`@architect-pattern`),

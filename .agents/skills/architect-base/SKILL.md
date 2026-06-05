@@ -134,7 +134,7 @@ The load-bearing set:
 - Production TS owns **how + with what** (implementation surface).
 - Neither duplicates the other.
 
-A pattern is **identified** by exactly one surface — the feature file for behavioral patterns, the `.ts` file for code-originated patterns (codecs, contracts, utilities). Production TS realizes a feature-owned pattern via `@architect-implements:<Pattern>` — a relation, not an identity claim.
+A pattern is **identified** by exactly one surface — the feature file for behavioral patterns, the `.ts` file for code-originated patterns (codecs, contracts, utilities). Production TS realizes a feature-owned pattern via `@architect-implements:<Pattern>` — a relation, not an identity claim. A code/contract **stub** in `architect/stubs/` is itself a code-originated surface, so it carries its **own** distinct `@architect-pattern` (plus `@architect-implements`/`@architect-target`) — that identity then travels with the code to `src/` (it is _not_ duplication: the names differ). The lone stub exception is a **step-definition** stub (`architect/step-stubs/`), which never carries `@architect-pattern` (ADR-008). Full split in [`references/annotation-ownership.md`](references/annotation-ownership.md).
 
 **Production-TS `@architect-*` JSDoc is additive, not mandatory.** A pattern can be `@architect-status:completed` with zero `@architect-*` JSDoc on its source, provided the executable feature carries the full surface (identity, status, deps, invariants, scenarios). Annotations enrich discoverability; they do not gate completion.
 
@@ -221,12 +221,18 @@ The PatternGraph treats them identically; the suffix is human-facing.
 
 ## 13. Value transfer and design-spec deletion (high level)
 
-Design-level specs are **scaffolds, not permanent documentation**. Once implementation completes, the spec's value moves to durable surfaces and the spec is deleted.
+**Deletion is not loss — it is cleanup of a redundant copy _after_ its value has moved.** A design-level spec is a **scaffold, not permanent documentation**: once implementation completes, every piece of its value has a durable home, and only then is the now-duplicated scaffold removed. Nothing valuable is destroyed — "what did we delete?" is a `git log` question, not information lost.
 
-Durable carriers:
+The three scaffolds and where each one's value goes:
+
+- **Design-level `.feature` spec** → invariants move to **executable Gherkin** (`tests/features/`, canonical) + rationale to JSDoc; then the `.feature` is **deleted**.
+- **Step-definition stubs** (`architect/step-stubs/`) → become the executable feature's real step wiring; then **deleted**.
+- **Code/contract stubs** (`architect/stubs/`) → **promoted to `src/`** as a code-originated pattern: their `@architect-pattern` identity **persists** (it travels with the code per ADR-003; `@architect-status` advances `roadmap` → `completed`). The staging copy is removed — the pattern is **not** discarded.
+
+Durable carriers (where the value lands):
 
 - **Executable Gherkin** (canonical) — pattern identity, status, dependencies, invariants, scenarios that prove them.
-- **JSDoc `@architect-*` on production code** (additive) — rationale that doesn't fit in Gherkin, decisions, usecases, roles.
+- **Production code + its `@architect-*` JSDoc** (additive) — a promoted code/contract stub's contract shape and identity, plus rationale that doesn't fit in Gherkin (decisions, usecases, roles).
 
 **Pre-deletion gate (high level)**: forward link present + resolves; reverse link present; all Rule blocks with invariants have counterparts in the executable feature.
 

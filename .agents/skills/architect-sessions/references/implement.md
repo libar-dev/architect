@@ -4,7 +4,7 @@ The design-level `.feature` is your implementation prompt; the stubs encode shap
 
 **The spec IS the prompt — do not create a wrapper "context" or "session-prep" document.** If the design has a major gap that needs new architectural decisions (not just clarifications), stop and route back to [`design.md`](design.md) / [`review-spec.md`](review-spec.md) rather than papering over it.
 
-Doctrine depth: the value-transfer concept is in [`../SKILL.md`](../SKILL.md) §"The spec is a scaffold"; the **execution detail** (transfer checklist + pre-deletion gate) is [`ephemeral-spec-deletion.md`](ephemeral-spec-deletion.md). Split-ownership (production code MUST NOT carry `@architect-pattern`; JSDoc is additive) is [`../../architect-base/references/annotation-ownership.md`](../../architect-base/references/annotation-ownership.md); the bipartite naming + forward/reverse link pair is [`../../architect-base/references/spec-pattern-relationships.md`](../../architect-base/references/spec-pattern-relationships.md); the FSM table + `@architect-unlock-reason:` rules are [`../../architect-base/references/fsm-transitions.md`](../../architect-base/references/fsm-transitions.md).
+Doctrine depth: the value-transfer concept is in [`../SKILL.md`](../SKILL.md) §"The spec is a scaffold"; the **execution detail** (transfer checklist + pre-deletion gate) is [`ephemeral-spec-deletion.md`](ephemeral-spec-deletion.md). Split-ownership (realizing code uses `@architect-implements`, not a duplicate `@architect-pattern`; but a code-originated pattern — incl. a promoted stub — owns its own `@architect-pattern` on the `.ts`; JSDoc is additive) is [`../../architect-base/references/annotation-ownership.md`](../../architect-base/references/annotation-ownership.md); the bipartite naming + forward/reverse link pair is [`../../architect-base/references/spec-pattern-relationships.md`](../../architect-base/references/spec-pattern-relationships.md); the FSM table + `@architect-unlock-reason:` rules are [`../../architect-base/references/fsm-transitions.md`](../../architect-base/references/fsm-transitions.md).
 
 ## Pre-flight
 
@@ -20,8 +20,8 @@ If `scope-validate <pattern> implement` is not PASS, **stop**: either the design
 4. **Implement deliverables in the order listed**, guided by Rules + Scenarios.
 5. **After each deliverable:** run the closest targeted typecheck/test slice for the files you touched, then `pnpm typecheck` before the next phase boundary. Before any commit or handoff: `pnpm typecheck && pnpm test && pnpm validate:all`. Do not batch verification to the end.
 6. **Author / refine executable Gherkin** under `tests/features/` as you go — transfer the design Scenarios with `**Invariant:** / **Rationale:** / **Verified by:**` blocks intact. Enumerate what must land with `pnpm architect:query rules --pattern <pattern> --only-invariants`.
-7. **Add `@architect-*` JSDoc** to every production file you create or modify — at minimum `@architect-implements:<Pattern>` (the realization edge). Production code MUST NOT carry `@architect-pattern` (identity is the feature file's). Add `@architect-uses` / `@architect-usecase` / `@architect-decision` / `@architect-role` / `@architect-bounded-context` as additive enrichment. `@architect-uses` is one comma-separated line — extend it, never add a second line. Reverse edges derive; never author them.
-8. **When ALL deliverables complete:** transition the spec to `completed`, regenerate docs, then run the value-transfer-and-delete step below.
+7. **Add `@architect-*` JSDoc** to every production file you create or modify — at minimum `@architect-implements:<Pattern>` (the realization edge). Do **not** author `@architect-pattern:X` for a pattern `X` a feature file already owns — that duplicates identity; use `@architect-implements:X` instead. **A code-originated pattern keeps its own identity on the `.ts`, though:** when you promote a stub to `src/` it **retains** its `@architect-pattern:<ContractName>` + `@architect-role:<role>` (identity travels from stub through production, ADR-003 — do not strip it). Its `@architect-status` is the opposite — it **advances with the FSM** (`roadmap` → `active` → `completed`) as you build it; **never ship a promoted stub still marked `@architect-status:roadmap`** (that leaves shipped code stale and miscounts delivery progress). A codec/contract/utility defined directly in code likewise owns `@architect-pattern` there. Add `@architect-uses` / `@architect-usecase` / `@architect-decision` / `@architect-role` / `@architect-bounded-context` as additive enrichment. `@architect-uses` is one comma-separated line — extend it, never add a second line. Reverse edges derive; never author them.
+8. **When ALL deliverables complete:** transition the spec to `completed` — and advance **every code-originated pattern you promoted from a stub** to `completed` too (verify none still reads `@architect-status:roadmap` on shipped `src/`: `pnpm architect:query list --status roadmap` should not list a pattern whose file is now under `src/`). Then regenerate docs and run the value-transfer-and-delete step below.
 
 ## Value transfer (verify before deletion)
 
@@ -39,8 +39,8 @@ Phrase it like: "Value transfer is verified for `<Pattern>`. Delete the design s
 If the user authorizes deletion now:
 
 ```bash
-git rm architect/specs/<pattern>.feature      # delete the design spec
-git rm -r architect/stubs/<pattern>/          # if a stubs directory exists
+git rm architect/specs/<pattern>.feature      # delete the design spec (behavioral identity)
+git rm -r architect/stubs/<pattern>/          # remove the staging copy — a code stub's identity now lives in src/ (promoted in step 7, not discarded)
 pnpm architect:query overview                 # confirm the pattern shows completed
 pnpm docs:all                                 # regenerate docs
 ```
