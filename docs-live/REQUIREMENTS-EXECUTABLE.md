@@ -36,6 +36,8 @@
 | DocumentationCompositionProjectionExecutableTests     | completed |            |
 | DocumentationTypeRegistryExecutableTests              | active    |            |
 | DualSourceMergeIntegration                            | completed |            |
+| EmissionDescriptor                                    | active    |            |
+| EmissionDescriptorTesting                             | active    |            |
 | ErrorFactoryTypes                                     | completed |            |
 | ErrorFactoryTypesExecutableTests                      | completed |            |
 | ExecutionContextProjectionExecutableTests             | completed |            |
@@ -90,6 +92,7 @@
 | SourceMerging                                         | completed |            |
 | StubTaxonomyTagTests                                  | active    |            |
 | TagRegistrySchemasValidation                          | active    |            |
+| TaxonomyDocumentationClusterTesting                   | active    |            |
 | TraceabilityMatrixProjectionExecutableTests           | completed |            |
 | TypeScriptTaxonomyImplementation                      | completed |            |
 | ValidatorReadModelConsolidation                       | completed |            |

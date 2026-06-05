@@ -92,6 +92,12 @@ export {
   parseAndProjectPrChangeReview,
   assertGeneratorNotDegenerate,
   GeneratorDegenerateError,
+  projectTaxonomyEmbeddedShapes,
+  taxonomyGroupSource,
+  TAXONOMY_EMBEDDED_GENERATORS,
+  TAXONOMY_ROLE_ENUM_SOURCE,
+  TAXONOMY_SKILL_GENERATOR,
+  TAXONOMY_TAG_COUNT_SOURCE,
 } from './documentation-composition/index.js';
 export type {
   PatternBundleOptions,
@@ -121,4 +127,6 @@ export type {
   SupportedDocumentationTypeRegistryEntry,
   SupportedDocumentationType,
   SupportedDocumentationTypeMetadata,
+  TaxonomyEmbeddedGeneratorInfo,
+  TaxonomyEmbeddedShape,
 } from './documentation-composition/index.js';

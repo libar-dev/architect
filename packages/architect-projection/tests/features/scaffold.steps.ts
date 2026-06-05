@@ -14,10 +14,8 @@ import {
   separator,
   table,
   type Block,
-  type Fragment,
-  type ProjectionContext,
-  type TagExampleOverrides,
-} from '../../src/index.js';
+} from '@libar-dev/architect-core';
+import type { Fragment, ProjectionContext, TagExampleOverrides } from '../../src/index.js';
 import { createTestPackageResolver } from '../support/test-package-resolver.js';
 
 interface ScaffoldState {

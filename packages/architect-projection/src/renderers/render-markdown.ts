@@ -33,9 +33,14 @@ import {
   type ListBlock,
   type ListItem,
   type TableBlock,
-} from '../blocks/schema.js';
+} from '@libar-dev/architect-core';
 import { slugForFilename } from '../_internal/slug.js';
 import { summarizeTaxonomyDigest } from '../projections/governance/taxonomy-digest.js';
+import {
+  taxonomyGroupSource,
+  TAXONOMY_ROLE_ENUM_SOURCE,
+  TAXONOMY_TAG_COUNT_SOURCE,
+} from '../projections/documentation-composition/taxonomy-embedded.js';
 import {
   isBundle,
   type ApiReferenceDigest,
@@ -46,6 +51,7 @@ import {
   type DecisionCatalog,
   type DecisionRecord,
   type Fragment,
+  type MarkdownFileRoute,
   type ProjectionBundle,
   type ReleaseNotesDigest,
   type RequirementDigest,
@@ -264,9 +270,10 @@ function renderBundle(
   }
 
   const routing = bundle.routing;
+  const markdownRoute = bundleMarkdownRoute(bundle);
   const entries = new Map<string, string>();
   const rootPath = normalizeRequiredRoutedOutputPath(
-    options.routeProfile.mapPath(routing.rootRouteId, bundle.root.kind, undefined, routing),
+    options.routeProfile.mapPath(routing.rootRouteId, bundle.root.kind, undefined, markdownRoute),
     routing.rootRouteId,
   );
   const sortedKeys = [...childKeys].sort((left, right) => left.localeCompare(right));
@@ -443,7 +450,16 @@ function resolveChildRoutePath(
     throw new Error(`renderMarkdown missing child route ID for bundle child key: ${key}`);
   }
 
-  return options.routeProfile.mapPath(routeId, child.kind, key, bundle.routing);
+  return options.routeProfile.mapPath(routeId, child.kind, key, bundleMarkdownRoute(bundle));
+}
+
+/**
+ * The markdown-file route a `whole-artifact` emission descriptor carries, or
+ * `undefined` for a sink-agnostic bundle (no descriptor) or an `embedded-region`
+ * descriptor (which routes into host regions, not whole-file output paths).
+ */
+function bundleMarkdownRoute(bundle: ProjectionBundle<Fragment>): MarkdownFileRoute | undefined {
+  return bundle.emission?.mode === 'whole-artifact' ? bundle.emission.markdownFileRoute : undefined;
 }
 
 function resolveBundleDisclosureSpec(
@@ -1764,6 +1780,58 @@ function buildTaxonomyGroupTable(group: TaxonomyDigest['tags'][number]): Trusted
     ]),
     ['left', 'left', 'left', 'left', 'left', 'left', 'left', 'left'],
   );
+}
+
+/**
+ * Render the markdown body for one taxonomy embedded-region `source` (cluster
+ * `TaxonomyDocumentationCluster`): the canonical role-value enum, the live
+ * registry counts, or one digest tag-group's enumeration table. The body carries
+ * NO document chrome (no `# title`, no frontmatter) and no trailing newline — the
+ * managed-region engine owns the in-region blank-line/EOL normalization. The
+ * group tables reuse `buildTaxonomyGroupTable`, so an embedded region is
+ * byte-consistent with the corresponding `docs-live/TAXONOMY.md` table.
+ *
+ * Throws when `source` matches no role-enum / tag-count / digest-group selection
+ * (an unknown routing key), so a stale descriptor fails loud rather than emitting
+ * an empty region.
+ */
+export function renderTaxonomyManagedRegion(digest: TaxonomyDigest, source: string): string {
+  const blocks = buildTaxonomyRegionBlocks(digest, source);
+  const lines: string[] = [];
+  for (const block of blocks) {
+    lines.push(...renderBlock(block));
+  }
+  return lines.join('\n').trimEnd();
+}
+
+function buildTaxonomyRegionBlocks(
+  digest: TaxonomyDigest,
+  source: string,
+): MarkdownRenderableBlock[] {
+  if (source === TAXONOMY_ROLE_ENUM_SOURCE) {
+    const roleGroup = digest.tags.find((group) => group.entries[0]?.kind === 'role');
+    const roleTags = roleGroup?.entries.map((entry) => entry.tag) ?? [];
+    return [code(roleTags.join(' · '))];
+  }
+
+  if (source === TAXONOMY_TAG_COUNT_SOURCE) {
+    const counts = summarizeTaxonomyDigest(digest);
+    return [
+      trustedMarkdownParagraph(
+        `The validation registry currently defines **${String(counts.roles)} roles**, ` +
+          `**${String(counts.metadata)} metadata tags**, and ` +
+          `**${String(counts.aggregation)} aggregation tags** (**${String(counts.total)} total**).`,
+      ),
+    ];
+  }
+
+  const group = digest.tags.find(
+    (candidate) => taxonomyGroupSource(candidate.groupName) === source,
+  );
+  if (group === undefined) {
+    throw new Error(`Unknown taxonomy managed-region source: ${source}`);
+  }
+  return [buildTaxonomyGroupTable(group)];
 }
 
 function buildFsmStateDiagram(fragment: ValidationRuleDigest): string {

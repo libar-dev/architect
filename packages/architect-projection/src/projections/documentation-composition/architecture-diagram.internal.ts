@@ -14,7 +14,7 @@
 
 import { z } from 'zod';
 
-import { heading, list, mermaid } from '../../blocks/schema.js';
+import { heading, list, mermaid } from '@libar-dev/architect-core';
 import type { ProjectionContext } from '../../context/projection-context.js';
 import { ProjectionError } from '../errors.js';
 import type {

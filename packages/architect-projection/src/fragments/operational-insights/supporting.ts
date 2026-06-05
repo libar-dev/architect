@@ -10,7 +10,7 @@
  */
 import { z } from 'zod';
 
-import { BlockSchema, MermaidBlockSchema } from '../../blocks/schema.js';
+import { BlockSchema, MermaidBlockSchema } from '@libar-dev/architect-core';
 
 /**
  * Delivery progress totals for the overview — overall pattern count broken

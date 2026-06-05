@@ -9,6 +9,12 @@
  * mermaid, link-out, collapsible) used inside prose-carrying projection fragments
  * — e.g. DecisionRecord carries ADR prose as `Block[]` rather than a raw string,
  * and the markdown / UI renderers consume these primitives directly.
+ *
+ * This is the single canonical block vocabulary for the workspace. It lives in
+ * `architect-core` (the lower layer) so both core consumers — `markdown-parser.ts`
+ * and the config `presentation-contracts.ts` — and every `architect-projection`
+ * renderer / fragment validate against one schema. (Reconciled from the former
+ * `architect-projection` `blocks/schema.ts`; No-BC, DOCS-IA-FINDINGS §6 R8.)
  */
 import { z } from 'zod';
 

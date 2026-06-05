@@ -6,7 +6,348 @@
 
 ## Overview
 
-75 shapes across 9 patterns in architect-core.
+101 shapes across 10 patterns in architect-core.
+
+## BlockSchema
+
+### Block
+
+The discriminated union of every inline content primitive — the building block type that prose-carrying projection fragments compose into.
+
+```ts
+type Block =
+  | HeadingBlock
+  | ParagraphBlock
+  | SeparatorBlock
+  | TableBlock
+  | ListBlock
+  | CodeBlock
+  | MermaidBlock
+  | CollapsibleBlock
+  | LinkOutBlock;
+```
+
+### BLOCK_TYPES
+
+Runtime set of every valid BlockType, used to test whether an unknown value carries a recognized block discriminant.
+
+```ts
+BLOCK_TYPES = new Set<BlockType>([
+  'heading',
+  'paragraph',
+  'separator',
+  'table',
+  'list',
+  'code',
+  'mermaid',
+  'collapsible',
+  'link-out',
+])
+```
+
+### BlockSchema
+
+Runtime schema for any Block; a discriminated union over every block primitive keyed on \`type\`, with an explicit \`z.ZodType\` annotation because the recursive collapsible branch cannot be inferred.
+
+```ts
+const BlockSchema: z.ZodType<Block>;
+```
+
+### BlockType
+
+The set of valid block discriminant strings — the \`type\` literal of every Block variant.
+
+```ts
+type BlockType = Block['type'];
+```
+
+### code
+
+Constructs a CodeBlock, omitting \`language\` when not supplied.
+
+```ts
+code = (content: string, language?: string): CodeBlock => ({
+  type: 'code',
+  content,
+  ...(language && { language }),
+})
+```
+
+### CodeBlockSchema
+
+A code block carrying source content and an optional identifier-shaped language hint.
+
+```ts
+CodeBlockSchema = z.strictObject({
+  type: z.literal('code'),
+  language: z
+    .string()
+    .regex(/^[A-Za-z0-9_+\-.]*$/u, 'language must be identifier-shaped')
+    .max(64)
+    .optional(),
+  content: z.string(),
+})
+```
+
+### collapsible
+
+Constructs a CollapsibleBlock.
+
+```ts
+collapsible = (summary: string, content: Block[]): CollapsibleBlock => ({
+  type: 'collapsible',
+  summary,
+  content,
+})
+```
+
+### CollapsibleBlock
+
+A collapsible block that nests further blocks behind a summary label. Hand-written (rather than inferred) because its \`content\` is recursive and Zod cannot infer recursive lazy unions.
+
+```ts
+interface CollapsibleBlock {
+  /** Discriminant tag identifying this as a collapsible block. */
+  type: 'collapsible';
+  /** The always-visible summary label shown above the collapsed content. */
+  summary: string;
+  /** The nested blocks revealed when the block is expanded. */
+  content: Block[];
+}
+```
+
+#### Properties
+
+| Property | Description                                                         |
+| -------- | ------------------------------------------------------------------- |
+| type     | Discriminant tag identifying this as a collapsible block.           |
+| summary  | The always-visible summary label shown above the collapsed content. |
+| content  | The nested blocks revealed when the block is expanded.              |
+
+### CollapsibleBlockSchema
+
+Runtime schema for a CollapsibleBlock; its \`content\` uses \`z.lazy\` to reference BlockSchema (declared below) for recursive nesting.
+
+```ts
+CollapsibleBlockSchema = z.strictObject({
+  type: z.literal('collapsible'),
+  summary: z.string(),
+  content: z.lazy(() => z.array(BlockSchema)),
+})
+```
+
+### heading
+
+Constructs a HeadingBlock.
+
+```ts
+heading = (level: 1 | 2 | 3 | 4 | 5 | 6, text: string): HeadingBlock => ({
+  type: 'heading',
+  level,
+  text,
+})
+```
+
+### HeadingBlockSchema
+
+A heading block carrying a level (1-6) and its text.
+
+```ts
+HeadingBlockSchema = z.strictObject({
+  type: z.literal('heading'),
+  level: z.union([
+    z.literal(1),
+    z.literal(2),
+    z.literal(3),
+    z.literal(4),
+    z.literal(5),
+    z.literal(6),
+  ]),
+  text: z.string(),
+})
+```
+
+### isBlock
+
+Type guard narrowing an unknown value to a Block via a cheap shape check on its \`type\` discriminant.
+
+```ts
+function isBlock(value: unknown): value is Block;
+```
+
+#### Parameters
+
+| Parameter | Type | Description                |
+| --------- | ---- | -------------------------- |
+| value     |      | The unknown value to test. |
+
+#### Returns
+
+\`true\` when \`value\` is an object whose \`type\` is a known block kind.
+
+### linkOut
+
+Constructs a LinkOutBlock.
+
+```ts
+linkOut = (text: string, path: string): LinkOutBlock => ({
+  type: 'link-out',
+  text,
+  path,
+})
+```
+
+### LinkOutBlockSchema
+
+A link-out block carrying display text and a target path to another document or anchor.
+
+```ts
+LinkOutBlockSchema = z.strictObject({
+  type: z.literal('link-out'),
+  text: z.string(),
+  path: z.string(),
+})
+```
+
+### list
+
+Constructs a ListBlock.
+
+```ts
+list = (items: ListItem[], ordered = false): ListBlock => ({
+  type: 'list',
+  ordered,
+  items,
+})
+```
+
+### ListBlockSchema
+
+A list block carrying its ordered/unordered flag and its ListItem entries.
+
+```ts
+ListBlockSchema = z.strictObject({
+  type: z.literal('list'),
+  ordered: z.boolean().default(false),
+  items: z.array(ListItemSchema),
+})
+```
+
+### ListItem
+
+A single list entry — either a bare string or an object carrying text, an optional checkbox state, and optional nested child items. Recursive: a \`ListItem\` may contain further \`ListItem\`s, so the type is hand-written because Zod cannot infer recursive lazy unions.
+
+```ts
+type ListItem =
+  | string
+  | {
+      text: string;
+      checked?: boolean | undefined;
+      children?: ListItem[] | undefined;
+    };
+```
+
+### ListItemSchema
+
+Runtime schema for a ListItem; uses \`z.lazy\` so it can reference itself for nested children, and carries an explicit \`z.ZodType\` annotation because the recursive lazy union cannot be inferred.
+
+```ts
+const ListItemSchema: z.ZodType<ListItem>;
+```
+
+### mermaid
+
+Constructs a MermaidBlock.
+
+```ts
+mermaid = (content: string): MermaidBlock => ({
+  type: 'mermaid',
+  content,
+})
+```
+
+### MermaidBlockSchema
+
+A Mermaid diagram block carrying raw Mermaid source as its content.
+
+```ts
+MermaidBlockSchema = z.strictObject({
+  type: z.literal('mermaid'),
+  content: z.string(),
+})
+```
+
+### paragraph
+
+Constructs a ParagraphBlock.
+
+```ts
+paragraph = (text: string): ParagraphBlock => ({
+  type: 'paragraph',
+  text,
+})
+```
+
+### ParagraphBlockSchema
+
+A paragraph block carrying a single run of prose text.
+
+```ts
+ParagraphBlockSchema = z.strictObject({
+  type: z.literal('paragraph'),
+  text: z.string(),
+})
+```
+
+### separator
+
+Constructs a SeparatorBlock.
+
+```ts
+separator = (): SeparatorBlock => ({
+  type: 'separator',
+})
+```
+
+### SeparatorBlockSchema
+
+A horizontal-rule separator block with no payload beyond its discriminant.
+
+```ts
+SeparatorBlockSchema = z.strictObject({
+  type: z.literal('separator'),
+})
+```
+
+### table
+
+Constructs a TableBlock, omitting \`alignment\` when not supplied.
+
+```ts
+table = (
+  columns: string[],
+  rows: string[][],
+  alignment?: ('left' | 'center' | 'right')[],
+): TableBlock => ({
+  type: 'table',
+  columns,
+  rows,
+  ...(alignment && { alignment }),
+})
+```
+
+### TableBlockSchema
+
+A table block carrying column headers, row cells, and optional per-column alignment.
+
+```ts
+TableBlockSchema = z.strictObject({
+  type: z.literal('table'),
+  columns: z.array(z.string()),
+  rows: z.array(z.array(z.string())),
+  alignment: z.array(z.enum(['left', 'center', 'right'])).optional(),
+})
+```
 
 ## CodecUtils
 
@@ -1031,10 +1372,10 @@ type ExtractionDiagnosticSeverity = (typeof EXTRACTION_DIAGNOSTIC_SEVERITIES)[nu
 
 ### parseMarkdownToBlocks
 
-Parse markdown text into an ordered list of typed \`SectionBlock\` values. Runs a line-driven state machine that recognizes headings, code fences (including mermaid), pipe tables, ordered/unordered lists, separators, and paragraphs for the rendering pipeline.
+Parse markdown text into an ordered list of typed \`Block\` values. Runs a line-driven state machine that recognizes headings, code fences (including mermaid), pipe tables, ordered/unordered lists, separators, and paragraphs for the rendering pipeline.
 
 ```ts
-function parseMarkdownToBlocks(content: string): readonly SectionBlock[];
+function parseMarkdownToBlocks(content: string): readonly Block[];
 ```
 
 #### Parameters

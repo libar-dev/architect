@@ -107,7 +107,7 @@ Block these aggressively (the idea-tier anti-pattern set; details in the ladder 
 - **No scenarios at idea tier.** Rules-with-invariants suffice; scenarios belong at candidate tier and above.
 - **No `**Rationale:**`/`**Verified by:**` at idea tier** — those are plan-tier additions.
 
-> **Tripwire — retroactive plan-level specs (the #1 failure mode).** If the validator reports missing Gherkin coverage for a pattern that is _already shipping_, the fix is to tag an existing executable feature with `@architect-implements:<Pattern>` and enrich it — never to author a fresh plan-level spec. A plan-level spec is meant to die after implementation; conjuring one back to "cover" shipped behavior inverts the pipeline and leaves a zombie. (Refactoring carve-out: backfilling coverage skips directly to design or executable tier, never via plan.)
+> **Tripwire — retroactive plan-level specs (the #1 failure mode).** If the validator reports missing Gherkin coverage for a pattern that is _already shipping_, the fix is to tag an existing executable feature with `@architect-implements:<Pattern>` and enrich it — never to author a fresh plan-level spec. A plan-level spec is meant to die after implementation; conjuring one back to "cover" shipped behavior inverts the pipeline and leaves a zombie. (Refactoring carve-out: backfilling coverage skips candidate and plan — to the executable `*ExecutableTests` convention in practice — never a fresh plan-level spec.)
 
 ## Output for this session
 

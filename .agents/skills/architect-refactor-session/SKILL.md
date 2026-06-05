@@ -1,6 +1,6 @@
 ---
 name: architect-refactor-session
-description: MANDATORY when modifying shipped code that has NO design-level Architect spec — triggers on refactor, rename, extract, inline, consolidate, split-package, move-file, or any production-code edit on a `completed` pattern whose design spec was already deleted. Operationalizes the kernel's refactoring carve-out — skip the four-tier ladder, evolve the existing executable feature in place, preserve documented invariants unless `.pr-coordination/DECISIONS.md` authorizes a change. Invoke before the edit. Do NOT use for implementing a design spec, bug fixes that restore an invariant, or feature work needing a fresh pattern — those route to architect-sessions.
+description: MANDATORY when modifying shipped code that has NO design-level Architect spec — triggers on refactor, rename, extract, inline, consolidate, split-package, move-file, or any production-code edit on a `completed` pattern whose design spec was already deleted. Operationalizes the kernel's refactoring carve-out — skip the four-tier ladder, evolve the existing executable feature in place, preserve documented invariants unless `.pr-coordination/DECISIONS.md` authorizes a change. Invoke before the edit. Do NOT use for implementing a design spec, bug fixes that restore an invariant, or feature work needing a fresh pattern — those route to architect-sessions. DO NOT USE for spec-driven development.
 allowed-tools:
   - Bash
   - Read
@@ -18,7 +18,7 @@ the executable Gherkin in `tests/features/` is now the canonical
 pattern definition. There is nothing to "implement from"; there is
 existing code to evolve and an existing executable feature whose
 invariants must continue to hold (or be deliberately changed under a
-recorded decision).
+recorded decision). **This skill is only for non-spec-driven development. DO NOT USE for refactoring based on a design-level spec.**
 
 ## Premise — value transfer without a spec
 
@@ -44,8 +44,16 @@ Load [`architect-base`](../architect-base/SKILL.md) (vocabulary) and [`architect
   session type). Required when the refactor touches ≥3 packages or
   spans ≥3 sessions.
 - [`../architect-base/references/four-tier-ladder.md`](../architect-base/references/four-tier-ladder.md)
-  — refactoring carve-out: skip idea / candidate / plan tiers. Never
-  author a retroactive spec for shipped code.
+  — the maturity ladder this carve-out skips (base owns the rungs). The
+  carve-out itself — skip idea / candidate / plan and capture
+  already-shipped behavior at executable-tier (a `*ExecutableTests`
+  feature, or evolve the one in place) rather than revive the deleted
+  design spec — is this skill's own subject (see Premise · Refactor
+  order · Anti-patterns below). (Provenance:
+  `formal-spec/08-spec-evolution.md` § "Exception: Refactoring specs"
+  lets a refactoring spec skip candidate and plan, going to design-level
+  _or_ executable; this skill narrows that to the executable
+  `*ExecutableTests` convention — see Anti-patterns.)
 - [`../architect-base/references/spec-pattern-relationships.md`](../architect-base/references/spec-pattern-relationships.md)
   — `<Pattern>ExecutableTests` is the formal escape hatch when shipped
   code lacks a `tests/features/<pattern>.feature`. Bipartite naming applies.

@@ -89,10 +89,10 @@ idea ──► candidate ──► plan ──► design
 - **Plan → Design:** add stubs in `architect/stubs/<pattern>/`, error/edge/integration scenarios, ADR refs. Status stays `roadmap` (it transitions to `active` during the implement-spec session, not here). Edit in place.
 
 Skipping rungs (idea → plan, candidate → design, etc.) is rejected — promote
-through every rung. The only exception is the **refactoring carve-out**: when
-backfilling coverage for code that already exists, skip directly to design or
-executable tier. Never via plan-level. Rule: `formal-spec/08-spec-evolution.md`
-§ "Anti-Patterns" ("Exception: Refactoring specs").
+through every rung. (The one non-spec-driven exception — backfilling shipped
+code that has no spec — is owned by
+[`architect-refactor-session`](../../architect-refactor-session/SKILL.md), not
+this spec-driven ladder.)
 
 ## Worked example 1 — idea-tier minimum
 

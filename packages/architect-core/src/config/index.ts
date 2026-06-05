@@ -40,7 +40,7 @@ export {
   GeneratorSourceOverrideSchema,
   isProjectConfig,
 } from './project-config-schema.js';
-export { SectionBlockSchema, type SectionBlock } from './section-block.js';
+export * from './block.js';
 export { BUILTIN_ROLES, type RoleDefinition } from './role-constants.js';
 export { DEFAULT_GENERATORS, type DefaultGenerator } from './default-generators.js';
 export type { ArchitectConfig, ArchitectInstance, RegexBuilders } from './types.js';

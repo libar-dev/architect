@@ -45,7 +45,7 @@ import {
   ProjectionError,
 } from '@libar-dev/architect-core';
 
-import { heading, list, mermaid, paragraph, type Block } from '../../blocks/schema.js';
+import { heading, list, mermaid, paragraph, type Block } from '@libar-dev/architect-core';
 import type { ProjectionContext } from '../../context/projection-context.js';
 import type { BusinessRuleReference } from '../../fragments/governance/index.js';
 import { projectSingle, type ProjectionBundle } from '../../fragments/base.js';

@@ -8,7 +8,7 @@
 import type { ExtractedPattern } from '@libar-dev/architect-core';
 import { z } from 'zod';
 
-import { list, paragraph, type Block } from '../../blocks/schema.js';
+import { list, paragraph, type Block } from '@libar-dev/architect-core';
 import type { ProjectionContext } from '../../context/projection-context.js';
 import type { PrChangeReview } from '../../fragments/documentation-composition/index.js';
 import { filterPatterns } from '../_shared/filter.js';

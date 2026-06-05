@@ -13,7 +13,7 @@
  */
 import { z } from 'zod';
 
-import { BlockSchema } from '../../blocks/schema.js';
+import { BlockSchema } from '@libar-dev/architect-core';
 
 /**
  * A PR change-review fragment — the branch, its changed files, the patterns

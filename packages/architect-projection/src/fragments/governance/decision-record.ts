@@ -12,7 +12,7 @@
  */
 import { z } from 'zod';
 
-import { BlockSchema } from '../../blocks/schema.js';
+import { BlockSchema } from '@libar-dev/architect-core';
 import { DecisionStatusSchema, DecisionTypeSchema } from './supporting.js';
 
 /**

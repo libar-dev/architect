@@ -4,6 +4,15 @@
 export { parseAndProjectArchitectureDiagram } from './architecture-diagram.js';
 export type { ProjectArchitectureDiagramOptions } from './architecture-diagram.js';
 export {
+  projectTaxonomyEmbeddedShapes,
+  taxonomyGroupSource,
+  TAXONOMY_EMBEDDED_GENERATORS,
+  TAXONOMY_ROLE_ENUM_SOURCE,
+  TAXONOMY_SKILL_GENERATOR,
+  TAXONOMY_TAG_COUNT_SOURCE,
+} from './taxonomy-embedded.js';
+export type { TaxonomyEmbeddedGeneratorInfo, TaxonomyEmbeddedShape } from './taxonomy-embedded.js';
+export {
   ProjectConfigOptionsSchema,
   SourceGlobGroupsSchema,
   parseAndProjectConfig,

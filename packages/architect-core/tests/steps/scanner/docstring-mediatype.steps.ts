@@ -12,7 +12,7 @@ import { parseFeatureFile } from '../../../src/scanner/gherkin-ast-parser.js';
 import type { Result } from '../../../src/types/result.js';
 import type { ParsedFeatureFile } from '../../../src/scanner/gherkin-ast-parser.js';
 import type { GherkinFileError } from '../../../src/validation-schemas/feature.js';
-import type { SectionBlock, CodeBlock } from '../../../src/config/section-block.js';
+import type { Block, CodeBlock } from '../../../src/config/block.js';
 
 // =============================================================================
 // Types
@@ -31,7 +31,7 @@ interface DocstringMediatypeState {
   fileContent: string;
   parseResult: Result<ParsedFeatureFile, GherkinFileError> | null;
   docString: string | { content: string; mediaType?: string } | null;
-  renderedBlock: SectionBlock | null;
+  renderedBlock: Block | null;
   defaultLanguage: string;
 }
 
@@ -105,14 +105,14 @@ function getStep(scenarioIdx: number, stepIdx: number): ParsedStep | undefined {
 /**
  * Type guard for code blocks
  */
-function isCodeBlock(block: SectionBlock | null): block is CodeBlock {
+function isCodeBlock(block: Block | null): block is CodeBlock {
   return block !== null && block.type === 'code';
 }
 
 function renderDocString(
   docString: string | { content: string; mediaType?: string },
   defaultLanguage: string,
-): SectionBlock {
+): Block {
   if (typeof docString === 'string') {
     return { type: 'code', language: defaultLanguage, content: docString };
   }

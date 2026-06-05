@@ -7,7 +7,7 @@
 
 import type { ExtractedPattern } from '@libar-dev/architect-core';
 
-import { code, list, paragraph, table, type Block } from '../../blocks/schema.js';
+import { code, list, paragraph, table, type Block } from '@libar-dev/architect-core';
 import type { ProjectionContext } from '../../context/projection-context.js';
 import { ProjectionError } from '../errors.js';
 import { type ProjectionBundle } from '../../fragments/base.js';

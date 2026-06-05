@@ -1,12 +1,11 @@
 /**
  * @architect
  * @architect-pattern EmissionDescriptor
- * @architect-status roadmap
+ * @architect-status active
  * @architect-role:contract
  * @architect-product-area:Generation
  * @architect-bounded-context:documentation-composition
  * @architect-implements TaxonomyDocumentationCluster
- * @architect-target packages/architect-projection/src/fragments/emission-descriptor.ts
  * @architect-enforces-decision ADR010DocumentationCompositionHelpers
  *
  * Emission descriptor — the sink-side half of the `BundleRouting` split
@@ -18,7 +17,7 @@
  * moves OFF `BundleRouting` (which keeps only logical routing + `disclosureSpec`)
  * and ONTO this descriptor. This is the No-BC split the epic's rule
  * "A generated document is one emission of a sink-agnostic view" mandates; the
- * hand-written `isRoutingLike` guard (`fragments/base.ts:64`) is DELETED, not aliased.
+ * hand-written `isRoutingLike` guard (`fragments/base.ts`) is DELETED, not aliased.
  *
  * DD-1 (guard → Zod). Resolved to Zod under the Zod-first boundary doctrine — a
  * `discriminatedUnion` of `strictObject` variants. `isRoutingLike` already delegated
@@ -52,8 +51,8 @@
  * DD-5 (preserve the `.md` contract — reuse, don't fork). A whole-artifact
  * descriptor's markdown-file route carries the SHIPPED `.md` output contract forward:
  * `rootTarget` keeps the suffix rule already on `architect-projection`'s
- * `documentation-type-registry.ts:42` + the `${string}.md` template type at
- * `documentation-type-registry.output-routing.ts:7` — a relaxed `z.string().min(1)` WEAKENS
+ * `documentation-type-registry.ts` + the `${string}.md` template type at
+ * `documentation-type-registry.output-routing.ts` — a relaxed `z.string().min(1)` WEAKENS
  * it to accept a non-`.md` filename. This descriptor is the single re-home for the routing
  * fields the registry inlines today (per GoalOrientedNavigation), so the `.md` contract is
  * defined ONCE here — the no-duplication thesis (`MultiSourceComposition`) applied to the
@@ -89,9 +88,6 @@
  * (that is the determinism gate, extended into the region).
  */
 import { z } from 'zod';
-// At implement time these move with the file into packages/architect-projection/src/fragments/:
-// import { DisclosureSpecSchema } from '../disclosure/spec.js';
-// import { isLogicalRouteId } from '../routing/route-id.js';
 
 const RepoRelativePathMessage =
   'descriptor path must be normalized and repo-relative (no absolute paths, ~ roots, Windows drive roots, backslashes, empty segments, . segments, or .. traversal segments)';
@@ -148,7 +144,7 @@ export type EmbeddedRegionTarget = z.infer<typeof EmbeddedRegionTargetSchema>;
 /**
  * Markdown-file sink route profile — the file-system specifics that today live inline on BOTH
  * `BundleRouting` (`fragments/base.ts`) and `SupportedDocumentationTypeRegistryEntrySchema`
- * (`documentation-type-registry.ts:37-54`). This is ONE sink's profile, not the definition of
+ * (`documentation-type-registry.ts`). This is ONE sink's profile, not the definition of
  * whole-artifact emission: it applies only when a descriptor is present and writes to the
  * markdown-file sink; the live-API/MCP-bundle and Studio view-state sinks carry no descriptor.
  *

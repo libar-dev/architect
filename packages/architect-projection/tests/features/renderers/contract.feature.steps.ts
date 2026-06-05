@@ -8,6 +8,7 @@ import {
   type BundleRouting,
   isBundle,
   type Fragment,
+  type MarkdownFileRoute,
   type MarkdownRenderEvent,
   type PatternSummary,
   type ProjectionBundle,
@@ -107,7 +108,6 @@ function materializeMarkdownRecord(
       routing.rootRouteId as LogicalRouteId,
       bundle.root.kind,
       undefined,
-      routing,
     )
   ] = `root:${bundle.root.patternName}`;
 
@@ -117,9 +117,8 @@ function materializeMarkdownRecord(
       throw new Error(`Missing child route id for ${key}`);
     }
 
-    fileMap[
-      defaultMarkdownRouteProfile.mapPath(routeId as LogicalRouteId, child.kind, key, routing)
-    ] = `child:${child.kind}:${key}`;
+    fileMap[defaultMarkdownRouteProfile.mapPath(routeId as LogicalRouteId, child.kind, key)] =
+      `child:${child.kind}:${key}`;
   }
 
   return fileMap;
@@ -257,7 +256,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   routeId: LogicalRouteId,
                   kind: Fragment['kind'],
                   key: string | undefined,
-                  routing: BundleRouting | undefined,
+                  markdownRoute?: MarkdownFileRoute,
                 ) => string;
               };
               onRenderDocument?: (event: MarkdownRenderEvent) => void;

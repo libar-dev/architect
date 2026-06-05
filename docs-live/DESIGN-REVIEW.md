@@ -161,7 +161,7 @@ graph TD
   apireferenceprojection["ApiReferenceProjection<br/>(projection · active)"]
   architecturediagram["ArchitectureDiagram<br/>(contract · active)"]
   documentationcompositionsupporting["DocumentationCompositionSupporting<br/>(contract · active)"]
-  emissiondescriptor["EmissionDescriptor<br/>(contract · roadmap)"]
+  emissiondescriptor["EmissionDescriptor<br/>(contract · active)"]
   generatordegeneracyguard["GeneratorDegeneracyGuard<br/>(utility · completed)"]
   prchangereview["PrChangeReview<br/>(contract · active)"]
   projectconfigsnapshot["ProjectConfigSnapshot<br/>(contract · active)"]
@@ -515,7 +515,7 @@ graph TD
   dodvalidation["DoDValidation<br/>(roadmap)"]
   effortvariancetracking["EffortVarianceTracking<br/>(roadmap)"]
   generatorinfrastructureexecutabletests["GeneratorInfrastructureExecutableTests<br/>(roadmap)"]
-  goalorientednavigation["GoalOrientedNavigation<br/>(candidate)"]
+  goalorientednavigation["GoalOrientedNavigation<br/>(roadmap)"]
   livingroadmapcli["LivingRoadmapCLI<br/>(roadmap)"]
   monoreposupport["MonorepoSupport<br/>(roadmap)"]
   multisourcecomposition["MultiSourceComposition<br/>(candidate)"]
@@ -548,6 +548,10 @@ graph TD
   adr010documentationcompositionhelpers -. see-also .- adr006singlereadmodelarchitecture
   adr010documentationcompositionhelpers -. see-also .- adr009projectiontrustboundary
   documentationprojection -->|depends-on| adr010documentationcompositionhelpers
+  goalorientednavigation -. see-also .- adr006singlereadmodelarchitecture
+  goalorientednavigation -. see-also .- adr009projectiontrustboundary
+  goalorientednavigation -. see-also .- adr010documentationcompositionhelpers
+  goalorientednavigation -. see-also .- taxonomydocumentationcluster
   pdr005processguardfsm -->|depends-on| adr001taxonomycanonicalvalues
   stepdefinitioncompletion -->|depends-on| adr002gherkinonlytesting
   taxonomydocumentationcluster -. see-also .- adr010documentationcompositionhelpers
@@ -577,16 +581,15 @@ Most-depended-on patterns in this view, ranked by in-view dependant count.
 
 Bounded contexts whose patterns span more than one workspace package.
 
-| Bounded context           | Packages                                        | Patterns |
-| ------------------------- | ----------------------------------------------- | -------- |
-| cli                       | Architect CLI, Architect Guard, Architect MCP   | 6        |
-| api                       | Architect MCP, Architect Package Content        | 7        |
-| documentation-composition | Architect Package Content, Architect Projection | 8        |
-| extractor                 | Architect Core, Architect Package Content       | 7        |
-| governance                | Architect Package Content, Architect Projection | 9        |
-| projection                | Architect Package Content, Architect Projection | 47       |
-| rendering                 | Architect Core, Architect Projection            | 9        |
-| validation                | Architect Core, Architect Guard                 | 8        |
+| Bounded context | Packages                                        | Patterns |
+| --------------- | ----------------------------------------------- | -------- |
+| cli             | Architect CLI, Architect Guard, Architect MCP   | 6        |
+| api             | Architect MCP, Architect Package Content        | 7        |
+| extractor       | Architect Core, Architect Package Content       | 7        |
+| governance      | Architect Package Content, Architect Projection | 9        |
+| projection      | Architect Package Content, Architect Projection | 47       |
+| rendering       | Architect Core, Architect Projection            | 9        |
+| validation      | Architect Core, Architect Guard                 | 8        |
 
 ## Legend
 

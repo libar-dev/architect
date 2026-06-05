@@ -14,7 +14,7 @@
  */
 import { z } from 'zod';
 
-import { BlockSchema, MermaidBlockSchema } from '../../blocks/schema.js';
+import { BlockSchema, MermaidBlockSchema } from '@libar-dev/architect-core';
 import { ArchitectureDiagramScopeSchema } from './supporting.js';
 
 /**

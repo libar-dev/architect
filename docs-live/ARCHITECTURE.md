@@ -7,7 +7,7 @@
 
 ## Overview
 
-This view captures 168 patterns across 23 diagrams in the Component architecture view.
+This view captures 169 patterns across 23 diagrams in the Component architecture view.
 
 ## Related views
 
@@ -27,7 +27,7 @@ graph LR
   cli["cli (6)"]
   configuration["configuration (4)"]
   delivery_reporting["delivery-reporting (7)"]
-  documentation_composition["documentation-composition (7)"]
+  documentation_composition["documentation-composition (8)"]
   domain["domain (1)"]
   execution_context["execution-context (8)"]
   extractor["extractor (6)"]
@@ -141,7 +141,7 @@ graph TD
   traceabilitymatrix["TraceabilityMatrix<br/>(contract)"]
 ```
 
-### Bounded context: documentation-composition (7 patterns)
+### Bounded context: documentation-composition (8 patterns)
 
 ```mermaid
 graph TD
@@ -149,6 +149,7 @@ graph TD
   apireferenceprojection["ApiReferenceProjection<br/>(projection)"]
   architecturediagram["ArchitectureDiagram<br/>(contract)"]
   documentationcompositionsupporting["DocumentationCompositionSupporting<br/>(contract)"]
+  emissiondescriptor["EmissionDescriptor<br/>(contract)"]
   generatordegeneracyguard["GeneratorDegeneracyGuard<br/>(utility)"]
   prchangereview["PrChangeReview<br/>(contract)"]
   projectconfigsnapshot["ProjectConfigSnapshot<br/>(contract)"]
@@ -568,6 +569,7 @@ Bounded contexts whose patterns span more than one workspace package.
 - DoDValidationTypes
 - DoDValidator
 - DualSourceExtractor
+- EmissionDescriptor
 - ErrorFactoryTypes
 - ExecutionContextProjectionSupport
 - ExecutionContextSupporting

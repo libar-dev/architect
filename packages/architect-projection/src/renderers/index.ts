@@ -1,6 +1,13 @@
 export { renderCompactText } from './render-compact-text.js';
 export { renderJson } from './render-json.js';
-export { renderMarkdown } from './render-markdown.js';
+export { renderMarkdown, renderTaxonomyManagedRegion } from './render-markdown.js';
+export {
+  applyManagedRegion,
+  applyManagedRegions,
+  managedRegionMarkers,
+  ManagedRegionError,
+  readManagedRegion,
+} from './managed-region.js';
 export { renderUi } from './render-ui.js';
 export type {
   MarkdownRenderEvent,

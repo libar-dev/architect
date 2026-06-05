@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { mkdir, readFile, stat, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, rename, rm, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import {
@@ -18,9 +18,13 @@ import {
   type ResolvedConfig,
 } from '@libar-dev/architect-core';
 import {
+  applyManagedRegions,
   ProjectionFilterSchema,
   ProgressiveDisclosureLevelSchema,
+  projectTaxonomyEmbeddedShapes,
+  renderTaxonomyManagedRegion,
   SUPPORTED_DOCUMENTATION_TYPE_REGISTRY,
+  TAXONOMY_EMBEDDED_GENERATORS,
   parseAndProjectDocumentationBundle,
   renderMarkdown,
   type Fragment,
@@ -71,9 +75,24 @@ interface GeneratedRootDocument {
 }
 
 interface GeneratorExecution {
-  readonly generator: GeneratorDescriptor;
+  readonly generator: ProjectionGenerator | IndexGenerator;
   readonly files: readonly GeneratedFile[];
   readonly rootDocument: GeneratedRootDocument;
+}
+
+/**
+ * The result of rendering one embedded-region generator: the host file on disk
+ * with its managed regions rewritten. `newContent` differs from `currentContent`
+ * only inside the marker spans, so a `currentContent !== newContent` comparison is
+ * an automatically region-scoped drift check.
+ */
+interface EmbeddedExecution {
+  readonly generator: EmbeddedGenerator;
+  readonly hostFile: string;
+  readonly absolutePath: string;
+  readonly currentContent: string;
+  readonly newContent: string;
+  readonly regionCount: number;
 }
 
 type MarkdownProjection = Fragment | ProjectionBundle<Fragment>;
@@ -95,7 +114,21 @@ interface IndexGenerator {
   readonly aliases: readonly string[];
 }
 
-type GeneratorDescriptor = ProjectionGenerator | IndexGenerator;
+/**
+ * An embedded-region generator: it does not write a whole `.md` file under the
+ * output directory, it rewrites marker-bounded regions inside an authored host
+ * `.md` (cluster `TaxonomyDocumentationCluster`). The host is repo-relative and
+ * usually lives OUTSIDE `docs-live/`.
+ */
+interface EmbeddedGenerator {
+  readonly name: string;
+  readonly description: string;
+  readonly kind: 'embedded';
+  readonly hostFile: string;
+  readonly aliases: readonly string[];
+}
+
+type GeneratorDescriptor = ProjectionGenerator | IndexGenerator | EmbeddedGenerator;
 
 const PROJECTION_GENERATORS: readonly ProjectionGenerator[] =
   SUPPORTED_DOCUMENTATION_TYPE_REGISTRY.map((metadata) => ({
@@ -115,7 +148,21 @@ const INDEX_GENERATOR: IndexGenerator = {
   aliases: [],
 };
 
-const GENERATORS: readonly GeneratorDescriptor[] = [...PROJECTION_GENERATORS, INDEX_GENERATOR];
+const EMBEDDED_GENERATORS: readonly EmbeddedGenerator[] = TAXONOMY_EMBEDDED_GENERATORS.map(
+  (info) => ({
+    name: info.name,
+    description: info.description,
+    kind: 'embedded' as const,
+    hostFile: info.hostFile,
+    aliases: [],
+  }),
+);
+
+const GENERATORS: readonly GeneratorDescriptor[] = [
+  ...PROJECTION_GENERATORS,
+  ...EMBEDDED_GENERATORS,
+  INDEX_GENERATOR,
+];
 
 function renderDocumentationIndex(): string {
   const rows = SUPPORTED_DOCUMENTATION_TYPE_REGISTRY.map(
@@ -521,8 +568,58 @@ async function writeGeneratedFiles(
   }
 }
 
+/**
+ * Commit every embedded host's regenerated content as an all-or-nothing batch.
+ *
+ * Embedded hosts are AUTHORED files (skill `taxonomy.md`, the normative RFC) whose
+ * out-of-region prose is NOT regenerable from source — unlike a `docs-live/` file, a
+ * truncated or half-written host loses hand-authored content irrecoverably. A plain
+ * `writeFile` truncates-then-writes, so a failed or interrupted write (disk full, a
+ * sibling write rejecting the batch, a crash mid-stream) could leave a host partially
+ * mutated. This stages each host to a sibling temp file and commits by `rename` only
+ * AFTER every temp wrote successfully:
+ *
+ * - **Stage fails ⇒ nothing committed.** If any temp write rejects, all temps are
+ *   removed and the run aborts having touched no authored host (fail loud, never
+ *   partial — the same promise the managed-region engine makes within a host, now
+ *   extended across the whole embedded-host set).
+ * - **Commit is atomic per host.** `rename` of a same-directory temp over the host is
+ *   atomic on POSIX, so a host is never observed truncated; a crash mid-commit leaves
+ *   already-renamed hosts complete and the rest still holding their original authored
+ *   content (re-running completes them — each host's content is idempotent).
+ *
+ * The temp lives in the host's own directory so the rename stays on one filesystem.
+ */
+async function commitEmbeddedHostsAtomically(
+  embeddedExecutions: readonly EmbeddedExecution[],
+): Promise<void> {
+  if (embeddedExecutions.length === 0) {
+    return;
+  }
+  const staged = embeddedExecutions.map((embedded) => ({
+    tempPath: `${embedded.absolutePath}.${String(process.pid)}.tmp`,
+    targetPath: embedded.absolutePath,
+    content: embedded.newContent,
+  }));
+
+  try {
+    await Promise.all(staged.map((entry) => writeFile(entry.tempPath, entry.content, 'utf8')));
+  } catch (error) {
+    // Stage failed: no host has been renamed yet. Remove every temp (best-effort)
+    // so a failed run leaves the authored hosts and their directories untouched.
+    await Promise.all(staged.map((entry) => rm(entry.tempPath, { force: true })));
+    throw error;
+  }
+
+  // All temps are on disk and complete; commit each over its host.
+  for (const entry of staged) {
+    await rename(entry.tempPath, entry.targetPath);
+  }
+}
+
 async function reportDriftAndExit(
   executions: readonly { execution: GeneratorExecution; outputDir: string }[],
+  embeddedExecutions: readonly EmbeddedExecution[] = [],
 ): Promise<void> {
   const drift: string[] = [];
   let checked = 0;
@@ -541,6 +638,21 @@ async function reportDriftAndExit(
       } else if (current !== file.content) {
         drift.push(`content drift: ${file.path}`);
       }
+    }
+  }
+
+  // Embedded-region drift: `newContent` is the host regenerated from the live
+  // digest; it differs from the on-disk `currentContent` only inside the marker
+  // spans, so this comparison is automatically region-scoped — a hand-edit inside
+  // a region (or a stale region the registry has moved past) fails the gate, while
+  // any change to the authored voice outside the markers leaves the two equal.
+  // Closes the docs-live-only coverage hole: embedded hosts live outside the
+  // output directory yet are still diffed here (cluster Rule "…covered by the
+  // determinism gate").
+  for (const embedded of embeddedExecutions) {
+    checked += 1;
+    if (embedded.newContent !== embedded.currentContent) {
+      drift.push(`region drift: ${embedded.hostFile}`);
     }
   }
 
@@ -610,7 +722,7 @@ async function reportDriftAndExit(
 
 function renderGeneratorExecution(
   context: ProjectionContext,
-  generator: GeneratorDescriptor,
+  generator: ProjectionGenerator | IndexGenerator,
   disclosureLevel: ProgressiveDisclosureLevel | undefined,
 ): GeneratorExecution {
   if (generator.kind === 'projection') {
@@ -627,6 +739,64 @@ function renderGeneratorExecution(
     generator,
     files: indexResult.files,
     rootDocument: indexResult.rootDocument,
+  };
+}
+
+/**
+ * Render one embedded-region generator: project its routed regions from the live
+ * digest, read the authored host, and rewrite each region's marker span via the
+ * managed-region engine. The host's authored prose is preserved byte-for-byte;
+ * only inter-marker spans change.
+ *
+ * Returns `null` when the host file does not exist in this base directory — an
+ * embedded generator targets a repo-specific authored file, so "host absent" means
+ * "not applicable here" (a generic `--all` in a project without that file simply
+ * skips it), NOT a misconfiguration. A host that EXISTS but lacks/​malforms its
+ * markers still throws `ManagedRegionError` (loud, no partial write) — that
+ * is the real misconfiguration the gate must catch. Throws a containment error if
+ * the resolved host escapes the repo (defense in depth over the descriptor's
+ * parse-once path check).
+ */
+async function renderEmbeddedExecution(
+  context: ProjectionContext,
+  generator: EmbeddedGenerator,
+  baseDir: string,
+): Promise<EmbeddedExecution | null> {
+  const [shape] = projectTaxonomyEmbeddedShapes(context, [generator.name]);
+  if (shape === undefined) {
+    throw new Error(`No embedded shape produced for generator: ${generator.name}`);
+  }
+
+  const baseAbsolute = path.resolve(baseDir);
+  const absolutePath = path.resolve(baseDir, shape.hostFile);
+  const relativeToBase = path.relative(baseAbsolute, absolutePath);
+  if (relativeToBase.startsWith('..') || path.isAbsolute(relativeToBase)) {
+    throw new Error(
+      `Embedded host "${shape.hostFile}" resolves outside the repository root; refusing to write.`,
+    );
+  }
+
+  if (!(await pathExists(absolutePath))) {
+    process.stderr.write(
+      `Skipping embedded generator ${generator.name}: host ${shape.hostFile} not found in this project.\n`,
+    );
+    return null;
+  }
+  const currentContent = await readFile(absolutePath, 'utf8');
+
+  const regions = shape.regions.map((region) => ({
+    regionId: region.regionId,
+    body: renderTaxonomyManagedRegion(shape.digest, region.source),
+  }));
+  const newContent = applyManagedRegions(currentContent, regions, shape.hostFile);
+
+  return {
+    generator,
+    hostFile: shape.hostFile,
+    absolutePath,
+    currentContent,
+    newContent,
+    regionCount: regions.length,
   };
 }
 
@@ -675,6 +845,12 @@ async function main(): Promise<void> {
       ? args.generators
       : effectiveConfig.project.generators;
   const requestedGenerators = resolveRequestedGenerators(requestedGeneratorNames);
+  const fileGenerators = requestedGenerators.filter(
+    (generator): generator is ProjectionGenerator | IndexGenerator => generator.kind !== 'embedded',
+  );
+  const embeddedGenerators = requestedGenerators.filter(
+    (generator): generator is EmbeddedGenerator => generator.kind === 'embedded',
+  );
   const build = await buildGraph(effectiveConfig, args.baseDir);
   const projectionContext = createCliProjectionContext({
     graph: build.graph,
@@ -689,19 +865,33 @@ async function main(): Promise<void> {
   });
   const overwrite = args.overwrite || effectiveConfig.project.output.overwrite;
 
-  // Phase 1: render each generator's projection. Rendering is synchronous
-  // and pure on the projection context, so this is a plain map. Write and
-  // manifest phases below parallelise the IO work.
-  const executions = requestedGenerators.map((generator) => {
+  // Phase 1: render each whole-file generator's projection. Rendering is
+  // synchronous and pure on the projection context, so this is a plain map.
+  // Write and manifest phases below parallelise the IO work.
+  const executions = fileGenerators.map((generator) => {
     const execution = renderGeneratorExecution(projectionContext, generator, args.disclosureLevel);
     const outputDir = resolveOutputDirectory(effectiveConfig, args, generator.name, args.baseDir);
     return { execution, outputDir };
   });
 
+  // Phase 1b: render embedded-region generators. Unlike whole-file generators
+  // these read their authored host (async) and rewrite only marker-bounded
+  // regions, preserving the host's authored prose byte-for-byte. A malformed or
+  // missing host marker throws here (loud, no partial write) before anything is
+  // committed to disk.
+  const embeddedExecutions = (
+    await Promise.all(
+      embeddedGenerators.map((generator) =>
+        renderEmbeddedExecution(projectionContext, generator, args.baseDir),
+      ),
+    )
+  ).filter((execution): execution is EmbeddedExecution => execution !== null);
+
   // Guardrail: detect file-path collisions across generators. With the old
   // sequential loop a later generator could silently overwrite an earlier
   // generator's output; with parallel writes that same case would race.
-  // Fail loudly either way.
+  // Fail loudly either way. Embedded hosts join the same map so a host can never
+  // collide with a generated whole-file target.
   const seenAbsolutePaths = new Map<string, string>();
   for (const { execution, outputDir } of executions) {
     for (const file of execution.files) {
@@ -715,20 +905,35 @@ async function main(): Promise<void> {
       seenAbsolutePaths.set(absolute, execution.generator.name);
     }
   }
+  for (const embedded of embeddedExecutions) {
+    const prior = seenAbsolutePaths.get(embedded.absolutePath);
+    if (prior !== undefined && prior !== embedded.generator.name) {
+      throw new Error(
+        `File-path collision: ${embedded.absolutePath} would be written by both ${prior} and ${embedded.generator.name}`,
+      );
+    }
+    seenAbsolutePaths.set(embedded.absolutePath, embedded.generator.name);
+  }
 
   // --check: prove idempotency without mutating the tree. Diff each freshly
-  // rendered file against its on-disk counterpart and report drift, mutating
-  // nothing. Unlike `git diff --exit-code docs-live`, this works mid-changeset
-  // (it compares regenerated content to the working tree, not to HEAD), so a
-  // dirty tree no longer conflates an uncommitted edit with a non-deterministic
-  // generator. Exits non-zero on drift via handleCliError.
+  // rendered file (and each embedded host's regenerated regions) against its
+  // on-disk counterpart and report drift, mutating nothing. Unlike
+  // `git diff --exit-code docs-live`, this works mid-changeset (it compares
+  // regenerated content to the working tree, not to HEAD), so a dirty tree no
+  // longer conflates an uncommitted edit with a non-deterministic generator, and
+  // it reaches embedded hosts that live OUTSIDE docs-live. Exits non-zero on
+  // drift via handleCliError.
   if (args.check) {
-    await reportDriftAndExit(executions);
+    await reportDriftAndExit(executions, embeddedExecutions);
     return;
   }
 
-  // Phase 2: write files in parallel. Each generator's file set is disjoint
-  // (verified above), so concurrent writes are safe.
+  // Phase 2: write the regenerable whole-file generators in parallel. Each
+  // generator's file set is disjoint (verified above), so concurrent writes are
+  // safe; a `docs-live/` file is regenerable, so a failed write here is recovered
+  // by re-running. This (and the manifest upsert below) run BEFORE the authored-host
+  // commit, so a failure anywhere in the regenerable-output work leaves every
+  // authored host untouched.
   await Promise.all(
     executions.map(({ execution, outputDir }) =>
       writeGeneratedFiles(outputDir, execution.files, overwrite),
@@ -769,14 +974,32 @@ async function main(): Promise<void> {
     }),
   );
 
+  // Phase 4 (LAST): commit the embedded hosts as an all-or-nothing staged batch.
+  // Authored hosts carry hand-authored, non-regenerable prose, so mutating them is
+  // the one irreversible step — it runs AFTER every fallible regenerable-output step
+  // (rendering, the whole-file writes, the manifest upsert), so a failure in any of
+  // those leaves the authored hosts exactly as committed. Within this step the temps
+  // are all staged before any rename, and a rename never truncates, so a failed run
+  // never leaves an authored host changed or half-written. See
+  // commitEmbeddedHostsAtomically.
+  await commitEmbeddedHostsAtomically(embeddedExecutions);
+
   // Deterministic summary: generators in user-requested order, output
   // directories sorted.
   const fileCount = executions.reduce((total, { execution }) => total + execution.files.length, 0);
+  const regionCount = embeddedExecutions.reduce(
+    (total, embedded) => total + embedded.regionCount,
+    0,
+  );
   const outputDirs = [...new Set(executions.map((entry) => entry.outputDir))].sort();
   const generatorList = requestedGenerators.map((generator) => generator.name).join(', ');
+  const embeddedSummary =
+    embeddedExecutions.length > 0
+      ? ` and ${String(regionCount)} embedded region(s) across ${String(embeddedExecutions.length)} host(s)`
+      : '';
 
   process.stdout.write(
-    `Generated ${String(fileCount)} files from ${String(build.graph.counts.total)} patterns using ${generatorList} in ${outputDirs.join(', ')}.\n`,
+    `Generated ${String(fileCount)} files${embeddedSummary} from ${String(build.graph.counts.total)} patterns using ${generatorList} in ${outputDirs.join(', ')}.\n`,
   );
 }
 

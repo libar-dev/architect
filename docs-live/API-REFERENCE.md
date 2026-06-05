@@ -13,9 +13,9 @@ This API reference covers 246 shapes across 3 packages, sourced from \`@architec
 
 | Package              | Patterns | Shapes |
 | -------------------- | -------- | ------ |
-| architect-core       | 9        | 75     |
+| architect-core       | 10       | 101    |
 | architect-guard      | 2        | 27     |
-| architect-projection | 51       | 144    |
+| architect-projection | 50       | 118    |
 
 ## Packages — detail
 

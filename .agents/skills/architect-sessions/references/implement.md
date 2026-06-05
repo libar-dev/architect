@@ -4,11 +4,13 @@ The design-level `.feature` is your implementation prompt; the stubs encode shap
 
 **The spec IS the prompt — do not create a wrapper "context" or "session-prep" document.** If the design has a major gap that needs new architectural decisions (not just clarifications), stop and route back to [`design.md`](design.md) / [`review-spec.md`](review-spec.md) rather than papering over it.
 
+**This is execution, not (re-)planning.** The design is settled: do not reopen decisions or re-derive an implementation map — blast radius, consumer list, sequencing — that already exists. The `.feature` deliberately holds only the **durable invariants**; the **volatile `file:line` consumer/blast-radius map** is kept _out_ of it (so it can't rot) and parked in a companion under `plans/` (or `.pr-coordination/`, `.sisyphus/plans/`). So before any `Grep`/Explore to learn _what to touch_, **look for that companion** — `plans/<pattern>-*.md` is the common name — and read it. Use `Grep`/Explore only to **verify** the map against the live tree, never to rebuild it from scratch. Re-deriving a map that already exists (e.g. fanning out search agents to re-discover the blast radius) is wasted work and a sign the companion read was skipped; independent re-confirmation is corroboration, not a reason to keep deliberating instead of building.
+
 Doctrine depth: the value-transfer concept is in [`../SKILL.md`](../SKILL.md) §"The spec is a scaffold"; the **execution detail** (transfer checklist + pre-deletion gate) is [`ephemeral-spec-deletion.md`](ephemeral-spec-deletion.md). Split-ownership (realizing code uses `@architect-implements`, not a duplicate `@architect-pattern`; but a code-originated pattern — incl. a promoted stub — owns its own `@architect-pattern` on the `.ts`; JSDoc is additive) is [`../../architect-base/references/annotation-ownership.md`](../../architect-base/references/annotation-ownership.md); the bipartite naming + forward/reverse link pair is [`../../architect-base/references/spec-pattern-relationships.md`](../../architect-base/references/spec-pattern-relationships.md); the FSM table + `@architect-unlock-reason:` rules are [`../../architect-base/references/fsm-transitions.md`](../../architect-base/references/fsm-transitions.md).
 
 ## Pre-flight
 
-Run the pre-flight from [`../../architect-data-api/SKILL.md`](../../architect-data-api/SKILL.md): `overview`, the `scope-validate <Pattern> implement` gate, the implement-mode `bundle`, `files`, `rules --only-invariants`, and the `query isValidTransition` FSM gate.
+Run the pre-flight from [`../../architect-data-api/SKILL.md`](../../architect-data-api/SKILL.md): `overview`, the `scope-validate <Pattern> implement` gate, the implement-mode `bundle`, `files`, `rules --only-invariants`, and the `query isValidTransition` FSM gate. **Then check `plans/` (and `.pr-coordination/`, `.sisyphus/plans/`) for a companion impact/assessment doc** — if one exists it carries the `file:line` consumer map the `.feature` omits; read it before grepping (see "execution, not (re-)planning" above).
 
 If `scope-validate <pattern> implement` is not PASS, **stop**: either the design is incomplete (→ [`design.md`](design.md)) or a dependency is blocked (→ [`review-spec.md`](review-spec.md) to find the blocker).
 
@@ -50,7 +52,7 @@ If the user defers: leave the spec + stubs in place, and name [`review-implement
 ## Anti-patterns (stop and redirect)
 
 - **Wrapper documents.** The spec is the prompt; do not create a parallel context markdown.
-- **Retroactive specs at any tier.** Discovering code that already implements the pattern → tag an existing executable feature with `@architect-implements:<Pattern>` and enrich it; never author a fresh idea/candidate/plan/design spec for shipped behavior (refactoring carve-out: skip to design/executable, never via plan).
+- **Retroactive specs at any tier.** Discovering code that already implements the pattern → tag an existing executable feature with `@architect-implements:<Pattern>` and enrich it; never author a fresh idea/candidate/plan/design spec for shipped behavior (the refactoring carve-out backfills via a `*ExecutableTests` feature at executable-tier, never via plan).
 - **Zombie design specs.** Leaving the design spec after implementation is a lie at worst, noise at best.
 - **Half-transferred value.** Rules to executable specs but not to annotations (or vice versa) where both should carry weight.
 - **Backward-compat shims.** No `@deprecated`, `// eslint-disable`, `@ts-expect-error`, or re-export aliases — the No-BC guard fails CI.

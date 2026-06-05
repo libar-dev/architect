@@ -1,33 +1,50 @@
+import { z } from 'zod';
+
 import type { Fragment } from './fragment-schema.internal.js';
-import { isLogicalRouteId, type LogicalRouteId } from '../routing/route-id.js';
+import { EmissionDescriptorSchema, type EmissionDescriptor } from './emission-descriptor.js';
+import { LogicalRouteIdSchema, type LogicalRouteId } from '../routing/route-id.js';
 import { DisclosureSpecSchema, type DisclosureSpec } from '../disclosure/spec.js';
 import { isPlainObject } from '../shared/plain-object.js';
 
+/**
+ * Logical, sink-agnostic routing for a projection bundle. The file-sink specifics
+ * (which `.md` file, child directory, entity layout) moved OFF this interface and
+ * ONTO the optional `emission` descriptor (`ProjectionBundle.emission`) — see the
+ * `BundleRouting` split in `emission-descriptor.ts`. This carries only logical
+ * route ids + the composition `disclosureSpec`; it never names a file target.
+ */
 export interface BundleRouting {
   rootRouteId: LogicalRouteId;
   childRouteIds: Readonly<Record<string, LogicalRouteId>>;
   childPathStrategy: 'flat' | 'nested';
   anchorStrategy: 'heading-slug' | 'kind-id';
   disclosureSpec?: DisclosureSpec;
-  /** Filename for the root document under the markdown route profile (e.g. `PATTERNS.md`). */
-  markdownRootTarget?: string;
-  /**
-   * Child directory for entity and child routes under the markdown route profile.
-   * Falls back to `documentType` from the routeId when undefined.
-   */
-  markdownChildDirectory?: string;
-  /**
-   * Entity-route file layout. When `'nested-index'`, entities resolve to
-   * `${dir}/${slug}/INDEX.md`; otherwise (or when undefined) entities resolve
-   * to a flat `${dir}/${slug}.md` file.
-   */
-  entityPathLayout?: 'flat' | 'nested-index';
 }
+
+/**
+ * Runtime witness for {@link BundleRouting} — the Zod replacement for the deleted
+ * hand-written `isRoutingLike` guard (stub DD-1). `strictObject` so a stray field
+ * fails discrimination rather than silently passing; the markdown-file fields that
+ * used to be tolerated here now live on the `emission` descriptor exclusively.
+ */
+export const BundleRoutingSchema = z.strictObject({
+  rootRouteId: LogicalRouteIdSchema,
+  childRouteIds: z.record(z.string(), LogicalRouteIdSchema),
+  childPathStrategy: z.enum(['flat', 'nested']),
+  anchorStrategy: z.enum(['heading-slug', 'kind-id']),
+  disclosureSpec: DisclosureSpecSchema.optional(),
+});
 
 export interface ProjectionBundle<T extends Fragment> {
   root: T;
   children: Record<string, Fragment>;
   routing?: BundleRouting;
+  /**
+   * Optional file-sink overlay. Its ABSENCE is the sink-agnostic baseline (the
+   * bundle handed to the API/MCP consumer or the Studio view-state sink); a PRESENT
+   * descriptor writes the bundle to a markdown file (whole-artifact or embedded-region).
+   */
+  emission?: EmissionDescriptor;
 }
 
 export function isBundle<T extends Fragment>(value: unknown): value is ProjectionBundle<T> {
@@ -47,7 +64,13 @@ export function isBundle<T extends Fragment>(value: unknown): value is Projectio
     return false;
   }
 
-  return value['routing'] === undefined || isRoutingLike(value['routing']);
+  const routingValid =
+    value['routing'] === undefined || BundleRoutingSchema.safeParse(value['routing']).success;
+  const emissionValid =
+    value['emission'] === undefined ||
+    EmissionDescriptorSchema.safeParse(value['emission']).success;
+
+  return routingValid && emissionValid;
 }
 
 export function projectSingle<T extends Fragment>(fragment: T): ProjectionBundle<T> {
@@ -59,43 +82,4 @@ export function projectSingle<T extends Fragment>(fragment: T): ProjectionBundle
 
 function isFragmentLike(value: unknown): value is Fragment {
   return isPlainObject(value) && typeof value['kind'] === 'string';
-}
-
-function isRoutingLike(value: unknown): value is BundleRouting {
-  return (
-    isPlainObject(value) &&
-    isRouteIdValue(value['rootRouteId']) &&
-    isPlainObject(value['childRouteIds']) &&
-    Object.values(value['childRouteIds']).every(isRouteIdValue) &&
-    isChildPathStrategy(value['childPathStrategy']) &&
-    isAnchorStrategy(value['anchorStrategy']) &&
-    isValidDisclosureSpec(value['disclosureSpec']) &&
-    isOptionalString(value['markdownRootTarget']) &&
-    isOptionalString(value['markdownChildDirectory']) &&
-    isOptionalEntityPathLayout(value['entityPathLayout'])
-  );
-}
-
-function isOptionalString(value: unknown): boolean {
-  return value === undefined || typeof value === 'string';
-}
-
-function isOptionalEntityPathLayout(value: unknown): boolean {
-  return value === undefined || value === 'flat' || value === 'nested-index';
-}
-
-function isValidDisclosureSpec(value: unknown): boolean {
-  return value === undefined || DisclosureSpecSchema.safeParse(value).success;
-}
-
-function isChildPathStrategy(value: unknown): value is BundleRouting['childPathStrategy'] {
-  return value === 'flat' || value === 'nested';
-}
-
-function isAnchorStrategy(value: unknown): value is BundleRouting['anchorStrategy'] {
-  return value === 'heading-slug' || value === 'kind-id';
-}
-
-function isRouteIdValue(value: unknown): value is LogicalRouteId {
-  return typeof value === 'string' && isLogicalRouteId(value);
 }

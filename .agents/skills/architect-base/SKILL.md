@@ -1,6 +1,6 @@
 ---
 name: architect-base
-description: MANDATORY first-load for any work in this Architect repo — the shared vocabulary every other surface assumes. Covers what Libar Architect is, the PatternGraph + `@architect-*` tag taxonomy, the four authored tiers plus executable/maintenance levels, the FSM lifecycle, value-transfer doctrine, and the key ADRs. Load it before any architect-scoped Read/Glob/Grep and before any other architect-* skill, whenever work touches Architect, the architect package family, specs/stubs, `pnpm architect:query`, an `architect_*` MCP tool, or a session-intent verb (plan/design/implement/review/refactor/handoff). Does NOT cover per-session execution detail or refactoring carve-outs — those route to the session skills.
+description: MANDATORY first-load for any work in this Architect repo — the shared vocabulary every other surface assumes. Covers what Libar Architect is, the PatternGraph + `@architect-*` tag taxonomy, the four authored tiers plus executable/maintenance levels, the FSM lifecycle, value-transfer doctrine, and the key ADRs. Load it before any architect-scoped Read/Glob/Grep and before any other architect-* skill, whenever work touches Architect, the architect package family, specs/stubs, `pnpm architect:query`, an `architect_*` MCP tool, or a session-intent verb (plan/design/implement/review/refactor/handoff). Does NOT cover per-session execution detail — that routes to the session skills.
 allowed-tools:
   - Bash
   - Read
@@ -155,7 +155,7 @@ There are **six** levels along the detail/maturity axis. Four are authored in `a
 | Executable  | `tests/features/`, `packages/*/tests/features/` | Realization (`@architect-implements:`) + executable scenarios that prove invariants hold |
 | Maintenance | Shipped code + its executable feature           | Evolves in place; scenarios grow as behavior grows                                       |
 
-**Promotion is linear**: `idea → candidate → plan → design → executable`. Skipping rungs is rejected EXCEPT for the **refactoring carve-out** — backfilling coverage for code that already ships skips directly to design or executable tier, using the `<Pattern>ExecutableTests` convention.
+**Promotion is linear**: `idea → candidate → plan → design → executable`. Skipping rungs is rejected. (The one non-spec-driven exception — backfilling shipped code that has no spec — lives in [`architect-refactor-session`](../architect-refactor-session/SKILL.md), not this spec-driven ladder.)
 
 > **Depth:** the per-tier line budgets, mandatory-tag sets, epic/slice variants, and worked promotion examples live in [`references/four-tier-ladder.md`](references/four-tier-ladder.md). The 4-field `Rule:` block convention (`Invariant` / `Rationale` / `Verified by`) and its per-tier field requirements live in [`references/rule-block-template.md`](references/rule-block-template.md).
 

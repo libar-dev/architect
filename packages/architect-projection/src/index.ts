@@ -13,7 +13,6 @@
 // Context types that are shared across subdomains (ProjectionContext,
 // TagExampleOverride, etc.) stay explicitly enumerated below.
 
-export * from './blocks/schema.js';
 export * from './disclosure/index.js';
 export * from './routing/index.js';
 export * from './fragments/index.js';

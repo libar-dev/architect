@@ -74,20 +74,6 @@ This produces graph visibility for the shipped pattern without
 authoring a fictitious "planned" design spec that would immediately
 become a zombie.
 
-## Refactoring carve-out
-
-When backfilling coverage for code that already exists, **skip
-directly to design-tier or executable-tier authoring** — never via
-idea, candidate, or plan tier. The `*ExecutableTests` convention above
-is the executable-tier carve-out; the design-tier carve-out applies
-when stub-level scaffolding is genuinely useful for the refactor (e.g.,
-extracting a new abstraction).
-
-(Provenance: the carve-out rule was originally codified in
-`formal-spec/08-spec-evolution.md` § "Anti-Patterns" ("Exception:
-Refactoring specs") in the formal Architect Spec; the kernel
-statement above is the canonical reference for plugin-internal work.)
-
 ## Hierarchy axis (epic / phase / task / slice)
 
 Patterns can be organized into a hierarchy independent of their

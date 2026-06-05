@@ -20,13 +20,17 @@ A pattern is classified along three independent axes (ADR-001 / ADR-007). They d
 | **Bounded context** | `@architect-bounded-context:<context>` | _Which context_ does it belong to?          |
 | **Layer**           | (derived / structural)                 | _Which architectural layer_ does it sit in? |
 
-### The role enum is closed (8 values)
+### The role enum is closed
 
-`@architect-role:` draws from exactly these canonical values:
+`@architect-role:` draws from exactly these canonical values (generated from the live tag registry — do not hand-edit between the markers):
+
+<!-- architect:gen taxonomy-role-enum begin -->
 
 ```
 projection · service · decider · read-model · codec · contract · barrel · utility
 ```
+
+<!-- architect:gen taxonomy-role-enum end -->
 
 A role outside this set is a lint error. Verify the live enum with `pnpm architect:query arch roles`.
 
@@ -51,7 +55,15 @@ Tags fall into a handful of purpose categories. The per-tag detail lives in the 
 
 ## Two tag sources — one reason to always query live
 
-The generated `docs-live/TAXONOMY.md` and the `taxonomy` digest project the **validation registry** (8 roles + a metadata set + 3 aggregation tags — read the live count from `docs-live/TAXONOMY.md`'s header rather than any number frozen here, since the registry grows as the product does). But the scanner also recognizes tags that are **not** in that registry — notably `@architect-executable-specs` and `@architect-usecase`, parsed straight into pattern metadata. So neither the generated doc nor any hand-list is a complete view of _recognized_ tags. When unsure whether a tag is recognized, the live graph is the arbiter: author it and inspect the pattern's parsed metadata, or run the live query. (This two-source gap is logged in `FEEDBACK.md`.)
+The generated `docs-live/TAXONOMY.md` and the `taxonomy` digest project the **validation registry**, whose live size is generated below (so it cannot drift as the registry grows):
+
+<!-- architect:gen taxonomy-tag-count begin -->
+
+The validation registry currently defines **8 roles**, **22 metadata tags**, and **3 aggregation tags** (**33 total**).
+
+<!-- architect:gen taxonomy-tag-count end -->
+
+But the scanner also recognizes tags that are **not** in that registry — notably `@architect-executable-specs` and `@architect-usecase`, parsed straight into pattern metadata. So neither the generated doc nor any hand-list is a complete view of _recognized_ tags. When unsure whether a tag is recognized, the live graph is the arbiter: author it and inspect the pattern's parsed metadata, or run the live query. (This two-source gap is logged in `FEEDBACK.md`.)
 
 ## Authoring syntax — csv vs colon (lint-enforced)
 

@@ -380,3 +380,71 @@ Architect verb logic ran: `tsx` could not `listen` on its IPC pipe under
 This appears to be a harness/sandbox incompatibility with the `tsx` CLI's parent IPC server. A direct Node
 loader invocation did work and preserved the source CLI behavior:
 `node --conditions=source --require ./node_modules/.pnpm/tsx@4.22.0/node_modules/tsx/dist/preflight.cjs --import ./node_modules/.pnpm/tsx@4.22.0/node_modules/tsx/dist/loader.mjs ./packages/architect-cli/src/cli/pattern-graph-cli.ts --base-dir . ...`.
+
+---
+
+## 2026-06-05 — `files <Pattern>` picks the stub as PRIMARY while `patterns` doc picks `src/` during a stub→src promotion
+
+While implementing `TaxonomyDocumentationCluster` I promoted the `EmissionDescriptor` code/contract stub
+(`architect/stubs/taxonomy-documentation-cluster/emission-descriptor.ts`, `@architect-status:roadmap`) into
+`packages/architect-projection/src/fragments/emission-descriptor.ts` (`@architect-status:active`). For the
+window between *creating the src file* and *deleting the stub*, two files carried
+`@architect-pattern:EmissionDescriptor`.
+
+**Surprise:** the graph resolved that duplicate inconsistently across verbs —
+`architect:query files EmissionDescriptor` reported `=== PRIMARY ===` as the **stub** path (roadmap), while the
+regenerated `docs-live/PATTERNS.md` listed the **src** path (active). `validate:all` and the determinism gate
+both passed with the duplicate present, so nothing flagged the split-brain identity. Deleting the stub (the
+correct value-transfer step — identity travels to `src/`, ADR-003) resolved both to `src/`.
+
+**Impact:** during a promotion, an executor trusting `files <Pattern>` would be pointed at the about-to-be-deleted
+stub (wrong status, wrong location) even though the canonical home is already `src/`. No verb surfaced the
+duplicate `@architect-pattern` as a diagnostic.
+
+**Suggestions:** (1) `diagnostics` (or `validate:all`) should flag two non-stub-vs-stub files sharing one
+`@architect-pattern` where one is under `/stubs/` and the other under `src/` — that is the promotion-in-progress
+smell, and catching it would tell the executor "now delete the stub." (2) When a stub's `@architect-target`
+resolves to an existing `src/` file that already owns the same `@architect-pattern`, `files`/`pattern` should
+prefer the `src/` file as PRIMARY (the stub is, by definition, the superseded staging copy).
+
+---
+
+## 2026-06-05 — unresolved `@architect-executable-specs` path passes every gate AND leaks into the read model
+
+`TaxonomyDocumentationCluster`'s design spec carries `@architect-executable-specs:…/taxonomy-cluster.feature` — a
+file that does not exist yet (deferred step-4 work; the shipped executable is `emission-descriptor.feature`, which
+implements the child `EmissionDescriptor`, not the cluster).
+
+- **Ran:** `arch dangling --strict` → `danglingReferenceCount: 0`; `validate:all` → pass.
+- **Expected:** an unresolved forward-link path to surface — it is pre-deletion-gate criterion #2 ("forward link resolves").
+- **Got:** green. The graph validates pattern-name refs (`@architect-uses`/`-implements`/`-parent`) but never resolves
+  the `executable-specs` *file path*.
+
+**Impact (sharper than a false "clean"):** flipping the cluster `roadmap → active` published the nonexistent path as
+**fact** in a generated read model — `docs-live/REQUIREMENTS-SPECS.md` now lists `taxonomy-cluster.feature` as the
+cluster's "Test Files". A read model is supposed to carry only live state; here it asserts a file that isn't on disk.
+
+**Suggestions:** (1) resolve every `@architect-executable-specs` path in `validate:all`/`arch dangling`, flagging an
+unresolved target as `pending` (deliberately-deferred targets shouldn't hard-fail the gate); (2) the requirements-specs
+projection should render an unresolved forward link as `pending`/`—`, not as an extant file; (3) the future
+`value-transfer <pattern>` verb's `deletionReady` mechanizes criterion #2.
+
+## 2026-06-05 — deliverable rows with an out-of-enum `Status` are silently dropped from the manifest
+
+Authoring `03-goal-oriented-navigation.feature` I gave the `Background: Deliverables` rows `Status: planned`. The
+deliverable-status enum is `complete · in-progress · pending · deferred · superseded · n/a` (`taxonomy/deliverable-status.ts`),
+so every row failed `DeliverableSchema.safeParse` and was skipped (`extractor/dual-source-extractor.ts` `extractDeliverables`).
+
+- **Ran:** `pattern GoalOrientedNavigation --format json` → `deliverableManifest.items: 0`; `scope-validate … implement`
+  → `BLOCKED: No deliverables found in Background table`.
+- **Expected:** either the rows parse (with the invalid status flagged) or a loud author-facing error naming the bad value.
+- **Got:** all four rows silently vanished from the manifest; the only signal was a zero count. The same bug had already
+  bitten the **cluster** spec — its formal-spec row used `Status: deferred — design resolved, …` (not the bare enum
+  value), so it was dropped too and `TaxonomyDocumentationCluster`'s manifest showed 7 of 8 deliverables until I fixed it.
+
+**Impact:** a typo'd or prose-y `Status` makes a real deliverable disappear from the read model with no surfaced error,
+and `scope-validate implement` then reports "no deliverables" which reads as an authoring omission, not a status typo.
+
+**Suggestions:** (1) surface the buried `invalid-enum-value` deliverable diagnostic through `validate:all` so a dropped
+row fails loudly with the bad value named; (2) consider treating an unrecognized status as `pending` + a warning rather
+than dropping the row, so the deliverable still appears.

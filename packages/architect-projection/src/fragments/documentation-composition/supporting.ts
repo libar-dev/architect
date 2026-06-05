@@ -13,7 +13,7 @@
  */
 import { z } from 'zod';
 
-import { BlockSchema } from '../../blocks/schema.js';
+import { BlockSchema } from '@libar-dev/architect-core';
 
 /**
  * One documentation section — its id, title, and the blocks it contains.

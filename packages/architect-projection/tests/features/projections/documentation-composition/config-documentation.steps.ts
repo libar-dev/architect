@@ -1082,7 +1082,13 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 'architecture:layered',
                 'architecture:package-seam',
               ]);
-              expect(bundle?.routing?.markdownChildDirectory).toBe('architecture');
+              const emission = bundle?.emission;
+              expect(emission?.mode).toBe('whole-artifact');
+              expect(
+                emission?.mode === 'whole-artifact'
+                  ? emission.markdownFileRoute.childDirectory
+                  : undefined,
+              ).toBe('architecture');
             },
           );
 

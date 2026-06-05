@@ -300,5 +300,41 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         });
       });
     });
+
+    RuleScenario(
+      "the count summary is a self-consistent function of the digest's own entries",
+      ({ Given, When, Then, And }) => {
+        Given('a taxonomy projection context with roles metadata tags and aggregation tags', () => {
+          state!.context = createTaxonomyContext();
+        });
+
+        When('I project the taxonomy digest', () => {
+          state!.firstDigest = parseAndProjectTaxonomyDigest(state!.context!).root;
+        });
+
+        Then(
+          'the count summary equals the role, metadata, and aggregation entries enumerated from the digest itself',
+          () => {
+            const entries = state!.firstDigest!.tags.flatMap((group) => group.entries);
+            const summary = summarizeTaxonomyDigest(state!.firstDigest!);
+            expect(summary.roles).toBe(entries.filter((entry) => entry.kind === 'role').length);
+            expect(summary.metadata).toBe(
+              entries.filter((entry) => entry.kind === 'metadata').length,
+            );
+            expect(summary.aggregation).toBe(
+              entries.filter((entry) => entry.kind === 'aggregation').length,
+            );
+          },
+        );
+
+        And(
+          'the total equals the sum of those three counts, so the count surface cannot diverge from the enumerated surface',
+          () => {
+            const summary = summarizeTaxonomyDigest(state!.firstDigest!);
+            expect(summary.total).toBe(summary.roles + summary.metadata + summary.aggregation);
+          },
+        );
+      },
+    );
   });
 });

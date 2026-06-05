@@ -1,7 +1,7 @@
 {
   "name": "@libar-dev/architect-projection",
   "version": "2.0.0-pre.1",
-  "description": "Fragment-based projection pipeline for the Libar Architect package family — Named Domain Fragments, block types, and renderers (compact-text, json, markdown, ui).",
+  "description": "Fragment-based projection pipeline for the Libar Architect package family — Named Domain Fragments and renderers (compact-text, json, markdown, ui). The shared block vocabulary lives in @libar-dev/architect-core.",
   "license": "MIT",
   "author": "Libar AI",
   "repository": {
@@ -27,11 +27,6 @@
       "source": "./src/index.ts",
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
-    },
-    "./blocks": {
-      "source": "./src/blocks/schema.ts",
-      "types": "./dist/blocks/schema.d.ts",
-      "import": "./dist/blocks/schema.js"
     },
     "./context": {
       "source": "./src/context/projection-context.ts",

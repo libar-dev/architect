@@ -61,6 +61,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - DocumentationTypeRegistry
 - DocumentationTypeRegistryExecutableTests
 - DualSourceExtractor
+- EmissionDescriptor
+- EmissionDescriptorTesting
 - ExecutionContextSupporting
 - ExtractedPattern
 - ExtractionDiagnostics
@@ -149,6 +151,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - TagUsageEntry
 - TagUsageMatrix
 - TaxonomyDigest
+- TaxonomyDocumentationClusterTesting
 - TraceabilityMatrix
 - ValidationRuleDigest
 - ValueFormatCanonicalValuesDispatch

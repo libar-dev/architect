@@ -21,11 +21,12 @@
 import {
   fuzzyMatchPatterns,
   inferHandoffSessionType,
+  paragraph,
   parseAtBoundary,
+  table,
   type SessionType,
 } from '@libar-dev/architect-core';
 import {
-  paragraph,
   projectAnnotationCoverage,
   projectArchitectureNeighborhood,
   projectOverviewDigest,
@@ -34,7 +35,6 @@ import {
   projectStatusDistribution,
   renderCompactText,
   renderJson,
-  table,
   type ContentRichness,
   type Fragment,
   type PatternSummary,

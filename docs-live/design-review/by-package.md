@@ -18,10 +18,10 @@ Each node is a group; each arrow is a cross-group dependency (`depends-on` / `us
 ```mermaid
 graph LR
   pkg_architect_cli["Architect CLI (4)"]
-  pkg_architect_core["Architect Core (33)"]
+  pkg_architect_core["Architect Core (34)"]
   pkg_architect_guard["Architect Guard (20)"]
   pkg_architect_mcp["Architect MCP (5)"]
-  pkg_architect_package_content["Architect Package Content (47)"]
+  pkg_architect_package_content["Architect Package Content (46)"]
   pkg_architect_projection["Architect Projection (106)"]
   pkg_architect_cli --> pkg_architect_core
   pkg_architect_cli --> pkg_architect_projection
@@ -48,12 +48,13 @@ graph TD
   patterngraphcli -->|depends-on| cliversionhelper
 ```
 
-### Package: Architect Core (33 patterns)
+### Package: Architect Core (34 patterns)
 
 ```mermaid
 graph TD
   architectureinspection["ArchitectureInspection<br/>(utility · active)"]
   astparser["AstParser<br/>(service · active)"]
+  blockschema["BlockSchema<br/>(contract · active)"]
   buildpipeline["BuildPipeline<br/>(service · completed)"]
   codecutils["CodecUtils<br/>(codec · active)"]
   configloader["ConfigLoader<br/>(service · active)"]
@@ -188,7 +189,7 @@ graph TD
   mcptoolregistry -->|depends-on| mcppipelinesession
 ```
 
-### Package: Architect Package Content (47 patterns)
+### Package: Architect Package Content (46 patterns)
 
 ```mermaid
 graph TD
@@ -211,10 +212,9 @@ graph TD
   documentationprojection["DocumentationProjection<br/>(epic · candidate)"]
   dodvalidation["DoDValidation<br/>(roadmap)"]
   effortvariancetracking["EffortVarianceTracking<br/>(roadmap)"]
-  emissiondescriptor["EmissionDescriptor<br/>(contract · roadmap)"]
   generatorinfrastructureexecutabletests["GeneratorInfrastructureExecutableTests<br/>(roadmap)"]
   gherkinparsefailurediagnostics["GherkinParseFailureDiagnostics<br/>(candidate)"]
-  goalorientednavigation["GoalOrientedNavigation<br/>(candidate)"]
+  goalorientednavigation["GoalOrientedNavigation<br/>(roadmap)"]
   livingroadmapcli["LivingRoadmapCLI<br/>(roadmap)"]
   mcpoutputschemavalidation["McpOutputSchemaValidation<br/>(candidate)"]
   modelenricheddataapi["ModelEnrichedDataAPI<br/>(candidate)"]
@@ -257,6 +257,10 @@ graph TD
   architectbriefdeterministicbundle -->|depends-on| valuetransferstate
   decisionrecordtemporalhygiene -. see-also .- adr006singlereadmodelarchitecture
   documentationprojection -->|depends-on| adr010documentationcompositionhelpers
+  goalorientednavigation -. see-also .- adr006singlereadmodelarchitecture
+  goalorientednavigation -. see-also .- adr009projectiontrustboundary
+  goalorientednavigation -. see-also .- adr010documentationcompositionhelpers
+  goalorientednavigation -. see-also .- taxonomydocumentationcluster
   mcpoutputschemavalidation -. see-also .- adr006singlereadmodelarchitecture
   modelenricheddataapi -. see-also .- adr005codecbasedmarkdownrendering
   modelenricheddataapi -. see-also .- adr006singlereadmodelarchitecture
@@ -286,7 +290,6 @@ graph TD
   architecturegraphprojection["ArchitectureGraphProjection<br/>(projection · active)"]
   architectureneighborhood["ArchitectureNeighborhood<br/>(contract · active)"]
   architectureneighborhoodprojection["ArchitectureNeighborhoodProjection<br/>(projection · completed)"]
-  blockschema["BlockSchema<br/>(contract · active)"]
   boundedcontextfragmentcontract["BoundedContextFragmentContract<br/>(contract · active)"]
   boundedcontextprojection["BoundedContextProjection<br/>(projection · completed)"]
   businessrule["BusinessRule<br/>(contract · active)"]
@@ -313,6 +316,7 @@ graph TD
   documentationcompositionprojectionsupport["DocumentationCompositionProjectionSupport<br/>(utility · completed)"]
   documentationcompositionsupporting["DocumentationCompositionSupporting<br/>(contract · active)"]
   documentationtyperegistry["DocumentationTypeRegistry<br/>(contract · active)"]
+  emissiondescriptor["EmissionDescriptor<br/>(contract · active)"]
   executioncontextprojectionsupport["ExecutionContextProjectionSupport<br/>(utility · completed)"]
   executioncontextsupporting["ExecutionContextSupporting<br/>(contract · active)"]
   filereadinglist["FileReadingList<br/>(contract · active)"]
@@ -388,7 +392,6 @@ graph TD
   architecturecomparisonprojection -->|depends-on| architecturecomparison
   architecturecomparisonprojection -->|depends-on| patternrelationsfragmentcontracts
   architecturecomparisonprojection -->|depends-on| patternrelationsprojectionsupport
-  architecturediagram -->|depends-on| blockschema
   architecturediagramprojection -->|depends-on| documentationcompositionprojectionsupport
   architecturediagramprojection -->|depends-on| projectionfragmentcontracts
   architectureneighborhoodprojection -->|depends-on| architectureneighborhood
@@ -407,7 +410,6 @@ graph TD
   decisioncatalogprojection -->|depends-on| decisionrecord
   decisioncatalogprojection -->|depends-on| governanceprojectionsupport
   decisioncatalogprojection -->|depends-on| projectionfragmentcontracts
-  decisionrecord -->|depends-on| blockschema
   deliverableprojection -->|depends-on| deliverable
   deliverableprojection -->|depends-on| deliverablemanifest
   deliverableprojection -->|depends-on| executioncontextprojectionsupport
@@ -429,7 +431,6 @@ graph TD
   documentationcompositionprojectionsupport -->|depends-on| architecturediagram
   documentationcompositionprojectionsupport -->|depends-on| prchangereview
   documentationcompositionprojectionsupport -->|depends-on| projectconfigsnapshot
-  documentationcompositionsupporting -->|depends-on| blockschema
   executioncontextprojectionsupport -->|depends-on| projectionfragmentcontracts
   filereadinglistprojection -->|depends-on| executioncontextprojectionsupport
   filereadinglistprojection -->|depends-on| filereadinglist
@@ -442,14 +443,12 @@ graph TD
   handoffprojection -->|depends-on| projectionfragmentcontracts
   handoffrecord -->|depends-on| executioncontextsupporting
   jsonrenderer -->|depends-on| projectionfragmentschema
-  markdownrenderer -->|depends-on| blockschema
   markdownrenderer -->|depends-on| fragmentrendererdispatch
   markdownrenderer -->|depends-on| projectionfragmentschema
   openquestionlistprojection -->|depends-on| patternrelationsfragmentcontracts
   openquestionlistprojection -->|depends-on| patternrelationsprojectionsupport
   operationalinsightsprojectionsupport -->|depends-on| businessrulereference
   operationalinsightsprojectionsupport -->|depends-on| projectionfragmentcontracts
-  operationalinsightssupporting -->|depends-on| blockschema
   orphanpatternlistprojection -->|depends-on| orphanpatternlist
   orphanpatternlistprojection -->|depends-on| patternrelationsfragmentcontracts
   orphanpatternlistprojection -->|depends-on| patternrelationsprojectionsupport
@@ -472,7 +471,6 @@ graph TD
   patternsummaryprojection -->|depends-on| patternsummary
   phaseprogressprojection -->|depends-on| deliveryreportingprojectionsupport
   phaseprogressprojection -->|depends-on| phaseprogress
-  prchangereview -->|depends-on| blockschema
   prchangereviewprojection -->|depends-on| documentationcompositionprojectionsupport
   prchangereviewprojection -->|depends-on| projectionfragmentcontracts
   projectconfigprojection -->|depends-on| documentationcompositionprojectionsupport
@@ -514,7 +512,6 @@ graph TD
   taxonomydigestprojection -->|depends-on| taxonomydigest
   traceabilitymatrixprojection -->|depends-on| deliveryreportingprojectionsupport
   traceabilitymatrixprojection -->|depends-on| traceabilitymatrix
-  uirenderer -->|depends-on| blockschema
   uirenderer -->|depends-on| fragmentrendererdispatch
   uirenderer -->|depends-on| projectionfragmentschema
   validationruledigestprojection -->|depends-on| governanceprojectionsupport
@@ -543,16 +540,15 @@ Most-depended-on patterns in this view, ranked by in-view dependant count.
 
 Bounded contexts whose patterns span more than one workspace package.
 
-| Bounded context           | Packages                                        | Patterns |
-| ------------------------- | ----------------------------------------------- | -------- |
-| cli                       | Architect CLI, Architect Guard, Architect MCP   | 6        |
-| api                       | Architect MCP, Architect Package Content        | 7        |
-| documentation-composition | Architect Package Content, Architect Projection | 8        |
-| extractor                 | Architect Core, Architect Package Content       | 7        |
-| governance                | Architect Package Content, Architect Projection | 9        |
-| projection                | Architect Package Content, Architect Projection | 47       |
-| rendering                 | Architect Core, Architect Projection            | 9        |
-| validation                | Architect Core, Architect Guard                 | 8        |
+| Bounded context | Packages                                        | Patterns |
+| --------------- | ----------------------------------------------- | -------- |
+| cli             | Architect CLI, Architect Guard, Architect MCP   | 6        |
+| api             | Architect MCP, Architect Package Content        | 7        |
+| extractor       | Architect Core, Architect Package Content       | 7        |
+| governance      | Architect Package Content, Architect Projection | 9        |
+| projection      | Architect Package Content, Architect Projection | 47       |
+| rendering       | Architect Core, Architect Projection            | 9        |
+| validation      | Architect Core, Architect Guard                 | 8        |
 
 ## Legend
 

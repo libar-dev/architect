@@ -5,11 +5,11 @@ import {
   REQUIREMENTS_EXECUTABLE_AREA_LABEL,
   REQUIREMENTS_SPECS_AREA_LABEL,
 } from '../../../src/fragments/operational-insights/requirement-digest.js';
+import type { Block } from '@libar-dev/architect-core';
 import {
   type DisclosureSpec,
   getSupportedDocumentationTypeMetadata,
   renderMarkdown,
-  type Block,
   type BusinessRuleSet,
   type Fragment,
   type MarkdownRenderEvent,
@@ -705,15 +705,6 @@ function withBundleDisclosureSpec<TFragment extends Fragment>(
       childPathStrategy: routing?.childPathStrategy ?? 'nested',
       anchorStrategy: routing?.anchorStrategy ?? 'heading-slug',
       disclosureSpec,
-      ...(routing?.markdownRootTarget !== undefined
-        ? { markdownRootTarget: routing.markdownRootTarget }
-        : {}),
-      ...(routing?.markdownChildDirectory !== undefined
-        ? { markdownChildDirectory: routing.markdownChildDirectory }
-        : {}),
-      ...(routing?.entityPathLayout !== undefined
-        ? { entityPathLayout: routing.entityPathLayout }
-        : {}),
     },
   };
 }

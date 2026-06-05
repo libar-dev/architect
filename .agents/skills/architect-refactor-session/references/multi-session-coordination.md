@@ -222,6 +222,7 @@ inline-vs-defer before continuing.
   past campaign artifacts are anecdote, useful for understanding why
   the rule exists but not authoritative for what the rule is.
 - [`../../architect-base/references/four-tier-ladder.md`](../../architect-base/references/four-tier-ladder.md)
-  — the refactoring carve-out (skip directly to design or executable
-  tier when backfilling coverage for already-shipped code) is one of
-  the scope-discovery patterns Rule 5 anticipates.
+  — the refactoring carve-out (skip idea / candidate / plan to
+  executable-tier — a `*ExecutableTests` feature — when backfilling
+  coverage for already-shipped code) is one of the scope-discovery
+  patterns Rule 5 anticipates.

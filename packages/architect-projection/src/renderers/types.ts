@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import type { BundleRouting } from '../fragments/base.js';
+import type { MarkdownFileRoute } from '../fragments/emission-descriptor.js';
 import type { Fragment, ProjectionBundle } from '../fragments/index.js';
 import { ContentRichnessSchema } from '../disclosure/spec.js';
 import type { ContentRichness, DisclosureSpec } from '../disclosure/spec.js';
@@ -13,7 +13,7 @@ export interface MarkdownRouteProfile {
     routeId: LogicalRouteId,
     kind: Fragment['kind'],
     key: string | undefined,
-    routing: BundleRouting | undefined,
+    markdownRoute?: MarkdownFileRoute,
   ) => string;
 }
 

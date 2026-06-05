@@ -31,7 +31,7 @@ import {
   type Block,
   type CollapsibleBlock,
   type LinkOutBlock,
-} from '../blocks/schema.js';
+} from '@libar-dev/architect-core';
 import {
   isBundle,
   type Fragment,

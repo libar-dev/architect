@@ -1,28 +1,28 @@
 import type { MarkdownRouteProfile } from './types.js';
 import { slugForFilename } from '../_internal/slug.js';
-import type { BundleRouting } from '../fragments/base.js';
+import type { MarkdownFileRoute } from '../fragments/emission-descriptor.js';
 import { parseLogicalRouteId, type LogicalRouteId } from '../routing/route-id.js';
 
 export const defaultMarkdownRouteProfile: MarkdownRouteProfile = {
-  mapPath(routeId, _kind, _key, routing) {
-    return resolveLogicalRoutePath(routeId, routing);
+  mapPath(routeId, _kind, _key, markdownRoute) {
+    return resolveLogicalRoutePath(routeId, markdownRoute);
   },
 };
 
 export function resolveLogicalRoutePath(
   routeId: LogicalRouteId,
-  routing: BundleRouting | undefined,
+  markdownRoute: MarkdownFileRoute | undefined,
 ): string {
   const route = parseLogicalRouteId(routeId);
 
   if (route.kind === 'index') {
-    return resolveRootMarkdownPath(route.documentType, routing);
+    return resolveRootMarkdownPath(route.documentType, markdownRoute);
   }
 
-  const resolvedDirectory = routing?.markdownChildDirectory ?? route.documentType;
+  const resolvedDirectory = markdownRoute?.childDirectory ?? route.documentType;
 
   if (route.kind === 'entity') {
-    if (routing?.entityPathLayout === 'nested-index') {
+    if (markdownRoute?.entityPathLayout === 'nested-index') {
       return `${resolvedDirectory}/${slugForFilename(route.stableEntityId)}/INDEX.md`;
     }
 
@@ -38,9 +38,12 @@ export function resolveLogicalRoutePath(
     : `${slugForFilename(route.stableEntityId)}/${childFileName}.md`;
 }
 
-function resolveRootMarkdownPath(documentType: string, routing: BundleRouting | undefined): string {
-  if (routing?.markdownRootTarget !== undefined) {
-    return routing.markdownRootTarget;
+function resolveRootMarkdownPath(
+  documentType: string,
+  markdownRoute: MarkdownFileRoute | undefined,
+): string {
+  if (markdownRoute?.rootTarget !== undefined) {
+    return markdownRoute.rootTarget;
   }
 
   return `${documentType.toUpperCase()}.md`;

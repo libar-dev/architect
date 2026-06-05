@@ -71,8 +71,10 @@ export {
   ProjectConfigSnapshotSchema,
 } from './documentation-composition/index.js';
 export { FragmentSchema } from './fragment-schema.internal.js';
-export { isBundle, projectSingle } from './base.js';
+export { isBundle, projectSingle, BundleRoutingSchema } from './base.js';
 export type { BundleRouting, ProjectionBundle } from './base.js';
+export { EmissionDescriptorSchema } from './emission-descriptor.js';
+export type { EmissionDescriptor, MarkdownFileRoute } from './emission-descriptor.js';
 export type {
   ArchitectureComparison,
   BoundedContext,

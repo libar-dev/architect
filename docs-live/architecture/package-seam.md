@@ -7,7 +7,7 @@
 
 ## Overview
 
-This view captures 257 patterns across 8 diagrams in the Package architecture view.
+This view captures 260 patterns across 8 diagrams in the Package architecture view.
 
 ## Diagrams
 
@@ -18,12 +18,12 @@ Each node is a group; each arrow is a cross-group dependency (`depends-on` / `us
 ```mermaid
 graph LR
   pkg_architect_cli["Architect CLI (4)"]
-  pkg_architect_core["Architect Core (59)"]
+  pkg_architect_core["Architect Core (60)"]
   pkg_architect_guard["Architect Guard (21)"]
   pkg_architect_host_dev["Architect Host (Dev) (23)"]
   pkg_architect_mcp["Architect MCP (9)"]
   pkg_architect_package_content["Architect Package Content (12)"]
-  pkg_architect_projection["Architect Projection (129)"]
+  pkg_architect_projection["Architect Projection (131)"]
   pkg_architect_cli --> pkg_architect_core
   pkg_architect_cli --> pkg_architect_projection
   pkg_architect_guard --> pkg_architect_core
@@ -47,12 +47,13 @@ graph TD
   patterngraphcli -->|depends-on| cliversionhelper
 ```
 
-### Package: Architect Core (59 patterns)
+### Package: Architect Core (60 patterns)
 
 ```mermaid
 graph TD
   architectureinspection["ArchitectureInspection<br/>(utility)"]
   astparser["AstParser<br/>(service)"]
+  blockschema["BlockSchema<br/>(contract)"]
   buildpipeline["BuildPipeline<br/>(service)"]
   codecutils["CodecUtils<br/>(codec)"]
   codecutilsvalidation["CodecUtilsValidation"]
@@ -279,7 +280,7 @@ graph TD
   pdr005processguardfsm -->|depends-on| adr001taxonomycanonicalvalues
 ```
 
-### Package: Architect Projection (129 patterns)
+### Package: Architect Projection (131 patterns)
 
 ```mermaid
 graph TD
@@ -296,7 +297,6 @@ graph TD
   architecturenavigationprojectionexecutabletests["ArchitectureNavigationProjectionExecutableTests<br/>(projection)"]
   architectureneighborhood["ArchitectureNeighborhood<br/>(contract)"]
   architectureneighborhoodprojection["ArchitectureNeighborhoodProjection<br/>(projection)"]
-  blockschema["BlockSchema<br/>(contract)"]
   boundedcontextfragmentcontract["BoundedContextFragmentContract<br/>(contract)"]
   boundedcontextprojection["BoundedContextProjection<br/>(projection)"]
   businessrule["BusinessRule<br/>(contract)"]
@@ -332,6 +332,8 @@ graph TD
   documentationcompositionsupporting["DocumentationCompositionSupporting<br/>(contract)"]
   documentationtyperegistry["DocumentationTypeRegistry<br/>(contract)"]
   documentationtyperegistryexecutabletests["DocumentationTypeRegistryExecutableTests<br/>(contract)"]
+  emissiondescriptor["EmissionDescriptor<br/>(contract)"]
+  emissiondescriptortesting["EmissionDescriptorTesting<br/>(contract)"]
   executioncontextprojectionexecutabletests["ExecutionContextProjectionExecutableTests<br/>(projection)"]
   executioncontextprojectionsupport["ExecutionContextProjectionSupport<br/>(utility)"]
   executioncontextsupporting["ExecutionContextSupporting<br/>(contract)"]
@@ -406,6 +408,7 @@ graph TD
   tagusageprojection["TagUsageProjection<br/>(projection)"]
   taxonomydigest["TaxonomyDigest<br/>(contract)"]
   taxonomydigestprojection["TaxonomyDigestProjection<br/>(projection)"]
+  taxonomydocumentationclustertesting["TaxonomyDocumentationClusterTesting<br/>(projection)"]
   traceabilitymatrix["TraceabilityMatrix<br/>(contract)"]
   traceabilitymatrixprojection["TraceabilityMatrixProjection<br/>(projection)"]
   traceabilitymatrixprojectionexecutabletests["TraceabilityMatrixProjectionExecutableTests<br/>(projection)"]
@@ -419,7 +422,6 @@ graph TD
   architecturecomparisonprojection -->|depends-on| architecturecomparison
   architecturecomparisonprojection -->|depends-on| patternrelationsfragmentcontracts
   architecturecomparisonprojection -->|depends-on| patternrelationsprojectionsupport
-  architecturediagram -->|depends-on| blockschema
   architecturediagramprojection -->|depends-on| documentationcompositionprojectionsupport
   architecturediagramprojection -->|depends-on| projectionfragmentcontracts
   architectureneighborhoodprojection -->|depends-on| architectureneighborhood
@@ -438,7 +440,6 @@ graph TD
   decisioncatalogprojection -->|depends-on| decisionrecord
   decisioncatalogprojection -->|depends-on| governanceprojectionsupport
   decisioncatalogprojection -->|depends-on| projectionfragmentcontracts
-  decisionrecord -->|depends-on| blockschema
   deliverableprojection -->|depends-on| deliverable
   deliverableprojection -->|depends-on| deliverablemanifest
   deliverableprojection -->|depends-on| executioncontextprojectionsupport
@@ -460,7 +461,6 @@ graph TD
   documentationcompositionprojectionsupport -->|depends-on| architecturediagram
   documentationcompositionprojectionsupport -->|depends-on| prchangereview
   documentationcompositionprojectionsupport -->|depends-on| projectconfigsnapshot
-  documentationcompositionsupporting -->|depends-on| blockschema
   executioncontextprojectionsupport -->|depends-on| projectionfragmentcontracts
   filereadinglistprojection -->|depends-on| executioncontextprojectionsupport
   filereadinglistprojection -->|depends-on| filereadinglist
@@ -473,14 +473,12 @@ graph TD
   handoffprojection -->|depends-on| projectionfragmentcontracts
   handoffrecord -->|depends-on| executioncontextsupporting
   jsonrenderer -->|depends-on| projectionfragmentschema
-  markdownrenderer -->|depends-on| blockschema
   markdownrenderer -->|depends-on| fragmentrendererdispatch
   markdownrenderer -->|depends-on| projectionfragmentschema
   openquestionlistprojection -->|depends-on| patternrelationsfragmentcontracts
   openquestionlistprojection -->|depends-on| patternrelationsprojectionsupport
   operationalinsightsprojectionsupport -->|depends-on| businessrulereference
   operationalinsightsprojectionsupport -->|depends-on| projectionfragmentcontracts
-  operationalinsightssupporting -->|depends-on| blockschema
   orphanpatternlistprojection -->|depends-on| orphanpatternlist
   orphanpatternlistprojection -->|depends-on| patternrelationsfragmentcontracts
   orphanpatternlistprojection -->|depends-on| patternrelationsprojectionsupport
@@ -503,7 +501,6 @@ graph TD
   patternsummaryprojection -->|depends-on| patternsummary
   phaseprogressprojection -->|depends-on| deliveryreportingprojectionsupport
   phaseprogressprojection -->|depends-on| phaseprogress
-  prchangereview -->|depends-on| blockschema
   prchangereviewprojection -->|depends-on| documentationcompositionprojectionsupport
   prchangereviewprojection -->|depends-on| projectionfragmentcontracts
   projectconfigprojection -->|depends-on| documentationcompositionprojectionsupport
@@ -545,7 +542,6 @@ graph TD
   taxonomydigestprojection -->|depends-on| taxonomydigest
   traceabilitymatrixprojection -->|depends-on| deliveryreportingprojectionsupport
   traceabilitymatrixprojection -->|depends-on| traceabilitymatrix
-  uirenderer -->|depends-on| blockschema
   uirenderer -->|depends-on| fragmentrendererdispatch
   uirenderer -->|depends-on| projectionfragmentschema
   validationruledigestprojection -->|depends-on| governanceprojectionsupport
@@ -678,6 +674,8 @@ Bounded contexts whose patterns span more than one workspace package.
 - DoDValidator
 - DualSourceExtractor
 - DualSourceMergeIntegration
+- EmissionDescriptor
+- EmissionDescriptorTesting
 - ErrorFactoryTypes
 - ErrorFactoryTypesExecutableTests
 - ExecutionContextProjectionExecutableTests
@@ -834,6 +832,7 @@ Bounded contexts whose patterns span more than one workspace package.
 - TagUsageProjection
 - TaxonomyDigest
 - TaxonomyDigestProjection
+- TaxonomyDocumentationClusterTesting
 - TraceabilityMatrix
 - TraceabilityMatrixProjection
 - TraceabilityMatrixProjectionExecutableTests

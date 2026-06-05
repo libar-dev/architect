@@ -97,14 +97,14 @@ export function writeJson(value: unknown): void {
 
     if (looksLikeBundleCandidate(data)) {
       throw new Error(
-        'Received malformed projection bundle in response data for JSON output. Expected { root: Fragment, children: Record<string, Fragment>, routing?: BundleRouting }.',
+        'Received malformed projection bundle in response data for JSON output. Expected { root: Fragment, children: Record<string, Fragment>, routing?: BundleRouting, emission?: EmissionDescriptor }.',
       );
     }
   }
 
   if (looksLikeBundleCandidate(value)) {
     throw new Error(
-      'Received malformed projection bundle for JSON output. Expected { root: Fragment, children: Record<string, Fragment>, routing?: BundleRouting }.',
+      'Received malformed projection bundle for JSON output. Expected { root: Fragment, children: Record<string, Fragment>, routing?: BundleRouting, emission?: EmissionDescriptor }.',
     );
   }
 

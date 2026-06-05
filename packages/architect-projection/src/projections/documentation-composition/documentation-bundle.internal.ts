@@ -5,6 +5,7 @@ import { z } from 'zod';
 
 import type { ProjectionContext } from '../../context/projection-context.js';
 import type { ProjectionBundle } from '../../fragments/base.js';
+import type { MarkdownFileRoute } from '../../fragments/emission-descriptor.js';
 import type { Fragment } from '../../fragments/index.js';
 import { ProjectionError } from '../errors.js';
 
@@ -78,14 +79,24 @@ export function projectDocumentationBundleInternal(
     const childDirectory = 'childDirectory' in definition ? definition.childDirectory : undefined;
     const entityPathLayout =
       'entityPathLayout' in definition ? definition.entityPathLayout : undefined;
+    // The file-sink specifics (which `.md` file, child dir, entity layout) move OFF
+    // `routing` and ONTO the optional `emission` descriptor (the `BundleRouting` split).
+    // `routing` keeps only the logical `disclosureSpec`; `emission` is the whole-artifact
+    // markdown-file overlay built from the registry definition.
+    const markdownFileRoute: MarkdownFileRoute = {
+      rootTarget: definition.markdownRootTarget,
+      ...(childDirectory !== undefined ? { childDirectory } : {}),
+      ...(entityPathLayout !== undefined ? { entityPathLayout } : {}),
+    };
     return {
       ...bundle,
       routing: {
         ...bundle.routing,
         disclosureSpec: definition.disclosureMatrix[level],
-        markdownRootTarget: definition.markdownRootTarget,
-        ...(childDirectory !== undefined ? { markdownChildDirectory: childDirectory } : {}),
-        ...(entityPathLayout !== undefined ? { entityPathLayout } : {}),
+      },
+      emission: {
+        mode: 'whole-artifact',
+        markdownFileRoute,
       },
     };
   }

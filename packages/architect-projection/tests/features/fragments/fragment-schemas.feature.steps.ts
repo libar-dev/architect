@@ -1,12 +1,8 @@
 import { describeFeature, loadFeature } from '@amiceli/vitest-cucumber';
 import { describe, expect, it } from 'vitest';
 
-import {
-  ArchitectureDiagramSchema,
-  CodeBlockSchema,
-  FragmentSchema,
-  type Fragment,
-} from '../../../src/index.js';
+import { CodeBlockSchema } from '@libar-dev/architect-core';
+import { ArchitectureDiagramSchema, FragmentSchema, type Fragment } from '../../../src/index.js';
 import {
   FRAGMENT_INVALID_FIXTURES,
   FRAGMENT_SCHEMAS,
