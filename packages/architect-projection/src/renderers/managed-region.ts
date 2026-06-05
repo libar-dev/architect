@@ -1,7 +1,10 @@
 /**
  * @architect
+ * @architect-pattern ManagedRegionEngine
+ * @architect-status active
  * @architect-implements TaxonomyDocumentationCluster
  * @architect-role:utility
+ * @architect-product-area:Generation
  * @architect-bounded-context:documentation-composition
  * @architect-enforces-decision ADR010DocumentationCompositionHelpers
  *

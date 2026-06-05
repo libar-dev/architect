@@ -52,6 +52,7 @@
 | LintPatternsCliBehavior                               | completed |            |
 | LintProcessCliBehavior                                | completed |            |
 | LoadPreambleParser                                    | active    |            |
+| ManagedRegionEngine                                   | active    |            |
 | MCPFileWatcher                                        | completed |            |
 | MCPPipelineSession                                    | completed |            |
 | MCPRuntimeHardeningExecutableTests                    | active    |            |
@@ -93,6 +94,7 @@
 | StubTaxonomyTagTests                                  | active    |            |
 | TagRegistrySchemasValidation                          | active    |            |
 | TaxonomyDocumentationClusterTesting                   | active    |            |
+| TaxonomyEmbeddedShapesProjection                      | active    |            |
 | TraceabilityMatrixProjectionExecutableTests           | completed |            |
 | TypeScriptTaxonomyImplementation                      | completed |            |
 | ValidatorReadModelConsolidation                       | completed |            |

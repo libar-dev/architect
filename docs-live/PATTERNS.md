@@ -4,7 +4,7 @@
 
 | Field | Value |
 | ----- | ----- |
-| Count | 259   |
+| Count | 261   |
 
 ## Filters
 
@@ -154,6 +154,7 @@
 - LintProcessCliBehavior
 - LintRules
 - LoadPreambleParser
+- ManagedRegionEngine
 - MarkdownBlockParser
 - MarkdownRenderer
 - MCPFileWatcher
@@ -264,6 +265,7 @@
 - TaxonomyDigestProjection
 - TaxonomyDocumentationCluster
 - TaxonomyDocumentationClusterTesting
+- TaxonomyEmbeddedShapesProjection
 - TraceabilityMatrix
 - TraceabilityMatrixProjection
 - TraceabilityMatrixProjectionExecutableTests
@@ -418,6 +420,7 @@
 | tests/features/cli/lint-process.feature                                                                                   | executable | LintProcessCliBehavior                                |            | gherkin    | completed |
 | packages/architect-guard/src/lint/rules.ts                                                                                | executable | LintRules                                             | service    | typescript | completed |
 | tests/features/generation/load-preamble.feature                                                                           | design     | LoadPreambleParser                                    |            | gherkin    | active    |
+| packages/architect-projection/src/renderers/managed-region.ts                                                             | design     | ManagedRegionEngine                                   | utility    | typescript | active    |
 | packages/architect-core/src/utils/markdown-parser.ts                                                                      | design     | MarkdownBlockParser                                   | codec      | typescript | active    |
 | packages/architect-projection/src/renderers/render-markdown.ts                                                            | executable | MarkdownRenderer                                      | codec      | typescript | completed |
 | packages/architect-mcp/src/file-watcher.ts                                                                                | executable | MCPFileWatcher                                        | utility    | typescript | completed |
@@ -528,6 +531,7 @@
 | packages/architect-projection/src/projections/governance/taxonomy-digest.ts                                               | executable | TaxonomyDigestProjection                              | projection | typescript | completed |
 | architect/specs/documentation-projection/05-taxonomy-documentation-cluster.feature                                        | design     | TaxonomyDocumentationCluster                          |            | gherkin    | active    |
 | packages/architect-projection/tests/features/projections/documentation-composition/taxonomy-documentation-cluster.feature | design     | TaxonomyDocumentationClusterTesting                   | projection | gherkin    | active    |
+| packages/architect-projection/src/projections/documentation-composition/taxonomy-embedded.ts                              | design     | TaxonomyEmbeddedShapesProjection                      | projection | typescript | active    |
 | packages/architect-projection/src/fragments/delivery-reporting/traceability-matrix.ts                                     | design     | TraceabilityMatrix                                    | contract   | typescript | active    |
 | packages/architect-projection/src/projections/delivery-reporting/index.ts                                                 | executable | TraceabilityMatrixProjection                          | projection | typescript | completed |
 | packages/architect-projection/tests/features/projections/delivery-reporting/traceability-matrix.feature                   | executable | TraceabilityMatrixProjectionExecutableTests           | projection | gherkin    | completed |

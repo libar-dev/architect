@@ -342,6 +342,54 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   });
 
   // ---------------------------------------------------------------------------
+  // Rule: Extraction diagnostics affect validation result
+  // ---------------------------------------------------------------------------
+
+  Rule('Extraction diagnostics affect validation result', ({ RuleScenario }) => {
+    RuleScenario('Extraction diagnostic errors fail validation', ({ Given, And, When, Then }) => {
+      Given(
+        'a TypeScript file {string} with content:',
+        async (_ctx: unknown, filePath: string, content: string) => {
+          await writeTempFile(getTempDir(), filePath, content);
+        },
+      );
+
+      And(
+        'a Gherkin file {string} with pattern {string} at phase {int} status {string}',
+        async (
+          _ctx: unknown,
+          filePath: string,
+          patternName: string,
+          phase: number,
+          status: string,
+        ) => {
+          await writeTempFile(
+            getTempDir(),
+            filePath,
+            createGherkinPatternFile(patternName, phase, status),
+          );
+        },
+      );
+
+      When('running {string}', async (_ctx: unknown, cmd: string) => {
+        await runCLICommand(cmd);
+      });
+
+      Then('exit code is {int}', (_ctx: unknown, code: number) => {
+        expect(getResult().exitCode).toBe(code);
+      });
+
+      And('stdout contains {string}', (_ctx: unknown, text: string) => {
+        expect(getResult().stdout).toContain(text);
+      });
+
+      And('stdout does not contain {string}', (_ctx: unknown, text: string) => {
+        expect(getResult().stdout).not.toContain(text);
+      });
+    });
+  });
+
+  // ---------------------------------------------------------------------------
   // Rule: CLI supports multiple output formats
   // ---------------------------------------------------------------------------
 

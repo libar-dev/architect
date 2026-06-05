@@ -1,5 +1,7 @@
 /**
  * @architect
+ * @architect-pattern TaxonomyEmbeddedShapesProjection
+ * @architect-status active
  * @architect-implements TaxonomyDocumentationCluster
  * @architect-role:projection
  * @architect-product-area:Generation

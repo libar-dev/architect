@@ -489,7 +489,7 @@ export function validatePatterns(dataset: RuntimePatternGraph): ValidationSummar
 /**
  * Format summary for pretty output
  */
-function formatPretty(output: ValidatePatternsOutput, verbose = false): string {
+function formatPretty(output: ValidatePatternsOutput, verbose = false, strict = false): string {
   const lines: string[] = [];
   const { issues, stats, diagnostics } = output;
 
@@ -507,6 +507,8 @@ function formatPretty(output: ValidatePatternsOutput, verbose = false): string {
   const errors = issues.filter((i) => i.severity === 'error');
   const warnings = issues.filter((i) => i.severity === 'warning');
   const infos = issues.filter((i) => i.severity === 'info');
+  const diagnosticErrors = diagnostics.filter((diagnostic) => diagnostic.severity === 'error');
+  const diagnosticWarnings = diagnostics.filter((diagnostic) => diagnostic.severity === 'warning');
 
   if (errors.length > 0) {
     lines.push(`Errors (${String(errors.length)}):`);
@@ -556,11 +558,16 @@ function formatPretty(output: ValidatePatternsOutput, verbose = false): string {
   }
 
   // Summary line
-  if (errors.length === 0 && warnings.length === 0) {
+  if (
+    errors.length === 0 &&
+    warnings.length === 0 &&
+    diagnosticErrors.length === 0 &&
+    (!strict || diagnosticWarnings.length === 0)
+  ) {
     lines.push('All validations passed.');
   } else {
     lines.push(
-      `Found ${String(errors.length)} error(s), ${String(warnings.length)} warning(s), ${String(infos.length)} info message(s).`,
+      `Found ${String(errors.length + diagnosticErrors.length)} error(s), ${String(warnings.length + diagnosticWarnings.length)} warning(s), ${String(infos.length)} info message(s).`,
     );
   }
 
@@ -730,7 +737,9 @@ async function main(): Promise<void> {
           `Updated dangling baseline at ${DANGLING_BASELINE_SOURCE_PATH} with ${String(updatedEntryCount)} entries.\n\n`,
         );
       }
-      process.stdout.write(`${formatPretty({ ...summary, diagnostics }, config.verbose)}\n`);
+      process.stdout.write(
+        `${formatPretty({ ...summary, diagnostics }, config.verbose, config.strict)}\n`,
+      );
     }
 
     // Run anti-pattern detection if enabled.
@@ -789,8 +798,16 @@ async function main(): Promise<void> {
     }
 
     // Determine exit code based on all validation results
-    const hasErrors = summary.issues.some((i) => i.severity === 'error') || antiPatternHasErrors;
-    const hasWarnings = summary.issues.some((i) => i.severity === 'warning');
+    const hasDiagnosticErrors = diagnostics.some((diagnostic) => diagnostic.severity === 'error');
+    const hasDiagnosticWarnings = diagnostics.some(
+      (diagnostic) => diagnostic.severity === 'warning',
+    );
+    const hasErrors =
+      summary.issues.some((i) => i.severity === 'error') ||
+      antiPatternHasErrors ||
+      hasDiagnosticErrors;
+    const hasWarnings =
+      summary.issues.some((i) => i.severity === 'warning') || hasDiagnosticWarnings;
 
     if (hasErrors) {
       process.exit(1);

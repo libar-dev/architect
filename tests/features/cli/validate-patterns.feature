@@ -112,6 +112,32 @@ Feature: Validator Read Model Consolidation — validate-patterns CLI
       Then exit code is 1
       And stdout contains "Status mismatch"
 
+  Rule: Extraction diagnostics affect validation result
+
+    **Invariant:** Error-severity extraction diagnostics are validation failures and must produce a non-zero exit without claiming all validations passed.
+    **Rationale:** A malformed gated directive has already been rejected by the extraction boundary; treating that as success hides dropped source facts from CI.
+    **Verified by:** Extraction diagnostic errors fail validation
+
+    @validation
+    Scenario: Extraction diagnostic errors fail validation
+      Given a TypeScript file "src/malformed.ts" with content:
+        """
+        /** @architect */
+
+        /**
+         * @architect-status:completed
+         * @architect-role:utility
+         */
+        export function malformed(): boolean {
+          return true;
+        }
+        """
+      And a Gherkin file "features/test.feature" with pattern "CleanFeature" at phase 1 status "completed"
+      When running "validate-patterns -i src/*.ts -F features/*.feature"
+      Then exit code is 1
+      And stdout contains "invalid-pattern-name"
+      And stdout does not contain "All validations passed"
+
   # ============================================================================
   # RULE 4: Output Formats
   # ============================================================================

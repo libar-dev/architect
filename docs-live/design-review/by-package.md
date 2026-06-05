@@ -7,7 +7,7 @@
 
 ## Overview
 
-This view captures 208 patterns across 7 diagrams in the Package view.
+This view captures 210 patterns across 7 diagrams in the Package view.
 
 ## Diagrams
 
@@ -22,7 +22,7 @@ graph LR
   pkg_architect_guard["Architect Guard (19)"]
   pkg_architect_mcp["Architect MCP (5)"]
   pkg_architect_package_content["Architect Package Content (43)"]
-  pkg_architect_projection["Architect Projection (103)"]
+  pkg_architect_projection["Architect Projection (105)"]
   pkg_architect_cli --> pkg_architect_core
   pkg_architect_cli --> pkg_architect_projection
   pkg_architect_guard --> pkg_architect_core
@@ -278,7 +278,7 @@ graph TD
   valuetransferstate -. see-also .- architectbriefdeterministicbundle
 ```
 
-### Package: Architect Projection (103 patterns)
+### Package: Architect Projection (105 patterns)
 
 ```mermaid
 graph TD
@@ -332,6 +332,7 @@ graph TD
   handoffprojection["HandoffProjection<br/>(projection · completed)"]
   handoffrecord["HandoffRecord<br/>(contract · active)"]
   jsonrenderer["JsonRenderer<br/>(codec · completed)"]
+  managedregionengine["ManagedRegionEngine<br/>(utility · active)"]
   markdownrenderer["MarkdownRenderer<br/>(codec · completed)"]
   openquestionlistprojection["OpenQuestionListProjection<br/>(projection · active)"]
   operationalinsightsprojectionsupport["OperationalInsightsProjectionSupport<br/>(utility · completed)"]
@@ -380,6 +381,7 @@ graph TD
   tagusageprojection["TagUsageProjection<br/>(projection · completed)"]
   taxonomydigest["TaxonomyDigest<br/>(contract · active)"]
   taxonomydigestprojection["TaxonomyDigestProjection<br/>(projection · completed)"]
+  taxonomyembeddedshapesprojection["TaxonomyEmbeddedShapesProjection<br/>(projection · active)"]
   traceabilitymatrix["TraceabilityMatrix<br/>(contract · active)"]
   traceabilitymatrixprojection["TraceabilityMatrixProjection<br/>(projection · completed)"]
   uirenderer["UiRenderer<br/>(codec · completed)"]
@@ -508,6 +510,8 @@ graph TD
   taxonomydigestprojection -->|depends-on| governancesupporting
   taxonomydigestprojection -->|depends-on| projectionfragmentcontracts
   taxonomydigestprojection -->|depends-on| taxonomydigest
+  taxonomyembeddedshapesprojection -->|depends-on| emissiondescriptor
+  taxonomyembeddedshapesprojection -->|depends-on| taxonomydigestprojection
   traceabilitymatrixprojection -->|depends-on| deliveryreportingprojectionsupport
   traceabilitymatrixprojection -->|depends-on| traceabilitymatrix
   uirenderer -->|depends-on| fragmentrendererdispatch
@@ -666,6 +670,7 @@ Bounded contexts whose patterns span more than one workspace package.
 - LintPatternsCLI
 - LintProcessCLI
 - LintRules
+- ManagedRegionEngine
 - MarkdownBlockParser
 - MarkdownRenderer
 - MCPFileWatcher
@@ -755,6 +760,7 @@ Bounded contexts whose patterns span more than one workspace package.
 - TaxonomyDigest
 - TaxonomyDigestProjection
 - TaxonomyDocumentationCluster
+- TaxonomyEmbeddedShapesProjection
 - TraceabilityEnhancements
 - TraceabilityGenerator
 - TraceabilityMatrix

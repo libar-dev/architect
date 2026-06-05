@@ -7,7 +7,7 @@
 
 ## Overview
 
-This view captures 165 patterns across 23 diagrams in the Component architecture view.
+This view captures 167 patterns across 23 diagrams in the Component architecture view.
 
 ## Related views
 
@@ -27,7 +27,7 @@ graph LR
   cli["cli (6)"]
   configuration["configuration (4)"]
   delivery_reporting["delivery-reporting (5)"]
-  documentation_composition["documentation-composition (8)"]
+  documentation_composition["documentation-composition (10)"]
   domain["domain (1)"]
   execution_context["execution-context (8)"]
   extractor["extractor (6)"]
@@ -55,6 +55,7 @@ graph LR
   cli --> scanner
   delivery_reporting --> execution_context
   delivery_reporting --> pattern_relations
+  documentation_composition --> projection
   documentation_composition --> rendering
   extractor --> read_api
   extractor --> scanner
@@ -139,7 +140,7 @@ graph TD
   traceabilitymatrix["TraceabilityMatrix<br/>(contract)"]
 ```
 
-### Bounded context: documentation-composition (8 patterns)
+### Bounded context: documentation-composition (10 patterns)
 
 ```mermaid
 graph TD
@@ -149,9 +150,12 @@ graph TD
   documentationcompositionsupporting["DocumentationCompositionSupporting<br/>(contract)"]
   emissiondescriptor["EmissionDescriptor<br/>(contract)"]
   generatordegeneracyguard["GeneratorDegeneracyGuard<br/>(utility)"]
+  managedregionengine["ManagedRegionEngine<br/>(utility)"]
   prchangereview["PrChangeReview<br/>(contract)"]
   projectconfigsnapshot["ProjectConfigSnapshot<br/>(contract)"]
+  taxonomyembeddedshapesprojection["TaxonomyEmbeddedShapesProjection<br/>(projection)"]
   apireferenceprojection -->|depends-on| apireferencedigest
+  taxonomyembeddedshapesprojection -->|depends-on| emissiondescriptor
 ```
 
 ### Bounded context: domain (1 pattern)
@@ -594,6 +598,7 @@ Bounded contexts whose patterns span more than one workspace package.
 - LintPatternsCLI
 - LintProcessCLI
 - LintRules
+- ManagedRegionEngine
 - MarkdownBlockParser
 - MarkdownRenderer
 - MCPFileWatcher
@@ -665,6 +670,7 @@ Bounded contexts whose patterns span more than one workspace package.
 - TagUsageProjection
 - TaxonomyDigest
 - TaxonomyDigestProjection
+- TaxonomyEmbeddedShapesProjection
 - TraceabilityMatrix
 - TraceabilityMatrixProjection
 - UiRenderer

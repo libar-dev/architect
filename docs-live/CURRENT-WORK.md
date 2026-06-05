@@ -6,13 +6,13 @@
 
 ## Overview
 
-Current work timeline covering 136 patterns.
+Current work timeline covering 138 patterns.
 
 | Metric    | Value |
 | --------- | ----- |
-| Patterns  | 136   |
+| Patterns  | 138   |
 | Completed | 0     |
-| Active    | 136   |
+| Active    | 138   |
 | Planned   | 0     |
 | Candidate | 0     |
 
@@ -85,6 +85,7 @@ Current work timeline covering 136 patterns.
 | LayerInference                                      | active | service    | packages/architect-core/src/extractor/layer-inference.ts                                                                  |
 | LintProcessCLI                                      | active | service    | packages/architect-guard/src/cli/lint-process.ts                                                                          |
 | LoadPreambleParser                                  | active |            | tests/features/generation/load-preamble.feature                                                                           |
+| ManagedRegionEngine                                 | active | utility    | packages/architect-projection/src/renderers/managed-region.ts                                                             |
 | MarkdownBlockParser                                 | active | codec      | packages/architect-core/src/utils/markdown-parser.ts                                                                      |
 | MCPRuntimeHardeningExecutableTests                  | active |            | packages/architect-mcp/tests/features/mcp-runtime-hardening.feature                                                       |
 | MCPServerLifecycleExecutableTests                   | active |            | packages/architect-mcp/tests/features/mcp-server-lifecycle.feature                                                        |
@@ -150,6 +151,7 @@ Current work timeline covering 136 patterns.
 | TaxonomyDigest                                      | active | contract   | packages/architect-projection/src/fragments/governance/taxonomy-digest.ts                                                 |
 | TaxonomyDocumentationCluster                        | active |            | architect/specs/documentation-projection/05-taxonomy-documentation-cluster.feature                                        |
 | TaxonomyDocumentationClusterTesting                 | active | projection | packages/architect-projection/tests/features/projections/documentation-composition/taxonomy-documentation-cluster.feature |
+| TaxonomyEmbeddedShapesProjection                    | active | projection | packages/architect-projection/src/projections/documentation-composition/taxonomy-embedded.ts                              |
 | TraceabilityMatrix                                  | active | contract   | packages/architect-projection/src/fragments/delivery-reporting/traceability-matrix.ts                                     |
 | ValidationRuleDigest                                | active | contract   | packages/architect-projection/src/fragments/governance/validation-rule-digest.ts                                          |
 | ValueFormatCanonicalValuesDispatch                  | active |            | packages/architect-core/tests/features/extractor/value-format-canonical-values.feature                                    |

@@ -7,7 +7,7 @@
 
 ## Overview
 
-This view captures 208 patterns across 24 diagrams in the Component view.
+This view captures 210 patterns across 24 diagrams in the Component view.
 
 ## Related views
 
@@ -27,7 +27,7 @@ graph LR
   cli["cli (6)"]
   configuration["configuration (4)"]
   delivery_reporting["delivery-reporting (5)"]
-  documentation_composition["documentation-composition (8)"]
+  documentation_composition["documentation-composition (10)"]
   domain["domain (1)"]
   execution_context["execution-context (8)"]
   extractor["extractor (7)"]
@@ -57,6 +57,7 @@ graph LR
   cli --> scanner
   delivery_reporting --> execution_context
   delivery_reporting --> pattern_relations
+  documentation_composition --> projection
   documentation_composition --> rendering
   extractor --> read_api
   extractor --> scanner
@@ -151,7 +152,7 @@ graph TD
   traceabilitymatrix["TraceabilityMatrix<br/>(contract · active)"]
 ```
 
-### Bounded context: documentation-composition (8 patterns)
+### Bounded context: documentation-composition (10 patterns)
 
 ```mermaid
 graph TD
@@ -161,9 +162,12 @@ graph TD
   documentationcompositionsupporting["DocumentationCompositionSupporting<br/>(contract · active)"]
   emissiondescriptor["EmissionDescriptor<br/>(contract · active)"]
   generatordegeneracyguard["GeneratorDegeneracyGuard<br/>(utility · completed)"]
+  managedregionengine["ManagedRegionEngine<br/>(utility · active)"]
   prchangereview["PrChangeReview<br/>(contract · active)"]
   projectconfigsnapshot["ProjectConfigSnapshot<br/>(contract · active)"]
+  taxonomyembeddedshapesprojection["TaxonomyEmbeddedShapesProjection<br/>(projection · active)"]
   apireferenceprojection -->|depends-on| apireferencedigest
+  taxonomyembeddedshapesprojection -->|depends-on| emissiondescriptor
 ```
 
 ### Bounded context: domain (1 pattern)
@@ -710,6 +714,7 @@ Bounded contexts whose patterns span more than one workspace package.
 - LintPatternsCLI
 - LintProcessCLI
 - LintRules
+- ManagedRegionEngine
 - MarkdownBlockParser
 - MarkdownRenderer
 - MCPFileWatcher
@@ -799,6 +804,7 @@ Bounded contexts whose patterns span more than one workspace package.
 - TaxonomyDigest
 - TaxonomyDigestProjection
 - TaxonomyDocumentationCluster
+- TaxonomyEmbeddedShapesProjection
 - TraceabilityEnhancements
 - TraceabilityGenerator
 - TraceabilityMatrix
