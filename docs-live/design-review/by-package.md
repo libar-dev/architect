@@ -7,7 +7,7 @@
 
 ## Overview
 
-This view captures 214 patterns across 7 diagrams in the Package view.
+This view captures 215 patterns across 7 diagrams in the Package view.
 
 ## Diagrams
 
@@ -21,7 +21,7 @@ graph LR
   pkg_architect_core["Architect Core (33)"]
   pkg_architect_guard["Architect Guard (20)"]
   pkg_architect_mcp["Architect MCP (5)"]
-  pkg_architect_package_content["Architect Package Content (46)"]
+  pkg_architect_package_content["Architect Package Content (47)"]
   pkg_architect_projection["Architect Projection (106)"]
   pkg_architect_cli --> pkg_architect_core
   pkg_architect_cli --> pkg_architect_projection
@@ -188,7 +188,7 @@ graph TD
   mcptoolregistry -->|depends-on| mcppipelinesession
 ```
 
-### Package: Architect Package Content (46 patterns)
+### Package: Architect Package Content (47 patterns)
 
 ```mermaid
 graph TD
@@ -211,6 +211,7 @@ graph TD
   documentationprojection["DocumentationProjection<br/>(epic · candidate)"]
   dodvalidation["DoDValidation<br/>(roadmap)"]
   effortvariancetracking["EffortVarianceTracking<br/>(roadmap)"]
+  emissiondescriptor["EmissionDescriptor<br/>(contract · roadmap)"]
   generatorinfrastructureexecutabletests["GeneratorInfrastructureExecutableTests<br/>(roadmap)"]
   gherkinparsefailurediagnostics["GherkinParseFailureDiagnostics<br/>(candidate)"]
   goalorientednavigation["GoalOrientedNavigation<br/>(candidate)"]
@@ -542,15 +543,16 @@ Most-depended-on patterns in this view, ranked by in-view dependant count.
 
 Bounded contexts whose patterns span more than one workspace package.
 
-| Bounded context | Packages                                        | Patterns |
-| --------------- | ----------------------------------------------- | -------- |
-| cli             | Architect CLI, Architect Guard, Architect MCP   | 6        |
-| api             | Architect MCP, Architect Package Content        | 7        |
-| extractor       | Architect Core, Architect Package Content       | 7        |
-| governance      | Architect Package Content, Architect Projection | 9        |
-| projection      | Architect Package Content, Architect Projection | 47       |
-| rendering       | Architect Core, Architect Projection            | 9        |
-| validation      | Architect Core, Architect Guard                 | 8        |
+| Bounded context           | Packages                                        | Patterns |
+| ------------------------- | ----------------------------------------------- | -------- |
+| cli                       | Architect CLI, Architect Guard, Architect MCP   | 6        |
+| api                       | Architect MCP, Architect Package Content        | 7        |
+| documentation-composition | Architect Package Content, Architect Projection | 8        |
+| extractor                 | Architect Core, Architect Package Content       | 7        |
+| governance                | Architect Package Content, Architect Projection | 9        |
+| projection                | Architect Package Content, Architect Projection | 47       |
+| rendering                 | Architect Core, Architect Projection            | 9        |
+| validation                | Architect Core, Architect Guard                 | 8        |
 
 ## Legend
 
@@ -635,6 +637,7 @@ Bounded contexts whose patterns span more than one workspace package.
 - DoDValidator
 - DualSourceExtractor
 - EffortVarianceTracking
+- EmissionDescriptor
 - ErrorFactoryTypes
 - ExecutionContextProjectionSupport
 - ExecutionContextSupporting
