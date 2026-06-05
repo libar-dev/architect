@@ -85,6 +85,11 @@ The load-bearing architectural decisions are `.feature` records in `architect/de
 - **ADR-003 / ADR-002 (source-first, Gherkin-only)** — TypeScript source owns pattern identity; `@architect-implements` (authored on the test `.feature`) is the **primary** reverse-traceability edge: UML realization, many-to-one. It is distinct from derived reverse edges (`usedBy` / `enables`), which the graph computes and you never hand-author.
 - **ADR-005 / ADR-009 (projection)** — the `PatternGraph` is the sole codec/renderer input (ADR-005); `parseAndProject*` is the raw-input trust boundary for external projection callers, parsed once (ADR-009).
 
+### Specs-driven development
+
+**The spec is the prompt and detailed design — do not create a wrapper "context", or "session-prep" document or “design-brief" documents.** Design-level specs go through numerous spec/design review iterations before we consider them implementation-ready.
+**Value transfer/Ephemeral specs** - specs in `architect/specs/` get transformed into code and executable specs (live tests) and are deleted from the architect state folder (except epics and other high-level/navigation context). But the value is not ephemeral - it is durable and lives as production code and live tests.
+
 ## Engineering doctrine
 
 CI-enforced. Treat as load-bearing.

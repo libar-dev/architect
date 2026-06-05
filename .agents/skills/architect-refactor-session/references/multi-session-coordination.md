@@ -1,5 +1,7 @@
 # Multi-Session / PR Coordination (canonical reference)
 
+**This skill is only for non-spec-driven development. DO NOT USE for refactoring based on a design-level spec.**
+
 The convention for any pull request whose work is large or risky enough
 that a single agent session cannot land it cleanly in one pass. This is
 **not refactor-specific** — feature PRs with cross-cutting changes,

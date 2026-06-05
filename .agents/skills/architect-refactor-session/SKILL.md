@@ -142,6 +142,34 @@ pnpm test && pnpm validate:all`. Do not batch verification to the
    `@architect-pattern` on the `.ts` (per
    [`../architect-base/references/annotation-ownership.md`](../architect-base/references/annotation-ownership.md)).
 
+## Edge-authoring heuristics (refactor-specific)
+
+Two recurring refactor cases are easy to get wrong because the truthful
+edge is not the most obvious-looking one.
+
+- **Produced fragments:** when a projection or builder genuinely
+  constructs a fragment (for example its return type / `kind:` literal
+  proves it produces `PatternDetail`), author the edge on the producer:
+  `<Producer> @architect-uses <Fragment>`. Do **not** hang the edge on a
+  pure re-export barrel when a truthful producer exists — that inverts
+  the dependency and lies to the graph.
+- **Producerless grouping barrels:** when a barrel is only a module
+  grouping surface and no truthful producer exists, `barrel →
+submodule` edges are acceptable. Verify against the barrel's actual
+  exports/imports; if there is no concrete dependency to point at,
+  defer rather than invent a phantom edge.
+- **CLI subprocess tests:** an executable feature that drives the CLI
+  through `runCommand("foo ...")` may
+  `@architect-implements:<ProductionCliPattern>` when the command string
+  maps **1:1** to one named production pattern. The command invocation
+  is the concrete fact that authorizes the edge. If the command fans out
+  across several patterns or no single production pattern exists, defer
+  rather than guess.
+
+Read back every such edge through the Data API after authoring. The
+file edit is not proof until `pattern`, `bundle`, or `dep-tree` shows
+the intended relationship in the live graph.
+
 ## Adapted invariant-carrier gate
 
 The five criteria below replace the §"Pre-deletion gate" in

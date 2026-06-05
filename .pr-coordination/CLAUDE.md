@@ -1,0 +1,1 @@
+/Users/darkomijic/dev-projects/architect/.pr-coordination/AGENTS.md

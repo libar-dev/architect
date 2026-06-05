@@ -5,7 +5,7 @@
  * mermaid block stays under Mermaid's default `maxTextSize`, and that the
  * document is split into more than one block. This guards against a regression
  * back to the single all-pattern `graph TD` that exceeded the limit and failed
- * to render. See `.pr-coordination/DECISIONS.md` D-14.
+ * to render.
  */
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
