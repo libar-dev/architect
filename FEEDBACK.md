@@ -10,6 +10,31 @@ for anything that does not fit the verb's shape.
 
 ---
 
+## 2026-06-05 — Finalized TaxonomyDocumentationCluster + reconciled value-transfer / code-stub-identity doctrine end-to-end
+
+Reviewed the uncommitted campaign work across four fronts; validated the prior session's code-stub-identity reversal as **canonically correct** (no doctrine change needed), and found one substantive gap a green gate missed.
+
+- **Doctrine validated, not changed.** Code/contract stubs carrying their own `@architect-pattern` is mandated by `formal-spec/04-tag-registry.md:31` + `:148`, `07-stub-format.md:86-94` (the code-stub Required-Tags table), ADR-003 ("identity travels with code from stub through production"), and ADR-008 (step-stubs are the lone node-less carve-out). `merge-patterns.ts:6-29` rejects only the *same* name in TS+Gherkin, so the distinct `EmissionDescriptor` / `TaxonomyDocumentationCluster` pair is no collision.
+- **B1 — a real BLOCKER behind a green `scope-validate`.** `EmbeddedRegionEmissionSchema` carried a single `region`, but the spec requires multiple regions per host (formal-spec: one per digest tag-group; skill: `taxonomy-role-enum` + `taxonomy-tag-count`), and the digest is a childless `projectSingle` bundle with no per-group descriptor hook. `scope-validate … implement` reported READY anyway — the stub parsed, deliverables enumerated, and no scenario exercised the multi-region case. This is a substantive-gap class the mechanical gate cannot see: it checks structure, not whether the contract can express the shape a deliverable names. **Verb-feedback idea:** a `scope-validate` signal when a deliverable/Rule names a shape the stub's schema can't represent would catch this; today it is invisible. Resolved by making the embedded emission a `hostFile` + `regions[]` routing map (DD-6, ADR-010-clean — routing, not a content tree) and adding multi-region / normalization-contract / absent-host scenarios.
+- **Value-transfer framing propagated to the top level.** `architect-base` §13 + §8 and `architect-sessions` "the spec is a scaffold" now lead with "deletion ≠ loss" and name the three scaffold destinations (design `.feature` → executable Gherkin; step-stub → step wiring; code/contract stub → **promoted** to `src/`, identity persists). The formal-spec (`02-artifact-types`, `07-stub-format`, `08-spec-evolution`) said "all stubs are deleted" — reconciled to distinguish code-stub promotion from behavioral-spec/step-stub deletion.
+- **Authoring-syntax precision.** Doctrine text prescribed colon-form `.ts` tags; the measured convention is space-form for `@architect-pattern` / `-implements` / `-target` / `-status` and colon for `-role:` / `-bounded-context:` / `-product-area:`. Fixed the `design.md` + `annotation-ownership.md` examples (the `emission-descriptor.ts` stub itself was already correct).
+
+## 2026-06-05 — RESOLVED: `design-decisions-recorded` WARN was a doctrine bug, not a check bug
+
+Resolves the earlier entry "`scope-validate … design-decisions-recorded` is structurally unsatisfiable for a doctrine-compliant stub." That entry's premise — that doctrine forbids `@architect-pattern` on stubs, so `findStubPatterns` can never find one — was itself wrong for **code/contract** stubs. The blanket "code stubs MUST NOT carry `@architect-pattern`" lived only in `architect-sessions/references/design.md` and was an over-generalization of ADR-008's **step-definition-stub** rule onto code/contract stubs. The opposite is canonical: `formal-spec/04-tag-registry.md:31` makes `@architect-pattern` a **MUST on stubs**, ADR-003 records "identity travels with code from stub through production," and the extraction predecessor (`architect-studio/…/architect`) authors all 5 code stubs identity-bearing (`@architect-pattern:EnforcementConfig` implementing `EnforcementConfiguration`).
+
+- **Fix applied:** authored `architect/stubs/taxonomy-documentation-cluster/emission-descriptor.ts` with its own code-originated identity (`@architect` + `@architect-pattern:EmissionDescriptor` + `@architect-role:contract` + `@architect-status:roadmap` + `@architect-product-area:Generation` + `@architect-implements:TaxonomyDocumentationCluster` + `@architect-target`).
+- **Result:** the stub is now a graph node (`list`/`search`/`pattern` resolve it, `total` 295→296), `TaxonomyDocumentationCluster.implementedBy` points back at it (`arch neighborhood` confirms), and `scope-validate … implement` reports `[PASS] Design decisions recorded: 7 decision(s) found in 1 stub(s)` — WARN cleared, **0 dangling**.
+- **Doctrine reconciled:** `architect-sessions/references/design.md` + `architect-base/references/annotation-ownership.md` now distinguish code/contract stubs (identity-bearing) from step-definition stubs (node-less, ADR-008). So `findStubPatterns`'s graph-node requirement is the **correct** contract — no check change needed; the proposed "locate stubs by file" fix would have entrenched the wrong (node-less) convention.
+- **Lingering nit:** `pattern <Name> --format json` returned all-null on the *first* call right after the stub edit (cache miss mid-rebuild) while `list`/`search` already saw the node; a second call resolved fully. Minor cache-warming race in the `pattern` verb's rebuild path, worth a look.
+
+## 2026-06-04 — `arch neighborhood <Epic>` silently drops the parent/child (epic↔member) axis — epic reads as near-isolated
+
+- **Verb / surface:** `pnpm -s architect:query arch neighborhood DocumentationProjection` (text and `--format json | jq '.data'`).
+- **Expected:** an epic's local subgraph to include its hierarchy axis — the 8 epic↔member parent/child edges — alongside dependency edges, so `arch neighborhood` alone conveys the epic's shape.
+- **Got:** only the dependency edge `uses`/`dependsOn` = `ADR010DocumentationCompositionHelpers`. The `ArchitectureNeighborhood` shape carries **no parent/child field at all** (`uses`/`usedBy`/`dependsOn`/`enables`/`seeAlso`/`enforcedBy`/`sameContext`/`implements`/`implementedBy` only), so the 8 member edges have nowhere to land and are silently absent — the epic looks like a near-isolated node with one dependency. The hierarchy is real and surfaces everywhere else: `pattern DocumentationProjection` Hierarchy block lists 8 members, `bundle … --format json` `.root.members` has 8, `list --parent DocumentationProjection --names-only` returns the same 8, and `open-questions --parent` resolves the members.
+- **Impact:** a refiner relying on `arch neighborhood` alone to understand an epic's shape would misread it as nearly isolated and miss the entire member sub-tree. The dependency-axis-only behavior is undocumented (no note in `architect-data-api` that the verb excludes the parent/child axis). Either add the hierarchy edges to the neighborhood shape, or document the verb as dependency-axis-only and point readers at `pattern` / `bundle` / `list --parent` for the hierarchy.
+
 ## 2026-06-04 — API carried a full WIP-spec design review; one interpretation nuance on the `open-questions` gating count
 
 Reviewed the `DocumentationProjection` candidate family (epic + 8 members) entirely through the Data API (`list --parent`, `pattern`, `dep-tree`, `arch neighborhood`, `scope-validate`, `open-questions --parent … --include-self`, `documentation design-review`). Every verb worked first try and the capability tour passed all 13 steps. `documentation design-review` rendering the unbuilt members status-annotated — with the shipped `DesignReviewProjection` engine rendering its own parent epic's review — is the verb's intended use working as designed; it carried the review with zero spec-file scans for graph state.
@@ -309,3 +334,49 @@ rename one feature's identity (e.g. `pattern-graph-cli-query.feature` → `Patte
 `@architect-implements:PatternGraphAPICLI` if it should stay a realization of the CLI pattern), and ideally
 to add a duplicate-Gherkin-identity gate so this fails loud next time. Deferred from this session because it
 ripples pattern identity + reverse edges + downstream `@architect-implements` refs.
+
+---
+
+## 2026-06-04 — `scope-validate <pattern> implement` "Design decisions recorded" WARN is unclearable for a doctrine-compliant stub
+
+> **[SUPERSEDED 2026-06-05 — see the resolution entry at the top.]** The premise below ("doctrine forbids `@architect-pattern` on stubs") was wrong for *code/contract* stubs: `formal-spec/04-tag-registry.md` makes `@architect-pattern` a MUST on stubs and ADR-003 has identity travel from stub through production. The check is correct; the stub was under-annotated. Retained verbatim as a record of the original diagnosis.
+
+**Verb:** `pnpm architect:query scope-validate TaxonomyDocumentationCluster implement`
+
+**Expected:** a stub authored to doctrine (no `@architect-pattern`, with `@architect-target` +
+`@architect-implements` + ADR/DD references in its JSDoc) should be able to satisfy the
+`design-decisions-recorded` check — its description literally contains `ADR-010`, `DD-1`, `DD-2`, `DD-3`,
+all of which match the detector regex `/\b(?:ADR|PDR|DD)-[A-Za-z0-9-]+\b/`.
+
+**Got:** `[WARN] Design decisions recorded: No PDR/AD references found in stubs`, and it cannot be cleared.
+
+**Root cause** (`packages/architect-projection/src/projections/execution-context/scope-readiness.internal.ts:202,335-351`):
+`buildDesignDecisionsRecordedCheck` → `findStubPatterns` filters `context.graph.patterns` for a `/stubs/`
+file whose `implementsPatterns` includes the target. A pattern node only exists for a file carrying
+`@architect-pattern`. But stub doctrine (architect-sessions `design.md`; annotation-ownership) is explicit
+that **stubs MUST NOT carry `@architect-pattern`** — so a correctly-authored stub is never in
+`context.graph.patterns`, `findStubPatterns` returns `[]`, `decisionCount` is 0, and the check WARNs
+regardless of how many ADR/DD references the stub's JSDoc actually carries. Confirmed: the only stub `.ts`
+in the repo carries `ADR-010` + `DD-1..3` in its description and still WARNs; `dep-tree` shows the stub's
+`@architect-implements` edge produces no graph node (0 downstream).
+
+**Impact:** the check is structurally unsatisfiable without violating annotation-ownership doctrine, so
+`scope-validate implement` can never reach a no-WARN PASS for a doctrine-compliant design. This session left
+the WARN rather than manufacture `@architect-pattern` identity on the stub to game the substring scan.
+
+**Clean fix:** `findStubPatterns` should locate stubs by file (path under `/stubs/` + an `@architect-target`
+or `@architect-implements:<pattern>` tag), not by requiring pattern identity; `extractDecisionReferences`
+then scans the stub file's JSDoc as today. That makes the check honor the same stubs the rest of the
+session lifecycle treats as identity-less scaffolds.
+
+---
+
+## 2026-06-05 — `pnpm architect:query` route blocked by `tsx` IPC pipe EPERM in Codex sandbox
+
+During a design-tier patch session, `bash scripts/api-capability-tour.sh` failed every step before any
+Architect verb logic ran: `tsx` could not `listen` on its IPC pipe under
+`/var/folders/dv/vjxl688n5wqbc334q2sqdv_80000gn/T/tsx-501/*.pipe` (`EPERM`). Retrying direct API calls with
+`TMPDIR=/private/tmp pnpm -s architect:query ...` failed the same way under `/private/tmp/tsx-501/*.pipe`.
+This appears to be a harness/sandbox incompatibility with the `tsx` CLI's parent IPC server. A direct Node
+loader invocation did work and preserved the source CLI behavior:
+`node --conditions=source --require ./node_modules/.pnpm/tsx@4.22.0/node_modules/tsx/dist/preflight.cjs --import ./node_modules/.pnpm/tsx@4.22.0/node_modules/tsx/dist/loader.mjs ./packages/architect-cli/src/cli/pattern-graph-cli.ts --base-dir . ...`.
