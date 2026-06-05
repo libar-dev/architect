@@ -309,16 +309,14 @@ Raw scans are retained only for DoD and anti-pattern detection, which are stage-
 
 ### Anti-Pattern Detection
 
-Detects process metadata tags that belong in feature files but appear in TypeScript code (`process-in-code`):
+Detects the remaining process metadata tags that belong in feature files but appear in TypeScript code (`process-in-code`):
 
-| Tag Suffix (Feature-Only) | What It Tracks       |
-| ------------------------- | -------------------- |
-| `@<prefix>-quarter`       | Timeline metadata    |
-| `@<prefix>-team`          | Ownership metadata   |
-| `@<prefix>-effort`        | Estimation metadata  |
-| `@<prefix>-effort-actual` | Actual effort        |
-| `@<prefix>-workflow`      | Workflow metadata    |
-| `@<prefix>-completed`     | Completion timestamp |
+| Tag Suffix (Feature-Only) | What It Tracks     |
+| ------------------------- | ------------------ |
+| `@<prefix>-team`          | Ownership metadata |
+| `@<prefix>-workflow`      | Workflow metadata  |
+
+Retired taxonomy tags such as `quarter`, `phase`, `release`, `completed`, `effort`, `effort-actual`, `risk`, `priority`, `since`, `user-role`, and `business-value` are reported as `removed-tag` when they appear in feature files.
 
 Additional anti-pattern checks:
 

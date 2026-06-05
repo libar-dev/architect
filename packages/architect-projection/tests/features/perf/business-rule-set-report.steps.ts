@@ -52,13 +52,8 @@ const BOUNDED_CONTEXTS = [
 
 const ARCH_LAYERS = ['domain', 'application', 'interface', 'infrastructure'] as const;
 const STATUSES = ['active', 'completed', 'roadmap'] as const;
-const PRIORITIES = ['P0', 'P1', 'P2'] as const;
 const TEAMS = ['core-platform', 'projection-runtime', 'docs-foundation'] as const;
-const EFFORTS = ['small', 'medium', 'large'] as const;
-const EFFORT_ACTUALS = ['small', 'medium', 'large'] as const;
-const USER_ROLES = ['maintainer', 'operator', 'reviewer'] as const;
 const WORKFLOWS = ['implementation', 'verification', 'handoff'] as const;
-const RISKS = ['low', 'medium', 'high'] as const;
 
 const COVERAGE_REQUIRED_TAGS: TagRegistry['metadataTags'] = [
   {
@@ -82,27 +77,9 @@ const COVERAGE_REQUIRED_TAGS: TagRegistry['metadataTags'] = [
     values: [...ARCH_LAYERS],
   },
   {
-    tag: 'priority',
-    format: 'value',
-    purpose: 'Records priority coverage.',
-    required: true,
-  },
-  {
     tag: 'team',
     format: 'value',
     purpose: 'Records owning team coverage.',
-    required: true,
-  },
-  {
-    tag: 'effort',
-    format: 'value',
-    purpose: 'Records estimated effort coverage.',
-    required: true,
-  },
-  {
-    tag: 'effort-actual',
-    format: 'value',
-    purpose: 'Records actual effort coverage.',
     required: true,
   },
   {
@@ -112,40 +89,15 @@ const COVERAGE_REQUIRED_TAGS: TagRegistry['metadataTags'] = [
     required: true,
   },
   {
-    tag: 'user-role',
-    format: 'value',
-    purpose: 'Records user-role coverage.',
-    required: true,
-  },
-  {
-    tag: 'business-value',
-    format: 'quoted-value',
-    purpose: 'Records business-value coverage.',
-    required: true,
-  },
-  {
     tag: 'workflow',
     format: 'value',
     purpose: 'Records workflow coverage.',
     required: true,
   },
   {
-    tag: 'risk',
-    format: 'enum',
-    purpose: 'Records risk coverage.',
-    required: true,
-    values: [...RISKS],
-  },
-  {
     tag: 'target-path',
     format: 'value',
     purpose: 'Records implementation target-path coverage.',
-    required: true,
-  },
-  {
-    tag: 'since',
-    format: 'value',
-    purpose: 'Records introduction-version coverage.',
     required: true,
   },
   {
@@ -243,12 +195,7 @@ interface PerfPatternOptions {
   readonly productArea: ExtractedPattern['productArea'];
   readonly boundedContext: ExtractedPattern['boundedContext'];
   readonly adrLayer: ExtractedPattern['adrLayer'];
-  readonly userRole: ExtractedPattern['userRole'];
-  readonly businessValue: ExtractedPattern['businessValue'];
   readonly team: ExtractedPattern['team'];
-  readonly effort: ExtractedPattern['effort'];
-  readonly effortActual: ExtractedPattern['effortActual'];
-  readonly priority: ExtractedPattern['priority'];
   readonly targetPath: ExtractedPattern['targetPath'];
   readonly uses: ExtractedPattern['uses'];
   readonly dependsOn: readonly string[];
@@ -258,8 +205,6 @@ interface PerfPatternOptions {
   readonly seeAlso: ExtractedPattern['seeAlso'];
   readonly apiRef: ExtractedPattern['apiRef'];
   readonly workflow: string;
-  readonly risk: string;
-  readonly since: string;
   readonly rules: readonly ReturnType<typeof createRule>[];
   readonly adr?: string;
   readonly adrStatus?: ExtractedPattern['adrStatus'];
@@ -312,12 +257,7 @@ function createBusinessRuleSetPerfContext(): BusinessRuleSetPerfFixture {
       productArea,
       boundedContext,
       adrLayer,
-      userRole: USER_ROLES[patternIndex % USER_ROLES.length]!,
-      businessValue: `Keep ${boundedContext} perf coverage deterministic for ${patternName}.`,
       team: TEAMS[patternIndex % TEAMS.length]!,
-      effort: EFFORTS[patternIndex % EFFORTS.length]!,
-      effortActual: EFFORT_ACTUALS[patternIndex % EFFORT_ACTUALS.length]!,
-      priority: PRIORITIES[patternIndex % PRIORITIES.length]!,
       targetPath: `packages/architect-projection/src/perf/${patternName}.ts`,
       uses: [relatedPattern],
       dependsOn: [dependencyPattern],
@@ -327,8 +267,6 @@ function createBusinessRuleSetPerfContext(): BusinessRuleSetPerfFixture {
       seeAlso: [`ADR-${String((patternIndex % 4) + 1).padStart(3, '0')}`],
       apiRef: [`https://example.test/${patternName.toLowerCase()}`],
       workflow: WORKFLOWS[patternIndex % WORKFLOWS.length]!,
-      risk: RISKS[patternIndex % RISKS.length]!,
-      since: `2026-Q${String((patternIndex % 4) + 1)}`,
       rules: Array.from({ length: 3 }, (_, ruleIndex) => {
         const ruleNumber = ruleIndex + 1;
         const ruleLabel = String(ruleNumber);
@@ -404,12 +342,7 @@ function createPerfPattern(name: string, options: PerfPatternOptions): Extracted
     productArea: options.productArea,
     boundedContext: options.boundedContext,
     adrLayer: options.adrLayer,
-    userRole: options.userRole,
-    businessValue: options.businessValue,
     team: options.team,
-    effort: options.effort,
-    effortActual: options.effortActual,
-    priority: options.priority,
     targetPath: options.targetPath,
     uses: options.uses,
     dependsOn: options.dependsOn,
@@ -427,8 +360,6 @@ function createPerfPattern(name: string, options: PerfPatternOptions): Extracted
   return {
     ...pattern,
     workflow: options.workflow,
-    risk: options.risk,
-    since: options.since,
   };
 }
 

@@ -22,8 +22,8 @@ Feature: Architect guard runtime
       When I detect anti-patterns for two features with distinct pattern identities
       Then no duplicate-pattern-identity violation is reported
 
-    Scenario: Flag retired temporal and release tags as removed tags
-      When I detect removed tags in a feature using retired ADR-013 tags
+    Scenario: Flag retired taxonomy tags as removed tags
+      When I detect removed tags in a feature using retired ADR-013 taxonomy tags
       Then a removed-tag violation is reported for each retired tag
       And no removed-tag violation is reported for the status or level look-alikes
 

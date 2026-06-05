@@ -49,33 +49,18 @@ export function extractProcessMetadata(feature: ScannedGherkinFile): ProcessMeta
   const pattern = patternTag.replace('pattern:', '');
   const status = statusTag?.replace('status:', '') ?? DEFAULT_STATUS;
 
-  const effort = tags.find((tag) => tag.startsWith('effort:'))?.replace('effort:', '');
   const team = tags.find((tag) => tag.startsWith('team:'))?.replace('team:', '');
   const workflow = tags.find((tag) => tag.startsWith('workflow:'))?.replace('workflow:', '');
-  const effortActual = tags
-    .find((tag) => tag.startsWith('effort-actual:'))
-    ?.replace('effort-actual:', '');
-  const risk = tags.find((tag) => tag.startsWith('risk:'))?.replace('risk:', '');
   const productArea = tags
     .find((tag) => tag.startsWith('product-area:'))
     ?.replace('product-area:', '');
-  const userRole = tags.find((tag) => tag.startsWith('user-role:'))?.replace('user-role:', '');
-  const businessValueRaw = tags
-    .find((tag) => tag.startsWith('business-value:'))
-    ?.replace('business-value:', '');
-  const businessValue = businessValueRaw?.replace(/^["']|["']$/g, '');
 
   const validation = ProcessMetadataSchema.safeParse({
     pattern,
     status,
-    ...(effort && { effort }),
     ...(team && { team }),
     ...(workflow && { workflow }),
-    ...(effortActual && { effortActual }),
-    ...(risk && { risk }),
     ...(productArea && { productArea }),
-    ...(userRole && { userRole }),
-    ...(businessValue && { businessValue }),
   });
 
   if (!validation.success) {

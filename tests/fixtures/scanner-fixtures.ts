@@ -387,8 +387,6 @@ export interface GherkinContentOptions {
   description?: string;
   /** Status (completed, in_progress, planned) */
   status?: string;
-  /** Effort estimate (1w, 2d, etc.) */
-  effort?: string;
   /** Team (platform, frontend, etc.) */
   team?: string;
   /** Pattern name from @libar-pattern tag */
@@ -424,7 +422,6 @@ export function buildGherkinContent(options: GherkinContentOptions = {}): string
     featureName = 'Test Feature',
     description = 'A test feature',
     status,
-    effort,
     team,
     patternName,
     dependencies = [],
@@ -452,9 +449,6 @@ Scenario: Orphan scenario
   // Process metadata tags (using @architect-* prefix per PDR-004)
   if (status) {
     lines.push(`@architect-status:${status}`);
-  }
-  if (effort) {
-    lines.push(`@architect-effort:${effort}`);
   }
   if (team) {
     lines.push(`@architect-team:${team}`);

@@ -15,9 +15,9 @@ export const ContentRichnessSchema = z
   );
 
 export const GroupingAxisSchema = z
-  .enum(['flat', 'package', 'product-area', 'phase', 'feature', 'per-entity'])
+  .enum(['flat', 'package', 'product-area', 'feature', 'per-entity'])
   .describe(
-    'Axis used to partition entries within a disclosure spec. "flat" = no grouping, all entries in one section; "package" = grouped by package; "product-area" = grouped by product-area tag; "phase" = grouped by phase number; "feature" = grouped by feature; "per-entity" = one section per entity with no aggregation.',
+    'Axis used to partition entries within a disclosure spec. "flat" = no grouping, all entries in one section; "package" = grouped by package; "product-area" = grouped by product-area tag; "feature" = grouped by feature; "per-entity" = one section per entity with no aggregation.',
   );
 
 export const RootShapeSchema = z

@@ -39,12 +39,9 @@ interface PatternFixtureOptions {
   readonly executableSpecs?: ExtractedPattern['executableSpecs'];
   readonly behaviorFile?: ExtractedPattern['behaviorFile'];
   readonly productArea?: ExtractedPattern['productArea'];
-  readonly userRole?: ExtractedPattern['userRole'];
-  readonly businessValue?: ExtractedPattern['businessValue'];
   readonly adr?: ExtractedPattern['adr'];
   readonly team?: ExtractedPattern['team'];
-  readonly effort?: ExtractedPattern['effort'];
-  readonly priority?: ExtractedPattern['priority'];
+  readonly workflow?: ExtractedPattern['workflow'];
   readonly rules?: readonly RuleFixture[];
 }
 
@@ -73,12 +70,9 @@ export function createPattern(name: string, options: PatternFixtureOptions = {})
     ...(options.executableSpecs !== undefined ? { executableSpecs: options.executableSpecs } : {}),
     ...(options.behaviorFile !== undefined ? { behaviorFile: options.behaviorFile } : {}),
     ...(options.productArea !== undefined ? { productArea: options.productArea } : {}),
-    ...(options.userRole !== undefined ? { userRole: options.userRole } : {}),
-    ...(options.businessValue !== undefined ? { businessValue: options.businessValue } : {}),
     ...(options.adr !== undefined ? { adr: options.adr } : {}),
     ...(options.team !== undefined ? { team: options.team } : {}),
-    ...(options.effort !== undefined ? { effort: options.effort } : {}),
-    ...(options.priority !== undefined ? { priority: options.priority } : {}),
+    ...(options.workflow !== undefined ? { workflow: options.workflow } : {}),
     ...(options.rules !== undefined ? { rules: options.rules } : {}),
   });
   _nextPatternId += 1;

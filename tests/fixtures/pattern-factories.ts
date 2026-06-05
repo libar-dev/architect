@@ -80,17 +80,13 @@ export interface TestPatternOptions {
   dependsOn?: string[] | undefined;
   /** Enables patterns (default: none) */
   enables?: string[] | undefined;
-  // Timeline-specific fields
-  /** Effort estimate like "2w", "3d", "1m" (default: none) */
-  effort?: string | undefined;
+  // Process and hierarchy fields
   /** Team responsible (default: none) */
   team?: string | undefined;
   /** Deliverables list (default: none) */
   deliverables?: TestDeliverable[] | undefined;
-  /** Workflow type for changelog mapping (default: none) */
+  /** Workflow label for package requirement documentation (default: none) */
   workflow?: string | undefined;
-  /** Priority level for process tracking (default: none) */
-  priority?: 'critical' | 'high' | 'medium' | 'low' | undefined;
   /** Hierarchy level for grouping (default: none) */
   level?: 'epic' | 'phase' | 'task' | undefined;
   /** Patterns this code implements (realization relationship, default: none) */
@@ -113,12 +109,8 @@ export interface TestPatternOptions {
   discoveredLearnings?: string[] | undefined;
   /** Discovered risks during implementation (default: none) */
   discoveredRisks?: string[] | undefined;
-  /** Business value statement (default: none) */
-  businessValue?: string | undefined;
   /** Target implementation path for stub files (default: none) */
   targetPath?: string | undefined;
-  /** Design session that created this pattern (default: none) */
-  since?: string | undefined;
   /** Related patterns for cross-reference (default: none) */
   seeAlso?: string[] | undefined;
   // Architecture fields
@@ -200,12 +192,10 @@ export function createTestPattern(options: TestPatternOptions = {}): ExtractedPa
     whenToUse,
     dependsOn,
     enables,
-    // Timeline-specific fields
-    effort,
+    // Process and hierarchy fields
     team,
     deliverables,
     workflow,
-    priority,
     level,
     implementsPatterns,
     // Display and traceability fields
@@ -218,10 +208,8 @@ export function createTestPattern(options: TestPatternOptions = {}): ExtractedPa
     discoveredImprovements,
     discoveredLearnings,
     discoveredRisks,
-    businessValue,
     // Stub metadata
     targetPath,
-    since,
     seeAlso,
     // Architecture fields
     archRole,
@@ -250,7 +238,6 @@ export function createTestPattern(options: TestPatternOptions = {}): ExtractedPa
     ...(mergedUses.length > 0 ? { uses: mergedUses } : {}),
     ...(whenToUse && whenToUse.length > 0 ? { whenToUse } : {}),
     ...(targetPath ? { target: targetPath } : {}),
-    ...(since ? { since } : {}),
     ...(seeAlso && seeAlso.length > 0 ? { seeAlso } : {}),
     ...(executableSpecs && executableSpecs.length > 0 ? { executableSpecs } : {}),
   };
@@ -284,12 +271,10 @@ export function createTestPattern(options: TestPatternOptions = {}): ExtractedPa
     ...(scenarios && scenarios.length > 0 ? { scenarios } : {}),
     ...(mergedUses.length > 0 ? { uses: mergedUses } : {}),
     ...(whenToUse && whenToUse.length > 0 ? { whenToUse } : {}),
-    // Timeline-specific fields
-    ...(effort ? { effort } : {}),
+    // Process and hierarchy fields
     ...(team ? { team } : {}),
     ...(deliverables && deliverables.length > 0 ? { deliverables } : {}),
     ...(workflow ? { workflow } : {}),
-    ...(priority ? { priority } : {}),
     ...(level ? { level } : {}),
     ...(implementsPatterns && implementsPatterns.length > 0 ? { implementsPatterns } : {}),
     // Display and traceability fields
@@ -304,10 +289,8 @@ export function createTestPattern(options: TestPatternOptions = {}): ExtractedPa
       : {}),
     ...(discoveredLearnings && discoveredLearnings.length > 0 ? { discoveredLearnings } : {}),
     ...(discoveredRisks && discoveredRisks.length > 0 ? { discoveredRisks } : {}),
-    ...(businessValue ? { businessValue } : {}),
     // Stub metadata
     ...(targetPath ? { targetPath } : {}),
-    ...(since ? { since } : {}),
     ...(seeAlso && seeAlso.length > 0 ? { seeAlso } : {}),
     // Architecture fields — Wave 1 retired archContext/archLayer; the
     // options are accepted for backward-compat but no longer set on the
@@ -501,12 +484,11 @@ export function createRoadmapPatterns(): ExtractedPattern[] {
 }
 
 /**
- * Create patterns representing completed timeline milestones with deliverables
+ * Create patterns representing completed delivery milestones with deliverables
  *
  * Useful for testing:
  * - completed-phases section renderer
- * - timeline-summary section renderer
- * - Status filtering with timeline metadata
+ * - status filtering with delivery metadata
  */
 export function createTimelinePatterns(): ExtractedPattern[] {
   return [
@@ -515,7 +497,6 @@ export function createTimelinePatterns(): ExtractedPattern[] {
       name: 'Foundation Types',
       category: 'core',
       status: 'completed',
-      effort: '2w',
       team: 'platform',
       deliverables: [
         { name: 'Decider interface', status: 'complete', tests: 1, location: 'src/decider/' },
@@ -527,7 +508,6 @@ export function createTimelinePatterns(): ExtractedPattern[] {
       name: 'CMS Integration',
       category: 'core',
       status: 'completed',
-      effort: '1w',
       team: 'platform',
       deliverables: [{ name: 'CMS types', status: 'complete', tests: 1, location: 'src/cms/' }],
     }),
@@ -536,7 +516,6 @@ export function createTimelinePatterns(): ExtractedPattern[] {
       name: 'Event Store Enhancement',
       category: 'event-sourcing',
       status: 'active',
-      effort: '3w',
       team: 'platform',
       dependsOn: ['Foundation Types', 'CMS Integration'],
     }),
@@ -545,7 +524,6 @@ export function createTimelinePatterns(): ExtractedPattern[] {
       name: 'Advanced Projections',
       category: 'projection',
       status: 'roadmap',
-      effort: '2w',
       team: 'platform',
       dependsOn: ['Event Store Enhancement'],
     }),

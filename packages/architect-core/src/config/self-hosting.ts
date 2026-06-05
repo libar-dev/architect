@@ -80,7 +80,6 @@ export const PACKAGE_SELF_HOSTING_SOURCES = {
     'architect/specs/**/*.feature',
     'architect/slices/**/*.feature',
     'architect/decisions/*.feature',
-    'architect/releases/*.feature',
     'tests/features/**/*.feature',
     `${workspaceRoot}/packages/architect-core/tests/features/**/*.feature`,
     `${workspaceRoot}/packages/architect-projection/tests/features/**/*.feature`,

@@ -10,18 +10,18 @@
  *
  * **Value:** Gives list and search consumers (CLI list, MCP search, UI
  * pickers) a stable filtered catalog of `PatternSummary` items, with
- * role-alias resolution, combined status/phase/role filtering, and compact
+ * role-alias resolution, combined status/role filtering, and compact
  * `namesOnly` / `count` response modes.
  *
  * **Invariant:** The output always carries `{filters, count, names, items}`
  * with `count` matching the filtered result size; role filters are resolved
- * to canonical tags through the tag registry before matching, status/phase/
- * role combine with AND semantics, results are sorted alphabetically by
+ * to canonical tags through the tag registry before matching, status/role
+ * combine with AND semantics, results are sorted alphabetically by
  * pattern name, and `namesOnly`/`count` flags omit `items` (and `names`
  * when `count` is true) while still reporting `count`.
  *
  * **Behavior:**
- * - Validates options through `PatternCatalogOptionsSchema` (status, phase,
+ * - Validates options through `PatternCatalogOptionsSchema` (status, maturity,
  *   role, namesOnly, count) and delegates to `buildPatternCatalog`.
  * - Resolves role aliases via the graph's `tagRegistry.roles` before
  *   filtering, so callers can pass non-canonical role names.

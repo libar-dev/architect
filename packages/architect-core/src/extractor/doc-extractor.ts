@@ -255,7 +255,6 @@ export function buildPattern(
     ...(directive.apiRef !== undefined &&
       directive.apiRef.length > 0 && { apiRef: directive.apiRef }),
     ...(directive.target !== undefined && { targetPath: directive.target }),
-    ...(directive.since !== undefined && { since: directive.since }),
     ...(directive.executableSpecs !== undefined &&
       directive.executableSpecs.length > 0 && { executableSpecs: directive.executableSpecs }),
     ...(directive.include !== undefined &&

@@ -56,7 +56,6 @@ export {
   HIERARCHY_LEVELS,
   type HierarchyLevel,
 } from './hierarchy-levels.js';
-export { RISK_LEVELS, type RiskLevel } from './risk-levels.js';
 export { DIAGRAM_SHAPE_VALUES, type DiagramShapeValue } from './diagram-shape-values.js';
 export { SCENARIO_LAYER_TYPES, type ScenarioLayerType } from './scenario-layer-types.js';
 export { SEVERITY_TYPES, type SeverityType } from './severity-types.js';
@@ -74,10 +73,8 @@ export {
   GLOBAL_FORMAT_OPTIONS,
   PATTERN_LIST_FORMAT,
   PRD_FEATURES_GROUP_BY,
-  PRIORITY_VALUES,
   PR_CHANGES_SORT_BY,
   REMAINING_WORK_GROUP_BY,
-  REMAINING_WORK_SORT_BY,
   SESSION_FINDINGS_GROUP_BY,
   WORKFLOW_VALUES,
   type AcceptanceCriteriaFormat,
@@ -94,9 +91,7 @@ export {
   type PatternListFormat,
   type PrChangesSortBy,
   type PrdFeaturesGroupBy,
-  type PriorityValue,
   type RemainingWorkGroupBy,
-  type RemainingWorkSortBy,
   type SessionFindingsGroupBy,
   type WorkflowValue,
 } from './generator-options.js';

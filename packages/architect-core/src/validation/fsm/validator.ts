@@ -39,15 +39,8 @@ export type TransitionValidationResult =
       validAlternatives?: readonly ProcessStatusValue[];
     };
 
-export interface CompletionMetadataValidationResult {
-  valid: boolean;
-  warnings: string[];
-}
-
 export interface PatternMetadata {
   status: string;
-  effortActual?: string;
-  effortPlanned?: string;
 }
 
 export function isValidStatusValue(status: string): status is ProcessStatusValue {
@@ -120,44 +113,20 @@ export function validateTransition(from: string, to: string): TransitionValidati
   };
 }
 
-export function validateCompletionMetadata(
-  pattern: PatternMetadata,
-  options?: FSMValidationOptions,
-): CompletionMetadataValidationResult {
-  const tagPrefix = options?.registry?.tagPrefix ?? DEFAULT_TAG_PREFIX;
-  const warnings: string[] = [];
-
-  if (pattern.status !== 'completed') {
-    return { valid: true, warnings: [] };
-  }
-
-  if (pattern.effortPlanned && !pattern.effortActual) {
-    warnings.push(
-      `Pattern has ${tagPrefix}effort but missing ${tagPrefix}effort-actual. ` +
-        'Consider adding actual effort for tracking.',
-    );
-  }
-
-  return { valid: true, warnings };
-}
-
 export function validatePatternStatus(
   pattern: PatternMetadata,
   options?: FSMValidationOptions,
 ): {
   valid: boolean;
   statusResult: StatusValidationResult;
-  completionResult: CompletionMetadataValidationResult;
   allWarnings: string[];
 } {
   const statusResult = validateStatus(pattern.status, options);
-  const completionResult = validateCompletionMetadata(pattern, options);
-  const allWarnings = [...(statusResult.warnings ?? []), ...completionResult.warnings];
+  const allWarnings = [...(statusResult.warnings ?? [])];
 
   return {
-    valid: statusResult.valid && completionResult.valid,
+    valid: statusResult.valid,
     statusResult,
-    completionResult,
     allWarnings,
   };
 }

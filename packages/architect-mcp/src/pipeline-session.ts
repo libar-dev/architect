@@ -243,10 +243,6 @@ export class PipelineSessionManager {
       if (fs.existsSync(specsDir)) {
         config.features.push('architect/specs/*.feature');
       }
-      const releasesDir = path.join(config.baseDir, 'architect', 'releases');
-      if (fs.existsSync(releasesDir)) {
-        config.features.push('architect/releases/*.feature');
-      }
     }
   }
 }

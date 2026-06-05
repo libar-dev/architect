@@ -97,8 +97,6 @@ export function createParityContext(overrides: Partial<ProjectionContext> = {}):
       status: seed.status,
       maturity: seed.maturity,
       productArea: seed.productArea,
-      userRole: 'developer',
-      businessValue: 'demonstrates parity invariants',
       rules: seed.rules.map((rule) => buildBusinessRuleStub(rule)),
     }),
   );

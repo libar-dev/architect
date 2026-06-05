@@ -238,19 +238,12 @@ function buildGherkinPatternDraft(input: {
       : {}),
     ...(metadata.extendsPattern !== undefined ? { extendsPattern: metadata.extendsPattern } : {}),
     ...(metadata.target !== undefined ? { targetPath: metadata.target } : {}),
-    ...(metadata.since !== undefined ? { since: metadata.since } : {}),
     ...(metadata.executableSpecs !== undefined && metadata.executableSpecs.length > 0
       ? { executableSpecs: metadata.executableSpecs }
       : {}),
-    ...(metadata.effort !== undefined ? { effort: metadata.effort } : {}),
-    ...(metadata.effortActual !== undefined ? { effortActual: metadata.effortActual } : {}),
     ...(metadata.team !== undefined ? { team: metadata.team } : {}),
     ...(metadata.workflow !== undefined ? { workflow: metadata.workflow } : {}),
-    ...(metadata.risk !== undefined ? { risk: metadata.risk } : {}),
-    ...(metadata.priority !== undefined ? { priority: metadata.priority } : {}),
     ...(metadata.productArea !== undefined ? { productArea: metadata.productArea } : {}),
-    ...(metadata.userRole !== undefined ? { userRole: metadata.userRole } : {}),
-    ...(metadata.businessValue !== undefined ? { businessValue: metadata.businessValue } : {}),
     ...(metadata.level !== undefined ? { level: metadata.level } : {}),
     ...(metadata.parent !== undefined ? { parent: metadata.parent } : {}),
     ...(metadata.discoveredGaps !== undefined && metadata.discoveredGaps.length > 0
@@ -440,16 +433,9 @@ export async function extractPatternsFromGherkin(
       diagnostics.push(unlockReasonDiagnostic);
     }
 
-    let behaviorFile = metadata.behaviorFile;
     let behaviorPathToVerify: string | undefined;
-    if (!behaviorFile) {
-      const inferred = inferBehaviorFilePath(relativePath);
-      if (inferred !== undefined) {
-        behaviorFile = inferred;
-        behaviorPathToVerify = path.join(baseDir, inferred);
-      }
-    } else {
-      behaviorPathToVerify = path.join(baseDir, behaviorFile);
+    if (metadata.behaviorFile) {
+      behaviorPathToVerify = path.join(baseDir, metadata.behaviorFile);
     }
 
     try {
@@ -467,7 +453,7 @@ export async function extractPatternsFromGherkin(
           rules,
           deliverables,
           unlockReason,
-          behaviorFile,
+          behaviorFile: metadata.behaviorFile,
           behaviorFileVerified: undefined,
         }),
         `ExtractedPatternDraft validation failed for ${relativePath}`,
@@ -512,11 +498,6 @@ export async function extractPatternsFromGherkin(
   );
 
   return { patterns, errors, diagnostics };
-}
-
-export function inferBehaviorFilePath(timelineFilePath: string): string | undefined {
-  const match = /phase-\d+[a-z]?-(.+)\.feature$/.exec(timelineFilePath);
-  return match?.[1] ? `tests/features/behavior/${match[1]}.feature` : undefined;
 }
 
 async function fileExistsAsync(filePath: string): Promise<boolean> {

@@ -174,14 +174,6 @@ function readStringMetadata(
   return typeof value === 'string' ? value : undefined;
 }
 
-function readNumberMetadata(
-  metadataResults: ReadonlyMap<string, unknown>,
-  key: string,
-): number | undefined {
-  const value = metadataResults.get(key);
-  return typeof value === 'number' ? value : undefined;
-}
-
 function readStringArrayMetadata(
   metadataResults: ReadonlyMap<string, unknown>,
   key: string,
@@ -309,7 +301,6 @@ function parseDirective(
   const status = readStringMetadata(metadataResults, 'status') as AcceptedStatusValue | undefined;
   const boundedContext = readStringMetadata(metadataResults, 'bounded-context');
   const uses = readStringArrayMetadata(metadataResults, 'uses');
-  const phase = readNumberMetadata(metadataResults, 'phase');
   const level = readStringMetadata(metadataResults, 'level') as DocDirective['level'];
   const parent = readStringMetadata(metadataResults, 'parent');
   const implementsPatterns = readStringArrayMetadata(metadataResults, 'implements');
@@ -320,7 +311,6 @@ function parseDirective(
   const role = readStringMetadata(metadataResults, 'role');
   const unlockReason = readStringMetadata(metadataResults, 'unlock-reason');
   const target = readStringMetadata(metadataResults, 'target');
-  const since = readStringMetadata(metadataResults, 'since');
   const executableSpecs = readStringArrayMetadata(metadataResults, 'executable-specs');
   const productArea = readStringMetadata(metadataResults, 'product-area');
   const convention = readStringArrayMetadata(metadataResults, 'convention');
@@ -384,7 +374,6 @@ function parseDirective(
     ...(boundedContext && { boundedContext }),
     ...(whenToUse && { whenToUse }),
     ...(uses && uses.length > 0 && { uses }),
-    ...(phase !== undefined && { phase }),
     ...(level !== undefined && { level }),
     ...(parent && { parent }),
     ...(implementsPatterns && implementsPatterns.length > 0 && { implements: implementsPatterns }),
@@ -393,7 +382,6 @@ function parseDirective(
     ...(enforcesDecisions && enforcesDecisions.length > 0 && { enforcesDecisions }),
     ...(apiRef && apiRef.length > 0 && { apiRef }),
     ...(target && { target }),
-    ...(since && { since }),
     ...(executableSpecs && executableSpecs.length > 0 && { executableSpecs }),
     ...(role && { role }),
     ...(unlockReason && { unlockReason }),
@@ -544,33 +532,51 @@ function extractWhenToUse(
   commentText: string,
   fileOptInTag: string,
 ): readonly string[] | undefined {
-  const cleanedLines = commentText.split('\n').map((line) =>
-    line
+  const cleanedLines = commentText.split('\n').map((line) => {
+    return line
       .trim()
       .replace(/^\*\s?/, '')
-      .trim(),
-  );
+      .trim();
+  });
   const cleanedText = cleanedLines.join('\n');
 
   const headingMatch = /###\s*When to Use\s*\n/i.exec(cleanedText);
   if (headingMatch) {
     const afterHeading = cleanedText.slice(headingMatch.index + headingMatch[0].length);
     const bullets: string[] = [];
+
     for (const line of afterHeading.split('\n')) {
       const trimmed = line.trim();
-      if (trimmed === '' || trimmed.startsWith('#') || trimmed.startsWith('|')) break;
-      if (trimmed.startsWith('@') && !trimmed.startsWith(fileOptInTag)) break;
+
+      if (trimmed === '' || trimmed.startsWith('#') || trimmed.startsWith('|')) {
+        break;
+      }
+
+      if (trimmed.startsWith('@') && !trimmed.startsWith(fileOptInTag)) {
+        break;
+      }
+
       const bulletMatch = /^[-*]\s+(.+)$/.exec(trimmed);
-      if (bulletMatch?.[1]) bullets.push(bulletMatch[1].trim());
-      else break;
+
+      if (bulletMatch?.[1]) {
+        bullets.push(bulletMatch[1].trim());
+        continue;
+      }
+
+      break;
     }
-    if (bullets.length > 0) return bullets;
+
+    if (bullets.length > 0) {
+      return bullets;
+    }
   }
 
   const inlineMatch = /\*\*When to use:\*\*\s*([^\n]+)/i.exec(cleanedText);
   if (inlineMatch?.[1]) {
     const description = inlineMatch[1].trim();
-    if (description) return [description];
+    if (description) {
+      return [description];
+    }
   }
 
   return undefined;

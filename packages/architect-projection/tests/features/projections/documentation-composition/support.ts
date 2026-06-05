@@ -33,8 +33,6 @@ interface PatternFixtureOptions {
   readonly archLayer?: string;
   readonly archTheme?: string;
   readonly productArea?: ExtractedPattern['productArea'];
-  readonly userRole?: ExtractedPattern['userRole'];
-  readonly businessValue?: ExtractedPattern['businessValue'];
   readonly deliverables?: ExtractedPattern['deliverables'];
   readonly executableSpecs?: ExtractedPattern['executableSpecs'];
   readonly behaviorFile?: ExtractedPattern['behaviorFile'];

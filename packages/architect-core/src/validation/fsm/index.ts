@@ -19,7 +19,6 @@ export {
 export {
   type StatusValidationResult,
   type TransitionValidationResult,
-  type CompletionMetadataValidationResult,
   type PatternMetadata,
   type FSMValidationOptions,
   isValidStatusValue,

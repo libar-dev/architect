@@ -22,7 +22,6 @@ export { inferFeatureLayer, type FeatureLayer } from './layer-inference.js';
 export {
   extractPatternsFromGherkin,
   computeHierarchyChildren,
-  inferBehaviorFilePath,
   type GherkinExtractionResult,
   type GherkinExtractorConfig,
 } from './gherkin-extractor.js';

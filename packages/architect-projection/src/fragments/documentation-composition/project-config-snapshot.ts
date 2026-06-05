@@ -14,7 +14,7 @@ import { z } from 'zod';
 
 /**
  * A snapshot of project configuration and graph metrics — base directory,
- * config path, source globs, build time, and pattern/phase/role counts.
+ * config path, source globs, build time, and pattern/role counts.
  *
  * @architect-shape
  */

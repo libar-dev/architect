@@ -50,8 +50,8 @@ export type { AntiPatternViolation, AntiPatternThresholds } from './types.js';
  * These are process metadata tags that track delivery workflow state.
  *
  * Per ADR-001 Rule 6 (D-3 hybrid model): the canonical minimum is `team`;
- * this package extends with `workflow` and `completed` for its
- * requirement-doc enrichment. Source of truth lives in
+ * this package extends with `workflow` for its requirement-doc enrichment.
+ * Source of truth lives in
  * `@libar-dev/architect-core`'s taxonomy module.
  */
 const FEATURE_ONLY_TAG_SUFFIXES = ARCHITECT_PACKAGE_FEATURE_ONLY_TAG_SUFFIXES;
@@ -60,13 +60,27 @@ const FEATURE_ONLY_TAG_SUFFIXES = ARCHITECT_PACKAGE_FEATURE_ONLY_TAG_SUFFIXES;
  * Tag suffixes that have been removed from the registry.
  * Using these tags causes silent data loss — the scanner skips unrecognized tags.
  *
- * `quarter`, `phase`, `release`, and `completed` were retired by ADR-013 (the
- * temporal/release/completion-date dimensions). Matching is on the full
+ * ADR-013 retires the temporal/release/completion-date dimensions and the
+ * unpopulated process-metadata band (`effort`, `effort-actual`, `risk`,
+ * `priority`, `since`, `user-role`, `business-value`). Matching is on the full
  * `<prefix><suffix>` token (exact or `<prefix><suffix>:`), so `completed` flags
  * `@architect-completed` but NOT `@architect-status:completed`, and `phase`
  * flags `@architect-phase` but NOT `@architect-level:phase`.
  */
-const REMOVED_TAG_SUFFIXES = ['brief', 'quarter', 'phase', 'release', 'completed'] as const;
+const REMOVED_TAG_SUFFIXES = [
+  'brief',
+  'quarter',
+  'phase',
+  'release',
+  'completed',
+  'effort',
+  'effort-actual',
+  'risk',
+  'priority',
+  'since',
+  'user-role',
+  'business-value',
+] as const;
 
 /**
  * Builds feature-only annotation list from the tag prefix.

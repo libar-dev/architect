@@ -168,7 +168,7 @@ export function transformToPatternGraphWithValidation(
       bySourceType.typescript.push(pattern);
     }
 
-    if (pattern.productArea || pattern.userRole || pattern.businessValue) {
+    if (pattern.productArea) {
       bySourceType.prd.push(pattern);
     }
 

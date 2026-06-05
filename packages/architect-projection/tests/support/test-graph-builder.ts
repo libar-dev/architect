@@ -42,12 +42,8 @@ export interface PatternStubOptions {
   readonly archLayer?: string;
   readonly archTheme?: string;
   readonly productArea?: ExtractedPattern['productArea'];
-  readonly userRole?: ExtractedPattern['userRole'];
-  readonly businessValue?: ExtractedPattern['businessValue'];
   readonly team?: ExtractedPattern['team'];
-  readonly effort?: ExtractedPattern['effort'];
-  readonly effortActual?: ExtractedPattern['effortActual'];
-  readonly priority?: ExtractedPattern['priority'];
+  readonly workflow?: ExtractedPattern['workflow'];
   readonly deliverables?: ExtractedPattern['deliverables'];
   readonly executableSpecs?: ExtractedPattern['executableSpecs'];
   readonly behaviorFile?: ExtractedPattern['behaviorFile'];
@@ -122,12 +118,8 @@ export function buildPatternStub(name: string, options: PatternStubOptions = {})
       ? { adrTheme: options.adrTheme ?? options.archTheme }
       : {}),
     ...(options.productArea !== undefined ? { productArea: options.productArea } : {}),
-    ...(options.userRole !== undefined ? { userRole: options.userRole } : {}),
-    ...(options.businessValue !== undefined ? { businessValue: options.businessValue } : {}),
     ...(options.team !== undefined ? { team: options.team } : {}),
-    ...(options.effort !== undefined ? { effort: options.effort } : {}),
-    ...(options.effortActual !== undefined ? { effortActual: options.effortActual } : {}),
-    ...(options.priority !== undefined ? { priority: options.priority } : {}),
+    ...(options.workflow !== undefined ? { workflow: options.workflow } : {}),
     ...(options.deliverables !== undefined ? { deliverables: options.deliverables } : {}),
     ...(options.executableSpecs !== undefined ? { executableSpecs: options.executableSpecs } : {}),
     ...(options.behaviorFile !== undefined ? { behaviorFile: options.behaviorFile } : {}),
@@ -205,11 +197,7 @@ export function buildGraphFromPatterns(options: GraphBuilderOptions): PatternGra
       gherkin: patterns.filter((pattern) => pattern.source.file.endsWith('.feature')),
       roadmap: [],
       prd: patterns.filter(
-        (pattern) =>
-          pattern.adr === undefined &&
-          (pattern.productArea !== undefined ||
-            pattern.userRole !== undefined ||
-            pattern.businessValue !== undefined),
+        (pattern) => pattern.adr === undefined && pattern.productArea !== undefined,
       ),
     },
     byProductArea: buildProductAreaIndex(patterns),

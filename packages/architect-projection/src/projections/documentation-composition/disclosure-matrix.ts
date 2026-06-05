@@ -156,10 +156,10 @@ export const patternsDisclosureMatrix = disclosureMatrix({
 });
 
 export const roadmapDisclosureMatrix = disclosureMatrix({
-  essential: disclosureSpec('phase', 'summary', false, true, PLANNED_WORK_FILTER),
-  important: disclosureSpec('phase', 'summary', true, true, PLANNED_WORK_FILTER),
-  useful: disclosureSpec('phase', 'full', true, true, PLANNED_WORK_FILTER),
-  advanced: disclosureSpec('phase', 'full', true, true),
+  essential: disclosureSpec('flat', 'summary', false, true, PLANNED_WORK_FILTER),
+  important: disclosureSpec('flat', 'summary', true, true, PLANNED_WORK_FILTER),
+  useful: disclosureSpec('flat', 'full', true, true, PLANNED_WORK_FILTER),
+  advanced: disclosureSpec('flat', 'full', true, true),
 });
 
 export const currentWorkDisclosureMatrix = flatSummaryDisclosureMatrix;

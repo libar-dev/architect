@@ -18,7 +18,7 @@
  *
  * **Behavior:**
  * - Resolves each focal pattern via `requirePattern` and emits
- *   `PatternContextMeta` with summary, status, phase, role, and file.
+ *   `PatternContextMeta` with summary, status, role, and file.
  * - Flattens per-pattern dependencies into a deduped `dependencies` list and
  *   a `sharedDependencies` subset (names appearing across multiple focal
  *   patterns).

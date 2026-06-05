@@ -94,13 +94,11 @@ export {
   type TagRegistry,
 } from './tag-registry.js';
 export {
-  RiskLevelSchema,
   ProcessMetadataSchema,
   DeliverableSchema,
   ValidationSummarySchema,
   HierarchyLevelSchema,
   type ProcessStatus,
-  type RiskLevel,
   type ProcessMetadata,
   type Deliverable,
   type ValidationSummary,

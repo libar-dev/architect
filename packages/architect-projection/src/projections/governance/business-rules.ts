@@ -21,7 +21,7 @@
  *   a single-bundle projection of the normalized `BusinessRule`, unless the
  *   current `ProjectionFilter` excludes the owning pattern.
  * - `projectBusinessRuleSet` filters, groups, and sorts rules by product
- *   area, package, phase, or feature; defaults to scope `all` when no option
+ *   area, package, or feature; defaults to scope `all` when no option
  *   is given.
  * - Re-exports `BusinessRuleSetOptionsSchema` for callers that validate
  *   options independently, and exposes `parseAndProjectBusinessRuleSet` as a

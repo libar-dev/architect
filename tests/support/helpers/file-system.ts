@@ -272,7 +272,6 @@ export interface RegularType {
  */
 export function createFeatureFile(options: {
   status?: string;
-  effort?: string;
   team?: string;
   name?: string;
   description?: string;
@@ -280,7 +279,6 @@ export function createFeatureFile(options: {
 }): string {
   const {
     status = 'completed',
-    effort = '1w',
     team = 'platform',
     name = 'Test Feature',
     description = 'A test feature for validation.',
@@ -291,7 +289,6 @@ export function createFeatureFile(options: {
 
   // Process tags (using @architect-* prefix per PDR-004)
   lines.push(`@architect-status:${status}`);
-  lines.push(`@architect-effort:${effort}`);
   lines.push(`@architect-team:${team}`);
   lines.push(`Feature: ${name}`);
   lines.push(`  ${description}`);

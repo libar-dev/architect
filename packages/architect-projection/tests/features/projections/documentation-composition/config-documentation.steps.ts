@@ -1357,8 +1357,6 @@ function createDocumentationContext(): ProjectionContext {
     archContext: 'projection',
     archLayer: 'application',
     productArea: 'Projection Platform',
-    userRole: 'AI engineer',
-    businessValue: 'Deterministic projections for Studio and MCP consumers.',
     deliverables: [
       {
         name: 'Documentation Composition projection support',
@@ -1395,8 +1393,6 @@ function createDocumentationContext(): ProjectionContext {
     archContext: 'projection',
     archLayer: 'infrastructure',
     productArea: 'Studio UI',
-    userRole: 'Architect reviewer',
-    businessValue: 'Structured documentation rendering inside Studio.',
     deliverables: [
       {
         name: 'Documentation view wiring',
@@ -1425,8 +1421,6 @@ function createDocumentationContext(): ProjectionContext {
     archContext: 'studio',
     archLayer: 'application',
     productArea: 'Studio UI',
-    userRole: 'Architect reviewer',
-    businessValue: 'Project diagnostics stay readable in the Studio shell.',
     deliverables: [
       {
         name: 'Settings config card',
@@ -1445,8 +1439,6 @@ function createDocumentationContext(): ProjectionContext {
     archContext: 'projection',
     archLayer: 'application',
     productArea: 'Projection Platform',
-    userRole: 'AI engineer',
-    businessValue: 'Requirement readers drill into rule details only when needed.',
     executableSpecs: [
       'packages/architect-projection/tests/features/projections/documentation-composition/config-documentation.feature',
     ],

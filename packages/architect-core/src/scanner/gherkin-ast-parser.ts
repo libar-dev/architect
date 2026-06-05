@@ -112,15 +112,9 @@ export const FeatureTagMetadataSchema = z.strictObject({
   enforcesDecisions: z.array(z.string()).readonly().optional(),
   apiRef: z.array(z.string()).readonly().optional(),
   role: z.string().optional(),
-  effort: z.string().optional(),
-  effortActual: z.string().optional(),
   team: z.string().optional(),
   workflow: z.string().optional(),
-  risk: z.string().optional(),
-  priority: z.string().optional(),
   productArea: z.string().optional(),
-  userRole: z.string().optional(),
-  businessValue: z.string().optional(),
   level: z.enum(HIERARCHY_LEVELS).optional(),
   parent: z.string().optional(),
   title: z.string().optional(),
@@ -138,7 +132,6 @@ export const FeatureTagMetadataSchema = z.strictObject({
   adrTheme: z.enum(ADR_THEME_VALUES).optional(),
   adrLayer: z.enum(ADR_LAYER_VALUES).optional(),
   target: z.string().optional(),
-  since: z.string().optional(),
   convention: z.array(z.string()).readonly().optional(),
   executableSpecs: z.array(z.string()).readonly().optional(),
   roadmapSpec: z.string().optional(),
@@ -455,15 +448,9 @@ export function extractPatternTags(
   let seeAlso: readonly string[] | undefined;
   let enforcesDecisions: readonly string[] | undefined;
   let apiRef: readonly string[] | undefined;
-  let effort: string | undefined;
-  let effortActual: string | undefined;
   let team: string | undefined;
   let workflow: string | undefined;
-  let risk: string | undefined;
-  let priority: string | undefined;
   let productArea: string | undefined;
-  let userRole: string | undefined;
-  let businessValue: string | undefined;
   let level: HierarchyLevel | undefined;
   let parent: string | undefined;
   let title: string | undefined;
@@ -481,7 +468,6 @@ export function extractPatternTags(
   let adrTheme: string | undefined;
   let adrLayer: string | undefined;
   let target: string | undefined;
-  let since: string | undefined;
   let convention: readonly string[] | undefined;
   let executableSpecs: readonly string[] | undefined;
   let roadmapSpec: string | undefined;
@@ -648,32 +634,14 @@ export function extractPatternTags(
             case 'extendsPattern':
               extendsPattern = value;
               break;
-            case 'effort':
-              effort = value;
-              break;
-            case 'effortActual':
-              effortActual = value;
-              break;
             case 'team':
               team = value;
               break;
             case 'workflow':
               workflow = value;
               break;
-            case 'risk':
-              risk = value;
-              break;
-            case 'priority':
-              priority = value;
-              break;
             case 'productArea':
               productArea = value;
-              break;
-            case 'userRole':
-              userRole = value;
-              break;
-            case 'businessValue':
-              businessValue = value;
               break;
             case 'parent':
               parent = value;
@@ -698,9 +666,6 @@ export function extractPatternTags(
               break;
             case 'target':
               target = value;
-              break;
-            case 'since':
-              since = value;
               break;
             case 'roadmapSpec':
               roadmapSpec = value;
@@ -730,15 +695,9 @@ export function extractPatternTags(
     ...(enforcesDecisions !== undefined ? { enforcesDecisions } : {}),
     ...(apiRef !== undefined ? { apiRef } : {}),
     ...(resolvedRole !== undefined ? { role: resolvedRole } : {}),
-    ...(effort !== undefined ? { effort } : {}),
-    ...(effortActual !== undefined ? { effortActual } : {}),
     ...(team !== undefined ? { team } : {}),
     ...(workflow !== undefined ? { workflow } : {}),
-    ...(risk !== undefined ? { risk } : {}),
-    ...(priority !== undefined ? { priority } : {}),
     ...(productArea !== undefined ? { productArea } : {}),
-    ...(userRole !== undefined ? { userRole } : {}),
-    ...(businessValue !== undefined ? { businessValue } : {}),
     ...(level !== undefined ? { level } : {}),
     ...(parent !== undefined ? { parent } : {}),
     ...(title !== undefined ? { title } : {}),
@@ -756,7 +715,6 @@ export function extractPatternTags(
     ...(adrTheme !== undefined ? { adrTheme } : {}),
     ...(adrLayer !== undefined ? { adrLayer } : {}),
     ...(target !== undefined ? { target } : {}),
-    ...(since !== undefined ? { since } : {}),
     ...(convention !== undefined ? { convention } : {}),
     ...(executableSpecs !== undefined ? { executableSpecs } : {}),
     ...(roadmapSpec !== undefined ? { roadmapSpec } : {}),

@@ -60,9 +60,7 @@ export function aggregateTagUsage(dataset: PatternGraph): TagUsageReport {
     increment('status', pattern.status);
     if (pattern.role !== undefined) increment('role', pattern.role);
     if (pattern.boundedContext !== undefined) increment('arch-context', pattern.boundedContext);
-    if (pattern.priority !== undefined) increment('priority', pattern.priority);
     if (pattern.team !== undefined) increment('team', pattern.team);
-    if (pattern.effort !== undefined) increment('effort', pattern.effort);
   }
 
   const tags: TagUsageEntry[] = [];

@@ -169,7 +169,7 @@ Feature: Operational Insights reporting projections
       When I project the requirement digests for all areas and for "Projection Platform"
       Then the all-areas requirement digest should aggregate every non-ADR product requirement
       And the filtered requirement digest should keep structured blocks and test file references
-      And the all-areas requirement digest should include product-metadata requirements without a product area
+      And the all-areas requirement digest should exclude requirements without a product area
 
     Scenario: requirement digests aggregate business-rule references for duplicate feature names
       Given a Operational Insights requirement context with duplicate feature names across packages

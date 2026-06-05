@@ -9,12 +9,12 @@
  * ## Pattern summary projection
  *
  * **Value:** Gives consumers the canonical short description of any pattern
- * — name, status, role, optional phase, file, and source (`typescript` or
+ * — name, status, role, file, and source (`typescript` or
  * `gherkin`) — as a stable, schema-validated fragment reused by catalog,
  * detail, and every renderer.
  *
  * **Invariant:** A `PatternSummary` always exposes `patternName`, `status`,
- * `role`, optional `phase`, `file`, and a `source` discriminator derived
+ * `role`, `file`, and a `source` discriminator derived
  * from the file extension; lookup is case-insensitive, and unknown names
  * fail with a `PATTERN_NOT_FOUND` error plus a fuzzy suggestion.
  *

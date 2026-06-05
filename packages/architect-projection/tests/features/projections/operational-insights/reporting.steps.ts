@@ -518,8 +518,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 archContext: 'projection',
                 archLayer: 'application',
                 team: 'projection',
-                effort: 'm',
-                priority: 'high',
+                workflow: 'implementation',
                 file: 'packages/architect-projection/src/projections/operational-insights/overview.ts',
               }),
               createPattern('ServiceCompleted', {
@@ -528,8 +527,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 archContext: 'projection',
                 archLayer: 'application',
                 team: 'projection',
-                effort: 'm',
-                priority: 'high',
+                workflow: 'implementation',
                 file: 'packages/architect-projection/src/projections/operational-insights/support.ts',
               }),
               createPattern('CliRoadmap', {
@@ -538,7 +536,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 archContext: 'tooling',
                 archLayer: 'application',
                 team: 'tooling',
-                priority: 'medium',
+                workflow: 'documentation',
                 file: 'packages/architect-cli/src/cli/pattern-graph-cli.ts',
               }),
               createPattern('DecisionRecord', {
@@ -607,15 +605,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 },
                 {
                   kind: 'TagUsageEntry',
-                  tag: 'priority',
-                  count: 3,
-                  values: [
-                    { value: 'high', count: 2 },
-                    { value: 'medium', count: 1 },
-                  ],
-                },
-                {
-                  kind: 'TagUsageEntry',
                   tag: 'team',
                   count: 3,
                   values: [
@@ -625,9 +614,12 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 },
                 {
                   kind: 'TagUsageEntry',
-                  tag: 'effort',
-                  count: 2,
-                  values: [{ value: 'm', count: 2 }],
+                  tag: 'workflow',
+                  count: 3,
+                  values: [
+                    { value: 'implementation', count: 2 },
+                    { value: 'documentation', count: 1 },
+                  ],
                 },
               ],
               patternCount: 6,
@@ -776,7 +768,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   createPattern('CoverageProjection', {
                     status: 'completed',
                     productArea: 'Projection Platform',
-                    userRole: 'Maintainer',
                     description: 'Expose graph-only annotation coverage as a typed fragment.',
                     rules: [
                       {
@@ -805,10 +796,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   }),
                   createPattern('OperatorNeeds', {
                     status: 'active',
-                    userRole: 'Operator',
-                    businessValue: 'Expose requirement digests beyond product-area tags.',
                     description:
-                      'Include PRD patterns that only carry user-role/business-value metadata.',
+                      'Unclassified requirement metadata should not enter product digests.',
                     executableSpecs: ['tests/features/query/context.feature'],
                   }),
                   createPattern('ADRProjectionDecision', {
@@ -849,20 +838,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                     },
                   ],
                   requirements: [
-                    {
-                      pattern: 'OperatorNeeds',
-                      ownerRouteId:
-                        'requirements-executable:architect-projection:requirement:operator-needs',
-                      status: 'active',
-                      description: [
-                        { type: 'heading', level: 2, text: 'Requirement' },
-                        {
-                          type: 'paragraph',
-                          text: 'Include PRD patterns that only carry user-role/business-value metadata.',
-                        },
-                      ],
-                      testFiles: ['tests/features/query/context.feature'],
-                    },
                     {
                       pattern: 'CoverageProjection',
                       ownerRouteId:
@@ -917,11 +892,11 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           );
 
           And(
-            'the all-areas requirement digest should include product-metadata requirements without a product area',
+            'the all-areas requirement digest should exclude requirements without a product area',
             () => {
               expect(
                 state!.allRequirements?.root.requirements.map((requirement) => requirement.pattern),
-              ).toContain('OperatorNeeds');
+              ).not.toContain('OperatorNeeds');
             },
           );
 

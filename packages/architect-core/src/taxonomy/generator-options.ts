@@ -13,13 +13,13 @@ export type DeliverablesFormat = (typeof DELIVERABLES_FORMAT)[number];
 export const ACCEPTANCE_CRITERIA_FORMAT = ['gherkin', 'bullet-points', 'table'] as const;
 export type AcceptanceCriteriaFormat = (typeof ACCEPTANCE_CRITERIA_FORMAT)[number];
 
-export const DELIVERABLES_GROUP_BY = ['status', 'phase', 'location', 'none'] as const;
+export const DELIVERABLES_GROUP_BY = ['status', 'location', 'none'] as const;
 export type DeliverablesGroupBy = (typeof DELIVERABLES_GROUP_BY)[number];
 
-export const PRD_FEATURES_GROUP_BY = ['product-area', 'user-role', 'phase'] as const;
+export const PRD_FEATURES_GROUP_BY = ['product-area'] as const;
 export type PrdFeaturesGroupBy = (typeof PRD_FEATURES_GROUP_BY)[number];
 
-export const SESSION_FINDINGS_GROUP_BY = ['category', 'phase'] as const;
+export const SESSION_FINDINGS_GROUP_BY = ['category'] as const;
 export type SessionFindingsGroupBy = (typeof SESSION_FINDINGS_GROUP_BY)[number];
 
 export const CONSTRAINTS_GROUP_BY = ['product-area', 'constraint'] as const;
@@ -28,13 +28,10 @@ export type ConstraintsGroupBy = (typeof CONSTRAINTS_GROUP_BY)[number];
 export const ADR_LIST_GROUP_BY = ['status', 'category'] as const;
 export type AdrListGroupBy = (typeof ADR_LIST_GROUP_BY)[number];
 
-export const REMAINING_WORK_GROUP_BY = ['priority', 'level', 'none'] as const;
+export const REMAINING_WORK_GROUP_BY = ['level', 'none'] as const;
 export type RemainingWorkGroupBy = (typeof REMAINING_WORK_GROUP_BY)[number];
 
-export const REMAINING_WORK_SORT_BY = ['priority', 'effort'] as const;
-export type RemainingWorkSortBy = (typeof REMAINING_WORK_SORT_BY)[number];
-
-export const PR_CHANGES_SORT_BY = ['phase', 'priority', 'workflow'] as const;
+export const PR_CHANGES_SORT_BY = ['workflow'] as const;
 export type PrChangesSortBy = (typeof PR_CHANGES_SORT_BY)[number];
 
 export const WORKFLOW_VALUES = [
@@ -44,9 +41,6 @@ export const WORKFLOW_VALUES = [
   'documentation',
 ] as const;
 export type WorkflowValue = (typeof WORKFLOW_VALUES)[number];
-
-export const PRIORITY_VALUES = ['critical', 'high', 'medium', 'low'] as const;
-export type PriorityValue = (typeof PRIORITY_VALUES)[number];
 
 export const ADR_STATUS_VALUES = ['proposed', 'accepted', 'deprecated', 'superseded'] as const;
 export type AdrStatusValue = (typeof ADR_STATUS_VALUES)[number];

@@ -273,54 +273,65 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
       },
     );
 
-    RuleScenario(
-      'Flag retired temporal and release tags as removed tags',
-      ({ When, Then, And }): void => {
-        When('I detect removed tags in a feature using retired ADR-013 tags', () => {
-          const baseDir = createTempDir('architect-guard-removed-tags-');
-          const filePath = path.join(baseDir, 'retired.feature');
-          // The retired ADR-013 tags must flag; the status/level look-alikes
-          // (@architect-status:completed, @architect-level:phase) must NOT —
-          // matching is on the full <prefix><suffix> token, not a substring.
-          writeFileSync(
-            filePath,
-            [
-              '@architect-quarter:2026-Q1',
-              '@architect-phase:2',
-              '@architect-release:v1.0.0',
-              '@architect-completed:2026-01-07',
-              '@architect-status:completed',
-              '@architect-level:phase',
-              'Feature: Retired tag usage',
-              '',
-              '  Scenario: Placeholder',
-              '    Given a step',
-            ].join('\n'),
-          );
+    RuleScenario('Flag retired taxonomy tags as removed tags', ({ When, Then, And }): void => {
+      When('I detect removed tags in a feature using retired ADR-013 taxonomy tags', () => {
+        const baseDir = createTempDir('architect-guard-removed-tags-');
+        const filePath = path.join(baseDir, 'retired.feature');
+        // The retired ADR-013 tags must flag; the status/level look-alikes
+        // (@architect-status:completed, @architect-level:phase) must NOT —
+        // matching is on the full <prefix><suffix> token, not a substring.
+        writeFileSync(
+          filePath,
+          [
+            '@architect-quarter:2026-Q1',
+            '@architect-phase:2',
+            '@architect-release:v1.0.0',
+            '@architect-completed:2026-01-07',
+            '@architect-effort:1w',
+            '@architect-effort-actual:2w',
+            '@architect-risk:high',
+            '@architect-priority:critical',
+            '@architect-since:design-session-1',
+            '@architect-user-role:developer',
+            '@architect-business-value:eliminate-context-loss',
+            '@architect-status:completed',
+            '@architect-level:phase',
+            'Feature: Retired tag usage',
+            '',
+            '  Scenario: Placeholder',
+            '    Given a step',
+          ].join('\n'),
+        );
 
-          state.removedTagViolations = detectRemovedTags([{ filePath }] as never);
-        });
+        state.removedTagViolations = detectRemovedTags([{ filePath }] as never);
+      });
 
-        Then('a removed-tag violation is reported for each retired tag', () => {
-          const flaggedTokens = (state.removedTagViolations ?? []).map((v) =>
-            v.message.split('"')[1]?.toLowerCase(),
-          );
-          expect(state.removedTagViolations?.every((v) => v.id === 'removed-tag')).toBe(true);
-          expect(flaggedTokens).toContain('@architect-quarter:2026-q1');
-          expect(flaggedTokens).toContain('@architect-phase:2');
-          expect(flaggedTokens).toContain('@architect-release:v1.0.0');
-          expect(flaggedTokens).toContain('@architect-completed:2026-01-07');
-        });
+      Then('a removed-tag violation is reported for each retired tag', () => {
+        const flaggedTokens = (state.removedTagViolations ?? []).map((v) =>
+          v.message.split('"')[1]?.toLowerCase(),
+        );
+        expect(state.removedTagViolations?.every((v) => v.id === 'removed-tag')).toBe(true);
+        expect(flaggedTokens).toContain('@architect-quarter:2026-q1');
+        expect(flaggedTokens).toContain('@architect-phase:2');
+        expect(flaggedTokens).toContain('@architect-release:v1.0.0');
+        expect(flaggedTokens).toContain('@architect-completed:2026-01-07');
+        expect(flaggedTokens).toContain('@architect-effort:1w');
+        expect(flaggedTokens).toContain('@architect-effort-actual:2w');
+        expect(flaggedTokens).toContain('@architect-risk:high');
+        expect(flaggedTokens).toContain('@architect-priority:critical');
+        expect(flaggedTokens).toContain('@architect-since:design-session-1');
+        expect(flaggedTokens).toContain('@architect-user-role:developer');
+        expect(flaggedTokens).toContain('@architect-business-value:eliminate-context-loss');
+      });
 
-        And('no removed-tag violation is reported for the status or level look-alikes', () => {
-          const flaggedTokens = (state.removedTagViolations ?? []).map((v) =>
-            v.message.split('"')[1]?.toLowerCase(),
-          );
-          expect(flaggedTokens).not.toContain('@architect-status:completed');
-          expect(flaggedTokens).not.toContain('@architect-level:phase');
-        });
-      },
-    );
+      And('no removed-tag violation is reported for the status or level look-alikes', () => {
+        const flaggedTokens = (state.removedTagViolations ?? []).map((v) =>
+          v.message.split('"')[1]?.toLowerCase(),
+        );
+        expect(flaggedTokens).not.toContain('@architect-status:completed');
+        expect(flaggedTokens).not.toContain('@architect-level:phase');
+      });
+    });
 
     RuleScenario(
       'Warn on completed spec edits without unlock reason',

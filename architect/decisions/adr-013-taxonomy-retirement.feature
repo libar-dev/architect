@@ -6,10 +6,10 @@
 @architect-adr-theme:taxonomy
 @architect-pattern:ADR013TaxonomyRetirement
 @architect-status:completed
-@architect-unlock-reason:Born-accepted-after-code-removed-the-temporal-dimensions-quarter-phase-release-axis-and-completion-date
+@architect-unlock-reason:Born-accepted-after-code-removed-the-temporal-release-and-process-metadata-residue
 @architect-product-area:Process
 @architect-uses:ADR001TaxonomyCanonicalValues,ADR007CoordinatedTaxonomyRedesign
-Feature: ADR-013 - Retire Quarter, USDP Phase, Numeric Phase, Release Axis, and Completion-Date Taxonomy
+Feature: ADR-013 - Retire Temporal, Release, Completion-Date, and Unpopulated Process-Metadata Taxonomy
 
   **Context:**
   Several temporal taxonomy dimensions arrived with the package's extraction from
@@ -18,6 +18,10 @@ Feature: ADR-013 - Retire Quarter, USDP Phase, Numeric Phase, Release Axis, and 
   six-phase USDP workflow (Inception through Retrospective), the numeric
   `@architect-phase` delivery-sequence tag, the `@architect-release` axis (a
   release-tag bucket), and the `@architect-completed` completion-date field.
+  The same zero-population sweep showed the broader process-metadata band —
+  `@architect-effort`, `@architect-effort-actual`, `@architect-risk`,
+  `@architect-priority`, `@architect-since`, `@architect-user-role`, and
+  `@architect-business-value` — was also unpopulated across the live graph.
   Each is a proxy for when work happens, wired end to end — schema fields,
   pre-computed views, read-API methods, projections — yet carrying no (or near
   zero) populated data. `@architect-release` was never even a registered
@@ -29,11 +33,13 @@ Feature: ADR-013 - Retire Quarter, USDP Phase, Numeric Phase, Release Axis, and 
 
   **Decision:**
   Retire the dimensions. The clean-bootstrapped taxonomy models no calendar or
-  ordinal temporal axis, no release axis, and no completion-date field; these
-  unpopulated proxies are removed rather than maintained. If a temporal grouping
-  is needed later it will be introduced deliberately on a populated dimension,
-  not retained as residue. Releases, when first practiced, are derived from git
-  tags (per the `ArchitectureDelta` roadmap spec), never annotated.
+  ordinal temporal axis, no release axis, no completion-date field, and no
+  unpopulated effort/risk/priority/session/user/business-value process-metadata
+  band. These unpopulated proxies are removed rather than maintained. If a
+  temporal grouping or process metadata dimension is needed later it will be
+  introduced deliberately on a populated dimension, not retained as residue.
+  Releases, when first practiced, are derived from git tags (per the
+  `ArchitectureDelta` roadmap spec), never annotated.
 
   1. `@architect-quarter` is retired as a canonical feature-only tag. Its
      ownership rule, its YYYY-QN format, its schema field, the by-quarter
@@ -57,6 +63,14 @@ Feature: ADR-013 - Retire Quarter, USDP Phase, Numeric Phase, Release Axis, and 
      release-free completed-patterns view (the `completed` set in name order,
      with no calendar or ordinal fallback).
 
+  5. The unpopulated process-metadata band is retired. `effort`,
+     `effortActual`, `risk`, `priority`, `since`, `userRole`, and
+     `businessValue` are absent from `ExtractedPattern`, doc-directive and
+     dual-source schemas, scanners, extractors, read-model inventory, projection
+     grouping/sorting options, and generated test fixtures. The guard treats the
+     corresponding authored tags as removed tags. ADR-001 Rule 6 keeps only the
+     canonical `team` floor plus this package's `workflow` extension.
+
   This record states the retirement decision; the code removal follows. Because
   the affected tables in ADR-001 (Rules 6, 7, 8) are sync-tested mirrors of live
   constants, ADR-001 is re-mirrored to the narrowed taxonomy in the same change
@@ -66,7 +80,7 @@ Feature: ADR-013 - Retire Quarter, USDP Phase, Numeric Phase, Release Axis, and 
 
   **Consequences:**
   | Type | Impact |
-  | Positive | The taxonomy carries no unpopulated temporal machinery — schema fields, views, read-API methods, and projections that never hold data are gone |
+  | Positive | The taxonomy carries no unpopulated temporal or process-metadata machinery — schema fields, views, read-API methods, and projections that never hold data are gone |
   | Positive | Generated timeline and changelog groupings simplify to completion order, with no calendar, ordinal, or release fallback |
   | Positive | One fewer way to conflate structural grouping with delivery timing; release/changelog state is sourced from git, where it belongs |
   | Negative | Any future calendar, phase, or release grouping must be reintroduced deliberately on a populated dimension (releases via git tags per ArchitectureDelta) |
@@ -116,3 +130,29 @@ Feature: ADR-013 - Retire Quarter, USDP Phase, Numeric Phase, Release Axis, and 
       And completed is not a registered metadata tag
       And the @architect-release tag is not registered
       And the changelog renders a release-free completed-patterns view
+
+  Rule: The unpopulated process-metadata band is not modeled
+
+    **Invariant:** `@architect-effort`, `@architect-effort-actual`,
+    `@architect-risk`, `@architect-priority`, `@architect-since`,
+    `@architect-user-role`, and `@architect-business-value` are not part of the
+    taxonomy or the read model. `team` remains the canonical feature-only
+    ownership tag, and `workflow` remains this package's feature-only extension.
+    **Rationale:** The live graph populated none of these fields across any
+    pattern. Keeping zero-data estimation, prioritization, risk, session,
+    persona, or business-value fields would preserve dead planning machinery in
+    a bootstrap read model that should carry only live state.
+    **Verified by:** The process-metadata band is absent
+
+    @acceptance-criteria @validation
+    Scenario: The process-metadata band is absent
+      Given the taxonomy registry and read model after retirement
+      When the registered tags and pattern fields are listed
+      Then effort is not a pattern field
+      And effortActual is not a pattern field
+      And risk is not a pattern field
+      And priority is not a process-metadata pattern field
+      And since is not a pattern field
+      And userRole is not a pattern field
+      And businessValue is not a pattern field
+      And team and workflow remain feature-only process metadata

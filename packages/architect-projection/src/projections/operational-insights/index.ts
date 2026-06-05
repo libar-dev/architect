@@ -389,9 +389,8 @@ export function buildTagUsageMatrix(context: ProjectionContext): TagUsageMatrix 
     if (pattern.boundedContext !== undefined)
       incrementTagUsage(tagMap, 'arch-context', pattern.boundedContext);
     if (pattern.adrLayer !== undefined) incrementTagUsage(tagMap, 'arch-layer', pattern.adrLayer);
-    if (pattern.priority !== undefined) incrementTagUsage(tagMap, 'priority', pattern.priority);
     if (pattern.team !== undefined) incrementTagUsage(tagMap, 'team', pattern.team);
-    if (pattern.effort !== undefined) incrementTagUsage(tagMap, 'effort', pattern.effort);
+    if (pattern.workflow !== undefined) incrementTagUsage(tagMap, 'workflow', pattern.workflow);
   }
 
   return {
@@ -543,28 +542,14 @@ function patternSatisfiesTag(
     case 'arch-layer':
     case 'layer':
       return hasNonEmptyString(pattern.adrLayer);
-    case 'priority':
-      return hasNonEmptyString(pattern.priority);
     case 'team':
       return hasNonEmptyString(pattern.team);
-    case 'effort':
-      return hasNonEmptyString(pattern.effort);
-    case 'effort-actual':
-      return hasNonEmptyString(pattern.effortActual);
     case 'product-area':
       return hasNonEmptyString(pattern.productArea);
-    case 'user-role':
-      return hasNonEmptyString(pattern.userRole);
-    case 'business-value':
-      return hasNonEmptyString(pattern.businessValue);
     case 'workflow':
       return hasNonEmptyString(pattern.workflow);
-    case 'risk':
-      return hasNonEmptyString(pattern.risk);
     case 'target-path':
       return hasNonEmptyString(pattern.targetPath);
-    case 'since':
-      return hasNonEmptyString(pattern.since);
     case 'depends-on': {
       const relationships = getRelationships(context, getPatternName(pattern));
       return (relationships?.dependsOn.length ?? pattern.uses?.length ?? 0) > 0;
@@ -771,12 +756,7 @@ function resolveRequirementPatterns(
   const patterns =
     productArea !== undefined
       ? [...(context.graph.byProductArea[productArea] ?? [])]
-      : context.graph.patterns.filter(
-          (pattern) =>
-            hasNonEmptyString(pattern.productArea) ||
-            hasNonEmptyString(pattern.userRole) ||
-            hasNonEmptyString(pattern.businessValue),
-        );
+      : context.graph.patterns.filter((pattern) => hasNonEmptyString(pattern.productArea));
 
   return filterPatterns(patterns, context.projectionFilter)
     .filter((pattern) => pattern.adr === undefined)
@@ -974,7 +954,7 @@ export function projectOverviewDigest(
  * **Behavior:**
  * - Filters patterns by `graph.byProductArea[productArea]` when a product
  *   area is supplied, otherwise includes any pattern with a non-empty
- *   `productArea`, `userRole`, or `businessValue`.
+ *   `productArea`.
  * - Builds each description from the pattern's directive description, use
  *   cases, and rule names using the `heading`/`paragraph`/`list` block
  *   helpers, falling back to a single placeholder paragraph when nothing
@@ -1323,7 +1303,7 @@ export function projectSourceInventoryDigest(
  *
  * **Value:** Produces a `TagUsageMatrix` that counts every metadata-tag
  * value across the pattern graph — status, role, arch-context, arch-layer,
- * priority, team, effort — so dashboards can surface dominant conventions
+ * team, workflow — so dashboards can surface dominant conventions
  * and outliers at a glance.
  *
  * **Invariant:** Every pattern contributes exactly one increment per
