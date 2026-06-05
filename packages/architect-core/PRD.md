@@ -10,8 +10,8 @@
 
 The boundary surface is wide (root `index.ts` re-exports ~12 sub-barrels). Grouped by responsibility:
 
-- **Read API (the headline contract)** — `createPatternGraphAPI()` → `PatternGraphAPI` (status/phase/role/quarter queries, dependency & relationship lookups, deliverables, FSM transition checks, `getPatternGraph()`); `QueryResult<T>` / `QuerySuccess` / `QueryError` envelope + `createSuccess` / `createError` / `QueryApiError`; pattern helpers (`findPatternByName`, `getRelationships`, `suggestPattern`, `resolveCanonicalRole`, …); inspection (`computeNeighborhood`, `compareContexts`); inventory (`aggregateTagUsage`, `buildSourceInventory`, `findOrphanPatterns`).
-- **Read model contracts (Zod)** — `PatternGraphSchema` / `PatternGraph`, `ExtractedPatternSchema` / `ExtractedPattern` (the canonical per-pattern record), `StatusCounts`, `PhaseGroup`, `RelationshipEntry`, `ImplementationRef`, plus the whole `validation-schemas/` family (feature/Gherkin, dual-source, lint, output-schemas, tag-registry, codec-utils).
+- **Read API (the headline contract)** — `createPatternGraphAPI()` → `PatternGraphAPI` (status, role, dependency, relationship, documentation, and FSM transition queries, plus inventory and inspection helpers); `QueryResult<T>` / `QuerySuccess` / `QueryError` envelope + `createSuccess` / `createError` / `QueryApiError`; pattern helpers (`findPatternByName`, `getRelationships`, `suggestPattern`, `resolveCanonicalRole`, …); inspection (`computeNeighborhood`, `compareContexts`); inventory (`aggregateTagUsage`, `buildSourceInventory`, `findOrphanPatterns`).
+- **Read model contracts (Zod)** — `PatternGraphSchema` / `PatternGraph`, `ExtractedPatternSchema` / `ExtractedPattern` (the canonical per-pattern record), `StatusCounts`, `RelationshipEntry`, `ImplementationRef`, plus the whole `validation-schemas/` family (feature/Gherkin, dual-source, lint, output-schemas, tag-registry, codec-utils).
 - **Graph-build pipeline** — `buildPatternGraph()` (single graph-construction entrypoint), `transformToPatternGraph[WithValidation]`, `mergePatterns`; `BuildResult` / `TransformResult` / `RawDataset` / `RuntimePatternGraph` / `PipelineOptions` / `DanglingReference`.
 - **Scanner / extractor** — `scanPatterns`, `parseFileDirectives`, `parseFeatureFile`, `scanGherkinFiles`; `extractPatterns`, `extractPatternsFromGherkin`, extraction diagnostics.
 - **FSM** — `validateTransition`, `isValidTransition`, `getValidTransitionsFrom`, `getProtectionSummary`, `VALID_TRANSITIONS`, `PROCESS_STATUS_VALUES`.
@@ -28,7 +28,7 @@ The boundary surface is wide (root `index.ts` re-exports ~12 sub-barrels). Group
 - Parse TS annotations (typescript-estree) and Gherkin ASTs (`@cucumber/gherkin`) into validated records.
 - Extract patterns, deliverables, process metadata, and shapes from both sources.
 - Merge dual-source records and resolve relationships / cross-package edges / dangling references.
-- Transform into the immutable `PatternGraph` read model (status groups, phase groups, relationship index, pre-computed views).
+- Transform into the immutable `PatternGraph` read model (status groups, relationship index, hierarchy/navigation edges, and pre-computed views).
 - Serve deterministic structured queries over the graph via `PatternGraphAPI`.
 - Enforce the FSM lifecycle: legal status transitions + protection levels.
 - Define the canonical tag/status/role/maturity taxonomy and the Zod schemas for every cross-package contract.
@@ -71,7 +71,7 @@ Direction is one-way (everything points at core):
 - **`src/read-api/pattern-classification.ts`** — thin re-export wrapper (`classifyEdgeExternality`, plus `buildDeclaredPatternIndex` / `inferPackageId` / `resolveUsesTarget` re-aliased verbatim from `generators/pipeline/relationship-resolver.ts`). Duplicate surface for the same machinery; no `src` consumer of these names outside core. Fold the one genuinely-new helper into the pipeline module and drop the wrapper, or stop re-exporting from the read-api barrel.
 - **`src/extractor/dual-source-extractor.ts` public exports** — `extractProcessMetadata` / `combineSources` / `validateDualSource` / `DualSourceResults` are re-exported from the root barrel but have **no external `src` consumer**; only `extractDeliverables` is used (internally, by `gherkin-extractor.ts`). Demote the module to internal and stop exporting the dual-source surface.
 - **`src/extractor/shape-extractor.ts` (693 LOC) exports** — `extractShapes` / `discoverTaggedShapes` have no external `src` consumer (projection reads `ExtractedPattern['extractedShapes']` off the graph, not these functions). If shapes are populated inside the pipeline, keep the impl internal and drop it from the public barrel.
-- **Over-broad root barrel** — `src/index.ts` re-exports ~200 symbols including large blocks of taxonomy format/group-by constants (`ADR_LIST_GROUP_BY`, `TIMELINE_GROUP_BY`, `PR_CHANGES_SORT_BY`, …) that read as projection/CLI render options leaking through core. Audit and trim; a narrower boundary makes the remaining cuts safe.
+- **Over-broad root barrel** — `src/index.ts` still re-exports taxonomy format constants (`GLOBAL_FORMAT_OPTIONS`, …) that read as projection/CLI render options leaking through core. Audit and trim; a narrower boundary makes the remaining cuts safe.
 
 ## Size signal
 

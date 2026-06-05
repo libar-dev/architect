@@ -52,7 +52,6 @@ Feature: ADR-008 - Step Definition Stubs Live in Architect State Folder
   | `stubs/` | Code stubs (TypeScript API shapes) | `src/` |
   | `step-stubs/` | Step definition stubs (TypeScript test skeletons) | `tests/steps/` and `tests/features/` |
   | `decisions/` | Architecture and process decision records | Durable — survives implementation |
-  | `releases/` | Release definitions | Durable |
   | `design-reviews/` | Generated and manual design reviews | Ephemeral |
 
   Folder organization within `step-stubs/` is flexible — by pattern name,

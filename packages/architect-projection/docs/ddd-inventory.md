@@ -8,14 +8,12 @@ subdomain. Classification: **Composite** (contains arrays of other fragments),
 
 ### delivery-reporting
 
-| Fragment                                       | Subdomain          | Classification | Notes                                                            |
-| ---------------------------------------------- | ------------------ | -------------- | ---------------------------------------------------------------- |
-| `phase-progress.ts` (PhaseProgress)            | delivery-reporting | Primitive      | Per-phase completion stats                                       |
-| `release-notes-digest.ts` (ReleaseNotesDigest) | delivery-reporting | Composite      | Aggregates release entries with deliverables and patterns        |
-| `roadmap-timeline.ts` (RoadmapTimeline)        | delivery-reporting | Composite      | Contains QuarterEntry array with nested PatternSummary-like rows |
-| `status-distribution.ts` (StatusDistribution)  | delivery-reporting | Primitive      | Counts by status                                                 |
-| `traceability-matrix.ts` (TraceabilityMatrix)  | delivery-reporting | Composite      | Array of TraceRow (pattern + tests + specs + deliverables)       |
-| `supporting.ts`                                | delivery-reporting | Technical      | Shared Zod schemas: QuarterEntrySchema, TraceRowSchema, etc.     |
+| Fragment                                      | Subdomain          | Classification | Notes                                                                           |
+| --------------------------------------------- | ------------------ | -------------- | ------------------------------------------------------------------------------- |
+| `roadmap-timeline.ts` (RoadmapTimeline)       | delivery-reporting | Composite      | Flat roadmap/current/milestones view over PatternSummary rows                   |
+| `status-distribution.ts` (StatusDistribution) | delivery-reporting | Primitive      | Counts by status                                                                |
+| `traceability-matrix.ts` (TraceabilityMatrix) | delivery-reporting | Composite      | Array of TraceRow (pattern + tests + specs + deliverables)                      |
+| `supporting.ts`                               | delivery-reporting | Technical      | Shared Zod schemas: StatusCountsSchema, StatusPercentagesSchema, TraceRowSchema |
 
 ### documentation-composition
 
@@ -115,8 +113,8 @@ Maximum two levels of nesting shown.
 
 ### RoadmapTimeline (delivery-reporting)
 
-- `quarters`: QuarterEntrySchema (supporting)
-  - Each quarter contains PatternSummary-like row data
+- `patterns`: **PatternSummary** (pattern-relations)
+- `counts`: StatusCountsSchema (supporting)
 
 ### PatternDetail (pattern-relations)
 
@@ -159,12 +157,13 @@ Maximum two levels of nesting shown.
 
 ### delivery-reporting
 
-Fragments that project delivery progress and release tracking. PhaseProgress
-and StatusDistribution provide aggregate counts. RoadmapTimeline organizes
-patterns into quarterly views (roadmap, current work, milestones).
-ReleaseNotesDigest aggregates deliverables and patterns into a changelog
-structure. TraceabilityMatrix connects patterns to their tests, specs, and
-deliverables for audit visibility.
+Fragments that project delivery progress and release-free reporting.
+StatusDistribution provides aggregate counts. RoadmapTimeline organizes
+patterns into flat deterministic roadmap/current work/milestones views.
+TraceabilityMatrix connects patterns to their tests, specs, and deliverables
+for audit visibility. Historical release/phase fragments such as
+`ReleaseNotesDigest`, `PhaseProgress`, and `QuarterEntry` were retired during
+ADR-013 cleanup and are not part of the current fragment inventory.
 
 ### documentation-composition
 

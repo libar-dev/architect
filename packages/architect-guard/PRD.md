@@ -21,8 +21,8 @@ The barrel (`src/index.ts`) re-exports everything; there is no `exports` subpath
 
 ## Enumerated functionality
 
-- **FSM transition validation** — every `@architect-status` change is validated against the PDR-005 FSM (via core), with terminal-state completion exemption and unlock-reason bypass.
-- **Process-guard checks (5 rules)** — completed-protection (hard, needs `unlock-reason`), invalid-status-transition (hard), scope-creep / new deliverable on active spec (hard), deliverable-removed (warn), session-scope (warn) and session-excluded (hard).
+- **FSM transition validation** — every `@architect-status` change is validated against the FSM in core, including advisory reopen paths from `completed` back to `active` or `roadmap`.
+- **Process-guard checks (5 rules)** — completed-protection (warns by default; `unlock-reason` suppresses the warning), invalid-status-transition (hard), scope-creep / new deliverable on active spec (warn), deliverable-removed (warn), session-scope (warn) and session-excluded (hard).
 - **Definition of Done** — phase deliverables all terminal + at least one `@acceptance-criteria` scenario.
 - **Dangling-reference baselining** — diff current dangling refs against a checked-in baseline; surfaces new vs removed.
 - **Annotation lint (9 rules)** — missing-pattern-name, invalid/missing-status, missing-when-to-use, tautological-description, missing-relationships, pattern-conflict-in-implements, missing-relationship-target, hierarchy-parent-level-mismatch.
@@ -49,7 +49,7 @@ The barrel (`src/index.ts`) re-exports everything; there is no `exports` subpath
 
 **Load-bearing — the deterministic gates that protect the loop:**
 
-- **Process guard / FSM transition validation** (`src/lint/process-guard/`) — the core reason the package exists. `validateChanges` + the completed-protection and invalid-status-transition rules are what make `completed` immutable and the FSM non-skippable. Pure decider, fully testable, wired into `architect:guard`. Keep.
+- **Process guard / FSM transition validation** (`src/lint/process-guard/`) — the core reason the package exists. `validateChanges` + the completed-protection and invalid-status-transition rules keep consequential lifecycle changes visible while preserving a non-skippable FSM. Pure decider, fully testable, wired into `architect:guard`. Keep.
 - **DoD validator** (`src/validation/dod-validator.ts`) — the terminal-state gate for "is this phase actually done." Wired into `validate:all`. Keep.
 - **Dangling-baseline** (`src/lint/dangling-baseline.ts` + json) — the regression ratchet on broken references; checked-in baseline is the diff target. Keep.
 - **Git helpers** (`src/git/`) — thin, no overlap, prerequisite for change detection. Keep.

@@ -75,7 +75,7 @@ Confirm with the user before `git rm`. Default is **review only**; deletion is o
 
 ## Do not
 
-- Do not transition the FSM here. Reopening a pattern is a separate [`implement.md`](implement.md) session with `@architect-unlock-reason:` (the FSM reference).
+- Do not transition the FSM here. Reopening a pattern is a separate [`implement.md`](implement.md) session; `@architect-unlock-reason:` is optional there and suppresses the advisory warning.
 - Do not delete specs without explicit user authorization this session.
 - Do not paraphrase the implementations back as a summary — per-pattern verdicts only.
 

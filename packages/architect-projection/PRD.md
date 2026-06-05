@@ -47,16 +47,16 @@ Four logical layers:
   `projectDependencyEdges`, `projectArchitectureNeighborhood`, `projectArchitectureComparison`,
   `projectBoundedContext`, `projectArchitectureGraph`, `projectOpenQuestionList`,
   `projectOrphanPatternList`.
-- **Delivery-reporting projections**: `projectStatusDistribution`, `projectPhaseProgress`,
+- **Delivery-reporting projections**: `projectStatusDistribution`,
   `projectRoadmapTimeline`, `projectCompletedMilestones`, `projectCurrentWork`,
-  `projectReleaseNotesDigest`, `projectTraceabilityMatrix`.
+  `projectChangelog`, `projectTraceabilityMatrix`.
 - **Governance projections**: business rules / rule-set, decision catalog + record, taxonomy digest,
   validation-rule digest.
 - **Execution-context projections**: deliverables/manifest, file-reading-list, handoff record,
   scope-readiness report, session-context bundle.
 - **Operational-insights projections**: overview digest, annotation coverage, tag-usage matrix,
   source inventory, role profile(s), requirement digest (general + executable + specs buckets).
-- **Document types (13)**: `architecture`, `api-reference`, `decisions`, `business-rules`,
+- **Document types (14)**: `architecture`, `design-review`, `api-reference`, `decisions`, `business-rules`,
   `patterns`, `roadmap`, `current-work`, `requirements-executable`, `requirements-specs`,
   `validation-rules`, `taxonomy`, `changelog`, `traceability` — each a metadata identity + output
   routing + disclosure matrix + CLI-surface aliases, composed in `documentation-definition.internal.ts`.
@@ -84,7 +84,7 @@ Four logical layers:
 - **`architect-mcp`** — the `architect_*` tool twins call the same projection functions, returning
   fragment JSON.
 - **docgen (`pnpm docs:all` → `docs-live/`)** — drives `parseAndProjectDocumentationBundle` across
-  all 13 document types and renders markdown (the determinism-gate diff target).
+  all 14 document types and renders markdown (the determinism-gate diff target).
 - **Libar Studio (desktop/web)** — consumes `renderUi` `UiDocument` blocks (live view-state, the
   product sink).
 - **Dogfood scripts / tests** — smoke + the CI perf gate (36-pattern / 108-rule fixture) exercise the
@@ -125,29 +125,30 @@ overview path.
 ### Incidental / deletion-candidate (the documentType sprawl — cut)
 
 1. **The documentType "star" (`projections/documentation-composition/`, ~1,990 LOC).** This is the
-   single biggest cut. `documentation-definition.internal.ts` wires **13 document types** each to a
+   single biggest cut. `documentation-definition.internal.ts` wires **14 document types** each to a
    bespoke factory; `documentation-type-registry.{identity,disclosure,output-routing,cli-surface}.ts`
    split one registry across four files; `documentation-bundle.internal.ts` + `projection-filter-resolver.ts`
    - `disclosure-matrix.ts` form a config-engine that exists to make "one bespoke projection per
      output" feel uniform. Under a source-first model this collapses to a handful of Views over one
-     engine; most of these 13 types are doc-shaped slices of the same graph and do not need their own
+     engine; most of these 14 types are doc-shaped slices of the same graph and do not need their own
      factory, registry row, routing block, and disclosure matrix.
 
 2. **Dead/degenerate generators over dimensions the read-model no longer carries.**
    - `delivery-reporting/` (~740 LOC) — `projectCurrentWork`, `projectRoadmapTimeline`,
-     `projectCompletedMilestones`, `projectTraceabilityMatrix`, `projectReleaseNotesDigest`,
-     `projectPhaseProgress`. These project over **quarter / release / phase / milestone** dimensions
-     — exactly the temporal/roadmap framing the kernel says lives in `git log`, not the live read
-     model. `current-work` is `active`-status-filtered timeline; `traceability` is a pattern→tests
-     matrix; `roadmap`/`changelog`/`milestones` re-bucket the same patterns by date metadata. These
-     are bespoke-per-question projections feeding markdown docs (the minor sink), not Studio
-     view-state. Strong candidates for deletion or collapse into one status/timeline view.
+     `projectCompletedMilestones`, `projectTraceabilityMatrix`, `projectChangelog`. Most of these
+     project over status and completion-oriented views rather than retired quarter / numeric-phase
+     axes, and the remaining timeline framing still leans on `git log`, not the live
+     read model. `current-work` is `active`-status-filtered timeline; `traceability` is a
+     pattern→tests matrix; `projectChangelog` is the one surviving release-free completed-patterns
+     view, keeping release history git-tag-derived instead of authored as manifest state. These are
+     bespoke-per-question projections feeding markdown docs (the minor sink), not Studio view-state.
+     Strong candidates for deletion or collapse into one status/timeline view.
    - `traceability` and `roadmap` document types route over removed/disfavored dimensions and produce
      per-row child files (`TRACEABILITY.md` + one child per pattern) that no live sink consumes.
 
 3. **Fragment-per-question schemas beyond what a live sink renders (~44 fragments is too many).**
    Many fragments are one-projection-one-fragment pairings: `TraceabilityMatrix`, `RoadmapTimeline`,
-   `PhaseProgress`, `ReleaseNotesDigest`, `OrphanPatternList`, `ArchitectureComparison`,
+   `OrphanPatternList`, `ArchitectureComparison`,
    `BusinessRuleReference` vs `BusinessRule` vs `BusinessRuleSet` (three governance fragments where
    one would do), the `SourceInventory*` / `TagUsage*` / `AnnotationCoverage` operational-insights
    trio. Each adds a schema file + supporting types + a renderer dispatch arm. A source-first model
@@ -181,7 +182,7 @@ their fragments are roughly **55–60% of the package** — directly in line wit
   `render-markdown.ts` alone is 2,544), `projections/` ~9,970, `fragments/` ~2,919.
 - **Fragments:** ~44 Zod fragment schema files across 6 bounded contexts.
 - **Projections:** 51 exported `projectX` functions + 14 `parseAndProjectX` trust-boundary variants;
-  13 document types in the composition star.
+  14 document types in the composition star.
 - **Patterns:** ~106 `@architect-pattern` identity tags in production `src/`; the live graph reports
   **121** patterns for the package (production + `*ExecutableTests` test patterns) — by far the
   heaviest package in the family.

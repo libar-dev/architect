@@ -760,7 +760,6 @@ function resolveRequirementPatterns(
 
   return filterPatterns(patterns, context.projectionFilter)
     .filter((pattern) => pattern.adr === undefined)
-    .filter((pattern) => !ARCHITECT_RELEASE_RE.test(pattern.source.file))
     .sort((left, right) => {
       if (productArea === undefined) {
         const areaCompare = (left.productArea ?? '').localeCompare(right.productArea ?? '');
@@ -1065,11 +1064,10 @@ export function projectRequirementSpecsDigest(
  *                durable artifact (executable Gherkin or annotated TypeScript
  *                source) exists and is being maintained or has shipped.
  *
- * ADRs (`pattern.adr !== undefined`), release notes, and pattern-area
- * filtering are applied upstream by `createRequirementSourceEntries`.
+ * ADRs (`pattern.adr !== undefined`) and pattern-area filtering are applied
+ * upstream by `createRequirementSourceEntries`.
  */
-const ARCHITECT_RELEASE_RE = /(^|\/)architect\/releases\//u;
-const ARCHITECT_DESIGN_TIER_RE = /(^|\/)architect\/(specs|slices|stubs|releases)\//u;
+const ARCHITECT_DESIGN_TIER_RE = /(^|\/)architect\/(specs|slices|stubs)\//u;
 
 function isPlannedStatus(status: string | undefined): boolean {
   const normalizedStatus = normalizeStatus(status);

@@ -65,13 +65,13 @@ documentation generation, dependency analysis, and AI context assembly.
 A Level 3 conformant implementation satisfies all Level 2 requirements AND:
 
 1. MUST implement the FSM state machine with valid transitions (§09)
-2. MUST enforce protection levels: scope-locked for `active`, hard-locked for `completed`
+2. MUST enforce the advisory protection model: active-scope expansion and completed-work reopen/edit surface warnings by default, with optional strict promotion to blocking
 3. MUST implement ProcessGuard rules for at least: completed-protection, scope-creep, invalid-status-transition
 4. MUST produce a pattern graph data structure conforming to the schema in §10
 5. SHOULD produce at least the following projections: patterns inventory, business rules, decisions, architecture overview
 6. MAY produce session-aware AI context bundles
 
-**What Level 3 enables:** Full delivery lifecycle enforcement with scope-creep prevention,
+**What Level 3 enables:** Full delivery lifecycle enforcement with visible advisory protection,
 generated documentation, and AI agent context delivery.
 
 ## Conformance Summary
@@ -87,7 +87,7 @@ generated documentation, and AI agent context delivery.
 | Scenario tags                      | MAY     | MUST    | MUST    |
 | Valid FSM transitions              | —       | MUST    | MUST    |
 | FSM enforcement (ProcessGuard)     | —       | —       | MUST    |
-| Protection levels                  | —       | —       | MUST    |
+| Advisory protection semantics      | —       | —       | MUST    |
 | Pattern graph generation           | —       | —       | MUST    |
 | Documentation projections          | —       | —       | SHOULD  |
 | AI context bundles                 | —       | —       | MAY     |

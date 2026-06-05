@@ -222,10 +222,10 @@ Feature: ModelEnrichedDataAPI
     prompt hash + selected-tool name + tool-args hash (the model's
     tool choice is part of the response identity).
 
-  - Q-PHASE: Tagged `@architect-phase:50` as the natural next slot after the
-    active 49 cluster. Confirm against epic ordering once the remaining
-    ADR007CoordinatedTaxonomyRedesign cleanup closes out.
-    The 99-104 phase block appears reserved for a different campaign.
+  - Q-ORDER: Where should this candidate sit in edge-derived delivery
+    navigation once its blockers are resolved? Recommendation: keep ordering
+    structural, via `@architect-uses` / `@architect-parent` and status, never
+    via a numeric phase tag.
 
   - Q-FAILURE-VERB: When `model_status: failed`, do we surface the underlying
     OpenRouter error message (helpful for debugging) or sanitize it (privacy /

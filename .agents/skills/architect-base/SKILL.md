@@ -35,7 +35,7 @@ The **canonical source of truth** is annotated production code + executable Gher
 | Aspect           | Value                                                                                                                                                                                                                                                                                                                               |
 | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Config           | `architect.config.ts` at the repo root                                                                                                                                                                                                                                                                                              |
-| Working state    | `architect/` (specs, decisions, releases, stubs, step-stubs)                                                                                                                                                                                                                                                                        |
+| Working state    | `architect/` (specs, decisions, stubs, step-stubs)                                                                                                                                                                                                                                                                                  |
 | Source of truth  | Annotated `packages/*/src/**/*.ts` + executable Gherkin under `tests/features/` and `packages/*/tests/features/`                                                                                                                                                                                                                    |
 | CLI              | `pnpm architect:query <verb>` (canonical script name across architect-managed repos)                                                                                                                                                                                                                                                |
 | MCP              | `architect` server → `mcp__architect__*` callable tools                                                                                                                                                                                                                                                                             |
@@ -58,7 +58,6 @@ When this package family is consumed by another project, the consumer wires thei
 | `architect/stubs/`            | Design-tier TS contract scaffolds (one folder per pattern)                                                                  | Ephemeral                                                       |
 | `architect/step-stubs/`       | Design-tier stub step definitions                                                                                           | Ephemeral                                                       |
 | `architect/decisions/`        | ADRs / PDRs — compact, durable, decisions-only (no operational or temporal context)                                         | **Permanent**                                                   |
-| `architect/releases/`         | Release notes, roadmap, phase plans                                                                                         | Permanent                                                       |
 
 **Two Gherkin parsers, do not confuse them:**
 
@@ -79,7 +78,7 @@ A **pattern** is a named architectural unit (a feature, service, component, cont
 - **Hierarchy axis**: `@architect-level:<epic|phase|task|slice>` (independent of maturity)
 - **Implementation enrichment** (on production TS): `@architect-usecase`, `@architect-enforces-decision:<ADR>` (the structured pattern→ADR edge — distinct from `@architect-decision`, which is a doc-aggregation tag, not this), `@architect-target` (stub forward pointer)
 - **Forward link**: `@architect-executable-specs:<path>` (design spec → executable feature)
-- **Audit**: `@architect-unlock-reason:<reason>` (required for non-standard FSM transitions)
+- **Audit**: `@architect-unlock-reason:<reason>` (optional advisory-warning suppressor for completed reopen/edit and a required marker only for genuinely non-standard transitions)
 
 > **Depth:** the categories above are the conceptual model. The three orthogonal classification axes (role · bounded-context · layer) and the csv-vs-colon authoring rules live in [`references/taxonomy.md`](references/taxonomy.md). The **complete enumerated set is generated, never hand-maintained** — query it live (`pnpm architect:query taxonomy --format json`) or read the generated `docs-live/TAXONOMY.md`. Those two are canonical; the categories here teach the shape, they do not enumerate it.
 
@@ -183,16 +182,16 @@ Design-level specs do not always need stubs and full design details. Idea-tier s
             ┌─ (maturity flip, human acceptance gate, not process-guard)
             │
 candidate ──┴──► roadmap ──► active ──► completed
-                  │ ▲                       (terminal — reopen
-                  ▼ │                         requires unlock-reason)
-               deferred
+                  │ ▲                    │      │
+                  ▼ │                    │      └──► active   (advisory reopen)
+               deferred                  └────────► roadmap  (advisory reopen)
 ```
 
 `deferred` hangs off **`roadmap`**, not `active` — `roadmap ⇄ deferred` is the only deferred edge (`active → deferred` is rejected). `active → roadmap` is the back edge (see below).
 
 - `candidate → roadmap` is a **maturity flip** (acceptance gate, human judgment). NOT a process-guard transition.
-- `roadmap → active`, `active → completed`, `active → roadmap`, `roadmap → deferred`, `deferred → roadmap` are process-guard-validated. Invalid jumps are rejected.
-- `completed` is terminal. Reopening requires `@architect-unlock-reason:<≥10 char, not a placeholder>`.
+- `roadmap → active`, `active → completed`, `active → roadmap`, `roadmap → deferred`, `deferred → roadmap`, `completed → active`, and `completed → roadmap` are process-guard-validated. Invalid jumps are rejected.
+- Reopening completed work is **advisory**, not blocked. `@architect-unlock-reason:<≥10 char, not a placeholder>` is optional and suppresses the warning.
 
 Verify any transition before flipping:
 
@@ -216,6 +215,8 @@ Two sanctioned suffix conventions:
 
 - `<Name>Testing` — test pattern accompanying a deliberately designed pattern (flowed through plan / design).
 - `<Name>ExecutableTests` — test pattern backfilling shipped code (the formal escape from retroactive plan-level specs).
+
+Epics and slices are durable, edge-derived navigation nodes. Any prose `**Members:**` list is human-facing orientation only; the authoritative member set is derived from reverse `@architect-parent` edges and persists after member design specs are deleted.
 
 The PatternGraph treats them identically; the suffix is human-facing.
 

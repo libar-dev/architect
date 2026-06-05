@@ -5,20 +5,20 @@
 Feature: Architecture Delta Generation
 
   **Problem:**
-  Architecture evolution is not visible between releases.
-  Breaking changes are not clearly documented.
-  New constraints introduced by phases are hard to track.
-  No automated way to generate "what changed" for a release.
+  Architecture evolution is not visible between tagged releases.
+  Breaking architectural changes are not clearly documented.
+  Newly introduced constraints are hard to track across tagged cuts.
+  No automated way exists to generate "what changed" between release tags.
 
   **Solution:**
-  Generate ARCH-DELTA.md showing changes since last release:
+  Generate ARCH-DELTA.md showing changes between two git tags:
   - New patterns introduced (with ADR references)
-  - Deprecated patterns (with replacement guidance)
-  - New constraints (with rationale)
-  - Breaking changes (with migration notes)
+  - Breaking changes (with migration guidance where authored)
+  - New and changed constraints (with rationale and owning ADRs)
 
   Uses git tags to determine release boundaries.
-  Uses @architect-decision, @architect-replaces annotations.
+  Uses graph diffs plus ADR references; no release manifest or release
+  annotation is required.
 
   Implements Convergence Opportunity 5: Architecture Change Control.
 
@@ -44,19 +44,18 @@ Feature: Architecture Delta Generation
     And git tags marking release versions
     When running architecture delta generator for v0.2.0
     Then report shows new patterns since v0.1.0
-    And deprecated patterns are listed with replacements
     And ADR references are included
 
   @acceptance-criteria
   Scenario: Highlight breaking changes
-    Given patterns with replaces annotations
+    Given patterns added, removed, or materially changed between two git tags
     When generating architecture delta
     Then breaking changes section is populated
     And migration guidance is included where available
 
   @acceptance-criteria
-  Scenario: Show new constraints by phase
-    Given phases introducing new constraints
+  Scenario: Show new constraints introduced between tags
+    Given decision records accepted between two git tags
     When generating architecture delta
-    Then constraints are listed with introducing phase
+    Then constraints are listed with owning ADRs
     And rationale from ADRs is summarized

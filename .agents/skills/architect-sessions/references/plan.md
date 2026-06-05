@@ -78,6 +78,8 @@ Feature: <EpicName> - <one-line purpose>
 
 A **slice** is the same with `@architect-level:slice` and a `**Usage:**` line under the members; slices live in `architect/slices/<name>.feature`. To list an epic's members from the graph instead of hand-tracking the bullet list: `pnpm architect:query list --parent <EpicName> --names-only` (unknown parent exits non-zero).
 
+The `**Members:**` bullets are human-facing orientation only. The authoritative member set is edge-derived from reverse `@architect-parent` links, so keep the list as reader help rather than the source of truth.
+
 ## Candidate-tier delta (only when promoting from idea)
 
 Idea shape plus an `**Open Questions:**` block and 1-2 happy-path scenarios:

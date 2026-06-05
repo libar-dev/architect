@@ -74,22 +74,22 @@ Start at Level 1. Graduate when you need more.
 
 ## Reading Guide
 
-| Document                                                    | What It Covers                            | Read When                            |
-| ----------------------------------------------------------- | ----------------------------------------- | ------------------------------------ |
-| [00 — Overview](00-overview.md)                             | Core concepts, component map, quick start | First. Always.                       |
-| [01 — Conformance](01-conformance.md)                       | 3 levels, versioning, RFC 2119            | Understanding what's required        |
-| [02 — Artifact Types](02-artifact-types.md)                 | 4 artifact types, directories, naming     | Setting up a project                 |
-| [03 — Tag System](03-tag-system.md)                         | Tag mechanics, format types, ordering     | Writing your first spec              |
-| [04 — Tag Registry](04-tag-registry.md)                     | Complete tag reference (50+ tags)         | Looking up a specific tag            |
-| [05 — Feature Spec Format](05-feature-spec-format.md)       | Gherkin structure conventions             | Writing feature specs                |
-| [06 — ADR Format](06-adr-format.md)                         | Architecture Decision Records             | Writing ADRs                         |
-| [07 — Stub Format](07-stub-format.md)                       | TypeScript design stubs                   | Creating design stubs                |
-| [08 — Spec Evolution](08-spec-evolution.md)                 | Plan → design → executable model          | Understanding the maturity lifecycle |
-| [09 — Delivery Lifecycle](09-delivery-lifecycle.md)         | FSM, ProcessGuard, sessions               | Enforcing delivery process           |
-| [10 — Pattern Graph](10-pattern-graph.md)                   | Data model specification                  | Building tooling                     |
-| [11 — Project Configuration](11-project-configuration.md)   | Config format and role sets               | Configuring a project                |
-| [12 — Live Documentation API](12-live-documentation-api.md) | Structured document serving via Data API  | Building live document views         |
-| [Appendix A — Examples](appendix-a-examples.md)             | 6 complete annotated examples             | Learning by example                  |
+| Document                                                    | What It Covers                                 | Read When                            |
+| ----------------------------------------------------------- | ---------------------------------------------- | ------------------------------------ |
+| [00 — Overview](00-overview.md)                             | Core concepts, component map, quick start      | First. Always.                       |
+| [01 — Conformance](01-conformance.md)                       | 3 levels, versioning, RFC 2119                 | Understanding what's required        |
+| [02 — Artifact Types](02-artifact-types.md)                 | 3 authored artifact types, directories, naming | Setting up a project                 |
+| [03 — Tag System](03-tag-system.md)                         | Tag mechanics, format types, ordering          | Writing your first spec              |
+| [04 — Tag Registry](04-tag-registry.md)                     | Complete tag reference (50+ tags)              | Looking up a specific tag            |
+| [05 — Feature Spec Format](05-feature-spec-format.md)       | Gherkin structure conventions                  | Writing feature specs                |
+| [06 — ADR Format](06-adr-format.md)                         | Architecture Decision Records                  | Writing ADRs                         |
+| [07 — Stub Format](07-stub-format.md)                       | TypeScript design stubs                        | Creating design stubs                |
+| [08 — Spec Evolution](08-spec-evolution.md)                 | Plan → design → executable model               | Understanding the maturity lifecycle |
+| [09 — Delivery Lifecycle](09-delivery-lifecycle.md)         | FSM, ProcessGuard, sessions                    | Enforcing delivery process           |
+| [10 — Pattern Graph](10-pattern-graph.md)                   | Data model specification                       | Building tooling                     |
+| [11 — Project Configuration](11-project-configuration.md)   | Config format and role sets                    | Configuring a project                |
+| [12 — Live Documentation API](12-live-documentation-api.md) | Structured document serving via Data API       | Building live document views         |
+| [Appendix A — Examples](appendix-a-examples.md)             | 6 complete annotated examples                  | Learning by example                  |
 
 ## Relationship to @libar-dev/architect
 

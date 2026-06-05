@@ -1375,23 +1375,24 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       );
 
       RuleScenario(
-        'package scoped architect releases stay out of requirement digests',
+        'nested architect decisions stay out of requirement digests',
         ({ Given, When, Then }) => {
           Given(
-            'a Operational Insights requirement context with a nested architect release pattern',
+            'a Operational Insights requirement context with a nested architect decision pattern',
             () => {
               state!.context = createProjectionContext({
                 patterns: [
-                  createPattern('NestedArchitectRelease', {
+                  createPattern('NestedArchitectDecision', {
                     status: 'completed',
                     productArea: 'Projection Platform',
-                    file: 'architect/releases/2026-q2-release.feature',
-                    description: 'Release notes must not appear in requirement digests.',
+                    file: 'architect/decisions/adr-099-decision.feature',
+                    adr: '099',
+                    description: 'Decision records must not appear in requirement digests.',
                     rules: [
                       {
-                        name: 'Release rule',
-                        description: '**Invariant:** Release notes stay excluded.',
-                        scenarioNames: ['nested architect release exclusion'],
+                        name: 'Decision rule',
+                        description: '**Invariant:** Decision records stay excluded.',
+                        scenarioNames: ['nested architect decision exclusion'],
                         scenarioCount: 1,
                       },
                     ],
@@ -1414,7 +1415,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           });
 
           Then(
-            'the nested architect release pattern should be excluded from the all-areas requirement digest',
+            'the nested architect decision pattern should be excluded from the all-areas requirement digest',
             () => {
               expect(state!.allRequirements?.root.requirements).toEqual([
                 {

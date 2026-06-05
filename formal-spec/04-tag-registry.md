@@ -110,7 +110,7 @@ The canonical role set used by the reference implementation
 > taxonomy.** The tags below are retained as informative reference for projects
 > migrating from earlier drafts. The reference implementation does not recognize
 > `@architect-phase`, `@architect-effort`, `@architect-priority`, `@architect-release`,
-> `@architect-quarter`, `@architect-team`, or `@architect-risk`. Roadmap ordering today
+> `@architect-quarter`, or `@architect-risk`. Roadmap ordering today
 > is conveyed via `@architect-uses` (a pattern is blocked by what it uses),
 > `@architect-status` (FSM state), and the hierarchy tags `@architect-level` /
 > `@architect-parent`. Projects MAY add custom planning tags as extensions.
@@ -122,8 +122,12 @@ The canonical role set used by the reference implementation
 | `@architect-priority` | enum   | Priority level         | **Removed** — custom | `critical`, `high`, `medium`, `low` |
 | `@architect-release`  | value  | Target release version | **Removed** — custom | `vNEXT`, `v1.0.0`                   |
 | `@architect-quarter`  | value  | Target quarter         | **Removed** — custom | `Q1-2026`, `Q2-2026`                |
-| `@architect-team`     | value  | Responsible team       | **Removed** — custom | `platform`, `frontend`              |
 | `@architect-risk`     | enum   | Risk level             | **Removed** — custom | `high`, `medium`, `low`             |
+
+> `@architect-team` is not a planning-order tag. It remains the canonical
+> feature-only ownership metadata tag per ADR-001; package-specific extensions
+> such as `@architect-workflow` stay outside the v0.2.0 standard set unless a
+> project opts into them.
 
 ### Effort Format (legacy)
 
@@ -194,21 +198,24 @@ for cross-process routing.
 
 Tags specific to decision records. See §06 for full ADR format.
 
-| Tag                            | Format | Purpose                         | Required (ADRs) | Values / Example                                      |
-| ------------------------------ | ------ | ------------------------------- | --------------- | ----------------------------------------------------- |
-| `@architect-adr`               | value  | ADR number (zero-padded)        | MUST            | `001`, `004`, `012`                                   |
-| `@architect-adr-status`        | enum   | Decision lifecycle status       | MUST            | `proposed`, `accepted`, `deprecated`, `superseded`    |
-| `@architect-adr-category`      | value  | Decision category               | MUST            | `architecture`, `process`, `testing`, `documentation` |
-| `@architect-adr-theme`         | value  | Decision theme                  | OPTIONAL        | `performance`, `security`, `scalability`              |
-| `@architect-adr-supersedes`    | value  | ADR number this supersedes      | OPTIONAL        | `003`                                                 |
-| `@architect-adr-superseded-by` | value  | ADR number that supersedes this | OPTIONAL        | `005`                                                 |
+| Tag                            | Format | Purpose                         | Required (ADRs)            | Values / Example                                                                   |
+| ------------------------------ | ------ | ------------------------------- | -------------------------- | ---------------------------------------------------------------------------------- |
+| `@architect-adr`               | value  | ADR number (zero-padded)        | MUST                       | `001`, `004`, `012`                                                                |
+| `@architect-adr-status`        | enum   | Decision lifecycle status       | MUST                       | `proposed`, `accepted`, `deprecated` (`superseded` is append-only, post-bootstrap) |
+| `@architect-adr-category`      | value  | Decision category               | MUST                       | `architecture`, `process`, `testing`, `documentation`                              |
+| `@architect-adr-theme`         | value  | Decision theme                  | OPTIONAL                   | `performance`, `security`, `scalability`                                           |
+| `@architect-adr-supersedes`    | value  | ADR number this supersedes      | OPTIONAL, append-only only | `003`                                                                              |
+| `@architect-adr-superseded-by` | value  | ADR number that supersedes this | OPTIONAL, append-only only | `005`                                                                              |
 
 ### ADR Status Lifecycle
 
 ```
 proposed → accepted → deprecated
-                   → superseded (by newer ADR)
 ```
+
+> _Informative:_ Bootstrap live-state deployments consolidate decision records in place and
+> do not author supersession edges. Post-1.0 append-only deployments may additionally model
+> `superseded` plus the `@architect-adr-supersedes` / `@architect-adr-superseded-by` pair.
 
 ---
 
@@ -269,10 +276,10 @@ Tags used exclusively in TypeScript design stubs (§07).
 ## Group 10: Release (Not in v0.2.0 Canonical Taxonomy)
 
 > **v0.2.0 status:** `@architect-release` is **NOT part of the v0.2.0 standard authored
-> taxonomy.** Release manifests today take their version identifier from the file name
-> (`vNEXT.feature`, `vX.Y.Z.feature`) and may carry only the core gate + status +
-> product-area tags. The table below is retained as informative reference for projects
-> migrating from earlier drafts.
+> taxonomy.** Release reporting is derived from git tags and graph state; no
+> authored release manifest or `architect/releases/` directory is part of the
+> reference implementation. The table below is retained as informative reference
+> for projects migrating from earlier drafts.
 
 | Tag                  | Format | Purpose                    | Status in v0.2.0     | Values / Example            |
 | -------------------- | ------ | -------------------------- | -------------------- | --------------------------- |
@@ -284,9 +291,9 @@ Tags used exclusively in TypeScript design stubs (§07).
 
 Tags used by ProcessGuard (§09) for lifecycle management.
 
-| Tag                        | Format | Purpose                                         | Required                        | Values / Example           |
-| -------------------------- | ------ | ----------------------------------------------- | ------------------------------- | -------------------------- |
-| `@architect-unlock-reason` | value  | Justification for modifying a completed pattern | MUST (when modifying completed) | `Bug-fix-for-token-expiry` |
+| Tag                        | Format | Purpose                                                                 | Required                                   | Values / Example           |
+| -------------------------- | ------ | ----------------------------------------------------------------------- | ------------------------------------------ | -------------------------- |
+| `@architect-unlock-reason` | value  | Audit note for completed-work reopen/edit and other unusual transitions | OPTIONAL (suppresses the advisory warning) | `Bug-fix-for-token-expiry` |
 
 > _Informative:_ Earlier drafts listed `@architect-workflow` for active workflow
 > identifiers. That tag is not part of the v0.2.0 canonical taxonomy.
@@ -317,22 +324,25 @@ aggregation tags ≈ 26 total** (the exact count depends on whether `@architect-
 is treated as authored — it is authored explicitly at the idea tier and auto-defaulted
 from `@architect-status` elsewhere).
 
-| Group               | v0.2.0 Canonical | v0.2.0 Tags                                                                            |
-| ------------------- | ---------------- | -------------------------------------------------------------------------------------- |
-| Core Identity       | 4                | gate, pattern, status, maturity (explicit at idea tier, else auto-defaulted)           |
-| Classification      | 4                | product-area, bounded-context, arch-layer, role                                        |
-| Relationships       | 4                | uses, implements, extends, see-also                                                    |
-| ADR                 | 7                | adr, adr-status, adr-category, adr-theme, adr-layer, adr-supersedes, adr-superseded-by |
-| Hierarchy           | 2                | level, parent                                                                          |
-| Stub-Specific       | 1                | target                                                                                 |
-| Process Enforcement | 1                | unlock-reason                                                                          |
-| Timeline            | 1                | completed                                                                              |
-| Core / Use-case     | 1                | usecase                                                                                |
-| Aggregation         | 3                | overview, decision, intro                                                              |
+| Group               | v0.2.0 Canonical   | v0.2.0 Tags                                                                              |
+| ------------------- | ------------------ | ---------------------------------------------------------------------------------------- |
+| Core Identity       | 4                  | gate, pattern, status, maturity (explicit at idea tier, else auto-defaulted)             |
+| Classification      | 4                  | product-area, bounded-context, arch-layer, role                                          |
+| Relationships       | 4                  | uses, implements, extends, see-also                                                      |
+| ADR                 | 5 (+2 append-only) | adr, adr-status, adr-category, adr-theme, adr-layer, adr-supersedes*, adr-superseded-by* |
+| Hierarchy           | 2                  | level, parent                                                                            |
+| Stub-Specific       | 1                  | target                                                                                   |
+| Feature Ownership   | 1                  | team                                                                                     |
+| Process Enforcement | 1                  | unlock-reason                                                                            |
+| Core / Use-case     | 1                  | usecase                                                                                  |
+| Aggregation         | 3                  | overview, decision, intro                                                                |
+
+> `*` `adr-supersedes` / `adr-superseded-by` are append-only, post-bootstrap tags. Live-state
+> bootstrap deployments omit them and consolidate records in place.
 
 | Group               | v0.2.0 Status | Earlier-Draft Tags (informative)                                                 |
 | ------------------- | ------------- | -------------------------------------------------------------------------------- |
-| Planning            | **Removed**   | phase, effort, priority, release, quarter, team, risk                            |
+| Planning            | **Removed**   | phase, effort, priority, release, quarter, risk                                  |
 | Product & Business  | **Removed**   | business-value, user-role, constraints                                           |
 | Sequence            | **Removed**   | orchestrator, step, module, error                                                |
 | Discovery           | **Removed**   | discovered-gaps, discovered-improvements, discovered-risks, discovered-learnings |

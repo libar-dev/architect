@@ -74,8 +74,8 @@ Load [`architect-base`](../architect-base/SKILL.md) (vocabulary) and [`architect
   gate"; honor §"Anti-patterns".
 - [`../architect-base/references/fsm-transitions.md`](../architect-base/references/fsm-transitions.md)
   — consult only when the refactor reopens a `completed` pattern
-  (`completed` → `active` requires `@architect-unlock-reason:` ≥10
-  non-placeholder characters). Most refactors never change status.
+  (`completed` → `active` is advisory; `@architect-unlock-reason:` ≥10
+  non-placeholder characters suppresses the warning). Most refactors never change status.
 
 ## Pre-flight (mandatory CLI bootstrap)
 

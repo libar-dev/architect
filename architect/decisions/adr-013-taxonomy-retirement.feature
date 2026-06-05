@@ -39,7 +39,9 @@ Feature: ADR-013 - Retire Temporal, Release, Completion-Date, and Unpopulated Pr
   temporal grouping or process metadata dimension is needed later it will be
   introduced deliberately on a populated dimension, not retained as residue.
   Releases, when first practiced, are derived from git tags (per the
-  `ArchitectureDelta` roadmap spec), never annotated.
+  `ArchitectureDelta` roadmap spec), never annotated. No
+  `architect/releases/` directory contract, release manifest artifact, or
+  release source glob survives as a first-class release surface.
 
   1. `@architect-quarter` is retired as a canonical feature-only tag. Its
      ownership rule, its YYYY-QN format, its schema field, the by-quarter
@@ -57,11 +59,13 @@ Feature: ADR-013 - Retire Temporal, Release, Completion-Date, and Unpopulated Pr
      completion-date field are retired. The `release`/`completed` schema fields,
      the parser cases, the extractor propagation (including the dual-source
      release table column), the `completed` package feature-only suffix and
-     metadata-tag registration, and the release-bucketed changelog projection
-     (`ReleaseNotesDigest`/`ReleaseEntry` and `buildReleaseEntries`) are removed.
-     The `changelog` document type stays registered but is reshaped to a
-     release-free completed-patterns view (the `completed` set in name order,
-     with no calendar or ordinal fallback).
+     metadata-tag registration, the release-bucketed changelog projection
+     (`ReleaseNotesDigest`/`ReleaseEntry` and `buildReleaseEntries`), and any
+     first-class authored release-manifest surface (`architect/releases/`,
+     release source globs, release-manifest docs) are removed. The `changelog`
+     document type stays registered but is reshaped to a release-free
+     completed-patterns view (the `completed` set in name order, with no
+     calendar or ordinal fallback).
 
   5. The unpopulated process-metadata band is retired. `effort`,
      `effortActual`, `risk`, `priority`, `since`, `userRole`, and
@@ -113,9 +117,10 @@ Feature: ADR-013 - Retire Temporal, Release, Completion-Date, and Unpopulated Pr
     read model. `release` and `completed` are absent from `ExtractedPattern`,
     the dual-source and doc-directive schemas, the parser, and the extractors;
     `completed` is not a package feature-only tag suffix and not a registered
-    metadata tag; the changelog is a release-free completed-patterns view.
-    Releases, when needed, are git-tag-derived per `ArchitectureDelta`, never
-    annotated.
+    metadata tag; no `architect/releases/` release-manifest surface or source
+    glob participates in the live model; the changelog is a release-free
+    completed-patterns view. Releases, when needed, are git-tag-derived per
+    `ArchitectureDelta`, never annotated.
     **Rationale:** A release tag and a completion date are denormalized git
     facts; baking them into the read model re-introduces the temporal/historical
     state the read model must not carry (history lives in git). They were
@@ -129,6 +134,7 @@ Feature: ADR-013 - Retire Temporal, Release, Completion-Date, and Unpopulated Pr
       Then completed is not a package feature-only tag suffix
       And completed is not a registered metadata tag
       And the @architect-release tag is not registered
+      And architect/releases is not a required authored release surface
       And the changelog renders a release-free completed-patterns view
 
   Rule: The unpopulated process-metadata band is not modeled

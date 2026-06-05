@@ -7,7 +7,8 @@
 ## Overview
 
 The pattern graph is the **single read model** computed from all annotated source files,
-Gherkin specs, stubs, ADRs, and release manifests. It is the sole data structure consumed
+Gherkin specs, stubs, ADRs, and executable features when a project chooses to project them.
+It is the sole data structure consumed
 by all downstream tools: CLI queries, MCP servers, documentation generators, ProcessGuard,
 and desktop UI views.
 
@@ -122,13 +123,13 @@ Each `Deliverable`:
 
 ### ADR Fields (when applicable)
 
-| Field             | Type                                                        | Description              |
-| ----------------- | ----------------------------------------------------------- | ------------------------ |
-| `adr`             | string?                                                     | ADR number               |
-| `adrStatus`       | `'proposed' \| 'accepted' \| 'deprecated' \| 'superseded'`? | ADR lifecycle            |
-| `adrCategory`     | string?                                                     | ADR category             |
-| `adrSupersedes`   | string?                                                     | ADR this supersedes      |
-| `adrSupersededBy` | string?                                                     | ADR that supersedes this |
+| Field             | Type                                                        | Description                                                                                         |
+| ----------------- | ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `adr`             | string?                                                     | ADR number                                                                                          |
+| `adrStatus`       | `'proposed' \| 'accepted' \| 'deprecated' \| 'superseded'`? | ADR lifecycle (`superseded` is append-only, not authored during bootstrap live-state consolidation) |
+| `adrCategory`     | string?                                                     | ADR category                                                                                        |
+| `adrSupersedes`   | string?                                                     | ADR this supersedes (append-only deployments)                                                       |
+| `adrSupersededBy` | string?                                                     | ADR that supersedes this (append-only deployments)                                                  |
 
 ### Hierarchy
 
@@ -156,11 +157,10 @@ are computed once during graph building and provide O(1) lookups.
 | `byStatus.active`    | ExtractedPattern[] | All active patterns             |
 | `byStatus.planned`   | ExtractedPattern[] | All roadmap + deferred patterns |
 
-### Phase Views
+### Retired Timeline Views
 
-| View      | Type                            | Description               |
-| --------- | ------------------------------- | ------------------------- |
-| `byPhase` | Map<number, ExtractedPattern[]> | Patterns grouped by phase |
+> _Informative:_ Earlier drafts exposed `byPhase`. Numeric phase grouping is retired and is not
+> part of the v0.2 live read model.
 
 ### Role Views
 

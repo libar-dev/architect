@@ -1300,7 +1300,7 @@ PrChangeReviewSchema = z.strictObject({
 
 ### ProjectConfigSnapshotSchema
 
-A snapshot of project configuration and graph metrics — base directory, config path, source globs, build time, and pattern/phase/role counts.
+A snapshot of project configuration and graph metrics — base directory, config path, source globs, build time, and pattern/role counts.
 
 ```ts
 ProjectConfigSnapshotSchema = z.strictObject({

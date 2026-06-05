@@ -312,7 +312,6 @@ A complete Architecture Decision Record.
 @architect-pattern:ADR005ElectronReactStack
 @architect-status:completed
 @architect-product-area:Process
-@architect-adr-supersedes:003
 Feature: ADR-005 - Electron + React Technology Stack
 
   **Context:** Studio needs a desktop application framework. The original choice
@@ -375,7 +374,7 @@ Feature: ADR-005 - Electron + React Technology Stack
 **What this demonstrates:**
 
 - ADR-specific tags (`@architect-adr`, `@architect-adr-status`, `@architect-adr-category`)
-- Supersession reference (`@architect-adr-supersedes:003`)
+- Live-state bootstrap example with no supersession chain
 - Context / Decision / Consequences structure
 - Consequences table with Positive/Negative types
 - Rules prefixed with `Decision:`
@@ -520,12 +519,8 @@ export default defineConfig({
     // Design stubs (not compiled, not linted)
     stubs: ['architect/stubs/**/*.ts'],
 
-    // Gherkin feature files (specs, ADRs, releases)
-    features: [
-      'architect/specs/*.feature',
-      'architect/decisions/*.feature',
-      'architect/releases/*.feature',
-    ],
+    // Gherkin feature files (specs, ADRs, executable features if projected)
+    features: ['architect/specs/*.feature', 'architect/decisions/*.feature'],
 
     // Exclude test files from pattern extraction
     exclude: ['**/*.test.ts', '**/*.spec.ts', '**/node_modules/**'],

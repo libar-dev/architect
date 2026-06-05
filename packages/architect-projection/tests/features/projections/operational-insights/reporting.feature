@@ -196,7 +196,7 @@ Feature: Operational Insights reporting projections
       When I project the requirements-executable digest
       Then the executable requirement digest should use the resolver-derived package id for routes
 
-    Scenario: package scoped architect releases stay out of requirement digests
-      Given a Operational Insights requirement context with a nested architect release pattern
+    Scenario: nested architect decisions stay out of requirement digests
+      Given a Operational Insights requirement context with a nested architect decision pattern
       When I project the requirement digest for all areas
-      Then the nested architect release pattern should be excluded from the all-areas requirement digest
+      Then the nested architect decision pattern should be excluded from the all-areas requirement digest

@@ -59,12 +59,12 @@ ADRs use a specific tag set. See §04 Group 6 for the complete ADR tag reference
 
 ### ADR Status Lifecycle
 
-| Status       | Meaning                                                      |
-| ------------ | ------------------------------------------------------------ |
-| `proposed`   | Under discussion, not yet ratified                           |
-| `accepted`   | Ratified and in effect                                       |
-| `deprecated` | No longer recommended but not replaced                       |
-| `superseded` | Replaced by a newer ADR (use `@architect-adr-superseded-by`) |
+| Status       | Meaning                                                                             |
+| ------------ | ----------------------------------------------------------------------------------- |
+| `proposed`   | Under discussion, not yet ratified                                                  |
+| `accepted`   | Ratified and in effect                                                              |
+| `deprecated` | No longer recommended but not replaced                                              |
+| `superseded` | Append-only status for post-bootstrap deployments that retain historical ADR chains |
 
 ## Feature Description
 
@@ -163,29 +163,32 @@ prefix to distinguish them from behavioral rules in feature specs:
 - Rules SHOULD be testable — the decision should be verifiable
 - Rules are compact and durable — no procedural details or session-specific content
 
-## Supersession
+## Amendment in live-state bootstrap deployments
 
-When an ADR is superseded:
+Under the event-sourced, No-BC bootstrap model this repo uses, the read model carries only
+live state. Decision records are therefore consolidated in place: edit, slim, or delete the
+record directly rather than authoring a superseding chain, and treat "what changed?" as a
+`git log` question.
 
-1. The old ADR's `@architect-adr-status` changes to `superseded`
-2. The old ADR adds `@architect-adr-superseded-by:NNN` pointing to the new ADR
-3. The new ADR adds `@architect-adr-supersedes:NNN` pointing to the old ADR
+In that model:
+
+1. The existing ADR is updated in place when the decision changes during bootstrap.
+2. No `@architect-adr-supersedes` / `@architect-adr-superseded-by` edges are authored.
+3. No historical replacement record is kept solely to preserve the chain.
 
 ```gherkin
-# Old ADR (superseded)
-@architect-adr:003
-@architect-adr-status:superseded
-@architect-adr-superseded-by:005
-
-# New ADR (superseding)
+@architect
 @architect-adr:005
 @architect-adr-status:accepted
-@architect-adr-supersedes:003
+Feature: ADR-005 - Updated decision title
+
+  **Context:** The live-state deployment proved a narrower decision shape.
+  **Decision:** The existing record is consolidated in place during bootstrap.
 ```
 
-The superseded ADR remains in the project as historical record — it is never deleted.
-
-> **Live-state deployments override this.** Under the event-sourced / No-BC model (this repo — see the `CLAUDE.md` / `AGENTS.md` bootstrap doctrine), the read model carries only live state: the superseded record is **consolidated in place or deleted**, not retained — "what did we replace?" is a `git log` question, with no `@architect-adr-supersedes` / `@architect-adr-superseded-by` edges. The supersession mechanism above is the append-only model; a live-state deployment deletes instead. Consistent with `08-spec-evolution.md`, which deletes ephemeral specs rather than marking them superseded.
+> _Informative:_ Post-1.0 append-only deployments may choose a supersession workflow with
+> `superseded`, `@architect-adr-superseded-by`, and `@architect-adr-supersedes`. That is a
+> different deployment doctrine, not the bootstrap default.
 
 ## Quality Criteria
 

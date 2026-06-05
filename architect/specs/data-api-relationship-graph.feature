@@ -83,8 +83,9 @@ Feature: Data API Relationship Graph
     **Invariant:** Impact analysis answers "if I change X, what else is affected?"
     by walking `usedBy` + `enables` recursively.
 
-    **Rationale:** Before modifying a completed pattern (which requires unlock),
-    understanding the blast radius prevents unintended breakage. Impact analysis
+    **Rationale:** Before modifying a completed pattern (which now warns by default and
+    optionally records intent via `@architect-unlock-reason`), understanding the blast
+    radius prevents unintended breakage. Impact analysis
     is the reverse of dependency traversal -- it looks forward, not backward.
 
     **Verified by:** Impact with transitive dependents, Impact with no dependents

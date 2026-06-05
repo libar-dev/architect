@@ -26,14 +26,14 @@ roadmap   ──► deferred                     (work parked)
 active    ──► completed                    (implementation done, value transferred)
 active    ──► roadmap                      (implementation rolled back)
 deferred  ──► roadmap                      (work resumed)
-completed ──► (none)                       (terminal — see unlock-reason rule below)
+completed ──► active                       (advisory reopen)
+completed ──► roadmap                      (advisory reopen)
 ```
 
 Notes:
 
-- `completed` is terminal under the standard rules. Reopening a
-  completed pattern requires `@architect-unlock-reason:` (see next
-  section) AND `architect-guard` authorization.
+- `completed` is no longer terminal. Reopening to `active` or `roadmap`
+  is a valid, advisory transition.
 - Skipping rungs (e.g., `roadmap` → `completed` directly) is rejected
   unless the unlock-reason mechanism authorizes it. Use
   `pnpm architect:query scope-validate <pattern> <session>` as the pre-flight
@@ -63,11 +63,12 @@ spec edits.
 
 ## `@architect-unlock-reason:` requirements
 
-`architect-guard` requires `@architect-unlock-reason:<short reason>` on
-the spec for any unusual transition:
+`architect-guard` treats `@architect-unlock-reason:<short reason>` as an
+advisory-warning suppressor for completed reopen/edit and as a required
+marker for genuinely unusual transitions:
 
-- Reopening a `completed` pattern (e.g., bug surfaced, behavior
-  change required).
+- Reopening or editing a `completed` pattern when you want the commit
+  path to stay silent instead of warning.
 - Any transition the standard FSM table above does not include.
 - Re-completing a pattern that was reopened (the original
   unlock-reason should remain alongside a new one).

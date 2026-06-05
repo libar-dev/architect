@@ -34,7 +34,7 @@ Grouped by source module:
 Two verbs are **namespaces** with their own sub-verbs (dispatched in `commands/_shared/structured.ts`):
 
 - `arch <sub>`: `roles · bounded-context · neighborhood · graph · compare · coverage · dangling · orphans · blocking · packages` (10)
-- `query <method>`: `getStatusCounts · isValidTransition · getPatternsByStatus · getPatternsByPhase` (4)
+- `query <method>`: typed `PatternGraphAPI` passthrough, including methods such as `getStatusCounts`, `getCompletionPercentage`, `getPatternsByStatus`, and `isValidTransition`
 
 ## Enumerated functionality
 
@@ -85,42 +85,42 @@ External: `zod` (^4) only (runtime). Dev: `vitest` + `@amiceli/vitest-cucumber` 
 
 Lens: a verb is a **deletion-candidate** if it is a projection/slice/filter an agent could compute locally from **one naked typed read-model emission** (the PatternGraph + relationship index). It **survives** only if it encodes a server-side deterministic gate or non-trivial cross-graph computation.
 
-| Verb / sub-verb             | Verdict               | One-line reason                                                                                                |
-| --------------------------- | --------------------- | -------------------------------------------------------------------------------------------------------------- |
-| `overview`                  | deletion-candidate    | Progress + blocker digest; derivable from status counts + blocking edges in a raw emission.                    |
-| `status`                    | deletion-candidate    | Pure status histogram over patterns.                                                                           |
-| `list`                      | deletion-candidate    | Filter/projection over the node set (`--status/--role/--parent/--package/--count/--names-only`) — all local.   |
-| `search`                    | deletion-candidate    | Fuzzy match over `catalog.names`; agent can match locally.                                                     |
-| `pattern`                   | deletion-candidate    | Single node lookup (parse-failure provenance is the only non-trivial bit; keep that surfaced in the emission). |
-| `context`                   | deletion-candidate    | Session bundle = curated subset of nodes; composition an agent can do.                                         |
-| `bundle`                    | deletion-candidate    | Mode-driven include-set composition over one pattern's blocks; pure selection.                                 |
-| `dep-tree`                  | deletion-candidate    | Graph walk to depth N over `uses` edges; trivial from a raw graph.                                             |
-| `files`                     | deletion-candidate    | Reading list = file fields of a node (± related); local slice.                                                 |
-| `rules`                     | deletion-candidate    | Rule-block slice with filters/`--count`/`--names-only`; projection only.                                       |
-| `open-questions`            | deletion-candidate    | Filter of nodes carrying open-questions; local.                                                                |
-| `tags`                      | deletion-candidate    | Tag-usage histogram; derivable.                                                                                |
-| `taxonomy`                  | deletion-candidate    | Generated taxonomy digest; ship once in the emission (or read `docs-live/TAXONOMY.md`).                        |
-| `sources`                   | deletion-candidate    | Source-file inventory list; flat data.                                                                         |
-| `unannotated`               | deletion-candidate    | Annotation-coverage gap list; derivable from node annotation presence.                                         |
-| `diagnostics`               | deletion-candidate    | Echoes `build.diagnostics`; already part of a full emission.                                                   |
-| `arch roles`                | deletion-candidate    | Enumerates roles present; local over nodes.                                                                    |
-| `arch bounded-context`      | deletion-candidate    | Group-by bounded-context slice.                                                                                |
-| `arch neighborhood`         | deletion-candidate    | 1-hop edge slice around a node; trivial graph walk.                                                            |
-| `arch graph`                | deletion-candidate    | The graph itself — _this is the raw emission_ the others should derive from.                                   |
-| `arch compare`              | deletion-candidate    | Diff of two bounded-context slices; local set ops.                                                             |
-| `arch coverage`             | deletion-candidate    | Same annotation-coverage projection as `unannotated`.                                                          |
-| `arch orphans`              | deletion-candidate    | Nodes with no edges; derivable.                                                                                |
-| `arch blocking`             | deletion-candidate    | Re-reads `overview.blocking`; duplicate slice.                                                                 |
-| `arch packages`             | deletion-candidate    | Group-by-package over `archIndex.byPackage`; local.                                                            |
-| `query getStatusCounts`     | deletion-candidate    | Status tally; same as `status`.                                                                                |
-| `query getPatternsByStatus` | deletion-candidate    | Status filter; same as `list --status`.                                                                        |
-| `query getPatternsByPhase`  | deletion-candidate    | Phase filter over nodes; local.                                                                                |
-| `documentation`             | deletion-candidate    | Renders a doc-type bundle for markdown; the _markdown_ sink is a minor consumer, the data is in the emission.  |
-| `repl` / `help` / `version` | survives (incidental) | UX shims, not verb-sprawl; keep but trivially cheap.                                                           |
-| `scope-validate`            | **survives**          | Deterministic readiness gate (FSM-aware).                                                                      |
-| `query isValidTransition`   | **survives**          | Deterministic FSM legality boolean.                                                                            |
-| `arch dangling`             | **survives**          | Graph-drift gate with baseline compare + strict exit code.                                                     |
-| `handoff`                   | **survives**          | Composed, judgment-bearing transition report.                                                                  |
+| Verb / sub-verb                       | Verdict               | One-line reason                                                                                                |
+| ------------------------------------- | --------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `overview`                            | deletion-candidate    | Progress + blocker digest; derivable from status counts + blocking edges in a raw emission.                    |
+| `status`                              | deletion-candidate    | Pure status histogram over patterns.                                                                           |
+| `list`                                | deletion-candidate    | Filter/projection over the node set (`--status/--role/--parent/--package/--count/--names-only`) — all local.   |
+| `search`                              | deletion-candidate    | Fuzzy match over `catalog.names`; agent can match locally.                                                     |
+| `pattern`                             | deletion-candidate    | Single node lookup (parse-failure provenance is the only non-trivial bit; keep that surfaced in the emission). |
+| `context`                             | deletion-candidate    | Session bundle = curated subset of nodes; composition an agent can do.                                         |
+| `bundle`                              | deletion-candidate    | Mode-driven include-set composition over one pattern's blocks; pure selection.                                 |
+| `dep-tree`                            | deletion-candidate    | Graph walk to depth N over `uses` edges; trivial from a raw graph.                                             |
+| `files`                               | deletion-candidate    | Reading list = file fields of a node (± related); local slice.                                                 |
+| `rules`                               | deletion-candidate    | Rule-block slice with filters/`--count`/`--names-only`; projection only.                                       |
+| `open-questions`                      | deletion-candidate    | Filter of nodes carrying open-questions; local.                                                                |
+| `tags`                                | deletion-candidate    | Tag-usage histogram; derivable.                                                                                |
+| `taxonomy`                            | deletion-candidate    | Generated taxonomy digest; ship once in the emission (or read `docs-live/TAXONOMY.md`).                        |
+| `sources`                             | deletion-candidate    | Source-file inventory list; flat data.                                                                         |
+| `unannotated`                         | deletion-candidate    | Annotation-coverage gap list; derivable from node annotation presence.                                         |
+| `diagnostics`                         | deletion-candidate    | Echoes `build.diagnostics`; already part of a full emission.                                                   |
+| `arch roles`                          | deletion-candidate    | Enumerates roles present; local over nodes.                                                                    |
+| `arch bounded-context`                | deletion-candidate    | Group-by bounded-context slice.                                                                                |
+| `arch neighborhood`                   | deletion-candidate    | 1-hop edge slice around a node; trivial graph walk.                                                            |
+| `arch graph`                          | deletion-candidate    | The graph itself — _this is the raw emission_ the others should derive from.                                   |
+| `arch compare`                        | deletion-candidate    | Diff of two bounded-context slices; local set ops.                                                             |
+| `arch coverage`                       | deletion-candidate    | Same annotation-coverage projection as `unannotated`.                                                          |
+| `arch orphans`                        | deletion-candidate    | Nodes with no edges; derivable.                                                                                |
+| `arch blocking`                       | deletion-candidate    | Re-reads `overview.blocking`; duplicate slice.                                                                 |
+| `arch packages`                       | deletion-candidate    | Group-by-package over `archIndex.byPackage`; local.                                                            |
+| `query getStatusCounts`               | deletion-candidate    | Status tally; same as `status`.                                                                                |
+| `query getPatternsByStatus`           | deletion-candidate    | Status filter; same as `list --status`.                                                                        |
+| `query getPatternsByNormalizedStatus` | deletion-candidate    | Normalized status filter over nodes; local.                                                                    |
+| `documentation`                       | deletion-candidate    | Renders a doc-type bundle for markdown; the _markdown_ sink is a minor consumer, the data is in the emission.  |
+| `repl` / `help` / `version`           | survives (incidental) | UX shims, not verb-sprawl; keep but trivially cheap.                                                           |
+| `scope-validate`                      | **survives**          | Deterministic readiness gate (FSM-aware).                                                                      |
+| `query isValidTransition`             | **survives**          | Deterministic FSM legality boolean.                                                                            |
+| `arch dangling`                       | **survives**          | Graph-drift gate with baseline compare + strict exit code.                                                     |
+| `handoff`                             | **survives**          | Composed, judgment-bearing transition report.                                                                  |
 
 **Cut summary:** the right end-state is one naked typed PatternGraph emission (`arch graph` is essentially it) plus the four deterministic gates. The ~24 other verbs/sub-verbs are convenience projections that re-derive what the agent could slice locally — they exist because there is no single raw emission yet, not because the CLI needs to own them.
 

@@ -97,7 +97,7 @@ Each tag has a defined format type that determines how its value is parsed:
 | `value`        | Free-form string                   | `@tag:MyValue`    | `@tag MyValue`    | `@architect-pattern:UserService` |
 | `enum`         | One of a fixed set of values       | `@tag:active`     | `@tag active`     | `@architect-status:active`       |
 | `csv`          | Comma-separated list of values     | `@tag:A,B,C`      | `@tag A, B, C`    | `@architect-uses:Auth,Tokens`    |
-| `number`       | Numeric value                      | `@tag:3`          | `@tag 3`          | `@architect-phase:2`             |
+| `number`       | Numeric value                      | `@tag:3`          | `@tag 3`          | `@tag:2`                         |
 | `quoted-value` | String value (may contain spaces)  | `@tag:"My Value"` | `@tag "My Value"` | (rare, used internally)          |
 | `flag`         | Boolean presence (no value needed) | `@tag`            | `@tag`            | `@architect` (the gate tag)      |
 
@@ -153,11 +153,11 @@ tags in any order, consistent ordering improves readability and review.
 
 ### Level 1 (Minimal) — All Artifact Types
 
-| Tag                  | Required | Notes                    |
-| -------------------- | -------- | ------------------------ |
-| `@architect`         | MUST     | Gate tag                 |
-| `@architect-pattern` | MUST     | Except release manifests |
-| `@architect-status`  | MUST     | FSM state                |
+| Tag                  | Required | Notes            |
+| -------------------- | -------- | ---------------- |
+| `@architect`         | MUST     | Gate tag         |
+| `@architect-pattern` | MUST     | Pattern identity |
+| `@architect-status`  | MUST     | FSM state        |
 
 ### Candidate Specs (Pre-Acceptance)
 
@@ -207,20 +207,6 @@ Accepted specs (`@architect-status:roadmap` or later) require the full tag set:
 | `@architect-bounded-context` | SHOULD   | Architecture grouping      |
 | `@architect-arch-layer`      | SHOULD   | Architecture layer         |
 | `@architect-uses`            | SHOULD   | Patterns this stub uses    |
-
-### Level 2 (Standard) — Release Manifests
-
-| Tag                       | Required | Notes        |
-| ------------------------- | -------- | ------------ |
-| `@architect-product-area` | MUST     | Product area |
-
-> _Informative:_ Earlier drafts of this spec listed `@architect-release` as the version
-> identifier on release manifests. That tag is not part of the v0.2.0 canonical taxonomy;
-> release manifests today use the file name (`vNEXT.feature`, `vX.Y.Z.feature`) as the
-> version identifier and may carry only the core gate + status + product-area tags.
-
-> _Informative:_ Release manifests do not require `@architect-pattern` because
-> they represent temporal groupings, not architectural patterns.
 
 ## Tag Validation Rules
 

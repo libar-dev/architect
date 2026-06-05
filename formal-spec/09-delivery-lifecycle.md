@@ -7,9 +7,9 @@
 ## Overview
 
 The delivery lifecycle is a **finite state machine (FSM)** that governs how patterns
-move from idea to completion. Unlike advisory process documentation, this lifecycle is
-machine-enforced — toolchain implementations (Level 3) validate every state transition
-and prevent unauthorized modifications to protected patterns.
+move from idea to completion. Toolchain implementations (Level 3) validate every state
+transition, surface advisory warnings for consequential changes to active or completed
+work, and may promote those warnings to blocking in strict CI mode.
 
 ## States
 
@@ -23,12 +23,12 @@ The FSM has five states across two tracks:
 
 ### Delivery Track
 
-| State       | Meaning                        | Protection Level |
-| ----------- | ------------------------------ | ---------------- |
-| `roadmap`   | Accepted, planned for delivery | None             |
-| `active`    | Implementation in progress     | Scope-locked     |
-| `completed` | Done, tested, delivered        | Hard-locked      |
-| `deferred`  | Postponed indefinitely         | None             |
+| State       | Meaning                        | Protection Signal      |
+| ----------- | ------------------------------ | ---------------------- |
+| `roadmap`   | Accepted, planned for delivery | None                   |
+| `active`    | Implementation in progress     | Advisory scope signal  |
+| `completed` | Done, tested, delivered        | Advisory reopen signal |
+| `deferred`  | Postponed indefinitely         | None                   |
 
 ## State Transition Diagram
 
@@ -36,65 +36,65 @@ The FSM has five states across two tracks:
   REFINEMENT                 DELIVERY
 
   candidate                  roadmap ──────────► active ──────────► completed
-      │                          │                 │
-      │ acceptance               │                 │ (requires unlock-reason)
-      ├──────────────────────►   │                 │
-      │                          ▼                 │
-      │ rejection            deferred              │
-      ▼                          │                 │
-   (deleted)                     │                 │
+      │                          │                 │                 │
+      │ acceptance               │                 ▼                 ├────────► active
+      ├──────────────────────►   │              roadmap             └────────► roadmap
+      │                          ▼
+      │ rejection            deferred
+      ▼                          │
+   (deleted)                     │
                                  └─────────────────┘
                                    (regress, rare)
 ```
 
 ## Transition Matrix
 
-| From \ To   | `candidate` | `roadmap`         | `active`    | `completed` | `deferred`  |
-| ----------- | ----------- | ----------------- | ----------- | ----------- | ----------- |
-| `candidate` | —           | ALLOWED (accept)  | NOT ALLOWED | NOT ALLOWED | NOT ALLOWED |
-| `roadmap`   | NOT ALLOWED | —                 | ALLOWED     | NOT ALLOWED | ALLOWED     |
-| `active`    | NOT ALLOWED | ALLOWED (regress) | —           | ALLOWED     | NOT ALLOWED |
-| `completed` | NOT ALLOWED | NOT ALLOWED       | NOT ALLOWED | —           | NOT ALLOWED |
-| `deferred`  | NOT ALLOWED | ALLOWED           | NOT ALLOWED | NOT ALLOWED | —           |
+| From \ To   | `candidate` | `roadmap`         | `active`         | `completed` | `deferred`  |
+| ----------- | ----------- | ----------------- | ---------------- | ----------- | ----------- |
+| `candidate` | —           | ALLOWED (accept)  | NOT ALLOWED      | NOT ALLOWED | NOT ALLOWED |
+| `roadmap`   | NOT ALLOWED | —                 | ALLOWED          | NOT ALLOWED | ALLOWED     |
+| `active`    | NOT ALLOWED | ALLOWED (regress) | —                | ALLOWED     | NOT ALLOWED |
+| `completed` | NOT ALLOWED | ALLOWED (reopen)  | ALLOWED (reopen) | —           | NOT ALLOWED |
+| `deferred`  | NOT ALLOWED | ALLOWED           | NOT ALLOWED      | NOT ALLOWED | —           |
 
 **Transition rules:**
 
 1. **candidate → roadmap** — Acceptance gate. Open questions resolved, full tag set applied, deliverables defined.
 2. **candidate → (deleted)** — Rejection. Spec is deleted (version control preserves history).
 3. **roadmap → active** — Work begins. Deliverables and scope are established.
-4. **active → completed** — All deliverables are done. Design spec deleted, executable spec exists. Pattern is locked.
+4. **active → completed** — All deliverables are done. Design spec deleted, executable spec exists.
 5. **roadmap → deferred** — Feature is postponed. Can return to roadmap later.
 6. **deferred → roadmap** — Deferred feature is re-activated for planning.
 7. **active → roadmap** — Regression. Work is abandoned and the pattern returns to planning. (SHOULD be rare and justified.)
-8. **completed → anything** — NOT ALLOWED without an `@architect-unlock-reason` tag.
+8. **completed → active / roadmap** — Advisory reopen path. The transition is valid, warns by default, and `@architect-unlock-reason` optionally records intent and suppresses the warning.
 
-## Protection Levels
+## Protection Signals
 
-Each state has an associated protection level that constrains what modifications are allowed.
+Each state has an associated protection signal that determines whether ProcessGuard stays
+silent, warns, or rejects the change.
 
 ### None (roadmap, deferred)
 
 No protection. Any field, tag, or structural element can be modified freely.
 
-### Scope-Locked (active)
+### Advisory Scope Signal (`active`)
 
-Scope is frozen. Modifications are allowed within the existing scope but adding new
-scope is prevented:
+Scope changes stay visible without blocking legitimate implementation drift:
 
 - **ALLOWED:** Modifying existing rules, scenarios, and deliverables
 - **ALLOWED:** Updating deliverable status from `pending` to `in-progress` to `complete`
 - **ALLOWED:** Adding scenarios within existing rules
-- **NOT ALLOWED:** Adding new deliverables (scope creep)
-- **NOT ALLOWED:** Adding new rules that expand scope
+- **WARNS:** Adding new pending deliverables (scope expansion)
+- **WARNS:** Adding new rules that expand scope
 - **NOT ALLOWED:** Changing the pattern's bounded context or architecture layer
 
-### Hard-Locked (completed)
+### Advisory Reopen Signal (`completed`)
 
-The pattern is frozen. Modifications require explicit justification:
+Completed work may be reopened deliberately:
 
-- **NOT ALLOWED:** Any modification without `@architect-unlock-reason`
-- **ALLOWED (with unlock-reason):** Bug fixes, typo corrections, post-completion refinements
-- The `@architect-unlock-reason` tag MUST provide a hyphenated justification:
+- **WARNS:** Reopening or editing completed work without `@architect-unlock-reason`
+- **ALLOWED:** Bug fixes, typo corrections, post-completion refinements
+- The `@architect-unlock-reason` tag MAY provide a hyphenated justification that suppresses the advisory warning:
   `@architect-unlock-reason:Bug-fix-for-token-expiry`
 
 ## ProcessGuard Rules
@@ -103,23 +103,23 @@ Level 3 conformant implementations MUST enforce at least these six rules:
 
 ### Rule 1: Completed-Protection
 
-**Invariant:** Completed patterns cannot be modified without an unlock reason.
+**Invariant:** Reopening or editing completed patterns is advisory. The guard warns when `@architect-unlock-reason` is absent and stays silent when it is present.
 
 ```
 IF pattern.status == 'completed'
 AND pattern has modifications
 AND @architect-unlock-reason is NOT present
-THEN REJECT with "completed pattern requires unlock-reason"
+THEN WARN with "completed pattern changed without unlock-reason"
 ```
 
 ### Rule 2: Scope-Creep Detection
 
-**Invariant:** Active patterns cannot have new deliverables or scope-expanding rules added.
+**Invariant:** Active patterns surface scope expansion as a warning, not a block.
 
 ```
 IF pattern.status == 'active'
 AND (new deliverables added OR new rules expand scope)
-THEN REJECT with "scope creep on active pattern"
+THEN WARN with "scope creep on active pattern"
 ```
 
 ### Rule 3: Invalid-Status-Transition
@@ -154,12 +154,12 @@ THEN REJECT with "pattern excluded from session"
 
 ### Rule 6: Deliverable-Removed
 
-**Invariant:** Deliverables cannot be removed from active or completed patterns.
+**Invariant:** Deliverable removal from active or completed patterns surfaces a warning.
 
 ```
 IF pattern.status IN ('active', 'completed')
 AND a deliverable from the previous version is missing
-THEN REJECT with "deliverable removed from active/completed pattern"
+THEN WARN with "deliverable removed from active/completed pattern"
 ```
 
 ## Session Types
@@ -205,12 +205,12 @@ that checks:
 
 The delivery lifecycle maps to spec evolution levels (§08):
 
-| Lifecycle Phase | Spec Level                        | Status      | Protection   |
-| --------------- | --------------------------------- | ----------- | ------------ |
-| Planning        | Plan-level spec created           | `roadmap`   | None         |
-| Design          | Design-level spec evolved         | `roadmap`   | None         |
-| Implementation  | Code written from spec            | `active`    | Scope-locked |
-| Completion      | All deliverables done, tests pass | `completed` | Hard-locked  |
+| Lifecycle Phase | Spec Level                        | Status      | Protection Signal      |
+| --------------- | --------------------------------- | ----------- | ---------------------- |
+| Planning        | Plan-level spec created           | `roadmap`   | None                   |
+| Design          | Design-level spec evolved         | `roadmap`   | None                   |
+| Implementation  | Code written from spec            | `active`    | Advisory scope signal  |
+| Completion      | All deliverables done, tests pass | `completed` | Advisory reopen signal |
 
 The FSM status transitions as work progresses through the lifecycle. The spec file
 evolves in parallel but the status tag in the spec header reflects the FSM state.
