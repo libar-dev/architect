@@ -7,7 +7,7 @@
 
 ## Overview
 
-This view captures 260 patterns across 8 diagrams in the Package architecture view.
+This view captures 261 patterns across 8 diagrams in the Package architecture view.
 
 ## Diagrams
 
@@ -22,7 +22,7 @@ graph LR
   pkg_architect_guard["Architect Guard (21)"]
   pkg_architect_host_dev["Architect Host (Dev) (23)"]
   pkg_architect_mcp["Architect MCP (9)"]
-  pkg_architect_package_content["Architect Package Content (12)"]
+  pkg_architect_package_content["Architect Package Content (13)"]
   pkg_architect_projection["Architect Projection (131)"]
   pkg_architect_cli --> pkg_architect_core
   pkg_architect_cli --> pkg_architect_projection
@@ -31,6 +31,7 @@ graph LR
   pkg_architect_host_dev --> pkg_architect_projection
   pkg_architect_mcp --> pkg_architect_core
   pkg_architect_mcp --> pkg_architect_projection
+  pkg_architect_package_content --> pkg_architect_projection
   pkg_architect_projection --> pkg_architect_core
 ```
 
@@ -249,7 +250,7 @@ graph TD
   mcptoolregistry -->|depends-on| mcppipelinesession
 ```
 
-### Package: Architect Package Content (12 patterns)
+### Package: Architect Package Content (13 patterns)
 
 ```mermaid
 graph TD
@@ -265,6 +266,7 @@ graph TD
   pdr005processguardfsm["PDR005ProcessGuardFSM"]
   releasev100["ReleaseV100"]
   releasevnext["ReleaseVNEXT"]
+  taxonomydocumentationcluster["TaxonomyDocumentationCluster"]
   adr001taxonomycanonicalvalues -. see-also .- adr007coordinatedtaxonomyredesign
   adr003sourcefirstpatternarchitecture -->|depends-on| adr001taxonomycanonicalvalues
   adr006singlereadmodelarchitecture -->|depends-on| adr005codecbasedmarkdownrendering
@@ -278,6 +280,7 @@ graph TD
   adr010documentationcompositionhelpers -. see-also .- adr006singlereadmodelarchitecture
   adr010documentationcompositionhelpers -. see-also .- adr009projectiontrustboundary
   pdr005processguardfsm -->|depends-on| adr001taxonomycanonicalvalues
+  taxonomydocumentationcluster -. see-also .- adr010documentationcompositionhelpers
 ```
 
 ### Package: Architect Projection (131 patterns)
@@ -832,6 +835,7 @@ Bounded contexts whose patterns span more than one workspace package.
 - TagUsageProjection
 - TaxonomyDigest
 - TaxonomyDigestProjection
+- TaxonomyDocumentationCluster
 - TaxonomyDocumentationClusterTesting
 - TraceabilityMatrix
 - TraceabilityMatrixProjection

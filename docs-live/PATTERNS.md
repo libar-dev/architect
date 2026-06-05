@@ -4,7 +4,7 @@
 
 | Field | Value |
 | ----- | ----- |
-| Count | 260   |
+| Count | 261   |
 
 ## Filters
 
@@ -264,6 +264,7 @@
 - TagUsageProjection
 - TaxonomyDigest
 - TaxonomyDigestProjection
+- TaxonomyDocumentationCluster
 - TaxonomyDocumentationClusterTesting
 - TraceabilityMatrix
 - TraceabilityMatrixProjection
@@ -529,6 +530,7 @@
 | packages/architect-projection/src/projections/operational-insights/index.ts                                               | executable | TagUsageProjection                                    | projection | typescript | completed |
 | packages/architect-projection/src/fragments/governance/taxonomy-digest.ts                                                 | design     | TaxonomyDigest                                        | contract   | typescript | active    |
 | packages/architect-projection/src/projections/governance/taxonomy-digest.ts                                               | executable | TaxonomyDigestProjection                              | projection | typescript | completed |
+| architect/specs/documentation-projection/05-taxonomy-documentation-cluster.feature                                        | design     | TaxonomyDocumentationCluster                          |            | gherkin    | active    |
 | packages/architect-projection/tests/features/projections/documentation-composition/taxonomy-documentation-cluster.feature | design     | TaxonomyDocumentationClusterTesting                   | projection | gherkin    | active    |
 | packages/architect-projection/src/fragments/delivery-reporting/traceability-matrix.ts                                     | design     | TraceabilityMatrix                                    | contract   | typescript | active    |
 | packages/architect-projection/src/projections/delivery-reporting/index.ts                                                 | executable | TraceabilityMatrixProjection                          | projection | typescript | completed |

@@ -1,6 +1,6 @@
 @architect
 @architect-pattern:TaxonomyDocumentationCluster
-@architect-status:roadmap
+@architect-status:active
 @architect-product-area:Generation
 @architect-parent:DocumentationProjection
 @architect-uses:TaxonomyDigestProjection

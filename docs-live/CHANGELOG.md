@@ -17,6 +17,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **ProcessGuardPatternGraphMigration spec**: architect/specs/process-guard-patterngraph-migration.feature
 - **ValidatePatternsPipelineConsolidation spec**: architect/specs/validate-patterns-pipeline-consolidation.feature
 - **McpOutputSchemaValidation spec**: architect/specs/mcp-output-schema-validation.feature
+- **Reference shape (full enumeration)**: docs-live/TAXONOMY.md (\`projectTaxonomyDigest\`)
+- **Live-API taxonomy context**: \`architect:query taxonomy\`
+- **Skill shape (model + link-to-live)**: .agents/skills/architect-base/references/taxonomy.md (\`taxonomy-role-enum\` + \`taxonomy-tag-count\` regions, \`taxonomy-skill\` generator)
+- **Formal-spec shape (enumeration in normative prose)**: formal-spec/04-tag-registry.md — design resolved per epic 2026-06-05, pending one proof-slice implement (modality is a projected source fact; the RFC function grouping is an audience-shaped View read; projecting modality dissolves the column-span blocker). Per-group table rendering + N-regions-per-host capability is built and tested; remaining work is wiring one function group (\`Classification\`) end-to-end as the proof slice — an implement session, not a design call.
+- **Emission descriptor (BundleRouting split)**: packages/architect-projection/src/fragments/emission-descriptor.ts
+- **Managed-region engine (marker scan + rewrite + normalization)**: packages/architect-projection/src/renderers/managed-region.ts (pure; loud on malformed/missing/duplicate/nested markers)
+- **Multi-target write path**: \`architect-cli\`'s \`cli/generate-docs.ts\` embedded-generator track: reads the host, applies regions via the managed-region engine, writes the host outside the single output dir; re-checks repo containment after resolution
+- **Region-aware determinism gate**: \`reportDriftAndExit\` (\`architect-cli\`'s \`cli/generate-docs.ts\`) diffs each embedded host's regenerated regions against the on-disk host (region-scoped because only inter-marker spans change); closes the docs-live-only coverage hole
 - ADR007CoordinatedTaxonomyRedesign
 - AnnotationCoverage
 - ApiReferenceDigest
@@ -151,6 +159,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - TagUsageEntry
 - TagUsageMatrix
 - TaxonomyDigest
+- TaxonomyDocumentationCluster
 - TaxonomyDocumentationClusterTesting
 - TraceabilityMatrix
 - ValidationRuleDigest
