@@ -44,7 +44,7 @@ const architectLocalPlugin = {
 export default tseslint.config(
   // Ignore patterns
   {
-    ignores: ['**/node_modules/**', '**/dist/**', '**/*.js', '**/*.mjs'],
+    ignores: ['**/node_modules/**', '**/dist/**', '**/*.js', '**/*.mjs', 'playground/**'],
   },
 
   // Base recommended configs
