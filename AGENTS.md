@@ -88,7 +88,7 @@ The load-bearing architectural decisions are `.feature` records in `architect/de
 ### Specs-driven development
 
 **The spec is the prompt and detailed design — do not create a wrapper "context", or "session-prep" document or “design-brief" documents.** Design-level specs go through numerous spec/design review iterations before we consider them implementation-ready.
-**Value transfer/Ephemeral specs** - specs in `architect/specs/` get transformed into code and executable specs (live tests) and are deleted from the architect state folder (except epics and other high-level/navigation context). But the value is not ephemeral - it is durable and lives as production code and live tests.
+**Value transfer/ephemeral specs** - specs in `architect/specs/` get transformed into code and executable specs (live tests) and are deleted from the architect state folder (except epics and other high-level/navigation context). But the value is not ephemeral - it is durable and lives as production code and live tests.
 
 ## Engineering doctrine
 

@@ -183,6 +183,65 @@ Feature: generate-docs CLI
       And output contains ".generated-docs-manifest.json"
 
   # ============================================================================
+  # RULE 4c: Embedded-region host generation + gate
+  # ============================================================================
+
+  Rule: CLI generates and gates embedded-region hosts
+
+    **Invariant:** An embedded-region generator rewrites only the marker-bounded regions of an authored host `.md` that lives OUTSIDE the output directory, preserving the authored prose. A host that is present but missing its markers fails loud (named host + region, no partial write); a host absent in this project is skipped under `--all` so the run stays portable, but an explicit `-g` request for an absent host fails loud (a named host is requested on purpose, so a silent skip there would let a bad path exit 0 with nothing written); a hand-edited region is caught by `--check` even though the host is out of tree. Authored hosts are written LAST — after every regenerable step and after every routed host has rendered — so a validation failure (missing/malformed markers) aborts the run before any host is committed, leaving every authored host byte-untouched. The commit itself replaces each host by an atomic rename of a fully-staged temp (never a truncating in-place write), so a host is never observed half-written; the batch is staged-then-renamed and idempotent, so an interrupted commit completes on re-run rather than being rolled back (it does NOT guarantee every host stays untouched once renames begin).
+    **Rationale:** Embedded hosts carry hand-authored, non-regenerable prose, so the engine's promises (fail-loud, never-partial, region-scoped drift, commit-last + atomic-per-host rename) must hold at the CLI boundary — this is what closes the `docs-live`-only coverage hole without ever risking an authored file.
+    **Verified by:** An embedded host present but missing its markers fails loudly, An embedded host absent in the project is skipped under --all, An explicit -g request for an absent host fails loud, A hand-edited region in an out-of-tree host fails the determinism gate, A validation failure aborts before any embedded host is committed
+
+    @validation
+    Scenario: An embedded host present but missing its markers fails loudly
+      Given a TypeScript file "src/pattern.ts" with pattern annotations
+      And an embedded host "formal-spec/04-tag-registry.md" with no managed-region markers
+      When running "generate-docs -i src/pattern.ts -g taxonomy-formal-spec -f"
+      Then exit code is 1
+      And output contains all of:
+        | text                           |
+        | taxonomy-classification        |
+        | formal-spec/04-tag-registry.md |
+
+    @boundary
+    Scenario: An embedded host absent in the project is skipped under --all
+      Given an architect.config.js mapping sources to a package
+      And a TypeScript file "src/pattern.ts" with pattern annotations
+      When running "generate-docs --all -o docs -f"
+      Then exit code is 0
+      And output contains "Skipping embedded generator"
+      And file "docs/PATTERNS.md" exists in working directory
+
+    @error
+    Scenario: An explicit -g request for an absent host fails loud
+      Given a TypeScript file "src/pattern.ts" with pattern annotations
+      When running "generate-docs -i src/pattern.ts -g taxonomy-formal-spec -f"
+      Then exit code is 1
+      And output contains "not found"
+
+    @validation
+    Scenario: A hand-edited region in an out-of-tree host fails the determinism gate
+      Given a TypeScript file "src/pattern.ts" with pattern annotations
+      And an embedded host "formal-spec/04-tag-registry.md" with an empty "taxonomy-classification" region
+      And running "generate-docs -i src/pattern.ts -g taxonomy-formal-spec -f"
+      And the "taxonomy-classification" region in "formal-spec/04-tag-registry.md" is hand-edited
+      When running "generate-docs -i src/pattern.ts -g taxonomy-formal-spec --check"
+      Then exit code is 1
+      And output contains all of:
+        | text                           |
+        | region drift                   |
+        | formal-spec/04-tag-registry.md |
+
+    @boundary
+    Scenario: A validation failure aborts before any embedded host is committed
+      Given a TypeScript file "src/pattern.ts" with pattern annotations
+      And an embedded host "formal-spec/04-tag-registry.md" with an empty "taxonomy-classification" region
+      And an embedded host ".agents/skills/architect-base/references/taxonomy.md" with no managed-region markers
+      When running "generate-docs -i src/pattern.ts -g taxonomy-formal-spec -g taxonomy-skill -f"
+      Then exit code is 1
+      And the embedded host "formal-spec/04-tag-registry.md" was left unwritten by the failed run
+
+  # ============================================================================
   # RULE 5: Unknown Options
   # ============================================================================
 

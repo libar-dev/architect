@@ -229,7 +229,7 @@ graph TD
   statusawareeslintsuppression["StatusAwareEslintSuppression<br/>(roadmap)"]
   stepdefinitioncompletion["StepDefinitionCompletion<br/>(roadmap)"]
   streaminggitdiff["StreamingGitDiff<br/>(roadmap)"]
-  taxonomydocumentationcluster["TaxonomyDocumentationCluster<br/>(active)"]
+  taxonomydocumentationcluster["TaxonomyDocumentationCluster<br/>(completed)"]
   traceabilityenhancements["TraceabilityEnhancements<br/>(roadmap)"]
   traceabilitygenerator["TraceabilityGenerator<br/>(roadmap)"]
   valuetransferstate["ValueTransferState<br/>(candidate)"]

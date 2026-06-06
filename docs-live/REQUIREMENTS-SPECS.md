@@ -7,6 +7,6 @@
 
 ## Summary
 
-| Pattern                      | Status | Test Files                                                                                                                |
-| ---------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------- |
-| TaxonomyDocumentationCluster | active | packages/architect-projection/tests/features/projections/documentation-composition/taxonomy-documentation-cluster.feature |
+| Pattern                      | Status    | Test Files                                                                                                                |
+| ---------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------- |
+| TaxonomyDocumentationCluster | completed | packages/architect-projection/tests/features/projections/documentation-composition/taxonomy-documentation-cluster.feature |

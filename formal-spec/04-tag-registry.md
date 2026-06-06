@@ -59,12 +59,40 @@ Explicit `@architect-maturity` always wins over the default. See §08 for tier s
 
 Tags that classify a pattern within the project's organizational structure.
 
-| Tag                          | Format | Purpose                                      | Required              | Values / Example                                                                           |
-| ---------------------------- | ------ | -------------------------------------------- | --------------------- | ------------------------------------------------------------------------------------------ |
-| `@architect-product-area`    | value  | Product area grouping (project-defined enum) | MUST (Level 2)        | `Annotation`, `Configuration`, `Process`, `Projection`, `Validation`                       |
-| `@architect-bounded-context` | value  | Architecture domain grouping                 | MUST (specs, Level 2) | `identity`, `billing`, `delivery-reporting`                                                |
-| `@architect-arch-layer`      | enum   | Architecture layer                           | MUST (specs, Level 2) | `application`, `domain`, `infrastructure`                                                  |
-| `@architect-role`            | enum   | Canonical role tag                           | MUST (specs, Level 2) | `barrel`, `codec`, `contract`, `decider`, `projection`, `read-model`, `service`, `utility` |
+The canonical enumeration below is **generated from the reference tag registry** —
+the proof slice of the `TaxonomyDocumentationCluster` (`MultiSourceComposition`). The
+rows for `product-area`, `bounded-context`, and `role` are projected from the live tag
+digest, not hand-restated, so they cannot silently drift from the implementation; the
+`Required` column is the registry's projected `required` flag — the same source fact
+`docs-live/TAXONOMY.md` renders. **Do not hand-edit between the markers** — the
+determinism gate (`docs:check`) regenerates and diffs this region.
+
+<!-- architect:gen taxonomy-classification begin -->
+
+| Tag               | Format | Purpose                                                                 | Required | Repeatable | Values                                                                                     | Default Value | Example                                       |
+| ----------------- | ------ | ----------------------------------------------------------------------- | -------- | ---------- | ------------------------------------------------------------------------------------------ | ------------- | --------------------------------------------- |
+| `product-area`    | value  | Product area for PRD grouping (per ADR-001 Rule 1)                      | No       | No         | Annotation, Configuration, Generation, Validation, DataAPI, CoreTypes, Process, Projection |               | @architect-product-area Annotation            |
+| `bounded-context` | value  | Canonical bounded-context grouping for structural and subgraph views    | No       | No         |                                                                                            |               | @architect-bounded-context delivery-reporting |
+| `role`            | value  | Canonical role tag for pattern classification and architecture grouping | No       | No         | barrel, codec, contract, decider, projection, read-model, service, utility                 |               | @architect-role projection                    |
+
+<!-- architect:gen taxonomy-classification end -->
+
+> **`@architect-arch-layer` — authored note (not digest-emitted).** The architecture
+> layer (`enum`: `application`, `domain`, `infrastructure`) is canonical in this
+> registry, but the reference implementation does **not** project it into the tag
+> digest — only `@architect-adr-layer` is registered (see
+> `packages/architect-core/src/taxonomy/arch-layer-values.ts`). Per the cluster's
+> starting rule the generated region emits only the digest-emitted set, so
+> `@architect-arch-layer` stays an authored note here, and any future divergence
+> surfaces as a reviewable diff. Its values are enumerated under **Architecture Layer
+> Values** below.
+
+> **Conformance (tier-conditional requirement).** On specs at Level 2,
+> `@architect-product-area`, `@architect-bounded-context`, `@architect-arch-layer`,
+> and `@architect-role` are REQUIRED. This is a normative rule enforced by the tier
+> validators, **not** an unconditional registry flag — which is why the generated
+> `Required` column above reads `No` for these tags (the registry marks them required
+> only conditionally, at Level 2, not for every file).
 
 > **Historical note:** `@architect-arch-role` appears only in older migration notes and preserved reference docs.
 
@@ -146,12 +174,29 @@ collapses to four tags — `@architect-uses`, `@architect-implements`,
 `@architect-extends`, `@architect-see-also` — and the reverse edges are derived, not
 authored.
 
-| Tag                     | Format | Purpose                                                   | Required               | Values / Example           |
-| ----------------------- | ------ | --------------------------------------------------------- | ---------------------- | -------------------------- |
-| `@architect-uses`       | csv    | Patterns this pattern depends on / uses                   | SHOULD (if deps exist) | `UserService,TokenService` |
-| `@architect-implements` | csv    | Patterns this code or stub realizes                       | MUST (stubs)           | `McpServerIntegration`     |
-| `@architect-extends`    | value  | Pattern this extends or specializes                       | OPTIONAL               | `BaseRepository`           |
-| `@architect-see-also`   | csv    | Related patterns, informational only and not a dependency | OPTIONAL               | `UserProfile,AuditLog`     |
+The canonical enumeration below is **generated from the reference tag registry** — a
+function-group region of the `TaxonomyDocumentationCluster` projection. The rows for
+`uses`, `implements`, `extends`, and `see-also` are projected from the live tag digest,
+not hand-restated, so they cannot silently drift; the `Required` column is the registry's
+projected `required` flag. The selection deliberately **subsets** the digest's Relationship
+Tags bucket to the four canonical authored tags (it omits the derived `enforces-decision`,
+which the digest carries but the v0.2.0 authored set does not). **Do not hand-edit between
+the markers** — the determinism gate (`docs:check`) regenerates and diffs this region.
+
+<!-- architect:gen taxonomy-relationships begin -->
+
+| Tag          | Format | Purpose                                                             | Required | Repeatable | Values | Default Value | Example                                                            |
+| ------------ | ------ | ------------------------------------------------------------------- | -------- | ---------- | ------ | ------------- | ------------------------------------------------------------------ |
+| `uses`       | csv    | Patterns this depends on                                            | No       | No         |        |               | @architect-uses CommandBus, EventStore                             |
+| `implements` | csv    | Patterns this code file realizes (realization relationship)         | No       | No         |        |               | @architect-implements EventStoreDurability, IdempotentAppend       |
+| `extends`    | value  | Base pattern this pattern extends (generalization relationship)     | No       | No         |        |               | @architect-extends ProjectionCategories                            |
+| `see-also`   | csv    | Related patterns for cross-reference without dependency implication | No       | No         |        |               | @architect-see-also AgentAsBoundedContext, CrossContextIntegration |
+
+<!-- architect:gen taxonomy-relationships end -->
+
+> **Authored, not digest-emitted:** the relationship _semantics_ below (direction,
+> blocking, authored-vs-derived) are edge semantics, not tag-registry metadata, so the
+> digest does not carry them and they stay authored outside the region.
 
 ### Relationship Semantics
 

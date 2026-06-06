@@ -66,3 +66,18 @@ Feature: TaxonomyDocumentationCluster — embedded-region generation into author
     Scenario: a digest tag-group renders as a canonical enumeration table
       Then the region body for a digest group source is a markdown table of that group's tags
       And an unknown region source is rejected rather than emitting an empty region
+
+    Scenario: the classification function group gathers tags across digest buckets into one table
+      Given a digest whose Architecture Tags hold role and bounded-context and whose PRD Tags hold product-area
+      Then the "classification" function-group region is one table enumerating product-area, bounded-context, and role
+      And those tags are gathered across the digest's domain buckets, not one bucket surfacing unchanged
+      And the not-digest-emitted tag arch-layer is absent from the region
+
+    Scenario: a function group naming a tag absent from the digest fails loud
+      Given a digest whose Architecture Tags hold role and bounded-context but no product-area
+      Then rendering the "classification" function group throws and names the absent tag rather than dropping a row
+
+    Scenario: the relationships function group subsets one digest bucket to the canonical authored set
+      Given a digest whose Relationship Tags bucket holds uses, implements, extends, see-also, and enforces-decision
+      Then the "relationships" function-group region enumerates uses, implements, extends, and see-also in RFC order
+      And the derived enforces-decision tag is absent because the authored set subsets the bucket, not the whole bucket surfacing

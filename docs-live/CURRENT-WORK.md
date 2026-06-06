@@ -6,13 +6,13 @@
 
 ## Overview
 
-Current work timeline covering 138 patterns.
+Current work timeline covering 137 patterns.
 
 | Metric    | Value |
 | --------- | ----- |
-| Patterns  | 138   |
+| Patterns  | 137   |
 | Completed | 0     |
-| Active    | 138   |
+| Active    | 137   |
 | Planned   | 0     |
 | Candidate | 0     |
 
@@ -149,7 +149,6 @@ Current work timeline covering 138 patterns.
 | TagUsageEntry                                       | active | contract   | packages/architect-projection/src/fragments/operational-insights/tag-usage-entry.ts                                       |
 | TagUsageMatrix                                      | active | contract   | packages/architect-projection/src/fragments/operational-insights/tag-usage-matrix.ts                                      |
 | TaxonomyDigest                                      | active | contract   | packages/architect-projection/src/fragments/governance/taxonomy-digest.ts                                                 |
-| TaxonomyDocumentationCluster                        | active |            | architect/specs/documentation-projection/05-taxonomy-documentation-cluster.feature                                        |
 | TaxonomyDocumentationClusterTesting                 | active | projection | packages/architect-projection/tests/features/projections/documentation-composition/taxonomy-documentation-cluster.feature |
 | TaxonomyEmbeddedShapesProjection                    | active | projection | packages/architect-projection/src/projections/documentation-composition/taxonomy-embedded.ts                              |
 | TraceabilityMatrix                                  | active | contract   | packages/architect-projection/src/fragments/delivery-reporting/traceability-matrix.ts                                     |

@@ -18,6 +18,9 @@
  *   regions — `taxonomy-role-enum` (the canonical role values) and
  *   `taxonomy-tag-count` (the live registry counts) — the facts the skill
  *   previously hand-restated, so they can no longer drift (`MultiSourceComposition`).
+ * - **Formal-spec** (`formal-spec/04-tag-registry.md`): the `Classification`
+ *   function-group region (`taxonomy-classification`) — the RFC's normative
+ *   Classification table generated from the digest instead of hand-restated.
  *
  * This module owns the routing — which host, which `source` → which `regionId`
  * (DD-6) — and parses the `EmissionDescriptor` at the single trust boundary
@@ -26,19 +29,21 @@
  * renderer→projection layering); the CLI renders each region's body via
  * `renderTaxonomyManagedRegion` and writes it through the managed-region engine.
  *
- * NOT YET WIRED — the formal-spec shape (`formal-spec/04-tag-registry.md`). The
- * formal-spec RFC groups tags by FUNCTION (Core Identity, Classification, …) with
- * normative modality (`MUST`/`SHOULD`) in its tables, whereas the digest groups by
- * domain bucket (`Core Tags`, `Relationship Tags`, …) with a boolean `Required`.
- * The design is RESOLVED (epic "Resolved direction (2026-06-05)"): modality is a
- * projected source fact (the required-ness in the guard's tier checks + the
- * registry's `required` flags, projected into the digest so the whole row is
- * generated), the RFC's function grouping is an audience-shaped View read over the
- * one digest, and projecting modality dissolves the marker column-span problem.
- * Remaining work is an implement session on ONE proof slice (the `Classification`
- * function group wired end-to-end), not a design call. The capability it builds on
- * — per-group table rendering (`renderTaxonomyManagedRegion` group branch) and
- * N-regions-per-host writing — is built and tested.
+ * The formal-spec RFC groups tags by FUNCTION (Core Identity, Classification, …),
+ * whereas the digest groups by DOMAIN bucket (`Core Tags`, `Architecture Tags`,
+ * `PRD Tags`, …). A function group is therefore an audience-shaped View read that
+ * gathers tags across digest buckets (epic "Resolved direction (2026-06-05)"): the
+ * `classification` source pulls `role` + `bounded-context` (Architecture bucket)
+ * and `product-area` (PRD bucket) into one canonical enumeration table, with the
+ * `Required` column projected from the registry's `required` flag (a source fact,
+ * not hand-authored modality) so the WHOLE row is generated. The function-group
+ * selection lives in {@link TAXONOMY_FUNCTION_GROUPS}; the renderer resolves it.
+ *
+ * PROOF = MINIMUM GENERATION (cluster spec): only the `Classification` function
+ * group is wired end-to-end; the rest of the RFC stays authored until the seam is
+ * proven. A spec-canonical tag the digest does NOT emit (`arch-layer`) stays an
+ * authored note OUTSIDE the region and surfaces as a reviewable diff — it is not in
+ * {@link TAXONOMY_CLASSIFICATION_TAGS}.
  */
 
 import type { ProjectionContext } from '../../context/projection-context.js';
@@ -53,12 +58,68 @@ import { projectTaxonomyDigest } from '../governance/taxonomy-digest.js';
 export const TAXONOMY_ROLE_ENUM_SOURCE = 'role-enum';
 /** Region `source` selecting the live registry counts from the digest. */
 export const TAXONOMY_TAG_COUNT_SOURCE = 'tag-count';
+/**
+ * Region `source` selecting the formal-spec `Classification` function group — a
+ * cross-bucket read (see {@link TAXONOMY_FUNCTION_GROUPS}).
+ */
+export const TAXONOMY_CLASSIFICATION_SOURCE = 'classification';
+
+/**
+ * Region `source` selecting the formal-spec `Relationships` function group — the
+ * second function group, a single-bucket read (all four tags live in the digest's
+ * Relationship Tags bucket; see {@link TAXONOMY_FUNCTION_GROUPS}).
+ */
+export const TAXONOMY_RELATIONSHIPS_SOURCE = 'relationships';
+
+/**
+ * The metadata tags the formal-spec `Classification` function group enumerates, in
+ * RFC order. These live in DIFFERENT digest domain buckets — `product-area` in PRD
+ * Tags, `bounded-context` + `role` in Architecture Tags — so the function group is
+ * an audience-shaped View read across buckets, not one bucket surfacing unchanged.
+ *
+ * `arch-layer` is deliberately ABSENT: the formal-spec calls it canonical, but the
+ * reference registry does not project it into the digest (only `adr-layer` is
+ * registered). Per the cluster's starting rule the generated region emits only the
+ * digest-emitted set, so `arch-layer` stays an authored note outside the region and
+ * surfaces as a reviewable diff rather than silent divergence.
+ */
+export const TAXONOMY_CLASSIFICATION_TAGS = ['product-area', 'bounded-context', 'role'] as const;
+
+/**
+ * The metadata tags the formal-spec `Relationships` function group enumerates, in RFC
+ * order. Unlike `Classification` these all live in ONE digest bucket (Relationship
+ * Tags), so the function group here is a single-bucket selection rather than a
+ * cross-bucket gather — and it deliberately SUBSETS that bucket: the digest carries
+ * `enforces-decision` too, but the RFC's v0.2.0 canonical authored relationship set is
+ * these four, so the selection drops `enforces-decision`. That a function group can
+ * subset a bucket (not only gather across buckets) is the audience-read lever working.
+ */
+export const TAXONOMY_RELATIONSHIPS_TAGS = ['uses', 'implements', 'extends', 'see-also'] as const;
+
+/**
+ * Function-group selections: a `source` routing key → the ordered tag names the
+ * group gathers across digest domain buckets. The renderer
+ * (`renderTaxonomyManagedRegion`) resolves a `source` against this map before
+ * falling back to a single digest domain bucket, and renders the gathered entries
+ * as one canonical enumeration table. This is where the RFC's "group by function"
+ * audience read is defined — the digest's own grouping is by domain bucket.
+ */
+export const TAXONOMY_FUNCTION_GROUPS: Readonly<Record<string, readonly string[]>> = {
+  [TAXONOMY_CLASSIFICATION_SOURCE]: TAXONOMY_CLASSIFICATION_TAGS,
+  [TAXONOMY_RELATIONSHIPS_SOURCE]: TAXONOMY_RELATIONSHIPS_TAGS,
+};
 
 /** Skill host — lives outside `docs-live/`, carries authored teaching prose. */
 const SKILL_HOST_FILE = '.agents/skills/architect-base/references/taxonomy.md';
 
+/** Formal-spec RFC host — lives outside `docs-live/`, carries normative prose. */
+const FORMAL_SPEC_HOST_FILE = 'formal-spec/04-tag-registry.md';
+
 /** Static generator name for the skill embedded shape. */
 export const TAXONOMY_SKILL_GENERATOR = 'taxonomy-skill';
+
+/** Static generator name for the formal-spec embedded shape. */
+export const TAXONOMY_FORMAL_SPEC_GENERATOR = 'taxonomy-formal-spec';
 
 /**
  * Static manifest of the embedded-region generators — name, description, and host
@@ -77,6 +138,11 @@ export const TAXONOMY_EMBEDDED_GENERATORS: readonly TaxonomyEmbeddedGeneratorInf
     name: TAXONOMY_SKILL_GENERATOR,
     description: 'Generate the taxonomy skill reference regions (role enum + registry counts)',
     hostFile: SKILL_HOST_FILE,
+  },
+  {
+    name: TAXONOMY_FORMAL_SPEC_GENERATOR,
+    description: 'Generate the formal-spec RFC Classification function-group region',
+    hostFile: FORMAL_SPEC_HOST_FILE,
   },
 ];
 
@@ -140,6 +206,17 @@ function planRegions(
     return [
       { source: TAXONOMY_ROLE_ENUM_SOURCE, regionId: 'taxonomy-role-enum' },
       { source: TAXONOMY_TAG_COUNT_SOURCE, regionId: 'taxonomy-tag-count' },
+    ];
+  }
+  if (generatorName === TAXONOMY_FORMAL_SPEC_GENERATOR) {
+    // Two function groups wired: `Classification` (cross-bucket gather) and
+    // `Relationships` (single-bucket subset). Both are tag-row-shaped content the
+    // digest supplies; the RFC's non-tag-row content (relationship direction/blocks
+    // semantics, the status→maturity mapping) stays authored — the function-group
+    // abstraction's ceiling. Each region is an independent digest selection (DD-6).
+    return [
+      { source: TAXONOMY_CLASSIFICATION_SOURCE, regionId: 'taxonomy-classification' },
+      { source: TAXONOMY_RELATIONSHIPS_SOURCE, regionId: 'taxonomy-relationships' },
     ];
   }
   throw new Error(`Unknown taxonomy embedded generator: ${generatorName}`);

@@ -393,7 +393,9 @@ function printHelp(): void {
       'Options:\n' +
       '  -b, --base-dir <dir>   Resolve architect.config from this directory (default: cwd)\n' +
       '  -i, --input <glob>     TypeScript source glob (repeatable)\n' +
-      '      --all              Run every registered generator (all document types + index)\n' +
+      '      --all              Run every registered generator: all document types + index, plus\n' +
+      '                         embedded-region generators that rewrite marked regions inside\n' +
+      '                         authored hosts outside the output dir (formal-spec/, .agents/)\n' +
       '  -g, --generators <id>  Run specific generator(s); repeatable and comma-separated\n' +
       '  -o, --output <dir>     Override the config output directory for this run\n' +
       '  -f, --overwrite        Overwrite existing files for this run\n' +
@@ -569,7 +571,7 @@ async function writeGeneratedFiles(
 }
 
 /**
- * Commit every embedded host's regenerated content as an all-or-nothing batch.
+ * Commit every embedded host's regenerated content as a staged temp→rename batch.
  *
  * Embedded hosts are AUTHORED files (skill `taxonomy.md`, the normative RFC) whose
  * out-of-region prose is NOT regenerable from source — unlike a `docs-live/` file, a
@@ -711,7 +713,8 @@ async function reportDriftAndExit(
     );
     throw new Error(
       `Documentation is not up to date (${String(drift.length)} drifted file(s)); ` +
-        'regenerate with `architect-generate --all -f` and commit docs-live/.',
+        'regenerate with `architect-generate --all -f` and commit the drifted paths reported above ' +
+        '(docs-live/ plus any embedded hosts under formal-spec/ or .agents/).',
     );
   }
 
@@ -748,19 +751,21 @@ function renderGeneratorExecution(
  * managed-region engine. The host's authored prose is preserved byte-for-byte;
  * only inter-marker spans change.
  *
- * Returns `null` when the host file does not exist in this base directory — an
- * embedded generator targets a repo-specific authored file, so "host absent" means
- * "not applicable here" (a generic `--all` in a project without that file simply
- * skips it), NOT a misconfiguration. A host that EXISTS but lacks/​malforms its
- * markers still throws `ManagedRegionError` (loud, no partial write) — that
- * is the real misconfiguration the gate must catch. Throws a containment error if
- * the resolved host escapes the repo (defense in depth over the descriptor's
- * parse-once path check).
+ * Host-absent handling depends on HOW the generator was requested (`skipWhenHostAbsent`):
+ * under `--all` an absent host means "not applicable in this project" and is skipped
+ * (returns `null`) so `--all` stays portable across repos that lack a given authored
+ * host; but an EXPLICIT `-g <name>` request names that host on purpose, so an absent
+ * host is a misconfiguration and **fails loud** rather than exiting 0 with nothing
+ * written (a silent skip there is too easy to greenlight in CI after a bad path). A host
+ * that EXISTS but lacks/​malforms its markers always throws `ManagedRegionError` (loud,
+ * no partial write) regardless of mode. Throws a containment error if the resolved host
+ * escapes the repo (defense in depth over the descriptor's parse-once path check).
  */
 async function renderEmbeddedExecution(
   context: ProjectionContext,
   generator: EmbeddedGenerator,
   baseDir: string,
+  skipWhenHostAbsent: boolean,
 ): Promise<EmbeddedExecution | null> {
   const [shape] = projectTaxonomyEmbeddedShapes(context, [generator.name]);
   if (shape === undefined) {
@@ -777,6 +782,12 @@ async function renderEmbeddedExecution(
   }
 
   if (!(await pathExists(absolutePath))) {
+    if (!skipWhenHostAbsent) {
+      throw new Error(
+        `Embedded generator ${generator.name}: host ${shape.hostFile} not found. ` +
+          'An explicit -g request requires the host to exist; only --all skips an absent host (portability).',
+      );
+    }
     process.stderr.write(
       `Skipping embedded generator ${generator.name}: host ${shape.hostFile} not found in this project.\n`,
     );
@@ -882,7 +893,7 @@ async function main(): Promise<void> {
   const embeddedExecutions = (
     await Promise.all(
       embeddedGenerators.map((generator) =>
-        renderEmbeddedExecution(projectionContext, generator, args.baseDir),
+        renderEmbeddedExecution(projectionContext, generator, args.baseDir, args.all),
       ),
     )
   ).filter((execution): execution is EmbeddedExecution => execution !== null);
@@ -974,14 +985,16 @@ async function main(): Promise<void> {
     }),
   );
 
-  // Phase 4 (LAST): commit the embedded hosts as an all-or-nothing staged batch.
+  // Phase 4 (LAST): commit the embedded hosts via a staged temp→rename batch.
   // Authored hosts carry hand-authored, non-regenerable prose, so mutating them is
   // the one irreversible step — it runs AFTER every fallible regenerable-output step
   // (rendering, the whole-file writes, the manifest upsert), so a failure in any of
-  // those leaves the authored hosts exactly as committed. Within this step the temps
-  // are all staged before any rename, and a rename never truncates, so a failed run
-  // never leaves an authored host changed or half-written. See
-  // commitEmbeddedHostsAtomically.
+  // those aborts before this step and leaves every authored host untouched. Within
+  // this step the temps are all staged before any rename, so a staging failure
+  // renames nothing (every host untouched); once renames begin each is atomic (a host
+  // is never half-written), and the batch is idempotent — an interrupted commit is
+  // completed by re-running, NOT rolled back, so a host already renamed stays
+  // committed. See commitEmbeddedHostsAtomically.
   await commitEmbeddedHostsAtomically(embeddedExecutions);
 
   // Deterministic summary: generators in user-requested order, output

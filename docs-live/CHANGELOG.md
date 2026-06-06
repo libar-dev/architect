@@ -6,12 +6,12 @@
 
 ## Overview
 
-Completed milestones timeline covering 123 patterns.
+Completed milestones timeline covering 124 patterns.
 
 | Metric    | Value |
 | --------- | ----- |
-| Patterns  | 123   |
-| Completed | 123   |
+| Patterns  | 124   |
+| Completed | 124   |
 | Active    | 0     |
 | Planned   | 0     |
 | Candidate | 0     |
@@ -133,6 +133,7 @@ Completed milestones timeline covering 123 patterns.
 | StatusDistributionProjection                          | completed | projection | packages/architect-projection/src/projections/delivery-reporting/index.ts                                            |
 | TagUsageProjection                                    | completed | projection | packages/architect-projection/src/projections/operational-insights/index.ts                                          |
 | TaxonomyDigestProjection                              | completed | projection | packages/architect-projection/src/projections/governance/taxonomy-digest.ts                                          |
+| TaxonomyDocumentationCluster                          | completed |            | architect/specs/documentation-projection/05-taxonomy-documentation-cluster.feature                                   |
 | TraceabilityMatrixProjection                          | completed | projection | packages/architect-projection/src/projections/delivery-reporting/index.ts                                            |
 | TraceabilityMatrixProjectionExecutableTests           | completed | projection | packages/architect-projection/tests/features/projections/delivery-reporting/traceability-matrix.feature              |
 | TypeScriptTaxonomyImplementation                      | completed |            | packages/architect-core/tests/features/types/tag-registry-builder.feature                                            |

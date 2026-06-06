@@ -10,9 +10,104 @@ import {
   renderTaxonomyManagedRegion,
   taxonomyGroupSource,
   TaxonomyDigestSchema,
+  TAXONOMY_CLASSIFICATION_SOURCE,
   TAXONOMY_ROLE_ENUM_SOURCE,
   TAXONOMY_TAG_COUNT_SOURCE,
 } from '../../../../src/index.js';
+
+/**
+ * A cross-bucket digest: the `role` + `bounded-context` metadata tags live in the
+ * Architecture Tags bucket and `product-area` in the PRD Tags bucket — the exact
+ * shape the formal-spec `Classification` function group reads across. Drop
+ * `product-area` (`withProductArea: false`) to exercise the fail-loud path.
+ */
+function buildClassificationDigest({
+  withProductArea = true,
+}: { withProductArea?: boolean } = {}): ReturnType<typeof TaxonomyDigestSchema.parse> {
+  const architecture = {
+    groupName: 'Architecture Tags',
+    entries: [
+      {
+        kind: 'metadata' as const,
+        tag: 'bounded-context',
+        purpose: 'bounded-context grouping',
+        format: 'value' as const,
+        required: false,
+        example: '@architect-bounded-context delivery-reporting',
+      },
+      {
+        kind: 'metadata' as const,
+        tag: 'role',
+        purpose: 'canonical role tag',
+        format: 'value' as const,
+        required: false,
+        values: ['projection', 'service'],
+        example: '@architect-role projection',
+      },
+    ],
+  };
+  const prd = {
+    groupName: 'PRD Tags',
+    entries: [
+      {
+        kind: 'metadata' as const,
+        tag: 'product-area',
+        purpose: 'product-area grouping',
+        format: 'value' as const,
+        required: false,
+        values: ['Annotation', 'Generation'],
+        example: '@architect-product-area Annotation',
+      },
+    ],
+  };
+  // A decoy bucket: `adr-layer` IS digest-emitted but is NOT in the Classification
+  // function group, so it proves the gather is a SELECTION (named tags) rather than
+  // whole buckets surfacing.
+  const adr = {
+    groupName: 'ADR Tags',
+    entries: [
+      {
+        kind: 'metadata' as const,
+        tag: 'adr-layer',
+        purpose: 'architecture layer of an ADR',
+        format: 'enum' as const,
+        required: false,
+        example: '@architect-adr-layer domain',
+      },
+    ],
+  };
+  return TaxonomyDigestSchema.parse({
+    kind: 'TaxonomyDigest',
+    tags: withProductArea ? [architecture, prd, adr] : [architecture, adr],
+    formatTypes: [],
+  });
+}
+
+/**
+ * A single-bucket Relationship Tags digest carrying the four canonical authored tags
+ * PLUS the derived `enforces-decision` — so the `relationships` function group can prove
+ * it SUBSETS the bucket (drops `enforces-decision`) rather than surfacing it whole. This
+ * is the second function group's distinctive shape: a single-bucket SELECTION, the mirror
+ * of `Classification`'s cross-bucket GATHER.
+ */
+function buildRelationshipsDigest(): ReturnType<typeof TaxonomyDigestSchema.parse> {
+  const relationship = {
+    groupName: 'Relationship Tags',
+    entries: ['uses', 'implements', 'extends', 'see-also', 'enforces-decision'].map((tag) => ({
+      kind: 'metadata' as const,
+      tag,
+      purpose: `${tag} relationship`,
+      format: 'csv' as const,
+      required: false,
+      example: `@architect-${tag} Example`,
+    })),
+  };
+  return TaxonomyDigestSchema.parse({
+    kind: 'TaxonomyDigest',
+    tags: [relationship],
+    formatTypes: [],
+  });
+}
 
 const feature = await loadFeature(
   'tests/features/projections/documentation-composition/taxonomy-documentation-cluster.feature',
@@ -311,6 +406,108 @@ describeFeature(feature, ({ Background, Rule }) => {
               /Unknown taxonomy managed-region source/u,
             );
           });
+        },
+      );
+
+      RuleScenario(
+        'the classification function group gathers tags across digest buckets into one table',
+        ({ Given, Then, And }) => {
+          let body = '';
+          Given(
+            'a digest whose Architecture Tags hold role and bounded-context and whose PRD Tags hold product-area',
+            () => {
+              body = renderTaxonomyManagedRegion(
+                buildClassificationDigest(),
+                TAXONOMY_CLASSIFICATION_SOURCE,
+              );
+            },
+          );
+          Then(
+            'the "classification" function-group region is one table enumerating product-area, bounded-context, and role',
+            () => {
+              expect(body).toMatch(/^\| Tag\s+\| Format\s+\| Purpose/u);
+              expect(body).toContain('`product-area`');
+              expect(body).toContain('`bounded-context`');
+              expect(body).toContain('`role`');
+            },
+          );
+          And(
+            "those tags are gathered across the digest's domain buckets, not one bucket surfacing unchanged",
+            () => {
+              // RFC order: product-area (PRD bucket) precedes bounded-context + role
+              // (Architecture bucket) — a single bucket rendered as-is could not produce
+              // this order. And `adr-layer` (a digest-emitted tag in the ADR bucket, NOT
+              // in the Classification set) is excluded, proving a selection, not a dump.
+              const productAreaAt = body.indexOf('`product-area`');
+              const boundedContextAt = body.indexOf('`bounded-context`');
+              const roleAt = body.indexOf('`role`');
+              expect(productAreaAt).toBeGreaterThan(-1);
+              expect(productAreaAt).toBeLessThan(boundedContextAt);
+              expect(boundedContextAt).toBeLessThan(roleAt);
+              expect(body).not.toContain('adr-layer');
+            },
+          );
+          And('the not-digest-emitted tag arch-layer is absent from the region', () => {
+            expect(body).not.toContain('arch-layer');
+          });
+        },
+      );
+
+      RuleScenario(
+        'a function group naming a tag absent from the digest fails loud',
+        ({ Given, Then }) => {
+          let digestWithoutProductArea: ReturnType<typeof TaxonomyDigestSchema.parse>;
+          Given(
+            'a digest whose Architecture Tags hold role and bounded-context but no product-area',
+            () => {
+              digestWithoutProductArea = buildClassificationDigest({ withProductArea: false });
+            },
+          );
+          Then(
+            'rendering the "classification" function group throws and names the absent tag rather than dropping a row',
+            () => {
+              expect(() =>
+                renderTaxonomyManagedRegion(
+                  digestWithoutProductArea,
+                  TAXONOMY_CLASSIFICATION_SOURCE,
+                ),
+              ).toThrow(/product-area.*absent from the digest/u);
+            },
+          );
+        },
+      );
+
+      RuleScenario(
+        'the relationships function group subsets one digest bucket to the canonical authored set',
+        ({ Given, Then, And }) => {
+          let body = '';
+          Given(
+            'a digest whose Relationship Tags bucket holds uses, implements, extends, see-also, and enforces-decision',
+            () => {
+              // `relationships` is module-internal (deliberately NOT barrel-exported);
+              // the test exercises it through its public region-source string.
+              body = renderTaxonomyManagedRegion(buildRelationshipsDigest(), 'relationships');
+            },
+          );
+          Then(
+            'the "relationships" function-group region enumerates uses, implements, extends, and see-also in RFC order',
+            () => {
+              const usesAt = body.indexOf('`uses`');
+              const implementsAt = body.indexOf('`implements`');
+              const extendsAt = body.indexOf('`extends`');
+              const seeAlsoAt = body.indexOf('`see-also`');
+              expect(usesAt).toBeGreaterThan(-1);
+              expect(usesAt).toBeLessThan(implementsAt);
+              expect(implementsAt).toBeLessThan(extendsAt);
+              expect(extendsAt).toBeLessThan(seeAlsoAt);
+            },
+          );
+          And(
+            'the derived enforces-decision tag is absent because the authored set subsets the bucket, not the whole bucket surfacing',
+            () => {
+              expect(body).not.toContain('enforces-decision');
+            },
+          );
         },
       );
     },

@@ -38,6 +38,7 @@ import { slugForFilename } from '../_internal/slug.js';
 import { summarizeTaxonomyDigest } from '../projections/governance/taxonomy-digest.js';
 import {
   taxonomyGroupSource,
+  TAXONOMY_FUNCTION_GROUPS,
   TAXONOMY_ROLE_ENUM_SOURCE,
   TAXONOMY_TAG_COUNT_SOURCE,
 } from '../projections/documentation-composition/taxonomy-embedded.js';
@@ -1761,6 +1762,14 @@ function buildTaxonomyRegionBlocks(
     ];
   }
 
+  // Function-group selection (audience-shaped View read): the RFC groups tags by
+  // FUNCTION, gathering them across the digest's DOMAIN buckets into one canonical
+  // enumeration table. Resolved before the single-bucket fallback below.
+  const functionGroupTags = TAXONOMY_FUNCTION_GROUPS[source];
+  if (functionGroupTags !== undefined) {
+    return [buildTaxonomyFunctionGroupTable(digest, source, functionGroupTags)];
+  }
+
   const group = digest.tags.find(
     (candidate) => taxonomyGroupSource(candidate.groupName) === source,
   );
@@ -1768,6 +1777,33 @@ function buildTaxonomyRegionBlocks(
     throw new Error(`Unknown taxonomy managed-region source: ${source}`);
   }
   return [buildTaxonomyGroupTable(group)];
+}
+
+/**
+ * Gather a function group's tags from across the digest's domain buckets into one
+ * synthetic group and render it with {@link buildTaxonomyGroupTable}, so a
+ * function-group region is byte-consistent with the same tags' rows in
+ * `docs-live/TAXONOMY.md`. The `Required` column comes from each entry's projected
+ * `required` flag — a source fact, not hand-authored modality (cluster spec).
+ * Throws when a referenced tag is absent from the digest (a stale function-group
+ * definition), so the region fails loud rather than silently dropping a row.
+ */
+function buildTaxonomyFunctionGroupTable(
+  digest: TaxonomyDigest,
+  source: string,
+  tags: readonly string[],
+): TrustedTableBlock {
+  const allEntries = digest.tags.flatMap((group) => group.entries);
+  const entries = tags.map((tag) => {
+    const entry = allEntries.find((candidate) => candidate.tag === tag);
+    if (entry === undefined) {
+      throw new Error(
+        `Taxonomy function group "${source}" references tag "${tag}" absent from the digest`,
+      );
+    }
+    return entry;
+  });
+  return buildTaxonomyGroupTable({ groupName: source, entries });
 }
 
 function buildFsmStateDiagram(fragment: ValidationRuleDigest): string {
