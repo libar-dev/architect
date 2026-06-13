@@ -1,3 +1,8 @@
+@architect
+@architect-pattern:MarkdownRendererExecutableTests
+@architect-implements:MarkdownRenderer
+@architect-status:active
+@architect-role:projection
 @projection
 Feature: renderMarkdown renders canonical markdown blocks
   The markdown renderer should preserve the current codec semantics for the canonical block vocabulary.

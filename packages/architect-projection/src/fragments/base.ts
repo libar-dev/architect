@@ -1,3 +1,34 @@
+/**
+ * @architect
+ * @architect-pattern ProjectionBundle
+ * @architect-status active
+ * @architect-role:contract
+ * @architect-bounded-context:projection
+ * @architect-uses ProjectionFragmentSchema, EmissionDescriptor
+ *
+ * ## ProjectionBundle - The Sink-Agnostic Envelope Every Renderer Receives
+ *
+ * The output contract of every projection: `ProjectionBundle<T>` wraps a root
+ * fragment, its keyed `children`, an optional logical `BundleRouting`, and an
+ * optional `emission` overlay. The routing/emission split is the heart of the
+ * sink-agnostic doctrine — `routing` carries only logical route ids plus the
+ * composition `disclosureSpec` and never names a file target, while the file-sink
+ * specifics (which `.md` file, child directory, entity layout) live exclusively
+ * on the optional `EmissionDescriptor`. The absence of `emission` is the baseline
+ * (the bundle handed to API/MCP consumers or the Studio view-state sink); a
+ * present descriptor writes the bundle to markdown.
+ *
+ * Also exports the `BundleRouting` interface + its `strictObject` schema, the
+ * `isBundle` runtime witness, and `projectSingle` (the trivial root-only bundle).
+ * The second-highest fan-in contract in the package after `ProjectionContext`.
+ *
+ * ### When to Use
+ *
+ * - Returning a result from any projection function — the return is a bundle.
+ * - Composing or routing fragments without committing to a file sink.
+ * - Narrowing an `unknown` value to a bundle via `isBundle`.
+ * - Wrapping a single fragment into a bundle via `projectSingle`.
+ */
 import { z } from 'zod';
 
 import type { Fragment } from './fragment-schema.internal.js';

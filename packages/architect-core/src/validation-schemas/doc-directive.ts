@@ -1,3 +1,26 @@
+/**
+ * @architect
+ * @architect-pattern DocDirectiveContract
+ * @architect-status active
+ * @architect-role:contract
+ * @architect-bounded-context:validation-schemas
+ * @architect-uses TagRegistrySchemas
+ *
+ * ## DocDirectiveContract - Parsed Shape of an @architect-* JSDoc Block
+ *
+ * `DocDirectiveSchema` is the canonical parsed shape of a single `@architect-*`
+ * JSDoc directive block — the event-store contract sitting at the boundary
+ * between raw source tags and the typed PatternGraph build. The scanner,
+ * extractor, `ExtractedPattern`, and the lint engine all consume this shape.
+ * Also owns `createPatternStatusSchema`, the registry-driven status enum that
+ * derives the accepted `@architect-status` values from the active tag registry.
+ *
+ * ### When to Use
+ *
+ * - Parsing or validating a raw `@architect-*` JSDoc block into a typed directive.
+ * - Resolving the legal `@architect-status` enum from a `TagRegistry`.
+ * - Defining the directive fields a downstream extractor / validator may read.
+ */
 import { z } from 'zod';
 
 import { ACCEPTED_STATUS_VALUES, type AcceptedStatusValue } from '../taxonomy/index.js';

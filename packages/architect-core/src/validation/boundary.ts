@@ -1,3 +1,28 @@
+/**
+ * @architect
+ * @architect-pattern TrustBoundaryParser
+ * @architect-status active
+ * @architect-role:service
+ * @architect-bounded-context:validation
+ *
+ * ## TrustBoundaryParser - Parse-Once at the Trust Boundary (ADR-009)
+ *
+ * `parseAtBoundary()` plus `BoundaryParseError` make ADR-009's
+ * parse-once-at-the-boundary primitive concrete: raw external input is parsed
+ * exactly once against a Zod schema at an explicit seam, then either typed data
+ * is returned or a stable, Zod-independent error shape (`BoundaryParseError`
+ * with structured `details`) is thrown. A root primitive consumed across all
+ * five packages; its weight is fan-in, not outbound edges.
+ *
+ * ### When to Use
+ *
+ * - Validating raw, untrusted input (CLI args, MCP payloads, file contents,
+ *   external projection callers) at the point it enters the system.
+ * - Converting Zod validation failures into a caller-stable error contract that
+ *   does not leak the Zod dependency past the boundary.
+ * - Guaranteeing the parse-once discipline so internal code can rely on cheap
+ *   shape checks rather than re-parsing.
+ */
 import { z } from 'zod';
 
 export interface BoundaryParseIssue {

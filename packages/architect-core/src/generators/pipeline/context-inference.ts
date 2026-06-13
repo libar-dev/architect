@@ -1,3 +1,27 @@
+/**
+ * @architect
+ * @architect-pattern ContextInference
+ * @architect-status active
+ * @architect-role:service
+ * @architect-bounded-context:pipeline
+ *
+ * ## ContextInference - Path-Based Bounded-Context Derivation
+ *
+ * `inferContext()` derives a pattern's bounded-context from its file path by
+ * matching against an ordered set of `ContextInferenceRule` globs (first match
+ * wins). This is the mechanism behind every non-authored
+ * `@architect-bounded-context` value (ADR-001 / ADR-007): when a module does
+ * not declare the tag explicitly, the projection pipeline falls back to this
+ * derivation. The default ruleset is seeded by `ConfigDefaults`; the service
+ * itself owns no outbound pattern edges.
+ *
+ * ### When to Use
+ *
+ * - Resolving the bounded-context of a pattern whose source omits an explicit
+ *   `@architect-bounded-context` tag.
+ * - Classifying a file path against the project's context-inference ruleset
+ *   during graph composition.
+ */
 export interface ContextInferenceRule {
   readonly pattern: string;
   readonly context: string;

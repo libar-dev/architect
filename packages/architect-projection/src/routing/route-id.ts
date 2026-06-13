@@ -1,4 +1,28 @@
 /**
+ * @architect
+ * @architect-pattern LogicalRouteId
+ * @architect-status active
+ * @architect-role:contract
+ * @architect-bounded-context:rendering
+ *
+ * ## LogicalRouteId - Sink-Agnostic Projection Route Vocabulary
+ *
+ * The logical addressing scheme for the entire projection read side: a branded
+ * template-literal route id in one of three shapes — `docType:index`,
+ * `docType:stableEntityId` (entity), or
+ * `docType:stableEntityId:childKind:stableChildId` (child). Ships the Zod
+ * schema, the `create*RouteId` constructors, and the `parse` / `is` guards that
+ * validate and decompose a route id without binding to any concrete sink
+ * (markdown file path, API bundle key, or Studio view-state route).
+ *
+ * ### When to Use
+ *
+ * - Constructing a route id for an index, entity, or child document.
+ * - Parsing or guarding a raw string against the logical route-id grammar.
+ * - Wiring bundle routing or a renderer that must address documents without
+ *   depending on a single projection domain.
+ */
+/**
  * Logical route-id vocabulary — structured identifiers for documentation routing.
  * Format: docType:index | docType:stableEntityId | docType:stableEntityId:childKind:stableChildId.
  * Promoted here from documentation-composition/progressive-disclosure.ts so

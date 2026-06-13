@@ -1,5 +1,24 @@
 /**
+ * @architect
+ * @architect-pattern ProjectionTrustBoundary
+ * @architect-status active
+ * @architect-role:service
  * @architect-bounded-context:_shared
+ * @architect-uses ProjectionContext
+ *
+ * ## ProjectionTrustBoundary - Parse-Once Projection Entrypoint Wrapper
+ *
+ * The ADR-009 realization for projections: `parseAndProject` wraps each
+ * projection entrypoint so raw caller options hit the Zod schema exactly once
+ * at the trust boundary, then typed options flow into the projection. The
+ * single place external projection callers cross from untrusted input to a
+ * validated `ProjectionContext` projection call.
+ *
+ * ### When to Use
+ *
+ * - Exposing a projection entrypoint to external callers with raw options.
+ * - Enforcing parse-at-boundary so downstream projection code never re-parses.
+ * - Routing strict-object option schemas through one shared validation seam.
  */
 import { parseAtBoundary } from '@libar-dev/architect-core';
 import type { z } from 'zod';

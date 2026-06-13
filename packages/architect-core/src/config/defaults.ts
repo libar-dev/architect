@@ -1,3 +1,29 @@
+/**
+ * @architect
+ * @architect-pattern ConfigDefaults
+ * @architect-status active
+ * @architect-role:contract
+ * @architect-bounded-context:configuration
+ *
+ * ## ConfigDefaults - Canonical Default Configuration
+ *
+ * The single source of truth for Architect's out-of-the-box configuration:
+ * `DEFAULT_TAG_PREFIX`, `DEFAULT_FILE_OPT_IN_TAG`, the default output
+ * directories, and `DEFAULT_CONTEXT_INFERENCE_RULES` — the path-glob ruleset
+ * that seeds every non-hand-authored `@architect-bounded-context` value
+ * (ADR-001 / ADR-007). A high-fan-in shared seam imported across the
+ * toolchain; it owns no outbound pattern edges (its many references are
+ * importers, surfaced via the derived `usedBy` reverse edge).
+ *
+ * ### When to Use
+ *
+ * - Resolving the effective tag prefix, opt-in tag, or output directory when a
+ *   project config omits them.
+ * - Seeding or extending the context-inference ruleset consumed by
+ *   `inferContext()`.
+ * - Establishing the baseline a `ProjectConfigLoader` merges user overrides on
+ *   top of.
+ */
 import { type RegexBuilders, createRegexBuilders } from './regex-builders.js';
 import type { ContextInferenceRule } from '../generators/pipeline/context-inference.js';
 

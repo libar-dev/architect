@@ -1,3 +1,33 @@
+/**
+ * @architect
+ * @architect-pattern ProjectionContext
+ * @architect-status active
+ * @architect-role:contract
+ * @architect-bounded-context:projection
+ * @architect-uses PatternGraph, PackageResolver
+ *
+ * ## ProjectionContext - The Read-Side Spine Every Projection Receives
+ *
+ * The central typed envelope handed to every projection function: a readonly
+ * `{ graph, packageResolver, projectMetadata?, perspective?, projectionFilter? }`
+ * record plus its `strictObject` Zod schema. It is the seam between
+ * architect-core's read model (the `PatternGraph`) and the entire projection
+ * package — the single argument that carries the assembled graph, the
+ * config-supplied `PackageResolver`, and the optional shaping hints
+ * (perspective, projection filter, tag-example overrides) downstream into
+ * every renderer.
+ *
+ * The highest fan-in contract in the package: dozens of projections depend on
+ * this shape, so any change here ripples across the whole read side.
+ *
+ * ### When to Use
+ *
+ * - Writing or extending any projection function — it receives this context.
+ * - Resolving a `pattern.source.file` to a workspace package via
+ *   `packageResolver` (unmatched files raise a `ProjectionError`).
+ * - Carrying perspective / filter / project-metadata hints into a projection
+ *   without widening individual function signatures.
+ */
 import {
   PatternGraphSchema,
   type FormatType,

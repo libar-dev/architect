@@ -1,4 +1,28 @@
 /**
+ * @architect
+ * @architect-pattern ProgressiveDisclosureLevel
+ * @architect-status active
+ * @architect-role:contract
+ * @architect-bounded-context:rendering
+ *
+ * ## ProgressiveDisclosureLevel - Progressive-Disclosure Tier Vocabulary
+ *
+ * The package-wide progressive-disclosure tier contract: the ordered level
+ * tuple (`essential` / `important` / `useful` / `advanced`), its Zod enum, and
+ * the level→availability policy table mapping each tier to where it surfaces
+ * relative to the primary document path (`always` / `nearby` / `available` /
+ * `reference`) plus the editorial rationale. Promoted to the package root so
+ * renderers, fragments, and projections consume it without reaching across a
+ * domain boundary. Sibling-by-design to `DisclosureSpec` — tier (how deep)
+ * versus recipe (how to compose).
+ *
+ * ### When to Use
+ *
+ * - Tagging or filtering content by its progressive-disclosure tier.
+ * - Resolving where a tier should surface via the policy table.
+ * - Enumerating the legal disclosure levels for codegen or UI.
+ */
+/**
  * Disclosure-level vocabulary — package-wide concepts consumed by renderers,
  * fragments, and projections. Promoted here from documentation-composition/
  * so consumers don't reach across domain boundaries (was finding F17 in the

@@ -1,3 +1,27 @@
+/**
+ * @architect
+ * @architect-pattern RendererOptions
+ * @architect-status active
+ * @architect-role:contract
+ * @architect-bounded-context:rendering
+ * @architect-uses DisclosureSpec
+ *
+ * ## RendererOptions - The Typed Seam Between Bundle and Rendering Sink
+ *
+ * The per-sink option contracts that make renderers pluggable across rendering
+ * sinks: `RenderMarkdownOptions`, `RenderCompactOptions`, `RenderJsonOptions`,
+ * and `RenderUiOptions`, unified by the `RendererOptionsSchema` Zod union. Also
+ * carries the shared rendering vocabulary — `ProjectionInput` (the fragment or
+ * bundle a renderer accepts), `MarkdownRouteProfile` (path mapping for emitted
+ * markdown), and `MarkdownRenderEvent` (per-document render telemetry). Markdown
+ * options depend on `DisclosureSpec` to drive progressive-disclosure depth.
+ *
+ * ### When to Use
+ *
+ * - Typing or validating options passed to a specific rendering sink.
+ * - Adding a new renderer that must conform to the option contract.
+ * - Threading disclosure depth or route-profile mapping into markdown rendering.
+ */
 import { z } from 'zod';
 
 import type { MarkdownFileRoute } from '../fragments/emission-descriptor.js';

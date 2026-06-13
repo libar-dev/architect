@@ -1,4 +1,29 @@
 /**
+ * @architect
+ * @architect-pattern DisclosureSpec
+ * @architect-status active
+ * @architect-role:contract
+ * @architect-bounded-context:rendering
+ * @architect-uses ProjectionFilter
+ *
+ * ## DisclosureSpec - Bundle Composition Recipe Vocabulary
+ *
+ * The composition-recipe contract that declares how a single documentation
+ * bundle is composed and rendered: the grouping axis, per-entry content
+ * richness, root-document shape, child fan-out, a committed flag (whether the
+ * choice is invariant for the doc type), and an optional `ProjectionFilter`
+ * narrowing which patterns appear. Lives at the package root rather than under a
+ * projection domain so renderers, fragments, and projections all consume it
+ * without a layering inversion. Sibling-by-design to `ProgressiveDisclosureLevel`
+ * — recipe (how to compose) versus tier (how deep).
+ *
+ * ### When to Use
+ *
+ * - Declaring the composition shape of a documentation output.
+ * - Consuming a disclosure recipe in a renderer, fragment, or projection.
+ * - Attaching a `ProjectionFilter` to scope a bundle's pattern set.
+ */
+/**
  * Disclosure-spec vocabulary — composition recipes for documentation outputs.
  * Schemas live here (rather than under projections/documentation-composition/)
  * so renderers, fragments, and projections can consume them without a layering

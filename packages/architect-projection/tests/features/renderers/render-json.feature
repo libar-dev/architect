@@ -1,3 +1,8 @@
+@architect
+@architect-pattern:JsonRendererExecutableTests
+@architect-implements:JsonRenderer
+@architect-status:active
+@architect-role:projection
 @projection
 Feature: renderJson produces stable JSON-safe projection output
   The JSON renderer should preserve fragment identity while producing deterministic JSON-safe output for fragments and bundles.

@@ -1,9 +1,29 @@
 /**
- * Canonical Zod 4 schemas for value domains that cross package boundaries.
+ * @architect
+ * @architect-pattern DomainEnumSchemas
+ * @architect-status active
+ * @architect-role:contract
+ * @architect-bounded-context:domain
  *
- * Every enum-like primitive that CLI, MCP, projection, and guard share lives
- * here so the schemas themselves are the source of truth; TS types are inferred.
- * Downstream modules must import from this file rather than redeclare inline.
+ * ## DomainEnumSchemas - Cross-Package Zod Enum Hub
+ *
+ * The 20-importer cross-package Zod enum hub. Defines the canonical
+ * enum-like value-domain schemas every package shares — `SessionType`,
+ * `ScopeType`, `RenderFormat`, `StatusFilter`, and the status/maturity/
+ * deliverable schemas — so the schemas themselves are the source of truth and
+ * TS types are inferred. Composes raw taxonomy constants directly and carries
+ * no owning-pattern imports; a root primitive whose weight is fan-in.
+ *
+ * Carries the StatusFilter-vs-AcceptedStatus distinction: `StatusFilterSchema`
+ * widens the authored accepted values with the `planned` reporting bucket for
+ * filtering only, while `AcceptedStatusSchema` and `ProcessStatusSchema` stay
+ * narrow for authored-tag and FSM-transition validation.
+ *
+ * ### When to Use
+ *
+ * - Validating a CLI / MCP / projection input against a shared value domain.
+ * - Choosing between filter-scoped and validation-scoped status schemas.
+ * - Inferring a TS type from one of the canonical enum schemas.
  */
 import { z } from 'zod';
 import { ACCEPTED_STATUS_VALUES, PROCESS_STATUS_VALUES } from './taxonomy/status-values.js';

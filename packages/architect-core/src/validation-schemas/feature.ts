@@ -1,3 +1,25 @@
+/**
+ * @architect
+ * @architect-pattern GherkinScanResultContract
+ * @architect-status active
+ * @architect-role:contract
+ * @architect-bounded-context:validation-schemas
+ *
+ * ## GherkinScanResultContract - Parsed Executable-Spec Event-Store Contract
+ *
+ * The Gherkin half of the event-store contract: `ScannedGherkinFile` /
+ * `GherkinScanResults` plus the Gherkin AST schema family (feature, rule,
+ * scenario, background, step, examples, data-table, doc-string). Defines what a
+ * "parsed executable spec" means structurally — the typed shape produced when
+ * the Gherkin scanner reads `.feature` source on the way into the PatternGraph
+ * build, the parsed-Gherkin counterpart to the JSDoc-directive contract.
+ *
+ * ### When to Use
+ *
+ * - Validating the structured result of scanning a `.feature` file.
+ * - Defining or consuming the Gherkin AST node shapes (scenario, rule, step).
+ * - Carrying parse errors alongside successfully scanned files in one result.
+ */
 import { z } from 'zod';
 
 export type GherkinDataTableRow = Readonly<Record<string, string>>;

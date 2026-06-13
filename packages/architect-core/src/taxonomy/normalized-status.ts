@@ -1,3 +1,28 @@
+/**
+ * @architect
+ * @architect-pattern StatusNormalization
+ * @architect-status active
+ * @architect-role:service
+ * @architect-bounded-context:domain
+ *
+ * ## StatusNormalization - Reporting-Bucket Fold for @architect-status
+ *
+ * The 13-importer reporting-bucket fold. `normalizeStatus` plus
+ * `STATUS_NORMALIZATION_MAP` collapse the authored `@architect-status` values
+ * into the derived reporting vocabulary, mapping `roadmap` and `deferred` down
+ * to the synthetic `planned` bucket. A root primitive of the taxonomy with no
+ * outbound pattern edges; its weight is fan-in.
+ *
+ * Distinct concern from `StatusValueDomain`: that owns the authored value
+ * domain, this owns the projection-side fold of authored statuses into the
+ * `planned` reporting bucket that `StatusFilterSchema` is composed from.
+ *
+ * ### When to Use
+ *
+ * - Folding a raw `@architect-status` into a `NormalizedStatus` reporting bucket.
+ * - Testing whether a pattern is complete / active / planned / candidate.
+ * - Sourcing the `planned` bucket word for the consumer-facing status filter.
+ */
 export const NORMALIZED_STATUS_VALUES = ['completed', 'active', 'planned', 'candidate'] as const;
 
 export type NormalizedStatus = (typeof NORMALIZED_STATUS_VALUES)[number];

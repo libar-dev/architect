@@ -1,3 +1,8 @@
+@architect
+@architect-pattern:UiRendererExecutableTests
+@architect-implements:UiRenderer
+@architect-status:active
+@architect-role:projection
 @projection
 Feature: renderUi returns Studio-oriented structured UI documents
   The UI renderer should keep bundle structure intact while reshaping fragments into predictable pure-data sections for Studio consumption.

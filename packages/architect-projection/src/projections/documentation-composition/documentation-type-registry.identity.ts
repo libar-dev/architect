@@ -1,5 +1,25 @@
 /**
+ * @architect
+ * @architect-pattern DocumentationTypeIdentity
+ * @architect-status active
+ * @architect-role:contract
  * @architect-bounded-context:documentation-composition
+ * @architect-uses LogicalRouteId
+ *
+ * ## DocumentationTypeIdentity - The Closed Set of Documentation Types
+ *
+ * `SUPPORTED_DOCUMENTATION_TYPE_IDENTITIES` is the closed set of 14 documentation
+ * types — each a `key` / `displayTitle` / `description` / `rootRouteId` tuple —
+ * plus the derived `SupportedDocumentationType` key union and the
+ * `DocumentationTypeIdentity` record type. This is the identity backbone the
+ * multi-file `DocumentationTypeRegistry` constellation keys off: every doc type
+ * a projection can emit, its UI title, and the `LogicalRouteId` that roots it.
+ *
+ * ### When to Use
+ *
+ * - Enumerating or validating the supported documentation types.
+ * - Resolving a doc type's display title or root route id.
+ * - Narrowing a raw string to the `SupportedDocumentationType` union.
  */
 import type { LogicalRouteId } from '../../routing/route-id.js';
 import { createIndexRouteId } from '../../routing/route-id.js';

@@ -1,3 +1,28 @@
+/**
+ * @architect
+ * @architect-pattern ReadApiResultContract
+ * @architect-status active
+ * @architect-role:contract
+ * @architect-bounded-context:read-api
+ * @architect-uses PatternGraph
+ *
+ * ## ReadApiResultContract - The Structured-Answer Envelope (ADR-006)
+ *
+ * The shared result vocabulary every `architect:query` verb response is shaped
+ * by. Defines the `QueryResult<T>` discriminated union (`QuerySuccess<T>` /
+ * `QueryError`) with its metadata envelope, plus the read-side payload shapes a
+ * verb returns: `DependencyContext` (the focal-rooted, bidirectional blast-radius
+ * forest), `PatternRelationships`, `StatusDistribution`, `NeighborEntry`,
+ * `TransitionCheck`, `ProtectionInfo`, `BusinessRuleRef`, and the
+ * `createSuccess` / `createError` factories. A read-side contract that sits over
+ * the {@link PatternGraph} and never re-derives state.
+ *
+ * ### When to Use
+ *
+ * - Authoring or consuming a Data API verb that returns a `QueryResult<T>`.
+ * - Shaping a blast-radius / dependency-context or relationship response.
+ * - Constructing success / error envelopes via the result factories.
+ */
 import type { ImplementationRef, StatusCounts } from '../validation-schemas/pattern-graph.js';
 import type { ProcessStatusValue } from '../taxonomy/index.js';
 

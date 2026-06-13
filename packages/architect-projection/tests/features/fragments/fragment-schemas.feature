@@ -1,3 +1,7 @@
+@architect
+@architect-pattern FragmentSchemaMirrorExecutableTests
+@architect-status active
+@architect-implements:ProjectionFragmentSchema
 @projection
 Feature: Fragment schema mirror
   Every projection FragmentKind must parse strictly, reject extras, and survive

@@ -1,5 +1,26 @@
 /**
+ * @architect
+ * @architect-pattern GroupedRoutedBundleSupport
+ * @architect-status active
+ * @architect-role:service
  * @architect-bounded-context:_shared
+ * @architect-uses ProjectionBundle
+ *
+ * ## GroupedRoutedBundleSupport - Routed-Bundle Group/Sort/Root+Children Orchestrator
+ *
+ * The recurring group → sort → root+children → routing → degrade dance for
+ * routed projections (`api-reference`, `business-rules`). The helper never
+ * builds a fragment — callers keep ownership of every graph read, fragment
+ * construction, and Zod shape (ADR-005/006/009); it only orchestrates the
+ * caller's builders and degrades to a single root document when there are no
+ * groups. Declining the two-level generalization until a second caller needs
+ * it is the speculative-complexity refusal ADR-010 exists for.
+ *
+ * ### When to Use
+ *
+ * - Assembling a routed `ProjectionBundle` whose children are one-per-group.
+ * - Sharing the group/sort/degrade orchestration across routed projections
+ *   without re-implementing the dance per caller.
  *
  * Shared mechanics for the "grouped routed bundle" projection shape: collect a
  * flat list of items, bucket them by a stable group key, sort the groups, build

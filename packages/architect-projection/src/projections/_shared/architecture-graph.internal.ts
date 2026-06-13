@@ -1,4 +1,29 @@
 /**
+ * @architect
+ * @architect-pattern ArchitectureGraphSupport
+ * @architect-status active
+ * @architect-role:service
+ * @architect-bounded-context:_shared
+ * @architect-uses ExtractedPattern
+ *
+ * ## ArchitectureGraphSupport - Shared Mermaid Context-Map Infrastructure
+ *
+ * Turns the `PatternGraph` into grouped Mermaid context maps. The
+ * context-neutral node collection, edge collection, grouping, inter-group edge
+ * aggregation, and `graph LR` emission consumed by BOTH
+ * `ArchitectureDiagramProjection` (the full architecture doc) and
+ * `OverviewProjection` (the heads-up architecture glimpse). Output is
+ * deterministic — every collection sorts — so the `docs:all` determinism gate
+ * proves the diagram stays byte-identical.
+ *
+ * ### When to Use
+ *
+ * - Emitting a grouped Mermaid context map from `PatternGraph` patterns.
+ * - Sharing diagram node/edge/grouping logic across two projection contexts
+ *   without one importing the other's supporting code.
+ */
+
+/**
  * Shared architecture-graph construction — context-neutral helpers that turn the
  * PatternGraph into grouped Mermaid context maps.
  *
