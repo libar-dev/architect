@@ -237,7 +237,7 @@ as bytes on disk AND as tokens in context.
     gitignored (regenerable; per the thesis, agent-facing views freeze nothing).
 - Trust boundary lives in the thin IO runner; views stay pure (§6).
 
-**Open / next probes (recommended order):**
+**Open / next probes (recommended order):** _(situated within the cross-effort sequencing in §9.5 once the `DocumentationProjection` epic is in view)_
 
 1. **Value-transfer view** — fold the ephemeral-spec-deletion gate (executable-specs skill)
    into a handle method over the data we now expose: a pattern is `deletionReady` when its
@@ -321,3 +321,103 @@ pnpm exec tsx playground/cli.ts census       # coverage
   playground optimizes the sink the old pipeline optimized _least_.
 - **No-BC / live-state:** no historical scaffolding; `drift` flags real deletions, it does
   not record "what we replaced" (that is a `git log` question).
+
+---
+
+## 9. Session findings — annotation asymmetry, the live-graph gap, and convergence with `DocumentationProjection`
+
+Findings from probing the live graph against `architect-core` + `architect-projection`,
+plus the load-bearing connection to the `architect/specs/documentation-projection/` epic —
+the **fenced producer-side** counterpart to this **unfenced consumer-side** experiment.
+Durable working-state; prune each as it graduates to code or an ADR.
+
+### 9.1 Annotation coverage is two OPPOSITE gaps, not one
+
+"Coverage" is not "annotate everything to 100%." The two target packages fail in opposite
+directions, so the work is bidirectional:
+
+- **`architect-projection` is over-annotated with deletion candidates.** `63` projection-role
+  patterns; **60 have zero downstream consumers**, 62 have ≤1 (live `g.patterns` filter). Each
+  is a bespoke `*Projection` codec paired with a `*Digest`/`*Contract` fragment (~54 contracts)
+  — the documentType-first star. By ADR-010's own second-caller bar, ~95% never qualified to be
+  frozen. Work here is **subtractive**.
+- **`architect-core` is under-annotated on load-bearing modules.** 36% node coverage (34/94);
+  `fanInCandidates` names the targets — `fragments/projection-context.ts` (61), `fragments/base.ts`
+  (47), `taxonomy/status-values.ts` (23), `domain-enums.ts` (20). Work here is **additive**.
+
+The two-surface model is what makes the asymmetry safe to act on: `blastRadius` over the
+substrate keeps re-test coverage exhaustive while the curated layer stays a deliberate ~6–11%
+selection. "Useful coverage" = converge the two flows, not chase a percentage.
+
+### 9.2 Two of the three design-review lenses are decision-only
+
+`docs-live/design-review/by-layer.md` and `by-theme.md` carry **only the 14 ADR/PDR records**
+(grouped by `@architect-adr-layer` / `@architect-adr-theme` — axes populated only on decisions).
+They do not lens the implementation graph at all. Only `by-package.md` is the real component
+inventory (and it shows the projection-triad explosion at a glance). For "review core/projection
+by layer," the other two are empty calories — a concrete instance of the one-consumer projection
+the cut-down in §9.1 targets.
+
+### 9.3 The live-graph linkage gap (the WIP-API question)
+
+The handle reads a **static, gitignored** `data/pattern-graph-core.json` (a `--core` snapshot).
+The live wire already exists:
+
+```
+annotated source ──buildCliContext()──▶ live PatternGraph (ADR-006)
+                          │ scripts/snapshot-pattern-graph.ts --core   (Zod-codec validated write)
+                          ▼
+                  pattern-graph-core.json   ← loadAuthored() reads THIS (stale)
+                          ▲ scripts/load-pattern-graph.ts   (Zod-codec validated read → typed PatternGraph)
+```
+
+`snapshot-pattern-graph.ts --core` reuses `buildCliContext`, so the core is byte-identical to
+what every verb/codec consumes. To make `loadGraph()` never stale, `loadAuthored()` builds the
+core in-process (the snapshot script's own path) instead of reading old bytes. The mechanical
+substrate (`extract.ts`) is already live-on-demand.
+
+### 9.4 Convergence: this experiment and the `DocumentationProjection` epic are ONE effort from two ends
+
+The epic converges hard with this playground, which sharpens the sequencing:
+
+- **Both kill the documentType-first star.** Epic's 2026-06-06 synthesis: "the universal engine
+  already ships" — `ProjectionBundle{root, children, emission}` + one `scope`-parametrized fragment
+  - the managed-region engine _is_ the universal machinery; `architecture` and `design-review` are
+    the **same** fragment four booleans apart. Bespoke per-doc projections fold onto it — "the payload
+    is mostly subtraction." Same conclusion as §9.1's 60/63, reached independently.
+- **Both center on the same move: don't flatten the join.** Epic's one cross-cutting build is
+  **target-neutrality** — projections bake `{name,role,status,level}` into a mermaid label string, so
+  only `name`+`role` reach JSON and Studio must re-query. Fix: structured slices, labels deferred to
+  the renderer. This is _why_ the playground works — it reads the **pre-flatten `--core`** and keeps
+  data structured + in-process (the `~⅕ context` win). "Type the shapes richly" (`schema.ts`) and
+  "de-flatten the join" are the same principle on the two sides.
+- **The handle is the agent-sink emission the epic already names.** Epic: "a View with **no emission
+  descriptor** is the sink-agnostic baseline — the bundle handed to the API/MCP consumer or the Studio
+  view-state sink." `loadGraph()` is precisely the agent-sink reader of that no-descriptor View. Not
+  competitors — the playground is the no-descriptor sink the epic accounts for.
+- **ADR-010's second-caller bar is the shared arbiter.** The projections that **survive** the cut are
+  the ones a second _machine_ consumer needs — and the Studio live-view (Design-Review = pattern +
+  dependency subgraph + rule-coverage + conflicts) is that consumer. Everything whose only consumer is
+  one markdown doc collapses to a scriptable View. Agent sink freezes nothing (scripts the rest); the
+  machine sinks keep typed contracts. Same bar, two answers.
+
+### 9.5 Natural sequencing (analysis, not an execution plan)
+
+1. **Wire the handle live (§9.3).** Smallest step; makes census / fan-in / deletionReady reflect HEAD
+   and proves the agent-sink reader against the live no-descriptor core. De-risks everything after it.
+2. **deletionReady / value-transfer view (§5 #1).** Cheap — sits on the maturity×provenance grid
+   `invariantsOf` already computes. The _instrument_ that says which projections are safe to collapse
+   (value transferred, no second consumer). Drives step 4.
+3. **De-flatten the join (epic, cross-cutting).** Producer-side enabler: you cannot fold a bespoke
+   projection onto the universal engine while the engine still flattens. Agent sink doesn't need it; the
+   _surviving_ (Studio) sink does. Bigger; No-BC in place.
+4. **The subtraction (§9.1 + epic).** Collapse the ~60 one-consumer projections onto the universal
+   engine; add the `architect-core` fan-in modules. The taxonomy cluster (`member 05`, completed) is
+   the proof the fold-down works.
+5. **Graduate the handle (§5 #4) + gating decisions (epic).** Handle → package when shapes settle;
+   read-model-reach (reflexivity) and ADR-011 (facet helper) only when a genuine heterogeneous second
+   caller ships (the Studio Design-Review view).
+
+The decision that is the user's, not the tooling's: the cut is **"delete everything whose only consumer
+is one markdown doc; keep what Studio view-state will read"** — deletionReady _informs_ that line, it
+does not draw it.
