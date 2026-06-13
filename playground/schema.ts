@@ -40,14 +40,56 @@ export type ImportEdge = z.infer<typeof ImportEdgeSchema>;
 export type MechanicalCore = z.infer<typeof MechanicalCoreSchema>;
 
 // ─── Layer 2: the curated graph (authored, sparse) ───────────────────────────
-// Loose on purpose: validate only the fields the views touch, leave the fat
-// `directive`/`scenarios`/`code` payload untyped so the snapshot shape can drift
-// without breaking the playground.
+// Loose on purpose where it counts: still `looseObject` so the fat `code` payload
+// rides untyped, but we now TYPE the Gherkin (scenarios/rules) + taxonomy-bearing
+// `directive`. The prior playground left these untyped and the richest half of the
+// data went invisible — an agent reading the contract concluded scenarios didn't
+// exist. For an AI-native surface the type IS the discovery surface; type what you
+// want found.
+
+// A parsed Gherkin scenario — already in the snapshot, one per `Scenario:` block.
+export const ScenarioSchema = z.looseObject({
+  featureFile: z.string(),
+  featureName: z.string().optional(),
+  scenarioName: z.string().default(''),
+  steps: z.array(z.looseObject({ keyword: z.string(), text: z.string() })).default([]),
+  tags: z.array(z.string()).default([]),
+  semanticTags: z.array(z.string()).default([]),
+  layer: z.string().optional(),
+  line: z.number().optional(),
+});
+// A `Rule:` block — the *invariant* carrier. `description` holds the `**Invariant:**`
+// (and sometimes `**Rationale:**`) prose verbatim.
+export const RuleSchema = z.looseObject({
+  name: z.string(),
+  description: z.string().default(''),
+  scenarioCount: z.number().default(0),
+  scenarioNames: z.array(z.string()).default([]),
+});
+export type Scenario = z.infer<typeof ScenarioSchema>;
+export type Rule = z.infer<typeof RuleSchema>;
+
 export const AuthoredPatternSchema = z.looseObject({
   name: z.string(),
   status: z.string().default('?'),
   source: z.looseObject({ file: z.string() }).optional(),
+  // role / bounded-context are STRUCTURED top-level fields (the extractor already
+  // peeled the value off the JSDoc tag): populated on 195 / 176 of 293 patterns.
+  // `directive.tags` only carries the bare key `@architect-role` for TS patterns —
+  // reading the value from there silently drops ~167 of them. Read the field.
+  role: z.string().optional(),
+  boundedContext: z.string().optional(),
+  // directive still typed for `description` + the value-form tags some .feature
+  // patterns carry (a fallback, not the primary source).
+  directive: z
+    .looseObject({ tags: z.array(z.string()).default([]), description: z.string().optional() })
+    .optional(),
+  whenToUse: z.array(z.string()).default([]),
+  productArea: z.string().optional(),
+  scenarios: z.array(ScenarioSchema).default([]),
+  rules: z.array(RuleSchema).default([]),
 });
+export type AuthoredPattern = z.infer<typeof AuthoredPatternSchema>;
 export const AuthoredEdgeSchema = z.looseObject({
   uses: z.array(z.string()).default([]),
   usedBy: z.array(z.string()).default([]),
@@ -58,6 +100,25 @@ export const AuthoredCoreSchema = z.looseObject({
   relationshipIndex: z.record(z.string(), AuthoredEdgeSchema),
 });
 export type AuthoredCore = z.infer<typeof AuthoredCoreSchema>;
+
+// ─── the maturity axis (a REQUIREMENT, not a stored field) ───────────────────
+// `@architect-maturity` is authored at exactly one tier (idea) and otherwise
+// DERIVED from status (four-tier ladder + ADR-007). The snapshot stores 0 of these
+// as a field — so the handle derives it. An explicit `@architect-maturity:` tag in
+// directive.tags always wins (`formal-spec/04` "explicit always wins").
+export const MATURITIES = ['idea', 'plan', 'design', 'executable'] as const;
+export type Maturity = (typeof MATURITIES)[number];
+export const MATURITY_BY_STATUS: Record<string, Maturity> = {
+  candidate: 'idea', // idea + candidate tiers both → consideration track
+  roadmap: 'plan',
+  active: 'design',
+  completed: 'executable',
+};
+// Provenance answers a different question than maturity: is this spec a LIVE TEST
+// (`tests/features/**`) or an AUTHORED working-spec (`architect/specs|decisions/**`)?
+// "Specs of any maturity, both implemented and non-implemented" = report both axes,
+// drop neither.
+export type Provenance = 'executable' | 'authored';
 
 // ─── loaders (the trust boundary; parse once) ────────────────────────────────
 // `data/` is gitignored and regenerable, so on a fresh checkout these files are

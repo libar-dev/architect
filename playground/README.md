@@ -24,13 +24,20 @@ just rebuild the language server and throw away the curation.
 
 ## Files
 
-- `schema.ts` — the **exposed shapes** (Zod) + loaders. Read this, then script freely.
+- `schema.ts` — the **exposed shapes** (Zod) + loaders, incl. the now-typed Gherkin
+  (`Scenario`, `Rule`) and the maturity axis (`MATURITY_BY_STATUS`). Read this, then script.
+- `graph.ts` — **the handle: `loadGraph()`**. One typed object, joins + taxonomy-decode done
+  once, need-shaped accessors returning plain data. The AI-native read surface — `g.pattern`,
+  `g.invariantsOf`, `g.specsReverifying`, `g.maturityLadder`, `g.blastRadius`, the entry
+  adapters, and the curation-assist views, all on one object. Start here to script.
 - `extract.ts` — Layer-1 builder. Walks `packages/*/src` with the TS compiler API
   (syntactic, no type-checker), follows re-export barrels to the defining symbol.
-- `views.ts` — the trusted view library (pure functions): `graphDiff`,
-  `blastRadius`, `fanInCandidates`, `driftFlags`, `census`, plus the entry
-  adapters `findByConcept` (E1), `byFile` (E2), `bySymbol` (E3).
-- `cli.ts` — thin demo runner over the views.
+- `views.ts` — the pure view library the handle delegates to (`graphDiff`, `blastRadius`,
+  `fanInCandidates`, `driftFlags`, `census`, entry adapters `findByConcept`/`byFile`/`bySymbol`).
+- `cli.ts` — thin demo runner over the handle + views.
+- `recipes.md` — the "script the rest" demonstrations: I1/A1/A2 + a cross-method compose,
+  each a copy-pasteable script over the handle (verified), **not** a verb. Read this to see
+  how the demand-map's traversal rows get answered without freezing them.
 - `data/` — gitignored inputs/outputs (regenerable).
 
 ## Run
@@ -53,12 +60,24 @@ pnpm exec tsx playground/cli.ts file packages/architect-projection/src/fragments
 pnpm exec tsx playground/cli.ts symbol ProjectionBundle                                # E3: export symbol → defining pattern + importedBy
 ```
 
-Or import the library directly and script your own cut:
+Maturity-spanning Gherkin views — invariants / at-risk specs of **any** maturity, each
+labeled `executable`(live test) vs `authored`(working-spec):
+
+```bash
+pnpm exec tsx playground/cli.ts maturity                                  # the tier ladder + where authored invariants live
+pnpm exec tsx playground/cli.ts invariants AnnotationCoverageProjection   # "what does this guarantee?" (reaches executable specs)
+pnpm exec tsx playground/cli.ts invariants ArchitectBriefDeterministicBundle  # a non-implemented candidate spec → authored invariants
+pnpm exec tsx playground/cli.ts specs HEAD~8                              # specs re-verifying a diff, maturity + provenance labeled
+```
+
+Or import the handle and script your own cut — one object, joins precomputed:
 
 ```ts
-import { loadMechanical, loadAuthored } from './schema.ts';
-import { blastRadius } from './views.ts';
-const r = blastRadius(loadMechanical(), loadAuthored(), ['packages/architect-core/src/foo.ts']);
+import { loadGraph } from './graph.ts';
+const g = loadGraph();
+g.invariantsOf('packages/architect-core/src/foo.ts'); // → Invariant[] (any maturity, labeled)
+g.specsReverifying(['packages/architect-core/src/foo.ts']); // → AtRiskSpec[]
+g.blastRadius(['packages/architect-core/src/foo.ts']).atRiskSpecs; // impact, now reaching scenarios
 ```
 
 ## Regenerating the curated input

@@ -96,24 +96,45 @@ catalog of agent questions sorts onto the two surfaces, and each row gets a verd
 **ADR-010's second-caller bar**: adapters (many consumers) freeze; traversals (one
 consumer each) get scripted.
 
-| row    | question                                     | starts from     | surface                 | verdict                                                              |
-| ------ | -------------------------------------------- | --------------- | ----------------------- | -------------------------------------------------------------------- |
-| **E1** | "what patterns relate to this concept?"      | fuzzy string    | curated                 | **frozen** — `findByConcept` ✓                                       |
-| **E2** | "what owns this file + its neighborhood?"    | a file          | both                    | **frozen** — `byFile` ✓ (dark files get the mechanical neighborhood) |
-| **E3** | "where is this symbol used architecturally?" | a symbol        | substrate               | **frozen** — `bySymbol` ✓                                            |
-| **I4** | "blast radius of this diff?"                 | `git diff`      | substrate               | **frozen** — `blastRadius` ✓                                         |
-| I1     | "if I change X, what breaks?"                | a pattern       | both                    | **script** (in `blastRadius`)                                        |
-| I2     | "which executable specs re-verify?"          | pattern/file    | curated + Gherkin       | **script** / needs Gherkin index for precision                       |
-| I3     | "which invariants might I break?"            | pattern/file    | **needs Gherkin index** | **deferred** — Rule blocks not in the core                           |
-| A1     | "how is this kind of thing done here?"       | intent          | curated                 | **script** (precedent by role/context + ADR edges)                   |
-| A2     | "what context/seam am I extending?"          | package/context | curated                 | **script** (group by boundedContext)                                 |
+| row    | question                                     | starts from     | surface           | verdict                                                              |
+| ------ | -------------------------------------------- | --------------- | ----------------- | -------------------------------------------------------------------- |
+| **E1** | "what patterns relate to this concept?"      | fuzzy string    | curated           | **frozen** — `findByConcept` ✓                                       |
+| **E2** | "what owns this file + its neighborhood?"    | a file          | both              | **frozen** — `byFile` ✓ (dark files get the mechanical neighborhood) |
+| **E3** | "where is this symbol used architecturally?" | a symbol        | substrate         | **frozen** — `bySymbol` ✓                                            |
+| **I4** | "blast radius of this diff?"                 | `git diff`      | substrate         | **frozen** — `blastRadius` ✓                                         |
+| I1     | "if I change X, what breaks?"                | a pattern       | both              | **script** (in `blastRadius`)                                        |
+| I2     | "which specs re-verify (any maturity)?"      | pattern/file    | curated + Gherkin | **frozen** — `specsReverifying` ✓ (Gherkin was in-core all along)    |
+| I3     | "which invariants might I break?"            | pattern/file    | curated + Gherkin | **frozen** — `invariantsOf` ✓ (per-invariant maturity + provenance)  |
+| A1     | "how is this kind of thing done here?"       | intent          | curated           | **script** (precedent by role/context + ADR edges)                   |
+| A2     | "what context/seam am I extending?"          | package/context | curated           | **script** (group by boundedContext)                                 |
 
-**The entry adapters (E1–E3) + I4 are the frozen trusted core** — they are the universal
-bridge that makes "the agent scripts the rest" cheap. **I1/I2/A1/A2 are deliberately NOT
-frozen** (freezing them rebuilds the 9-verb pipeline we are deleting); they are short
-scripts over the shapes. **I3 / precise I2 need a Gherkin-side extractor** (sibling to
-`extract.ts`) — the core has the _edges_, the `.feature` files have the _scenarios + Rule
-blocks_; that join is the next Layer-1 expansion.
+**The entry adapters (E1–E3) + I4 are the frozen trusted core** — the universal bridge
+that makes "the agent scripts the rest" cheap. **A1/A2 stay scripts** (one consumer each;
+freezing them rebuilds the pipeline we are deleting).
+
+**I2/I3 are now frozen too — and the correction matters.** An earlier note here claimed
+"Rule blocks not in the core" and queued a _Gherkin-side extractor_ (a sibling to
+`extract.ts`) as the next Layer-1 build. **That was wrong.** The `.feature` files are
+**already parsed** by the snapshot pipeline and ride inside the `--core` snapshot: 929
+scenarios (3,572 steps), 431 Rule blocks, the `rule:<slug>` + `scenarioNames` linkage. The
+prior session missed it only because `schema.ts` left `scenarios`/`rules` **untyped** — so
+the richest half of the data was invisible to an agent reading the contract. The work was
+never an extractor; it was a **join view + the maturity axis**, both now built in
+`graph.ts` (`invariantsOf`, `specsReverifying`). Lesson, kept: _for an AI surface, the type
+is the discovery surface — under-typing a shape hides a capability._
+
+**Why freezing I2/I3 is NOT a regression toward the verb-wall.** The freeze-vs-script bar
+has **two** axes, and the catalog collapsed them: _consumer count_ (ADR-010) **and** _join
+irreducibility_. I1/A1/A2 stay scripts because each is a thin single-field traversal
+(`usedBy` transitive walk; group-by-`role`) an agent won't botch. `invariantsOf` /
+`specsReverifying` freeze because they are **irreducible cross-source joins** (the 2-hop
+`pattern→implementedBy→featureFile→rules` bridge + maturity/provenance/linkage decode) — the
+universal _spec_-bridge, entry-adapter class, same as E1–E3. The discriminator is not "is it
+a traversal" but **"would an agent hand-rolling this get it wrong"** — and the proof these
+would is that the prior session, reasoning carefully, got the very premise wrong.
+**Counter-proof the line still holds:** `maturityLadder` was built, then _removed from the
+handle_ — it is `groupBy(g.patterns, p => p.maturity)`, a 3-line script over the exposed
+`maturity` field, no irreducible join → it lives inline in `cli.ts`, not on the surface.
 
 ---
 
@@ -197,6 +218,19 @@ as bytes on disk AND as tokens in context.
 - The **entry-adapter trio (E1 `findByConcept` · E2 `byFile` · E3 `bySymbol`)** is built and
   verified — the grep→graph bridge, the frozen part of the demand map (§3). `byFile`
   returns a _mechanical_ neighborhood for dark files (proven on `fragments/base.ts`).
+- The **graph handle (`graph.ts` → `loadGraph()`)** is the AI-native read surface: one typed
+  object, joins + taxonomy-decode done once at construction, need-shaped accessors that
+  return plain composable data. It is the answer to "what type is most natural for Claude" —
+  **not 30 verbs, not raw-JSON-you-rejoin**, but one object whose method list _is_ the docs.
+  The snapshot's quirks (tag-encoding, the 2-hop `implementedBy` join, the dead `layer` axis)
+  stay decode-detail behind it. **Needs drove the surface, not storage.**
+- The **maturity axis is first-class and DERIVED** (`@architect-maturity` is stored 0/293 —
+  derived from status: candidate→idea · roadmap→plan · active→design · completed→executable;
+  explicit tag wins). **`invariantsOf` / `specsReverifying` span every tier** and label each
+  result with maturity **and** a ⊥ provenance axis (live test vs authored working-spec) — so
+  "specs of any maturity, implemented and non-implemented" are surfaced and distinguished,
+  never dropped. `maturityLadder()` shows where the non-implemented specs (and their authored
+  invariants) live — a direct input to the annotation push.
 - Determinism, **only where a machine contract needs it**, is available as committed-script
   - committed-snapshot + re-run-diff — `extract.ts` emits **sorted** symbols/edges to make
     that reproducible. But the playground itself commits **no** snapshot: `data/` is
@@ -205,18 +239,23 @@ as bytes on disk AND as tokens in context.
 
 **Open / next probes (recommended order):**
 
-1. **Symbol-level identity** — key nodes on `file#symbol`, not file. Kills the join
-   imprecision behind the ~100 code→code aspirational edges; makes the 24% / 143 numbers
-   exact; lets `fan-in` rank symbols. The substrate already emits `symbols[]`; it is mostly
-   a rewire of the join in `views.ts`.
-2. **Gherkin-side extractor** — a sibling to `extract.ts` that indexes `.feature` files
-   (scenarios + Rule blocks + `@implements` edges). The only way to do I3 ("which invariants
-   might I break?") and precise I2 — the core has the _edges_, the files have the _Rule
-   blocks_. The second Layer-1 expansion; pairs with symbol-level.
-3. **Act on the `fan-in` shortlist** — curate the top few (`base.ts`,
+1. **Value-transfer view** — fold the ephemeral-spec-deletion gate (executable-specs skill)
+   into a handle method over the data we now expose: a pattern is `deletionReady` when its
+   authored design-spec invariants each have an `executable`-provenance counterpart. This is
+   the natural next join — it sits exactly on the maturity×provenance grid `invariantsOf`
+   already computes, and it directly serves the bloat-removal push (find zombie specs:
+   implemented but not deleted). Mechanizes `architect/specs/value-transfer-state.feature`.
+2. **Act on the `fan-in` shortlist** — curate the top few (`base.ts`,
    `projection-context.ts`) into pattern nodes; watch `blast` coverage rise. Real dogfood win.
-4. **Graduate to a package** — lift `schema.ts` + `views.ts` into `packages/` with proper
-   lint/build once the shapes settle. Keep the curated/mechanical split as two surfaces.
+3. **Symbol-level identity** (demoted — precision, not load-bearing) — key nodes on
+   `file#symbol`, not file. Sharpens the 24% / 143 _measurement_; the substrate already emits
+   `symbols[]`. Defer until after the annotation push re-authors the curated layer anyway.
+4. **Graduate to a package** — lift `schema.ts` + `graph.ts` + `views.ts` into `packages/`
+   with proper lint/build once the shapes settle. Keep the curated/mechanical split as two
+   surfaces, and the handle as the typed front door over both.
+
+> The previously-queued **"Gherkin-side extractor"** is **struck** — it was a phantom (the
+> Gherkin is already in-core; see §3). What looked like a Layer-1 build was a join view.
 
 ---
 
@@ -262,10 +301,20 @@ pnpm exec tsx playground/cli.ts census       # coverage
 
 - **ADR-006 (single read model):** the read model is the `PatternGraph`. The curated layer
   here _is_ that graph; the substrate is a _separate_ derived structure, not a competing
-  read model.
+  read model. **The handle (`graph.ts`) is not a third read model either** — it authors and
+  persists nothing; it is an in-memory _join + decode_ over the existing read model and the
+  substrate, built fresh each `loadGraph()`. A typed front door, not a store.
 - **ADR-005 (decode-only projection codecs):** every view here is a **lossy one-way
   function** (a projection), never a round-trip codec. Do not reach for `z.codec` where a
-  pure function belongs.
+  pure function belongs. The handle's taxonomy decode is one-way at the load boundary —
+  decode-only, parse-once (ADR-009), never re-encoded. Read `role`/`boundedContext` from the
+  **structured fields** (`p.role`, 195/293; `p.boundedContext`, 176/293), _not_ the value-form
+  `directive.tags` — for TS patterns the tags array carries only the bare key, so peeling it
+  drops ~167 (the bug Codex caught). Maturity is the one tag-or-derive case (no structured field).
+- **ADR-007 (taxonomy / status→maturity):** the `maturity` axis is **derived**, not stored —
+  `MATURITY_BY_STATUS` is ADR-007's `DEFAULT_MATURITY_BY_STATUS`, and an explicit
+  `@architect-maturity:` tag wins ("explicit always wins"). The handle computes it once; the
+  snapshot stores 0 of them.
 - **ADR-010 (second-caller bar):** the organizing principle — freeze a projection only when
   a second machine consumer needs it.
 - **Sink priority (CLAUDE.md):** agents first, Studio view-state second, markdown last. This

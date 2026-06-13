@@ -8,7 +8,8 @@ import { execFileSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
-import { loadAuthored, loadMechanical } from './schema.ts';
+import { loadGraph } from './graph.ts';
+import { loadAuthored, loadMechanical, MATURITIES } from './schema.ts';
 import {
   blastRadius,
   byFile,
@@ -210,6 +211,81 @@ function symbol() {
   if (r.importedByFiles.length > 15) console.log(`    … +${r.importedByFiles.length - 15} files`);
 }
 
+// ─── MATURITY-SPANNING GHERKIN VIEWS (the handle) ─────────────────────────────
+// "What does this guarantee?" / "What reverifies if I touch it?" / "Where do the
+// non-implemented specs live?" — every result labeled maturity + provenance, so
+// executable-proven and authored-only invariants are distinguished, never dropped.
+
+const PROV = { executable: '✓exec', authored: '○auth' } as const;
+
+// invariants <PatternName | repo/rel/file.ts>
+function invariants() {
+  const target = process.argv.slice(3).join(' ').trim();
+  if (!target) {
+    console.log('usage: tsx playground/cli.ts invariants <PatternName | path/to/file.ts>');
+    process.exit(1);
+  }
+  const inv = loadGraph().invariantsOf(target);
+  console.log(`\ninvariantsOf(${JSON.stringify(target)}) — ${inv.length} invariant(s):`);
+  if (!inv.length) return void console.log('  (none — no Rule blocks reach this pattern/file)');
+  for (const i of inv) {
+    console.log(`  [${PROV[i.provenance]} · ${i.maturity}] ${i.rule}  (${i.pattern})`);
+    console.log(`      ${i.text}`);
+    if (i.provenByScenarios.length)
+      console.log(
+        `      proven by: ${i.provenByScenarios.slice(0, 3).join(' · ')}${i.provenByScenarios.length > 3 ? ' …' : ''}`,
+      );
+  }
+}
+
+// specs <git-ref>  — at-risk specs for the blast radius of a diff (any maturity)
+function specs() {
+  const label = arg ?? 'HEAD';
+  const sha = resolveCommit(label);
+  const changed = execFileSync('git', ['diff', '--name-only', '--end-of-options', sha, '--'], {
+    encoding: 'utf8',
+  })
+    .split('\n')
+    .filter(Boolean);
+  const g = loadGraph();
+  const r = g.blastRadius(changed);
+  const at = r.atRiskSpecs;
+  const exec = at.filter((s) => s.provenance === 'executable').length;
+  console.log(`\nspecs re-verifying \`git diff ${label}\` (${sha.slice(0, 9)}):`);
+  console.log(
+    `  downstream patterns: ${r.mechPatterns.length}  → at-risk specs: ${at.length} (${exec} executable, ${at.length - exec} authored-only)`,
+  );
+  for (const s of at.slice(0, 20))
+    console.log(`  [${PROV[s.provenance]} · ${s.maturity}] ${s.scenario}  (${s.pattern})`);
+  if (at.length > 20) console.log(`  … +${at.length - 20}`);
+}
+
+// maturity  — the ladder. NOTE: this is a SCRIPT over the handle's exposed `maturity`
+// field, not a handle method — exactly the "agent scripts the rest" boundary. Anything
+// expressible as a few lines of groupBy stays here; only irreducible joins go on the handle.
+function maturity() {
+  const g = loadGraph();
+  const rows = MATURITIES.map((m) => {
+    const ps = g.patterns.filter((p) => p.maturity === m);
+    const withInv = ps.filter((p) => p.ruleCount > 0);
+    return {
+      m,
+      patterns: ps.length,
+      withInvariants: withInv.length,
+      invariants: withInv.reduce((n, p) => n + p.ruleCount, 0),
+    };
+  });
+  console.log(`\nmaturity ladder (status-derived; explicit @architect-maturity wins):`);
+  console.log(`  ${'maturity'.padEnd(12)} patterns  with-invariants  invariants`);
+  for (const r of rows)
+    console.log(
+      `  ${r.m.padEnd(12)} ${String(r.patterns).padStart(8)}  ${String(r.withInvariants).padStart(14)}  ${String(r.invariants).padStart(10)}`,
+    );
+  console.log(
+    `\n  (maturity = the authored tier ladder. Whether an invariant is a LIVE TEST vs an\n   authored working-spec is the per-invariant provenance axis — see \`invariants\`/\`specs\`.)`,
+  );
+}
+
 const table: Record<string, () => void> = {
   diff,
   blast,
@@ -219,11 +295,14 @@ const table: Record<string, () => void> = {
   find,
   file,
   symbol,
+  invariants,
+  specs,
+  maturity,
 };
 const run = table[cmd];
 if (!run) {
   console.log(
-    'usage: tsx playground/cli.ts <diff|blast [ref]|fan-in [min]|drift|census|find <concept>|file <path>|symbol <name>>',
+    'usage: tsx playground/cli.ts <diff|blast [ref]|fan-in [min]|drift|census|find <concept>|file <path>|symbol <name>|invariants <pattern|file>|specs [ref]|maturity>',
   );
   process.exit(cmd === 'help' ? 0 : 1);
 }

@@ -23,19 +23,23 @@ export function isDecisionPattern(authored: AuthoredCore, name: string): boolean
   return !!authored.patterns.find((p) => p.name === name)?.source?.file?.endsWith('.feature');
 }
 
-// role / bounded-context are NOT top-level fields — they live in `directive.tags`
-// as `@architect-role:<v>` / `@architect-bounded-context:<v>`. Scan + peel the colon.
-// (Most patterns carry neither: decisions and unannotated units → undefined, not a bug.)
+// role / bounded-context are STRUCTURED top-level fields (`p.role` / `p.boundedContext`),
+// populated on 195 / 176 of 293 patterns. They are ALSO present value-form in some
+// .feature patterns' `directive.tags` — but TS patterns store only the bare key
+// `@architect-role` there, so peeling the tag drops ~167 of them. Read the field;
+// fall back to the tag only when the field is absent.
 function tagValue(p: unknown, prefix: string): string | undefined {
   const tags = (p as { directive?: { tags?: unknown } }).directive?.tags;
   if (!Array.isArray(tags)) return undefined;
   for (const t of tags as string[])
-    if (typeof t === 'string' && t.startsWith(prefix)) return t.slice(prefix.length);
+    if (typeof t === 'string' && t.startsWith(prefix) && t.length > prefix.length)
+      return t.slice(prefix.length);
   return undefined;
 }
-export const roleOf = (p: unknown): string | undefined => tagValue(p, '@architect-role:');
+export const roleOf = (p: unknown): string | undefined =>
+  (p as { role?: string }).role ?? tagValue(p, '@architect-role:');
 export const contextOf = (p: unknown): string | undefined =>
-  tagValue(p, '@architect-bounded-context:');
+  (p as { boundedContext?: string }).boundedContext ?? tagValue(p, '@architect-bounded-context:');
 
 const mechPatternEdges = (mech: MechanicalCore, f2p: Map<string, string>): Set<string> => {
   const s = new Set<string>();
