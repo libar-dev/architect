@@ -1,3 +1,11 @@
+/**
+ * @architect
+ * @architect-pattern PatternSourceMerger
+ * @architect-status active
+ * @architect-role:service
+ * @architect-bounded-context:pipeline
+ * @architect-uses ResultMonadTypes, ExtractedPattern, PatternHelpers
+ */
 import type { Result } from '../../types/result.js';
 import { Result as R } from '../../types/result.js';
 import type { ExtractedPattern } from '../../validation-schemas/index.js';

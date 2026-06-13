@@ -1,6 +1,6 @@
 @architect
-@architect-pattern FragmentSchemaMirrorExecutableTests
-@architect-status active
+@architect-pattern:FragmentSchemaMirrorExecutableTests
+@architect-status:active
 @architect-implements:ProjectionFragmentSchema
 @projection
 Feature: Fragment schema mirror

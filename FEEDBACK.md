@@ -486,3 +486,32 @@ commit purely to satisfy the rule.
    `pending` additions (genuine new unbuilt scope).
 3. Or downgrade `scope-creep` to a warning on active specs (it already warns, not errors, on
    deliverable *removal*) — the asymmetry (removal=warn, addition=hard-error) is the friction.
+
+---
+
+## Annotation authoring: two silent-failure traps a backfill fleet hit
+
+Context: a multi-agent fleet backfilling `@architect-*` JSDoc on dark `.ts` modules
+(core + projection). Two annotation forms parse to **nothing** with no error — the
+pattern node silently never enters the graph, and only a re-snapshot + node-count
+diff reveals it. Both cost a full debugging loop to localize.
+
+1. **Space-separated `@architect-uses` drops the WHOLE pattern, not just the edges.**
+   `@architect-uses A B C` (space) → the entire `@architect-pattern` node fails to
+   materialize. Only `@architect-uses A, B, C` (comma) parses. The taxonomy doctrine /
+   `architect-base` skill describe `@architect-uses` as a "csv tag (space/comma-separated)"
+   — that is **wrong** in the current code: space-form multi-value silently fails. Either
+   fix the parser to accept space-separated (as documented) or correct the docs to say
+   **comma-only**, and ideally emit a lint/validate diagnostic instead of dropping the node.
+
+2. **Omitting the bare `@architect` marker silently ignores the block.** A JSDoc block must
+   lead with `@architect` (then `@architect-pattern …`) to be recognized; without it the
+   block parses to no node, no warning. A block whose `@architect` sits *after* a description
+   paragraph also failed — tags must precede prose. A "block has `@architect-pattern` but no
+   `@architect` marker" diagnostic would turn both into loud errors.
+
+Impact: ~13 of 21 fleet annotations were syntactically reasonable but invisible until a
+manual `snapshot → grep name → absent` loop found them. The shared theme: **annotation
+mistakes fail silently to zero instead of erroring.** A `validate:all` rule that flags a
+JSDoc/`.feature` block carrying `@architect-pattern` whose node does NOT appear in the built
+graph would catch this entire class.

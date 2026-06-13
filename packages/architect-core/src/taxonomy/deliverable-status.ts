@@ -1,3 +1,10 @@
+/**
+ * @architect
+ * @architect-pattern DeliverableStatusDomain
+ * @architect-status active
+ * @architect-role:contract
+ * @architect-bounded-context:domain
+ */
 export const DELIVERABLE_STATUS_VALUES = [
   'complete',
   'in-progress',

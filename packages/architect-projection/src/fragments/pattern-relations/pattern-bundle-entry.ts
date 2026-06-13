@@ -1,5 +1,10 @@
 /**
+ * @architect
+ * @architect-pattern PatternBundleEntry
+ * @architect-status completed
+ * @architect-role:contract
  * @architect-bounded-context:pattern-relations
+ * @architect-uses BusinessRule, PatternSummary, PatternRelationsSupporting
  */
 import { z } from 'zod';
 

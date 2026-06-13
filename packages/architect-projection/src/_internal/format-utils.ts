@@ -1,4 +1,10 @@
 /**
+ * @architect
+ * @architect-pattern DeterministicFormatUtils
+ * @architect-status completed
+ * @architect-role:utility
+ * @architect-bounded-context:rendering
+ *
  * Shared formatting utilities used across renderers and projection support code.
  *
  * Centralised here to avoid quadruplication. All functions are pure and

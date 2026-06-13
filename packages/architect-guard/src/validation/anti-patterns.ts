@@ -104,6 +104,15 @@ const MAGIC_COMMENT_PATTERNS = [
 ] as const;
 
 /**
+ * Escape regex metacharacters so a literal tag token (which contains `-` and,
+ * for non-default prefixes, possibly other metacharacters) can be embedded in a
+ * dynamically constructed `RegExp` without altering its meaning.
+ */
+function escapeRegExp(literal: string): string {
+  return literal.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/**
  * Configuration options for anti-pattern detection
  */
 export interface AntiPatternDetectionOptions extends WithTagRegistry {
@@ -201,6 +210,77 @@ export function detectRemovedTags(
                 fix: `Remove the ${token} annotation. The "${suffix}" metadata field no longer exists.`,
               });
             }
+          }
+        }
+      }
+    } catch {
+      // Ignore read errors - file may have been deleted
+    }
+  }
+
+  return violations;
+}
+
+/**
+ * Tags whose Gherkin (single-token) form REQUIRES a colon separator.
+ *
+ * On `.feature` files a tag is one whitespace-delimited token, so identity tags
+ * are written colon-form (`@architect-pattern:Name`, `@architect-implements:Name`).
+ * The space-form authored on TypeScript JSDoc (`@architect-pattern Name`) is a
+ * silent slip on a feature file: the scanner reads only the bare
+ * `@architect-pattern` token and drops the name, so the pattern identity / reverse
+ * edge is lost without any diagnostic. This detector makes that slip loud.
+ */
+const GHERKIN_COLON_FORM_TAG_SUFFIXES = ['pattern', 'implements'] as const;
+
+/**
+ * Detect Gherkin identity tags authored in space-form instead of colon-form.
+ *
+ * On a `.feature` file, `@architect-pattern Name` / `@architect-implements Name`
+ * (whitespace after the suffix) is invalid: Gherkin tags are single tokens, so
+ * the name is silently dropped and the identity / reverse-traceability edge never
+ * materializes in the graph. The correct form is `@architect-pattern:Name`.
+ *
+ * Matching mirrors {@link detectRemovedTags}: it scans raw lines that begin with a
+ * tag, is prefix-aware via the registry, and reports `error` severity (the slip
+ * causes silent data loss, exactly like a removed tag).
+ *
+ * @param features - Array of scanned feature files
+ * @param registry - Optional tag registry for prefix-aware detection (defaults to @architect-)
+ * @returns Array of anti-pattern violations
+ */
+export function detectGherkinTagSpaceForm(
+  features: readonly ScannedGherkinFile[],
+  registry?: TagRegistry,
+): AntiPatternViolation[] {
+  const violations: AntiPatternViolation[] = [];
+  const tagPrefix = registry?.tagPrefix ?? DEFAULT_TAG_PREFIX;
+
+  for (const feature of features) {
+    try {
+      const content = readFileSync(feature.filePath, 'utf-8');
+      const lines = content.split('\n');
+
+      for (let i = 0; i < lines.length; i++) {
+        const rawLine = lines[i];
+        if (!rawLine) continue;
+        const trimmed = rawLine.trim();
+        if (!trimmed.startsWith('@')) continue;
+
+        for (const suffix of GHERKIN_COLON_FORM_TAG_SUFFIXES) {
+          // Space-form = the prefix+suffix token immediately followed by whitespace
+          // (e.g. "@architect-pattern Name"). Colon-form ("@architect-pattern:Name")
+          // and prefixed siblings ("@architect-pattern-foo") must NOT match.
+          const spaceForm = new RegExp(`(^|\\s)${escapeRegExp(`${tagPrefix}${suffix}`)}\\s`, 'i');
+          if (spaceForm.test(`${trimmed} `)) {
+            violations.push({
+              id: 'gherkin-tag-space-form',
+              message: `Tag "${tagPrefix}${suffix}" on a .feature file uses space-form (the name is silently dropped). Gherkin tags are single tokens and must use colon form: ${tagPrefix}${suffix}:Name`,
+              file: feature.filePath,
+              line: i + 1,
+              severity: 'error',
+              fix: `Rewrite as ${tagPrefix}${suffix}:Name (colon, no space). Space-form is only valid on TypeScript JSDoc.`,
+            });
           }
         }
       }
@@ -419,6 +499,7 @@ export function detectAntiPatterns(
     // Error-level (architectural violations)
     ...detectProcessInCode(scannedFiles, registry),
     ...detectRemovedTags(features, registry),
+    ...detectGherkinTagSpaceForm(features, registry),
     ...detectDuplicateFeatureIdentities(features),
     // Warning-level (hygiene issues)
     ...detectMagicComments(features, mergedThresholds.magicCommentThreshold),

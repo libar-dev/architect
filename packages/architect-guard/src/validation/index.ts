@@ -33,6 +33,7 @@ export {
   type AntiPatternDetectionOptions,
   detectProcessInCode,
   detectRemovedTags,
+  detectGherkinTagSpaceForm,
   detectMagicComments,
   detectScenarioBloat,
   detectMegaFeature,

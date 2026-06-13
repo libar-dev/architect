@@ -1,5 +1,10 @@
 /**
+ * @architect
+ * @architect-pattern PatternBundleAssembly
+ * @architect-status completed
+ * @architect-role:service
  * @architect-bounded-context:pattern-relations
+ * @architect-uses PatternHelpers, ProjectionContext, ProjectionBundle, BusinessRule, BusinessRulesProjection, PatternDetailProjection, PatternSummaryProjection, PatternRelationsProjectionSupport, LogicalRouteId, PatternCatalogAssembly
  */
 import { getRelationshipsForPattern } from '@libar-dev/architect-core';
 import { z } from 'zod';

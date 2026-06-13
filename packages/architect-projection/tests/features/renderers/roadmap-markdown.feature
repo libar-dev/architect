@@ -1,7 +1,3 @@
-@architect
-@architect-pattern RoadmapMarkdownExecutableTests
-@architect-status active
-@architect-implements:RoadmapTimelineProjection
 @rendering
 Feature: renderMarkdown renders roadmap timeline bundles
   The markdown renderer should keep RoadmapTimeline wired through documentation projection and routed markdown output.

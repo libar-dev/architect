@@ -1,3 +1,11 @@
+/**
+ * @architect
+ * @architect-pattern ProjectConfigSchema
+ * @architect-status active
+ * @architect-role:codec
+ * @architect-bounded-context:configuration
+ * @architect-uses ProjectConfigContract, PackageMatcherContract, FormatTypeDomain
+ */
 import { z } from 'zod';
 
 import type { ArchitectProjectConfig } from './project-config.js';

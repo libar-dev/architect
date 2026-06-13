@@ -1,5 +1,10 @@
 /**
+ * @architect
+ * @architect-pattern PatternCatalogAssembly
+ * @architect-status completed
+ * @architect-role:service
  * @architect-bounded-context:pattern-relations
+ * @architect-uses DomainEnumSchemas, PatternHelpers, StatusNormalization, ProjectionContext, PatternCatalog, ProjectionFilter, PatternRelationsProjectionSupport
  */
 /**
  * Builds the filtered pattern catalog and its name-resolution helpers for list and search surfaces.

@@ -1,3 +1,11 @@
+/**
+ * @architect
+ * @architect-pattern DualSourceSchemas
+ * @architect-status active
+ * @architect-role:contract
+ * @architect-bounded-context:validation-schemas
+ * @architect-uses DomainEnumSchemas, DeliverableStatusDomain, StatusValueDomain
+ */
 import { z } from 'zod';
 
 import {

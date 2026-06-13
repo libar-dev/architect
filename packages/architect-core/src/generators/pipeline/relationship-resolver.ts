@@ -1,3 +1,11 @@
+/**
+ * @architect
+ * @architect-pattern RelationshipResolver
+ * @architect-status active
+ * @architect-role:service
+ * @architect-bounded-context:pipeline
+ * @architect-uses PipelineDatasetContract, DecisionResolution, ExtractedPattern, PatternReferenceContract, PatternGraph
+ */
 import type { ExtractedPattern } from '../../validation-schemas/index.js';
 import { parsePatternReference } from '../../validation-schemas/index.js';
 import type {

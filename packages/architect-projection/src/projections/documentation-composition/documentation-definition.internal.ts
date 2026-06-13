@@ -1,5 +1,10 @@
 /**
+ * @architect
+ * @architect-pattern DocumentationDefinitionRegistry
+ * @architect-status completed
+ * @architect-role:decider
  * @architect-bounded-context:documentation-composition
+ * @architect-uses ProjectionContext, ProjectionBundle, DocumentationTypeIdentity, ApiReferenceProjection, ArchitectureDiagramProjection, DesignReviewProjection, DecisionCatalogProjection, BusinessRulesProjection, TaxonomyDigestProjection, ValidationRuleDigestProjection, TraceabilityMatrixProjection
  */
 import type { ProjectionContext } from '../../context/projection-context.js';
 import type { ProjectionBundle } from '../../fragments/base.js';

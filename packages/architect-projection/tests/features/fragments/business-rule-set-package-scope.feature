@@ -1,6 +1,6 @@
 @architect
-@architect-pattern BusinessRuleSetPackageScopeExecutableTests
-@architect-status active
+@architect-pattern:BusinessRuleSetPackageScopeExecutableTests
+@architect-status:active
 @architect-implements:BusinessRuleSet
 @projection @governance @package
 Feature: BusinessRuleSet — package scope branch

@@ -1,5 +1,10 @@
 /**
+ * @architect
+ * @architect-pattern BusinessRuleSetAssembly
+ * @architect-status completed
+ * @architect-role:service
  * @architect-bounded-context:governance
+ * @architect-uses DecisionResolution, PatternHelpers, RuleAggregation, ExtractedPattern, ProjectionContext, ProjectionBundle, BusinessRuleSet, BusinessRule, GovernanceSupporting, ProjectionFilter, GroupedRoutedBundleSupport, ProjectionError, GovernanceProjectionSupport, LogicalRouteId
  */
 /**
  * Builds governance business-rule fragments and sets from extracted patterns and annotation metadata.

@@ -1,7 +1,3 @@
-@architect
-@architect-pattern RequirementExecutableDigestExecutableTests
-@architect-status active
-@architect-implements:RequirementExecutableDigestProjection
 @projection
 @parity
 Feature: Bundle shape parity — cross-context references and file-count drop

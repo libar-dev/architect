@@ -1,3 +1,11 @@
+/**
+ * @architect
+ * @architect-pattern ProjectConfigResolution
+ * @architect-status active
+ * @architect-role:service
+ * @architect-bounded-context:configuration
+ * @architect-uses ConfigDefaults, ContextInference, ProjectConfigContract
+ */
 import type { ContextInferenceRule } from '../generators/pipeline/context-inference.js';
 import type {
   ArchitectProjectConfig,

@@ -1,3 +1,11 @@
+/**
+ * @architect
+ * @architect-pattern TransformDataset
+ * @architect-status active
+ * @architect-role:service
+ * @architect-bounded-context:pipeline
+ * @architect-uses ContextInference, RelationshipResolver, PipelineDatasetContract, PackageResolver, ProjectionError, PatternHelpers, StatusNormalization, StatusValueDomain, ExtractedPattern, PatternGraph, MaturityLevelDomain
+ */
 import type { ExtractedPattern } from '../../validation-schemas/index.js';
 import { getPatternName } from '../../read-api/pattern-helpers.js';
 import type {

@@ -150,3 +150,143 @@ good nodes to avoid 2 dead ones.
 
 3. `pnpm architect:query pattern MarkdownRenderer`
    → `"implementedBy":[{...,"name":"MarkdownRendererExecutableTests"}]` — the reverse realization edge from executable Gherkin now resolves (was empty `implementedBy` before).
+
+## Open decision: status:roadmap realization-edge policy
+
+**Question.** Should an `@architect-implements:<Target>` authored on an executable
+`.feature` against a target whose `@architect-status` is non-active (`roadmap` /
+`planned` / `candidate` / `deferred`) project the reverse realization edge — i.e.
+surface a candidate node and an `implementedBy` edge — or be dropped, as it is
+today? Today the edge is silently dropped, so the executable-spec annotation
+becomes a dead node/edge in the read model with no projected consequence.
+
+**Action taken pending the decision.** Two executable-spec annotation blocks were
+**removed** (reverting the additive fleet edit), per the live-state / no-dead-context
+doctrine — re-add when the implements target is the kind of node whose reverse edge
+projects:
+
+- `RoadmapMarkdownExecutableTests` → `RoadmapTimelineProjection`
+  (`packages/architect-projection/tests/features/renderers/roadmap-markdown.feature`)
+- `RequirementExecutableDigestExecutableTests` → `RequirementExecutableDigestProjection`
+  (`packages/architect-projection/tests/features/parity/parity-bundle-shape.feature`)
+
+**Discrepancy noted for the decider.** The cleanup brief framed both targets as
+`status:roadmap`, but the source of truth currently annotates both as
+`@architect-status completed` (see `projections/delivery-reporting/index.ts` and
+`projections/operational-insights/index.ts`). In the `playground/data/pattern-graph-core.json`
+snapshot both targets show `implementedBy: null` — **but so do all other fleet
+implements targets in that snapshot** (`MarkdownRenderer`, `JsonRenderer`,
+`BusinessRuleSet`, etc.), because `-core` does not carry the projection-package
+reverse edges. So the snapshot alone does not prove these two edges are _uniquely_
+dead; the removal is nonetheless safe and reversible. The underlying question —
+when a realization edge should project — is **read-model semantics, an ADR-level
+decision, and is deferred to a human.** Do not change edge-projection behavior in
+the read model as part of this cleanup.
+
+## Follow-up run: fixes + round 2
+
+A combined pass landed the four queued fixes from the first run and a second
+annotation batch (round 2). Working-state notes below.
+
+### Fixes landed (all 4)
+
+1. **glob** — added repo-root-relative `packages/*/tests/features/**/*.feature`
+   to `PACKAGE_SELF_HOSTING_SOURCES.features`
+   (`packages/architect-core/src/config/self-hosting.ts`). Brings package-local
+   executable specs (81 `.feature` files across all five packages) into the
+   dogfood scan via the canonical relative shape. Additive; the pre-existing
+   absolute `${workspaceRoot}/...` entries were left in place. **Build note:**
+   `architect.config.ts` imports the _built_ `@libar-dev/architect-core`, so a
+   `pnpm build` is required before the src change takes effect in the scan.
+2. **spec-syntax** — converted two package-local `.feature` files from the
+   fleet's space-form Gherkin tags to colon-form so they parse:
+   `business-rule-set-package-scope.feature` and `fragment-schemas.feature`
+   (`@architect-pattern:` / `@architect-status:`).
+3. **cleanup-roadmap** — reverted the two roadmap-target executable-spec blocks
+   (`RoadmapMarkdownExecutableTests`, `RequirementExecutableDigestExecutableTests`)
+   back to their HEAD blobs and recorded the deferred realization-edge policy
+   question above. Both names are gone from the entire `.feature` corpus.
+4. **add-lint** — added an additive `gherkin-tag-space-form` anti-pattern
+   detector in `packages/architect-guard/src/validation/` that flags space-form
+   `@architect-pattern`/`@architect-implements` on `.feature` files (the silent
+   name-drop failure mode that produced the dead specs). Error-level, with a
+   minimal unit test; `pnpm typecheck` is green.
+
+### Round-2 deltas
+
+21 `@architect-pattern` lines written across 6 batches on production `.ts`
+(B1 pipeline read-side, B2 configuration, B3 taxonomy domain, B4
+validation-schemas + error boundary, B5 projection agent-bundle, B6
+composition/governance/rendering), with ~80 `@architect-uses` edges total.
+All 21 are confirmed present in source (`grep` over the six batch directories);
+**every one of the 21 significance verdicts is `significant: true` /
+`conventionOk: true` / `edgeOk: true` — a 21/21 pass.** Two verdicts flag
+borderline-but-legitimate leaves to revisit first if curation tightens:
+`DeterministicFormatUtils` (renderer-shared formatting leaf, no edges) and
+`SlugCanonicalization` (route/anchor identity helper, 22 call sites).
+
+**Two round-2 recipe bugs found & fixed at integration (the gate's "awaits
+rebuild" was wrong).** At gate time the 21 round-2 `.ts` annotations did **not**
+materialize (snapshot stuck at 327) — not a rebuild-timing issue, but two recipe
+defects the workflow-2 doctrine introduced (workflow 1 had a recipe-probe that
+discovered the correct form empirically; workflow 2 did not):
+
+1. **Missing the bare `@architect` marker tag.** The extractor only recognizes a
+   JSDoc block as a pattern when it leads with `@architect` (then `@architect-pattern …`).
+   Round-2 blocks omitted it. Fix: insert ` * @architect` as the first tag in each
+   block (and put the tags ahead of any description prose — a block with the marker
+   _after_ a description paragraph still failed, e.g. `DeterministicFormatUtils`).
+2. **Space-separated `@architect-uses` breaks the whole pattern parse.** Round-2
+   wrote `@architect-uses A B C` (space). In this repo only the **comma** form
+   (`@architect-uses A, B, C`) parses; the space form silently drops the _entire_
+   node, not just the edges. (The doctrine/skill text says "space/comma" — that is
+   wrong here; logged to `FEEDBACK.md`.) Fix: convert all multi-value uses to commas.
+
+After both fixes (applied mechanically across the round-2 files) + a single
+re-snapshot, **all 21 round-2 nodes materialized. Verified final state: 348
+patterns, core 61/94 (65%), projection 110/138 (80%), 0 dangling, typecheck
+exit 0.** (Campaign arc, verified: 293 → 325 after round 1 → 348 after round 2 +
+fixes; core 36% → 51% → 65%; projection 64% → 74% → 80%.)
+
+### Dead-spec resolution
+
+All four originally-dead `.feature` specs are resolved: **2 promoted to live
+nodes, 2 removed.** `BusinessRuleSetPackageScopeExecutableTests` and
+`FragmentSchemaMirrorExecutableTests` now resolve as live nodes carrying their
+realization edges — `architect:query pattern BusinessRuleSetPackageScopeExecutableTests`
+returns `"implementsPatterns":["BusinessRuleSet"]`, and the `Fragment...`
+twin returns `"implementsPatterns":["ProjectionFragmentSchema"]`.
+`RoadmapMarkdownExecutableTests` and `RequirementExecutableDigestExecutableTests`
+are removed and absent from the entire `.feature` corpus, pending the
+realization-edge policy decision recorded above.
+
+### Regression check
+
+No regression (verified post-fix). `arch dangling` returns 0 over
+`patternCount: 348` (vs 0 before) — **no new dangling edges.** `pnpm typecheck`
+exits 0 across the workspace (the new guard rule and all round-2 annotations
+compile clean). No unknown-status or warning counts.
+
+### Recommendation: KEEP
+
+Keep all fixes and the full round-2 batch. The fixes are corrective (a real
+scan-coverage gap, a parse-failure class, a new guard rail against the same
+slip) and the round-2 batch is 21/21 significant with zero dangling and a clean
+typecheck. No partial revert is warranted. The two already-reverted roadmap
+specs stay out pending the human decision; do not re-add them as part of this.
+
+### Remaining follow-ups
+
+- **DONE — round-2 nodes materialized** after the two recipe-bug fixes above
+  (`@architect` marker + comma-form `@architect-uses`); verified 348 patterns,
+  core 65%, projection 80%, 0 dangling, typecheck clean.
+- **Resolve the realization-edge policy** (ADR-level, deferred to a human):
+  whether `@architect-implements` against a non-`active`/non-projecting target
+  should project a reverse edge / candidate node or be dropped — gates whether
+  the two removed roadmap specs can return.
+- **Reconcile the status discrepancy**: the cleanup brief framed the two roadmap
+  targets as `status:roadmap`, but source annotates both `completed`. Confirm
+  the intended status before re-adding either spec.
+- **Curation watch**: if the curated layer tightens, reconsider
+  `DeterministicFormatUtils` then `SlugCanonicalization` first (the two
+  borderline leaves).

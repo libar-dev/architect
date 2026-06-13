@@ -1,3 +1,11 @@
+/**
+ * @architect
+ * @architect-pattern ZodErrorBoundary
+ * @architect-status active
+ * @architect-role:utility
+ * @architect-bounded-context:validation
+ * @architect-uses TrustBoundaryParser
+ */
 import { z } from 'zod';
 import { parseAtBoundary } from '../validation/boundary.js';
 
