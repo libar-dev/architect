@@ -6,21 +6,20 @@
 
 ## Overview
 
-Roadmap timeline covering 15 patterns.
+Roadmap timeline covering 14 patterns.
 
 | Metric    | Value |
 | --------- | ----- |
-| Patterns  | 15    |
+| Patterns  | 14    |
 | Completed | 0     |
 | Active    | 0     |
-| Planned   | 15    |
+| Planned   | 14    |
 | Candidate | 0     |
 
 | Pattern                                | Status  | Role | Source File                                                                  |
 | -------------------------------------- | ------- | ---- | ---------------------------------------------------------------------------- |
 | ArchitectureDelta                      | roadmap |      | architect/specs/architecture-delta.feature                                   |
 | CodecBehaviorExecutableTests           | roadmap |      | architect/specs/codec-behavior-testing.feature                               |
-| DataAPIRelationshipGraph               | roadmap |      | architect/specs/data-api-relationship-graph.feature                          |
 | GeneratorInfrastructureExecutableTests | roadmap |      | architect/specs/generator-infrastructure-testing.feature                     |
 | GoalOrientedNavigation                 | roadmap |      | architect/specs/documentation-projection/03-goal-oriented-navigation.feature |
 | MonorepoSupport                        | roadmap |      | architect/specs/monorepo-support.feature                                     |

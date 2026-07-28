@@ -182,10 +182,10 @@ Feature: ADR-001 - Taxonomy Canonical Values and Process Constants
 
     Source-ownership *violation detection* — flagging `@architect-uses` in
     `.feature` files, or `@architect-depends-on` in TypeScript JSDoc — is
-    graph-health work tracked under `DataAPIRelationshipGraph` (see
-    `packages/architect/architect/specs/data-api-relationship-graph.feature`),
-    not the guard pipeline. The right substrate for bidirectional anti-pattern
-    detection is the relationship graph that already designs dangling-reference
+    graph-health work that belongs on the graph handle's drift views
+    (`driftFlags` / the `dangling` gate — ADR-014), not the guard pipeline.
+    The right substrate for bidirectional anti-pattern
+    detection is the relationship graph that already carries dangling-reference
     and orphan-pattern checks.
 
   # ===========================================================================

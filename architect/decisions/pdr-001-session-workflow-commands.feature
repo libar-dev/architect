@@ -11,12 +11,15 @@
 Feature: PDR-001 - Session Workflow Commands Design Decisions
 
   **Context:**
-  DataAPIDesignSessionSupport adds `scope-validate` (pre-flight session
-  readiness check) and `handoff` (session-end state summary) CLI subcommands.
-  Seven design decisions affect how these commands behave.
+  DataAPIDesignSessionSupport adds scope validation (pre-flight session
+  readiness check) and handoff (session-end state summary). Since ADR-014
+  the carriers are the `projectScopeReadinessReport` / `projectHandoffRecord`
+  projections and their `architect_scope_validate` / `architect_handoff` MCP
+  tools (the CLI-subcommand form was retired with the verb CLI).
 
   **Decision:**
-  Seven design decisions (DD-1 through DD-7) captured as Rules below.
+  Design decisions DD-1 through DD-7 captured as Rules below (DD-6, which
+  governed the retired CLI argument forms, was retired with the verb CLI).
 
   # ===========================================================================
   # DECISION CONTEXT
@@ -39,9 +42,9 @@ Feature: PDR-001 - Session Workflow Commands Design Decisions
     **Rationale:** Inconsistent output formats force consumers to detect and branch on format type, breaking the dual output path contract.
     **Verified by:** scope-validate outputs structured text
 
-    Both scope-validate and handoff return string from the router, using
-    === SECTION === markers. Follows the dual output path where text
-    commands bypass JSON.stringify.
+    Both scope-validate and handoff render plain text with === SECTION ===
+    markers (today: the MCP tools' rendered-text channel alongside the typed
+    projection bundle).
 
   # ===========================================================================
   # RULE 2: DD-2 - Git Integration Is Opt-In
@@ -109,19 +112,6 @@ Feature: PDR-001 - Session Workflow Commands Design Decisions
     Handoff always uses the current date. No --date flag.
 
   # ===========================================================================
-  # RULE 6: DD-6 - Both Positional And Flag Forms
-  # ===========================================================================
-
-  Rule: DD-6 - Both positional and flag forms for scope type
-
-    **Invariant:** scope-validate must accept scope type as both a positional argument and a --type flag.
-    **Rationale:** Supporting only one form creates inconsistency with CLI conventions and forces users to remember which form each subcommand uses.
-    **Verified by:** Verified by code review (no executable scenario)
-
-    scope-validate accepts scope type as both positional argument
-    and --type flag.
-
-  # ===========================================================================
   # RULE 7: DD-7 - Co-Located Formatter Functions
   # ===========================================================================
 
@@ -141,12 +131,12 @@ Feature: PDR-001 - Session Workflow Commands Design Decisions
 
   @acceptance-criteria @happy-path
   Scenario: scope-validate outputs structured text
-    Given the CLI receives "scope-validate MyPattern --type implement"
+    Given the architect_scope_validate tool receives pattern "MyPattern" and scope type "implement"
     When the handler returns a formatted string
-    Then main() outputs the string directly to stdout
+    Then the rendered-text channel carries the string with === SECTION === markers
 
   @acceptance-criteria @happy-path
   Scenario: Active pattern infers implement session
     Given a pattern with status "active"
-    When running "pattern-graph-cli handoff --pattern MyPattern"
+    When the architect_handoff tool runs for pattern "MyPattern"
     Then the session summary shows session type "implement"

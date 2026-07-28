@@ -577,7 +577,13 @@ const table: Record<string, () => Promise<void> | void> = {
   },
 };
 
-const run = table[cmd] ?? table[cmd === '--help' ? 'help' : cmd === '--version' ? 'version' : ''];
+const ALIAS: Record<string, string> = {
+  '--help': 'help',
+  '-h': 'help',
+  '--version': 'version',
+  '-v': 'version',
+};
+const run = table[cmd] ?? table[ALIAS[cmd] ?? ''];
 if (!run) {
   console.error(`architect: unknown command ${JSON.stringify(cmd)}\n`);
   console.error(USAGE);

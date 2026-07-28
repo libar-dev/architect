@@ -159,7 +159,7 @@ Feature: ArchitectBriefDeterministicBundle
       | Slash-command consolidation: implement.md | pending | packages/architect-claude-plugin/commands/implement.md | No | manual |
       | Slash-command consolidation: review.md | pending | packages/architect-claude-plugin/commands/review.md | No | manual |
       | Slash-command consolidation: handoff.md | pending | packages/architect-claude-plugin/commands/handoff.md | No | manual |
-      | CLI brief scenarios | pending | packages/architect/tests/features/cli/data-api-help.feature | Yes | integration |
+      | brief read scenarios | pending | tests/features/cli/graph-handle.feature | Yes | integration |
       | MCP architect_brief scenarios | pending | packages/architect-mcp/tests/features/architect-mcp-integration.feature.steps.ts | Yes | integration |
 
   # ============================================================================

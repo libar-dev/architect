@@ -28,8 +28,8 @@
  *
  * Source-ownership *violation detection* (flagging `@architect-uses` in
  * `.feature` files, or `@architect-depends-on` in TS JSDoc) is graph-health
- * work tracked under `DataAPIRelationshipGraph`, not the guard pipeline. See
- * the ADR-001 Rule 6 narrative for the rationale.
+ * work for the graph handle's drift views (ADR-014), not the guard pipeline.
+ * See the ADR-001 Rule 6 narrative for the rationale.
  */
 
 export const CANONICAL_FEATURE_ONLY_TAG_SUFFIXES = ['team'] as const;

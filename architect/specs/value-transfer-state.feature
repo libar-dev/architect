@@ -63,7 +63,7 @@ Feature: ValueTransferState
 
   **Worked example:**
   The MCPServerIntegration cleanup completed manually in 2026-04 is the
-  motivating case — `architect value-transfer MCPServerIntegration`
+  motivating case — the value-transfer read for `MCPServerIntegration`
   would have returned `deletionReady: true` with the forward/reverse
   links resolved, instead of requiring a hand audit. Future cleanups
   (the overview implies several — 37 active patterns out of 174 total,
@@ -81,12 +81,12 @@ Feature: ValueTransferState
       | governance fragment barrel export | pending | packages/architect-projection/src/fragments/governance/index.ts | Yes | typecheck |
       | governance projection barrel export | pending | packages/architect-projection/src/projections/governance/index.ts | Yes | typecheck |
       | top-level fragments barrel export | pending | packages/architect-projection/src/fragments/index.ts | Yes | typecheck |
-      | value-transfer handle read / named command | pending | packages/architect-cli/src/cli/graph-cli.ts | Yes | integration |
+      | value-transfer handle read | pending | packages/architect-cli/src/handle/graph.ts | Yes | integration |
       | value-transfer CLI command definition | pending | packages/architect-cli/src/cli/commands/governance.ts | Yes | integration |
       | architect_value_transfer MCP input shape | pending | packages/architect-mcp/src/tool-input-schemas.ts | Yes | integration |
       | architect_value_transfer MCP handler | pending | packages/architect-mcp/src/tool-registry.ts | Yes | integration |
       | architect_value_transfer metadata entry | pending | packages/architect-mcp/src/tool-metadata.ts | Yes | integration |
-      | CLI value-transfer scenarios | pending | packages/architect/tests/features/cli/data-api-help.feature | Yes | integration |
+      | handle value-transfer scenarios | pending | tests/features/cli/graph-handle.feature | Yes | integration |
       | MCP architect_value_transfer scenarios | pending | packages/architect-mcp/tests/features/architect-mcp-integration.feature.steps.ts | Yes | integration |
 
   # ============================================================================
@@ -214,11 +214,10 @@ Feature: ValueTransferState
   # RULE 4: Output Behaviour Matches Governance-Subdomain Conventions
   # ============================================================================
 
-  Rule: value-transfer verb and architect_value_transfer tool follow rules / taxonomy conventions
+  Rule: the value-transfer read and architect_value_transfer tool follow rules / taxonomy conventions
 
-    **Invariant:** The CLI verb supports `--format json` (pretty JSON)
-    and the default text rendering via `writeProjectionOutput`,
-    mirroring the rules/taxonomy MCP tools. The MCP tool
+    **Invariant:** The handle read returns the plain `ValueTransferState`
+    fragment (no envelope — ADR-014). The MCP tool
     returns the fragment via `renderJsonToolResult`, mirroring
     `architect_rules` and `architect_taxonomy`. The MCP input shape is
     composed via `createStrictReadonlyObjectSchema` referencing
@@ -229,15 +228,15 @@ Feature: ValueTransferState
     (governance) expose identical surface conventions. Convention
     parity > novelty.
 
-    **Verified by:** CLI value-transfer scenarios in data-api-help.feature,
-    MCP architect_value_transfer scenario, MCP input schema is the
+    **Verified by:** handle value-transfer scenario, MCP
+    architect_value_transfer scenario, MCP input schema is the
     spread of ValueTransferStateOptionsSchema.shape
 
     @acceptance-criteria @happy-path
-    Scenario: CLI verb supports --format json
-      When running "architect value-transfer <pattern>"
-      Then the output is valid JSON parseable as ValueTransferState
-      And the output has "kind": "ValueTransferState"
+    Scenario: the handle read returns the plain fragment
+      When evaluating the value-transfer read for "<pattern>" on the graph handle
+      Then the result is the plain ValueTransferState fragment
+      And the result has "kind": "ValueTransferState"
 
     @acceptance-criteria @happy-path
     Scenario: MCP tool returns valid JSON via renderJsonToolResult

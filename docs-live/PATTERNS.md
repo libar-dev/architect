@@ -4,7 +4,7 @@
 
 | Field | Value |
 | ----- | ----- |
-| Count | 318   |
+| Count | 317   |
 
 ## Filters
 
@@ -71,7 +71,6 @@
 - CLIErrorHandler
 - CliFlagParsingExecutableTests
 - CLIRuntimePaths
-- CLIVersionHelper
 - CodecUtils
 - CodecUtilsValidation
 - CompactTextRenderer
@@ -394,7 +393,6 @@
 | packages/architect-cli/src/cli/error-handler.ts                                                                           | executable | CLIErrorHandler                                       | utility    | typescript | completed |
 | packages/architect-cli/tests/features/cli-flag-parsing.feature                                                            | executable | CliFlagParsingExecutableTests                         |            | gherkin    | completed |
 | packages/architect-cli/src/cli/runtime-helpers.ts                                                                         | executable | CLIRuntimePaths                                       | utility    | typescript | completed |
-| packages/architect-cli/src/cli/version.ts                                                                                 | executable | CLIVersionHelper                                      | utility    | typescript | completed |
 | packages/architect-core/src/validation-schemas/codec-utils.ts                                                             | design     | CodecUtils                                            | codec      | typescript | active    |
 | packages/architect-core/tests/features/validation/codec-utils.feature                                                     | design     | CodecUtilsValidation                                  |            | gherkin    | active    |
 | packages/architect-projection/src/renderers/render-compact-text.ts                                                        | executable | CompactTextRenderer                                   | codec      | typescript | completed |

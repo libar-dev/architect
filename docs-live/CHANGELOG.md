@@ -6,12 +6,12 @@
 
 ## Overview
 
-Completed milestones timeline covering 140 patterns.
+Completed milestones timeline covering 139 patterns.
 
 | Metric    | Value |
 | --------- | ----- |
-| Patterns  | 140   |
-| Completed | 140   |
+| Patterns  | 139   |
+| Completed | 139   |
 | Active    | 0     |
 | Planned   | 0     |
 | Candidate | 0     |
@@ -51,7 +51,6 @@ Completed milestones timeline covering 140 patterns.
 | CLIErrorHandler                                       | completed | utility    | packages/architect-cli/src/cli/error-handler.ts                                                                      |
 | CliFlagParsingExecutableTests                         | completed |            | packages/architect-cli/tests/features/cli-flag-parsing.feature                                                       |
 | CLIRuntimePaths                                       | completed | utility    | packages/architect-cli/src/cli/runtime-helpers.ts                                                                    |
-| CLIVersionHelper                                      | completed | utility    | packages/architect-cli/src/cli/version.ts                                                                            |
 | CompactTextRenderer                                   | completed | codec      | packages/architect-projection/src/renderers/render-compact-text.ts                                                   |
 | ConfigBasedWorkflowDefinition                         | completed |            | packages/architect-core/tests/features/config/config-loader.feature                                                  |
 | ConfigResolution                                      | completed |            | packages/architect-core/tests/features/config/config-resolution.feature                                              |

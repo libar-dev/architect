@@ -7,7 +7,7 @@
 
 ## Overview
 
-This view captures 270 patterns across 25 diagrams in the Component view.
+This view captures 268 patterns across 25 diagrams in the Component view.
 
 ## Related views
 
@@ -25,7 +25,7 @@ Each node is a group; each arrow is a cross-group dependency (`depends-on` / `us
 graph LR
   shared["_shared (4)"]
   api["api (7)"]
-  cli["cli (13)"]
+  cli["cli (12)"]
   configuration["configuration (11)"]
   delivery_reporting["delivery-reporting (5)"]
   documentation_composition["documentation-composition (13)"]
@@ -46,7 +46,7 @@ graph LR
   validation["validation (9)"]
   validation_schemas["validation-schemas (11)"]
   role_contract["role: contract (2)"]
-  pkg_architect_package_content["Architect Package Content (38)"]
+  pkg_architect_package_content["Architect Package Content (37)"]
   shared --> projection
   shared --> validation_schemas
   api --> cli
@@ -158,7 +158,7 @@ graph TD
   modelenricheddataapi -->|depends-on| architectbriefdeterministicbundle
 ```
 
-### Bounded context: cli (13 patterns)
+### Bounded context: cli (12 patterns)
 
 ```mermaid
 graph TD
@@ -167,7 +167,6 @@ graph TD
   clicontexttypes["CLIContextTypes<br/>(contract · completed)"]
   clierrorhandler["CLIErrorHandler<br/>(utility · completed)"]
   cliruntimepaths["CLIRuntimePaths<br/>(utility · completed)"]
-  cliversionhelper["CLIVersionHelper<br/>(utility · completed)"]
   graphhandle["GraphHandle<br/>(service · completed)"]
   graphhandlecli["GraphHandleCli<br/>(service · completed)"]
   graphhandleshapes["GraphHandleShapes<br/>(contract · completed)"]
@@ -177,7 +176,6 @@ graph TD
   mechanicalsubstrateextractor["MechanicalSubstrateExtractor<br/>(service · completed)"]
   authoredcorebuilder -->|depends-on| clicontexttypes
   authoredcorebuilder -->|depends-on| graphhandleshapes
-  cliversionhelper -->|depends-on| cliruntimepaths
   graphhandle -->|depends-on| authoredcorebuilder
   graphhandle -->|depends-on| graphhandleshapes
   graphhandle -->|depends-on| graphhandleviews
@@ -624,7 +622,7 @@ graph TD
   resultmonadtypes["ResultMonadTypes<br/>(contract · completed)"]
 ```
 
-### Unclassified · Architect Package Content (38 patterns)
+### Unclassified · Architect Package Content (37 patterns)
 
 ```mermaid
 graph TD
@@ -644,7 +642,6 @@ graph TD
   architecturedelta["ArchitectureDelta<br/>(roadmap)"]
   assistivecodeintelligence["AssistiveCodeIntelligence<br/>(epic · candidate)"]
   codecbehaviorexecutabletests["CodecBehaviorExecutableTests<br/>(roadmap)"]
-  dataapirelationshipgraph["DataAPIRelationshipGraph<br/>(roadmap)"]
   documentationprojection["DocumentationProjection<br/>(epic · candidate)"]
   generatorinfrastructureexecutabletests["GeneratorInfrastructureExecutableTests<br/>(roadmap)"]
   goalorientednavigation["GoalOrientedNavigation<br/>(roadmap)"]
@@ -725,7 +722,7 @@ Bounded contexts whose patterns span more than one workspace package.
 
 | Bounded context | Packages                                                      | Patterns |
 | --------------- | ------------------------------------------------------------- | -------- |
-| cli             | Architect CLI, Architect Core, Architect Guard, Architect MCP | 13       |
+| cli             | Architect CLI, Architect Core, Architect Guard, Architect MCP | 12       |
 | api             | Architect MCP, Architect Package Content                      | 7        |
 | extractor       | Architect Core, Architect Package Content                     | 7        |
 | governance      | Architect Package Content, Architect Projection               | 10       |
@@ -791,7 +788,6 @@ Bounded contexts whose patterns span more than one workspace package.
 - CLIContextTypes
 - CLIErrorHandler
 - CLIRuntimePaths
-- CLIVersionHelper
 - CodecBehaviorExecutableTests
 - CodecUtils
 - CompactTextRenderer
@@ -799,7 +795,6 @@ Bounded contexts whose patterns span more than one workspace package.
 - ConfigLoader
 - ConfigValidationSchemas
 - ContextInference
-- DataAPIRelationshipGraph
 - DecisionCatalog
 - DecisionCatalogProjection
 - DecisionRecord

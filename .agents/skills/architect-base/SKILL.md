@@ -96,7 +96,7 @@ A **pattern** is a named architectural unit (a feature, service, component, cont
 - **`architect.config.ts`** — config loader; taxonomy customization, source globs, validation rules.
 - **`pnpm architect:q '<js>'`** — the graph handle (ADR-014); script the live graph, get the conclusion. **This is the default; use it.**
 - **`architect_*` MCP tools** — sub-ms per call, same verbs, **snake_case end-to-end** (`architect_scope_validate`, not `architect_scope-validate`). Reach for MCP only when bursting ≥5 verbs in close sequence.
-- File scanning architect-scoped paths to learn pattern state is a smell — every "what's the status of X?" question has a verb.
+- File scanning architect-scoped paths to learn pattern state is a smell — every "what's the status of X?" question is one `architect:q` script away.
 
 ## 6. Validation layers
 

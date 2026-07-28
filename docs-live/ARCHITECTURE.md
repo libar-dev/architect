@@ -7,7 +7,7 @@
 
 ## Overview
 
-This view captures 226 patterns across 24 diagrams in the Component architecture view.
+This view captures 225 patterns across 24 diagrams in the Component architecture view.
 
 ## Related views
 
@@ -25,7 +25,7 @@ Each node is a group; each arrow is a cross-group dependency (`depends-on` / `us
 graph LR
   shared["_shared (4)"]
   api["api (4)"]
-  cli["cli (13)"]
+  cli["cli (12)"]
   configuration["configuration (11)"]
   delivery_reporting["delivery-reporting (5)"]
   documentation_composition["documentation-composition (13)"]
@@ -144,7 +144,7 @@ graph TD
   mcptoolregistry -->|depends-on| mcppipelinesession
 ```
 
-### Bounded context: cli (13 patterns)
+### Bounded context: cli (12 patterns)
 
 ```mermaid
 graph TD
@@ -153,7 +153,6 @@ graph TD
   clicontexttypes["CLIContextTypes<br/>(contract)"]
   clierrorhandler["CLIErrorHandler<br/>(utility)"]
   cliruntimepaths["CLIRuntimePaths<br/>(utility)"]
-  cliversionhelper["CLIVersionHelper<br/>(utility)"]
   graphhandle["GraphHandle<br/>(service)"]
   graphhandlecli["GraphHandleCli<br/>(service)"]
   graphhandleshapes["GraphHandleShapes<br/>(contract)"]
@@ -163,7 +162,6 @@ graph TD
   mechanicalsubstrateextractor["MechanicalSubstrateExtractor<br/>(service)"]
   authoredcorebuilder -->|depends-on| clicontexttypes
   authoredcorebuilder -->|depends-on| graphhandleshapes
-  cliversionhelper -->|depends-on| cliruntimepaths
   graphhandle -->|depends-on| authoredcorebuilder
   graphhandle -->|depends-on| graphhandleshapes
   graphhandle -->|depends-on| graphhandleviews
@@ -630,7 +628,7 @@ Bounded contexts whose patterns span more than one workspace package.
 
 | Bounded context | Packages                                                      | Patterns |
 | --------------- | ------------------------------------------------------------- | -------- |
-| cli             | Architect CLI, Architect Core, Architect Guard, Architect MCP | 13       |
+| cli             | Architect CLI, Architect Core, Architect Guard, Architect MCP | 12       |
 | rendering       | Architect Core, Architect Projection                          | 16       |
 | validation      | Architect Core, Architect Guard                               | 9        |
 
@@ -676,7 +674,6 @@ Bounded contexts whose patterns span more than one workspace package.
 - CLIContextTypes
 - CLIErrorHandler
 - CLIRuntimePaths
-- CLIVersionHelper
 - CodecUtils
 - CompactTextRenderer
 - ConfigDefaults

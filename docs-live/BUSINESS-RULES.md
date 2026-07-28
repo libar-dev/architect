@@ -7,7 +7,7 @@
 
 ## Overview
 
-Structured business-rule catalog with 340 rules grouped by package.
+Structured business-rule catalog with 339 rules grouped by package.
 
 ## Packages
 
@@ -18,7 +18,7 @@ Structured business-rule catalog with 340 rules grouped by package.
 | architect-dev         | 12       | 63    | 63              |
 | architect-guard       | 1        | 7     | 7               |
 | architect-mcp         | 4        | 9     | 9               |
-| architect-pkg-content | 15       | 57    | 57              |
+| architect-pkg-content | 15       | 56    | 56              |
 | architect-projection  | 31       | 98    | 67              |
 
 ## Package Detail
