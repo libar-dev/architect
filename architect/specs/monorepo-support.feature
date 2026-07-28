@@ -9,14 +9,14 @@ Feature: Monorepo Cross-Package Support
   multiple packages), but the config system has no concept of "packages." The
   consumer passes all source paths as repeated --input and --features CLI flags,
   creating massive duplication across 15+ scripts. PatternGraph has no concept of
-  which package a pattern belongs to. There is no --package filter for scoping
-  queries, no cross-package dependency visibility, and no per-package coverage.
+  which package a pattern belongs to. There is no package scoping for reads,
+  no cross-package dependency visibility, and no per-package coverage.
 
   **Solution:**
   Extend config and pipeline with workspace-aware capabilities:
   1. Multi-package config mapping package names to source globs
   2. Package provenance derived from glob matching (not a new annotation tag)
-  3. Package-scoped query filter composing with existing filters
+  3. Package provenance surfaced on the graph handle, composing with existing filters
   4. Cross-package dependency analysis aggregated from pattern relationships
   5. Per-package coverage reports
 
@@ -28,8 +28,8 @@ Feature: Monorepo Cross-Package Support
       | Package provenance on ExtractedPattern | pending | src/validation-schemas/extracted-pattern.ts |
       | Scanner package assignment | pending | src/scanner/pattern-scanner.ts |
       | PatternGraph byPackage view | pending | src/generators/pipeline/transform-dataset.ts |
-      | CLI --package filter flag | pending | src/cli/output-pipeline.ts |
-      | Cross-package dependency subcommand | pending | src/api/cross-package.ts |
+      | Package field on the handle's PatternNode | pending | packages/architect-cli/src/handle/graph.ts |
+      | Cross-package dependency view (handle read) | pending | src/api/cross-package.ts |
       | Per-package coverage report | pending | src/api/coverage-analyzer.ts |
 
   Rule: Config supports workspace-aware package definitions
@@ -94,9 +94,9 @@ Feature: Monorepo Cross-Package Support
       When the file is scanned and extracted
       Then the resulting pattern has package "platform-core"
 
-  Rule: CLI commands accept a package filter that composes with existing filters
+  Rule: Reads accept a package scope that composes with existing filters
 
-    **Invariant:** The --package flag filters patterns to those from a specific
+    **Invariant:** The package scope filters patterns to those from a specific
     package. It composes with --status, --phase, --category via logical AND.
 
     **Rationale:** In a 600-file monorepo, unscoped queries return too many results.
@@ -119,7 +119,7 @@ Feature: Monorepo Cross-Package Support
 
   Rule: Cross-package dependencies are visible as a package-level graph
 
-    **Invariant:** The cross-package subcommand aggregates pattern-level relationships
+    **Invariant:** The cross-package view aggregates pattern-level relationships
     into package-level edges, showing source package, target package, and the patterns
     forming the dependency. Intra-package dependencies are excluded.
 

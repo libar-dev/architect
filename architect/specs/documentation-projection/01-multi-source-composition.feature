@@ -27,7 +27,7 @@ Feature: MultiSourceComposition - the projection composes by union over single-o
 
   @acceptance-criteria @happy-path
   Scenario: documents compose shared and document-unique sources from a partial overlap
-    Given the CLI verb and MCP tool catalog is a source shared by the data-api skill and the live-documentation-api spec
+    Given the `architect` bin command and MCP tool catalog is a source shared by the graph-handle skill and the live-documentation-api spec
     And each of those documents also carries document-unique content
     When the documents are projected
     Then both include the shared verb and tool catalog projected from the same source

@@ -13,7 +13,7 @@ Feature: ValueTransferState
   design spec**, **broken forward/reverse link**, and **retroactive
   plan-level spec**.
   All three are fully computable from existing scanner output (specs,
-  executable Gherkin, annotated TS) but no Data API verb returns the
+  executable Gherkin, annotated TS) but no deterministic read returns the
   derivation, so cleanup is a manual audit. The doctrine itself lives
   in
   `.agents/skills/architect-sessions/references/ephemeral-spec-deletion.md`
@@ -82,7 +82,7 @@ Feature: ValueTransferState
       | governance projection barrel export | pending | packages/architect-projection/src/projections/governance/index.ts | Yes | typecheck |
       | top-level fragments barrel export | pending | packages/architect-projection/src/fragments/index.ts | Yes | typecheck |
       | value-transfer handle read | pending | packages/architect-cli/src/handle/graph.ts | Yes | integration |
-      | value-transfer CLI command definition | pending | packages/architect-cli/src/cli/commands/governance.ts | Yes | integration |
+      | architect_value_transfer MCP tool definition | pending | packages/architect-mcp/src/tool-registry.ts | Yes | integration |
       | architect_value_transfer MCP input shape | pending | packages/architect-mcp/src/tool-input-schemas.ts | Yes | integration |
       | architect_value_transfer MCP handler | pending | packages/architect-mcp/src/tool-registry.ts | Yes | integration |
       | architect_value_transfer metadata entry | pending | packages/architect-mcp/src/tool-metadata.ts | Yes | integration |

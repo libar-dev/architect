@@ -10,7 +10,7 @@ Feature: ArchitectBriefDeterministicBundle
   **Problem:**
   Every Architect Claude Code slash command (`/architect:plan`,
   `/architect:design`, `/architect:implement`, `/architect:review`,
-  `/architect:handoff`) currently enumerates 3-5 raw CLI verbs --
+  `/architect:handoff`) formerly enumerated 3-5 raw CLI verbs (retired, ADR-014) --
   `overview`, `scope-validate`, `context --session <T>`, `dep-tree`,
   `files`, `rules`, sometimes `arch blocking` -- and the agent stitches
   the outputs into a working narrative. The stitching is duplicated
@@ -22,7 +22,7 @@ Feature: ArchitectBriefDeterministicBundle
   Most of what the slash commands stitch is **deterministically
   computable** from existing fragments. The rephrase pressure is
   largely a missing-bundling problem, not a missing-narrative problem.
-  Today there is no single Data API verb that returns the union of
+  Today there is no single deterministic MCP read that returns the union of
   what a session-open needs; each consumer composes the union by hand.
 
   Three secondary observations sharpen the case:
@@ -39,22 +39,20 @@ Feature: ArchitectBriefDeterministicBundle
 
   2. The `ScopeReadinessReport`, `BusinessRuleSet`, `OverviewDigest`,
      and the (sibling-candidate) `ValueTransferState` fragments are
-     each their own verb today. Composing them into one bundle is
+     each their own MCP tool today. Composing them into one bundle is
      mechanical -- pure projection composition over fragments that
      already exist.
 
-  3. CLAUDE.md's "Data API first" rule is enforced mechanically by
-     the `PreToolUse` hook, but the hook can only force *one* CLI call
-     before file reads are unblocked. In practice agents call the most
-     convenient verb (often `overview`) and immediately fall back to
-     reading files. A single verb that returns the full bundle in one
-     call closes that fallback path -- agents have what they need
-     without further verbs or reads.
+  3. Agent sessions already collapse to one graph-handle script
+     (ADR-014), so the agent-side stitching problem is dissolved. The
+     surviving consumers are the MACHINE sinks -- the plugin hook,
+     Studio, CI -- which need one deterministic bundle in one typed
+     call instead of stitching several reads.
 
   **Solution:**
   Add a new `ArchitectBrief` fragment in the `execution-context`
   subdomain that composes existing fragments via projection
-  composition. A single new verb returns the full bundle:
+  composition. A single new MCP tool returns the full bundle:
 
   - `sessionContext: SessionContextBundle` -- existing fragment, **no
     longer filtered by session-type**; uniform shape for every caller
@@ -66,13 +64,13 @@ Feature: ArchitectBriefDeterministicBundle
     fragment, folded in so every brief surfaces anti-patterns
   - `taxonomySlice: TaxonomySlice` -- new pruned slice; tags the
     pattern declares plus group-sibling tags, with a pointer to the
-    full `taxonomy` verb. Keeps token budget tight while making the
+    full taxonomy read. Keeps token budget tight while making the
     tag choice surface visible at every brief.
   - `transitiveBlockers: BlockingEntry[]` -- graph traversal beyond
     direct `blockedBy` (today's `arch blocking` is one-hop). Cycle-
     safe; bounded depth.
   - `nextActions: NextActionHint[]` -- deterministic lookup over
-    current bundle state. Each entry is a CLI verb suggestion plus a
+    current bundle state. Each entry is a follow-up read suggestion plus a
     triggering condition observable in the bundle (e.g., "deletionReady
     is true -> suggest `git rm <designSpecPath>`"). Reproducible
     byte-for-byte across runs given identical graph state.
@@ -82,12 +80,12 @@ Feature: ArchitectBriefDeterministicBundle
      handle read — a named `architect` command only if a second machine
      consumer requires the frozen contract (ADR-014).
   2. `architect_brief` MCP tool with the same input shape.
-  3. Slash commands collapse from 5-verb bash blocks to a single
+  3. Slash commands collapse from multi-call bash blocks to a single
      `<cli-prefix> brief <pattern>` line. The skill bodies stop
-     enumerating "run these verbs and stitch them" prose and start
+     enumerating "run these reads and stitch them" prose and start
      interpreting the bundle.
 
-  The verb accepts an optional `intent: string` parameter that is
+  The tool accepts an optional `intent: string` parameter that is
   carried through unmodified to downstream consumers. The
   deterministic payload shape does **not** vary by intent; intent is
   forwarded for use by `ModelEnrichedDataAPI`'s LLM enrichment layer
@@ -95,12 +93,12 @@ Feature: ArchitectBriefDeterministicBundle
 
   **Business Value:**
   | Benefit | Impact |
-  | Single round-trip session-open | Slash commands collapse from 5 verbs to 1; agent context shrinks proportionally |
+  | Single round-trip session-open | Slash commands collapse from 5 calls to 1; agent context shrinks proportionally |
   | LLM enrichment lands on richer payload | Wave 1 `model_summary` summarises a bundled, anti-pattern-aware payload, not 5 raw fragments |
   | Anti-patterns visible at every session-open | `valueTransfer.antipatterns` is one structured field away from every plan/design/implement/review session |
   | Convention parity | Deterministic-first, LLM-second mirrors the existing "deterministic CLI / optional MCP enrichment" split elsewhere in the codebase |
   | ADR-006 conformant | No fragment data is re-derived; the bundle is composition over the Single Read Model |
-  | Reduced drift surface | One verb to maintain instead of 5 stitching points across 5 slash commands |
+  | Reduced drift surface | One tool to maintain instead of 5 stitching points across 5 slash commands |
 
   **Relationship to ModelEnrichedDataAPI:**
   This candidate carves out the **deterministic-bundling slice** of
@@ -110,7 +108,7 @@ Feature: ArchitectBriefDeterministicBundle
   surfaces:
 
   | Owned by ArchitectBriefDeterministicBundle (this spec) | Owned by ModelEnrichedDataAPI (sibling spec) |
-  | `architect_brief` verb proposal | `model_summary` LLM narrative slice |
+  | `architect_brief` tool proposal | `model_summary` LLM narrative slice |
   | Multi-endpoint deterministic composition | Provenance envelope (source/confidence/prompt-version/latency_ms) |
   | Removal of `--session` type filtering | `intent` interpretation for prompt biasing |
   | `taxonomySlice`, `transitiveBlockers`, deterministic `nextActions` | BYOK + Vercel AI SDK + OpenRouter wiring |
@@ -125,7 +123,7 @@ Feature: ArchitectBriefDeterministicBundle
   payload -- higher floor, less drift surface.
 
   **Why "deterministic floor first":**
-  If wave 1 ships an LLM `model_summary` over the existing 5-verb
+  If wave 1 ships an LLM `model_summary` over the existing 5-read
   stitch, the LLM has to *infer* anti-patterns from raw fragments
   (sometimes correctly, sometimes not), and the provenance envelope
   can only say "this is what the model thought," never "this is the
@@ -150,7 +148,7 @@ Feature: ArchitectBriefDeterministicBundle
       | execution-context projection barrel export | pending | packages/architect-projection/src/projections/execution-context/index.ts | Yes | typecheck |
       | top-level fragments barrel export | pending | packages/architect-projection/src/fragments/index.ts | Yes | typecheck |
       | brief MCP tool / handle read | pending | packages/architect-mcp/src/tool-registry.ts | Yes | integration |
-      | brief CLI command definition | pending | packages/architect-cli/src/cli/commands/execution-context.ts | Yes | integration |
+      | architect_brief MCP tool definition | pending | packages/architect-mcp/src/tool-registry.ts | Yes | integration |
       | architect_brief MCP input shape | pending | packages/architect-mcp/src/tool-input-schemas.ts | Yes | integration |
       | architect_brief MCP handler | pending | packages/architect-mcp/src/tool-registry.ts | Yes | integration |
       | architect_brief metadata entry | pending | packages/architect-mcp/src/tool-metadata.ts | Yes | integration |
@@ -212,7 +210,7 @@ Feature: ArchitectBriefDeterministicBundle
 
     **Invariant:** A single `architect_brief <pattern>` call returns
     every field a plan, design, implement, review, or handoff session
-    needs to begin work without invoking other Data API verbs. The
+    needs to begin work without invoking other deterministic reads. The
     bundle is the union (not a subset) of what `overview` (relevant
     parts), `context --session <any>`, `scope-validate`, `dep-tree`,
     `files [--related]`, `rules --pattern <P>`, and `arch blocking`
@@ -288,7 +286,7 @@ Feature: ArchitectBriefDeterministicBundle
     **Invariant:** The `nextActions` list is derived from a documented
     lookup table over current bundle state. Each entry has a
     triggering condition (a predicate observable in the bundle) and a
-    suggested CLI verb (a string). The list is reproducible byte-for-
+    suggested follow-up read (a string). The list is reproducible byte-for-
     byte across runs given identical graph state. No randomization,
     no LLM call, no time-dependent value influences ordering or
     contents.

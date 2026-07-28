@@ -32,10 +32,10 @@ Feature: ModelEnrichedDataAPI
 
   **Solution:**
   `ModelEnrichedDataAPI` is a **decoration layer** over the deterministic
-  Data API. The `architect_brief` verb (specified in the sibling
+  Data API. The `architect_brief` MCP tool (specified in the sibling
   `ArchitectBriefDeterministicBundle` candidate) and the existing five
-  verbs (`pattern`, `scope-validate`, `rules`, `dep-tree`, `overview`)
-  keep their deterministic response shapes; this candidate wraps those
+  deterministic MCP reads (pattern, scope-validate, rules, dep-tree,
+  overview) keep their deterministic response shapes; this candidate wraps those
   responses with optional model-generated slices when configured. The
   Brief's optional `intent: string` parameter is forwarded unchanged at
   the deterministic tier and interpreted here at the LLM tier — biasing
@@ -97,7 +97,7 @@ Feature: ModelEnrichedDataAPI
   session-brief payload) is never withheld. The free CLI and open-source
   MCP package work fully without an API key.
 
-  **MVP fan-out boundary:** The existing five Data API verbs (`pattern`,
+  **MVP fan-out boundary:** The existing five deterministic MCP reads (`pattern`,
   `scope-validate`, `rules`, `dep-tree`, `overview`) keep their current
   deterministic-only response shapes for MVP, except that they accept
   the additive `intent` field for narrative biasing once decorated.

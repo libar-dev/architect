@@ -50,14 +50,14 @@ Feature: PDR-001 - Session Workflow Commands Design Decisions
   # RULE 2: DD-2 - Git Integration Is Opt-In
   # ===========================================================================
 
-  Rule: DD-2 - Git integration is opt-in via --git flag
+  Rule: DD-2 - Git integration is opt-in
 
     **Invariant:** Domain logic must never invoke shell commands or depend on git directly.
     **Rationale:** Shell dependencies in domain logic make functions untestable without git fixtures and break deterministic behavior.
     **Verified by:** Verified by code review (no executable scenario)
 
-    The handoff command accepts an optional --git flag. The CLI handler
-    calls git diff and passes file list to the pure generator function.
+    The handoff surface accepts an opt-in git input. The tool handler
+    calls git diff and passes the file list to the pure generator function.
     No shell dependency in domain logic.
 
   # ===========================================================================
@@ -66,12 +66,12 @@ Feature: PDR-001 - Session Workflow Commands Design Decisions
 
   Rule: DD-3 - Session type inferred from status
 
-    **Invariant:** Every accepted status value must map to exactly one default session type, overridable by an explicit --session flag.
-    **Rationale:** Ambiguous or missing inference forces users to always specify --session manually, defeating the ergonomic benefit of status-based defaults.
+    **Invariant:** Every accepted status value must map to exactly one default session type, overridable by an explicit session input.
+    **Rationale:** Ambiguous or missing inference forces callers to always specify the session type manually, defeating the ergonomic benefit of status-based defaults.
     **Verified by:** Active pattern infers implement session
 
     Handoff infers session type from pattern's current status.
-    An explicit --session flag overrides inference.
+    An explicit session input overrides inference.
 
     | Status | Inferred Session |
     | candidate | planning |
@@ -97,7 +97,7 @@ Feature: PDR-001 - Session Workflow Commands Design Decisions
     | BLOCKED | Hard prerequisite missing |
     | WARN | Recommendation not met |
 
-    The --strict flag promotes WARN to BLOCKED.
+    The strict option promotes WARN to BLOCKED.
 
   # ===========================================================================
   # RULE 5: DD-5 - Current Date Only For Handoff
