@@ -205,11 +205,11 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             // Role distribution tallies the canonical @architect-role of every
             // pattern that declares one; sorted by count descending.
             expect(Array.isArray(roleDistribution)).toBe(true);
-            // cliHints lead with the Data API banner and promote the map verb.
-            expect(cliHints?.[0]).toContain('DATA API');
-            expect(cliHints?.some((hint) => hint.includes('documentation architecture'))).toBe(
-              true,
-            );
+            // cliHints lead with the ADR-014 graph-handle banner and promote
+            // the eval front door (pnpm architect:q).
+            expect(cliHints?.[0]).toContain('READ SURFACE');
+            expect(cliHints?.[0]).toContain('graph handle');
+            expect(cliHints?.some((hint) => hint.includes('architect:q'))).toBe(true);
 
             const rendered = renderJson(state!.overview!.root);
             expect(typeof rendered).toBe('object');
