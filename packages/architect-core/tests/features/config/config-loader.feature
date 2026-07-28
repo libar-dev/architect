@@ -11,7 +11,7 @@ Feature: Config Loader
   taxonomy customization.
 
   **Problem:**
-  Every `pnpm architect:query` and `pnpm docs:*` invocation prints:
+  Every `pnpm architect:graph` / `pnpm architect:q` and `pnpm docs:*` invocation prints:
   `Failed to load default workflow (6-phase-standard): Workflow file not found`
 
   The `loadDefaultWorkflow()` function resolves to `catalogue/workflows/`

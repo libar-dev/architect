@@ -16,7 +16,6 @@ import {
   type TagRegistry,
 } from '@libar-dev/architect-core';
 import type { ProjectionContext } from '@libar-dev/architect-projection';
-import { createValidationMetadata, stringifyJsonValue } from './commands/_shared/output.js';
 import {
   createCliProjectionContext,
   createCliTaxonomyProjectionContext,
@@ -30,6 +29,24 @@ import {
 } from './pattern-graph-cli-types.js';
 
 const CACHE_DIRECTORY = path.join(os.tmpdir(), 'architect-cli-cache');
+
+export function stringifyJsonValue(value: unknown): string {
+  if (value === undefined) {
+    return 'null';
+  }
+
+  return JSON.stringify(value, null, 2);
+}
+
+export function createValidationMetadata(
+  build: CliContext['build'],
+): NonNullable<QueryMetadataExtra['validation']> {
+  return {
+    danglingReferenceCount: build.validation.danglingReferences.length,
+    unknownStatusCount: build.validation.unknownStatuses.length,
+    warningCount: build.validation.warningCount,
+  };
+}
 
 async function resolveSourcePlan(args: ParsedArgs): Promise<SourcePlan> {
   const workspaceSources = resolveWorkspaceSources(args.baseDir);

@@ -1,10 +1,29 @@
 /**
- * The exposed shapes. This file IS the contract — read it, then script freely.
- * No verb hides these; a consumer validates the slice it touches and joins at will.
+ * @architect
+ * @architect-cli
+ * @architect-pattern GraphHandleShapes
+ * @architect-status completed
+ * @architect-role:contract
+ * @architect-bounded-context:cli
+ * @architect-product-area:DataAPI
+ * @architect-usecase Read this file first when scripting the graph handle — the exposed shapes ARE the discovery surface.
+ *
+ * ## GraphHandleShapes — the exposed shapes of the two-surface graph handle
+ *
+ * This file IS the contract — read it, then script freely. No verb hides these;
+ * a consumer validates the slice it touches and joins at will.
  *
  * Pure shapes only — no IO, no cli-runtime coupling. The two cores are BUILT, not
- * read: `buildMechanicalCore()` (extract.ts) and `buildAuthoredCore()` (live.ts).
- * The sandbox reads NO dump (see CONTEXT.md §"staleness").
+ * read: `buildMechanicalCore()` (extract.ts) and `buildAuthoredCore()` (authored.ts).
+ * The handle reads NO dump — both cores build fresh in-process per `loadGraph()`.
+ *
+ * **Deliberate looseness (sanctioned exception to strictObject doctrine):** the
+ * authored-side schemas use `looseObject` because they DECODE an already-validated
+ * in-process graph (the trust boundary was `buildPatternGraph`, ADR-009 parse-once) —
+ * they type what an agent should FIND, they do not gate what may exist. Under-typing
+ * a shape hides a capability from an agent reading the contract; over-strictness
+ * breaks the handle every time the upstream graph grows a field. The mechanical
+ * side stays `strictObject` (this package owns that shape end-to-end).
  */
 import { z } from 'zod';
 
@@ -37,12 +56,11 @@ export type ImportEdge = z.infer<typeof ImportEdgeSchema>;
 export type MechanicalCore = z.infer<typeof MechanicalCoreSchema>;
 
 // ─── Layer 2: the curated graph (authored, sparse) ───────────────────────────
-// Loose on purpose where it counts: still `looseObject` so the fat `code` payload
-// rides untyped, but we now TYPE the Gherkin (scenarios/rules) + taxonomy-bearing
-// `directive`. The prior playground left these untyped and the richest half of the
-// data went invisible — an agent reading the contract concluded scenarios didn't
-// exist. For an AI-native surface the type IS the discovery surface; type what you
-// want found.
+// Loose on purpose where it counts (see header): the fat `code` payload rides
+// untyped, but the Gherkin (scenarios/rules) + taxonomy-bearing `directive` are
+// TYPED. An earlier iteration left these untyped and the richest half of the data
+// went invisible — an agent reading the contract concluded scenarios didn't exist.
+// For an AI-native surface the type IS the discovery surface; type what you want found.
 
 // A parsed Gherkin scenario — already in the built core, one per `Scenario:` block.
 export const ScenarioSchema = z.looseObject({
@@ -71,9 +89,9 @@ export const AuthoredPatternSchema = z.looseObject({
   status: z.string().default('?'),
   source: z.looseObject({ file: z.string() }).optional(),
   // role / bounded-context are STRUCTURED top-level fields (the extractor already
-  // peeled the value off the JSDoc tag): populated on 195 / 176 of 293 patterns.
-  // `directive.tags` only carries the bare key `@architect-role` for TS patterns —
-  // reading the value from there silently drops ~167 of them. Read the field.
+  // peeled the value off the JSDoc tag). `directive.tags` only carries the bare key
+  // `@architect-role` for TS patterns — reading the value from there silently drops
+  // most TS patterns. Read the field.
   role: z.string().optional(),
   boundedContext: z.string().optional(),
   // hierarchy axis (`@architect-level` / `@architect-parent`). `parent` is the
@@ -97,11 +115,10 @@ export const AuthoredEdgeSchema = z.looseObject({
   uses: z.array(z.string()).default([]),
   usedBy: z.array(z.string()).default([]),
   implementedBy: z.array(z.looseObject({ file: z.string().optional() })).default([]),
-  // live-but-previously-untyped edges (the relationshipIndex carries 12 kinds; this
-  // schema typed 3). These two are the architectural-SIGNIFICANCE signals a curation
-  // pass needs: does this pattern realize another (`implementsPatterns`), and does it
-  // enforce a decision (`enforcesDecisions`)? Untyped, they were invisible to an agent
-  // reading the contract — so a naive "is this noise?" filter over uses/usedBy alone
+  // The architectural-SIGNIFICANCE signals a curation pass needs: does this pattern
+  // realize another (`implementsPatterns`), and does it enforce a decision
+  // (`enforcesDecisions`)? Untyped, they were invisible to an agent reading the
+  // contract — so a naive "is this noise?" filter over uses/usedBy alone
   // false-positived genuine realizers. Type → surface → the filter gets safe.
   implementsPatterns: z.array(z.string()).default([]),
   enforcesDecisions: z.array(z.string()).default([]),
@@ -133,4 +150,4 @@ export type Provenance = 'executable' | 'authored';
 
 // Builders (not loaders): the two cores are constructed fresh in-process, never
 // read from disk. `buildMechanicalCore()` → extract.ts (tsc walk). `buildAuthoredCore()`
-// → live.ts (buildCliContext, the live PatternGraph). `loadGraph()` (graph.ts) joins them.
+// → authored.ts (buildCliContext, the live PatternGraph). `loadGraph()` (graph.ts) joins them.

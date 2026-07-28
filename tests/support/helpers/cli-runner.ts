@@ -71,14 +71,13 @@ const GUARD_PACKAGE_ROOT = path.resolve(__dirname, '../../../packages/architect-
 const TSX_BIN = path.join(PROJECT_ROOT, 'node_modules', '.bin', 'tsx');
 
 const LEGACY_CLI_BIN_ALIASES: Record<string, string> = {
-  'pattern-graph-cli': 'architect',
   'generate-docs': 'architect-generate',
   'lint-patterns': 'architect-lint-patterns',
   'validate-patterns': 'architect-validate',
   'lint-process': 'architect-guard',
 };
 
-const SOURCE_EXECUTED_CLIS = new Set(['pattern-graph-cli', 'lint-patterns']);
+const SOURCE_EXECUTED_CLIS = new Set(['graph-cli', 'lint-patterns']);
 
 function createChildEnv(env: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
   const childEnv: NodeJS.ProcessEnv = { ...env, FORCE_COLOR: '0' };

@@ -1,6 +1,6 @@
 # architect-cli — Package PRD
 
-> Boundary contract recorded post-PR-#15. Describes the **code as it is**, not the annotations. Source-primary: `package.json` `bin` map, `src/cli/pattern-graph-cli-commands.ts` (the `COMMAND_NAMES` enum), the five `src/cli/commands/*.ts` modules, and `src/cli/commands/_shared/structured.ts` (the `arch`/`query` sub-verb dispatch).
+> Boundary contract. Describes the **code as it is**, not the annotations. Source-primary: `package.json` `bin` map, `src/cli/graph-cli.ts` (the graph-handle CLI, ADR-014), and `src/handle/*` (the two-surface handle library).
 
 ## Purpose
 
@@ -10,14 +10,14 @@ The thin **CLI composition root** for Libar Architect. It owns every non-MCP exe
 
 ### Bins (`package.json` → `bin`)
 
-| Bin                       | Entry (`src/cli/…`)    | Nature                                                                 |
-| ------------------------- | ---------------------- | ---------------------------------------------------------------------- |
-| `architect`               | `pattern-graph-cli.ts` | The verb router (`architect:query <verb>`). Real logic.                |
-| `architect-generate`      | `generate-docs.ts`     | Regenerates `docs-live/` from the PatternGraph. Real logic (~670 LOC). |
-| `architect-guard`         | `lint-process.ts`      | One-line re-export of `runLintProcessCli` from `architect-guard`.      |
-| `architect-lint-patterns` | `lint-patterns.ts`     | One-line re-export of `runLintPatternsCli`.                            |
-| `architect-lint-steps`    | `lint-steps.ts`        | One-line re-export of `runLintStepsCli`.                               |
-| `architect-validate`      | `validate-patterns.ts` | One-line re-export of `runValidatePatternsCli`.                        |
+| Bin                       | Entry (`src/cli/…`)    | Nature                                                                                          |
+| ------------------------- | ---------------------- | ----------------------------------------------------------------------------------------------- |
+| `architect`               | `graph-cli.ts`         | The graph-handle CLI (`architect q '<js>'` + named commands + the `dangling` gate). Real logic. |
+| `architect-generate`      | `generate-docs.ts`     | Regenerates `docs-live/` from the PatternGraph. Real logic (~670 LOC).                          |
+| `architect-guard`         | `lint-process.ts`      | One-line re-export of `runLintProcessCli` from `architect-guard`.                               |
+| `architect-lint-patterns` | `lint-patterns.ts`     | One-line re-export of `runLintPatternsCli`.                                                     |
+| `architect-lint-steps`    | `lint-steps.ts`        | One-line re-export of `runLintStepsCli`.                                                        |
+| `architect-validate`      | `validate-patterns.ts` | One-line re-export of `runValidatePatternsCli`.                                                 |
 
 All bins are 3-line shims under `bin/*.js` that call `runArchitectCliEntrypoint` (`runtime-bridge.js` → `runBuiltPackageEntrypoint` in core), which enforces "build before run".
 
@@ -38,7 +38,7 @@ Two verbs are **namespaces** with their own sub-verbs (dispatched in `commands/_
 
 ## Enumerated functionality
 
-**`architect` verb router** (`pattern-graph-cli.ts`): global flag parse (`--format`, `--session`, `--depth`, `--base-dir`, `--dry-run`, `--no-cache`, `-h/-v`), per-command Zod-validated positional/flag parsing, `--dry-run` source planning, a `repl` read-loop, and dispatch to a command's `execute`. Each verb's `execute` calls one projection and writes it through `writeProjectionOutput`/`writeJson`.
+**`architect` graph-handle CLI** (`graph-cli.ts`, ADR-014): `--base-dir` resolution, the `q` eval front door (node:vm-compiled function body with `g`/`inspect`/`execFileSync`/`REPO_ROOT` injected), named demo commands over the handle (census/diff/blast/fan-in/drift/find/file/symbol/invariants/specs/maturity), and the one frozen machine contract — `dangling --baseline --strict` (the CI graph-integrity gate). The handle library lives in `src/handle/`: schema (the exposed shapes), extract (the mechanical substrate), authored (the live curated core via `buildCliContext`), views (pure view functions), graph (the `Graph` class + `loadGraph`, incl. the `g.api` PatternGraphAPI escape hatch).
 
 - **reporting** — progress digest (`overview`), status histogram (`status`), session context bundle (`context`), dependency tree (`dep-tree`), file reading list (`files`), raw build diagnostics (`diagnostics`).
 - **read** — full pattern detail (`pattern`, with parse-failure provenance), documentation bundle by document-type (`documentation`), composite pattern bundle by mode (`bundle`), pattern catalog with filters (`list`), open-questions slice (`open-questions`), fuzzy name match (`search`), architecture views namespace (`arch`), tag-usage digest (`tags`).
@@ -62,7 +62,7 @@ External: `zod` (^4) only (runtime). Dev: `vitest` + `@amiceli/vitest-cucumber` 
 
 ## Consumers
 
-- **Agents (primary)** — the `architect:query <verb>` surface is the agent context-gathering tool; `--format json` is the machine path.
+- **Agents (primary)** — the graph handle (`architect q '<js>'`) is the agent context-gathering tool; scripts return conclusions, not envelopes (ADR-014).
 - **Humans** — same verbs interactively, plus `repl`.
 - **Dogfood scripts / `package.json`** — `pnpm docs:all` (→ `architect-generate`), `pnpm validate:all`, `pnpm architect:guard --staged`, `pnpm architect:overview`/`:status`.
 - **Pre-push / CI gates** — `architect-guard` (FSM), `architect-validate` (DoD/anti-patterns), `arch dangling --strict --baseline` (graph drift), the `docs-live` determinism diff.
@@ -72,7 +72,7 @@ External: `zod` (^4) only (runtime). Dev: `vitest` + `@amiceli/vitest-cucumber` 
 
 ### Load-bearing (keep)
 
-- **The composition root itself** — `pattern-graph-cli.ts` argv parse + Zod boundary + dispatch, the `CommandDef`/`COMMAND_NAMES` registry, `error-handler.ts`, `runtime-bridge.js`, `_shared/output.ts`. This is the package's reason to exist.
+- **The composition root itself** — `graph-cli.ts` argv parse + Zod flag boundary + dispatch, the `src/handle/` library, `error-handler.ts`, `runtime-bridge.js`. This is the package's reason to exist.
 - **The bin wiring** — six bins; the four lint/validate/guard shims are one line each and stay (they're the published entry points even though the logic lives in `architect-guard`).
 - **`architect-generate` (`generate-docs.ts`)** — produces the git-tracked `docs-live/` determinism target. Not a verb-sprawl candidate.
 - **Deterministic gate verbs that must stay server-side** (an agent cannot re-derive these from a raw emission — they encode the FSM/validation rules):

@@ -1,5 +1,16 @@
 /**
- * The graph handle — the AI-native read surface.
+ * @architect
+ * @architect-cli
+ * @architect-pattern GraphHandle
+ * @architect-status completed
+ * @architect-role:service
+ * @architect-bounded-context:cli
+ * @architect-product-area:DataAPI
+ * @architect-uses GraphHandleShapes, GraphHandleViews, AuthoredCoreBuilder, MechanicalSubstrateExtractor, PatternGraphApi
+ * @architect-enforces-decision:ADR006SingleReadModelArchitecture
+ * @architect-usecase Use as the agent read surface over the PatternGraph — load once, script cuts in-process, return conclusions not firehoses.
+ *
+ * ## GraphHandle — the AI-native read surface
  *
  * One typed in-memory object. Load it once; the joins and the encoded-taxonomy
  * decode happen at construction, behind need-shaped accessors. An agent reads the
@@ -10,16 +21,20 @@
  *
  * Design rule held here: the PUBLIC types below are shaped by what an agent NEEDS
  * (a pattern's role/maturity, its invariants, what reverifies). The built core's
- * shape — tag-encoding, the implementedBy hop, the `rule:<slug>` linkage, the dead
- * `layer` axis — is decode detail, hidden. Needs drive the surface, not storage.
+ * shape — tag-encoding, the implementedBy hop, the `rule:<slug>` linkage — is
+ * decode detail, hidden. Needs drive the surface, not storage. The handle freezes
+ * only irreducible cross-source joins (entry adapters, the spec bridge, the
+ * firehose); everything else stays a script the agent writes.
  *
- *   import { loadGraph } from './graph.ts';
- *   const g = await loadGraph();                            // async: builds live from source
- *   g.invariantsOf('packages/architect-core/src/foo.ts');  // → Invariant[], any maturity
+ *   import { loadGraph } from '@libar-dev/architect-cli/handle';
+ *   const g = await loadGraph(baseDir);                     // async: builds live from source
+ *   g.invariantsOf('packages/architect-core/src/foo.ts');   // → Invariant[], any maturity
  *   g.specsReverifying(changedFiles);                       // → AtRiskSpec[]
  */
-import { buildMechanicalCore } from './extract.ts';
-import { buildAuthoredCore } from './live.ts';
+import type { PatternGraphAPI } from '@libar-dev/architect-core';
+
+import { buildAuthoredContext } from './authored.js';
+import { buildMechanicalCore } from './extract.js';
 import {
   type AuthoredCore,
   type AuthoredPattern,
@@ -30,7 +45,7 @@ import {
   type Provenance,
   type Rule,
   type Scenario,
-} from './schema.ts';
+} from './schema.js';
 import {
   blastRadius as blastRadiusView,
   byFile as byFileView,
@@ -40,7 +55,7 @@ import {
   fanInCandidates as fanInView,
   findByConcept as findByConceptView,
   graphDiff as graphDiffView,
-} from './views.ts';
+} from './views.js';
 
 // ═══ PUBLIC, need-shaped types ════════════════════════════════════════════════
 // What an agent asks for — not what the JSON happens to store.
@@ -49,12 +64,12 @@ export interface PatternNode {
   name: string;
   status: string;
   maturity: Maturity; // derived (explicit tag wins) — the axis the built core omits
-  role?: string;
-  boundedContext?: string;
-  productArea?: string;
-  sourceFile?: string;
-  level?: string; // @architect-level — epic / phase / task / slice (the hierarchy axis)
-  parent?: string; // @architect-parent — the membership backbone (was dropped pre-decode)
+  role?: string | undefined;
+  boundedContext?: string | undefined;
+  productArea?: string | undefined;
+  sourceFile?: string | undefined;
+  level?: string | undefined; // @architect-level — epic / phase / task / slice (the hierarchy axis)
+  parent?: string; // @architect-parent — the membership backbone
   children: string[]; // inverse of parent (computed) — an epic's members, first-class
   uses: string[];
   usedBy: string[];
@@ -112,13 +127,12 @@ function deriveMaturity(status: string, tags: string[]): Maturity {
 const provenanceOf = (featureFile: string): Provenance =>
   featureFile.includes('tests/features') ? 'executable' : 'authored';
 
-// The coherence rule between the two axes. `executable` is the REALIZATION rung, and in
-// gen-2 (LSDP) terms "a live verifier binds this" is exactly what executable provenance
-// records — so `executable` maturity ⟺ `executable` provenance, by construction:
-//   • a live test (executable provenance) sits AT the realization rung — never `idea`
-//     (kills the incoherent `✓exec · idea` label derived from a candidate test pattern);
+// The coherence rule between the two axes. `executable` is the REALIZATION rung, and
+// "a live verifier binds this" is exactly what executable provenance records — so
+// `executable` maturity ⟺ `executable` provenance, by construction:
+//   • a live test (executable provenance) sits AT the realization rung — never `idea`;
 //   • an authored spec (no live test) is capped just BELOW it at `design` — never claims
-//     the realization rung it hasn't reached (kills the twin `○auth · executable` label).
+//     the realization rung it hasn't reached.
 // The honest signal this stops fabricating — a live-test-backed pattern whose own design
 // status still lags — is a separate query (realized ∧ status<completed), not a maturity tag.
 const specMaturity = (owner: Maturity, provenance: Provenance): Maturity =>
@@ -126,7 +140,7 @@ const specMaturity = (owner: Maturity, provenance: Provenance): Maturity =>
 
 // pull the `**Invariant:**` clause out of a Rule description; fall back to the lead.
 function distillInvariant(description: string): string {
-  const m = description.match(/\*\*Invariant:\*\*\s*([\s\S]*?)(?:\n\s*\*\*|$)/);
+  const m = /\*\*Invariant:\*\*\s*([\s\S]*?)(?:\n\s*\*\*|$)/.exec(description);
   const text = (m?.[1] ?? description).replace(/\s+/g, ' ').trim();
   return text.length > 240 ? text.slice(0, 237) + '…' : text;
 }
@@ -148,6 +162,13 @@ interface FeatureEntry {
 export class Graph {
   readonly mech: MechanicalCore;
   readonly authored: AuthoredCore;
+  /**
+   * The canonical PatternGraphAPI (ADR-006 read side) over the same live graph —
+   * the deterministic-read escape hatch. Everything the retired verb CLI could
+   * answer about pattern state is one method call here: `g.api.getPattern(name)`,
+   * `g.api.isValidTransition(from, to)`, `g.api.getStatusCounts()`, …
+   */
+  readonly api: PatternGraphAPI;
 
   // private indices — built once, the joins the agent no longer re-derives
   #nodes = new Map<string, PatternNode>();
@@ -157,9 +178,10 @@ export class Graph {
   #featureCohort = new Map<string, string[]>(); // realizing .feature → ALL patterns it realizes (>1 ⇒ ambiguous)
   #features = new Map<string, FeatureEntry>(); // featureFile → its scenarios + rules
 
-  constructor(mech: MechanicalCore, authored: AuthoredCore) {
+  constructor(mech: MechanicalCore, authored: AuthoredCore, api: PatternGraphAPI) {
     this.mech = mech;
     this.authored = authored;
+    this.api = api;
 
     // 1. decode every pattern into a need-shaped node + index the raw record
     for (const p of authored.patterns) {
@@ -173,8 +195,8 @@ export class Graph {
         name: p.name,
         status: p.status,
         maturity: deriveMaturity(p.status, tags),
-        // structured field first (195/176 patterns); tag-peel only as a fallback for
-        // any .feature pattern that carries the value-form tag but no structured field.
+        // structured field first; tag-peel only as a fallback for any .feature
+        // pattern that carries the value-form tag but no structured field.
         role: p.role ?? tagValue(tags, '@architect-role:'),
         boundedContext: p.boundedContext ?? tagValue(tags, '@architect-bounded-context:'),
         productArea: p.productArea,
@@ -191,7 +213,7 @@ export class Graph {
         scenarioCount: p.scenarios.length,
       };
       this.#nodes.set(p.name, node);
-      if (p.source?.file?.endsWith('.ts')) this.#fileToPattern.set(p.source.file, p.name);
+      if (p.source?.file.endsWith('.ts')) this.#fileToPattern.set(p.source.file, p.name);
       if (impl.length) this.#implementedBy.set(p.name, impl);
     }
 
@@ -215,12 +237,13 @@ export class Graph {
 
     // 2. index Gherkin by feature file (scenarios grouped; rules from the .feature-sourced pattern)
     for (const p of authored.patterns) {
-      const node = this.#nodes.get(p.name)!;
+      const node = this.#nodes.get(p.name);
+      if (!node) continue;
       for (const sc of p.scenarios) {
         const e = this.#feature(sc.featureFile, node);
         e.scenarios.push(sc);
       }
-      if (p.source?.file?.endsWith('.feature') && p.rules.length) {
+      if (p.source?.file.endsWith('.feature') && p.rules.length) {
         const e = this.#feature(p.source.file, node);
         e.rules.push(...p.rules);
         e.ownerPattern = p.name;
@@ -262,7 +285,7 @@ export class Graph {
     return bySymbolView(this.mech, this.authored, symbolName);
   }
 
-  // ─── NEW: invariants of a pattern or file — ANY maturity, labeled ────────────
+  // ─── invariants of a pattern or file — ANY maturity, labeled ────────────────
   // "What does this guarantee?" Gathers Rule blocks the pattern carries directly
   // (working-specs / executable features that ARE the source) AND those reached
   // through its realizing features. Each invariant is tagged maturity + provenance
@@ -270,14 +293,14 @@ export class Graph {
   //
   // EMPTY ≠ "guarantees nothing" — and an agent scripting the handle must not read it
   // that way. `[]` collapses three very different cases, which you disambiguate in one
-  // cheap follow-up (no second method needed — see recipes.md "guarantee disambiguation"):
-  //   • code-originated CONTRACT (~40% of patterns: `role:contract`/`codec`, a `.ts`
-  //     sourceFile) — its guarantee is its TypeScript TYPE, not a Gherkin Rule. Check
+  // cheap follow-up:
+  //   • code-originated CONTRACT (`role:contract`/`codec`, a `.ts` sourceFile) — its
+  //     guarantee is its TypeScript TYPE, not a Gherkin Rule. Check
   //     `g.pattern(x)?.sourceFile?.endsWith('.ts')` → go read the type there.
   //   • a real pattern that genuinely carries no invariants yet (a `.feature` source, [] rules).
   //   • an unresolved name/file (`g.pattern(x)` / `g.fileToPattern(x)` is undefined).
-  // The `invariants` CLI command renders this note; the handle returns the raw [] so the
-  // COMPOSE/recipe filters (`.length`/`.every`) stay simple — disambiguation is one line.
+  // The `invariants` CLI command renders this note; the handle returns the raw [] so
+  // script filters (`.length`/`.every`) stay simple — disambiguation is one line.
   invariantsOf(patternOrFile: string): Invariant[] {
     const seed = this.#resolvePatterns(patternOrFile);
     const out: Invariant[] = [];
@@ -328,7 +351,7 @@ export class Graph {
   }
 
   #scenariosForRule(featureFile: string, r: Rule): string[] {
-    if (r.scenarioNames.length) return r.scenarioNames; // populated 387/431 — trust the field
+    if (r.scenarioNames.length) return r.scenarioNames; // populated on most rules — trust the field
     const want = `rule:${slug(r.name)}`; // else decode the scenario `rule:<slug>` tag
     const e = this.#features.get(featureFile);
     return (e?.scenarios ?? [])
@@ -336,7 +359,7 @@ export class Graph {
       .map((sc) => sc.scenarioName);
   }
 
-  // ─── NEW: specs that re-verify when these change — ANY maturity ──────────────
+  // ─── specs that re-verify when these change — ANY maturity ──────────────────
   // Accepts changed files OR pattern names. Walks each seed pattern's own scenarios
   // + its realizing features' scenarios. The maturity/provenance label is the point:
   // a touched `completed` pattern surfaces executable specs; a touched `roadmap`
@@ -388,7 +411,7 @@ export class Graph {
   // NB: there is deliberately NO `maturityLadder()` method. The spread of patterns
   // across the axis is `groupBy(g.patterns, p => p.maturity)` — a 3-line script over
   // the already-exposed `maturity` field, not an irreducible join. Putting it on the
-  // handle would be the first brick of the 50-verb wall. It lives inline in cli.ts.
+  // handle would be the first brick of a rebuilt verb wall. It lives inline in the CLI.
 
   // ─── impact / curation-assist (delegate to the proven pure views) ────────────
   // blastRadius gains scenario reach: feed its full downstream pattern set to the
@@ -421,8 +444,10 @@ export class Graph {
 
 // ─── the one entry point — build both cores LIVE, join, parse once ───────────
 // Async because the authored core is built from the live pipeline (buildCliContext).
-// Each call reflects HEAD (~1.5s): no dump, no dist, noCache. MUST run with
-// `--conditions=source` (see live.ts) or the authored side resolves stale dist/.
-export async function loadGraph(): Promise<Graph> {
-  return new Graph(buildMechanicalCore(), await buildAuthoredCore());
+// Each call reflects the working tree (~1.5s): no dump, noCache. When running from
+// workspace source, run with `--conditions=source` (see authored.ts) or the
+// authored side resolves stale dist/.
+export async function loadGraph(baseDir: string): Promise<Graph> {
+  const { core, api } = await buildAuthoredContext(baseDir);
+  return new Graph(buildMechanicalCore(baseDir), core, api);
 }

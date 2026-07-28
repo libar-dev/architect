@@ -3,7 +3,7 @@
 /**
  * check-build-fresh — staleness gate for the workspace `dist/` outputs.
  *
- * The dogfood query scripts (`architect:query` / `:overview` / `:status`) now run
+ * The dogfood graph scripts (`architect:q` / `architect:graph`) run
  * under `tsx --conditions=source` and resolve the workspace packages from `src/`,
  * so they are always live. But the *built bins* still execute from `dist/`:
  *

@@ -30,48 +30,6 @@ export const TIER_A_LINT_BASELINE: readonly TierABaselineEntry[] = [
     message: "Relationship target 'DocError' not found in known patterns",
   },
   {
-    path: 'packages/architect-cli/src/cli/pattern-graph-cli.ts',
-    rule: 'missing-relationship-target',
-    line: 3,
-    message: "Relationship target 'ContextFormatterImpl' not found in known patterns",
-  },
-  {
-    path: 'packages/architect-cli/src/cli/pattern-graph-cli.ts',
-    rule: 'missing-relationship-target',
-    line: 3,
-    message: "Relationship target 'ScopeValidatorImpl' not found in known patterns",
-  },
-  {
-    path: 'packages/architect-cli/src/cli/pattern-graph-cli.ts',
-    rule: 'missing-relationship-target',
-    line: 3,
-    message: "Relationship target 'CoverageAnalyzerImpl' not found in known patterns",
-  },
-  {
-    path: 'packages/architect-cli/src/cli/pattern-graph-cli.ts',
-    rule: 'missing-relationship-target',
-    line: 3,
-    message: "Relationship target 'HandoffGeneratorImpl' not found in known patterns",
-  },
-  {
-    path: 'packages/architect-cli/src/cli/pattern-graph-cli.ts',
-    rule: 'missing-relationship-target',
-    line: 3,
-    message: "Relationship target 'CLIVersionHelper' not found in known patterns",
-  },
-  {
-    path: 'packages/architect-cli/src/cli/pattern-graph-cli.ts',
-    rule: 'missing-relationship-target',
-    line: 3,
-    message: "Implementation target 'PatternGraphAPICLI' not found in known patterns",
-  },
-  {
-    path: 'packages/architect-cli/src/cli/pattern-graph-cli.ts',
-    rule: 'missing-relationship-target',
-    line: 3,
-    message: "Implementation target 'DataAPICLIErgonomics' not found in known patterns",
-  },
-  {
     path: 'packages/architect-cli/src/cli/version.ts',
     rule: 'missing-pattern-name',
     line: 1,

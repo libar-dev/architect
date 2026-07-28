@@ -1,7 +1,18 @@
 /**
- * The trusted view library. Pure functions over the two loaded layers — this is
- * the small, validated core (correctness guaranteed here) that the agent scripts
- * around. Two families:
+ * @architect
+ * @architect-cli
+ * @architect-pattern GraphHandleViews
+ * @architect-status completed
+ * @architect-role:service
+ * @architect-bounded-context:cli
+ * @architect-product-area:DataAPI
+ * @architect-uses GraphHandleShapes
+ * @architect-usecase Use via the Graph handle; import directly only for pure-function composition in scripts.
+ *
+ * ## GraphHandleViews — the trusted view library
+ *
+ * Pure functions over the two loaded layers — this is the small, validated core
+ * (correctness guaranteed here) that the agent scripts around. Two families:
  *
  *   IMPACT      blastRadius   — exhaustive, draws on Layer 1 (the firehose). Safety.
  *   ARCHITECTURE/ASSIST  graphDiff · fanInCandidates · driftFlags · census
@@ -10,24 +21,23 @@
  * None of these mutate the curated graph or derive architecture from code; they
  * answer impact and propose curation, keeping the editorial layer human-owned.
  */
-import type { AuthoredCore, MechanicalCore } from './schema.ts';
+import type { AuthoredCore, MechanicalCore } from './schema.js';
 
 // ─── join primitives ─────────────────────────────────────────────────────────
 export function fileToPattern(authored: AuthoredCore): Map<string, string> {
   const m = new Map<string, string>();
   for (const p of authored.patterns)
-    if (p.source?.file?.endsWith('.ts')) m.set(p.source.file, p.name);
+    if (p.source?.file.endsWith('.ts')) m.set(p.source.file, p.name);
   return m;
 }
 export function isDecisionPattern(authored: AuthoredCore, name: string): boolean {
-  return !!authored.patterns.find((p) => p.name === name)?.source?.file?.endsWith('.feature');
+  return authored.patterns.find((p) => p.name === name)?.source?.file.endsWith('.feature') === true;
 }
 
-// role / bounded-context are STRUCTURED top-level fields (`p.role` / `p.boundedContext`),
-// populated on 195 / 176 of 293 patterns. They are ALSO present value-form in some
-// .feature patterns' `directive.tags` — but TS patterns store only the bare key
-// `@architect-role` there, so peeling the tag drops ~167 of them. Read the field;
-// fall back to the tag only when the field is absent.
+// role / bounded-context are STRUCTURED top-level fields (`p.role` / `p.boundedContext`).
+// They are ALSO present value-form in some .feature patterns' `directive.tags` — but TS
+// patterns store only the bare key `@architect-role` there, so peeling the tag drops most
+// of them. Read the field; fall back to the tag only when the field is absent.
 function tagValue(p: unknown, prefix: string): string | undefined {
   const tags = (p as { directive?: { tags?: unknown } }).directive?.tags;
   if (!Array.isArray(tags)) return undefined;
@@ -78,10 +88,10 @@ export function graphDiff(mech: MechanicalCore, authored: AuthoredCore) {
 
 // ─── VIEW: blastRadius — IMPACT, exhaustive over the substrate ────────────────
 // "I changed these files — what's downstream and which executable specs re-verify?"
-// Draws on Layer 1 so it reaches the ~47% of src the curated graph deliberately omits.
+// Draws on Layer 1 so it reaches the src the curated graph deliberately omits.
 export function blastRadius(mech: MechanicalCore, authored: AuthoredCore, changedFiles: string[]) {
   const f2p = fileToPattern(authored);
-  // KNOWN SCOPE EDGE (G4, intentional): the seed is `.ts` SOURCE files only (f2p is
+  // KNOWN SCOPE EDGE (intentional): the seed is `.ts` SOURCE files only (f2p is
   // .ts-keyed; this filter drops `.feature`/test files). So "I edited a `.feature`"
   // produces no impact here — code-impact is the designed scope. Reverse-traceability
   // from a spec edit is a separate question, not this view.
@@ -91,17 +101,25 @@ export function blastRadius(mech: MechanicalCore, authored: AuthoredCore, change
 
   // reverse import index: file → files that import it
   const importedBy = new Map<string, Set<string>>();
-  for (const e of mech.edges)
-    (importedBy.get(e.toFile) ?? importedBy.set(e.toFile, new Set()).get(e.toFile)!).add(
-      e.fromFile,
-    );
+  for (const e of mech.edges) {
+    let rev = importedBy.get(e.toFile);
+    if (!rev) {
+      rev = new Set();
+      importedBy.set(e.toFile, rev);
+    }
+    rev.add(e.fromFile);
+  }
 
   // mechanical transitive downstream (file-level — covers dark files)
   const mechFiles = new Set(changedSrc);
   const q = [...changedSrc];
-  while (q.length) {
-    const f = q.shift()!;
-    for (const d of importedBy.get(f) ?? []) if (!mechFiles.has(d)) (mechFiles.add(d), q.push(d));
+  for (let f = q.shift(); f !== undefined; f = q.shift()) {
+    for (const d of importedBy.get(f) ?? []) {
+      if (!mechFiles.has(d)) {
+        mechFiles.add(d);
+        q.push(d);
+      }
+    }
   }
   const mechPatterns = new Set([...mechFiles].map((f) => f2p.get(f)).filter(Boolean) as string[]);
 
@@ -109,10 +127,13 @@ export function blastRadius(mech: MechanicalCore, authored: AuthoredCore, change
   const seed = new Set(changedSrc.map((f) => f2p.get(f)).filter(Boolean) as string[]);
   const authImpact = new Set(seed);
   const q2 = [...seed];
-  while (q2.length) {
-    const n = q2.shift()!;
-    for (const d of authored.relationshipIndex[n]?.usedBy ?? [])
-      if (!authImpact.has(d)) (authImpact.add(d), q2.push(d));
+  for (let n = q2.shift(); n !== undefined; n = q2.shift()) {
+    for (const d of authored.relationshipIndex[n]?.usedBy ?? []) {
+      if (!authImpact.has(d)) {
+        authImpact.add(d);
+        q2.push(d);
+      }
+    }
   }
 
   // Feature-FILE paths (the coarse view answer). NB distinct from the handle's
@@ -149,23 +170,28 @@ export function fanInCandidates(
   const fanIn = new Map<string, Set<string>>();
   for (const e of mech.edges) {
     if (e.fromFile === e.toFile) continue;
-    (fanIn.get(e.toFile) ?? fanIn.set(e.toFile, new Set()).get(e.toFile)!).add(e.fromFile);
+    let importers = fanIn.get(e.toFile);
+    if (!importers) {
+      importers = new Set();
+      fanIn.set(e.toFile, importers);
+    }
+    importers.add(e.fromFile);
   }
   return [...fanIn.entries()]
     .map(([file, importers]) => ({
       file,
       fanIn: importers.size,
-      pkg: file.match(/^packages\/([^/]+)\//)?.[1] ?? '(root)',
+      pkg: /^packages\/([^/]+)\//.exec(file)?.[1] ?? '(root)',
       annotated: f2p.has(file),
     }))
-    .filter((c) => c.fanIn >= min && !c.annotated && !/\/index\.ts$/.test(c.file)) // barrels excluded: aggregation, not units
+    .filter((c) => c.fanIn >= min && !c.annotated && !c.file.endsWith('/index.ts')) // barrels excluded: aggregation, not units
     .sort((a, b) => b.fanIn - a.fanIn)
     .slice(0, limit);
 }
 
 // ─── VIEW: driftFlags — SCOPED, unambiguous drift (target code gone) ──────────
 // Not the fuzzy aspirational bucket — only the two mechanical "code is gone" signals,
-// which trend monotonically to zero as the 95% deletion completes.
+// which trend monotonically to zero as cleanup completes.
 export function driftFlags(authored: AuthoredCore, existsOnDisk: (file: string) => boolean) {
   const patternNames = new Set(Object.keys(authored.relationshipIndex));
   const dangling: { from: string; to: string }[] = [];
@@ -174,7 +200,7 @@ export function driftFlags(authored: AuthoredCore, existsOnDisk: (file: string) 
 
   const orphanedSource: { pattern: string; file: string }[] = [];
   for (const p of authored.patterns)
-    if (p.source?.file?.endsWith('.ts') && !existsOnDisk(p.source.file))
+    if (p.source?.file.endsWith('.ts') && !existsOnDisk(p.source.file))
       orphanedSource.push({ pattern: p.name, file: p.source.file });
 
   return { dangling, orphanedSource };
@@ -185,15 +211,15 @@ export function census(mech: MechanicalCore, authored: AuthoredCore) {
   const f2p = fileToPattern(authored);
   const byPkg = new Map<string, { srcFiles: Set<string>; mapped: number }>();
   for (const s of mech.symbols) {
-    // one row per file via its symbols' file; barrels filtered by name
     const pkg = s.pkg;
     const rec = byPkg.get(pkg) ?? { srcFiles: new Set<string>(), mapped: 0 };
     rec.srcFiles.add(s.file);
     byPkg.set(pkg, rec);
   }
+  // barrels (index.ts) are excluded from the denominator below: aggregation, not units.
   const nodeCoverage = [...byPkg.entries()]
     .map(([pkg, rec]) => {
-      const nonBarrel = [...rec.srcFiles].filter((f) => !/\/index\.ts$/.test(f));
+      const nonBarrel = [...rec.srcFiles].filter((f) => !f.endsWith('/index.ts'));
       const mapped = nonBarrel.filter((f) => f2p.has(f)).length;
       return {
         pkg,
@@ -228,6 +254,16 @@ export function census(mech: MechanicalCore, authored: AuthoredCore) {
 // tokenize → lowercased word set (deterministic, no fuzzy lib)
 const tokens = (s: string): string[] => s.toLowerCase().match(/[a-z0-9]+/g) ?? [];
 
+/** A ranked findByConcept match — `matchedOn` names the fields that hit. */
+export interface ConceptHit {
+  name: string;
+  role?: string | undefined;
+  boundedContext?: string | undefined;
+  status: string;
+  score: number;
+  matchedOn: string[];
+}
+
 // ─── E1: findByConcept — CURATED, core-only ───────────────────────────────────
 // Fuzzy concept string → ranked patterns. Scores case-insensitive substring +
 // token-overlap against, in descending weight: name, whenToUse[], productArea,
@@ -250,43 +286,36 @@ export function findByConcept(
     { key: 'description', weight: 2 },
   ] as const;
 
-  type Hit = {
-    name: string;
-    role?: string;
-    boundedContext?: string;
-    status: string;
-    score: number;
-    matchedOn: string[];
-  };
-  const out: Hit[] = [];
+  const out: ConceptHit[] = [];
   for (const p of authored.patterns) {
     const wt = (p as { whenToUse?: unknown }).whenToUse;
     const fields: Record<string, string> = {
-      name: String((p as { name?: string }).name ?? ''),
+      name: (p as { name?: string }).name ?? '',
       whenToUse: (Array.isArray(wt) ? wt.map(String) : []).join(' '),
-      productArea: String((p as { productArea?: string }).productArea ?? ''),
-      description: String(
-        (p as { directive?: { description?: string } }).directive?.description ?? '',
-      ),
+      productArea: (p as { productArea?: string }).productArea ?? '',
+      description: (p as { directive?: { description?: string } }).directive?.description ?? '',
     };
     let score = 0;
     const matchedOn: string[] = [];
     for (const { key, weight } of FIELDS) {
-      const hay = fields[key]!.toLowerCase();
+      const hay = (fields[key] ?? '').toLowerCase();
       if (!hay) continue;
       let fieldScore = 0;
       if (hay.includes(qLower)) fieldScore += weight * 2; // whole-query substring: strongest signal
       const hayTokens = new Set(tokens(hay));
       const overlap = qTokens.filter((t) => hayTokens.has(t)).length;
       if (overlap) fieldScore += weight * overlap; // per-token overlap
-      if (fieldScore) ((score += fieldScore), matchedOn.push(key));
+      if (fieldScore) {
+        score += fieldScore;
+        matchedOn.push(key);
+      }
     }
     if (score > 0)
       out.push({
-        name: fields['name']!,
+        name: fields['name'] ?? '',
         role: roleOf(p),
         boundedContext: contextOf(p),
-        status: String((p as { status?: string }).status ?? '?'),
+        status: (p as { status?: string }).status ?? '?',
         score,
         matchedOn,
       });
@@ -297,8 +326,8 @@ export function findByConcept(
 
 // ─── E2: byFile — BOTH surfaces ───────────────────────────────────────────────
 // Repo-relative file → owning pattern + CURATED neighborhood (uses/usedBy/specs).
-// If unmapped (~47% of src is "dark"), still returns value: the MECHANICAL
-// neighborhood (imports out / importers in), each neighbor's owning pattern if any.
+// If unmapped (a "dark" file), still returns value: the MECHANICAL neighborhood
+// (imports out / importers in), each neighbor's owning pattern if any.
 export function byFile(authored: AuthoredCore, mech: MechanicalCore, filePath: string) {
   const f2p = fileToPattern(authored);
   const pattern = f2p.get(filePath);
@@ -309,20 +338,16 @@ export function byFile(authored: AuthoredCore, mech: MechanicalCore, filePath: s
   for (const e of mech.edges)
     if (e.fromFile === filePath && e.toFile !== filePath && !importsSeen.has(e.toFile)) {
       importsSeen.add(e.toFile);
-      imports.push({
-        file: e.toFile,
-        ...(f2p.get(e.toFile) ? { pattern: f2p.get(e.toFile)! } : {}),
-      });
+      const owner = f2p.get(e.toFile);
+      imports.push({ file: e.toFile, ...(owner !== undefined ? { pattern: owner } : {}) });
     }
   const importedSeen = new Set<string>();
   const importedBy: { file: string; pattern?: string }[] = [];
   for (const e of mech.edges)
     if (e.toFile === filePath && e.fromFile !== filePath && !importedSeen.has(e.fromFile)) {
       importedSeen.add(e.fromFile);
-      importedBy.push({
-        file: e.fromFile,
-        ...(f2p.get(e.fromFile) ? { pattern: f2p.get(e.fromFile)! } : {}),
-      });
+      const owner = f2p.get(e.fromFile);
+      importedBy.push({ file: e.fromFile, ...(owner !== undefined ? { pattern: owner } : {}) });
     }
   const sortByFile = (a: { file: string }, b: { file: string }) => a.file.localeCompare(b.file);
   const mechanical = { imports: imports.sort(sortByFile), importedBy: importedBy.sort(sortByFile) };
@@ -357,12 +382,15 @@ export function bySymbol(mech: MechanicalCore, authored: AuthoredCore, symbolNam
   const f2p = fileToPattern(authored);
   const definedIn = mech.symbols
     .filter((s) => s.name === symbolName)
-    .map((s) => ({
-      file: s.file,
-      kind: s.kind,
-      pkg: s.pkg,
-      ...(f2p.get(s.file) ? { pattern: f2p.get(s.file)! } : {}),
-    }))
+    .map((sym) => {
+      const owner = f2p.get(sym.file);
+      return {
+        file: sym.file,
+        kind: sym.kind,
+        pkg: sym.pkg,
+        ...(owner !== undefined ? { pattern: owner } : {}),
+      };
+    })
     .sort((a, b) => a.file.localeCompare(b.file));
 
   // every import edge carrying this symbol → importing file (dedup)

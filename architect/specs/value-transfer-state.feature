@@ -2,7 +2,7 @@
 @architect-pattern:ValueTransferState
 @architect-status:candidate
 @architect-product-area:Projection
-@architect-uses:MCPToolRegistry,PatternGraphCliSubcommands
+@architect-uses:MCPToolRegistry,GraphHandleCli
 @architect-bounded-context:projection
 @architect-see-also:ADR006SingleReadModelArchitecture,ArchitectBriefDeterministicBundle
 Feature: ValueTransferState
@@ -44,7 +44,7 @@ Feature: ValueTransferState
     to host
 
   Surfaces:
-  1. `pkg:query value-transfer <pattern>` CLI verb (governance sibling
+  1. a `value-transfer <pattern>` read on the graph handle — a named `architect:graph` command only if a second machine consumer requires the frozen contract, else a recipe (ADR-014); governance sibling
      of `rules` and `taxonomy`).
   2. `architect_value_transfer` MCP tool with the same input shape.
   3. The fragment is consumed by `ArchitectBriefDeterministicBundle`
@@ -63,7 +63,7 @@ Feature: ValueTransferState
 
   **Worked example:**
   The MCPServerIntegration cleanup completed manually in 2026-04 is the
-  motivating case — `pkg:query value-transfer MCPServerIntegration`
+  motivating case — `architect value-transfer MCPServerIntegration`
   would have returned `deletionReady: true` with the forward/reverse
   links resolved, instead of requiring a hand audit. Future cleanups
   (the overview implies several — 37 active patterns out of 174 total,
@@ -81,7 +81,7 @@ Feature: ValueTransferState
       | governance fragment barrel export | pending | packages/architect-projection/src/fragments/governance/index.ts | Yes | typecheck |
       | governance projection barrel export | pending | packages/architect-projection/src/projections/governance/index.ts | Yes | typecheck |
       | top-level fragments barrel export | pending | packages/architect-projection/src/fragments/index.ts | Yes | typecheck |
-      | value-transfer CLI verb registration | pending | packages/architect-cli/src/cli/pattern-graph-cli-commands.ts | Yes | integration |
+      | value-transfer handle read / named command | pending | packages/architect-cli/src/cli/graph-cli.ts | Yes | integration |
       | value-transfer CLI command definition | pending | packages/architect-cli/src/cli/commands/governance.ts | Yes | integration |
       | architect_value_transfer MCP input shape | pending | packages/architect-mcp/src/tool-input-schemas.ts | Yes | integration |
       | architect_value_transfer MCP handler | pending | packages/architect-mcp/src/tool-registry.ts | Yes | integration |
@@ -218,7 +218,7 @@ Feature: ValueTransferState
 
     **Invariant:** The CLI verb supports `--format json` (pretty JSON)
     and the default text rendering via `writeProjectionOutput`,
-    mirroring `pkg:query rules` and `pkg:query taxonomy`. The MCP tool
+    mirroring the rules/taxonomy MCP tools. The MCP tool
     returns the fragment via `renderJsonToolResult`, mirroring
     `architect_rules` and `architect_taxonomy`. The MCP input shape is
     composed via `createStrictReadonlyObjectSchema` referencing
@@ -235,7 +235,7 @@ Feature: ValueTransferState
 
     @acceptance-criteria @happy-path
     Scenario: CLI verb supports --format json
-      When running "pkg:query value-transfer <pattern> --format json"
+      When running "architect value-transfer <pattern>"
       Then the output is valid JSON parseable as ValueTransferState
       And the output has "kind": "ValueTransferState"
 

@@ -15,32 +15,31 @@ describeFeature(
     });
 
     Rule('Known command names dispatch to their handler', ({ RuleScenario }) => {
-      RuleScenario('overview subcommand resolves to overview handler', ({ When, Then, And }) => {
-        When('I run "architect overview"', async (): Promise<void> => {
-          lastResult = await runCli('architect overview');
+      RuleScenario('version command resolves to the metadata handler', ({ When, Then, And }) => {
+        When('I run "architect version"', async (): Promise<void> => {
+          lastResult = await runCli('architect version');
         });
 
         Then('the exit code is zero', () => {
           expect(lastResult?.exitCode).toBe(0);
         });
 
-        And('stdout begins with the overview-digest header', () => {
-          // The overview digest currently opens with `=== PROGRESS ===`. We assert
-          // a non-empty first line that matches one of the established header
-          // labels rather than pinning a single magic string — keeps the test
-          // resilient if the digest opener is rephrased without dropping its role.
-          const stdout = lastResult?.stdout ?? '';
-          expect(stdout.length).toBeGreaterThan(0);
-          expect(stdout.split('\n')[0]).toMatch(/PROGRESS|OVERVIEW|===/i);
+        And('stdout is a semver version', () => {
+          expect((lastResult?.stdout ?? '').trim()).toMatch(/^\d+\.\d+\.\d+/);
         });
       });
 
       RuleScenario(
-        'arch dangling subcommand resolves to dangling handler',
+        'dangling command resolves to the graph-integrity gate',
         ({ When, Then, And }) => {
-          When('I run "architect arch dangling"', async () => {
-            lastResult = await runCli('architect arch dangling');
-          });
+          When(
+            'I run "architect dangling --baseline packages/architect-guard/src/lint/dangling-baseline.json"',
+            async () => {
+              lastResult = await runCli(
+                'architect dangling --baseline packages/architect-guard/src/lint/dangling-baseline.json',
+              );
+            },
+          );
 
           Then('the exit code is zero', () => {
             expect(lastResult?.exitCode).toBe(0);
@@ -52,10 +51,10 @@ describeFeature(
             }).not.toThrow();
           });
 
-          And('the JSON document has key "metadata.validation.warningCount"', () => {
+          And('the JSON document has key "drift"', () => {
             const doc: unknown = JSON.parse(lastResult?.stdout ?? '');
-            const value = getJsonValueAtPath(doc, 'metadata.validation.warningCount');
-            expect(typeof value).toBe('number');
+            const value = getJsonValueAtPath(doc, 'drift');
+            expect(typeof value).toBe('boolean');
           });
         },
       );
@@ -71,8 +70,6 @@ describeFeature(
 
         And('stderr mentions "command" and "not-a-real-command"', () => {
           const stderr = (lastResult?.stderr ?? '').toLowerCase();
-          // CLI emits "Unknown subcommand: not-a-real-command" — "subcommand"
-          // contains "command", which satisfies the documented invariant.
           expect(stderr).toContain('command');
           expect(stderr).toContain('not-a-real-command');
         });

@@ -69,11 +69,11 @@ Feature: Compact Text Renderer - Plain Text Rendering
         | === PROGRESS ===|
 
     @acceptance-criteria @happy-path
-    Scenario: Overview renders architect query guidance
+    Scenario: Overview renders read-surface guidance
       Given an overview with 69 total patterns at 52 percent
       When I format the overview
-      Then the output contains "pnpm -s architect:query <verb>"
-      And the output contains "Full reference: pnpm -s architect:query --help"
+      Then the output contains "pnpm architect:q '<js>'"
+      And the output contains "Load the `architect-graph-handle` skill"
 
   Rule: formatFileReadingList renders categorized file paths
 

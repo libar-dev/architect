@@ -254,7 +254,7 @@ describeFeature(feature, ({ Rule }) => {
       );
     });
 
-    RuleScenario('Overview renders architect query guidance', ({ Given, When, Then, And }) => {
+    RuleScenario('Overview renders read-surface guidance', ({ Given, When, Then, And }) => {
       Given(
         'an overview with {int} total patterns at {int} percent',
         (_ctx: unknown, total: number, percentage: number) => {

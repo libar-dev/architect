@@ -2,7 +2,7 @@
 @architect-pattern:ArchitectBriefDeterministicBundle
 @architect-status:candidate
 @architect-product-area:DataAPI
-@architect-uses:ValueTransferState,SessionContextProjection,MCPToolRegistry,PatternGraphCliSubcommands
+@architect-uses:ValueTransferState,SessionContextProjection,MCPToolRegistry,GraphHandleCli
 @architect-bounded-context:api
 @architect-see-also:ModelEnrichedDataAPI,ADR006SingleReadModelArchitecture,ADR005CodecBasedMarkdownRendering
 Feature: ArchitectBriefDeterministicBundle
@@ -78,8 +78,9 @@ Feature: ArchitectBriefDeterministicBundle
     byte-for-byte across runs given identical graph state.
 
   Surfaces:
-  1. `pkg:query brief <pattern>` CLI verb (architect-pkg) and
-     `architect:query -- brief <pattern>` (Studio).
+  1. an `architect_brief` MCP tool (the typed machine sink) plus a `brief`
+     handle read — a named `architect` command only if a second machine
+     consumer requires the frozen contract (ADR-014).
   2. `architect_brief` MCP tool with the same input shape.
   3. Slash commands collapse from 5-verb bash blocks to a single
      `<cli-prefix> brief <pattern>` line. The skill bodies stop
@@ -148,7 +149,7 @@ Feature: ArchitectBriefDeterministicBundle
       | execution-context fragment barrel export | pending | packages/architect-projection/src/fragments/execution-context/index.ts | Yes | typecheck |
       | execution-context projection barrel export | pending | packages/architect-projection/src/projections/execution-context/index.ts | Yes | typecheck |
       | top-level fragments barrel export | pending | packages/architect-projection/src/fragments/index.ts | Yes | typecheck |
-      | brief CLI verb registration | pending | packages/architect-cli/src/cli/pattern-graph-cli-commands.ts | Yes | integration |
+      | brief MCP tool / handle read | pending | packages/architect-mcp/src/tool-registry.ts | Yes | integration |
       | brief CLI command definition | pending | packages/architect-cli/src/cli/commands/execution-context.ts | Yes | integration |
       | architect_brief MCP input shape | pending | packages/architect-mcp/src/tool-input-schemas.ts | Yes | integration |
       | architect_brief MCP handler | pending | packages/architect-mcp/src/tool-registry.ts | Yes | integration |
@@ -336,7 +337,7 @@ Feature: ArchitectBriefDeterministicBundle
     choice surface for related tags. Format-type entries are never
     included (the brief is per-pattern; format-types are global). The
     fragment carries a one-line `pointer` field referencing the
-    `pkg:query taxonomy` verb for callers who need the full surface.
+    `architect_taxonomy` MCP tool for callers who need the full surface.
 
     **Rationale:** TAXONOMY.md is ~3,500 tokens. Bulk-dumping it into
     every brief wastes budget on tags the pattern doesn't use. The
@@ -346,7 +347,7 @@ Feature: ArchitectBriefDeterministicBundle
     line. Callers who need the full taxonomy follow the pointer.
 
     **Verified by:** Pruned slice contains only relevant tags,
-    Pointer field references pkg:query taxonomy, Format-type entries
+    Pointer field references architect_taxonomy, Format-type entries
     are excluded from the slice
 
     @acceptance-criteria @happy-path

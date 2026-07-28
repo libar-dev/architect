@@ -8,7 +8,7 @@
  *
  * ## ReadApiResultContract - The Structured-Answer Envelope (ADR-006)
  *
- * The shared result vocabulary every `architect:query` verb response is shaped
+ * The shared result vocabulary every structured read-API response is shaped
  * by. Defines the `QueryResult<T>` discriminated union (`QuerySuccess<T>` /
  * `QueryError`) with its metadata envelope, plus the read-side payload shapes a
  * verb returns: `DependencyContext` (the focal-rooted, bidirectional blast-radius

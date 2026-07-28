@@ -2,7 +2,7 @@
 @architect-pattern:ArchitectPublicContract
 @architect-status:active
 @architect-product-area:DataAPI
-@cli @pattern-graph-cli @contracts
+@cli @contracts
 Feature: Architect public contract exports
   Freeze the canonical public exports that refactors must preserve.
 
