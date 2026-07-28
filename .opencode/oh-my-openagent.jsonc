@@ -9,6 +9,7 @@
         "enable": [
             "architect-base",
             "architect-data-api",
+            "architect-graph-handle",
             "architect-sessions"
         ]
     },
@@ -17,6 +18,7 @@
             "skills": [
                 "architect-base",
                 "architect-data-api",
+                "architect-graph-handle",
                 "architect-sessions"
             ]
         },
@@ -24,6 +26,7 @@
             "skills": [
                 "architect-base",
                 "architect-data-api",
+                "architect-graph-handle",
                 "architect-sessions"
             ]
         },
@@ -31,6 +34,7 @@
             "skills": [
                 "architect-base",
                 "architect-data-api",
+                "architect-graph-handle",
                 "architect-sessions"
             ]
         },
@@ -38,6 +42,7 @@
             "skills": [
                 "architect-base",
                 "architect-data-api",
+                "architect-graph-handle",
                 "architect-sessions"
             ]
         },
@@ -45,6 +50,7 @@
             "skills": [
                 "architect-base",
                 "architect-data-api",
+                "architect-graph-handle",
                 "architect-sessions"
             ]
         },
@@ -52,6 +58,7 @@
             "skills": [
                 "architect-base",
                 "architect-data-api",
+                "architect-graph-handle",
                 "architect-sessions"
             ]
         },
@@ -59,6 +66,7 @@
             "skills": [
                 "architect-base",
                 "architect-data-api",
+                "architect-graph-handle",
                 "architect-sessions"
             ]
         },
@@ -66,6 +74,7 @@
             "skills": [
                 "architect-base",
                 "architect-data-api",
+                "architect-graph-handle",
                 "architect-sessions"
             ]
         },
@@ -73,6 +82,7 @@
             "skills": [
                 "architect-base",
                 "architect-data-api",
+                "architect-graph-handle",
                 "architect-sessions"
             ]
         },
@@ -80,6 +90,7 @@
             "skills": [
                 "architect-base",
                 "architect-data-api",
+                "architect-graph-handle",
                 "architect-sessions"
             ]
         },
@@ -87,20 +98,23 @@
             "skills": [
                 "architect-base",
                 "architect-data-api",
+                "architect-graph-handle",
                 "architect-sessions"
             ]
         },
         "momus": {
             "skills": [
                 "architect-base",
-                "architect-data-api",   
+                "architect-data-api",
+                "architect-graph-handle",
                 "architect-sessions"
             ]
         },
         "plan": {
             "skills": [
                 "architect-base",
-                "architect-data-api",   
+                "architect-data-api",
+                "architect-graph-handle",
                 "architect-sessions"
             ]
         }
