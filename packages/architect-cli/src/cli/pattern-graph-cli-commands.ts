@@ -1,3 +1,23 @@
+/**
+ * @architect
+ * @architect-pattern:CLICommandRegistry
+ * @architect-status:completed
+ * @architect-role:service
+ * @architect-bounded-context:cli
+ * @architect-uses TrustBoundaryParser, ZodErrorBoundary
+ *
+ * ## CLICommandRegistry — Command Routing & Dispatch
+ *
+ * The canonical registry of every architect-query command (`overview`,
+ * `pattern`, `bundle`, `arch`, ...): owns the command-name enum, per-command
+ * flag parsing, input validation at the CLI trust boundary, and dispatch into
+ * the per-family command handlers (lifecycle / meta / planning / read /
+ * reporting).
+ *
+ * **When to Use:** as the single seam that turns parsed argv into a validated,
+ * routed command invocation. Adding or renaming a CLI command happens here.
+ */
+
 import {
   assertHasValue,
   assertNoNullBytes,

@@ -1,3 +1,22 @@
+/**
+ * @architect
+ * @architect-pattern:CLIOutputAdapter
+ * @architect-status:completed
+ * @architect-role:projection
+ * @architect-bounded-context:cli
+ * @architect-uses ReadApiResultContract, ProjectionBundle, CompactTextRenderer, JsonRenderer, DisclosureSpec
+ *
+ * ## CLIOutputAdapter — Result Envelope & Render Dispatch
+ *
+ * Turns a read-model fragment or projection bundle into the CLI's terminal
+ * output: wraps results in the success envelope, detects bundle vs fragment
+ * shape, and dispatches to the compact-text or JSON renderer per the requested
+ * format. The sink-side adapter where the projection meets the console.
+ *
+ * **When to Use:** whenever a command needs to emit a structured result — this
+ * is the single rendering/serialization seam for CLI output.
+ */
+
 import {
   createSuccess,
   type QueryMetadataExtra,

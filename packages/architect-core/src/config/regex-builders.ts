@@ -1,3 +1,22 @@
+/**
+ * @architect
+ * @architect-pattern:TagDirectiveRegexBuilders
+ * @architect-status:completed
+ * @architect-role:utility
+ * @architect-bounded-context:configuration
+ * @architect-uses ArchitectConfigContract
+ *
+ * ## TagDirectiveRegexBuilders — `@architect` Tag Recognition Primitives
+ *
+ * Compiles the prefix-aware regexes that detect the file opt-in marker and the
+ * `@architect-*` directive tags in source text, and normalizes a matched tag to
+ * its bare form. Parameterized by the configured tag prefix so the whole scanner
+ * stack respects a custom prefix. The lexical primitive every scanner builds on.
+ *
+ * **When to Use:** when detecting or normalizing architect directive tags in raw
+ * file content — do not hand-roll the prefix-escaping regex elsewhere.
+ */
+
 import type { RegexBuilders } from './types.js';
 
 export type { RegexBuilders } from './types.js';

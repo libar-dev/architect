@@ -1,3 +1,22 @@
+/**
+ * @architect
+ * @architect-pattern:CLIFlagSchemas
+ * @architect-status:completed
+ * @architect-role:contract
+ * @architect-bounded-context:cli
+ * @architect-uses DomainEnumSchemas, StatusNormalization, StatusValueDomain
+ *
+ * ## CLIFlagSchemas — Per-Command Flag & Argument Contracts
+ *
+ * The Zod-first input contract for the CLI: the strict-object flag schemas and
+ * value parsers (`parseIntegerValue`, `parseSessionTypeValue`, status/scope/
+ * session enums) that every command validates its parsed argv against. The
+ * trust boundary between raw user input and the read model.
+ *
+ * **When to Use:** when adding a command flag or tightening CLI input
+ * validation — extra/unknown flags must fail here, not silently pass.
+ */
+
 import {
   AcceptedStatusSchema,
   HandoffSessionTypeSchema,

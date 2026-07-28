@@ -1,3 +1,22 @@
+/**
+ * @architect
+ * @architect-pattern:ConfigValidationSchemas
+ * @architect-status:completed
+ * @architect-role:contract
+ * @architect-bounded-context:validation-schemas
+ * @architect-uses BrandedIdentifiers
+ *
+ * ## ConfigValidationSchemas — Config Path & Glob Safety Contract
+ *
+ * The Zod contract that validates architect config inputs: glob patterns, base
+ * directory, and output directory — rejecting parent-directory traversal (`..`)
+ * and out-of-base output paths via realpath comparison. A security-relevant
+ * trust boundary: untrusted config-supplied paths are constrained here.
+ *
+ * **When to Use:** when validating config-supplied filesystem paths or globs —
+ * never resolve a config path without passing it through these schemas first.
+ */
+
 import * as fs from 'fs';
 import * as path from 'path';
 import { z } from 'zod';

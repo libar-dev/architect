@@ -1,3 +1,22 @@
+/**
+ * @architect
+ * @architect-pattern:CLIRuntimeGuards
+ * @architect-status:completed
+ * @architect-role:utility
+ * @architect-bounded-context:cli
+ * @architect-uses CLICommandRegistry, CLIContextTypes
+ *
+ * ## CLIRuntimeGuards — Command Runtime Precondition Guards
+ *
+ * The narrow guard layer every command handler calls before doing work:
+ * asserts the live CLI context is present (`requireCliContext`) and that a
+ * required positional argument was supplied (`requireFirstPositional`), with
+ * REPL-vs-one-shot-aware error behaviour.
+ *
+ * **When to Use:** at the top of a command handler, to fail fast on missing
+ * context or missing required arguments.
+ */
+
 import type { CommandRuntimeContext } from '../../pattern-graph-cli-commands.js';
 import type { CliContext } from '../../pattern-graph-cli-types.js';
 
