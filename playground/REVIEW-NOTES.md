@@ -117,9 +117,10 @@ binding-anchor surface. The two open imports that _do_ matter are §5 #1–#2 be
 4. **`value-transfer` / `deletionReady` view** (CONTEXT §5 #1) — sits on the maturity×provenance grid
    `invariantsOf` already computes; finds zombie specs (implemented but not deleted). The natural next
    join, mechanizing `architect/specs/value-transfer-state.feature`.
-5. **Graduate the handle** to `packages/` when shapes settle and a second machine consumer (Studio
-   Design-Review) appears; make the package `bin` set the source condition so the `--conditions=source`
-   footgun disappears entirely.
+5. ~~Graduate the handle~~ — **DONE (ADR-014):** the handle lives at
+   `packages/architect-cli/src/handle/` behind the `architect` bin; the root
+   `architect:q` / `architect:graph` scripts bake in the source condition, and the bin
+   runs compiled `dist/` for consumers, so the `--conditions=source` footgun is contained.
 
 ### Non-blocking polish surfaced by the real test (none gate the campaign) 🔭
 

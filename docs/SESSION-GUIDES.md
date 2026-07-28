@@ -33,8 +33,10 @@ Starting from pattern brief?
 ### Context Gathering
 
 ```bash
-pnpm architect:query -- overview                                # Project health
-pnpm architect:query -- list --status roadmap --names-only      # Available patterns
+# Project health
+pnpm architect:q 'return {counts: g.api.getStatusCounts(), active: g.api.getCurrentWork().map(p => p.patternName ?? p.name)}'
+# Available patterns
+pnpm architect:q 'g.patterns.filter(p => p.status === "roadmap").map(p => p.name)'
 ```
 
 ### Checklist
@@ -99,12 +101,15 @@ See [`tests/features/validation/fsm-validator.feature`](../tests/features/valida
 ### Context Gathering
 
 ```bash
-pnpm architect:query -- context <PatternName> --session design  # Full context bundle
-pnpm architect:query -- dep-tree <PatternName>                  # Dependency chain
-pnpm architect:query -- stubs <PatternName>                     # Existing design stubs
+# Full context bundle (typed bundles remain the architect_bundle / architect_context MCP tools)
+pnpm architect:q 'const p = g.pattern("<PatternName>"); return {p, invariants: g.invariantsOf("<PatternName>"), reverifies: g.specsReverifying(["<PatternName>"]).length}'
+# Dependency chain
+pnpm architect:q 'g.api.getDependencyContext("<PatternName>")'
+# Existing design stubs live on disk:
+ls architect/stubs/<pattern-name>/
 ```
 
-Use these **before** launching explore agents. See [CLI.md](./CLI.md).
+Use these **before** launching explore agents. See [CLI.md](./CLI.md) and the `architect-graph-handle` skill.
 
 ### When Required
 
@@ -169,19 +174,21 @@ Use these **before** launching explore agents. See [CLI.md](./CLI.md).
 ### Context Gathering (Step 0)
 
 ```bash
-# Pre-flight — catches FSM violations, missing deps, incomplete deliverables
-pnpm architect:query -- scope-validate <PatternName> implement
+# Pre-flight — catches FSM violations, missing deps, incomplete deliverables:
+# ALWAYS run the architect_scope_validate MCP tool (PASS/WARN/BLOCKED) first.
+# The deterministic FSM check from the CLI:
+pnpm architect:q 'g.api.isValidTransition("roadmap","active")'
 
 # Curated context — deliverables, FSM state, test files
-pnpm architect:query -- context <PatternName> --session implement
+pnpm architect:q 'const p = g.pattern("<PatternName>"); return {p, invariants: g.invariantsOf("<PatternName>"), reverifies: g.specsReverifying(["<PatternName>"]).length}'
 
 # File paths for implementation
-pnpm architect:query -- files <PatternName> --related
+pnpm architect:q 'const p = g.pattern("<PatternName>"); return {file: p?.sourceFile, realizing: p?.implementedBy}'
 ```
 
-The `scope-validate` command replaces the manual pre-flight checklist — it checks
+The `architect_scope_validate` MCP tool replaces the manual pre-flight checklist — it checks
 dependency completion, deliverable definitions, FSM validity, and design decisions.
-See [CLI.md](./CLI.md#scope-validate).
+(The retired `scope-validate` CLI verb is gone — ADR-014.) See [CLI.md](./CLI.md).
 
 ### Execution Checklist
 
@@ -212,7 +219,7 @@ See [CLI.md](./CLI.md#scope-validate).
      ```
 
 4. **Verify all design decisions addressed:**
-   - [ ] Run `pnpm architect:query -- decisions <SpecName>` and confirm each DD-N has a corresponding `// DD-N:` comment in the implementation
+   - [ ] Run `pnpm architect:q 'g.pattern("<SpecName>")?.enforcesDecisions'`, cross-check the DD-N entries recorded in the spec, and confirm each DD-N has a corresponding `// DD-N:` comment in the implementation
 
 5. **Transition to completed** (only when ALL done):
 
@@ -322,13 +329,13 @@ See [CLI.md](./CLI.md#scope-validate).
 
 For multi-session work, capture state at session boundaries.
 
+The `handoff` CLI verb is retired (ADR-014). Generate handoffs with the **`architect_handoff` MCP tool** (preferred over a manual template), or author a handoff record per the `architect-sessions` skill. The current annotation state is one handle call away:
+
 ```bash
-# Generate handoff from actual annotation state (preferred over manual template)
-pnpm architect:query -- handoff --pattern <PatternName>
-pnpm architect:query -- handoff --pattern <PatternName> --git   # include recent commits
+pnpm architect:q 'g.pattern("<PatternName>")'
 ```
 
-The CLI handoff always reflects current annotation state. The template below is for additional context:
+The MCP handoff always reflects current annotation state. The template below is for additional context:
 
 ### Handoff Template
 
@@ -387,5 +394,5 @@ Valid transitions: See [METHODOLOGY.md#fsm-enforced-workflow](./METHODOLOGY.md#f
 | [GHERKIN-PATTERNS.md](./GHERKIN-PATTERNS.md) | DataTables, DocStrings, Rule blocks               |
 | [CONFIGURATION.md](./CONFIGURATION.md)       | Tag prefixes, role sets                           |
 | [TAXONOMY.md](./TAXONOMY.md)                 | Tag taxonomy concepts and API                     |
-| [CLI.md](./CLI.md)                           | Data API CLI commands for all session types       |
+| [CLI.md](./CLI.md)                           | The graph CLI read surface (ADR-014)              |
 | [VALIDATION.md](./VALIDATION.md)             | CLI flags for lint-patterns and validate-patterns |

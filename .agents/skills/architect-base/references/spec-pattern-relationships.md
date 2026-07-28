@@ -115,8 +115,8 @@ Constraints:
 ## Provenance (informational)
 
 `@architect-implements`, `@architect-executable-specs`, and
-`@architect-pattern` tag formats are derived live via
-`pnpm architect:query taxonomy --format json`. The `*ExecutableTests`
+`@architect-pattern` tag formats are enumerated in the generated
+`docs-live/TAXONOMY.md` (regenerate: `pnpm docs:all`). The `*ExecutableTests`
 and `*Testing` suffix conventions originated in the package family's
 executable-coverage pattern doctrine; the statement above is the
 canonical form.

@@ -1,6 +1,6 @@
 ---
 name: architect-sessions
-description: MANDATORY for any spec-driven session in this Architect repo — capturing or refining a spec, designing a pattern, implementing from a design spec, reviewing a spec or implementation, or handing off. Triggers on session-intent verbs (plan/ideate/capture/refine/promote/design/implement/review/verify-value-transfer/handoff) on an Architect pattern, and on `architect/specs/`, `architect/stubs/`, `scope-validate`, FSM transitions, or the four-tier ladder. Load after architect-base + architect-data-api. Do NOT use for refactoring shipped code with no design spec (route to architect-refactor-session), generic PR review, or sprint planning.
+description: MANDATORY for any spec-driven session in this Architect repo — capturing or refining a spec, designing a pattern, implementing from a design spec, reviewing a spec or implementation, or handing off. Triggers on session-intent verbs (plan/ideate/capture/refine/promote/design/implement/review/verify-value-transfer/handoff) on an Architect pattern, and on `architect/specs/`, `architect/stubs/`, `architect_scope_validate`, FSM transitions, or the four-tier ladder. Load after architect-base + architect-graph-handle. Do NOT use for refactoring shipped code with no design spec (route to architect-refactor-session), generic PR review, or sprint planning.
 allowed-tools:
   - Bash
   - Read
@@ -12,13 +12,13 @@ allowed-tools:
 
 # Architect Sessions
 
-The spec-driven delivery lifecycle in one skill: capture → design → implement → review → handoff. This body is the **context every session needs**; the per-session execution detail lives behind progressive disclosure in [`references/`](references/). Load [`architect-base`](../architect-base/SKILL.md) (vocabulary + doctrine) and [`architect-data-api`](../architect-data-api/SKILL.md) (the query surface) first — this skill builds on both and does not repeat them.
+The spec-driven delivery lifecycle in one skill: capture → design → implement → review → handoff. This body is the **context every session needs**; the per-session execution detail lives behind progressive disclosure in [`references/`](references/). Load [`architect-base`](../architect-base/SKILL.md) (vocabulary + doctrine) and [`architect-graph-handle`](../architect-graph-handle/SKILL.md) (the read surface, ADR-014) first — this skill builds on both and does not repeat them.
 
 The one shape that is **not** here: refactoring shipped code that has no design spec. That is the non-spec-driven carve-out and lives in [`architect-refactor-session`](../architect-refactor-session/SKILL.md).
 
 ## Sessions in this repo
 
-The lifecycle recognizes a small number of work shapes. Knowing which one you are in tells you **which reference to open** — it does not change the Data API verbs you run (see "State-driven" below).
+The lifecycle recognizes a small number of work shapes. Knowing which one you are in tells you **which reference to open** — it does not change the graph reads you run (see "State-driven" below).
 
 - **Idea / candidate authoring** — drafting a new pattern, sharpening invariants, refining open questions. The lightest two rungs. → [`references/plan.md`](references/plan.md)
 - **Design** — promoting a plan-level spec: deliverables, stubs, exhaustive scenarios, ADR refs. → [`references/design.md`](references/design.md)
@@ -31,15 +31,15 @@ The lifecycle recognizes a small number of work shapes. Knowing which one you ar
 
 ## State-driven, not intent-driven
 
-What the Data API returns is determined by the pattern's **state on disk**, not by your stated intent. A pattern that is `active` with all dependencies completed answers the same way whether you are about to design, implement, or review — only your downstream action differs.
+What the graph handle returns is determined by the pattern's **state on disk**, not by your stated intent. A pattern that is `active` with all dependencies completed answers the same way whether you are about to design, implement, or review — only your downstream action differs.
 
 In practice:
 
-- The same handful of verbs (`overview`, `bundle`, `pattern`, `dep-tree`, `files`, `rules`, `scope-validate`) covers every shape above. `bundle <Pattern>` is the default pre-flight.
+- The same handful of graph reads covers every shape above: status counts (`g.api.getStatusCounts()`), the pattern node (`g.pattern("<P>")`), dependency context (`g.api.getDependencyContext("<P>")`), realizing files (`p?.sourceFile` / `p?.implementedBy`), invariants (`g.invariantsOf("<P>")`), plus the `architect_scope_validate` MCP gate. The default pre-flight is one handle call: `pnpm architect:q 'const p = g.pattern("<P>"); return {p, invariants: g.invariantsOf("<P>"), reverifies: g.specsReverifying(["<P>"]).length}'`.
 - The work shape tells you which reference to read and which gate to honor — not a different command set.
-- The `--mode` flag on `bundle` (and `--session` on `context` — `context` has no `--mode`; an unknown flag is silently ignored) nudges which blocks are included by default, but defaults are good and the returned data is dominated by what the pattern actually _is_. Do not over-rely on intent flags; they are receding over time.
+- Typed context bundles remain as the `architect_bundle` / `architect_context` MCP tools; their mode/session inputs nudge which blocks are included by default, but defaults are good and the returned data is dominated by what the pattern actually _is_. Do not over-rely on intent flags; they are receding over time.
 
-Run the pre-flight from [`architect-data-api`](../architect-data-api/SKILL.md) before any architect-scoped `Read` / `Glob` / `Grep`. File scanning to learn pattern state is a smell — there is a verb for it.
+Run the pre-flight from [`architect-graph-handle`](../architect-graph-handle/SKILL.md) — the read surface (ADR-014) — before any architect-scoped `Read` / `Glob` / `Grep`. File scanning to learn pattern state is a smell — one `pnpm architect:q` script answers it.
 
 ## The spec is a scaffold (value transfer)
 
@@ -51,7 +51,7 @@ This is why no session "leaves the spec around as docs," why retroactive plan-le
 
 Three rules hold for every session here (the campaign-coordination rules — decisions-before-code, scope-discovery classification, learnings propagation — are refactor/campaign-flavored and live in [`architect-refactor-session`](../architect-refactor-session/references/multi-session-coordination.md)):
 
-1. **Data API first.** Every pattern-state question goes through `pnpm architect:query` (or the `architect_*` MCP twins) before any file read. It is faster and more accurate, and its output is the canonical signal. `architect-base` §15 is the bootstrap discipline.
+1. **Graph handle first.** Every pattern-state question goes through `pnpm architect:q '<js>'` (or the `architect_*` MCP tools) before any file read. It is faster and more accurate, and its output is the canonical signal. `architect-base` §15 is the bootstrap discipline.
 2. **Gates are non-negotiable.** The validation sequence (`pnpm typecheck && pnpm test && pnpm validate:all`, plus `pnpm architect:guard --staged` for FSM) runs before any commit or handoff. A failing gate is stop-and-surface — never `--no-verify`, never silence it.
 3. **Commit hygiene.** Stage explicit files (never `git add -A` on a multi-commit branch); `type(scope): imperative summary`; commit/push only when the user asks.
 
@@ -59,7 +59,7 @@ Three rules hold for every session here (the campaign-coordination rules — dec
 
 | You are about to…                                                | Open                                                                         | Note                                             |
 | ---------------------------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------ |
-| capture a new idea / refine a candidate / decide what to build   | [`references/plan.md`](references/plan.md)                                   | lightest tiers; no `scope-validate` target       |
+| capture a new idea / refine a candidate / decide what to build   | [`references/plan.md`](references/plan.md)                                   | lightest tiers; no scope gate target             |
 | promote a plan-level spec to design (stubs, deliverables, ADRs)  | [`references/design.md`](references/design.md)                               | writes specs + stubs only, never production code |
 | build a design spec end-to-end                                   | [`references/implement.md`](references/implement.md)                         | FSM → active, value transfer, deletion gate      |
 | find gaps in a spec **before** implementing                      | [`references/review-spec.md`](references/review-spec.md)                     | output is a gap list, not a rewrite              |
@@ -76,4 +76,4 @@ Three rules hold for every session here (the campaign-coordination rules — dec
 
 ## Each reference is self-sufficient
 
-Every file in [`references/`](references/) leads with a short context-gathering step, the lean execution sequence anchored to the Data API, and a one-line pointer to the natural next session. They cite `architect-base/references/*` for doctrine depth rather than restating it. Open exactly the one your work shape needs.
+Every file in [`references/`](references/) leads with a short context-gathering step, the lean execution sequence anchored to the graph handle, and a one-line pointer to the natural next session. They cite `architect-base/references/*` for doctrine depth rather than restating it. Open exactly the one your work shape needs.

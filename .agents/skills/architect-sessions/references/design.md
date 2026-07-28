@@ -19,9 +19,9 @@ The detail level is **contextual** (`architect-base` §10): invest depth where t
 
 ## Pre-flight
 
-Run the pre-flight from [`../../architect-data-api/SKILL.md`](../../architect-data-api/SKILL.md): `overview`, then the `scope-validate <Pattern> design` gate, then `bundle <Pattern> --mode design --format json` (blocks: docstring + open-questions + rules + scenarios), dropping to `dep-tree` / `rules` as needed. The design-mode bundle carries **no** `stubs` / `deliverables` / `deps` block — and there is no `stubs` verb; the spec's deliverables and stubs surface through `context --session design` (its `=== SPEC ===` section), not the bundle.
+Run the pre-flight from [`../../architect-graph-handle/SKILL.md`](../../architect-graph-handle/SKILL.md) — the read surface (ADR-014). Orient with `pnpm architect:q 'return {counts: g.api.getStatusCounts(), active: g.api.getCurrentWork().map(p => p.patternName ?? p.name)}'`, then run the scope gate — the `architect_scope_validate` MCP tool for `<Pattern>` at `design` — then pull the pattern's context in one handle call: `pnpm architect:q 'const p = g.pattern("<Pattern>"); return {p, invariants: g.invariantsOf("<Pattern>"), reverifies: g.specsReverifying(["<Pattern>"]).length}'`, dropping to `g.api.getDependencyContext("<Pattern>")` / `g.invariantsOf("<Pattern>")` as needed. Typed bundles remain as the `architect_bundle` / `architect_context` MCP tools: the design-mode bundle carries **no** `stubs` / `deliverables` / `deps` block — the spec's deliverables and stubs surface through `architect_context` with session `design` (its `=== SPEC ===` section), not the bundle.
 
-If `scope-validate` returns BLOCKED, **stop and surface the blocker.** Do not design around a blocked dependency chain. If the source spec is at idea or candidate tier, **stop** and route through [`plan.md`](plan.md) to promote through the missing rungs — skipping rungs is rejected (except the refactoring carve-out, which is [`architect-refactor-session`](../../architect-refactor-session/SKILL.md), not this).
+If `architect_scope_validate` returns BLOCKED, **stop and surface the blocker.** Do not design around a blocked dependency chain. If the source spec is at idea or candidate tier, **stop** and route through [`plan.md`](plan.md) to promote through the missing rungs — skipping rungs is rejected (except the refactoring carve-out, which is [`architect-refactor-session`](../../architect-refactor-session/SKILL.md), not this).
 
 ## Plan → Design delta
 
@@ -53,7 +53,7 @@ Encode in stubs the design intent production code will need but Gherkin can't ca
 2. Adding a `.ts` file under `src/` — wrong session; hand off to [`implement.md`](implement.md).
 3. Running `pnpm test` or editing `tests/features/` — wrong session.
 4. Editing a file outside the deliverables table — **add it to the table** before editing.
-5. Re-deriving pattern data outside `PatternGraph` — read via the Data API verbs, don't parallel-pipeline.
+5. Re-deriving pattern data outside `PatternGraph` — read via the graph handle (`pnpm architect:q`), don't parallel-pipeline.
 6. Inventing a business rule with no `**Invariant:**`.
 7. Promoting an idea straight to design — design requires plan tier first; route through [`plan.md`](plan.md).
 
@@ -63,12 +63,10 @@ Design-level specs and stubs are scaffolds. At implement time their value transf
 
 ## Acceptance criteria for design tier
 
-Verify with the Data API before claiming done:
+Verify with the read surface before claiming done:
 
-```bash
-pnpm architect:query scope-validate <pattern> implement     # must return PASS
-pnpm architect:query context <pattern> --session implement  # must include deliverables
-```
+- The `architect_scope_validate` MCP tool for `<pattern>` at `implement` **must return PASS**.
+- The `architect_context` MCP tool for `<pattern>` with session `implement` **must include deliverables**.
 
 WARN or BLOCKED on `implement` means the design is not ready — fix the gaps first.
 
@@ -78,4 +76,4 @@ WARN or BLOCKED on `implement` means the design is not ready — fix the gaps fi
 - Do not delete the design spec or its stubs here — [`implement.md`](implement.md) owns that, after value transfer.
 - Do not skip stubs for architecturally relevant behavior, and do not author scenarios the executable layer can't reach (design scenarios are written to become executable).
 
-**Next session:** when `scope-validate <pattern> implement` is PASS, continue in [`implement.md`](implement.md). If it returns WARN/BLOCKED, run [`review-spec.md`](review-spec.md) to enumerate the gaps first.
+**Next session:** when `architect_scope_validate` for `<pattern>` at `implement` is PASS, continue in [`implement.md`](implement.md). If it returns WARN/BLOCKED, run [`review-spec.md`](review-spec.md) to enumerate the gaps first.

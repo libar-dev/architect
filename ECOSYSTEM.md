@@ -58,6 +58,6 @@ An **event-sourced, provenance-linked, lifecycle-stated, decaying typed graph** 
 ## How to use this primer
 
 1. Read this first for cross-repo orientation; then the repo's own `AGENTS.md`/`CLAUDE.md`.
-2. **Trust live state over narrative.** Where a working surface (the platform's running code, `pnpm architect:query` output) disagrees with this doc, the live surface wins; flag the drift.
+2. **Trust live state over narrative.** Where a working surface (the platform's running code, `pnpm architect:q` output) disagrees with this doc, the live surface wins; flag the drift.
 3. **The platform is the reference for "what good looks like"** — judge design against it (a live composed view), never against generated markdown.
 4. Patterns are durable; implementations are substrate. When in doubt, preserve the _design idea_, re-substantiate the code.

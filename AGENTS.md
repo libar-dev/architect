@@ -78,7 +78,7 @@ What it implies (these override the usual append-only instincts):
 
 ### ADR grounding
 
-The load-bearing architectural decisions are `.feature` records in `architect/decisions/` — read them through the Data API (`pnpm architect:query documentation decisions`, or `pattern ADR006SingleReadModelArchitecture`), never paraphrase from memory. `architect-base` §7 lists the full key-ADR set; the decisions most often gotten wrong:
+The load-bearing architectural decisions are `.feature` records in `architect/decisions/` — read the records themselves, or query them through the handle (`pnpm architect:q 'g.pattern("ADR006SingleReadModelArchitecture")'`), never paraphrase from memory. `architect-base` §7 lists the full key-ADR set; the decisions most often gotten wrong:
 
 - **ADR-006 (Single Read Model)** — the read model is the **`PatternGraph`** (the assembled graph + `relationshipIndex` + pre-computed views from `transformToPatternGraph()`), **not** `ExtractedPattern`, which is the canonical per-pattern **record contract** the graph is built from. Feature consumers (codecs, validators, query APIs) depend on the `PatternGraph`; direct `scanner/` or `extractor/` imports are sanctioned **only** in pipeline-orchestration code that builds the graph.
 - **ADR-001 / ADR-007 (taxonomy)** — `@architect-role` draws from 8 canonical values (`projection · service · decider · read-model · codec · contract · barrel · utility`); classification has three orthogonal axes — role (what kind), bounded-context (which context), layer (which arch layer). `@architect-uses` is a TypeScript-owned **csv** tag (space/comma-separated, no colon); `@architect-role:` / `@architect-bounded-context:` take a colon.
@@ -139,7 +139,7 @@ pnpm test:dogfood     # repo-level smoke + regression
 pnpm docs:all         # regenerate docs-live/ from the current PatternGraph
 ```
 
-The architect dogfood CLI (`architect:overview`, `architect:status`, `architect:guard --staged`, `validate:all`, full `architect:query <verb>` surface) — verb inventory and per-flag quirks live in `architect-base` §14 and `architect-data-api`.
+The architect dogfood surfaces: `pnpm architect:q '<js>'` (the graph handle — the agent read surface, ADR-014), `pnpm architect:graph <cmd>` (named demos + the `dangling` CI gate), `pnpm architect:guard --staged`, `validate:all`. The handle surface and recipes live in `architect-graph-handle`; the conceptual model in `architect-base` §14.
 
 ## Operational notes
 
@@ -150,7 +150,7 @@ The architect dogfood CLI (`architect:overview`, `architect:status`, `architect:
 
 **Harnesses we use for coding:**
 
-- **Codex** — skills at `.codex/skills/` (directory symlink to `.agents/skills/`); shared SessionStart hook at `.codex/hooks/architect-api-first.sh` (symlink to `.claude/hooks/architect-api-first.sh`, one file for both harnesses) injects the source-first / event-sourced mental model and loads `architect-base` (mandatory first-load), pointing to `architect-data-api`, `architect-graph-handle`, and `architect-sessions` as on-demand loads.
+- **Codex** — skills at `.codex/skills/` (directory symlink to `.agents/skills/`); shared SessionStart hook at `.codex/hooks/architect-api-first.sh` (symlink to `.claude/hooks/architect-api-first.sh`, one file for both harnesses) injects the source-first / event-sourced mental model and loads `architect-base` (mandatory first-load), pointing to `architect-graph-handle` (the read surface) and `architect-sessions` as on-demand loads.
 - **Claude Code** — skills at `.claude/skills/` (symlinks into `.agents/skills/`, the canonical source).
 - **OpenCode + oh-my-openagent (OmO)** — skills at `.opencode/skills/` (symlinks into `.agents/skills/`); coordination state at `.sisyphus/` (`plans/`, `notepads/`, `drafts/`, `evidence/`).
 
@@ -158,7 +158,7 @@ All three skill trees symlink into `.agents/skills/`; run `pnpm check:skills` to
 
 ## Skills — mandatory
 
-Four skills carry the operational substance of this repo. **`architect-base` is the mandatory first-load; `architect-sessions` loads for spec-driven work; `architect-data-api` and `architect-graph-handle` load on demand** — the two read surfaces (the canonical `pnpm architect:query` verbs, and the agent-sink live-graph handle), pulled in when you need them, not unconditionally at startup.
+Three skills carry the operational substance of this repo. **`architect-base` is the mandatory first-load; `architect-graph-handle` loads on demand as THE read surface (ADR-014); `architect-sessions` loads for spec-driven work.**
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -166,11 +166,8 @@ Four skills carry the operational substance of this repo. **`architect-base` is 
 │   ▶  architect-base        the vocabulary of the repo               │
 │                            PatternGraph · tiers · FSM · ADRs        │
 │                                                                     │
-│   ▶  architect-data-api    deterministic answers about pattern      │
-│                            state, deps, gates, transitions          │
-│                                                                     │
-│   ▶  architect-graph-handle  architectural cuts the verbs           │
-│                              don't pre-bake; script the graph       │
+│   ▶  architect-graph-handle  the read surface — script the live     │
+│                              graph (state, slices, impact, gates)   │
 │                                                                     │
 │   ▶  architect-sessions    the spec-driven session lifecycle        │
 │                            plan · design · implement · review       │
@@ -180,9 +177,7 @@ Four skills carry the operational substance of this repo. **`architect-base` is 
 
 **`architect-base`** hands you the PatternGraph + tag taxonomy, the four authored detail tiers plus executable + maintenance levels, the FSM lifecycle, value-transfer / spec-deletion doctrine, key ADRs, and the validation layers. The conceptual model that makes every other surface in this repo legible.
 
-**`architect-data-api`** (load on demand, not auto-loaded at startup) is the product itself and your context-gathering tool. The CLI (`pnpm architect:query <verb>`) gives you "what's the state of `X`?", "what does `X` depend on?", "is this transition legal?" — sub-second, deterministic, structured. Pattern exploration through the API is faster than file scanning and won't lie to you.
-
-**`architect-graph-handle`** (load on demand) is the agent-sink read surface — the complement to the verbs. When you'd otherwise grep across files for an architectural slice the verbs don't pre-bake (a file's owner + neighborhood, a symbol's architectural usage, the blast radius of a diff, what a pattern guarantees, which specs re-verify a change), one command (`pnpm playground:q '<js>'`) builds the live graph in-process and hands you `g` to script the cut — returning the conclusion, not the firehose. The verbs stay canonical for pattern state; reach here to navigate and reshape graph cuts no single verb produces.
+**`architect-graph-handle`** (load on demand) is the agent read surface (ADR-014 — the verb CLI is retired). Whenever you need graph state — a pattern's status/deps/rules, a file's owner + neighborhood, a symbol's architectural usage, the blast radius of a diff, what a pattern guarantees, which specs re-verify a change — one command (`pnpm architect:q '<js>'`) builds the live graph in-process and hands you `g` to script the cut, returning the conclusion, not the firehose. `g.api` carries the canonical PatternGraphAPI for deterministic reads (including `isValidTransition`); ordinary grep stays the complement for content-level search; the `architect_*` MCP tools remain the stable typed surface for burst-mode/Studio use.
 
 **`architect-sessions`** is the spec-driven delivery lifecycle — capture → design → implement → review → handoff — as one skill, with the per-session execution detail behind progressive disclosure so the always-loaded body stays small. Load it for any work that touches a spec, a pattern, or an FSM transition (which is nearly everything here).
 

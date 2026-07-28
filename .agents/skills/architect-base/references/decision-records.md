@@ -23,17 +23,18 @@ That line — durable decision vs operational worklog — is the whole point. A 
 
 **Amendment rule.** _Post-1.0:_ a decision is amended by authoring a **new** ADR that supersedes the old one — never by editing the original; the history of _why we changed our mind_ is itself durable. _**During bootstrap**_ (pre-1.0, live-state — the standing context; see the repo `CLAUDE.md` / `AGENTS.md` bootstrap doctrine): consolidate **in place** — edit / slim / delete the record directly, with **no supersession metadata** (no `@architect-adr-supersedes` / `adr-superseded-by` tags, no "replaces" / "superseded-by" prose — that is read-model history the bootstrap excludes; the replaced record is deleted, not linked). An amend-chain manufactures exactly the history the read model is built to exclude, so a "new superseding ADR" for a record nobody has built on yet is residue, not provenance. The deliberate change of mind is still recorded on its own terms; what is dropped is the append-only scaffolding around it.
 
-## Read records through the Data API, not from memory
+## Read records through the read surface, not from memory
 
 The records are the authority; your recollection is anecdote (see [`../SKILL.md`](../SKILL.md) §"Anti-anecdote"). Read them:
 
 ```bash
-pnpm architect:query documentation decisions          # the projected decision set
-pnpm architect:query pattern ADR006SingleReadModelArchitecture   # a specific record
-pnpm architect:query documentation architecture       # ADRs as theme/layer slices (by-theme / layered lenses)
+pnpm architect:q 'g.pattern("ADR006SingleReadModelArchitecture")'   # a specific record
+# the projected decision set: docs-live/DECISIONS.md
+# ADRs as theme/layer slices (by-theme / layered lenses): docs-live/ARCHITECTURE.md
+# (regenerate docs-live/ with `pnpm docs:all`; the architect_documentation MCP tool serves the same projections)
 ```
 
-ADRs also carry `@architect-adr-theme` / `@architect-adr-layer` classification, so `documentation architecture` renders them grouped into named theme clusters (e.g. `Theme: projections` = ADR-005/006/009/010) with their depends-on/see-also web, and `documentation design-review` carries the same by-theme / by-layer lenses over working-state-inclusive patterns. **"Which decisions cluster around projections / persistence / taxonomy?"** is one lens query — never grep `architect/decisions/` for it.
+ADRs also carry `@architect-adr-theme` / `@architect-adr-layer` classification, so the generated `docs-live/ARCHITECTURE.md` renders them grouped into named theme clusters (e.g. `Theme: projections` = ADR-005/006/009/010) with their depends-on/see-also web, and `docs-live/DESIGN-REVIEW.md` carries the same by-theme / by-layer lenses over working-state-inclusive patterns. **"Which decisions cluster around projections / persistence / taxonomy?"** is one lens read — never grep `architect/decisions/` for it.
 
 ## The load-bearing set (and the nuance each is most often gotten wrong on)
 

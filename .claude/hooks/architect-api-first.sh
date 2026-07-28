@@ -4,16 +4,13 @@ set -u
 
 # SessionStart context injection.
 #
-# The previous version pushed an "API-first" contract and EXECUTED the gen-1
-# `architect` verb CLI (a live `overview` snapshot) on every startup. During the
-# projection rearchitecture we are moving off that verb API, so this hook no
-# longer suggests or runs it. What remains is durable orientation only:
+# Injects durable orientation only:
 #   1. the source-first / event-sourced mental model, and
-#   2. loading the self-contained `architect-base` skill.
-# The full prior version lives in git history. The new graph-handle read surface
-# is now proven (reviewed, tested, smoke-guarded, cold-validated) and wired in
-# below as an on-demand skill (architect-graph-handle) — the agent-sink complement
-# to the verbs.
+#   2. loading the self-contained `architect-base` skill, with the graph handle
+#      (`architect-graph-handle`) and `architect-sessions` as on-demand loads.
+# The gen-1 verb CLI is retired (ADR-014); the graph handle is THE agent read
+# surface. Prior hook versions (API-first contract, live overview exec) live in
+# git history.
 
 MENTAL_MODEL_BLOCK="$(cat <<'EOF'
 [Architect mental model — source-first, event-sourced, projected]
@@ -28,9 +25,8 @@ SKILL_BLOCK="$(cat <<'EOF'
 [Load skills]
 Before proceeding, load `.agents/skills/architect-base` NOW (canonical repo-root path; self-contained — the vocabulary every other surface assumes; pulls in no other skill).
 Load these ON DEMAND, never pre-loaded at startup:
-- `.agents/skills/architect-data-api` — when you need pattern state, deps, gates, or transitions (the canonical `pnpm architect:query` verbs).
-- `.agents/skills/architect-graph-handle` — when you need an architectural slice the verbs don't pre-bake (a file's owner + neighborhood, a symbol's usage, blast radius, what a pattern guarantees / which specs re-verify), or you'd otherwise grep across files. The agent-sink complement to the verbs: script cuts over the live graph via `pnpm playground:q`.
-- `.agents/skills/architect-sessions` — for spec-driven work (capture/design/implement/review/handoff). NB: loading it pulls in architect-data-api per its own prerequisite, so pre-loading sessions at startup would re-introduce the data-api startup load.
+- `.agents/skills/architect-graph-handle` — THE read surface (ADR-014; the verb CLI is retired). Whenever you need graph state (a pattern's status/deps/rules, a file's owner + neighborhood, a symbol's usage, blast radius, what a pattern guarantees / which specs re-verify), or you'd otherwise grep across files to learn the architecture: script cuts over the live graph via `pnpm architect:q`.
+- `.agents/skills/architect-sessions` — for spec-driven work (capture/design/implement/review/handoff).
 `.codex/skills/` symlinks to `.agents/skills/`; `.claude/skills/` and `.opencode/skills/` mirror it. Use `.agents/skills/` as the canonical path set.
 EOF
 )"

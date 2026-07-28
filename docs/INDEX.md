@@ -6,14 +6,14 @@
 
 ## Package Metadata
 
-| Field            | Value                                                |
-| ---------------- | ---------------------------------------------------- |
-| **Package**      | @libar-dev/architect                                 |
-| **Version**      | 1.0.0-pre.0                                          |
-| **Purpose**      | Context engineering for AI-assisted codebases        |
-| **Key Features** | Living docs, FSM enforcement, AI-native Data API CLI |
-| **Node.js**      | >= 18.0.0                                            |
-| **License**      | MIT                                                  |
+| Field            | Value                                              |
+| ---------------- | -------------------------------------------------- |
+| **Package**      | @libar-dev/architect                               |
+| **Version**      | 1.0.0-pre.0                                        |
+| **Purpose**      | Context engineering for AI-assisted codebases      |
+| **Key Features** | Living docs, FSM enforcement, scriptable graph CLI |
+| **Node.js**      | >= 18.0.0                                          |
+| **License**      | MIT                                                |
 
 ---
 
@@ -42,14 +42,14 @@
 
 ### For New Users
 
-1. **[README.md](../README.md)** — Installation, quick start, Data API CLI overview
+1. **[README.md](../README.md)** — Installation, quick start, graph CLI overview
 2. **[CONFIGURATION.md](./CONFIGURATION.md)** — Role sets, tag prefixes, config files
 3. **[METHODOLOGY.md](./METHODOLOGY.md)** — Core thesis, dual-source architecture
 
 ### For Developers / AI
 
 4. **[ARCHITECTURE.md](./ARCHITECTURE.md)** — Historical four-stage pipeline reference; use `packages/architect-projection` docs for current projection APIs
-5. **[CLI.md](./CLI.md)** — Data API CLI query interface
+5. **[CLI.md](./CLI.md)** — the graph CLI read surface (`architect:q` / `architect:graph`, ADR-014)
 6. **[SESSION-GUIDES.md](./SESSION-GUIDES.md)** — Planning/Design/Implementation workflows
 7. **[GHERKIN-PATTERNS.md](./GHERKIN-PATTERNS.md)** — Writing effective Gherkin specs
 8. **[ANNOTATION-GUIDE.md](./ANNOTATION-GUIDE.md)** — Annotation mechanics, shape extraction, tag quick reference
@@ -68,14 +68,14 @@
 | Section                   | Lines   | Key Topics                                    |
 | ------------------------- | ------- | --------------------------------------------- |
 | Why This Exists           | 17-31   | AI context failure, code as source of truth   |
-| Built for AI-Assisted Dev | 33-50   | Data API CLI typed queries                    |
+| Built for AI-Assisted Dev | 33-50   | Graph-handle typed queries                    |
 | Quick Start               | 52-109  | Install, annotate, generate, lint             |
 | How It Works              | 111-165 | Annotation examples, pipeline one-liner       |
 | What Gets Generated       | 167-184 | Content block types, config-driven generation |
-| CLI Commands              | 186-254 | architect-generate, architect:query           |
+| CLI Commands              | 186-254 | architect-generate, architect:q               |
 | Proven at Scale           | 256-303 | Discovery, real results, 3-session MVP        |
 | FSM-Enforced Workflow     | 305-337 | State diagram, protection levels              |
-| Data API CLI              | 339-365 | CLI example, context cost comparison          |
+| Graph CLI                 | 339-365 | CLI example, context cost comparison          |
 | Rich Relationship Model   | 367-390 | Dependency tags, Mermaid graph                |
 | How It Compares           | 392-414 | Comparison with Backstage, Mintlify, etc.     |
 | Design-First Development  | 416-420 | Stub pattern summary + link                   |
@@ -172,9 +172,9 @@ renderers instead.
 | Session Decision Tree    | 7-25    | Which session type to use                  |
 | Planning Session         | 27-91   | Context gathering, checklist, do NOT       |
 | Design Session           | 93-161  | Context gathering, when required, stubs    |
-| Implementation Session   | 163-235 | scope-validate, execution, FSM transitions |
+| Implementation Session   | 163-235 | scope pre-flight, execution, FSM checks    |
 | Planning + Design        | 237-317 | Combined workflow, handoff complete when   |
-| Handoff Documentation    | 319-365 | CLI handoff, template, discovery tags      |
+| Handoff Documentation    | 319-365 | MCP handoff, template, discovery tags      |
 | FSM Protection Quick Ref | 367-376 | State protection levels table              |
 | Related Documentation    | 380-389 | Links to Methodology, Gherkin, Config, etc |
 
@@ -198,19 +198,14 @@ renderers instead.
 
 ---
 
-### CLI.md (Lines 1-507)
+### CLI.md
 
-| Section                   | Lines   | Key Topics                                                  |
-| ------------------------- | ------- | ----------------------------------------------------------- |
-| Why Use This              | 12-28   | Context cost comparison, AI agent tiers, two output modes   |
-| Quick Start               | 30-63   | Session recipe (overview → scope-validate → context)        |
-| Session Types             | 65-77   | planning/design/implement decision tree                     |
-| Session Workflow Commands | 79-204  | overview, scope-validate, context, dep-tree, files, handoff |
-| Pattern Discovery         | 206-302 | status, list, search, pattern, stubs, decisions, pdr, rules |
-| Architecture Queries      | 304-333 | 11 arch subcommands table, examples                         |
-| Metadata & Inventory      | 335-375 | tags, sources, unannotated, query escape hatch              |
-| Output Reference          | 377-465 | Options, modifiers, filters, JSON envelope, exit codes      |
-| Common Recipes            | 467-507 | Starting, finding work, investigating, design, ending       |
+| Section           | Key Topics                                                     |
+| ----------------- | -------------------------------------------------------------- |
+| The q front door  | `pnpm architect:q '<js>'`, the `g` handle surface, `g.api`     |
+| Named commands    | `pnpm architect:graph` census/diff/blast/fan-in/drift/…        |
+| The dangling gate | CI machine gate: `dangling --baseline <path> --strict`         |
+| Reference         | architect-graph-handle skill, ADR-014, generated docs pointers |
 
 ---
 
@@ -301,18 +296,22 @@ roadmap ──→ active ──→ completed
 deferred ──→ roadmap
 ```
 
-### Data API CLI — Primary Context Source
+### Graph Handle CLI — Primary Context Source
 
-The CLI is the **recommended way** to gather context in any session type.
+The graph handle is the **recommended way** to gather context in any session type (ADR-014 — the read surface).
 It queries annotated sources in real time — not generated snapshots.
-See [CLI.md](./CLI.md).
+See [CLI.md](./CLI.md) and the `architect-graph-handle` skill.
 
 ```bash
-pnpm architect:query -- scope-validate MyPattern implement      # ALWAYS run first
-pnpm architect:query -- context MyPattern --session implement    # Curated context bundle
-pnpm architect:query -- files MyPattern --related                # Implementation paths
-pnpm architect:query -- handoff --pattern MyPattern              # Capture session end state
+# Pre-flight FSM gate — ALWAYS check the transition first
+pnpm architect:q 'g.api.isValidTransition("roadmap","active")'
+# Context bundle
+pnpm architect:q 'const p = g.pattern("MyPattern"); return {p, invariants: g.invariantsOf("MyPattern"), reverifies: g.specsReverifying(["MyPattern"]).length}'
+# Implementation paths
+pnpm architect:q 'const p = g.pattern("MyPattern"); return {file: p?.sourceFile, realizing: p?.implementedBy}'
 ```
+
+Scope readiness (PASS/WARN/BLOCKED) and session-end handoffs remain typed MCP tools: `architect_scope_validate`, `architect_handoff` (plus `architect_bundle` / `architect_context` for curated bundles).
 
 ---
 
@@ -324,7 +323,7 @@ pnpm architect:query -- handoff --pattern MyPattern              # Capture sessi
 | METHODOLOGY.md      | Everyone    | Why — core thesis, principles     |
 | CONFIGURATION.md    | Users       | Setup — role sets, tags, config   |
 | ARCHITECTURE.md     | Developers  | Historical architecture reference |
-| CLI.md              | AI/Devs     | Data API CLI query interface      |
+| CLI.md              | AI/Devs     | Graph CLI read surface (ADR-014)  |
 | SESSION-GUIDES.md   | AI/Devs     | Workflow — day-to-day usage       |
 | GHERKIN-PATTERNS.md | Writers     | Specs — writing effective Gherkin |
 | PROCESS-GUARD.md    | Team Leads  | Governance — enforcement rules    |

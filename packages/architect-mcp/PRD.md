@@ -1,6 +1,6 @@
 # architect-mcp — Package PRD
 
-> Boundary contract recorded post-hoc (PR #15 split the monolith; the per-package contract was never written down). Records what the **code** is as of this commit, not what annotations claim. Verified against `src/`, `package.json`, and `pnpm architect:query list --package architect-mcp`.
+> Boundary contract recorded post-hoc (PR #15 split the monolith; the per-package contract was never written down). Records what the **code** is as of this commit, not what annotations claim. Verified against `src/`, `package.json`, and the then-current `architect:query list --package architect-mcp` verb (since retired, ADR-014).
 
 ## Purpose
 
@@ -49,7 +49,7 @@
 
 ## Consumers
 
-- **Agentic harnesses** connecting the `architect` MCP server over stdio: Claude Code, Codex, OpenCode + oh-my-openagent. They call the `architect_*` snake_case tools as twins of the `pnpm architect:query` CLI verbs.
+- **Agentic harnesses** connecting the `architect` MCP server over stdio: Claude Code, Codex, OpenCode + oh-my-openagent. They call the `architect_*` snake_case tools — since ADR-014 the canonical typed verb surface (the CLI twins were retired; the agent CLI is now the graph handle).
 - **Libar Studio desktop/cloud main process** (proprietary) — the comment on `TOOL_HANDLERS` calls out that `invokeTool` exists specifically so the desktop main can consume the **typed** `ToolResult` projection output without re-parsing rendered text. This is the load-bearing programmatic consumer.
 - This package is **not** imported by other `@libar-dev/architect-*` packages — it is a top-of-stack composition root.
 

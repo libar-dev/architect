@@ -42,7 +42,8 @@ feature-identity-owned pattern carries zero `@architect-*` identity JSDoc
 on its realizing production source and is still legitimately complete
 because the executable feature carries the full surface. (Confirm the
 current set live rather than trusting a frozen name — samples rot:
-`pnpm architect:query list --status completed`, then `files <Name>`.)
+`pnpm architect:q 'g.patterns.filter(p => p.status === "completed").map(p => p.name)'`,
+then `pnpm architect:q 'const p = g.pattern("<Name>"); return {file: p?.sourceFile, realizing: p?.implementedBy}'`.)
 
 The maximalist framing "value must transfer to BOTH surfaces" (executable
 Gherkin + JSDoc annotations) is a useful default goal, but it is **not**
@@ -133,10 +134,13 @@ The candidate spec
 `architect/specs/value-transfer-state.feature`
 proposes:
 
-- A CLI verb `pnpm architect:query value-transfer <pattern>` returning the
-  per-pattern state (`designSpecPath`, `executableSpecPaths`,
+- A deterministic per-pattern value-transfer read returning
+  (`designSpecPath`, `executableSpecPaths`,
   `annotatedSourcePaths`, `forwardLink`, `reverseLinks`, `antipatterns`,
-  `deletionReady`, `transferComplete`).
+  `deletionReady`, `transferComplete`). The spec's original CLI-verb form
+  predates the verb CLI's retirement (ADR-014); the shipped form will be
+  a graph-handle read (`pnpm architect:q`) or a named
+  `pnpm architect:graph` command.
 - An MCP tool `architect_value_transfer` with the same input shape.
 - Composition into `ArchitectBriefDeterministicBundle` so every
   session-open brief surfaces anti-patterns as graph-derived ground

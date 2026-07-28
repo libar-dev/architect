@@ -25,7 +25,7 @@ planning intent.
 
 ## Mandatory tags per tier
 
-Every tier carries these five authored baseline tags (plus `@architect-level:epic|slice` for those structural variants — see "Epic and slice variants" below). **The idea tier additionally authors `@architect-maturity:idea`** — the explicit opt-in the guard's idea-tier checks key on. Maturity is otherwise **derived from status** (ADR-007: `idea` maturity = consideration, `plan` = delivery; `DEFAULT_MATURITY_BY_STATUS` maps `candidate→idea`, `roadmap→plan`, …) and normally left to derive (an explicit value still wins, per §04): the candidate tier drops the explicit `:idea` (deriving back to `idea` = still consideration), and `roadmap`+ derives `plan`/`design`. Tiers above idea may add metadata tags (e.g. `@architect-completed` at completion time) without changing the baseline. `@architect-product-area` is **not** one of these — it is baseline tag #4, required from idea tier up. See `pnpm architect:query taxonomy` for the live tag set; do not maintain a hand-curated list here.
+Every tier carries these five authored baseline tags (plus `@architect-level:epic|slice` for those structural variants — see "Epic and slice variants" below). **The idea tier additionally authors `@architect-maturity:idea`** — the explicit opt-in the guard's idea-tier checks key on. Maturity is otherwise **derived from status** (ADR-007: `idea` maturity = consideration, `plan` = delivery; `DEFAULT_MATURITY_BY_STATUS` maps `candidate→idea`, `roadmap→plan`, …) and normally left to derive (an explicit value still wins, per §04): the candidate tier drops the explicit `:idea` (deriving back to `idea` = still consideration), and `roadmap`+ derives `plan`/`design`. Tiers above idea may add metadata tags (e.g. `@architect-completed` at completion time) without changing the baseline. `@architect-product-area` is **not** one of these — it is baseline tag #4, required from idea tier up. See the generated `docs-live/TAXONOMY.md` for the live tag set; do not maintain a hand-curated list here.
 
 The four-tier ladder is the maturity axis. It is independent of the hierarchy axis (`@architect-level`, `@architect-parent`), which expresses epic→phase→task→slice decomposition. A pattern at any maturity tier can be at any hierarchy level.
 
@@ -96,7 +96,7 @@ this spec-driven ladder.)
 
 ## Worked example 1 — idea-tier minimum
 
-> The pattern names and `@architect-product-area:editor` below are **illustrative** — product-area values are repo-configured (this repo's live enum is `Annotation · Configuration · Generation · Validation · DataAPI · CoreTypes · Process · Projection`; verify with `pnpm architect:query taxonomy`). The example teaches the tag _shape_, not a value to copy.
+> The pattern names and `@architect-product-area:editor` below are **illustrative** — product-area values are repo-configured (this repo's live enum is `Annotation · Configuration · Generation · Validation · DataAPI · CoreTypes · Process · Projection`; verify in the generated `docs-live/TAXONOMY.md`). The example teaches the tag _shape_, not a value to copy.
 
 Location: `architect/specs/ideas/copilot-context-bundle.feature`
 

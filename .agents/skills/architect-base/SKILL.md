@@ -1,6 +1,6 @@
 ---
 name: architect-base
-description: MANDATORY first-load for any work in this Architect repo — the shared vocabulary every other surface assumes. Covers what Libar Architect is, the PatternGraph + `@architect-*` tag taxonomy, the four authored tiers plus executable/maintenance levels, the FSM lifecycle, value-transfer doctrine, and the key ADRs. Load it before any architect-scoped Read/Glob/Grep and before any other architect-* skill, whenever work touches Architect, the architect package family, specs/stubs, `pnpm architect:query`, an `architect_*` MCP tool, or a session-intent verb (plan/design/implement/review/refactor/handoff). Does NOT cover per-session execution detail — that routes to the session skills.
+description: MANDATORY first-load for any work in this Architect repo — the shared vocabulary every other surface assumes. Covers what Libar Architect is, the PatternGraph + `@architect-*` tag taxonomy, the four authored tiers plus executable/maintenance levels, the FSM lifecycle, value-transfer doctrine, and the key ADRs. Load it before any architect-scoped Read/Glob/Grep and before any other architect-* skill, whenever work touches Architect, the architect package family, specs/stubs, `pnpm architect:q`, an `architect_*` MCP tool, or a session-intent verb (plan/design/implement/review/refactor/handoff). Does NOT cover per-session execution detail — that routes to the session skills.
 allowed-tools:
   - Bash
   - Read
@@ -25,7 +25,7 @@ Two things in one place:
 
 Architect serves two audiences from the same source of truth:
 
-- **AI agents and humans doing work** — live, queryable projections via CLI + MCP (`pnpm architect:query`, `architect_*` tools), task-oriented context bundles, FSM-validated transitions.
+- **AI agents and humans doing work** — the scriptable live graph handle (`pnpm architect:q`, ADR-014) plus `architect_*` MCP tools, task-oriented context, FSM-validated transitions.
 - **Surfaces that consume the projection** — generated documentation, the Architect Studio web/desktop app's view state, architecture-review context, release notes, change logs.
 
 The **canonical source of truth** is annotated production code + executable Gherkin (`tests/features/`). Everything else is a projection.
@@ -37,12 +37,12 @@ The **canonical source of truth** is annotated production code + executable Gher
 | Config           | `architect.config.ts` at the repo root                                                                                                                                                                                                                                                                                              |
 | Working state    | `architect/` (specs, decisions, stubs, step-stubs)                                                                                                                                                                                                                                                                                  |
 | Source of truth  | Annotated `packages/*/src/**/*.ts` + executable Gherkin under `tests/features/` and `packages/*/tests/features/`                                                                                                                                                                                                                    |
-| CLI              | `pnpm architect:query <verb>` (canonical script name across architect-managed repos)                                                                                                                                                                                                                                                |
+| CLI              | `pnpm architect:q '<js>'` (the graph handle, ADR-014) + `pnpm architect:graph <cmd>` (named demos + the dangling gate)                                                                                                                                                                                                              |
 | MCP              | `architect` server → `mcp__architect__*` callable tools                                                                                                                                                                                                                                                                             |
 | Validation entry | `pnpm typecheck`, `pnpm test`, `pnpm validate:all`, `pnpm architect:guard --staged`                                                                                                                                                                                                                                                 |
 | Doc regeneration | `pnpm docs:all` → `docs-live/` (git-tracked, derived — determinism-gate diff target); `pnpm docs:check` verifies idempotency in place (re-renders, diffs the working tree, writes nothing, non-zero on drift) — usable mid-changeset where `git diff --exit-code` can't tell an uncommitted edit from a non-deterministic generator |
 
-When this package family is consumed by another project, the consumer wires their own `architect.config.ts` and exposes their own `architect:query` script — the contracts above are stable across architect-managed repos.
+When this package family is consumed by another project, the consumer wires their own `architect.config.ts` and exposes their own `architect:q` / `architect:graph` scripts over the `architect` bin — the contracts above are stable across architect-managed repos.
 
 ## 3. Architect State — what lives where
 
@@ -68,7 +68,7 @@ When this package family is consumed by another project, the consumer wires thei
 
 A **pattern** is a named architectural unit (a feature, service, component, contract, codec, spec). The graph nodes are patterns; the edges are typed relationships.
 
-**Tag taxonomy** (verify live via `pnpm architect:query taxonomy --format json`):
+**Tag taxonomy** (canonical enumerated set: the generated `docs-live/TAXONOMY.md`):
 
 - **Identity**: `@architect-pattern:<Name>` (one file owns identity)
 - **State**: `@architect-status:<candidate|roadmap|active|completed|deferred>`; `@architect-maturity` derives from status (idea=consideration, plan=delivery) and an explicit value wins (§04) — explicit is **required only at the idea tier** (`@architect-maturity:idea`, the guard's opt-in), dropped on promotion to candidate, derived elsewhere
@@ -80,7 +80,7 @@ A **pattern** is a named architectural unit (a feature, service, component, cont
 - **Forward link**: `@architect-executable-specs:<path>` (design spec → executable feature)
 - **Audit**: `@architect-unlock-reason:<reason>` (optional advisory-warning suppressor for completed reopen/edit and a required marker only for genuinely non-standard transitions)
 
-> **Depth:** the categories above are the conceptual model. The three orthogonal classification axes (role · bounded-context · layer) and the csv-vs-colon authoring rules live in [`references/taxonomy.md`](references/taxonomy.md). The **complete enumerated set is generated, never hand-maintained** — query it live (`pnpm architect:query taxonomy --format json`) or read the generated `docs-live/TAXONOMY.md`. Those two are canonical; the categories here teach the shape, they do not enumerate it.
+> **Depth:** the categories above are the conceptual model. The three orthogonal classification axes (role · bounded-context · layer) and the csv-vs-colon authoring rules live in [`references/taxonomy.md`](references/taxonomy.md). The **complete enumerated set is generated, never hand-maintained** — read the generated `docs-live/TAXONOMY.md` (regenerate via `pnpm docs:all`). That is canonical; the categories here teach the shape, they do not enumerate it.
 
 **Instances** of patterns live in two surfaces:
 
@@ -94,24 +94,24 @@ A **pattern** is a named architectural unit (a feature, service, component, cont
 ## 5. Entry points
 
 - **`architect.config.ts`** — config loader; taxonomy customization, source globs, validation rules.
-- **`pnpm architect:query <verb>`** — primary CLI; deterministic, JSON-pipeable. **This is the default; use it.**
+- **`pnpm architect:q '<js>'`** — the graph handle (ADR-014); script the live graph, get the conclusion. **This is the default; use it.**
 - **`architect_*` MCP tools** — sub-ms per call, same verbs, **snake_case end-to-end** (`architect_scope_validate`, not `architect_scope-validate`). Reach for MCP only when bursting ≥5 verbs in close sequence.
 - File scanning architect-scoped paths to learn pattern state is a smell — every "what's the status of X?" question has a verb.
 
 ## 6. Validation layers
 
-| Layer                 | Command                                                         | What it checks                                                           |
-| --------------------- | --------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| Type system           | `pnpm typecheck`                                                | Strict TS (see CLAUDE.md "TypeScript strictness")                        |
-| Annotation lint + DoD | `pnpm validate:all`                                             | Definition-of-done, anti-patterns, dangling references                   |
-| Process Guard (FSM)   | `pnpm architect:guard --staged`                                 | FSM transitions, `@architect-unlock-reason` rules, structural invariants |
-| Graph integrity       | `pnpm architect:query arch dangling --strict --baseline <path>` | Cross-pattern reference drift                                            |
+| Layer                 | Command                                                    | What it checks                                                           |
+| --------------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------ |
+| Type system           | `pnpm typecheck`                                           | Strict TS (see CLAUDE.md "TypeScript strictness")                        |
+| Annotation lint + DoD | `pnpm validate:all`                                        | Definition-of-done, anti-patterns, dangling references                   |
+| Process Guard (FSM)   | `pnpm architect:guard --staged`                            | FSM transitions, `@architect-unlock-reason` rules, structural invariants |
+| Graph integrity       | `pnpm architect:graph dangling --baseline <path> --strict` | Cross-pattern reference drift                                            |
 
 All of these are CI-enforced. Failing gates are stop-and-surface; never `--no-verify`.
 
 ## 7. Key decision records (load-bearing, decisions-only)
 
-ADRs / PDRs in `architect/decisions/` are **permanent and decisions-only**. They record a _decision_ + its rationale and **only durable, non-execution-related facts**. Operational or temporal context — status, work-in-progress, ETAs, who is doing what this week — **never** belongs here; that is the difference between a decision record and a worklog. Decisions are amended via a **new** ADR, never by editing the old one — _except during bootstrap_ (pre-1.0, live-state), when records are consolidated **in place** (edit / slim / delete directly; no amend-chains and no supersedes / superseded-by edges — they manufacture the history the read model excludes; see [`references/decision-records.md`](references/decision-records.md) §"Amendment rule" and the repo bootstrap doctrine). Read the relevant record before changing anything in its area — through the Data API (`pnpm architect:query documentation decisions`, or `pattern ADR006SingleReadModelArchitecture`), never paraphrased from memory.
+ADRs / PDRs in `architect/decisions/` are **permanent and decisions-only**. They record a _decision_ + its rationale and **only durable, non-execution-related facts**. Operational or temporal context — status, work-in-progress, ETAs, who is doing what this week — **never** belongs here; that is the difference between a decision record and a worklog. Decisions are amended via a **new** ADR, never by editing the old one — _except during bootstrap_ (pre-1.0, live-state), when records are consolidated **in place** (edit / slim / delete directly; no amend-chains and no supersedes / superseded-by edges — they manufacture the history the read model excludes; see [`references/decision-records.md`](references/decision-records.md) §"Amendment rule" and the repo bootstrap doctrine). Read the relevant record before changing anything in its area — the `.feature` file itself, or `pnpm architect:q 'g.pattern("ADR006SingleReadModelArchitecture")'` — never paraphrased from memory.
 
 The load-bearing set:
 
@@ -120,6 +120,7 @@ The load-bearing set:
 - **ADR-006** — Single Read Model
 - **ADR-007** — Coordinated Taxonomy Redesign
 - **ADR-009** — Projection Trust Boundary
+- **ADR-014** — Scriptable Graph Handle as the Agent Read Surface
 
 > **Not the same as a campaign `DECISIONS.md`.** `architect/decisions/` holds **durable** ADRs (permanent). A campaign's `.pr-coordination/DECISIONS.md` holds **ephemeral** judgment-calls for one active campaign (resolved-with-commit-sha, then archived). Both are called "decisions" but have opposite lifetimes — do not file durable architecture in the campaign log, or campaign bookkeeping in an ADR.
 >
@@ -137,7 +138,7 @@ A pattern is **identified** by exactly one surface — the feature file for beha
 
 **Production-TS `@architect-*` JSDoc is additive, not mandatory.** A pattern can be `@architect-status:completed` with zero `@architect-*` JSDoc on its source, provided the executable feature carries the full surface (identity, status, deps, invariants, scenarios). Annotations enrich discoverability; they do not gate completion.
 
-A completed, **feature-identity-owned** pattern carries no `@architect-*` identity JSDoc on its realizing production `.ts` at all — identity, status, deps, and invariants live entirely on its `.feature`. Confirm the current set live rather than trusting a frozen name (samples rot — §16): `pnpm architect:query list --status completed`, then `files <Name>` (a feature-owned pattern's primary file is its `.feature`). A reviewer flagging "no annotations on `<file.ts>`" as a value-transfer blocker is mistaken.
+A completed, **feature-identity-owned** pattern carries no `@architect-*` identity JSDoc on its realizing production `.ts` at all — identity, status, deps, and invariants live entirely on its `.feature`. Confirm the current set live rather than trusting a frozen name (samples rot — §16): `pnpm architect:q 'g.patterns.filter(p => p.status === "completed").map(p => [p.name, p.sourceFile])'` (a feature-owned pattern's `sourceFile` is its `.feature`). A reviewer flagging "no annotations on `<file.ts>`" as a value-transfer blocker is mistaken.
 
 > **Depth:** the per-tag ownership tables (what feature files own vs what production TS owns) + the code-originated-identity rules live in [`references/annotation-ownership.md`](references/annotation-ownership.md).
 
@@ -196,8 +197,8 @@ candidate ──┴──► roadmap ──► active ──► completed
 Verify any transition before flipping:
 
 ```bash
-pnpm architect:query scope-validate <Pattern> design|implement
-pnpm architect:query query isValidTransition <from> <to>   # deterministic boolean
+pnpm architect:q 'g.api.isValidTransition("<from>", "<to>")'   # deterministic boolean
+# scope-readiness (PASS/WARN/BLOCKED) remains available as the `architect_scope_validate` MCP tool
 ```
 
 > **Depth:** the process-guard transition table, the maturity-flip-vs-FSM distinction, and the `@architect-unlock-reason:` authoring rules live in [`references/fsm-transitions.md`](references/fsm-transitions.md).
@@ -243,80 +244,82 @@ Durable carriers (where the value lands):
 
 > **Depth:** the transfer checklist, the five-criterion pre-deletion gate, and deletion timing live in [`../architect-sessions/references/ephemeral-spec-deletion.md`](../architect-sessions/references/ephemeral-spec-deletion.md) — the central doctrine every session type should understand.
 
-## 14. Data API — essentials
+## 14. The read surface — essentials (ADR-014)
 
-Default surface: **CLI**. Reach for MCP only when bursting ≥5 verbs.
+Default surface: **the graph handle** (`pnpm architect:q`) — script the live graph, get the
+conclusion back. The full surface, recipes, and quirks live in the dedicated
+`architect-graph-handle` skill; load it before real use. The essentials:
 
 ```bash
-# Health / inventory
-pnpm architect:query overview [--richness <level>]          # progress + blockers; --richness summary-with-references leads with a START HERE orientation tier (depth: data-api skill)
-pnpm architect:query status                                 # status distribution
-pnpm architect:query list [--status v] [--names-only]
-pnpm architect:query search <query>                         # fuzzy pattern-name match
+# Health / inventory / orientation
+pnpm architect:q 'g.api.getStatusCounts()'                        # status distribution
+pnpm architect:q 'g.api.getCurrentWork()'                         # active work
+pnpm architect:graph census                                       # annotation coverage per package
+pnpm architect:q 'g.findByConcept("taxonomy").slice(0,5)'         # fuzzy concept → patterns
 
 # Per-pattern detail
-pnpm architect:query pattern <Name>                         # full PatternDetail
-pnpm architect:query context <Pattern> --session <intent>   # curated bundle
-pnpm architect:query files <Pattern> [--related]
-pnpm architect:query dep-tree <Pattern> [--depth n]
-pnpm architect:query rules --pattern <Pattern> [--only-invariants]
-
-# Composite (default pre-flight when a pattern name is known)
-pnpm architect:query bundle <Pattern> --mode <plan|design|implement|review> --format json
+pnpm architect:q 'g.pattern("<Name>")'                            # need-shaped node (status, edges, maturity)
+pnpm architect:q 'g.api.getPattern("<Name>")'                     # full canonical record
+pnpm architect:q 'g.invariantsOf("<Name>")'                       # what it guarantees, exec vs authored
+pnpm architect:q 'g.specsReverifying(["<Name>"])'                 # what re-verifies if it changes
 
 # Gates (deterministic)
-pnpm architect:query scope-validate <Pattern> <design|implement>      # PASS / WARN / BLOCKED
-pnpm architect:query query isValidTransition <from> <to>              # JSON boolean
-pnpm architect:query arch dangling --baseline <path> --strict         # non-zero exit on drift
+pnpm architect:q 'g.api.isValidTransition("<from>","<to>")'       # FSM boolean
+pnpm architect:graph dangling --baseline <path> --strict          # non-zero exit on drift (the CI gate)
 
-# Architecture views
-pnpm architect:query arch blocking                          # global blocker view
-pnpm architect:query arch workable                          # roadmap items with deps satisfied (complement of blocking)
-pnpm architect:query arch neighborhood <Pattern>
-pnpm architect:query taxonomy [--count] [--format json]
-
-# Documentation projections (composed views; architecture + design-review fan out into inline lenses)
-pnpm architect:query documentation <type>                   # 14 types: architecture, design-review, api-reference, decisions, business-rules, patterns, roadmap, current-work, requirements-executable, requirements-specs, validation-rules, taxonomy, changelog, traceability
-pnpm architect:query documentation architecture             # root map + by-theme / layered / package-seam lenses inline
-pnpm architect:query documentation design-review            # working-state-inclusive component view (by-layer/by-package/by-theme); nodes show (role · status), unbuilt specs as (candidate)/(roadmap) — review a planned pattern's shape before building
+# Impact / architecture cuts
+pnpm architect:graph blast HEAD~8                                 # downstream + at-risk specs of a diff
+pnpm architect:q 'g.byFile("packages/.../x.ts")'                  # file → owner + neighborhood
+pnpm architect:q 'g.bySymbol("<Exported>")'                       # symbol → architectural usage
 ```
 
-Re-confirm the live type count from `pnpm architect:query documentation <bad-type>`, which enumerates the accepted set — counts drift as projections are added.
+Generated documentation projections live in `docs-live/` (regenerate: `pnpm docs:all`); the
+generated `docs-live/TAXONOMY.md` is the canonical enumerated tag set.
 
-**MCP twins** use snake_case end-to-end: `architect_overview`, `architect_scope_validate`, `architect_bundle`, etc. The canonical inventory is `packages/architect-mcp/src/tool-registry.ts` — read it for the current tool set rather than trusting a count cached here.
+**MCP twins** (`architect_*`, snake_case end-to-end — `architect_overview`,
+`architect_scope_validate`, `architect_bundle`, …) remain the stable typed surface for
+burst-mode use and the Studio sink. The canonical inventory is
+`packages/architect-mcp/src/tool-registry.ts` — read it for the current tool set rather than
+trusting a count cached here.
 
-**Quirks worth knowing now** (full list in the dedicated data-API skill):
+**Quirks worth knowing now** (full list in the graph-handle skill):
 
-- `scope-validate` only accepts `design` and `implement`. `planning` / `review` error with `Scope type must be design or implement`.
-- `bundle --include` takes a comma list (`--include rules,deps,open-questions`); repeated `--include` flags also accumulate (equivalent), so neither form silently drops blocks.
-- `pattern <Name>` "not found" can mean parse failure (with provenance) OR doesn't exist — cross-check with `search` or `list --names-only`.
-- `list --status` accepts the five FSM values (`candidate`/`roadmap`/`active`/`completed`/`deferred`) **plus** the rollup alias `planned` (= roadmap+deferred). Out-of-enum values error with the accepted set enumerated — read the error, don't guess. (The `query getPatternsByStatus` passthrough still rejects `planned` — the alias is a `list` convenience, not an FSM status. Status-vocabulary detail: data-api skill.)
+- Never call `architect:q` bare in automation — with a non-TTY stdin and no argument it waits
+  on stdin. Pass an argument or piped input (`… < /dev/null` is safe).
+- q bodies are plain JS function bodies: no `import`/`export`, no TS-only syntax; end with
+  `return <value>` (a single argv expression needs no `return`).
+- `g.invariantsOf(x) === []` does NOT mean "guarantees nothing" — code-originated contracts
+  carry their guarantee as a TS type, not a Gherkin Rule (the GUARANTEE recipe disambiguates).
+- `g.pattern("<Name>") === undefined` can mean parse failure OR doesn't exist — cross-check
+  with `g.findByConcept` and `g.api.getPatternParseFailure("<Name>")`.
 
 ## 15. Bootstrap discipline (every session)
 
-Before any architect-scoped `Read` / `Glob` / `Grep`:
+Orient from the live graph, not from file scanning. A cheap first read:
 
 ```bash
-pnpm architect:query overview
+pnpm architect:q 'return {counts: g.api.getStatusCounts(), active: g.api.getCurrentWork().map(p => p.patternName ?? p.name)}'
 ```
 
 If a pattern name is in scope:
 
 ```bash
-pnpm architect:query bundle <Pattern> --mode <plan|design|implement|review> --format json
+pnpm architect:q 'const p = g.pattern("<Name>"); return {p, invariants: g.invariantsOf("<Name>").length, reverifies: g.specsReverifying(["<Name>"]).length}'
 ```
 
-The Data API is faster (2-5s cold CLI, sub-ms MCP) and more accurate than file scanning, and the output is the canonical signal — file scanning gives you snapshots that can lie.
+The handle is faster and more accurate than file scanning (~2s per call, data stays
+in-process), and the output is the canonical signal — file scanning gives you snapshots that
+can lie.
 
 ## 16. Anti-anecdote — the live graph wins
 
 When a sample-derived finding (an old session-handoff note, a snapshot folder with a SHA suffix, an n=2 "we tried this twice" worklog, or a skill body that has drifted) appears to contradict the live state:
 
-- **The live CLI / PatternGraph is canonical.** `pnpm architect:query` output reflects the graph as it is right now; a skill paraphrase reflects the graph as it was when written. When they disagree, the CLI wins.
+- **The live PatternGraph is canonical.** `pnpm architect:q` output reflects the graph as it is right now; a skill paraphrase reflects the graph as it was when written. When they disagree, the live graph wins.
 - **A sample is useful for _why_, not _what_.** It explains why a rule exists; it is not authoritative for what the rule currently is.
 - **Silence is provisional, not permission.** If the live state is silent on a question a sample answers, treat the sample's finding as provisional and flag it (`FEEDBACK.md`) rather than encoding it as doctrine.
 
-This is the same instinct as `architect-data-api`'s "API surprises are signal" — surprises feed the loop, they do not override the source of truth.
+Surprises are signal — they feed the loop (`FEEDBACK.md`), they do not override the source of truth.
 
 ## 17. What this skill does NOT cover
 

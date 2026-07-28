@@ -78,7 +78,7 @@ Four logical layers:
 
 ## Consumers
 
-- **`architect-cli`** — `architect:query` verbs (overview / status / list / pattern / bundle /
+- **`architect-cli`** — the docs generator (`architect-generate`) and, formerly, the retired verb CLI (ADR-014) (overview / status / list / pattern / bundle /
   dep-tree / context / rules / taxonomy / `documentation <type>`, etc.) render projections to
   compact-text / JSON / markdown.
 - **`architect-mcp`** — the `architect_*` tool twins call the same projection functions, returning

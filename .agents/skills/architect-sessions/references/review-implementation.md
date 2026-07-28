@@ -14,15 +14,20 @@ Doctrine depth: the pre-deletion gate + transfer checklist + anti-patterns are i
 
 ## Pre-flight
 
-Run the implement-mode pre-flight from [`../../architect-data-api/SKILL.md`](../../architect-data-api/SKILL.md) (the reviewer's view of what shipped: `bundle` composite + `scope-validate` + `files` + `rules --only-invariants`), plus the global blocker view `pnpm architect:query arch blocking`. For a batch orientation across the whole reviewed set, run `pnpm architect:query documentation design-review` — it renders every in-scope pattern status-annotated (`Name (role · status)`, e.g. `MCPServer (service · completed)`) grouped by layer / package / theme, so you can see which patterns are `completed` vs still `active` (and which deliverables are still unbuilt `candidate` / `roadmap` specs) at a glance instead of reconstructing it from per-pattern `context` calls. Then, per pattern in scope:
+Run the implement-mode pre-flight from [`../../architect-graph-handle/SKILL.md`](../../architect-graph-handle/SKILL.md) — the read surface (ADR-014) — for the reviewer's view of what shipped, plus the global blocker view:
 
 ```bash
-pnpm architect:query context <pattern> --session implement
-pnpm architect:query rules --pattern <pattern>
-pnpm architect:query files <pattern> --related
+pnpm architect:q 'g.patterns.filter(p => p.status === "roadmap" && p.uses.some(u => g.pattern(u)?.status !== "completed")).map(p => p.name)'
 ```
 
-When `pnpm architect:query value-transfer <pattern>` ships, run it per pattern — it returns the deterministic `deletionReady` verdict. Until then, walk the manual gate below.
+Scope readiness (PASS / WARN / BLOCKED) remains the `architect_scope_validate` MCP tool. For a batch orientation across the whole reviewed set, read the generated design-review document under `docs-live/` (regenerate with `pnpm docs:all`; the `architect_documentation` MCP tool serves the same content) — it renders every in-scope pattern status-annotated (`Name (role · status)`, e.g. `MCPServer (service · completed)`) grouped by layer / package / theme, so you can see which patterns are `completed` vs still `active` (and which deliverables are still unbuilt `candidate` / `roadmap` specs) at a glance instead of reconstructing it from per-pattern calls. Then, per pattern in scope:
+
+```bash
+pnpm architect:q 'const p = g.pattern("<pattern>"); return {p, invariants: g.invariantsOf("<pattern>"), reverifies: g.specsReverifying(["<pattern>"]).length}'
+pnpm architect:q 'const p = g.pattern("<pattern>"); return {file: p?.sourceFile, realizing: p?.implementedBy}'
+```
+
+(The typed per-pattern bundle remains as the `architect_bundle` / `architect_context` MCP tools.) When a deterministic `value-transfer` check ships on the read surface, run it per pattern — it returns the deterministic `deletionReady` verdict. Until then, walk the manual gate below.
 
 ## Per-pattern verification (apply the gate)
 
@@ -33,7 +38,7 @@ For each pattern:
 3. **Reverse link.** Does that target feature carry `@architect-implements:<Pattern>` for the focal pattern?
 4. **Rich content landed — and distilled.** Every Rule block in the design spec has a counterpart in the executable feature carrying `**Invariant:**` (and, where present in the source, `**Rationale:**` + `**Verified by:**`) — but **distilled, not transcribed**: a `**Rationale:**` that only restates its `**Invariant:**`, a `**Verified by:**` repeated verbatim across rules, or a step stub / JSDoc comment re-explaining the pattern (rather than its local how) is **Transcription bloat** ([`ephemeral-spec-deletion.md`](ephemeral-spec-deletion.md)). Remedy = slim the destination, not block deletion.
 5. **Production-TS rationale (judgment).** Architecturally significant rationale that doesn't fit in Gherkin lives in JSDoc — but **annotations are additive**, so absence is not a blocker; presence enriches discoverability.
-6. **Graph integrity.** `pnpm architect:query arch dangling --baseline packages/architect-guard/src/lint/dangling-baseline.json --strict` — exit 0 means no new dangling references; non-zero means the graph regressed (resolve the new edge, or deliberately rewrite the baseline with `--write-baseline` and explain why).
+6. **Graph integrity.** `pnpm architect:graph dangling --baseline packages/architect-guard/src/lint/dangling-baseline.json --strict` — exit 0 means no new dangling references; non-zero means the graph regressed (resolve the new edge, or deliberately rewrite the baseline with `--write-baseline` and explain why).
 
 ## Output format
 
@@ -60,7 +65,7 @@ Found nothing wrong? State it in one sentence — no elaborate restatement.
 ```bash
 git rm <designSpecPath1> <designSpecPath2> …
 git rm -r <stubDir1> <stubDir2> …
-pnpm architect:query overview     # confirm patterns show completed without lingering specs
+pnpm architect:q 'return {counts: g.api.getStatusCounts(), active: g.api.getCurrentWork().map(p => p.patternName ?? p.name)}'   # confirm patterns show completed without lingering specs
 pnpm docs:all                     # regenerate docs
 ```
 
@@ -71,7 +76,7 @@ Confirm with the user before `git rm`. Default is **review only**; deletion is o
 - **Re-authoring spec content** — this is verification, not design. If rich content didn't transfer, surface the gap; route the fix to the implementer or a follow-up [`implement.md`](implement.md) session.
 - **Deleting specs whose value hasn't transferred** — every pre-deletion gate criterion must hold.
 - **Gating on production-TS JSDoc presence** — annotations are additive; a pattern with zero JSDoc and a complete executable feature is legitimately complete.
-- **Reading source via Read/Glob/Grep before the CLI bootstrap.**
+- **Reading source via Read/Glob/Grep before the graph-handle pre-flight.**
 
 ## Do not
 

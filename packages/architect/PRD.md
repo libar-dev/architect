@@ -29,7 +29,7 @@ So 6 of 7 bins are owned by `architect-cli`; only `architect-mcp` is owned by `a
 Scripts dispatch to package owners via `pnpm exec architect-<bin>` or run the dogfood CLI through `tsx` against `packages/architect-cli/src`. Grouped by intent:
 
 - **build / typecheck / lint / test** — `build`, `typecheck`, `lint`, `test` fan out across `./packages/**` via `pnpm -r --filter`; `typecheck:dogfood` (`tsc -b tsconfig.json`) and `test:dogfood` (`vitest run`) compile/test the repo-root dogfood instance; `smoke` (`tsx scripts/workspace-smoke.ts`), `clean`, `format`, `format:check`.
-- **query** — `architect:query` (full verb surface, `tsx ... pattern-graph-cli.ts --base-dir .`), plus convenience aliases `architect:overview`, `architect:status`.
+- **query** — `architect:q` (the graph handle eval front door) and `architect:graph` (named commands + the `dangling` CI gate), both `tsx --conditions=source ... graph-cli.ts --base-dir .` (ADR-014).
 - **guard** — `architect:guard` (`--staged`), `architect:guard:all` (`--all`), `architect:lint-steps`; validation pair `validate:patterns`, `validate:all` (`--dod --anti-patterns`).
 - **docs** — `docs:patterns`, `docs:architecture`, `docs:roadmap`, `docs:taxonomy`, `docs:api-reference`, and `docs:all` (`architect-generate --base-dir . --all -f`) → regenerates git-tracked `docs-live/`.
 - **release / ci-adjacent** — `changeset`, `changeset:version`, `changeset:publish`, `release`; doctrine guards `audit:subtractive`, `guard:no-suppressions`, `check:skills`.
@@ -64,7 +64,7 @@ Consumers in other repos supply their own `architect.config.ts` of the same shap
 
 ## Dependencies
 
-Family dependency graph (strictly acyclic; confirmed via `architect:query overview` and each package's `dependencies`):
+Family dependency graph (strictly acyclic; confirmed via the graph handle and each package's `dependencies`):
 
 ```
 architect-core        (leaf — no @libar-dev deps; deps: @cucumber/gherkin, typescript-estree, glob, zod)
@@ -84,11 +84,11 @@ Notable external tooling: **pnpm** (workspaces, pinned `10.4.1`), **tsx** (run C
 
 ## Consumers
 
-- **Developers** — run the dogfood scripts (`pnpm architect:query`, `architect:guard`, `validate:all`, `docs:all`) against this repo.
+- **Developers** — run the dogfood scripts (`pnpm architect:q`, `architect:graph`, `architect:guard`, `validate:all`, `docs:all`) against this repo.
 - **CI** — invokes build/typecheck/lint/test, the guards (`guard:no-suppressions`, `audit:subtractive`, `check:skills`), the docs determinism gate (`docs:all` + `git diff --exit-code docs-live`), and changesets release.
-- **Agents / harnesses** — Codex, Claude Code, OpenCode reach the toolchain through `pnpm architect:query` (CLI) and the `architect-mcp` server.
+- **Agents / harnesses** — Codex, Claude Code, OpenCode reach the toolchain through `pnpm architect:q` (the graph handle) and the `architect-mcp` server.
 - **Studio / desktop (proprietary)** — consume the same projections the shell exposes.
-- **Consuming repos** — install `@libar-dev/architect` (or the granular splits for a narrower footprint), wire their own `architect.config.ts` of the same shape, and expose their own `architect:query` script.
+- **Consuming repos** — install `@libar-dev/architect` (or the granular splits for a narrower footprint), wire their own `architect.config.ts` of the same shape, and expose their own `architect:q` / `architect:graph` scripts.
 
 ## Load-bearing vs incidental (cut-list)
 
@@ -103,7 +103,7 @@ Notable external tooling: **pnpm** (workspaces, pinned `10.4.1`), **tsx** (run C
 
 - **Highest-confidence cut — the per-doc `docs:*` scripts (`docs:patterns`, `docs:architecture`, `docs:roadmap`, `docs:taxonomy`, `docs:api-reference`).** Five single-generator wrappers around `architect-generate -g <type> -f` that `docs:all` already subsumes. As the projection pipeline collapses the documentType-first star into source-first Views over one engine, per-documentType invocation scripts are exactly the accreted surface that should disappear; keep `docs:all` only.
 - **`tsconfig.architect-base.json` adds a single flag** (`noPropertyAccessFromIndexSignature`) over `tsconfig.base.json`. Two base files for one extra option is borderline; the flag could fold into `tsconfig.base.json` and the extra file be deleted — verify no package extends only the plain base first.
-- **Convenience query aliases `architect:overview` / `architect:status`** duplicate `architect:query overview` / `architect:query status`. Harmless, but pure sugar — candidates to drop if the script list is being trimmed.
+- (The former `architect:overview` / `architect:status` convenience aliases were removed with the verb CLI — ADR-014.)
 - **Naming drift to fix, not necessarily cut:** a bin named `architect-lint-patterns` exists, but the wired root script is `validate:patterns` (→ `architect-validate`), and `architect:lint-steps` wraps `architect-lint-steps`. The `lint-patterns` bin has no root-script entrypoint — confirm it is still reached (e.g. by the guard pipeline) or it is a dangling bin.
 - **Planning-context script families `pkg:*` and `ci:architect:*` do not exist** in the current root `package.json` — no cut needed, but any doc/skill claiming they exist is stale and should be corrected.
 
@@ -113,4 +113,4 @@ Notable external tooling: **pnpm** (workspaces, pinned `10.4.1`), **tsx** (run C
 - **Root scripts:** 31.
 - **Bins:** 7 (6 cli-owned, 1 mcp-owned).
 - **Config size:** `architect.config.ts` ≈ 49 lines (mostly the 7-entry `packages` display map); `tsconfig.base.json` ≈ 28 lines, `tsconfig.architect-base.json` ≈ 8 lines, `eslint.config.mjs` ≈ 435 lines (the large surface is `architect-projection` import-boundary rules, not generic shell config), `pnpm-workspace.yaml` 3 lines.
-- **Pattern-graph scale (dogfood, from `architect:query overview`):** 267 delivery patterns + 20 candidates; per-package node counts core 31 / projection 103 / guard 20 / cli 4 / mcp 5.
+- **Pattern-graph scale (dogfood, from the graph handle; drifts with every annotation):** ~350 patterns — re-derive live via `pnpm architect:graph census`.

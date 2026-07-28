@@ -1,8 +1,15 @@
 # playground — essential context
 
-Conceptual + findings context for this folder. `README.md` is the operational guide
-(files, shapes, run commands); this doc is the **why**, the **mental model**, and the
-**verified findings** so a future session can re-enter without re-deriving them.
+Conceptual + findings context for this folder: the **why**, the **mental model**, and the
+**verified findings** of the experiment that produced the graph handle.
+
+> **GRADUATED (ADR-014).** The experiment concluded: the handle now lives at
+> `packages/architect-cli/src/handle/` behind the `architect` bin
+> (`pnpm architect:q` / `pnpm architect:graph` — the old `pnpm playground:q` /
+> `pnpm playground:cli` commands in this doc are retired names), the decision is
+> `architect/decisions/adr-014-agent-read-surface.feature`, and the operational guide is
+> the `architect-graph-handle` skill. This doc remains as the experiment's findings
+> record — read it for rationale, not for run commands.
 
 > Status note: this is _working-state notes_, not a projected read-model artifact.
 > It records durable findings and decisions, deliberately without dates/worklog

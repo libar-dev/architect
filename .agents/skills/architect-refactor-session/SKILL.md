@@ -79,17 +79,26 @@ Load [`architect-base`](../architect-base/SKILL.md) (vocabulary) and [`architect
 
 ## Pre-flight (mandatory CLI bootstrap)
 
-`scope-validate` is intentionally absent — the verb only accepts
-`design` or `implement` and refactors have no spec to validate.
+Scope validation is intentionally absent — scope readiness
+(the `architect_scope_validate` MCP tool) only covers `design` or
+`implement` sessions and refactors have no spec to validate.
 
-Run the pre-flight from
-[`../architect-data-api/SKILL.md`](../architect-data-api/SKILL.md) — for a
-refactor that means `overview`, `context --session implement` (current
-surface), `files` (touched-file inventory), `dep-tree` (blast radius),
-`arch blocking`, and `arch dangling --baseline ... --strict` (the
-graph-integrity gate used in the closing checks below).
+Run the read-surface pre-flight per
+[`../architect-graph-handle/SKILL.md`](../architect-graph-handle/SKILL.md)
+(the read surface, ADR-014) — for a refactor that means:
 
-If `pnpm architect:query` returns no rows for the pattern (the pattern is
+- **Orientation:**
+  `pnpm architect:q 'return {counts: g.api.getStatusCounts(), active: g.api.getCurrentWork().map(p => p.patternName ?? p.name)}'`
+- **Touched-file inventory:**
+  `pnpm architect:q 'const p = g.pattern("<Pattern>"); return {file: p?.sourceFile, realizing: p?.implementedBy}'`
+- **Blast radius:**
+  `pnpm architect:q 'g.api.getDependencyContext("<Pattern>")'`
+- **Blocked work:**
+  `pnpm architect:q 'g.patterns.filter(p => p.status === "roadmap" && p.uses.some(u => g.pattern(u)?.status !== "completed")).map(p => p.name)'`
+- **Graph-integrity gate** (also used in the closing checks below):
+  `pnpm architect:graph dangling --baseline packages/architect-guard/src/lint/dangling-baseline.json --strict`
+
+If `g.pattern("<Pattern>")` returns `undefined` (the pattern is
 unknown to the graph), stop. Either the pattern name is wrong, or the
 work is feature work disguised as refactor — route to
 [`architect-sessions`](../architect-sessions/SKILL.md) and its
@@ -99,7 +108,8 @@ work is feature work disguised as refactor — route to
 
 1. **Identify the executable feature.** Locate the file under
    `tests/features/` carrying `@architect-implements:<Pattern>` (use
-   `files <pattern>` and the `context --session implement` output).
+   the pre-flight inventory one-liner — `g.pattern("<Pattern>")`
+   exposes `sourceFile` and `implementedBy`).
    If absent, create it as
    `tests/features/<area>/<pattern-kebab>-executable-tests.feature`
    per
@@ -108,8 +118,10 @@ work is feature work disguised as refactor — route to
    `@architect-implements:<Pattern>`. The new file is the durable
    artifact — never substitute a retroactive design-level spec.
 2. **Read before edit.** Read the executable feature first; read every
-   production file listed by `files <pattern>`; read `dep-tree
-<pattern>` to understand the blast radius. Do not skim.
+   production file the inventory one-liner lists (`sourceFile` +
+   `implementedBy`); read the
+   `pnpm architect:q 'g.api.getDependencyContext("<Pattern>")'` output
+   to understand the blast radius. Do not skim.
 3. **Capture decisions before code.** Any invariant the refactor
    intends to change must be entered in `.pr-coordination/DECISIONS.md`
    (or, for solo-session refactors, the working note the user
@@ -166,8 +178,10 @@ submodule` edges are acceptable. Verify against the barrel's actual
   across several patterns or no single production pattern exists, defer
   rather than guess.
 
-Read back every such edge through the Data API after authoring. The
-file edit is not proof until `pattern`, `bundle`, or `dep-tree` shows
+Read back every such edge through the graph handle after authoring.
+The file edit is not proof until
+`pnpm architect:q 'g.pattern("<Pattern>")'` (the node carries
+`uses`/`usedBy`) or `g.api.getDependencyContext("<Pattern>")` shows
 the intended relationship in the live graph.
 
 ## Adapted invariant-carrier gate
@@ -195,11 +209,13 @@ five must hold before declaring the refactor done.
    code-originated pattern (codec / contract / utility) does own its
    `@architect-pattern` on the `.ts`; no stale `@architect-uses`
    referencing removed dependencies.
-5. **Graph integrity.** `dep-tree <pattern>` after-state matches the
-   refactor's intent — no surprise edges. `arch blocking` shows no
-   new blockers introduced by the refactor. (Run both verbs again
-   after the final commit.) Use
-   `pnpm architect:query arch dangling --baseline packages/architect-guard/src/lint/dangling-baseline.json --strict`
+5. **Graph integrity.** The
+   `g.api.getDependencyContext("<Pattern>")` after-state matches the
+   refactor's intent — no surprise edges. The blocked-work script
+   (`pnpm architect:q 'g.patterns.filter(p => p.status === "roadmap" && p.uses.some(u => g.pattern(u)?.status !== "completed")).map(p => p.name)'`)
+   shows no new blockers introduced by the refactor. (Run both reads
+   again after the final commit.) Use
+   `pnpm architect:graph dangling --baseline packages/architect-guard/src/lint/dangling-baseline.json --strict`
    as the deterministic graph-integrity gate — non-zero exit means the
    refactor introduced (or removed) a dangling reference and the drift
    must be resolved before declaring done.

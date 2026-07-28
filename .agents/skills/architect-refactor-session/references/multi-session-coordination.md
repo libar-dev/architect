@@ -27,7 +27,8 @@ scope-discovery rule below.
 
 ## The campaign rules (beyond the universal three)
 
-The three universal session rules — **Data API first**, **gates
+The three universal session rules — **graph handle first** (the read
+surface, ADR-014 — `pnpm architect:q`), **gates
 non-negotiable**, **commit hygiene** — are the floor for every session
 (stated in [`../../architect-sessions/SKILL.md`](../../architect-sessions/SKILL.md)
 §"Universal session rules"). A campaign adds three more, which the
@@ -217,8 +218,9 @@ inline-vs-defer before continuing.
 ## Sibling references
 
 - [`../../architect-sessions/SKILL.md`](../../architect-sessions/SKILL.md)
-  §"Universal session rules" — the three universal rules (Data API
-  first, gates, commit hygiene) that the campaign rules above build on.
+  §"Universal session rules" — the three universal rules (graph
+  handle first, gates, commit hygiene) that the campaign rules above
+  build on.
 - [`../../architect-base/SKILL.md`](../../architect-base/SKILL.md)
   §"Anti-anecdote" — the templates above are deliberately abstract;
   past campaign artifacts are anecdote, useful for understanding why

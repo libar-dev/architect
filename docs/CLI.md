@@ -1,89 +1,49 @@
-# Data API CLI
+# Graph CLI
 
-> **Deprecated:** The full CLI story now lives in generated package docs. This file keeps only quick-start guidance and operational reference for the package host.
+> **Deprecated:** `docs/` is the legacy manual-docs set, superseded by the generated docs in [`docs-live/`](../docs-live/INDEX.md). This file keeps only quick-start guidance for the `architect` bin's read surface.
 >
-> Query the pattern graph directly from annotated source code.
-
-> **For AI coding agents:** Start every session with these three commands:
->
-> 1. `overview` — project health
-> 2. `scope-validate <pattern> <session-type>` — catches blockers before you start
-> 3. `context <pattern> --session <type>` — curated context bundle
->
-> `context <pattern> --session <type>` remains the top-level session-context bundle command. The bounded-context architecture query was the surface that changed: use `arch bounded-context [name]`, not `arch context`.
+> The retired verb CLI (24 pre-baked query verbs) was deleted by **ADR-014** (`architect/decisions/adr-014-agent-read-surface.feature`). Its replacement is the scriptable graph handle below; the operational guide is the **architect-graph-handle** skill (`.agents/skills/architect-graph-handle/SKILL.md`). The typed `architect_*` MCP tools (`architect_scope_validate`, `architect_bundle`, `architect_context`, `architect_handoff`, `architect_documentation`, …) are unchanged — the stable surface for burst-mode and Studio use.
 
 ---
 
-## Generated References
-
-> This document retains operational reference for the package host. For the
-> generated CLI story, start at the package docs index and then jump to the CLI
-> pattern pages that are actually emitted today.
-
-- **[Generated Docs Index](../docs-live/INDEX.md)** — current generated package-doc entrypoint
-- **[PatternGraphAPICLI](../docs-live/patterns/pattern-graph-apicli.md)** — CLI runtime surface and linked executable coverage
-- **[PatternGraphCliSubcommands](../docs-live/patterns/pattern-graph-cli-subcommands.md)** — subcommand inventory and behavior coverage
-- **[DataAPICLIErgonomics](../docs-live/patterns/data-apicli-ergonomics.md)** — session-start workflow and CLI ergonomics rationale
-
-## Package-host wrapper
-
-From the monorepo root, the package-host wrapper is:
+## The q front door
 
 ```bash
-pnpm pkg:query -- <subcommand>
+pnpm architect:q '<js>'
 ```
 
-Inside `packages/architect/` itself, use the local script instead:
+Evaluates a JS expression (or statement body ending in `return`) with `g` — the live PatternGraph handle, built fresh from the working tree — in scope. Accessors return plain composable data, no envelopes.
 
 ```bash
-pnpm architect:query -- <subcommand>
+pnpm architect:q 'g.api.getStatusCounts()'                            # status distribution
+pnpm architect:q 'g.pattern("PatternGraphApi")'                       # one node: status, deps, files
+pnpm architect:q 'g.findByConcept("taxonomy")'                        # concept → ranked patterns
+pnpm architect:q 'g.byFile("packages/architect-core/src/index.ts")'   # file → owner + neighborhood
+pnpm architect:q 'g.api.isValidTransition("roadmap","active")'        # deterministic FSM gate
 ```
 
-Use the direct runtime entrypoint only when you need banner-free JSON piping,
-or when you are working directly on the CLI runtime surface.
+The surface: `g.patterns`, `g.pattern(name)`, `g.fileToPattern(file)`, `g.findByConcept(q)`, `g.byFile(f)`, `g.bySymbol(s)`, `g.invariantsOf(x)`, `g.specsReverifying(xs)`, `g.blastRadius(files)`, `g.fanInCandidates()`, `g.graphDiff()`, `g.census()`, `g.driftFlags(fn)`, plus `g.api` (the canonical `PatternGraphAPI`: `getPattern`, `getStatusCounts`, `getCurrentWork`, `getDependencyContext`, `getRulesForPattern`, `isValidTransition`, `checkTransition`, `getPatternParseFailure`, …) and the raw shapes `g.authored` / `g.mech`.
 
----
-
-## Output Reference
-
-### JSON Envelope
-
-All JSON commands wrap output in a `QueryResult` envelope:
-
-```json
-{
-  "success": true,
-  "data": { ... },
-  "metadata": {
-    "timestamp": "2026-02-21T04:31:31.633Z",
-    "patternCount": 318
-  }
-}
-```
-
-On error:
-
-```json
-{
-  "success": false,
-  "error": "Pattern not found: \"Orchestrator\"\nDid you mean: OrchestratorPipelineFactoryMigration?",
-  "code": "PATTERN_NOT_FOUND"
-}
-```
-
-### Exit Codes
-
-| Code | Meaning                        |
-| ---- | ------------------------------ |
-| `0`  | Success                        |
-| `1`  | Error (with message on stderr) |
-
-### JSON Piping
-
-`pnpm` outputs a banner line to stdout (`> @libar-dev/...`). For clean JSON
-piping from `packages/architect/`, use the direct CLI runtime instead of the
-wrapper scripts:
+## Named commands
 
 ```bash
-pnpm exec architect --base-dir . list --status roadmap --names-only | jq '.data[]'
+pnpm architect:graph <cmd>
 ```
+
+Runnable documentation over the handle: `census`, `diff`, `blast [ref]`, `fan-in`, `drift`, `maturity`, `find`, `file`, `symbol`, `invariants <Pattern>`, `specs [ref]`.
+
+## The dangling gate (CI)
+
+The one frozen machine contract, consumed by CI:
+
+```bash
+pnpm architect:graph dangling --baseline packages/architect-guard/src/lint/dangling-baseline.json --strict
+```
+
+Exit code `0` on success, `1` on failure (message on stderr).
+
+## Reference
+
+- **[architect-graph-handle skill](../.agents/skills/architect-graph-handle/SKILL.md)** — full surface, return shapes, recipes, decision guide.
+- **ADR-014** (`architect/decisions/adr-014-agent-read-surface.feature`) — why the verb CLI is gone and what stayed frozen.
+- **[Generated docs index](../docs-live/INDEX.md)** — regenerate with `pnpm docs:all`; [`docs-live/TAXONOMY.md`](../docs-live/TAXONOMY.md) is the canonical enumerated tag set.

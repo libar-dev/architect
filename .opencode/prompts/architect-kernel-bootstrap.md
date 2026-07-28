@@ -1,6 +1,6 @@
 ## Skills — mandatory
 
-This is the Architect repository. Four skills carry the operational substance of this repo. **`architect-base` is the mandatory first-load; `architect-sessions` loads for spec-driven work; `architect-data-api` and `architect-graph-handle` load on demand** — the two read surfaces (the canonical `pnpm architect:query` verbs, and the agent-sink live-graph handle), pulled in when you need them, not unconditionally at startup.
+This is the Architect repository. Three skills carry the operational substance of this repo. **`architect-base` is the mandatory first-load; `architect-graph-handle` loads on demand as THE read surface (ADR-014); `architect-sessions` loads for spec-driven work.**
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -8,11 +8,8 @@ This is the Architect repository. Four skills carry the operational substance of
 │   ▶  architect-base        the vocabulary of the repo               │
 │                            PatternGraph · tiers · FSM · ADRs        │
 │                                                                     │
-│   ▶  architect-data-api    deterministic answers about pattern      │
-│                            state, deps, gates, transitions          │
-│                                                                     │
-│   ▶  architect-graph-handle  architectural cuts the verbs           │
-│                              don't pre-bake; script the graph       │
+│   ▶  architect-graph-handle  the read surface — script the live     │
+│                              graph (state, slices, impact, gates)   │
 │                                                                     │
 │   ▶  architect-sessions    the spec-driven session lifecycle        │
 │                            plan · design · implement · review       │
@@ -22,9 +19,7 @@ This is the Architect repository. Four skills carry the operational substance of
 
 **`architect-base`** hands you the PatternGraph + tag taxonomy, the four authored detail tiers plus executable + maintenance levels, the FSM lifecycle, value-transfer / spec-deletion doctrine, key ADRs, and the validation layers. The conceptual model that makes every other surface in this repo legible.
 
-**`architect-data-api`** (load on demand, not auto-loaded at startup) is the product itself and your context-gathering tool. The CLI (`pnpm architect:query <verb>`) gives you "what's the state of `X`?", "what does `X` depend on?", "is this transition legal?" — sub-second, deterministic, structured. Pattern exploration through the API is faster than file scanning and won't lie to you.
-
-**`architect-graph-handle`** (load on demand) is the agent-sink read surface — the complement to the verbs. When you'd otherwise grep across files for an architectural slice the verbs don't pre-bake (a file's owner + neighborhood, a symbol's architectural usage, the blast radius of a diff, what a pattern guarantees, which specs re-verify a change), one command (`pnpm playground:q '<js>'`) builds the live graph in-process and hands you `g` to script the cut — returning the conclusion, not the firehose. The verbs stay canonical for pattern state; reach here to navigate and reshape graph cuts no single verb produces.
+**`architect-graph-handle`** (load on demand) is the agent read surface (ADR-014 — the verb CLI is retired). Whenever you need graph state — a pattern's status/deps/rules, a file's owner + neighborhood, a symbol's architectural usage, the blast radius of a diff, what a pattern guarantees, which specs re-verify a change — one command (`pnpm architect:q '<js>'`) builds the live graph in-process and hands you `g` to script the cut, returning the conclusion, not the firehose. `g.api` carries the canonical PatternGraphAPI for deterministic reads (including `isValidTransition`); ordinary grep stays the complement for content-level search; the `architect_*` MCP tools remain the stable typed surface for burst-mode/Studio use.
 
 **`architect-sessions`** is the spec-driven delivery lifecycle — capture → design → implement → review → handoff — as one skill, with the per-session execution detail behind progressive disclosure so the always-loaded body stays small. Load it for any work that touches a spec, a pattern, or an FSM transition (which is nearly everything here).
 

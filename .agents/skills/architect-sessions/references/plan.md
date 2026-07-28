@@ -17,7 +17,7 @@ If the answers aren't there yet, refining intent in conversation is a valid outc
 
 ## Pre-flight
 
-Run the everyday-verb pre-flight from [`../../architect-data-api/SKILL.md`](../../architect-data-api/SKILL.md) (`overview`, then `search` / `list --status candidate --names-only` to locate, `open-questions [--parent <Epic>]` for candidate readiness). **No `scope-validate` at this tier** — it accepts only `design` and `implement`; idea/candidate readiness is structural (the ladder reference).
+Run the pre-flight from [`../../architect-graph-handle/SKILL.md`](../../architect-graph-handle/SKILL.md) — the read surface (ADR-014). Orient with `pnpm architect:q 'return {counts: g.api.getStatusCounts(), active: g.api.getCurrentWork().map(p => p.patternName ?? p.name)}'`; locate with `pnpm architect:q 'g.findByConcept("<q>")'` or `pnpm architect:q 'g.patterns.filter(p => p.status === "candidate").map(p => p.name)'`; for candidate readiness read the candidate's full record — `pnpm architect:q 'g.api.getPattern("<Name>")'` — and check its open-questions block. **No scope gate at this tier** — `architect_scope_validate` (MCP) accepts only `design` and `implement`; idea/candidate readiness is structural (the ladder reference).
 
 ## Six-tag idea-tier minimum
 
@@ -76,7 +76,7 @@ Feature: <EpicName> - <one-line purpose>
     **Invariant:** <what must always be true>
 ```
 
-A **slice** is the same with `@architect-level:slice` and a `**Usage:**` line under the members; slices live in `architect/slices/<name>.feature`. To list an epic's members from the graph instead of hand-tracking the bullet list: `pnpm architect:query list --parent <EpicName> --names-only` (unknown parent exits non-zero).
+A **slice** is the same with `@architect-level:slice` and a `**Usage:**` line under the members; slices live in `architect/slices/<name>.feature`. To list an epic's members from the graph instead of hand-tracking the bullet list: `pnpm architect:q 'g.patterns.filter(p => p.parent === "<EpicName>").map(p => p.name)'` (an unknown parent yields an empty list — verify the name with `g.findByConcept` before trusting an empty result).
 
 The `**Members:**` bullets are human-facing orientation only. The authoritative member set is edge-derived from reverse `@architect-parent` links, so keep the list as reader help rather than the source of truth.
 
