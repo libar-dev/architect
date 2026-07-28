@@ -150,7 +150,7 @@ The architect dogfood CLI (`architect:overview`, `architect:status`, `architect:
 
 **Harnesses we use for coding:**
 
-- **Codex** — skills at `.codex/skills/` (directory symlink to `.agents/skills/`); session hook at `.codex/hooks/architect-api-first.sh` injects the API-first contract and live overview.
+- **Codex** — skills at `.codex/skills/` (directory symlink to `.agents/skills/`); shared SessionStart hook at `.codex/hooks/architect-api-first.sh` (symlink to `.claude/hooks/architect-api-first.sh`, one file for both harnesses) injects the source-first / event-sourced mental model and loads `architect-base` (mandatory first-load), pointing to `architect-data-api`, `architect-graph-handle`, and `architect-sessions` as on-demand loads.
 - **Claude Code** — skills at `.claude/skills/` (symlinks into `.agents/skills/`, the canonical source).
 - **OpenCode + oh-my-openagent (OmO)** — skills at `.opencode/skills/` (symlinks into `.agents/skills/`); coordination state at `.sisyphus/` (`plans/`, `notepads/`, `drafts/`, `evidence/`).
 
@@ -158,7 +158,7 @@ All three skill trees symlink into `.agents/skills/`; run `pnpm check:skills` to
 
 ## Skills — mandatory
 
-Three skills carry the operational substance of this repo. Load all three.
+Four skills carry the operational substance of this repo. **`architect-base` is the mandatory first-load; `architect-sessions` loads for spec-driven work; `architect-data-api` and `architect-graph-handle` load on demand** — the two read surfaces (the canonical `pnpm architect:query` verbs, and the agent-sink live-graph handle), pulled in when you need them, not unconditionally at startup.
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -169,6 +169,9 @@ Three skills carry the operational substance of this repo. Load all three.
 │   ▶  architect-data-api    deterministic answers about pattern      │
 │                            state, deps, gates, transitions          │
 │                                                                     │
+│   ▶  architect-graph-handle  architectural cuts the verbs           │
+│                              don't pre-bake; script the graph       │
+│                                                                     │
 │   ▶  architect-sessions    the spec-driven session lifecycle        │
 │                            plan · design · implement · review       │
 │                                                                     │
@@ -177,7 +180,9 @@ Three skills carry the operational substance of this repo. Load all three.
 
 **`architect-base`** hands you the PatternGraph + tag taxonomy, the four authored detail tiers plus executable + maintenance levels, the FSM lifecycle, value-transfer / spec-deletion doctrine, key ADRs, and the validation layers. The conceptual model that makes every other surface in this repo legible.
 
-**`architect-data-api`** is the product itself and your context-gathering tool. The CLI (`pnpm architect:query <verb>`) gives you "what's the state of `X`?", "what does `X` depend on?", "is this transition legal?" — sub-second, deterministic, structured. Pattern exploration through the API is faster than file scanning and won't lie to you.
+**`architect-data-api`** (load on demand, not auto-loaded at startup) is the product itself and your context-gathering tool. The CLI (`pnpm architect:query <verb>`) gives you "what's the state of `X`?", "what does `X` depend on?", "is this transition legal?" — sub-second, deterministic, structured. Pattern exploration through the API is faster than file scanning and won't lie to you.
+
+**`architect-graph-handle`** (load on demand) is the agent-sink read surface — the complement to the verbs. When you'd otherwise grep across files for an architectural slice the verbs don't pre-bake (a file's owner + neighborhood, a symbol's architectural usage, the blast radius of a diff, what a pattern guarantees, which specs re-verify a change), one command (`pnpm playground:q '<js>'`) builds the live graph in-process and hands you `g` to script the cut — returning the conclusion, not the firehose. The verbs stay canonical for pattern state; reach here to navigate and reshape graph cuts no single verb produces.
 
 **`architect-sessions`** is the spec-driven delivery lifecycle — capture → design → implement → review → handoff — as one skill, with the per-session execution detail behind progressive disclosure so the always-loaded body stays small. Load it for any work that touches a spec, a pattern, or an FSM transition (which is nearly everything here).
 
