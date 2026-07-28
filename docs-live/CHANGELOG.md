@@ -6,12 +6,12 @@
 
 ## Overview
 
-Completed milestones timeline covering 124 patterns.
+Completed milestones timeline covering 140 patterns.
 
 | Metric    | Value |
 | --------- | ----- |
-| Patterns  | 124   |
-| Completed | 124   |
+| Patterns  | 140   |
+| Completed | 140   |
 | Active    | 0     |
 | Planned   | 0     |
 | Candidate | 0     |
@@ -29,6 +29,7 @@ Completed milestones timeline covering 124 patterns.
 | ADR010DocumentationCompositionHelpers                 | completed |            | architect/decisions/adr-010-documentation-composition-helpers.feature                                                |
 | ADR012DeliveryNavigation                              | completed |            | architect/decisions/adr-012-delivery-navigation.feature                                                              |
 | ADR013TaxonomyRetirement                              | completed |            | architect/decisions/adr-013-taxonomy-retirement.feature                                                              |
+| ADR014AgentReadSurface                                | completed |            | architect/decisions/adr-014-agent-read-surface.feature                                                               |
 | AnnotationCoverageProjection                          | completed | projection | packages/architect-projection/src/projections/operational-insights/index.ts                                          |
 | AntiPatternDetector                                   | completed | service    | packages/architect-guard/src/validation/anti-patterns.ts                                                             |
 | AntiPatternValidationTypes                            | completed | contract   | packages/architect-guard/src/validation/types.ts                                                                     |
@@ -36,20 +37,26 @@ Completed milestones timeline covering 124 patterns.
 | ArchitectureDiagramProjection                         | completed | projection | packages/architect-projection/src/projections/documentation-composition/architecture-diagram.ts                      |
 | ArchitectureNavigationProjectionExecutableTests       | completed | projection | packages/architect-projection/tests/features/projections/pattern-relations/architecture-neighborhood.feature         |
 | ArchitectureNeighborhoodProjection                    | completed | projection | packages/architect-projection/src/projections/pattern-relations/architecture-neighborhood.ts                         |
+| ArgvHygiene                                           | completed | utility    | packages/architect-core/src/utils/argv-hygiene.ts                                                                    |
+| AuthoredCoreBuilder                                   | completed | service    | packages/architect-cli/src/handle/authored.ts                                                                        |
 | BoundedContextProjection                              | completed | projection | packages/architect-projection/src/projections/pattern-relations/architecture-context.ts                              |
 | BuildPipeline                                         | completed | service    | packages/architect-core/src/generators/pipeline/build-pipeline.ts                                                    |
+| BusinessRuleSetAssembly                               | completed | service    | packages/architect-projection/src/projections/governance/business-rules.internal.ts                                  |
 | BusinessRulesProjection                               | completed | projection | packages/architect-projection/src/projections/governance/business-rules.ts                                           |
 | BusinessRulesProjectionExecutableTests                | completed | projection | packages/architect-projection/tests/features/projections/governance/business-rules.feature                           |
 | ChangelogProjection                                   | completed | projection | packages/architect-projection/src/projections/delivery-reporting/index.ts                                            |
 | ChangelogProjectionExecutableTests                    | completed | projection | packages/architect-projection/tests/features/projections/delivery-reporting/changelog.feature                        |
+| CliCommandResolutionExecutableTests                   | completed |            | packages/architect-cli/tests/features/cli-command-resolution.feature                                                 |
+| CLIContextTypes                                       | completed | contract   | packages/architect-cli/src/cli/pattern-graph-cli-types.ts                                                            |
 | CLIErrorHandler                                       | completed | utility    | packages/architect-cli/src/cli/error-handler.ts                                                                      |
+| CliFlagParsingExecutableTests                         | completed |            | packages/architect-cli/tests/features/cli-flag-parsing.feature                                                       |
 | CLIRuntimePaths                                       | completed | utility    | packages/architect-cli/src/cli/runtime-helpers.ts                                                                    |
 | CLIVersionHelper                                      | completed | utility    | packages/architect-cli/src/cli/version.ts                                                                            |
 | CompactTextRenderer                                   | completed | codec      | packages/architect-projection/src/renderers/render-compact-text.ts                                                   |
 | ConfigBasedWorkflowDefinition                         | completed |            | packages/architect-core/tests/features/config/config-loader.feature                                                  |
 | ConfigResolution                                      | completed |            | packages/architect-core/tests/features/config/config-resolution.feature                                              |
 | ConfigurationAPI                                      | completed |            | packages/architect-core/tests/features/config/configuration-api.feature                                              |
-| DataAPICLIErgonomics                                  | completed |            | tests/features/cli/data-api-help.feature                                                                             |
+| ConfigValidationSchemas                               | completed | contract   | packages/architect-core/src/validation-schemas/config.ts                                                             |
 | DataAPIOutputShaping                                  | completed |            | tests/features/api/output-shaping/output-pipeline.feature                                                            |
 | DecisionCatalogProjection                             | completed | projection | packages/architect-projection/src/projections/governance/decision-records.ts                                         |
 | DecisionCatalogProjectionExecutableTests              | completed | projection | packages/architect-projection/tests/features/projections/governance/decision-records.feature                         |
@@ -62,10 +69,12 @@ Completed milestones timeline covering 124 patterns.
 | DependencyContextProjectionExecutableTests            | completed | projection | packages/architect-projection/tests/features/projections/pattern-relations/dependency-context.feature                |
 | DependencyEdgeProjection                              | completed | projection | packages/architect-projection/src/projections/pattern-relations/dependency-edges.ts                                  |
 | DependencyEdgeProjectionExecutableTests               | completed | projection | packages/architect-projection/tests/features/projections/pattern-relations/dependency-edges.feature                  |
+| DeterministicFormatUtils                              | completed | utility    | packages/architect-projection/src/\_internal/format-utils.ts                                                         |
 | DocStringMediaType                                    | completed |            | packages/architect-core/tests/features/scanner/docstring-mediatype.feature                                           |
 | DocumentationBundle                                   | completed | projection | packages/architect-projection/src/projections/documentation-composition/documentation-bundle.ts                      |
 | DocumentationCompositionProjectionExecutableTests     | completed | projection | packages/architect-projection/tests/features/projections/documentation-composition/config-documentation.feature      |
 | DocumentationCompositionProjectionSupport             | completed | utility    | packages/architect-projection/src/projections/documentation-composition/documentation-composition-shared.internal.ts |
+| DocumentationDefinitionRegistry                       | completed | decider    | packages/architect-projection/src/projections/documentation-composition/documentation-definition.internal.ts         |
 | DualSourceMergeIntegration                            | completed |            | packages/architect-core/tests/features/extractor/dual-source-merge.feature                                           |
 | ErrorFactoryTypes                                     | completed | contract   | packages/architect-core/src/types/errors.ts                                                                          |
 | ErrorFactoryTypesExecutableTests                      | completed | contract   | packages/architect-core/tests/features/types/error-factories.feature                                                 |
@@ -80,7 +89,13 @@ Completed milestones timeline covering 124 patterns.
 | GherkinRulesSupport                                   | completed |            | packages/architect-core/tests/features/scanner/gherkin-parser.feature                                                |
 | GovernanceProjectionSupport                           | completed | utility    | packages/architect-projection/src/projections/governance/governance-shared.internal.ts                               |
 | GovernanceValidationTaxonomyProjectionExecutableTests | completed | projection | packages/architect-projection/tests/features/projections/governance/validation-taxonomy.feature                      |
+| GraphHandle                                           | completed | service    | packages/architect-cli/src/handle/graph.ts                                                                           |
+| GraphHandleCli                                        | completed | service    | packages/architect-cli/src/cli/graph-cli.ts                                                                          |
+| GraphHandleCliExecutableTests                         | completed |            | tests/features/cli/graph-handle.feature                                                                              |
+| GraphHandleShapes                                     | completed | contract   | packages/architect-cli/src/handle/schema.ts                                                                          |
+| GraphHandleViews                                      | completed | service    | packages/architect-cli/src/handle/views.ts                                                                           |
 | HandoffProjection                                     | completed | projection | packages/architect-projection/src/projections/execution-context/handoff.ts                                           |
+| HierarchyLevelDomain                                  | completed | contract   | packages/architect-core/src/taxonomy/hierarchy-levels.ts                                                             |
 | JsonRenderer                                          | completed | codec      | packages/architect-projection/src/renderers/render-json.ts                                                           |
 | LintEngine                                            | completed | service    | packages/architect-guard/src/lint/engine.ts                                                                          |
 | LintModule                                            | completed | barrel     | packages/architect-guard/src/lint/index.ts                                                                           |
@@ -94,20 +109,19 @@ Completed milestones timeline covering 124 patterns.
 | MCPServer                                             | completed | service    | packages/architect-mcp/src/server.ts                                                                                 |
 | MCPServerBin                                          | completed | utility    | packages/architect-mcp/src/cli/mcp-server.ts                                                                         |
 | MCPToolRegistry                                       | completed | service    | packages/architect-mcp/src/tool-registry.ts                                                                          |
+| MechanicalSubstrateExtractor                          | completed | service    | packages/architect-cli/src/handle/extract.ts                                                                         |
+| OpenQuestionList                                      | completed | contract   | packages/architect-projection/src/fragments/pattern-relations/open-question-list.ts                                  |
 | OperationalInsightsProjectionExecutableTests          | completed | projection | packages/architect-projection/tests/features/projections/operational-insights/reporting.feature                      |
 | OperationalInsightsProjectionSupport                  | completed | utility    | packages/architect-projection/src/projections/operational-insights/index.ts                                          |
 | OrphanPatternListProjection                           | completed | projection | packages/architect-projection/src/projections/pattern-relations/orphan-pattern-list.ts                               |
 | OverviewProjection                                    | completed | projection | packages/architect-projection/src/projections/operational-insights/index.ts                                          |
+| PatternBundleAssembly                                 | completed | service    | packages/architect-projection/src/projections/pattern-relations/bundle.internal.ts                                   |
+| PatternBundleEntry                                    | completed | contract   | packages/architect-projection/src/fragments/pattern-relations/pattern-bundle-entry.ts                                |
+| PatternCatalogAssembly                                | completed | service    | packages/architect-projection/src/projections/pattern-relations/pattern-catalog.internal.ts                          |
 | PatternCatalogProjection                              | completed | projection | packages/architect-projection/src/projections/pattern-relations/pattern-catalog.ts                                   |
 | PatternCatalogStatusFilterExecutableTests             | completed | projection | packages/architect-projection/tests/features/projections/pattern-relations/pattern-catalog-status-filter.feature     |
 | PatternDetailProjection                               | completed | projection | packages/architect-projection/src/projections/pattern-relations/pattern-detail.ts                                    |
 | PatternDetailProjectionExecutableTests                | completed | projection | packages/architect-projection/tests/features/projections/pattern-relations/pattern-detail.feature                    |
-| PatternGraphAPICLI                                    | completed |            | tests/features/cli/pattern-graph-cli-core.feature                                                                    |
-| PatternGraphCliArchHealth                             | completed |            | tests/features/cli/pattern-graph-cli-arch-health.feature                                                             |
-| PatternGraphCliOutputModifiers                        | completed |            | tests/features/cli/pattern-graph-cli-output-modifiers.feature                                                        |
-| PatternGraphCliQueryPassthrough                       | completed |            | tests/features/cli/pattern-graph-cli-query.feature                                                                   |
-| PatternGraphCliRulesSubcommand                        | completed |            | tests/features/cli/pattern-graph-cli-rules-subcommand.feature                                                        |
-| PatternGraphCliSubcommands                            | completed |            | tests/features/cli/pattern-graph-cli-subcommands.feature                                                             |
 | PatternRelationsProjectionSupport                     | completed | utility    | packages/architect-projection/src/projections/\_shared/pattern-helpers.internal.ts                                   |
 | PatternSummaryCatalogProjectionExecutableTests        | completed | projection | packages/architect-projection/tests/features/projections/pattern-relations/pattern-summary.feature                   |
 | PatternSummaryProjection                              | completed | projection | packages/architect-projection/src/projections/pattern-relations/pattern-summary.ts                                   |
@@ -128,9 +142,11 @@ Completed milestones timeline covering 124 patterns.
 | ScopeReadinessProjection                              | completed | projection | packages/architect-projection/src/projections/execution-context/scope-readiness.ts                                   |
 | SessionContextProjection                              | completed | projection | packages/architect-projection/src/projections/execution-context/session-context.ts                                   |
 | ShapeExtraction                                       | completed |            | packages/architect-core/tests/features/extractor/shape-extraction-types.feature                                      |
+| SlugCanonicalization                                  | completed | utility    | packages/architect-projection/src/\_internal/slug.ts                                                                 |
 | SourceInventoryProjection                             | completed | projection | packages/architect-projection/src/projections/operational-insights/index.ts                                          |
 | SourceMerging                                         | completed |            | packages/architect-core/tests/features/config/source-merging.feature                                                 |
 | StatusDistributionProjection                          | completed | projection | packages/architect-projection/src/projections/delivery-reporting/index.ts                                            |
+| TagDirectiveRegexBuilders                             | completed | utility    | packages/architect-core/src/config/regex-builders.ts                                                                 |
 | TagUsageProjection                                    | completed | projection | packages/architect-projection/src/projections/operational-insights/index.ts                                          |
 | TaxonomyDigestProjection                              | completed | projection | packages/architect-projection/src/projections/governance/taxonomy-digest.ts                                          |
 | TaxonomyDocumentationCluster                          | completed |            | architect/specs/documentation-projection/05-taxonomy-documentation-cluster.feature                                   |

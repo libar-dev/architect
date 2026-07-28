@@ -9,8 +9,8 @@
 
 | Metric     | Value |
 | ---------- | ----- |
-| Total ADRs | 14    |
-| Accepted   | 14    |
+| Total ADRs | 15    |
+| Accepted   | 15    |
 | Proposed   | 0     |
 | Deprecated | 0     |
 | Superseded | 0     |
@@ -30,6 +30,7 @@
 | [ADR-010](decisions/adr-010.md) | Documentation Composition Helpers | accepted | ADR  |
 | [ADR-012](decisions/adr-012.md) | Delivery Navigation               | accepted | ADR  |
 | [ADR-013](decisions/adr-013.md) | Taxonomy Retirement               | accepted | ADR  |
+| [ADR-014](decisions/adr-014.md) | Agent Read Surface                | accepted | ADR  |
 | [PDR-001](decisions/pdr-001.md) | Session Workflow Commands         | accepted | PDR  |
 | [PDR-005](decisions/pdr-005.md) | Process Guard FSM                 | accepted | PDR  |
 | [PDR-006](decisions/pdr-006.md) | Advisory Process Guard Protection | accepted | PDR  |

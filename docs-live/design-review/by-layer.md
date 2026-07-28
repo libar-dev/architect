@@ -7,7 +7,7 @@
 
 ## Overview
 
-This view captures 14 patterns across 4 diagrams in the Layered view.
+This view captures 15 patterns across 4 diagrams in the Layered view.
 
 ## Diagrams
 
@@ -18,9 +18,10 @@ Each node is a group; each arrow is a cross-group dependency (`depends-on` / `us
 ```mermaid
 graph LR
   foundation["foundation (4)"]
-  infrastructure["infrastructure (3)"]
+  infrastructure["infrastructure (4)"]
   refinement["refinement (7)"]
   infrastructure --> foundation
+  infrastructure --> refinement
   refinement --> foundation
 ```
 
@@ -36,14 +37,16 @@ graph TD
   pdr005processguardfsm -->|depends-on| adr001taxonomycanonicalvalues
 ```
 
-### Layer: infrastructure (3 patterns)
+### Layer: infrastructure (4 patterns)
 
 ```mermaid
 graph TD
   adr005codecbasedmarkdownrendering["ADR005CodecBasedMarkdownRendering<br/>(completed)"]
   adr006singlereadmodelarchitecture["ADR006SingleReadModelArchitecture<br/>(completed)"]
   adr008stepdefinitionstubsconvention["ADR008StepDefinitionStubsConvention<br/>(completed)"]
+  adr014agentreadsurface["ADR014AgentReadSurface<br/>(completed)"]
   adr006singlereadmodelarchitecture -->|depends-on| adr005codecbasedmarkdownrendering
+  adr014agentreadsurface -->|depends-on| adr006singlereadmodelarchitecture
 ```
 
 ### Layer: refinement (7 patterns)
@@ -66,14 +69,16 @@ graph TD
 
 Most-depended-on patterns in this view, ranked by in-view dependant count.
 
-| Pattern                              | Dependants | Top dependants                                                                                                                                     |
-| ------------------------------------ | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ADR001TaxonomyCanonicalValues        | 6          | ADR003SourceFirstPatternArchitecture, ADR007CoordinatedTaxonomyRedesign, ADR012DeliveryNavigation, ADR013TaxonomyRetirement, PDR005ProcessGuardFSM |
-| ADR003SourceFirstPatternArchitecture | 2          | ADR008StepDefinitionStubsConvention, ADR012DeliveryNavigation                                                                                      |
-| PDR005ProcessGuardFSM                | 2          | ADR007CoordinatedTaxonomyRedesign, PDR006AdvisoryProcessGuardProtection                                                                            |
-| ADR002GherkinOnlyTesting             | 1          | ADR008StepDefinitionStubsConvention                                                                                                                |
-| ADR005CodecBasedMarkdownRendering    | 1          | ADR006SingleReadModelArchitecture                                                                                                                  |
-| ADR007CoordinatedTaxonomyRedesign    | 1          | ADR013TaxonomyRetirement                                                                                                                           |
+| Pattern                               | Dependants | Top dependants                                                                                                                                     |
+| ------------------------------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ADR001TaxonomyCanonicalValues         | 6          | ADR003SourceFirstPatternArchitecture, ADR007CoordinatedTaxonomyRedesign, ADR012DeliveryNavigation, ADR013TaxonomyRetirement, PDR005ProcessGuardFSM |
+| ADR003SourceFirstPatternArchitecture  | 2          | ADR008StepDefinitionStubsConvention, ADR012DeliveryNavigation                                                                                      |
+| PDR005ProcessGuardFSM                 | 2          | ADR007CoordinatedTaxonomyRedesign, PDR006AdvisoryProcessGuardProtection                                                                            |
+| ADR002GherkinOnlyTesting              | 1          | ADR008StepDefinitionStubsConvention                                                                                                                |
+| ADR005CodecBasedMarkdownRendering     | 1          | ADR006SingleReadModelArchitecture                                                                                                                  |
+| ADR006SingleReadModelArchitecture     | 1          | ADR014AgentReadSurface                                                                                                                             |
+| ADR007CoordinatedTaxonomyRedesign     | 1          | ADR013TaxonomyRetirement                                                                                                                           |
+| ADR010DocumentationCompositionHelpers | 1          | ADR014AgentReadSurface                                                                                                                             |
 
 ## Legend
 
@@ -95,6 +100,7 @@ Most-depended-on patterns in this view, ranked by in-view dependant count.
 - ADR010DocumentationCompositionHelpers
 - ADR012DeliveryNavigation
 - ADR013TaxonomyRetirement
+- ADR014AgentReadSurface
 - PDR001SessionWorkflowCommands
 - PDR005ProcessGuardFSM
 - PDR006AdvisoryProcessGuardProtection

@@ -195,6 +195,13 @@
           "parentPath": "DECISIONS.md"
         },
         {
+          "path": "decisions/adr-014.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "DECISIONS.md"
+        },
+        {
           "path": "decisions/pdr-001.md",
           "role": "progressive-child",
           "audience": "published",
@@ -242,6 +249,13 @@
           "role": "root",
           "audience": "published",
           "tracking": "commit"
+        },
+        {
+          "path": "business-rules/architect-cli.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "BUSINESS-RULES.md"
         },
         {
           "path": "business-rules/architect-core.md",
