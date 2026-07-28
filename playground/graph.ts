@@ -9,20 +9,20 @@
  * `implementedBy` join) removed.
  *
  * Design rule held here: the PUBLIC types below are shaped by what an agent NEEDS
- * (a pattern's role/maturity, its invariants, what reverifies). The snapshot's
+ * (a pattern's role/maturity, its invariants, what reverifies). The built core's
  * shape — tag-encoding, the implementedBy hop, the `rule:<slug>` linkage, the dead
  * `layer` axis — is decode detail, hidden. Needs drive the surface, not storage.
  *
  *   import { loadGraph } from './graph.ts';
- *   const g = loadGraph();
+ *   const g = await loadGraph();                            // async: builds live from source
  *   g.invariantsOf('packages/architect-core/src/foo.ts');  // → Invariant[], any maturity
  *   g.specsReverifying(changedFiles);                       // → AtRiskSpec[]
  */
+import { buildMechanicalCore } from './extract.ts';
+import { buildAuthoredCore } from './live.ts';
 import {
   type AuthoredCore,
   type AuthoredPattern,
-  loadAuthored,
-  loadMechanical,
   type Maturity,
   MATURITY_BY_STATUS,
   MATURITIES,
@@ -48,13 +48,19 @@ import {
 export interface PatternNode {
   name: string;
   status: string;
-  maturity: Maturity; // derived (explicit tag wins) — the axis the snapshot omits
+  maturity: Maturity; // derived (explicit tag wins) — the axis the built core omits
   role?: string;
   boundedContext?: string;
   productArea?: string;
   sourceFile?: string;
+  level?: string; // @architect-level — epic / phase / task / slice (the hierarchy axis)
+  parent?: string; // @architect-parent — the membership backbone (was dropped pre-decode)
+  children: string[]; // inverse of parent (computed) — an epic's members, first-class
   uses: string[];
   usedBy: string[];
+  implementedBy: string[]; // realizing .feature files — a live test here ⇒ proven
+  implements: string[]; // patterns this realizes (@architect-implements) — is-a-realizer signal
+  enforcesDecisions: string[]; // ADRs this enforces — an architectural-significance signal
   ruleCount: number;
   scenarioCount: number;
 }
@@ -63,11 +69,17 @@ export interface PatternNode {
 export interface Invariant {
   rule: string; // the `Rule:` block name
   text: string; // the `**Invariant:**` prose, distilled
-  pattern: string; // owning pattern
+  pattern: string; // owning pattern (the realizing-feature pattern when reached via a realization edge)
   maturity: Maturity;
   provenance: Provenance; // executable test vs authored working-spec
   featureFile: string;
   provenByScenarios: string[]; // scenarios that exercise it (decoded join)
+  // When this invariant is reached through a `.feature` that realizes MORE THAN ONE
+  // pattern, the source attributes the Rule to the whole cohort, not to your query —
+  // there is no per-Rule pattern tag to disambiguate. Present so the agent never reads
+  // a sibling pattern's guarantee as the queried pattern's. Omitted when the realizing
+  // feature is 1:1 (the result is then precise to `pattern`).
+  cohort?: string[];
 }
 
 /** A spec that re-verifies when something upstream changes — labeled by maturity + provenance. */
@@ -79,9 +91,12 @@ export interface AtRiskSpec {
   maturity: Maturity;
   provenance: Provenance;
   semanticTags: string[]; // happy-path / validation — behavioral class
+  // Same caveat as Invariant.cohort: the realizing `.feature` covers >1 pattern, so this
+  // scenario re-verifies the cohort, not your single query target. Omitted when 1:1.
+  cohort?: string[];
 }
 
-// ═══ decode helpers (snapshot → need-shaped) ══════════════════════════════════
+// ═══ decode helpers (core → need-shaped) ══════════════════════════════════════
 const tagValue = (tags: string[], prefix: string): string | undefined => {
   for (const t of tags) if (t.startsWith(prefix)) return t.slice(prefix.length);
   return undefined;
@@ -96,6 +111,18 @@ function deriveMaturity(status: string, tags: string[]): Maturity {
 }
 const provenanceOf = (featureFile: string): Provenance =>
   featureFile.includes('tests/features') ? 'executable' : 'authored';
+
+// The coherence rule between the two axes. `executable` is the REALIZATION rung, and in
+// gen-2 (LSDP) terms "a live verifier binds this" is exactly what executable provenance
+// records — so `executable` maturity ⟺ `executable` provenance, by construction:
+//   • a live test (executable provenance) sits AT the realization rung — never `idea`
+//     (kills the incoherent `✓exec · idea` label derived from a candidate test pattern);
+//   • an authored spec (no live test) is capped just BELOW it at `design` — never claims
+//     the realization rung it hasn't reached (kills the twin `○auth · executable` label).
+// The honest signal this stops fabricating — a live-test-backed pattern whose own design
+// status still lags — is a separate query (realized ∧ status<completed), not a maturity tag.
+const specMaturity = (owner: Maturity, provenance: Provenance): Maturity =>
+  provenance === 'executable' ? 'executable' : owner === 'executable' ? 'design' : owner;
 
 // pull the `**Invariant:**` clause out of a Rule description; fall back to the lead.
 function distillInvariant(description: string): string {
@@ -127,6 +154,7 @@ export class Graph {
   #raw = new Map<string, AuthoredPattern>();
   #fileToPattern = new Map<string, string>();
   #implementedBy = new Map<string, string[]>(); // pattern → realizing .feature paths
+  #featureCohort = new Map<string, string[]>(); // realizing .feature → ALL patterns it realizes (>1 ⇒ ambiguous)
   #features = new Map<string, FeatureEntry>(); // featureFile → its scenarios + rules
 
   constructor(mech: MechanicalCore, authored: AuthoredCore) {
@@ -138,6 +166,9 @@ export class Graph {
       this.#raw.set(p.name, p);
       const tags = p.directive?.tags ?? [];
       const rel = authored.relationshipIndex[p.name];
+      const impl = (rel?.implementedBy ?? [])
+        .map((i) => i.file)
+        .filter((f): f is string => !!f && f.endsWith('.feature'));
       const node: PatternNode = {
         name: p.name,
         status: p.status,
@@ -148,18 +179,39 @@ export class Graph {
         boundedContext: p.boundedContext ?? tagValue(tags, '@architect-bounded-context:'),
         productArea: p.productArea,
         sourceFile: p.source?.file,
+        level: p.level ?? tagValue(tags, '@architect-level:'),
+        ...(p.parent ? { parent: p.parent } : {}), // exactOptionalPropertyTypes: omit when absent
+        children: [], // filled by the inverse pass below, once every node exists
         uses: rel?.uses ?? [],
         usedBy: rel?.usedBy ?? [],
+        implementedBy: impl, // realizing .feature files (the live-test-proven signal)
+        implements: rel?.implementsPatterns ?? [],
+        enforcesDecisions: rel?.enforcesDecisions ?? [],
         ruleCount: p.rules.length,
         scenarioCount: p.scenarios.length,
       };
       this.#nodes.set(p.name, node);
       if (p.source?.file?.endsWith('.ts')) this.#fileToPattern.set(p.source.file, p.name);
-      const impl = (rel?.implementedBy ?? [])
-        .map((i) => i.file)
-        .filter((f): f is string => !!f && f.endsWith('.feature'));
       if (impl.length) this.#implementedBy.set(p.name, impl);
     }
+
+    // 1a. invert `parent` → `children`. The membership edge lives on the pattern, not
+    // the relationshipIndex, so an epic's members were orphans on the decoded surface.
+    // Now `g.pattern(epic).children` IS the member set (a first-class read, no escape hatch).
+    for (const node of this.#nodes.values())
+      if (node.parent) this.#nodes.get(node.parent)?.children.push(node.name);
+    for (const node of this.#nodes.values()) node.children.sort();
+
+    // 1b. invert implementedBy → the cohort each realizing feature covers. A feature that
+    // realizes >1 pattern attributes its Rule blocks to the whole cohort (no per-Rule tag
+    // exists), so the spec-bridge must label that ambiguity rather than imply precision.
+    for (const [pattern, feats] of this.#implementedBy)
+      for (const f of feats) {
+        let c = this.#featureCohort.get(f);
+        if (!c) this.#featureCohort.set(f, (c = []));
+        c.push(pattern);
+      }
+    for (const c of this.#featureCohort.values()) c.sort();
 
     // 2. index Gherkin by feature file (scenarios grouped; rules from the .feature-sourced pattern)
     for (const p of authored.patterns) {
@@ -179,6 +231,9 @@ export class Graph {
   #feature(file: string, owner: PatternNode): FeatureEntry {
     let e = this.#features.get(file);
     if (!e) {
+      // Store the RAW owning-pattern maturity here; the coherence rule (executable
+      // maturity ⟺ executable provenance) is applied uniformly at every emit site via
+      // `specMaturity`, so it cannot be bypassed by the direct-scenario path.
       e = { scenarios: [], rules: [], maturity: owner.maturity, provenance: provenanceOf(file) };
       this.#features.set(file, e);
     }
@@ -212,6 +267,17 @@ export class Graph {
   // (working-specs / executable features that ARE the source) AND those reached
   // through its realizing features. Each invariant is tagged maturity + provenance
   // so an executable-proven invariant and an idea-tier aspiration are never flattened.
+  //
+  // EMPTY ≠ "guarantees nothing" — and an agent scripting the handle must not read it
+  // that way. `[]` collapses three very different cases, which you disambiguate in one
+  // cheap follow-up (no second method needed — see recipes.md "guarantee disambiguation"):
+  //   • code-originated CONTRACT (~40% of patterns: `role:contract`/`codec`, a `.ts`
+  //     sourceFile) — its guarantee is its TypeScript TYPE, not a Gherkin Rule. Check
+  //     `g.pattern(x)?.sourceFile?.endsWith('.ts')` → go read the type there.
+  //   • a real pattern that genuinely carries no invariants yet (a `.feature` source, [] rules).
+  //   • an unresolved name/file (`g.pattern(x)` / `g.fileToPattern(x)` is undefined).
+  // The `invariants` CLI command renders this note; the handle returns the raw [] so the
+  // COMPOSE/recipe filters (`.length`/`.every`) stay simple — disambiguation is one line.
   invariantsOf(patternOrFile: string): Invariant[] {
     const seed = this.#resolvePatterns(patternOrFile);
     const out: Invariant[] = [];
@@ -247,14 +313,17 @@ export class Graph {
     const key = `${featureFile}#${r.name}`;
     if (seen.has(key)) return;
     seen.add(key);
+    const cohort = this.#featureCohort.get(featureFile);
+    const provenance = provenanceOf(featureFile);
     out.push({
       rule: r.name,
       text: distillInvariant(r.description),
       pattern,
-      maturity,
-      provenance: provenanceOf(featureFile),
+      maturity: specMaturity(maturity, provenance),
+      provenance,
       featureFile,
       provenByScenarios: this.#scenariosForRule(featureFile, r),
+      ...(cohort && cohort.length > 1 ? { cohort } : {}),
     });
   }
 
@@ -288,14 +357,17 @@ export class Graph {
       const key = `${sc.featureFile}#${sc.scenarioName}`;
       if (seen.has(key)) return;
       seen.add(key);
+      const cohort = this.#featureCohort.get(sc.featureFile);
+      const provenance = provenanceOf(sc.featureFile);
       out.push({
         scenario: sc.scenarioName,
         pattern,
         featureFile: sc.featureFile,
         ...(sc.line !== undefined ? { line: sc.line } : {}),
-        maturity,
-        provenance: provenanceOf(sc.featureFile),
+        maturity: specMaturity(maturity, provenance),
+        provenance,
         semanticTags: sc.semanticTags,
+        ...(cohort && cohort.length > 1 ? { cohort } : {}),
       });
     };
     for (const name of patterns) {
@@ -347,7 +419,10 @@ export class Graph {
   }
 }
 
-// ─── the one entry point — load both cores, build the handle, parse once ─────
-export function loadGraph(): Graph {
-  return new Graph(loadMechanical(), loadAuthored());
+// ─── the one entry point — build both cores LIVE, join, parse once ───────────
+// Async because the authored core is built from the live pipeline (buildCliContext).
+// Each call reflects HEAD (~1.5s): no dump, no dist, noCache. MUST run with
+// `--conditions=source` (see live.ts) or the authored side resolves stale dist/.
+export async function loadGraph(): Promise<Graph> {
+  return new Graph(buildMechanicalCore(), await buildAuthoredCore());
 }

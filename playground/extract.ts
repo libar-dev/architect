@@ -7,23 +7,28 @@
  * firehose the curated graph deliberately abstracts over — kept separate, built
  * on demand, never hand-curated.
  *
- *   pnpm exec tsx playground/extract.ts   → playground/data/mechanical-core.json
+ * `buildMechanicalCore()` returns the core IN-MEMORY — the handle calls it every
+ * `loadGraph()`, so the substrate always reflects HEAD. No file is read or written
+ * (the sandbox keeps NO dump; see CONTEXT.md §"staleness"). Run this file directly
+ * only to eyeball the stats:
+ *
+ *   pnpm exec tsx playground/extract.ts        # prints counts, writes nothing
  */
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 import ts from 'typescript';
 
+import { REPO_ROOT as REPO } from './repo-root.ts';
 import {
   type ImportEdge,
-  MECH_PATH,
   type MechanicalCore,
   MechanicalCoreSchema,
   type SymbolNode,
 } from './schema.ts';
 
-const REPO = resolve(import.meta.dirname, '..');
 const rel = (abs: string) => abs.slice(REPO.length + 1);
 const pkgOf = (f: string) => f.match(/^packages\/([^/]+)\//)?.[1] ?? '(root)';
 
@@ -43,8 +48,6 @@ function walk(dir: string, out: string[] = []): string[] {
   }
   return out;
 }
-const srcAbs = walk(join(REPO, 'packages')).filter((f) => /\/src\//.test(f));
-const fileSet = new Set(srcAbs.map(rel));
 
 type Reexport = { exported: string; original: string; from: string } | { star: true; from: string };
 type FileRec = {
@@ -57,8 +60,8 @@ type FileRec = {
     typeOnly: boolean;
   }[];
 };
-const files = new Map<string, FileRec>();
 
+// parse is pure: reads one file, returns its export/import record.
 function parse(abs: string): FileRec {
   const r = rel(abs);
   const sf = ts.createSourceFile(r, readFileSync(abs, 'utf8'), ts.ScriptTarget.Latest, true);
@@ -130,9 +133,8 @@ function parse(abs: string): FileRec {
   }
   return rec;
 }
-for (const abs of srcAbs) files.set(rel(abs), parse(abs));
 
-function resolveModule(fromFile: string, spec: string): string | null {
+function resolveModule(fromFile: string, spec: string, fileSet: Set<string>): string | null {
   if (spec.startsWith('.')) {
     const base = resolve(REPO, dirname(fromFile), spec.replace(/\.js$/, ''));
     for (const cand of [`${base}.ts`, join(base, 'index.ts')]) {
@@ -157,7 +159,13 @@ function resolveModule(fromFile: string, spec: string): string | null {
 }
 
 // resolve (file, exportedName) → its DEFINING file, following re-export barrels
-function resolveDef(file: string, name: string, seen = new Set<string>()): string | null {
+function resolveDef(
+  file: string,
+  name: string,
+  files: Map<string, FileRec>,
+  fileSet: Set<string>,
+  seen = new Set<string>(),
+): string | null {
   const key = `${file}#${name}`;
   if (seen.has(key)) return null;
   seen.add(key);
@@ -166,80 +174,94 @@ function resolveDef(file: string, name: string, seen = new Set<string>()): strin
   if (rec.localExports.has(name)) return file;
   for (const re of rec.reexports) {
     if ('star' in re || re.exported !== name) continue;
-    const tgt = resolveModule(file, re.from);
+    const tgt = resolveModule(file, re.from, fileSet);
     if (tgt) {
-      const d = resolveDef(tgt, re.original, seen);
+      const d = resolveDef(tgt, re.original, files, fileSet, seen);
       if (d) return d;
     }
   }
   for (const re of rec.reexports) {
     if (!('star' in re)) continue;
-    const tgt = resolveModule(file, re.from);
+    const tgt = resolveModule(file, re.from, fileSet);
     if (tgt) {
-      const d = resolveDef(tgt, name, seen);
+      const d = resolveDef(tgt, name, files, fileSet, seen);
       if (d) return d;
     }
   }
   return null;
 }
 
-const symbols: SymbolNode[] = [];
-for (const [file, rec] of files)
-  for (const [name, kind] of rec.localExports)
-    symbols.push({ id: `${file}#${name}`, file, name, kind, pkg: pkgOf(file) });
+/**
+ * Build the mechanical substrate fresh from the working tree. Pure (no IO except
+ * reading source + `git rev-parse HEAD`), deterministic (sorted symbols/edges),
+ * reentrant. Validated against `MechanicalCoreSchema` before return — fails loud.
+ */
+export function buildMechanicalCore(): MechanicalCore {
+  const srcAbs = walk(join(REPO, 'packages')).filter((f) => /\/src\//.test(f));
+  const fileSet = new Set(srcAbs.map(rel));
+  const files = new Map<string, FileRec>();
+  for (const abs of srcAbs) files.set(rel(abs), parse(abs));
 
-const edges: ImportEdge[] = [];
-const unresolved: { fromFile: string; spec: string }[] = [];
-const seenEdge = new Set<string>();
-for (const [file, rec] of files) {
-  for (const imp of rec.imports) {
-    const tgt = resolveModule(file, imp.from);
-    if (!tgt) {
-      if (imp.from.startsWith('.') || imp.from.startsWith('@libar-dev/'))
-        unresolved.push({ fromFile: file, spec: imp.from });
-      continue;
+  const symbols: SymbolNode[] = [];
+  for (const [file, rec] of files)
+    for (const [name, kind] of rec.localExports)
+      symbols.push({ id: `${file}#${name}`, file, name, kind, pkg: pkgOf(file) });
+
+  const edges: ImportEdge[] = [];
+  const unresolved: { fromFile: string; spec: string }[] = [];
+  const seenEdge = new Set<string>();
+  for (const [file, rec] of files) {
+    for (const imp of rec.imports) {
+      const tgt = resolveModule(file, imp.from, fileSet);
+      if (!tgt) {
+        if (imp.from.startsWith('.') || imp.from.startsWith('@libar-dev/'))
+          unresolved.push({ fromFile: file, spec: imp.from });
+        continue;
+      }
+      let toFile = tgt;
+      let symbol: string | null = null;
+      if (imp.kind === 'named') {
+        symbol = imp.name;
+        toFile = resolveDef(tgt, imp.name, files, fileSet) ?? tgt;
+      }
+      const k = `${file}->${toFile}#${symbol ?? '*'}:${imp.kind}`;
+      if (seenEdge.has(k)) continue;
+      seenEdge.add(k);
+      edges.push({
+        fromFile: file,
+        toFile,
+        symbol,
+        kind: imp.kind,
+        typeOnly: imp.typeOnly,
+        crossPkg: pkgOf(file) !== pkgOf(toFile),
+      });
     }
-    let toFile = tgt;
-    let symbol: string | null = null;
-    if (imp.kind === 'named') {
-      symbol = imp.name;
-      toFile = resolveDef(tgt, imp.name) ?? tgt;
-    }
-    const k = `${file}->${toFile}#${symbol ?? '*'}:${imp.kind}`;
-    if (seenEdge.has(k)) continue;
-    seenEdge.add(k);
-    edges.push({
-      fromFile: file,
-      toFile,
-      symbol,
-      kind: imp.kind,
-      typeOnly: imp.typeOnly,
-      crossPkg: pkgOf(file) !== pkgOf(toFile),
-    });
   }
+
+  symbols.sort((a, b) => a.id.localeCompare(b.id));
+  edges.sort((a, b) =>
+    (a.fromFile + a.toFile + (a.symbol ?? '')).localeCompare(
+      b.fromFile + b.toFile + (b.symbol ?? ''),
+    ),
+  );
+
+  const out: MechanicalCore = {
+    version: '1.0.0',
+    head: execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8', cwd: REPO }).trim(),
+    fileCount: files.size,
+    symbols,
+    edges,
+    unresolved,
+  };
+  return MechanicalCoreSchema.parse(out);
 }
 
-symbols.sort((a, b) => a.id.localeCompare(b.id));
-edges.sort((a, b) =>
-  (a.fromFile + a.toFile + (a.symbol ?? '')).localeCompare(
-    b.fromFile + b.toFile + (b.symbol ?? ''),
-  ),
-);
-
-const out: MechanicalCore = {
-  version: '1.0.0',
-  head: execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(),
-  fileCount: files.size,
-  symbols,
-  edges,
-  unresolved,
-};
-MechanicalCoreSchema.parse(out);
-mkdirSync(dirname(MECH_PATH), { recursive: true }); // data/ is gitignored — absent on first run after a fresh checkout
-writeFileSync(MECH_PATH, JSON.stringify(out, null, 0));
-
-console.log(
-  `mechanical-core.json: ${out.fileCount} files, ${symbols.length} symbols, ${edges.length} edges ` +
-    `(${edges.filter((e) => e.crossPkg).length} cross-pkg, ${edges.filter((e) => e.symbol !== null).length} symbol-resolved), ` +
-    `${unresolved.length} unresolved.`,
-);
+// Direct run → print stats only (writes nothing; the handle never reads a file).
+if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
+  const out = buildMechanicalCore();
+  console.log(
+    `mechanical-core: ${out.fileCount} files, ${out.symbols.length} symbols, ${out.edges.length} edges ` +
+      `(${out.edges.filter((e) => e.crossPkg).length} cross-pkg, ${out.edges.filter((e) => e.symbol !== null).length} symbol-resolved), ` +
+      `${out.unresolved.length} unresolved.`,
+  );
+}

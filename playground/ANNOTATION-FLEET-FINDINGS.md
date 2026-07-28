@@ -173,11 +173,11 @@ projects:
 **Discrepancy noted for the decider.** The cleanup brief framed both targets as
 `status:roadmap`, but the source of truth currently annotates both as
 `@architect-status completed` (see `projections/delivery-reporting/index.ts` and
-`projections/operational-insights/index.ts`). In the `playground/data/pattern-graph-core.json`
-snapshot both targets show `implementedBy: null` — **but so do all other fleet
-implements targets in that snapshot** (`MarkdownRenderer`, `JsonRenderer`,
+`projections/operational-insights/index.ts`). In the live `--core` graph (what
+`buildAuthoredCore` builds) both targets show `implementedBy: null` — **but so do all other fleet
+implements targets there** (`MarkdownRenderer`, `JsonRenderer`,
 `BusinessRuleSet`, etc.), because `-core` does not carry the projection-package
-reverse edges. So the snapshot alone does not prove these two edges are _uniquely_
+reverse edges. So the core alone does not prove these two edges are _uniquely_
 dead; the removal is nonetheless safe and reversible. The underlying question —
 when a realization edge should project — is **read-model semantics, an ADR-level
 decision, and is deferred to a human.** Do not change edge-projection behavior in

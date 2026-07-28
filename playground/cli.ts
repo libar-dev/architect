@@ -2,14 +2,17 @@
  * Thin demo runner over the view library. The IO lives here (load, git, print);
  * the views stay pure. An agent can skip this entirely and import views.ts directly.
  *
- *   pnpm exec tsx playground/cli.ts <diff|blast|fan-in|drift|census|find|file|symbol> [arg]
+ *   pnpm exec tsx --conditions=source playground/cli.ts <diff|blast|fan-in|drift|census|find|file|symbol> [arg]
  */
 import { execFileSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { join } from 'node:path';
 
+import { buildMechanicalCore } from './extract.ts';
 import { loadGraph } from './graph.ts';
-import { loadAuthored, loadMechanical, MATURITIES } from './schema.ts';
+import { buildAuthoredCore } from './live.ts';
+import { REPO_ROOT as REPO } from './repo-root.ts';
+import { MATURITIES } from './schema.ts';
 import {
   blastRadius,
   byFile,
@@ -21,12 +24,11 @@ import {
   graphDiff,
 } from './views.ts';
 
-const REPO = resolve(import.meta.dirname, '..');
 const cmd = process.argv[2] ?? 'help';
 const arg = process.argv[3];
 
-function diff() {
-  const r = graphDiff(loadMechanical(), loadAuthored());
+async function diff() {
+  const r = graphDiff(buildMechanicalCore(), await buildAuthoredCore());
   console.log(`\nmechanical pattern→pattern edges: ${r.mechEdges}`);
   console.log(`authored   pattern→pattern edges: ${r.authEdges}`);
   console.log(`  shared (curated selection of the firehose): ${r.shared.length}`);
@@ -63,6 +65,7 @@ function resolveCommit(ref: string): string {
       ['rev-parse', '--verify', '--quiet', '--end-of-options', `${ref}^{commit}`],
       {
         encoding: 'utf8',
+        cwd: REPO,
       },
     ).trim();
   } catch {
@@ -72,15 +75,16 @@ function resolveCommit(ref: string): string {
   }
 }
 
-function blast() {
+async function blast() {
   const label = arg ?? 'HEAD';
   const sha = resolveCommit(label);
   const changed = execFileSync('git', ['diff', '--name-only', '--end-of-options', sha, '--'], {
     encoding: 'utf8',
+    cwd: REPO,
   })
     .split('\n')
     .filter(Boolean);
-  const r = blastRadius(loadMechanical(), loadAuthored(), changed);
+  const r = blastRadius(buildMechanicalCore(), await buildAuthoredCore(), changed);
   console.log(`\nblast radius of \`git diff ${label}\` (${sha.slice(0, 9)}):`);
   console.log(
     `  changed src files: ${r.changedSrc.length}  (${r.mappedSeed.length} map to a pattern)`,
@@ -92,20 +96,22 @@ function blast() {
   console.log(`  RECOVERED (curated graph missed): ${r.recovered.length}`);
   for (const n of r.recovered.slice(0, 20)) console.log(`    + ${n}`);
   if (r.recovered.length > 20) console.log(`    … +${r.recovered.length - 20}`);
-  console.log(`  at-risk executable specs: ${r.atRiskSpecs.length}`);
-  for (const f of r.atRiskSpecs.slice(0, 10)) console.log(`    ${f}`);
+  console.log(`  at-risk feature files: ${r.atRiskFeatureFiles.length}`);
+  for (const f of r.atRiskFeatureFiles.slice(0, 10)) console.log(`    ${f}`);
 }
 
-function fanIn() {
-  const r = fanInCandidates(loadMechanical(), loadAuthored(), { min: arg ? Number(arg) : 4 });
+async function fanIn() {
+  const r = fanInCandidates(buildMechanicalCore(), await buildAuthoredCore(), {
+    min: arg ? Number(arg) : 4,
+  });
   console.log(
     `\ncuration candidates — load-bearing modules with NO pattern node (top ${r.length}):`,
   );
   for (const c of r) console.log(`  ${String(c.fanIn).padStart(3)} importers  ${c.file}`);
 }
 
-function drift() {
-  const r = driftFlags(loadAuthored(), (f) => existsSync(join(REPO, f)));
+async function drift() {
+  const r = driftFlags(await buildAuthoredCore(), (f) => existsSync(join(REPO, f)));
   console.log(`\nscoped drift (target code gone — should trend to zero as cleanup completes):`);
   console.log(`  dangling \`uses\` (target not in graph): ${r.dangling.length}`);
   for (const d of r.dangling.slice(0, 15)) console.log(`    ${d.from} → ${d.to}`);
@@ -113,8 +119,8 @@ function drift() {
   for (const o of r.orphanedSource.slice(0, 15)) console.log(`    ${o.pattern}  (${o.file})`);
 }
 
-function censusCmd() {
-  const r = census(loadMechanical(), loadAuthored());
+async function censusCmd() {
+  const r = census(buildMechanicalCore(), await buildAuthoredCore());
   console.log(`\nnode coverage (non-barrel src → pattern node):`);
   for (const c of r.nodeCoverage)
     console.log(`  ${c.pkg.padEnd(22)} ${c.mapped}/${c.total} (${c.pct}%)`);
@@ -132,13 +138,13 @@ function censusCmd() {
 
 // E1 — fuzzy concept → ranked patterns. Join trailing args so unquoted multi-word
 // (`find blast radius`) works as well as quoted (`find "blast radius"`).
-function find() {
+async function find() {
   const query = process.argv.slice(3).join(' ').trim();
   if (!query) {
     console.log('usage: tsx playground/cli.ts find <concept>');
     process.exit(1);
   }
-  const r = findByConcept(loadAuthored(), query);
+  const r = findByConcept(await buildAuthoredCore(), query);
   console.log(`\nfindByConcept(${JSON.stringify(query)}) — top ${r.length} (curated, core-only):`);
   if (!r.length) return void console.log('  (no matches)');
   for (const h of r) {
@@ -152,13 +158,13 @@ function find() {
 }
 
 // E2 — file → owning pattern + neighborhood (curated if mapped, else mechanical).
-function file() {
+async function file() {
   const path = arg;
   if (!path) {
     console.log('usage: tsx playground/cli.ts file <repo-relative-path>');
     process.exit(1);
   }
-  const r = byFile(loadAuthored(), loadMechanical(), path);
+  const r = byFile(await buildAuthoredCore(), buildMechanicalCore(), path);
   console.log(`\nbyFile(${JSON.stringify(path)}):`);
   if (r.mapped) {
     console.log(`  owning pattern: ${r.pattern}  (role=${r.role ?? '—'})`);
@@ -187,13 +193,13 @@ function file() {
 }
 
 // E3 — export symbol → defining pattern + importedBy.
-function symbol() {
+async function symbol() {
   const name = arg;
   if (!name) {
     console.log('usage: tsx playground/cli.ts symbol <ExportedSymbolName>');
     process.exit(1);
   }
-  const r = bySymbol(loadMechanical(), loadAuthored(), name);
+  const r = bySymbol(buildMechanicalCore(), await buildAuthoredCore(), name);
   console.log(`\nbySymbol(${JSON.stringify(name)}):`);
   console.log(`  defined in (${r.definedIn.length}):`);
   if (!r.definedIn.length) console.log(`    (no definition found in substrate)`);
@@ -219,35 +225,63 @@ function symbol() {
 const PROV = { executable: '✓exec', authored: '○auth' } as const;
 
 // invariants <PatternName | repo/rel/file.ts>
-function invariants() {
+async function invariants() {
   const target = process.argv.slice(3).join(' ').trim();
   if (!target) {
     console.log('usage: tsx playground/cli.ts invariants <PatternName | path/to/file.ts>');
     process.exit(1);
   }
-  const inv = loadGraph().invariantsOf(target);
+  const g = await loadGraph();
+  const inv = g.invariantsOf(target);
   console.log(`\ninvariantsOf(${JSON.stringify(target)}) — ${inv.length} invariant(s):`);
-  if (!inv.length) return void console.log('  (none — no Rule blocks reach this pattern/file)');
+  if (!inv.length) {
+    // Empty ≠ "guarantees nothing". 140/348 patterns are code-originated contracts whose
+    // guarantee is their TS TYPE, not a Gherkin Rule block. Distinguish that honest case
+    // (a real, located, structural contract) from a target that simply doesn't exist —
+    // returning [] is the correct handle shape; only the PRESENTATION must not mislead.
+    const node = g.pattern(target) ?? g.pattern(g.fileToPattern(target) ?? '');
+    if (node?.sourceFile?.endsWith('.ts')) {
+      console.log(
+        `  no Gherkin invariants — \`${node.name}\` is a \`${node.role ?? 'code'}\` whose contract is its\n` +
+          `  TypeScript type at ${node.sourceFile}. Its guarantee is STRUCTURAL (the type), not a Rule block.`,
+      );
+      return;
+    }
+    console.log(
+      '  (none — no Rule blocks reach this pattern/file, and no code-originated contract matches)',
+    );
+    return;
+  }
+  const ambiguous = inv.filter((i) => i.cohort).length;
   for (const i of inv) {
     console.log(`  [${PROV[i.provenance]} · ${i.maturity}] ${i.rule}  (${i.pattern})`);
     console.log(`      ${i.text}`);
+    if (i.cohort)
+      console.log(
+        `      ⚠ cohort-wide: realizing feature covers ${i.cohort.length} patterns (${i.cohort.join(', ')}) — not specific to your query`,
+      );
     if (i.provenByScenarios.length)
       console.log(
         `      proven by: ${i.provenByScenarios.slice(0, 3).join(' · ')}${i.provenByScenarios.length > 3 ? ' …' : ''}`,
       );
   }
+  if (ambiguous)
+    console.log(
+      `\n  note: ${ambiguous}/${inv.length} invariant(s) come from a multi-pattern feature — the source attributes them to the cohort, not your single target.`,
+    );
 }
 
 // specs <git-ref>  — at-risk specs for the blast radius of a diff (any maturity)
-function specs() {
+async function specs() {
   const label = arg ?? 'HEAD';
   const sha = resolveCommit(label);
   const changed = execFileSync('git', ['diff', '--name-only', '--end-of-options', sha, '--'], {
     encoding: 'utf8',
+    cwd: REPO,
   })
     .split('\n')
     .filter(Boolean);
-  const g = loadGraph();
+  const g = await loadGraph();
   const r = g.blastRadius(changed);
   const at = r.atRiskSpecs;
   const exec = at.filter((s) => s.provenance === 'executable').length;
@@ -263,10 +297,14 @@ function specs() {
 // maturity  — the ladder. NOTE: this is a SCRIPT over the handle's exposed `maturity`
 // field, not a handle method — exactly the "agent scripts the rest" boundary. Anything
 // expressible as a few lines of groupBy stays here; only irreducible joins go on the handle.
-function maturity() {
-  const g = loadGraph();
+async function maturity() {
+  const g = await loadGraph();
   const rows = MATURITIES.map((m) => {
     const ps = g.patterns.filter((p) => p.maturity === m);
+    // KNOWN SCOPE EDGE (G3, intentional): counts only Rule blocks the pattern carries
+    // DIRECTLY (`ruleCount`). A production pattern whose invariants live in a *realizing*
+    // feature reads as 0 here. The per-pattern realized view is `g.invariantsOf(name)`,
+    // which DOES follow the implementedBy hop; this ladder is a coarse direct-carry tally.
     const withInv = ps.filter((p) => p.ruleCount > 0);
     return {
       m,
@@ -286,7 +324,7 @@ function maturity() {
   );
 }
 
-const table: Record<string, () => void> = {
+const table: Record<string, () => void | Promise<void>> = {
   diff,
   blast,
   'fan-in': fanIn,
@@ -302,8 +340,8 @@ const table: Record<string, () => void> = {
 const run = table[cmd];
 if (!run) {
   console.log(
-    'usage: tsx playground/cli.ts <diff|blast [ref]|fan-in [min]|drift|census|find <concept>|file <path>|symbol <name>|invariants <pattern|file>|specs [ref]|maturity>',
+    'usage: tsx --conditions=source playground/cli.ts <diff|blast [ref]|fan-in [min]|drift|census|find <concept>|file <path>|symbol <name>|invariants <pattern|file>|specs [ref]|maturity>',
   );
   process.exit(cmd === 'help' ? 0 : 1);
 }
-run();
+await run();

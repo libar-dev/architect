@@ -58,14 +58,14 @@ new doc-generation onto the existing engine — but all four were **doctrine-fen
 
 This is the part most easily lost. **Read it before changing anything.**
 
-|                      | **Curated** (Layer 2)                        | **Mechanical substrate** (Layer 1)               |
-| -------------------- | -------------------------------------------- | ------------------------------------------------ |
-| answers              | "what _is_ the architecture"                 | "what could break / where used at all"           |
-| virtue               | **editorial sparsity** (human judgment)      | **exhaustiveness** (derived)                     |
-| source               | `data/pattern-graph-core.json` (annotations) | `extract.ts` → `data/mechanical-core.json` (tsc) |
-| authored by          | a human, deliberately                        | derived on demand, never curated                 |
-| feeds                | API/MCP/Studio/docs projections              | blast-radius, impact, find-all-usages            |
-| vs a language server | **is the differentiator**                    | **is the language server**                       |
+|                      | **Curated** (Layer 2)                           | **Mechanical substrate** (Layer 1)                    |
+| -------------------- | ----------------------------------------------- | ----------------------------------------------------- |
+| answers              | "what _is_ the architecture"                    | "what could break / where used at all"                |
+| virtue               | **editorial sparsity** (human judgment)         | **exhaustiveness** (derived)                          |
+| source               | annotations → live graph (`live.ts`, in-memory) | `extract.ts` tsc walk of `packages/*/src` (in-memory) |
+| authored by          | a human, deliberately                           | derived on demand, never curated                      |
+| feeds                | API/MCP/Studio/docs projections                 | blast-radius, impact, find-all-usages                 |
+| vs a language server | **is the differentiator**                       | **is the language server**                            |
 
 ### The correction that defines this model (do not regress on it)
 
@@ -115,7 +115,7 @@ freezing them rebuilds the pipeline we are deleting).
 **I2/I3 are now frozen too — and the correction matters.** An earlier note here claimed
 "Rule blocks not in the core" and queued a _Gherkin-side extractor_ (a sibling to
 `extract.ts`) as the next Layer-1 build. **That was wrong.** The `.feature` files are
-**already parsed** by the snapshot pipeline and ride inside the `--core` snapshot: 929
+**already parsed** by the pipeline (`buildCliContext`) and ride inside the live `--core` graph: 929
 scenarios (3,572 steps), 431 Rule blocks, the `rule:<slug>` + `scenarioNames` linkage. The
 prior session missed it only because `schema.ts` left `scenarios`/`rules` **untyped** — so
 the richest half of the data was invisible to an agent reading the contract. The work was
@@ -138,9 +138,14 @@ handle_ — it is `groupBy(g.patterns, p => p.maturity)`, a 3-line script over t
 
 ---
 
-## 4. What the experiments proved (verified numbers)
+## 4. What the experiments proved (the shape of the result, not the exact counts)
 
-All figures from runs over the current core + `packages/*/src`. Re-derivable via the CLI.
+> **The figures below are illustrative as-of-a-SHA, not invariants.** The graph builds live and the
+> mechanical numbers drift with every annotation; **the graph wins, always re-derive via the CLI**
+> (`pnpm playground:cli census` / `diff` / `blast`). What is durable is the **shape** of each result —
+> a ~quarter-overlap curated/mechanical Jaccard, a mostly-correct "dark" bucket, a blast radius that
+> roughly doubles re-test reach. Read the numbers as orders of magnitude, never as targets (the
+> north star is agent usability, not coverage %).
 
 **Substrate (`extract.ts`)** — complete, barrel-followed, deterministic:
 `334 files · 1502 exported symbols · 1878 import edges (451 cross-pkg) · 0 unresolved`.
@@ -184,22 +189,20 @@ The mechanical layer ~doubles re-test coverage and reaches the ~47% of src the c
 graph deliberately omits — the code↔spec↔pattern cut no grep and no single verb produces.
 
 **Fan-in candidates (`cli.ts fan-in`)** — curation assist working: load-bearing modules
-with NO pattern node, ranked by importers:
+with NO pattern node, ranked by importers. **Run the command for the live list — do not
+read a frozen shortlist here.** The original probe's top four (`fragments/base.ts` ≈47 — the
+`ProjectionBundle` base every synth fork hand-cited — `context/projection-context.ts` ≈61,
+`taxonomy/status-values.ts`, `domain-enums.ts`) have **all since graduated to pattern nodes**
+(`ProjectionBundle`, `ProjectionContext`, `StatusValueDomain`, `DomainEnumSchemas`) — the assist
+loop closed on its own shortlist, which is the proof the signal is real. That same fact is why a
+frozen list here rots within one annotation campaign: as of this writing the live top has moved to
+the `architect-cli` `_shared` cluster. The durable claim is the **shape** (there is always a fan-in
+tail; the top of it is the next curation target), never the filenames — re-derive with `fan-in`.
 
-```
-61  fragments/projection-context.ts
-47  fragments/base.ts            ← the ProjectionBundle base every synth fork hand-cited
-23  taxonomy/status-values.ts
-20  domain-enums.ts
-```
-
-That `base.ts` surfaced at #2 purely from import fan-in — the exact module the architects
-already knew mattered — is the proof the assist signal is real.
-
-**Census (`cli.ts census`)** — node coverage (non-barrel src → pattern node):
-`cli 15% · core 36% · guard 52% · mcp 57% · projection 64%`. Edge density:
-`uses 41% · usedBy 38% · implementedBy 28%`. (`extendedBy` / `enforces*` ≈ 0–2% — dead
-taxonomy machinery, deletable per bootstrap doctrine.)
+**Census (`cli.ts census`)** — node coverage (non-barrel src → pattern node), as-of-a-SHA:
+`cli 15% · core 65% · guard 52% · mcp 57% · projection 80%`. Edge density:
+`uses ~43% · usedBy ~43% · implementedBy ~25%`. (`extendedBy` / `enforces*` ≈ 0–2% — dead
+taxonomy machinery, deletable per bootstrap doctrine.) Re-derive with `pnpm playground:cli census`.
 
 **Context efficiency** — the whole multi-experiment session ran in ~127k tokens, ≈⅕ of the
 grep/verb-API equivalent. Mechanism: the data stays _in-process_; only conclusions return.
@@ -217,12 +220,15 @@ as bytes on disk AND as tokens in context.
 - Expose shapes + small trusted view library; agent scripts the rest.
 - The **entry-adapter trio (E1 `findByConcept` · E2 `byFile` · E3 `bySymbol`)** is built and
   verified — the grep→graph bridge, the frozen part of the demand map (§3). `byFile`
-  returns a _mechanical_ neighborhood for dark files (proven on `fragments/base.ts`).
+  returns a _mechanical_ neighborhood for dark files (current dark example:
+  `config/regex-builders.ts` — 4/5 importers are curated patterns). NB: `fragments/base.ts`,
+  the original dark exemplar, has since been **annotated** (`@architect-pattern:ProjectionBundle`)
+  — the fan-in assist loop (§4) closing on its own #2 candidate, so it now demos the _mapped_ path.
 - The **graph handle (`graph.ts` → `loadGraph()`)** is the AI-native read surface: one typed
   object, joins + taxonomy-decode done once at construction, need-shaped accessors that
   return plain composable data. It is the answer to "what type is most natural for Claude" —
   **not 30 verbs, not raw-JSON-you-rejoin**, but one object whose method list _is_ the docs.
-  The snapshot's quirks (tag-encoding, the 2-hop `implementedBy` join, the dead `layer` axis)
+  The built core's quirks (tag-encoding, the 2-hop `implementedBy` join, the dead `layer` axis)
   stay decode-detail behind it. **Needs drove the surface, not storage.**
 - The **maturity axis is first-class and DERIVED** (`@architect-maturity` is stored 0/293 —
   derived from status: candidate→idea · roadmap→plan · active→design · completed→executable;
@@ -231,10 +237,12 @@ as bytes on disk AND as tokens in context.
   "specs of any maturity, implemented and non-implemented" are surfaced and distinguished,
   never dropped. `maturityLadder()` shows where the non-implemented specs (and their authored
   invariants) live — a direct input to the annotation push.
-- Determinism, **only where a machine contract needs it**, is available as committed-script
-  - committed-snapshot + re-run-diff — `extract.ts` emits **sorted** symbols/edges to make
-    that reproducible. But the playground itself commits **no** snapshot: `data/` is
-    gitignored (regenerable; per the thesis, agent-facing views freeze nothing).
+- The handle is **live, not snapshotted** (§9.3/§9.6): both cores build in-process each call
+  (~1.5s), no `data/` dump. `loadGraph()` is **async**; run every entry with `--conditions=source`.
+  Determinism, **only where a machine contract later needs it**, remains available as
+  committed-script + committed-snapshot + re-run-diff — `extract.ts` still emits **sorted**
+  symbols/edges to make that gate possible — but the agent sink freezes nothing, so today there
+  is nothing to commit, by design.
 - Trust boundary lives in the thin IO runner; views stay pure (§6).
 
 **Open / next probes (recommended order):** _(situated within the cross-effort sequencing in §9.5 once the `DocumentationProjection` epic is in view)_
@@ -245,8 +253,10 @@ as bytes on disk AND as tokens in context.
    the natural next join — it sits exactly on the maturity×provenance grid `invariantsOf`
    already computes, and it directly serves the bloat-removal push (find zombie specs:
    implemented but not deleted). Mechanizes `architect/specs/value-transfer-state.feature`.
-2. **Act on the `fan-in` shortlist** — curate the top few (`base.ts`,
-   `projection-context.ts`) into pattern nodes; watch `blast` coverage rise. Real dogfood win.
+2. **Act on the live `fan-in` shortlist** — curate the current top few into pattern nodes; watch
+   `blast` coverage rise. (The first round's targets — `base.ts`, `projection-context.ts`,
+   `status-values.ts`, `domain-enums.ts` — already graduated; re-derive the tail with the command,
+   don't re-curate the done.) Real dogfood win.
 3. **Symbol-level identity** (demoted — precision, not load-bearing) — key nodes on
    `file#symbol`, not file. Sharpens the 24% / 143 _measurement_; the substrate already emits
    `symbols[]`. Defer until after the annotation push re-authors the curated layer anyway.
@@ -279,21 +289,25 @@ identity at the edge — don't sanitize it in place.** Views stay pure; the runn
 ## 7. How to re-enter
 
 ```bash
-pnpm exec tsx playground/extract.ts          # (re)build data/mechanical-core.json
-pnpm exec tsx playground/cli.ts diff         # graph diff
-pnpm exec tsx playground/cli.ts blast HEAD~8 # impact + at-risk specs
-pnpm exec tsx playground/cli.ts fan-in       # curation candidates
-pnpm exec tsx playground/cli.ts drift        # scoped drift (should be ~0)
-pnpm exec tsx playground/cli.ts census       # coverage
+# front door — eval anything against the live handle (g):
+pnpm playground:q 'g.patterns.length'
+# named demo commands:
+pnpm playground:cli diff         # graph diff
+pnpm playground:cli blast HEAD~8 # impact + at-risk specs
+pnpm playground:cli fan-in       # curation candidates
+pnpm playground:cli drift        # scoped drift (should be ~0)
+pnpm playground:cli census       # coverage
 ```
 
-- Code is git-tracked (visible); `data/` is gitignored — **no snapshot is committed**. The
-  extractor's sorted output makes a commit+diff gate _possible_ only if a view ever becomes
-  a machine contract; until then there is nothing to diff against, by design.
-- Regenerate the curated input:
-  `pnpm exec tsx --conditions=source ./scripts/snapshot-pattern-graph.ts --core playground/data/pattern-graph-core.json`
+- **The `pnpm playground:*` scripts bake in `--conditions=source`** — without that flag the authored
+  core silently reads stale `dist/` (§9.6). A bare `tsx` invocation (e.g. a standalone scratch module)
+  must pass it explicitly.
+- **No snapshot on disk.** Both cores build live each call (~1.5s); `data/` is deleted. If a view
+  ever becomes a machine contract needing determinism, re-introduce a committed snapshot then —
+  `extract.ts` still emits sorted output for a commit+diff gate.
 - `playground/**` is excluded from root ESLint + tsconfig, so it is `tsx`-run only and does
   not gate CI. When it graduates to a package, that changes.
+- New-session orientation: **`USAGE.md`** (road-test / use the handle) · **`ITERATION.md`** (extend it).
 
 ---
 
@@ -314,7 +328,7 @@ pnpm exec tsx playground/cli.ts census       # coverage
 - **ADR-007 (taxonomy / status→maturity):** the `maturity` axis is **derived**, not stored —
   `MATURITY_BY_STATUS` is ADR-007's `DEFAULT_MATURITY_BY_STATUS`, and an explicit
   `@architect-maturity:` tag wins ("explicit always wins"). The handle computes it once; the
-  snapshot stores 0 of them.
+  built core stores 0 of them.
 - **ADR-010 (second-caller bar):** the organizing principle — freeze a projection only when
   a second machine consumer needs it.
 - **Sink priority (CLAUDE.md):** agents first, Studio view-state second, markdown last. This
@@ -341,9 +355,13 @@ directions, so the work is bidirectional:
   is a bespoke `*Projection` codec paired with a `*Digest`/`*Contract` fragment (~54 contracts)
   — the documentType-first star. By ADR-010's own second-caller bar, ~95% never qualified to be
   frozen. Work here is **subtractive**.
-- **`architect-core` is under-annotated on load-bearing modules.** 36% node coverage (34/94);
-  `fanInCandidates` names the targets — `fragments/projection-context.ts` (61), `fragments/base.ts`
-  (47), `taxonomy/status-values.ts` (23), `domain-enums.ts` (20). Work here is **additive**.
+- **`architect-core` was under-annotated on load-bearing modules** (it has since climbed — census
+  core is ~65% now, up from ~36% as the fan-in loop closed; re-derive). The original shortlist —
+  `projection-context.ts`, `base.ts`, `status-values.ts`, `domain-enums.ts` — has **all graduated**
+  to nodes (`ProjectionContext`, `ProjectionBundle`, `StatusValueDomain`, `DomainEnumSchemas`); the
+  assist loop closed on its own candidates. `fanInCandidates` now names a fresh tail (live: the
+  `architect-cli` `_shared` cluster) — **run `pnpm playground:cli fan-in` for the current targets,
+  never trust a filename frozen here.** Work here is **additive**.
 
 The two-surface model is what makes the asymmetry safe to act on: `blastRadius` over the
 substrate keeps re-test coverage exhaustive while the curated layer stays a deliberate ~6–11%
@@ -358,23 +376,23 @@ inventory (and it shows the projection-triad explosion at a glance). For "review
 by layer," the other two are empty calories — a concrete instance of the one-consumer projection
 the cut-down in §9.1 targets.
 
-### 9.3 The live-graph linkage gap (the WIP-API question)
+### 9.3 The live-graph linkage gap — RESOLVED (the handle builds live)
 
-The handle reads a **static, gitignored** `data/pattern-graph-core.json` (a `--core` snapshot).
-The live wire already exists:
+This was the open WIP-API question; it is now closed. `loadGraph()` builds **both** cores
+fresh in-process every call — there is **no dump**:
 
 ```
-annotated source ──buildCliContext()──▶ live PatternGraph (ADR-006)
-                          │ scripts/snapshot-pattern-graph.ts --core   (Zod-codec validated write)
+annotated source ──buildCliContext({noCache})──▶ live PatternGraph (ADR-006)
+                          ▼ live.ts  buildAuthoredCore() → AuthoredCoreSchema.parse(live objects)
+packages/*/src   ──tsc walk────────────────────▶ extract.ts  buildMechanicalCore() → MechanicalCore
                           ▼
-                  pattern-graph-core.json   ← loadAuthored() reads THIS (stale)
-                          ▲ scripts/load-pattern-graph.ts   (Zod-codec validated read → typed PatternGraph)
+       loadGraph() = new Graph(mechanical, authored)   ← async, ~1.5s, reflects HEAD
 ```
 
-`snapshot-pattern-graph.ts --core` reuses `buildCliContext`, so the core is byte-identical to
-what every verb/codec consumes. To make `loadGraph()` never stale, `loadAuthored()` builds the
-core in-process (the snapshot script's own path) instead of reading old bytes. The mechanical
-substrate (`extract.ts`) is already live-on-demand.
+`buildAuthoredCore` reuses `buildCliContext` (the snapshot script's own path), so the core is
+byte-identical to what every verb/codec consumes — but never written to disk. The dump
+(`data/pattern-graph-core.json`) and the mechanical dump are **deleted**; `loadGraph` is now
+**async**. See §9.6 for the two stale sources this closed and the `--conditions=source` rule.
 
 ### 9.4 Convergence: this experiment and the `DocumentationProjection` epic are ONE effort from two ends
 
@@ -421,3 +439,24 @@ The epic converges hard with this playground, which sharpens the sequencing:
 The decision that is the user's, not the tooling's: the cut is **"delete everything whose only consumer
 is one markdown doc; keep what Studio view-state will read"** — deletionReady _informs_ that line, it
 does not draw it.
+
+### 9.6 Staleness — the two sources, and the fix (durable; do not re-derive)
+
+"The graph isn't live" had **two** independent causes; the sandbox now closes both.
+
+1. **The dump.** `loadGraph()` used to read a gitignored `data/*.json` snapshot — frozen the
+   moment it was written. **Fix: deleted.** Both cores build in-process every call
+   (`buildAuthoredCore` via `buildCliContext`+`noCache`; `buildMechanicalCore` via the tsc walk).
+   ~1.5s; a just-saved annotation shows on the next call. This also means the silent-failure trap
+   the annotation fleet hit (an annotation that drops to zero nodes) is now **visible**: re-run
+   `census`/`q.ts 'g.pattern("X")'` and the node is either there or it isn't.
+2. **`dist/`.** The authored build imports `@libar-dev/architect-*`. Node's default export
+   resolution picks the **compiled `dist/`**, which lags `src/` until `pnpm build`. So even with
+   no dump, you'd silently read stale pipeline code. **Fix: run with `--conditions=source`** — the
+   `source` export-condition selects `src/*.ts`. This is non-optional for every playground entry
+   (`q.ts`, `cli.ts`, any `scratch/` script). It is why `live.ts` documents it loudly.
+
+A **watch command is unnecessary**: build-fresh-per-call already reflects HEAD. A persistent
+watch-server would only matter if per-call latency (~1.5s) became the bottleneck — an MVP
+non-problem, and a server is explicitly out of scope (that path is the Studio/MCP surface, which
+keeps stable verbs, not this eval sandbox).

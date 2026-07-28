@@ -81,6 +81,10 @@ export function graphDiff(mech: MechanicalCore, authored: AuthoredCore) {
 // Draws on Layer 1 so it reaches the ~47% of src the curated graph deliberately omits.
 export function blastRadius(mech: MechanicalCore, authored: AuthoredCore, changedFiles: string[]) {
   const f2p = fileToPattern(authored);
+  // KNOWN SCOPE EDGE (G4, intentional): the seed is `.ts` SOURCE files only (f2p is
+  // .ts-keyed; this filter drops `.feature`/test files). So "I edited a `.feature`"
+  // produces no impact here — code-impact is the designed scope. Reverse-traceability
+  // from a spec edit is a separate question, not this view.
   const changedSrc = changedFiles.filter(
     (f) => /^packages\/[^/]+\/src\/.*\.ts$/.test(f) && !/\.(steps|test)\.ts$/.test(f),
   );
@@ -111,10 +115,14 @@ export function blastRadius(mech: MechanicalCore, authored: AuthoredCore, change
       if (!authImpact.has(d)) (authImpact.add(d), q2.push(d));
   }
 
-  const atRiskSpecs = new Set<string>();
+  // Feature-FILE paths (the coarse view answer). NB distinct from the handle's
+  // `blastRadius().atRiskSpecs: AtRiskSpec[]` (per-scenario, maturity-labeled) — the
+  // names must not collide, since the handle spreads this view then overrides. Named
+  // `atRiskFeatureFiles` here so both coexist instead of one silently shadowing.
+  const atRiskFeatureFiles = new Set<string>();
   for (const n of mechPatterns)
     for (const impl of authored.relationshipIndex[n]?.implementedBy ?? [])
-      if (impl.file?.endsWith('.feature')) atRiskSpecs.add(impl.file);
+      if (impl.file?.endsWith('.feature')) atRiskFeatureFiles.add(impl.file);
 
   const recovered = [...mechPatterns].filter((n) => !authImpact.has(n) && !seed.has(n));
   return {
@@ -124,7 +132,7 @@ export function blastRadius(mech: MechanicalCore, authored: AuthoredCore, change
     mechFiles: mechFiles.size - changedSrc.length,
     mechPatterns: [...mechPatterns],
     recovered, // patterns the curated graph MISSED (the safety delta)
-    atRiskSpecs: [...atRiskSpecs].sort(),
+    atRiskFeatureFiles: [...atRiskFeatureFiles].sort(),
   };
 }
 

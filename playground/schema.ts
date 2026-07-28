@@ -1,15 +1,12 @@
 /**
  * The exposed shapes. This file IS the contract — read it, then script freely.
  * No verb hides these; a consumer validates the slice it touches and joins at will.
+ *
+ * Pure shapes only — no IO, no cli-runtime coupling. The two cores are BUILT, not
+ * read: `buildMechanicalCore()` (extract.ts) and `buildAuthoredCore()` (live.ts).
+ * The sandbox reads NO dump (see CONTEXT.md §"staleness").
  */
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
-
 import { z } from 'zod';
-
-export const DATA_DIR = join(import.meta.dirname, 'data');
-export const MECH_PATH = join(DATA_DIR, 'mechanical-core.json');
-export const AUTHORED_PATH = join(DATA_DIR, 'pattern-graph-core.json');
 
 // ─── Layer 1: the mechanical substrate (derived, exhaustive) ─────────────────
 export const SymbolNodeSchema = z.strictObject({
@@ -47,7 +44,7 @@ export type MechanicalCore = z.infer<typeof MechanicalCoreSchema>;
 // exist. For an AI-native surface the type IS the discovery surface; type what you
 // want found.
 
-// A parsed Gherkin scenario — already in the snapshot, one per `Scenario:` block.
+// A parsed Gherkin scenario — already in the built core, one per `Scenario:` block.
 export const ScenarioSchema = z.looseObject({
   featureFile: z.string(),
   featureName: z.string().optional(),
@@ -79,6 +76,12 @@ export const AuthoredPatternSchema = z.looseObject({
   // reading the value from there silently drops ~167 of them. Read the field.
   role: z.string().optional(),
   boundedContext: z.string().optional(),
+  // hierarchy axis (`@architect-level` / `@architect-parent`). `parent` is the
+  // epic→member membership backbone — it rides on the PATTERN here (NOT as a
+  // relationshipIndex edge), so an agent that only reads relationshipIndex sees an
+  // epic's members as orphans. Typed here so the handle can surface it + its inverse.
+  level: z.string().optional(),
+  parent: z.string().optional(),
   // directive still typed for `description` + the value-form tags some .feature
   // patterns carry (a fallback, not the primary source).
   directive: z
@@ -94,6 +97,14 @@ export const AuthoredEdgeSchema = z.looseObject({
   uses: z.array(z.string()).default([]),
   usedBy: z.array(z.string()).default([]),
   implementedBy: z.array(z.looseObject({ file: z.string().optional() })).default([]),
+  // live-but-previously-untyped edges (the relationshipIndex carries 12 kinds; this
+  // schema typed 3). These two are the architectural-SIGNIFICANCE signals a curation
+  // pass needs: does this pattern realize another (`implementsPatterns`), and does it
+  // enforce a decision (`enforcesDecisions`)? Untyped, they were invisible to an agent
+  // reading the contract — so a naive "is this noise?" filter over uses/usedBy alone
+  // false-positived genuine realizers. Type → surface → the filter gets safe.
+  implementsPatterns: z.array(z.string()).default([]),
+  enforcesDecisions: z.array(z.string()).default([]),
 });
 export const AuthoredCoreSchema = z.looseObject({
   patterns: z.array(AuthoredPatternSchema),
@@ -103,7 +114,7 @@ export type AuthoredCore = z.infer<typeof AuthoredCoreSchema>;
 
 // ─── the maturity axis (a REQUIREMENT, not a stored field) ───────────────────
 // `@architect-maturity` is authored at exactly one tier (idea) and otherwise
-// DERIVED from status (four-tier ladder + ADR-007). The snapshot stores 0 of these
+// DERIVED from status (four-tier ladder + ADR-007). The built core stores 0 of these
 // as a field — so the handle derives it. An explicit `@architect-maturity:` tag in
 // directive.tags always wins (`formal-spec/04` "explicit always wins").
 export const MATURITIES = ['idea', 'plan', 'design', 'executable'] as const;
@@ -120,25 +131,6 @@ export const MATURITY_BY_STATUS: Record<string, Maturity> = {
 // drop neither.
 export type Provenance = 'executable' | 'authored';
 
-// ─── loaders (the trust boundary; parse once) ────────────────────────────────
-// `data/` is gitignored and regenerable, so on a fresh checkout these files are
-// absent. Turn the raw ENOENT into a clear "how to regenerate" message.
-function readSnapshot(path: string, hint: string): string {
-  try {
-    return readFileSync(path, 'utf8');
-  } catch (e) {
-    if ((e as NodeJS.ErrnoException).code === 'ENOENT')
-      throw new Error(`missing data file ${path}\n  → ${hint}`);
-    throw e;
-  }
-}
-export function loadMechanical(path = MECH_PATH): MechanicalCore {
-  return MechanicalCoreSchema.parse(
-    JSON.parse(readSnapshot(path, 'build it: pnpm exec tsx playground/extract.ts')),
-  );
-}
-export function loadAuthored(path = AUTHORED_PATH): AuthoredCore {
-  const hint =
-    'regenerate: pnpm exec tsx --conditions=source ./scripts/snapshot-pattern-graph.ts --core playground/data/pattern-graph-core.json';
-  return AuthoredCoreSchema.parse(JSON.parse(readSnapshot(path, hint)));
-}
+// Builders (not loaders): the two cores are constructed fresh in-process, never
+// read from disk. `buildMechanicalCore()` → extract.ts (tsc walk). `buildAuthoredCore()`
+// → live.ts (buildCliContext, the live PatternGraph). `loadGraph()` (graph.ts) joins them.
