@@ -2,9 +2,7 @@
  * @architect-bounded-context:execution-context
  */
 /**
- * Private helpers used exclusively by the session-context fragment.
- *
- * Part of the ExecutionContextProjectionSupport utility surface.
+ * Builds the session-context bundle, including metadata, dependencies, neighbors, deliverables, and FSM context.
  */
 
 import type { ExtractedPattern } from '@libar-dev/architect-core';
@@ -13,6 +11,7 @@ import {
   VALID_PROCESS_STATUS_SET,
   VALID_TRANSITIONS,
   findPatternByName,
+  resolveImplementingFeatures,
   SessionTypeSchema,
 } from '@libar-dev/architect-core';
 import { z } from 'zod';
@@ -52,7 +51,7 @@ export type SessionContextOptions = z.infer<typeof SessionContextOptionsSchema>;
 
 export function buildSessionContextBundle(
   context: ProjectionContext,
-  options: SessionContextOptions
+  options: SessionContextOptions,
 ): SessionContextBundle {
   const { patterns, sessionType } = options;
 
@@ -96,7 +95,27 @@ export function buildSessionContextBundle(
       (sessionType === 'design' || sessionType === 'implement') &&
       pattern.source.file.endsWith('.feature')
     ) {
-      specFiles.push(pattern.source.file);
+      pushUnique(specFiles, pattern.source.file);
+    }
+
+    if (sessionType === 'design' || sessionType === 'implement') {
+      // The implementing `.feature` specs ARE the spec files for a TS pattern;
+      // follow the derived implementedBy reverse edge (ADR-002/ADR-003).
+      for (const implementerName of resolveImplementingFeatures(context.graph, patternName)) {
+        const implementer = findPatternByName(context.graph, implementerName);
+        if (implementer === undefined) {
+          continue;
+        }
+        pushUnique(specFiles, implementer.source.file);
+        if (sessionType === 'implement') {
+          if (implementer.source.file.endsWith('.feature')) {
+            pushUnique(testFiles, implementer.source.file);
+          }
+          for (const testFile of resolveTestFiles(implementer)) {
+            pushUnique(testFiles, testFile);
+          }
+        }
+      }
     }
 
     if (sessionType === 'design') {
@@ -134,7 +153,9 @@ export function buildSessionContextBundle(
       if (fsm !== undefined) {
         fsmByPattern.push({ pattern: patternName, fsm });
       }
-      testFiles.push(...resolveTestFiles(pattern));
+      for (const testFile of resolveTestFiles(pattern)) {
+        pushUnique(testFiles, testFile);
+      }
     }
   }
 
@@ -164,7 +185,6 @@ function createPatternContextMeta(pattern: ExtractedPattern): PatternContextMeta
   return {
     name: getPatternName(pattern),
     status: pattern.status,
-    ...(pattern.phase !== undefined ? { phase: pattern.phase } : {}),
     role: pattern.role ?? '',
     file: pattern.source.file,
     summary: extractDescription(pattern.directive.description),
@@ -174,7 +194,7 @@ function createPatternContextMeta(pattern: ExtractedPattern): PatternContextMeta
 function createSessionDependencies(
   context: ProjectionContext,
   patternName: string,
-  sessionType: SessionType
+  sessionType: SessionType,
 ): readonly DepEntry[] {
   const relationships = getRelationships(context, patternName);
   const dependencies: DepEntry[] = [];
@@ -201,7 +221,7 @@ function createSessionDependencies(
 function resolveDepEntry(
   context: ProjectionContext,
   dependencyName: string,
-  kind: DepEntry['kind']
+  kind: DepEntry['kind'],
 ): DepEntry {
   const dependencyPattern = findPatternByName(context.graph, dependencyName);
   return {
@@ -215,7 +235,7 @@ function resolveDepEntry(
 function resolveArchitectureNeighbors(
   context: ProjectionContext,
   pattern: ExtractedPattern,
-  focalNames: ReadonlySet<string>
+  focalNames: ReadonlySet<string>,
 ): readonly NeighborEntry[] {
   if (pattern.boundedContext === undefined || context.graph.archIndex === undefined) {
     return [];
@@ -253,9 +273,15 @@ function flattenDependencies(perPatternDeps: ReadonlyMap<string, readonly DepEnt
   return {
     dependencies,
     sharedDependencies: dependencies.filter(
-      (dependency) => (dependencyCounts.get(dependency.name) ?? 0) > 1
+      (dependency) => (dependencyCounts.get(dependency.name) ?? 0) > 1,
     ),
   };
+}
+
+function pushUnique(bucket: string[], value: string | undefined): void {
+  if (value !== undefined && value.length > 0 && !bucket.includes(value)) {
+    bucket.push(value);
+  }
 }
 
 function createFsmContext(status: string | undefined): FsmContext | undefined {

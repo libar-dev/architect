@@ -126,14 +126,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         'I call createArchitect with fileOptInTag {string}',
         (_ctx: unknown, fileOptInTag: string) => {
           state!.registry = createArchitect({ fileOptInTag }).registry;
-        }
+        },
       );
 
       Then(
         'the registry fileOptInTag should be {string}',
         (_ctx: unknown, fileOptInTag: string) => {
           expect(requireRegistry().fileOptInTag).toBe(fileOptInTag);
-        }
+        },
       );
     });
 
@@ -142,7 +142,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         'I call createArchitect with tagPrefix {string} and fileOptInTag {string}',
         (_ctx: unknown, tagPrefix: string, fileOptInTag: string) => {
           state!.registry = createArchitect({ tagPrefix, fileOptInTag }).registry;
-        }
+        },
       );
 
       Then('the registry tagPrefix should be {string}', (_ctx: unknown, tagPrefix: string) => {

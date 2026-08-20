@@ -12,7 +12,6 @@ interface PatternFixtureOptions {
   readonly status?: ExtractedPattern['status'];
   readonly maturity?: PatternMaturity;
   readonly role?: ExtractedPattern['role'];
-  readonly phase?: ExtractedPattern['phase'];
   readonly file?: string;
   readonly description?: string;
   readonly deliverables?: ExtractedPattern['deliverables'];
@@ -28,6 +27,7 @@ interface PatternFixtureOptions {
   readonly extendsPattern?: ExtractedPattern['extendsPattern'];
   readonly seeAlso?: ExtractedPattern['seeAlso'];
   readonly apiRef?: ExtractedPattern['apiRef'];
+  readonly adr?: ExtractedPattern['adr'];
   readonly boundedContext?: ExtractedPattern['boundedContext'];
   readonly adrLayer?: ExtractedPattern['adrLayer'];
   readonly archContext?: string;
@@ -48,7 +48,6 @@ let _nextPatternId = 1;
 export function createPattern(name: string, options: PatternFixtureOptions = {}): ExtractedPattern {
   const pattern = buildPatternStub(name, {
     role: options.role ?? 'service',
-    phase: options.phase ?? 49,
     file: options.file ?? `packages/architect-projection/fixtures/${name}.ts`,
     ...(options.patternName !== undefined ? { patternName: options.patternName } : {}),
     ...(options.status !== undefined ? { status: options.status } : {}),
@@ -69,6 +68,7 @@ export function createPattern(name: string, options: PatternFixtureOptions = {})
     ...(options.extendsPattern !== undefined ? { extendsPattern: options.extendsPattern } : {}),
     ...(options.seeAlso !== undefined ? { seeAlso: options.seeAlso } : {}),
     ...(options.apiRef !== undefined ? { apiRef: options.apiRef } : {}),
+    ...(options.adr !== undefined ? { adr: options.adr } : {}),
     ...(options.boundedContext !== undefined ? { boundedContext: options.boundedContext } : {}),
     ...(options.adrLayer !== undefined ? { adrLayer: options.adrLayer } : {}),
     ...(options.archContext !== undefined ? { archContext: options.archContext } : {}),
@@ -82,7 +82,7 @@ export function createPattern(name: string, options: PatternFixtureOptions = {})
 }
 
 export function createRelationshipEntry(
-  overrides: Partial<RelationshipEntry> = {}
+  overrides: Partial<RelationshipEntry> = {},
 ): RelationshipEntry {
   return {
     uses: overrides.uses ?? [],
@@ -95,6 +95,8 @@ export function createRelationshipEntry(
     extendedBy: overrides.extendedBy ?? [],
     seeAlso: overrides.seeAlso ?? [],
     apiRef: overrides.apiRef ?? [],
+    enforcesDecisions: overrides.enforcesDecisions ?? [],
+    enforcedBy: overrides.enforcedBy ?? [],
   };
 }
 
@@ -121,6 +123,5 @@ function createPatternGraph(options: ProjectionContextOptions): PatternGraph {
         },
       ],
     }),
-    phaseNames: {},
   });
 }

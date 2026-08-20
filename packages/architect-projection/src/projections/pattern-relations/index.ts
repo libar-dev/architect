@@ -1,8 +1,15 @@
 /**
  * @architect-bounded-context:pattern-relations
+ *
+ * Re-exports the pattern-relations projection entrypoints and option schemas for bundle, catalog, detail, dependency, neighborhood, and context surfaces.
  */
 export { projectArchitectureComparison } from './architecture-comparison.js';
 export { projectBoundedContext } from './architecture-context.js';
+export {
+  projectArchitectureGraph,
+  ArchitectureGraphSchema,
+  type ArchitectureGraph,
+} from './architecture-graph.js';
 export { projectArchitectureNeighborhood } from './architecture-neighborhood.js';
 export {
   BundleIncludeSchema,
@@ -12,7 +19,10 @@ export {
   projectPatternBundle,
 } from './bundle.js';
 export { projectDependencyEdges } from './dependency-edges.js';
-export { parseAndProjectDependencyTree, projectDependencyTree } from './dependency-tree.js';
+export {
+  parseAndProjectDependencyContext,
+  projectDependencyContext,
+} from './dependency-context.js';
 export {
   OpenQuestionListOptionsSchema,
   parseAndProjectOpenQuestionList,
@@ -20,7 +30,7 @@ export {
 } from './open-question-list.js';
 export { projectOrphanPatternList } from './orphan-pattern-list.js';
 export { parseAndProjectPatternCatalog, projectPatternCatalog } from './pattern-catalog.js';
-export type { DepTreeOptions } from './dependency-tree.js';
+export type { DepContextOptions } from './dependency-context.js';
 export type { OpenQuestionListOptions } from './open-question-list.js';
 export type { PatternBundleOptions } from './bundle.js';
 export { projectPatternDetail } from './pattern-detail.js';

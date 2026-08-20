@@ -1,7 +1,15 @@
+/**
+ * @architect
+ * @architect-pattern ProjectConfigContract
+ * @architect-status active
+ * @architect-role:contract
+ * @architect-bounded-context:configuration
+ * @architect-uses ArchitectConfigContract, ContextInference, PackageMatcherContract, FormatTypeDomain, TagRegistrySchemas
+ */
 import type { ContextInferenceRule } from '../generators/pipeline/context-inference.js';
 import type { PackageConfig } from '../package/index.js';
 import type { FormatType } from '../taxonomy/format-types.js';
-import type { RoleDefinition } from './role-constants.js';
+import type { RoleDefinition } from '../validation-schemas/tag-registry.js';
 import type { ArchitectInstance } from './types.js';
 
 export interface SourcesConfig {

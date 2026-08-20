@@ -7,7 +7,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Defines the `BusinessRuleSet` fragment shape for a scoped collection of business rules, including optional grouping metadata.
  */
 import { z } from 'zod';
 
@@ -23,6 +23,13 @@ const BusinessRuleGroupingEntrySchema = z.strictObject({
   invariantCount: z.number().int().nonnegative(),
 });
 
+/**
+ * A scoped collection of business rules — discriminated on `scope` (all,
+ * product-area, feature, package, or decision) with optional grouping
+ * metadata describing how the rules are bucketed.
+ *
+ * @architect-shape
+ */
 export const BusinessRuleSetSchema = z.discriminatedUnion('scope', [
   z.strictObject({
     kind: z.literal('BusinessRuleSet'),
@@ -41,14 +48,6 @@ export const BusinessRuleSetSchema = z.discriminatedUnion('scope', [
   }),
   z.strictObject({
     kind: z.literal('BusinessRuleSet'),
-    scope: z.literal('phase'),
-    scopeValue: z.number().int(),
-    rules: z.array(BusinessRuleSchema),
-    groupedBy: BusinessRuleGroupingSchema.optional(),
-    groupingEntries: z.array(BusinessRuleGroupingEntrySchema).optional(),
-  }),
-  z.strictObject({
-    kind: z.literal('BusinessRuleSet'),
     scope: z.literal('feature'),
     scopeValue: z.string(),
     rules: z.array(BusinessRuleSchema),
@@ -58,6 +57,14 @@ export const BusinessRuleSetSchema = z.discriminatedUnion('scope', [
   z.strictObject({
     kind: z.literal('BusinessRuleSet'),
     scope: z.literal('package'),
+    scopeValue: z.string(),
+    rules: z.array(BusinessRuleSchema),
+    groupedBy: BusinessRuleGroupingSchema.optional(),
+    groupingEntries: z.array(BusinessRuleGroupingEntrySchema).optional(),
+  }),
+  z.strictObject({
+    kind: z.literal('BusinessRuleSet'),
+    scope: z.literal('decision'),
     scopeValue: z.string(),
     rules: z.array(BusinessRuleSchema),
     groupedBy: BusinessRuleGroupingSchema.optional(),

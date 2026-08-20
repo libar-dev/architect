@@ -21,7 +21,7 @@
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';
 
-import { parseMarkdownToBlocks, type SectionBlock } from '@libar-dev/architect-core';
+import { BlockSchema, parseMarkdownToBlocks, type Block } from '@libar-dev/architect-core';
 
 // =============================================================================
 // State Types
@@ -29,7 +29,7 @@ import { parseMarkdownToBlocks, type SectionBlock } from '@libar-dev/architect-c
 
 interface LoadPreambleState {
   markdownContent: string;
-  blocks: readonly SectionBlock[];
+  blocks: readonly Block[];
 }
 
 // =============================================================================
@@ -54,7 +54,7 @@ function requireState(): LoadPreambleState {
   return state;
 }
 
-function getBlock(index: number): SectionBlock {
+function getBlock(index: number): Block {
   const s = requireState();
   const block = s.blocks[index];
   if (!block) throw new Error(`No block at index ${String(index)}`);
@@ -355,7 +355,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             expect(block.content).toContain('const x = 1;');
             expect(block.content).toContain('const y = 2;');
           }
-        }
+        },
       );
     });
 
@@ -498,5 +498,98 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         }
       });
     });
+  });
+
+  // ---------------------------------------------------------------------------
+  // Rule: Code-fence language is a single identifier-shaped token
+  // ---------------------------------------------------------------------------
+
+  Rule('Code-fence language is a single identifier-shaped token', ({ RuleScenario }) => {
+    RuleScenario(
+      'Info string with a trailing attribute keeps only the language token',
+      ({ Given, When, Then }) => {
+        Given('markdown with a code fence info string carrying extra tokens', () => {
+          requireState().markdownContent = '```ts {highlight: 1}\nconst x = 1;\n```';
+        });
+
+        When('parsing the markdown to blocks', () => {
+          const s = requireState();
+          s.blocks = parseMarkdownToBlocks(s.markdownContent);
+        });
+
+        Then(
+          'block 1 is a code block with language {string}',
+          (_ctx: unknown, language: string) => {
+            const block = getBlock(0);
+            expect(block.type).toBe('code');
+            if (block.type === 'code') {
+              expect(block.language).toBe(language);
+            }
+          },
+        );
+      },
+    );
+
+    RuleScenario('Non-identifier info string yields no language', ({ Given, When, Then }) => {
+      Given('markdown with a non-identifier code fence info string', () => {
+        requireState().markdownContent = '```text/markdown\nhello\n```';
+      });
+
+      When('parsing the markdown to blocks', () => {
+        const s = requireState();
+        s.blocks = parseMarkdownToBlocks(s.markdownContent);
+      });
+
+      Then('block 1 is a code block with no language', () => {
+        const block = getBlock(0);
+        expect(block.type).toBe('code');
+        if (block.type === 'code') {
+          expect(block.language).toBeUndefined();
+        }
+      });
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // Rule: Parser output validates against the canonical block schema
+  // ---------------------------------------------------------------------------
+
+  Rule('Parser output validates against the canonical block schema', ({ RuleScenario }) => {
+    RuleScenario(
+      "A mixed markdown document's blocks all validate against the canonical schema",
+      ({ Given, When, Then }) => {
+        Given('markdown with heading, paragraph, table, code, and list', () => {
+          requireState().markdownContent = [
+            '## Overview',
+            '',
+            'This is a paragraph.',
+            '',
+            '| Col A | Col B |',
+            '|-------|-------|',
+            '| val1  | val2  |',
+            '',
+            '```typescript',
+            'const x = 1;',
+            '```',
+            '',
+            '- item one',
+            '- item two',
+          ].join('\n');
+        });
+
+        When('parsing the markdown to blocks', () => {
+          const s = requireState();
+          s.blocks = parseMarkdownToBlocks(s.markdownContent);
+        });
+
+        Then('every produced block validates against the canonical block schema', () => {
+          const s = requireState();
+          expect(s.blocks.length).toBeGreaterThan(0);
+          for (const block of s.blocks) {
+            expect(BlockSchema.safeParse(block).success).toBe(true);
+          }
+        });
+      },
+    );
   });
 });

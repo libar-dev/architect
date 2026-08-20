@@ -22,24 +22,48 @@ import type { Result } from '../types/index.js';
 import { Result as R } from '../types/index.js';
 import { formatZodError } from '../utils/errors.js';
 
+/**
+ * Failure value returned by codec parse/serialize operations.
+ *
+ * @architect-shape
+ */
 export interface CodecError {
+  /** Discriminator literal identifying a codec error. */
   type: 'codec-error';
+  /** Which operation failed. */
   operation: 'parse' | 'serialize';
+  /** Originating source label (e.g. file path), if known. */
   source?: string | undefined;
+  /** Human-readable error message. */
   message: string;
+  /** Formatted schema validation errors, if the failure was a validation failure. */
   validationErrors?: string[] | undefined;
 }
 
+/**
+ * Codec that parses JSON strings into validated typed values.
+ *
+ * @architect-shape
+ */
 export interface JsonInputCodec<T> {
+  /** Parse and validate `content`, returning a `Result` with the typed value or a {@link CodecError}. */
   parse(content: string, source?: string): Result<T, CodecError>;
+  /** Parse and validate `content`, returning the typed value or `undefined` on any failure. */
   safeParse(content: string): T | undefined;
 }
 
+/**
+ * Codec that serializes typed values into validated JSON strings.
+ *
+ * @architect-shape
+ */
 export interface JsonOutputCodec<T> {
+  /** Validate and serialize `data`, returning a `Result` with the JSON string or a {@link CodecError}. */
   serialize(data: T, source?: string): Result<string, CodecError>;
+  /** Validate and serialize `data` with explicit indent/source options. */
   serializeWithOptions(
     data: T,
-    options: { indent?: number | undefined; source?: string | undefined }
+    options: { indent?: number | undefined; source?: string | undefined },
   ): Result<string, CodecError>;
 }
 
@@ -60,6 +84,14 @@ function formatFileReadError(filePath: string, error: unknown): string {
   }
 }
 
+/**
+ * Build a {@link JsonInputCodec} that parses JSON against the given schema,
+ * stripping a leading `$schema` key before validation.
+ *
+ * @architect-shape
+ * @param schema - Zod schema the parsed JSON must satisfy.
+ * @returns A codec exposing `parse` (Result-returning) and `safeParse`.
+ */
 export function createJsonInputCodec<T>(schema: ZodType<T>): JsonInputCodec<T> {
   return {
     parse(content: string, source?: string): Result<T, CodecError> {
@@ -78,7 +110,7 @@ export function createJsonInputCodec<T>(schema: ZodType<T>): JsonInputCodec<T> {
 
       const configData =
         typeof data === 'object' && data !== null && '$schema' in data
-          ? (({ $schema: _, ...rest }) => rest)(data as Record<string, unknown>)
+          ? (({ $schema: _, ...rest }) => rest)(data)
           : data;
 
       const parseResult = schema.safeParse(configData);
@@ -102,9 +134,18 @@ export function createJsonInputCodec<T>(schema: ZodType<T>): JsonInputCodec<T> {
   };
 }
 
+/**
+ * Build a {@link JsonOutputCodec} that validates a value against the schema
+ * before serializing it to JSON.
+ *
+ * @architect-shape
+ * @param schema - Zod schema the value must satisfy before serialization.
+ * @param defaultIndent - Indent width used when `serialize` is called without options (defaults to 2).
+ * @returns A codec exposing `serialize` and `serializeWithOptions`.
+ */
 export function createJsonOutputCodec<T>(
   schema: ZodType<T>,
-  defaultIndent = 2
+  defaultIndent = 2,
 ): JsonOutputCodec<T> {
   return {
     serialize(data: T, source?: string): Result<string, CodecError> {
@@ -113,7 +154,7 @@ export function createJsonOutputCodec<T>(
 
     serializeWithOptions(
       data: T,
-      options: { indent?: number | undefined; source?: string | undefined }
+      options: { indent?: number | undefined; source?: string | undefined },
     ): Result<string, CodecError> {
       const parseResult = schema.safeParse(data);
       if (!parseResult.success) {
@@ -145,9 +186,18 @@ export function createJsonOutputCodec<T>(
   };
 }
 
+/**
+ * Build a file loader that reads a file and parses it through the given codec,
+ * mapping filesystem failures to a {@link CodecError}.
+ *
+ * @architect-shape
+ * @param codec - Input codec used to parse the file contents.
+ * @param readFile - Optional reader override; defaults to `fs/promises.readFile` with UTF-8.
+ * @returns An object whose `load` resolves to a `Result` with the typed value or a {@link CodecError}.
+ */
 export function createFileLoader<T>(
   codec: JsonInputCodec<T>,
-  readFile?: (filePath: string) => Promise<string>
+  readFile?: (filePath: string) => Promise<string>,
 ): { load(filePath: string): Promise<Result<T, CodecError>> } {
   return {
     async load(filePath: string): Promise<Result<T, CodecError>> {
@@ -168,6 +218,14 @@ export function createFileLoader<T>(
   };
 }
 
+/**
+ * Render a {@link CodecError} into a multi-line human-readable string,
+ * including the source and any validation errors.
+ *
+ * @architect-shape
+ * @param error - The codec error to format.
+ * @returns A formatted, newline-joined error report.
+ */
 export function formatCodecError(error: CodecError): string {
   const lines = [`Codec error (${error.operation}): ${error.message}`];
   if (error.source) {

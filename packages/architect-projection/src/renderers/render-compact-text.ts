@@ -4,6 +4,7 @@
  * @architect-status completed
  * @architect-role:codec
  * @architect-bounded-context:rendering
+ * @architect-uses FragmentRendererDispatch, ProjectionFragmentSchema
  *
  * Renders projection fragments into compact plain text for AI-facing CLI/MCP output.
  * Dedicated render paths assert the high-signal context fragments; unknown fragment
@@ -11,7 +12,9 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - When MCP tools or CLI surfaces need compact, marker-delimited plain text for
+ *   LLM consumption, especially for overview, session context, dependency,
+ *   reading-list, scope-readiness, or handoff fragments.
  */
 import {
   isDeliverableStatusComplete,
@@ -22,7 +25,7 @@ import {
 import { humanizeKey, isPrimitive, stableStringify } from '../_internal/format-utils.js';
 import {
   isBundle,
-  type DependencyTree,
+  type DependencyContext,
   type FileReadingList,
   type Fragment,
   type HandoffRecord,
@@ -33,21 +36,36 @@ import {
   type SessionContextBundle,
 } from '../fragments/index.js';
 
+import type { ContentRichness } from '../disclosure/spec.js';
+
 import { dispatchByKind, type KindTable } from './_shared/dispatch.js';
 import type { ProjectionInput, RenderCompactOptions } from './types.js';
+
+/** Blocking entries shown before collapsing to a "… and N more" pointer at non-full richness. */
+const OVERVIEW_SUMMARY_BLOCKING_LIMIT = 5;
 
 const COMPACT_NORMALIZERS: KindTable<string, RenderCompactOptions | undefined> = {
   OverviewDigest: (f, o) => renderOverviewDigest(f, o),
   SessionContextBundle: (f, o) => renderSessionContextBundle(f, o),
-  DependencyTree: (f) => renderDependencyTree(f),
+  DependencyContext: (f, o) => renderDependencyContext(f, o),
   FileReadingList: (f, o) => renderFileReadingList(f, o),
   ScopeReadinessReport: (f, o) => renderScopeReadinessReport(f, o),
   HandoffRecord: (f, o) => renderHandoffRecord(f, o),
 };
 
+/**
+ * Renders a projection fragment or bundle into compact, marker-delimited plain
+ * text for AI-facing CLI/MCP output. Bundles render their root followed by each
+ * child section; unknown fragment kinds fall back to a generic key-value view.
+ *
+ * @architect-shape
+ * @param input - The fragment or bundle to render.
+ * @param options - Optional richness and section-separator controls.
+ * @returns The compact plain-text rendering.
+ */
 export const renderCompactText = (
   input: ProjectionInput,
-  options?: RenderCompactOptions
+  options?: RenderCompactOptions,
 ): string => {
   if (isBundle(input)) {
     return renderBundle(input, options);
@@ -58,11 +76,11 @@ export const renderCompactText = (
 
 function renderBundle(
   bundle: ProjectionBundle<Fragment>,
-  options: RenderCompactOptions | undefined
+  options: RenderCompactOptions | undefined,
 ): string {
   const renderedRoot = renderFragment(bundle.root, options).trimEnd();
   const childEntries = Object.entries(bundle.children).sort(([left], [right]) =>
-    left.localeCompare(right)
+    left.localeCompare(right),
   );
 
   if (childEntries.length === 0) {
@@ -84,33 +102,83 @@ function renderFragment(fragment: Fragment, options: RenderCompactOptions | unde
 
 function renderOverviewDigest(
   overview: OverviewDigest,
-  options: RenderCompactOptions | undefined
+  options: RenderCompactOptions | undefined,
 ): string {
+  // Undefined richness renders at full fidelity (back-compatible for internal
+  // callers and fixtures). The CLI/MCP read surface defaults to `summary`.
+  const richness: ContentRichness = options?.richness ?? 'full';
   const sections: string[] = [];
   const { progress } = overview;
 
   sections.push(
     renderMarker('PROGRESS', options) +
       '\n' +
-      `${String(progress.total)} delivery patterns (${String(progress.completed)} completed, ${String(progress.active)} active, ${String(progress.planned)} planned) = ${String(progress.percentage)}%` +
+      `${String(progress.total)} delivery patterns (${String(progress.completed)} completed, ${String(progress.active)} active, ${String(progress.planned)} planned (roadmap+deferred)) = ${String(progress.percentage)}%` +
       (progress.candidate > 0
         ? `\n${String(progress.candidate)} candidate patterns excluded from delivery progress`
-        : '')
+        : ''),
   );
 
-  if (overview.activePhases.length > 0) {
-    const lines = overview.activePhases.map((phase) => {
-      const name = phase.name !== undefined ? `: ${phase.name}` : '';
-      return `Phase ${String(phase.phase)}${name} (${String(phase.activeCount)} active)`;
-    });
-    sections.push(renderMarker('ACTIVE PHASES', options) + '\n' + lines.join('\n'));
+  // name-only = the progress line alone — the most compact heads-up signal.
+  if (richness === 'name-only') {
+    return sections.join('\n\n') + '\n';
+  }
+
+  // START HERE — the references tier (`summary-with-references` / `full`) leads
+  // with orientation: which generated docs to read first + the workable set.
+  const showReferences = richness === 'summary-with-references' || richness === 'full';
+  if (showReferences && overview.orientation !== undefined) {
+    sections.push(renderOverviewOrientation(overview.orientation, options));
+  }
+
+  if (overview.architecture !== undefined) {
+    sections.push(renderOverviewArchitecture(overview.architecture, richness, options));
   }
 
   if (overview.blocking.length > 0) {
-    const lines = overview.blocking.map(
-      (entry) => `${entry.pattern} blocked by: ${entry.blockedBy.join(', ')}`
+    const showAll = richness === 'full';
+    const shown = showAll
+      ? overview.blocking
+      : overview.blocking.slice(0, OVERVIEW_SUMMARY_BLOCKING_LIMIT);
+    const lines = shown.map(
+      (entry) => `${entry.pattern} blocked by: ${entry.blockedBy.join(', ')}`,
     );
+    const hidden = overview.blocking.length - shown.length;
+    if (hidden > 0) {
+      lines.push(`... and ${String(hidden)} more — \`architect_arch_blocking\``);
+    }
     sections.push(renderMarker('BLOCKING', options) + '\n' + lines.join('\n'));
+  }
+
+  // In the lean `summary` tier the full orientation block is suppressed, but the
+  // "safe to start" count is too actionable to hide — surface it as one line so
+  // BLOCKING is never the only call to action.
+  if (
+    !showReferences &&
+    overview.orientation !== undefined &&
+    overview.orientation.startableCount > 0
+  ) {
+    const { startableCount, startableSample } = overview.orientation;
+    const sample = startableSample.slice(0, 5);
+    const suffix = startableCount > sample.length ? ', …' : '';
+    const tail = sample.length > 0 ? `: ${sample.join(', ')}${suffix}` : '';
+    sections.push(
+      renderMarker('READY TO START', options) +
+        '\n' +
+        `${String(startableCount)} roadmap pattern(s) with dependencies satisfied${tail}`,
+    );
+  }
+
+  if (
+    overview.roleDistribution !== undefined &&
+    overview.roleDistribution.length > 0 &&
+    showReferences
+  ) {
+    sections.push(renderRoleDistribution(overview.roleDistribution, richness, options));
+  }
+
+  if (overview.generatedViews !== undefined && overview.generatedViews.length > 0) {
+    sections.push(renderGeneratedViews(overview.generatedViews, richness, options));
   }
 
   if (overview.cliHints !== undefined && overview.cliHints.length > 0) {
@@ -120,16 +188,113 @@ function renderOverviewDigest(
   return sections.join('\n\n') + '\n';
 }
 
+/** Wraps Mermaid source in a fenced ```mermaid block so markdown/MCP surfaces
+ * render it and CLI consumers still read it as plain text. */
+function fenceMermaid(content: string): string {
+  return '```mermaid\n' + content + '\n```';
+}
+
+/**
+ * The high-level architecture glimpse. `name-only` never reaches here (the
+ * caller returns early). `summary` / `summary-with-references` show the coarse
+ * package chart + the API-promoting pointer; `full` adds the richer
+ * bounded-context map below it.
+ */
+function renderOverviewArchitecture(
+  architecture: NonNullable<OverviewDigest['architecture']>,
+  richness: ContentRichness,
+  options: RenderCompactOptions | undefined,
+): string {
+  const blocks = [fenceMermaid(architecture.packageChart.content)];
+  if (richness === 'full' && architecture.contextMap !== undefined) {
+    blocks.push(fenceMermaid(architecture.contextMap.content));
+  }
+  blocks.push(architecture.pointer);
+  return renderMarker('ARCHITECTURE', options) + '\n' + blocks.join('\n\n');
+}
+
+function renderGeneratedViews(
+  views: NonNullable<OverviewDigest['generatedViews']>,
+  richness: ContentRichness,
+  options: RenderCompactOptions | undefined,
+): string {
+  const header = renderMarker('GENERATED VIEWS', options);
+
+  if (richness === 'full') {
+    const width = Math.max(...views.map((view) => view.docType.length));
+    const lines = views.map(
+      (view) => `  ${view.docType.padEnd(width)}  ${view.summary} — \`${view.verb}\``,
+    );
+    return header + '\n' + lines.join('\n');
+  }
+
+  // summary / summary-with-references: one line naming the fetchable views.
+  return (
+    header +
+    '\n' +
+    `${String(views.length)} docs via \`architect_documentation\` / docs-live/: ${views.map((view) => view.docType).join(', ')}`
+  );
+}
+
+/**
+ * The "START HERE" orientation block (rendered at `summary-with-references` and
+ * `full`): the high-signal generated docs to read first, the typed
+ * `disclosure` input field, and the count + sample of roadmap patterns ready to
+ * start. Steers a cold-start agent toward orientation + workable items.
+ */
+function renderOverviewOrientation(
+  orientation: NonNullable<OverviewDigest['orientation']>,
+  options: RenderCompactOptions | undefined,
+): string {
+  const lines: string[] = ['Read these generated docs first:'];
+  for (const ref of orientation.references) {
+    lines.push(`  ${ref.title} — \`${ref.verb}\``);
+  }
+  lines.push(orientation.disclosureHint);
+
+  if (orientation.startableCount > 0) {
+    const sample = orientation.startableSample;
+    const suffix = orientation.startableCount > sample.length ? ', …' : '';
+    const tail = sample.length > 0 ? `: ${sample.join(', ')}${suffix}` : '';
+    lines.push(
+      `Ready to start (deps satisfied): ${String(orientation.startableCount)} roadmap pattern(s)${tail}`,
+    );
+  } else {
+    lines.push('Ready to start: 0 roadmap patterns with all dependencies satisfied.');
+  }
+
+  return renderMarker('START HERE', options) + '\n' + lines.join('\n');
+}
+
+/**
+ * The `@architect-role` distribution: itemized at `full`, a single dotted line
+ * at `summary-with-references`. Sourced from the precomputed graph tally.
+ */
+function renderRoleDistribution(
+  roles: NonNullable<OverviewDigest['roleDistribution']>,
+  richness: ContentRichness,
+  options: RenderCompactOptions | undefined,
+): string {
+  const header = renderMarker('ROLE DISTRIBUTION', options);
+
+  if (richness === 'full') {
+    const width = Math.max(...roles.map((entry) => entry.role.length));
+    const lines = roles.map((entry) => `  ${entry.role.padEnd(width)}  ${String(entry.count)}`);
+    return header + '\n' + lines.join('\n');
+  }
+
+  return header + '\n' + roles.map((entry) => `${entry.role} ${String(entry.count)}`).join(' · ');
+}
+
 function renderSessionContextBundle(
   bundle: SessionContextBundle,
-  options: RenderCompactOptions | undefined
+  options: RenderCompactOptions | undefined,
 ): string {
   const sections: string[] = [];
 
   for (const meta of bundle.metadata) {
     const parts: string[] = [];
     if (meta.status !== undefined) parts.push(`Status: ${meta.status}`);
-    if (meta.phase !== undefined) parts.push(`Phase: ${String(meta.phase)}`);
     parts.push(`Role: ${meta.role}`);
 
     sections.push(
@@ -137,7 +302,7 @@ function renderSessionContextBundle(
         '\n' +
         `${parts.join(' | ')}\n` +
         (meta.summary !== '' ? `${meta.summary}\n` : '') +
-        `File: ${meta.file}`
+        `File: ${meta.file}`,
     );
   }
 
@@ -147,7 +312,7 @@ function renderSessionContextBundle(
 
   if (bundle.stubs.length > 0) {
     const lines = bundle.stubs.map((stub) =>
-      stub.targetPath !== '' ? `${stub.stubFile} -> ${stub.targetPath}` : stub.stubFile
+      stub.targetPath !== '' ? `${stub.stubFile} -> ${stub.targetPath}` : stub.stubFile,
     );
     sections.push(renderMarker('STUBS', options) + '\n' + lines.join('\n'));
   }
@@ -169,7 +334,7 @@ function renderSessionContextBundle(
 
   if (bundle.consumers.length > 0) {
     const lines = bundle.consumers.map(
-      (consumer) => `${consumer.name} (${consumer.status ?? 'unknown'})`
+      (consumer) => `${consumer.name} (${consumer.status ?? 'unknown'})`,
     );
     sections.push(renderMarker('CONSUMERS', options) + '\n' + lines.join('\n'));
   }
@@ -182,7 +347,7 @@ function renderSessionContextBundle(
       return `${neighbor.name} (${status}${role})`;
     });
     sections.push(
-      renderMarker(`ARCHITECTURE (context: ${context})`, options) + '\n' + lines.join('\n')
+      renderMarker(`ARCHITECTURE (context: ${context})`, options) + '\n' + lines.join('\n'),
     );
   }
 
@@ -207,7 +372,7 @@ function renderSessionContextBundle(
     sections.push(
       renderMarker('FSM', options) +
         '\n' +
-        `Status: ${bundle.fsm.currentStatus} | Transitions: ${transitions} | Protection: ${bundle.fsm.protectionLevel}`
+        `Status: ${bundle.fsm.currentStatus} | Transitions: ${transitions} | Protection: ${bundle.fsm.protectionLevel}`,
     );
   } else if (bundle.fsmByPattern.length === 1) {
     const entry = bundle.fsmByPattern[0];
@@ -217,7 +382,7 @@ function renderSessionContextBundle(
       sections.push(
         renderMarker('FSM', options) +
           '\n' +
-          `${entry.pattern}: Status: ${entry.fsm.currentStatus} | Transitions: ${transitions} | Protection: ${entry.fsm.protectionLevel}`
+          `${entry.pattern}: Status: ${entry.fsm.currentStatus} | Transitions: ${transitions} | Protection: ${entry.fsm.protectionLevel}`,
       );
     }
   }
@@ -229,27 +394,51 @@ function renderSessionContextBundle(
   return sections.join('\n\n') + '\n';
 }
 
-function renderDependencyTree(tree: DependencyTree): string {
-  const lines: string[] = [];
+function renderDependencyContext(
+  context: DependencyContext,
+  options: RenderCompactOptions | undefined,
+): string {
+  const { summary } = context;
+  const header =
+    `${context.focal} depends on ${String(summary.upstreamDirect)} ` +
+    `(${String(summary.upstreamTransitive)} transitive); ` +
+    `${String(summary.downstreamDirect)} depend on ${context.focal} ` +
+    `(${String(summary.downstreamTransitive)} transitive)`;
 
-  for (const node of tree.nodes) {
-    renderDependencyTreeNode(node, 0, lines);
+  const upstreamLines: string[] = [];
+  for (const node of context.upstream) {
+    renderDependencyContextNode(node, 0, upstreamLines);
+  }
+  if (upstreamLines.length === 0) {
+    upstreamLines.push('(none)');
   }
 
-  return lines.join('\n') + '\n';
+  const downstreamLines: string[] = [];
+  for (const node of context.downstream) {
+    renderDependencyContextNode(node, 0, downstreamLines);
+  }
+  if (downstreamLines.length === 0) {
+    downstreamLines.push('(none)');
+  }
+
+  const sections = [
+    header,
+    renderMarker('DEPENDS ON (upstream)', options) + '\n' + upstreamLines.join('\n'),
+    renderMarker('REQUIRED BY (downstream)', options) + '\n' + downstreamLines.join('\n'),
+  ];
+
+  return sections.join('\n\n') + '\n';
 }
 
-function renderDependencyTreeNode(
-  node: DependencyTree['nodes'][number],
+function renderDependencyContextNode(
+  node: DependencyContext['upstream'][number],
   depth: number,
-  lines: string[]
+  lines: string[],
 ): void {
   const indent = depth > 0 ? '  '.repeat(depth) + '-> ' : '';
-  const phase = node.phase !== undefined ? `${String(node.phase)}, ` : '';
   const status = node.status ?? 'unknown';
-  const focal = node.isFocal ? ' <- YOU ARE HERE' : '';
 
-  lines.push(`${indent}${node.name} (${phase}${status})${focal}`);
+  lines.push(`${indent}${node.name} (${status})`);
 
   if (node.truncated) {
     const truncIndent = '  '.repeat(depth + 1) + '-> ';
@@ -258,13 +447,13 @@ function renderDependencyTreeNode(
   }
 
   for (const child of node.children) {
-    renderDependencyTreeNode(child, depth + 1, lines);
+    renderDependencyContextNode(child, depth + 1, lines);
   }
 }
 
 function renderFileReadingList(
   list: FileReadingList,
-  options: RenderCompactOptions | undefined
+  options: RenderCompactOptions | undefined,
 ): string {
   const sections: string[] = [];
 
@@ -274,19 +463,21 @@ function renderFileReadingList(
 
   if (list.completedDeps.length > 0) {
     sections.push(
-      renderMarker('COMPLETED DEPENDENCIES', options) + '\n' + list.completedDeps.join('\n')
+      renderMarker('COMPLETED DEPENDENCIES', options) + '\n' + list.completedDeps.join('\n'),
     );
   }
 
   if (list.roadmapDeps.length > 0) {
     sections.push(
-      renderMarker('ROADMAP DEPENDENCIES', options) + '\n' + list.roadmapDeps.join('\n')
+      renderMarker('ROADMAP DEPENDENCIES', options) + '\n' + list.roadmapDeps.join('\n'),
     );
   }
 
   if (list.architectureNeighbors.length > 0) {
     sections.push(
-      renderMarker('ARCHITECTURE NEIGHBORS', options) + '\n' + list.architectureNeighbors.join('\n')
+      renderMarker('ARCHITECTURE NEIGHBORS', options) +
+        '\n' +
+        list.architectureNeighbors.join('\n'),
     );
   }
 
@@ -295,12 +486,12 @@ function renderFileReadingList(
 
 function renderScopeReadinessReport(
   report: ScopeReadinessReport,
-  options: RenderCompactOptions | undefined
+  options: RenderCompactOptions | undefined,
 ): string {
   const sections: string[] = [];
 
   sections.push(
-    renderMarker(`SCOPE VALIDATION: ${report.pattern} (${report.sessionType})`, options)
+    renderMarker(`SCOPE VALIDATION: ${report.pattern} (${report.sessionType})`, options),
   );
 
   const checkLines = report.checks.map((check) => {
@@ -313,10 +504,10 @@ function renderScopeReadinessReport(
   sections.push(renderMarker('CHECKLIST', options) + '\n' + checkLines.join('\n'));
 
   const blockedChecks = report.checks.filter(
-    (check) => renderLegacyCheckSeverity(check) === 'BLOCKED'
+    (check) => renderLegacyCheckSeverity(check) === 'BLOCKED',
   );
   const warningChecks = report.checks.filter(
-    (check) => renderLegacyCheckSeverity(check) === 'WARN'
+    (check) => renderLegacyCheckSeverity(check) === 'WARN',
   );
 
   let verdictText: string;
@@ -350,7 +541,7 @@ function renderLegacyCheckSeverity(check: ScopeReadinessCheck): 'PASS' | 'WARN' 
 
 function renderHandoffRecord(
   handoff: HandoffRecord,
-  options: RenderCompactOptions | undefined
+  options: RenderCompactOptions | undefined,
 ): string {
   const sections: string[] = [];
   const headerLines = [
@@ -373,7 +564,7 @@ function renderHandoffRecord(
 
   if (handoff.filesModified.length > 0) {
     sections.push(
-      renderMarker('FILES MODIFIED', options) + '\n' + handoff.filesModified.join('\n')
+      renderMarker('FILES MODIFIED', options) + '\n' + handoff.filesModified.join('\n'),
     );
   }
 
@@ -384,7 +575,7 @@ function renderHandoffRecord(
   sections.push(
     renderMarker('BLOCKERS', options) +
       '\n' +
-      (handoff.blockers.length > 0 ? handoff.blockers.join('\n') : 'None')
+      (handoff.blockers.length > 0 ? handoff.blockers.join('\n') : 'None'),
   );
 
   if (handoff.nextSession !== '') {
@@ -396,12 +587,12 @@ function renderHandoffRecord(
 
 function renderMinimalStructured(
   fragment: Fragment,
-  options: RenderCompactOptions | undefined
+  options: RenderCompactOptions | undefined,
 ): string {
   const sections: string[] = [renderMarker(fragment.kind, options)];
 
   for (const [key, value] of Object.entries(fragment).sort(([left], [right]) =>
-    left.localeCompare(right)
+    left.localeCompare(right),
   )) {
     if (key === 'kind' || value === undefined) {
       continue;
@@ -421,7 +612,7 @@ function renderMinimalStructured(
       sections.push(
         renderMarker(humanizeKey(key), options) +
           '\n' +
-          value.map((entry) => stableStringify(entry)).join('\n')
+          value.map((entry) => stableStringify(entry)).join('\n'),
       );
       continue;
     }

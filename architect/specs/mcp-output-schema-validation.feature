@@ -2,7 +2,6 @@
 @architect-pattern:McpOutputSchemaValidation
 @architect-status:candidate
 @architect-product-area:DataAPI
-@architect-uses:PerspectiveAwareProjections
 @architect-bounded-context:api
 @architect-see-also:ADR006SingleReadModelArchitecture
 Feature: McpOutputSchemaValidation
@@ -19,11 +18,10 @@ Feature: McpOutputSchemaValidation
   patterns, and `jsonResult(undefined)` serializes to the string `"undefined"` --
   which an LLM treats as valid neighborhood data.
 
-  **Why deferred until after PerspectiveAwareProjections:**
-  PAP adds --maturity, --role, and --perspective parameters to `architect_list`,
-  `architect_status`, `architect_overview`, and 5+ other tools. It also adds
-  `architect_diagnostics` as a new tool. Adding Zod output schemas before PAP
-  stabilizes these response shapes would create throwaway validation code.
+  **Why deferred until after the phase-49 read-model cleanup:**
+  The coordinated taxonomy redesign still changes list, status, and overview
+  response shapes. Adding Zod output schemas before those payloads stabilize
+  would create throwaway validation code.
 
   **Solution:**
   After PAP ships and output shapes are stable, add Zod output schemas for all

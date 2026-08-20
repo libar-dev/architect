@@ -1,3 +1,8 @@
+@architect
+@architect-pattern:RendererDispatchSmokeExecutableTests
+@architect-implements:FragmentRendererDispatch
+@architect-status:active
+@architect-role:projection
 @projection
 Feature: Every renderer accepts every fragment kind without throwing
   New FragmentKinds must be accepted by each of the four renderers as a valid
@@ -19,9 +24,7 @@ Feature: Every renderer accepts every fragment kind without throwing
 
       Examples:
         | kind                     |
-        | PhaseProgress            |
         | StatusDistribution       |
-        | ReleaseNotesDigest       |
         | TraceabilityMatrix       |
         | ProjectConfigSnapshot    |
         | ArchitectureDiagram      |
@@ -55,6 +58,6 @@ Feature: Every renderer accepts every fragment kind without throwing
         | PatternDetail            |
         | DependencyEdge           |
         | DependencyEdgeSet        |
-        | DependencyTree           |
+        | DependencyContext        |
         | ArchitectureNeighborhood |
         | OrphanPatternList        |

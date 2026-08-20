@@ -1,16 +1,18 @@
 import { describeFeature, loadFeature } from '@amiceli/vitest-cucumber';
-import { expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import {
   REQUIREMENTS_EXECUTABLE_AREA_LABEL,
   REQUIREMENTS_SPECS_AREA_LABEL,
 } from '../../../src/fragments/operational-insights/requirement-digest.js';
+import type { Block } from '@libar-dev/architect-core';
 import {
+  type DisclosureSpec,
   getSupportedDocumentationTypeMetadata,
   renderMarkdown,
-  type Block,
   type BusinessRuleSet,
   type Fragment,
+  type MarkdownRenderEvent,
   type ProjectionBundle,
 } from '../../../src/index.js';
 
@@ -35,7 +37,6 @@ function documentationFixtureToFragment(view: SectionedDocumentFixture): Fragmen
     sourceGlobs: [],
     buildTimeMs: 0,
     patternCount: 0,
-    phaseCount: 0,
     roleCount: 0,
     title: view.title,
     sections: view.sections,
@@ -45,6 +46,7 @@ function documentationFixtureToFragment(view: SectionedDocumentFixture): Fragmen
 interface RenderMarkdownBlockState {
   input: Fragment | ProjectionBundle<Fragment> | null;
   rendered: string | Record<string, string> | null;
+  renderEvents: MarkdownRenderEvent[];
 }
 
 function assertRenderedString(value: string | Record<string, string> | null): string {
@@ -59,7 +61,7 @@ function assertRenderedString(value: string | Record<string, string> | null): st
 }
 
 function assertRenderedRecord(
-  value: string | Record<string, string> | null
+  value: string | Record<string, string> | null,
 ): Record<string, string> {
   expect(value).not.toBeNull();
   expect(typeof value).toBe('object');
@@ -79,6 +81,7 @@ function createState(): RenderMarkdownBlockState {
   return {
     input: null,
     rendered: null,
+    renderEvents: [],
   };
 }
 
@@ -275,33 +278,35 @@ function createUnsafeMarkdownFixture(): Fragment {
   });
 }
 
-function createHostileReleaseNotesFixture(): Fragment {
+function createHostileTaxonomyDigestFixture(): Fragment {
   return {
-    kind: 'ReleaseNotesDigest',
-    releases: [
+    kind: 'TaxonomyDigest',
+    tags: [
       {
-        release: 'v1.0](javascript:alert(1))',
-        date: '<script>alert(2)</script>',
-        patterns: [
+        groupName: 'Roles',
+        entries: [
           {
-            kind: 'PatternSummary',
-            patternName: 'Pattern **bold** [trap](javascript:alert(3))',
-            role: 'Pattern',
-            file: 'packages/foo.ts',
-            source: 'typescript',
+            kind: 'role',
+            tag: 'projection',
+            domain: 'Projection',
+            priority: 1,
+            description: 'Safe role tag',
+            aliases: [],
+          },
+          {
+            // A sourced tag value carrying a backtick + link: the backtick would
+            // close a naive `code` span and let the rest inject a live link.
+            kind: 'role',
+            tag: 'evil`[click](javascript:alert(11))',
+            domain: 'Injected',
+            priority: 2,
+            description: 'Hostile tag value',
+            aliases: [],
           },
         ],
-        deliverables: [
-          {
-            name: 'Deliverable [click](javascript:alert(4))',
-            status: 'active',
-            tests: [],
-            location: '<script>alert(5)</script>',
-          },
-        ],
-        notes: 'Release note [trap](javascript:alert(6))',
       },
     ],
+    formatTypes: [],
   } as unknown as Fragment;
 }
 
@@ -443,20 +448,28 @@ function createBusinessRulesDisclosureBundle(): ProjectionBundle<Fragment> {
     ],
   };
 
-  return {
-    root: documentationFixtureToFragment(root),
-    children: {
-      'business-rules:projection-api': documentationFixtureToFragment(child),
-    },
-    routing: {
-      rootRouteId: 'business-rules:index',
-      childRouteIds: {
-        'business-rules:projection-api': 'business-rules:projection-api',
+  return withBundleDisclosureSpec(
+    {
+      root: documentationFixtureToFragment(root),
+      children: {
+        'business-rules:projection-api': documentationFixtureToFragment(child),
       },
-      childPathStrategy: 'nested',
-      anchorStrategy: 'heading-slug',
+      routing: {
+        rootRouteId: 'business-rules:index',
+        childRouteIds: {
+          'business-rules:projection-api': 'business-rules:projection-api',
+        },
+        childPathStrategy: 'nested',
+        anchorStrategy: 'heading-slug',
+      },
     },
-  };
+    {
+      grouping: 'flat',
+      richness: 'full',
+      emitChildren: true,
+      committed: true,
+    },
+  );
 }
 
 function createBusinessRuleSetDisclosureBundle(): ProjectionBundle<BusinessRuleSet> {
@@ -471,7 +484,6 @@ function createBusinessRuleSetDisclosureBundle(): ProjectionBundle<BusinessRuleS
       verifiedBy: ['business-rule markdown richness is driven by disclosure policy'],
       scenarioCount: 1,
       pattern: 'ProjectionAPI',
-      phase: 49,
       productArea: 'Projection Platform',
     },
   ];
@@ -486,60 +498,62 @@ function createBusinessRuleSetDisclosureBundle(): ProjectionBundle<BusinessRuleS
       verifiedBy: ['business-rule markdown richness is driven by disclosure policy'],
       scenarioCount: 1,
       pattern: 'GenerateDocsCli',
-      phase: 49,
       productArea: 'CLI',
     },
   ];
 
-  return {
-    root: {
-      kind: 'BusinessRuleSet',
-      scope: 'all',
-      rules: [...projectionRules, ...cliRules],
-      groupedBy: 'package',
-      groupingEntries: [
-        {
-          childKey: 'architect-cli',
-          label: 'architect-cli',
-          featureCount: 1,
-          ruleCount: 1,
-          invariantCount: 1,
-        },
-        {
-          childKey: 'architect-projection',
-          label: 'architect-projection',
-          featureCount: 1,
-          ruleCount: 1,
-          invariantCount: 1,
-        },
-      ],
-    },
-    children: {
-      'architect-cli': {
+  return withBundleDisclosureSpec(
+    {
+      root: {
         kind: 'BusinessRuleSet',
-        scope: 'package',
-        scopeValue: 'architect-cli',
-        rules: cliRules,
+        scope: 'all',
+        rules: [...projectionRules, ...cliRules],
         groupedBy: 'package',
+        groupingEntries: [
+          {
+            childKey: 'architect-cli',
+            label: 'architect-cli',
+            featureCount: 1,
+            ruleCount: 1,
+            invariantCount: 1,
+          },
+          {
+            childKey: 'architect-projection',
+            label: 'architect-projection',
+            featureCount: 1,
+            ruleCount: 1,
+            invariantCount: 1,
+          },
+        ],
       },
-      'architect-projection': {
-        kind: 'BusinessRuleSet',
-        scope: 'package',
-        scopeValue: 'architect-projection',
-        rules: projectionRules,
-        groupedBy: 'package',
+      children: {
+        'architect-cli': {
+          kind: 'BusinessRuleSet',
+          scope: 'package',
+          scopeValue: 'architect-cli',
+          rules: cliRules,
+          groupedBy: 'package',
+        },
+        'architect-projection': {
+          kind: 'BusinessRuleSet',
+          scope: 'package',
+          scopeValue: 'architect-projection',
+          rules: projectionRules,
+          groupedBy: 'package',
+        },
+      },
+      routing: {
+        rootRouteId: 'business-rules:index',
+        childRouteIds: {
+          'architect-cli': 'business-rules:architect-cli',
+          'architect-projection': 'business-rules:architect-projection',
+        },
+        childPathStrategy: 'nested',
+        anchorStrategy: 'heading-slug',
       },
     },
-    routing: {
-      rootRouteId: 'business-rules:index',
-      childRouteIds: {
-        'architect-cli': 'business-rules:architect-cli',
-        'architect-projection': 'business-rules:architect-projection',
-      },
-      childPathStrategy: 'nested',
-      anchorStrategy: 'heading-slug',
-    },
-  };
+    getSupportedDocumentationTypeMetadata('business-rules').disclosureMatrix.important,
+  );
 }
 
 function createBusinessRuleSetHostileGroupingBundle(): ProjectionBundle<BusinessRuleSet> {
@@ -583,58 +597,79 @@ function createBusinessRuleSetHostileGroupingBundle(): ProjectionBundle<Business
       },
       childPathStrategy: routing.childPathStrategy,
       anchorStrategy: routing.anchorStrategy,
+      ...(routing.disclosureSpec !== undefined ? { disclosureSpec: routing.disclosureSpec } : {}),
     },
   };
 }
 
-function createBusinessRuleSetRichnessFixture(): ProjectionBundle<Fragment> {
-  return {
-    root: {
-      kind: 'BusinessRuleSet',
-      scope: 'all',
-      rules: [
-        {
-          kind: 'BusinessRule',
-          feature: 'ProjectionAPI',
-          ruleName: 'Canonical document types',
-          package: 'architect-projection',
-          invariant: 'Business rules expose stable disclosure-driven columns.',
-          rationale: 'Renderer richness should be explicit and testable.',
-          verifiedBy: ['BusinessRule table column count per richness'],
-          scenarioCount: 1,
-          pattern: 'ProjectionAPI',
-          phase: 49,
-          productArea: 'Projection Platform',
-        },
-        {
-          kind: 'BusinessRule',
-          feature: 'GenerateDocsCli',
-          ruleName: 'Registry dispatch',
-          package: 'architect-cli',
-          invariant: 'CLI business rules render through the same table policy.',
-          rationale: 'Disclosure richness should not be consumer-specific.',
-          verifiedBy: ['BusinessRule table column count per richness'],
-          scenarioCount: 1,
-          pattern: 'GenerateDocsCli',
-          phase: 49,
-          productArea: 'CLI',
-        },
-        {
-          kind: 'BusinessRule',
-          feature: 'ArchitectMcp',
-          ruleName: 'Documentation tool parity',
-          package: 'architect-mcp',
-          invariant: 'MCP business rules follow the same markdown richness policy.',
-          rationale: 'Boundary surfaces should share disclosure semantics.',
-          verifiedBy: ['BusinessRule table column count per richness'],
-          scenarioCount: 1,
-          pattern: 'ArchitectMcp',
-          phase: 49,
-          productArea: 'MCP',
-        },
-      ],
+function createBusinessRuleSetRichnessFixture(
+  disclosureSpec: DisclosureSpec,
+): ProjectionBundle<Fragment> {
+  return withBundleDisclosureSpec(
+    {
+      root: {
+        kind: 'BusinessRuleSet',
+        scope: 'all',
+        rules: [
+          {
+            kind: 'BusinessRule',
+            feature: 'ProjectionAPI',
+            ruleName: 'Canonical document types',
+            package: 'architect-projection',
+            invariant: 'Business rules expose stable disclosure-driven columns.',
+            rationale: 'Renderer richness should be explicit and testable.',
+            verifiedBy: ['BusinessRule table column count per richness'],
+            scenarioCount: 1,
+            pattern: 'ProjectionAPI',
+            productArea: 'Projection Platform',
+          },
+          {
+            kind: 'BusinessRule',
+            feature: 'GenerateDocsCli',
+            ruleName: 'Registry dispatch',
+            package: 'architect-cli',
+            invariant: 'CLI business rules render through the same table policy.',
+            rationale: 'Disclosure richness should not be consumer-specific.',
+            verifiedBy: ['BusinessRule table column count per richness'],
+            scenarioCount: 1,
+            pattern: 'GenerateDocsCli',
+            productArea: 'CLI',
+          },
+          {
+            kind: 'BusinessRule',
+            feature: 'ArchitectMcp',
+            ruleName: 'Documentation tool parity',
+            package: 'architect-mcp',
+            invariant: 'MCP business rules follow the same markdown richness policy.',
+            rationale: 'Boundary surfaces should share disclosure semantics.',
+            verifiedBy: ['BusinessRule table column count per richness'],
+            scenarioCount: 1,
+            pattern: 'ArchitectMcp',
+            productArea: 'MCP',
+          },
+        ],
+      },
+      children: {},
     },
-    children: {},
+    disclosureSpec,
+  );
+}
+
+function withBundleDisclosureSpec<TFragment extends Fragment>(
+  bundle: ProjectionBundle<TFragment>,
+  disclosureSpec: DisclosureSpec,
+): ProjectionBundle<TFragment> {
+  const routing = bundle.routing;
+
+  return {
+    ...bundle,
+    routing: {
+      rootRouteId: routing?.rootRouteId ?? 'documentation:index',
+      childRouteIds: routing?.childRouteIds ?? {},
+      childPathStrategy: routing?.childPathStrategy ?? 'nested',
+      anchorStrategy: routing?.anchorStrategy ?? 'heading-slug',
+      disclosureSpec,
+    },
   };
 }
 
@@ -778,7 +813,7 @@ function createRouteIdCollisionBundle(): ProjectionBundle<Fragment> {
 }
 
 function createRequirementsDisclosureBundle(
-  documentType: 'requirements-executable' | 'requirements-specs'
+  documentType: 'requirements-executable' | 'requirements-specs',
 ): ProjectionBundle<Fragment> {
   const label =
     documentType === 'requirements-executable'
@@ -869,7 +904,7 @@ function createRequirementsDisclosureBundle(
 }
 
 function createRequirementsDisclosureBundleWithRejectedChildren(
-  documentType: 'requirements-executable' | 'requirements-specs'
+  documentType: 'requirements-executable' | 'requirements-specs',
 ): ProjectionBundle<Fragment> {
   const label =
     documentType === 'requirements-executable'
@@ -1009,6 +1044,56 @@ const expectedAllBlocksMarkdown = [
   '',
 ].join('\n');
 
+function createDecisionCatalogFixture(): Fragment {
+  const record = (id: string, title: string) => ({
+    kind: 'DecisionRecord',
+    id,
+    type: 'ADR',
+    status: 'accepted',
+    title,
+    context: [],
+    decision: [],
+    consequences: [],
+    relatedDecisions: [],
+    affectedPatterns: [],
+  });
+  return {
+    kind: 'DecisionCatalog',
+    decisions: [
+      record('ADR-001', 'Taxonomy Canonical Values'),
+      record('ADR-X **bold**', 'Hostile Identifier'),
+    ],
+  } as unknown as Fragment;
+}
+
+function createArchitectureDiagramFixture(): Fragment {
+  return {
+    kind: 'ArchitectureDiagram',
+    scope: 'component',
+    sections: [
+      {
+        title: 'Context Map',
+        description:
+          'Each node is a group; each arrow is a cross-group dependency (`depends-on` / `uses`).',
+        diagram: { type: 'mermaid', content: 'graph LR\n  a --> b' },
+        patterns: [],
+      },
+      {
+        // Sourced group title carrying hostile markdown — the renderer must escape it while
+        // keeping the renderer-authored "(N patterns)" suffix live (ADR-009).
+        title: 'Bounded context: Auth **bold** [trap](javascript:alert(1))',
+        diagram: { type: 'mermaid', content: 'graph TD\n  gamma["Gamma"]' },
+        patterns: ['Gamma'],
+      },
+    ],
+    legend: [
+      { type: 'heading', level: 3, text: 'Legend' },
+      { type: 'list', ordered: false, items: ['Solid arrow = dependency (depends-on / uses)'] },
+    ],
+    patterns: ['Alpha', 'Beta'],
+  } as unknown as Fragment;
+}
+
 describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   AfterEachScenario(() => {
     state = null;
@@ -1042,7 +1127,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           'a SectionedDocumentFixture fixture containing hostile markdown text and unsafe links',
           () => {
             state!.input = createUnsafeMarkdownFixture();
-          }
+          },
         );
 
         When('I render the fragment as markdown', () => {
@@ -1052,10 +1137,10 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         Then('the markdown output should escape hostile plain text', () => {
           const markdown = assertRenderedString(state!.rendered);
           expect(markdown).toContain(
-            '&lt;script&gt;alert\\("x"\\)&lt;/script&gt; \\[trap\\]\\(javascript:alert\\(1\\)\\) \\*\\*bold\\*\\*'
+            '&lt;script&gt;alert("x")&lt;/script&gt; \\[trap\\](javascript:alert(1)) \\*\\*bold\\*\\*',
           );
-          expect(markdown).toContain('- \\!\\[img\\]\\(https://example.com/x.png\\)');
-          expect(markdown).toContain('- \\[link\\]\\(javascript:alert\\(2\\)\\)');
+          expect(markdown).toContain('- !\\[img\\](https://example.com/x.png)');
+          expect(markdown).toContain('- \\[link\\](javascript:alert(2))');
         });
 
         And('the markdown output should neutralize block-level markdown markers', () => {
@@ -1070,14 +1155,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         And('the markdown output should escape hostile collapsible summaries', () => {
           const markdown = assertRenderedString(state!.rendered);
           expect(markdown).toContain(
-            '<summary>\\*\\*Summary\\*\\* \\[trap\\]\\(javascript:alert\\(9\\)\\) &lt;b&gt;tag&lt;/b&gt;</summary>'
+            '<summary>\\*\\*Summary\\*\\* \\[trap\\](javascript:alert(9)) &lt;b&gt;tag&lt;/b&gt;</summary>',
           );
         });
 
         And('the markdown output should block unsafe link targets', () => {
           const markdown = assertRenderedString(state!.rendered);
           expect(markdown).not.toContain('[Click');
-          expect(markdown).toContain('Click\\]\\(javascript:alert\\(3\\)\\)');
+          expect(markdown).toContain('Click\\](javascript:alert(3))');
           expect(markdown).toContain('[Safe Docs](https://example.com/docs%20path)');
           expect(markdown).toContain('Protocol Relative');
           expect(markdown).not.toContain('[Protocol Relative](');
@@ -1115,34 +1200,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           expect(markdown).not.toContain('[Trailing Numeric NewLine HTTPS](');
           expect(markdown).toContain('[Safe Colonized Path](docs/&colonization-guide.md)');
         });
-      }
-    );
-
-    RuleScenario(
-      'Release notes trusted markdown escapes interpolated fragment values',
-      ({ Given, When, Then }) => {
-        Given('a ReleaseNotesDigest fixture containing hostile release metadata', () => {
-          state!.input = createHostileReleaseNotesFixture();
-        });
-
-        When('I render the fragment as markdown', () => {
-          state!.rendered = renderMarkdown(state!.input!);
-        });
-
-        Then('the release notes markdown should escape trusted interpolation values', () => {
-          const markdown = assertRenderedString(state!.rendered);
-          expect(markdown).toContain(
-            '## [v1.0\\]\\(javascript:alert\\(1\\)\\)] - &lt;script&gt;alert\\(2\\)&lt;/script&gt;'
-          );
-          expect(markdown).toContain(
-            '- **Deliverable \\[click\\]\\(javascript:alert\\(4\\)\\)**: &lt;script&gt;alert\\(5\\)&lt;/script&gt;'
-          );
-          expect(markdown).toContain(
-            '- Pattern \\*\\*bold\\*\\* \\[trap\\]\\(javascript:alert\\(3\\)\\)'
-          );
-          expect(markdown).toContain('Release note \\[trap\\]\\(javascript:alert\\(6\\)\\)');
-        });
-      }
+      },
     );
 
     RuleScenario(
@@ -1163,18 +1221,133 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         Then('the requirement markdown should escape trusted interpolation values', () => {
           const rendered = assertRenderedRecord(state!.rendered);
           expect(rendered['REQUIREMENTS-EXECUTABLE.md']).toContain(
-            '[RendererRequirement \\[trap\\]\\(javascript:alert\\(7\\)\\)](requirements-executable/renderer-package/renderer-threat.md)'
+            '[RendererRequirement \\[trap\\](javascript:alert(7))](requirements-executable/renderer-package/renderer-threat.md)',
           );
           expect(rendered['requirements-executable/renderer-package/renderer-threat.md']).toContain(
-            '**Status:** active \\*\\*bold\\*\\* \\[trap\\]\\(javascript:alert\\(8\\)\\)'
+            '**Status:** active \\*\\*bold\\*\\* \\[trap\\](javascript:alert(8))',
           );
           expect(rendered['requirements-executable/renderer-package/renderer-threat.md']).toContain(
-            'Requirement body remains plain text.'
+            'Requirement body remains plain text.',
           );
         });
-      }
+      },
     );
   });
+
+  Rule(
+    'Renderer-authored markdown renders live while sourced text stays escaped',
+    ({ RuleScenario }) => {
+      RuleScenario(
+        'Decision catalog renders live ADR links and escapes hostile link text',
+        ({ Given, When, Then, And }) => {
+          Given('a DecisionCatalog fixture with a normal and a hostile decision id', () => {
+            state!.input = createDecisionCatalogFixture();
+          });
+
+          When('I render the fragment as markdown', () => {
+            state!.rendered = renderMarkdown(state!.input!);
+          });
+
+          Then('the decision catalog markdown should render the ADR link as a live link', () => {
+            const markdown = assertRenderedString(state!.rendered);
+            expect(markdown).toContain('[ADR-001](decisions/adr-001.md)');
+            expect(markdown).not.toContain('\\[ADR-001\\]');
+          });
+
+          And('the decision catalog markdown should escape the hostile decision link text', () => {
+            const markdown = assertRenderedString(state!.rendered);
+            // The link STRUCTURE is trusted, but the link TEXT (sourced id) stays escaped.
+            expect(markdown).toContain('ADR-X \\*\\*bold\\*\\*');
+            expect(markdown).not.toContain('ADR-X **bold**');
+          });
+        },
+      );
+
+      RuleScenario(
+        'Architecture diagram trusts renderer-authored description and legend',
+        ({ Given, When, Then, And }) => {
+          Given('an ArchitectureDiagram fixture with a code-span description and a legend', () => {
+            state!.input = createArchitectureDiagramFixture();
+          });
+
+          When('I render the fragment as markdown', () => {
+            state!.rendered = renderMarkdown(state!.input!);
+          });
+
+          Then(
+            'the architecture markdown should render the description code spans unescaped',
+            () => {
+              const markdown = assertRenderedString(state!.rendered);
+              expect(markdown).toContain('cross-group dependency (`depends-on` / `uses`)');
+              expect(markdown).not.toContain('\\`depends-on\\`');
+            },
+          );
+
+          And('the architecture markdown should render the legend parentheses unescaped', () => {
+            const markdown = assertRenderedString(state!.rendered);
+            expect(markdown).toContain('Solid arrow = dependency (depends-on / uses)');
+            expect(markdown).not.toContain('dependency \\(depends-on / uses\\)');
+          });
+        },
+      );
+
+      RuleScenario(
+        'Architecture diagram escapes sourced section titles but keeps the pattern-count suffix live',
+        ({ Given, When, Then, And }) => {
+          Given('an ArchitectureDiagram fixture with a hostile sourced section title', () => {
+            state!.input = createArchitectureDiagramFixture();
+          });
+
+          When('I render the fragment as markdown', () => {
+            state!.rendered = renderMarkdown(state!.input!);
+          });
+
+          Then('the architecture markdown should escape the sourced section title', () => {
+            const markdown = assertRenderedString(state!.rendered);
+            expect(markdown).toContain(
+              'Bounded context: Auth \\*\\*bold\\*\\* \\[trap\\](javascript:alert(1))',
+            );
+            expect(markdown).not.toContain('Auth **bold**');
+          });
+
+          And(
+            'the architecture markdown should keep the renderer-authored count suffix live',
+            () => {
+              const markdown = assertRenderedString(state!.rendered);
+              expect(markdown).toContain('(1 pattern)');
+              expect(markdown).not.toContain('\\(1 pattern\\)');
+            },
+          );
+        },
+      );
+
+      RuleScenario(
+        'Taxonomy tag code spans render live but sourced tag text cannot inject',
+        ({ Given, When, Then, And }) => {
+          Given(
+            'a TaxonomyDigest fixture with a safe tag and a backtick-bearing hostile tag',
+            () => {
+              state!.input = createHostileTaxonomyDigestFixture();
+            },
+          );
+          When('I render the fragment as markdown', () => {
+            state!.rendered = renderMarkdown(state!.input!);
+          });
+          Then('the taxonomy markdown should render the safe tag as a live code span', () => {
+            const markdown = assertRenderedString(state!.rendered);
+            expect(markdown).toContain('`projection`');
+            expect(markdown).not.toContain('\\`projection\\`');
+          });
+          And('the taxonomy markdown should not let the hostile tag inject a live link', () => {
+            const markdown = assertRenderedString(state!.rendered);
+            // The hostile tag's backtick forces the escaped-plain-text fallback, so its
+            // `]` is escaped and no `](javascript:…)` link forms (lookbehind = unescaped `]`).
+            expect(markdown).not.toMatch(/(?<!\\)\]\(\s*javascript:alert\(11\)\)/i);
+          });
+        },
+      );
+    },
+  );
 
   Rule(
     'Routed markdown output can auto-split oversized files at H2 boundaries',
@@ -1186,14 +1359,16 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'a routed SectionedDocumentFixture bundle fixture that exceeds the markdown size budget',
             () => {
               state!.input = createSplitBundle();
-            }
+            },
           );
 
           When('I render the bundle as markdown with an H2 size budget', () => {
+            state!.renderEvents = [];
             state!.rendered = renderMarkdown(state!.input!, {
               includeChildren: true,
               sizeBudget: 12,
               splitStrategy: 'h2-boundary',
+              onRenderDocument: (event) => state!.renderEvents.push(event),
             });
           });
 
@@ -1226,19 +1401,35 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 '',
                 '[See Gamma Section](gamma-section.md)',
                 '',
-              ].join('\n')
+              ].join('\n'),
             );
             expect(rendered['guides/alpha-section.md']).toContain(
-              '[← Back to Renderer Guide](renderer-guide.md)'
+              '[← Back to Renderer Guide](renderer-guide.md)',
             );
             expect(rendered['guides/beta-section.md']).toContain('Beta details stay together too.');
             expect(rendered['guides/gamma-section.md']).toContain(
-              'Gamma details push the file over budget.'
+              'Gamma details push the file over budget.',
             );
           });
-        }
+
+          And('each split-path routed fragment should render at most twice', () => {
+            const counts = new Map<string, number>();
+            for (const event of state!.renderEvents) {
+              counts.set(event.renderKey, (counts.get(event.renderKey) ?? 0) + 1);
+            }
+
+            expect(Object.fromEntries(counts.entries())).toEqual({
+              'INDEX.md': 1,
+              'guides/renderer-guide.md': 2,
+              'guides/renderer-guide.md#0:alpha-section': 2,
+              'guides/renderer-guide.md#1:beta-section': 2,
+              'guides/renderer-guide.md#2:gamma-section': 2,
+            });
+            expect(Math.max(...counts.values())).toBeLessThanOrEqual(2);
+          });
+        },
       );
-    }
+    },
   );
 
   Rule(
@@ -1251,17 +1442,11 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'a routed business-rules SectionedDocumentFixture bundle with detailed children',
             () => {
               state!.input = createBusinessRulesDisclosureBundle();
-            }
+            },
           );
 
           When('I render the bundle as markdown without H2 splitting', () => {
             state!.rendered = renderMarkdown(state!.input!, {
-              disclosureSpec: {
-                grouping: 'flat',
-                richness: 'full',
-                emitChildren: true,
-                committed: true,
-              },
               includeChildren: true,
               splitStrategy: 'never',
             });
@@ -1272,16 +1457,16 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             () => {
               const rendered = assertRenderedRecord(state!.rendered);
               expect(rendered['BUSINESS-RULES.md']).toContain('Canonical document types');
-            }
+            },
           );
 
           And('the documentation detail child should retain its detail body', () => {
             const rendered = assertRenderedRecord(state!.rendered);
             expect(rendered['business-rules/projection-api.md']).toContain(
-              'Full invariant detail stays in the child page.'
+              'Full invariant detail stays in the child page.',
             );
           });
-        }
+        },
       );
 
       RuleScenario(
@@ -1294,8 +1479,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           When('I render the bundle as important business-rules markdown disclosure', () => {
             state!.rendered = renderMarkdown(state!.input!, {
               disclosureLevel: 'important',
-              disclosureSpec:
-                getSupportedDocumentationTypeMetadata('business-rules').disclosureMatrix.important,
               includeChildren: true,
               splitStrategy: 'never',
             });
@@ -1305,7 +1488,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             const rendered = assertRenderedRecord(state!.rendered);
             expect(rendered['BUSINESS-RULES.md']).toContain('## Packages');
             expect(rendered['BUSINESS-RULES.md']).toContain(
-              '| Package              | Features | Rules | With Invariants |'
+              '| Package              | Features | Rules | With Invariants |',
             );
           });
 
@@ -1325,7 +1508,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             const rendered = assertRenderedRecord(state!.rendered);
             expect(rendered['business-rules/architect-projection.md']).toContain('## Rules');
           });
-        }
+        },
       );
 
       RuleScenario(
@@ -1338,8 +1521,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           When('I render the bundle with an unsafe business-rules route profile', () => {
             state!.rendered = renderMarkdown(state!.input!, {
               disclosureLevel: 'important',
-              disclosureSpec:
-                getSupportedDocumentationTypeMetadata('business-rules').disclosureMatrix.important,
               includeChildren: true,
               splitStrategy: 'never',
               routeProfile: {
@@ -1354,18 +1535,24 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             () => {
               const rendered = assertRenderedRecord(state!.rendered);
               expect(rendered['BUSINESS-RULES.md']).toContain(
-                '| \\[CLI Trap\\]\\(javascript:alert\\(10\\)\\) | 1        | 1     | 1               |'
+                '| \\[CLI Trap\\](javascript:alert(10)) | 1        | 1     | 1               |',
               );
-              expect(rendered['BUSINESS-RULES.md']).not.toMatch(/\]\(\s*javascript:alert\(10\)\)/i);
+              // The label's brackets are escaped (`\]`), so no live link forms even
+              // though `](javascript:…)` now appears as a substring — assert there is
+              // no `](…)` whose `]` is UNescaped (the lookbehind), which is the real
+              // injection guard now that redundant paren-escaping is gone.
+              expect(rendered['BUSINESS-RULES.md']).not.toMatch(
+                /(?<!\\)\]\(\s*javascript:alert\(10\)\)/i,
+              );
               expect(rendered['BUSINESS-RULES.md']).not.toContain('## Package Detail');
-            }
+            },
           );
 
           And('the routed output should not contain the rejected child path', () => {
             const rendered = assertRenderedRecord(state!.rendered);
             expect(rendered['javascript:alert(10)']).toBeUndefined();
           });
-        }
+        },
       );
 
       RuleScenario(
@@ -1378,8 +1565,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           When('I render the bundle with traversal business-rules route targets', () => {
             state!.rendered = renderMarkdown(state!.input!, {
               disclosureLevel: 'important',
-              disclosureSpec:
-                getSupportedDocumentationTypeMetadata('business-rules').disclosureMatrix.important,
               includeChildren: true,
               splitStrategy: 'never',
               routeProfile: {
@@ -1401,10 +1586,10 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           Then('the business-rules root should render traversal labels as plain text', () => {
             const rendered = assertRenderedRecord(state!.rendered);
             expect(rendered['BUSINESS-RULES.md']).toContain(
-              '| \\[CLI Trap\\]\\(javascript:alert\\(10\\)\\) | 1        | 1     | 1               |'
+              '| \\[CLI Trap\\](javascript:alert(10)) | 1        | 1     | 1               |',
             );
             expect(rendered['BUSINESS-RULES.md']).not.toContain(
-              '[architect-projection](/tmp/absolute.md)'
+              '[architect-projection](/tmp/absolute.md)',
             );
             expect(rendered['BUSINESS-RULES.md']).not.toContain('## Package Detail');
           });
@@ -1414,7 +1599,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             expect(rendered['../outside.md']).toBeUndefined();
             expect(rendered['/tmp/absolute.md']).toBeUndefined();
           });
-        }
+        },
       );
 
       RuleScenario(
@@ -1427,15 +1612,21 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           When(
             'I render the bundle as important business-rules markdown disclosure without child pages',
             () => {
-              const importantDisclosure =
-                getSupportedDocumentationTypeMetadata('business-rules').disclosureMatrix.important;
+              const importantDisclosure = withBundleDisclosureSpec(
+                createBusinessRuleSetDisclosureBundle(),
+                {
+                  ...getSupportedDocumentationTypeMetadata('business-rules').disclosureMatrix
+                    .important,
+                  emitChildren: false,
+                },
+              );
+              state!.input = importantDisclosure;
               state!.rendered = renderMarkdown(state!.input!, {
                 disclosureLevel: 'important',
-                disclosureSpec: { ...importantDisclosure, emitChildren: false },
                 includeChildren: false,
                 splitStrategy: 'never',
               });
-            }
+            },
           );
 
           Then('the business-rules root should contain a Packages counts table', () => {
@@ -1443,7 +1634,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             const markdown = state!.rendered as string;
             expect(markdown).toContain('## Packages');
             expect(markdown).toContain(
-              '| Package              | Features | Rules | With Invariants |'
+              '| Package              | Features | Rules | With Invariants |',
             );
           });
 
@@ -1458,22 +1649,20 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             const markdown = state!.rendered as string;
             expect(markdown).not.toContain('## Rules');
           });
-        }
+        },
       );
 
       RuleScenarioOutline(
         'BusinessRule table column count per richness',
         ({ Given, When, Then }, examples: Record<string, unknown>) => {
-          Given('a BusinessRuleSet bundle of 3 rules', () => {
-            state!.input = createBusinessRuleSetRichnessFixture();
-          });
+          Given('a BusinessRuleSet bundle of 3 rules', () => void 0);
 
           When('I render the bundle to markdown at disclosure {string}', () => {
             const level = examples['level'] as 'essential' | 'important' | 'useful' | 'advanced';
-            const disclosureSpec =
-              getSupportedDocumentationTypeMetadata('business-rules').disclosureMatrix[level];
+            state!.input = createBusinessRuleSetRichnessFixture(
+              getSupportedDocumentationTypeMetadata('business-rules').disclosureMatrix[level],
+            );
             state!.rendered = renderMarkdown(state!.input!, {
-              disclosureSpec,
               disclosureLevel: level,
               includeChildren: false,
               splitStrategy: 'never',
@@ -1485,7 +1674,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             const markdown = state!.rendered as string;
             expect(countRuleTableColumns(markdown)).toBe(Number(examples['columns']));
           });
-        }
+        },
       );
 
       RuleScenario(
@@ -1495,7 +1684,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'a routed SectionedDocumentFixture bundle whose children request duplicate paths',
             () => {
               state!.input = createDuplicatePathBundle();
-            }
+            },
           );
 
           When('I render the bundle as markdown without H2 splitting', () => {
@@ -1521,10 +1710,10 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             const rendered = assertRenderedRecord(state!.rendered);
             expect(rendered['PATTERNS.md']).toContain('[First Pattern](patterns/detail.md)');
             expect(rendered['PATTERNS.md']).toContain(
-              '[Second Pattern](patterns/detail--second-pattern.md)'
+              '[Second Pattern](patterns/detail--second-pattern.md)',
             );
           });
-        }
+        },
       );
 
       RuleScenario(
@@ -1534,7 +1723,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'a routed SectionedDocumentFixture bundle whose children request duplicate paths',
             () => {
               state!.input = createDuplicatePathBundle();
-            }
+            },
           );
 
           When('I render the bundle as markdown without H2 splitting', () => {
@@ -1550,7 +1739,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             expect(rendered['PATTERNS.md']).toContain('Ambiguous Detail Alias');
             expect(rendered['PATTERNS.md']).not.toContain('[Ambiguous Detail Alias](');
           });
-        }
+        },
       );
 
       RuleScenario(
@@ -1560,7 +1749,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'a routed SectionedDocumentFixture bundle with a child-key and route-id collision',
             () => {
               state!.input = createRouteIdCollisionBundle();
-            }
+            },
           );
 
           When('I render the bundle as markdown without H2 splitting', () => {
@@ -1576,7 +1765,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             expect(rendered['PATTERNS.md']).toContain('Colliding Alias');
             expect(rendered['PATTERNS.md']).not.toContain('[Colliding Alias](');
           });
-        }
+        },
       );
 
       RuleScenario(
@@ -1586,7 +1775,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'a routed requirements-executable SectionedDocumentFixture bundle with detailed children',
             () => {
               state!.input = createRequirementsDisclosureBundle('requirements-executable');
-            }
+            },
           );
 
           When('I render the bundle as markdown without H2 splitting', () => {
@@ -1602,26 +1791,26 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             () => {
               const rendered = assertRenderedRecord(state!.rendered);
               expect(rendered['REQUIREMENTS-EXECUTABLE.md']).toContain(
-                '[RendererExecutableRequirement](requirements-executable/renderer-package/renderer-requirement.md)'
+                '[RendererExecutableRequirement](requirements-executable/renderer-package/renderer-requirement.md)',
               );
               expect(rendered['REQUIREMENTS-EXECUTABLE.md']).toContain(
-                'RendererExecutableRequirement'
+                'RendererExecutableRequirement',
               );
               expect(rendered['REQUIREMENTS-EXECUTABLE.md']).not.toContain(
-                'RendererExecutableRequirement full requirement body is retained in the detail page.'
+                'RendererExecutableRequirement full requirement body is retained in the detail page.',
               );
-            }
+            },
           );
 
           And('the requirements-executable detail child should retain its requirement body', () => {
             const rendered = assertRenderedRecord(state!.rendered);
             expect(
-              rendered['requirements-executable/renderer-package/renderer-requirement.md']
+              rendered['requirements-executable/renderer-package/renderer-requirement.md'],
             ).toContain(
-              'RendererExecutableRequirement full requirement body is retained in the detail page.'
+              'RendererExecutableRequirement full requirement body is retained in the detail page.',
             );
           });
-        }
+        },
       );
 
       RuleScenario(
@@ -1631,7 +1820,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'a routed requirements-executable SectionedDocumentFixture bundle with detailed children',
             () => {
               state!.input = createRequirementsDisclosureBundle('requirements-executable');
-            }
+            },
           );
 
           When('I render the requirements-executable bundle with traversal route targets', () => {
@@ -1653,12 +1842,12 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             () => {
               const rendered = assertRenderedRecord(state!.rendered);
               expect(rendered['REQUIREMENTS-EXECUTABLE.md']).toContain(
-                'RendererExecutableRequirement'
+                'RendererExecutableRequirement',
               );
               expect(rendered['REQUIREMENTS-EXECUTABLE.md']).not.toContain(
-                '[RendererExecutableRequirement](../outside.md)'
+                '[RendererExecutableRequirement](../outside.md)',
               );
-            }
+            },
           );
 
           And(
@@ -1666,9 +1855,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             () => {
               const rendered = assertRenderedRecord(state!.rendered);
               expect(rendered['../outside.md']).toBeUndefined();
-            }
+            },
           );
-        }
+        },
       );
 
       RuleScenario(
@@ -1678,7 +1867,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'a routed requirements-executable SectionedDocumentFixture bundle with detailed children',
             () => {
               state!.input = createRequirementsDisclosureBundle('requirements-executable');
-            }
+            },
           );
 
           When(
@@ -1695,7 +1884,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                       : '..%2Foutside.md',
                 },
               });
-            }
+            },
           );
 
           Then(
@@ -1703,12 +1892,12 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             () => {
               const rendered = assertRenderedRecord(state!.rendered);
               expect(rendered['REQUIREMENTS-EXECUTABLE.md']).toContain(
-                'RendererExecutableRequirement'
+                'RendererExecutableRequirement',
               );
               expect(rendered['REQUIREMENTS-EXECUTABLE.md']).not.toContain(
-                '[RendererExecutableRequirement](..%2Foutside.md)'
+                '[RendererExecutableRequirement](..%2Foutside.md)',
               );
-            }
+            },
           );
 
           And(
@@ -1716,9 +1905,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             () => {
               const rendered = assertRenderedRecord(state!.rendered);
               expect(rendered['..%2Foutside.md']).toBeUndefined();
-            }
+            },
           );
-        }
+        },
       );
 
       RuleScenario(
@@ -1728,7 +1917,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'a routed requirements-executable SectionedDocumentFixture bundle with detailed children',
             () => {
               state!.input = createRequirementsDisclosureBundle('requirements-executable');
-            }
+            },
           );
 
           When(
@@ -1745,7 +1934,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                       : '%09renderer.md',
                 },
               });
-            }
+            },
           );
 
           Then(
@@ -1753,12 +1942,12 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             () => {
               const rendered = assertRenderedRecord(state!.rendered);
               expect(rendered['REQUIREMENTS-EXECUTABLE.md']).toContain(
-                'RendererExecutableRequirement'
+                'RendererExecutableRequirement',
               );
               expect(rendered['REQUIREMENTS-EXECUTABLE.md']).not.toContain(
-                '[RendererExecutableRequirement](%09renderer.md)'
+                '[RendererExecutableRequirement](%09renderer.md)',
               );
-            }
+            },
           );
 
           And(
@@ -1766,9 +1955,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             () => {
               const rendered = assertRenderedRecord(state!.rendered);
               expect(rendered['%09renderer.md']).toBeUndefined();
-            }
+            },
           );
-        }
+        },
       );
 
       RuleScenario(
@@ -1779,7 +1968,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             () => {
               state!.input =
                 createRequirementsDisclosureBundleWithRejectedChildren('requirements-executable');
-            }
+            },
           );
 
           When(
@@ -1798,7 +1987,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                         : 'renderer.txt',
                 },
               });
-            }
+            },
           );
 
           Then(
@@ -1806,18 +1995,18 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             () => {
               const rendered = assertRenderedRecord(state!.rendered);
               expect(rendered['REQUIREMENTS-EXECUTABLE.md']).toContain(
-                'RendererExecutableRequirement'
+                'RendererExecutableRequirement',
               );
               expect(rendered['REQUIREMENTS-EXECUTABLE.md']).toContain(
-                'RendererExecutableRequirementTxt'
+                'RendererExecutableRequirementTxt',
               );
               expect(rendered['REQUIREMENTS-EXECUTABLE.md']).not.toContain(
-                '[RendererExecutableRequirement]('
+                '[RendererExecutableRequirement](',
               );
               expect(rendered['REQUIREMENTS-EXECUTABLE.md']).not.toContain(
-                '[RendererExecutableRequirementTxt]('
+                '[RendererExecutableRequirementTxt](',
               );
-            }
+            },
           );
 
           And(
@@ -1826,9 +2015,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               const rendered = assertRenderedRecord(state!.rendered);
               expect(rendered[' renderer.md ']).toBeUndefined();
               expect(rendered['renderer.txt']).toBeUndefined();
-            }
+            },
           );
-        }
+        },
       );
 
       RuleScenario(
@@ -1838,7 +2027,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'a routed requirements-executable SectionedDocumentFixture bundle with detailed children',
             () => {
               state!.input = createRequirementsDisclosureBundle('requirements-executable');
-            }
+            },
           );
 
           When(
@@ -1855,7 +2044,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                       : 'requirements-executable/renderer-package/renderer-requirement.md',
                 },
               });
-            }
+            },
           );
 
           Then(
@@ -1864,9 +2053,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               const rendered = assertRenderedRecord(state!.rendered);
               expect(rendered['REQUIREMENTS-EXECUTABLE.md']).toBeDefined();
               expect(rendered[' REQUIREMENTS-EXECUTABLE.md ']).toBeUndefined();
-            }
+            },
           );
-        }
+        },
       );
 
       RuleScenario(
@@ -1876,7 +2065,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'a routed requirements-specs SectionedDocumentFixture bundle with detailed children',
             () => {
               state!.input = createRequirementsDisclosureBundle('requirements-specs');
-            }
+            },
           );
 
           When('I render the bundle as markdown without H2 splitting', () => {
@@ -1892,23 +2081,158 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             () => {
               const rendered = assertRenderedRecord(state!.rendered);
               expect(rendered['REQUIREMENTS-SPECS.md']).toContain(
-                '[RendererSpecsRequirement](requirements-specs/renderer-requirement.md)'
+                '[RendererSpecsRequirement](requirements-specs/renderer-requirement.md)',
               );
               expect(rendered['REQUIREMENTS-SPECS.md']).toContain('RendererSpecsRequirement');
               expect(rendered['REQUIREMENTS-SPECS.md']).not.toContain(
-                'RendererSpecsRequirement full requirement body is retained in the detail page.'
+                'RendererSpecsRequirement full requirement body is retained in the detail page.',
               );
-            }
+            },
           );
 
           And('the requirements-specs detail child should retain its requirement body', () => {
             const rendered = assertRenderedRecord(state!.rendered);
             expect(rendered['requirements-specs/renderer-requirement.md']).toContain(
-              'RendererSpecsRequirement full requirement body is retained in the detail page.'
+              'RendererSpecsRequirement full requirement body is retained in the detail page.',
             );
           });
-        }
+        },
       );
-    }
+    },
   );
+});
+
+describe('renderMarkdown adversarial security coverage', () => {
+  it('uses bundle routing disclosure instead of a per-render-call override', () => {
+    const bundle = createBusinessRuleSetDisclosureBundle();
+    const rendered = renderMarkdown(bundle, {
+      disclosureLevel: 'important',
+      disclosureSpec: {
+        grouping: 'flat',
+        richness: 'full',
+        emitChildren: true,
+        committed: true,
+      },
+      includeChildren: true,
+      splitStrategy: 'never',
+    });
+
+    const markdown = assertRenderedRecord(rendered)['BUSINESS-RULES.md'];
+    expect(markdown).toContain('## Package Detail');
+    expect(markdown).not.toContain('## Rules');
+  });
+
+  it('uses five-backtick fences when code and mermaid content contains four-backtick runs', () => {
+    const rendered = renderMarkdown(
+      documentationFixtureToFragment({
+        kind: 'SectionedDocumentFixture',
+        documentType: 'security',
+        title: 'Fence Security',
+        sections: [
+          {
+            id: 'fences',
+            title: 'Fences',
+            blocks: [
+              { type: 'code', language: 'ts', content: 'const nested = "````";' },
+              { type: 'mermaid', content: 'graph TD; A[````] --> B[ok]' },
+            ],
+          },
+        ],
+      }),
+    );
+
+    const markdown = assertRenderedString(rendered);
+    expect(markdown).toContain('`````ts\nconst nested = "````";\n`````');
+    expect(markdown).toContain('`````mermaid\ngraph TD; A[````] --> B[ok]\n`````');
+  });
+
+  it('renders data URL link targets as plain text', () => {
+    const rendered = renderMarkdown(
+      documentationFixtureToFragment({
+        kind: 'SectionedDocumentFixture',
+        documentType: 'security',
+        title: 'Link Security',
+        sections: [
+          {
+            id: 'links',
+            title: 'Links',
+            blocks: [
+              { type: 'link-out', text: 'Data URL', path: 'data:text/html,<script>x</script>' },
+            ],
+          },
+        ],
+      }),
+    );
+
+    const markdown = assertRenderedString(rendered);
+    expect(markdown).toContain('Data URL');
+    expect(markdown).not.toContain('[Data URL](');
+  });
+
+  it('renders file URL link targets as plain text', () => {
+    const rendered = renderMarkdown(
+      documentationFixtureToFragment({
+        kind: 'SectionedDocumentFixture',
+        documentType: 'security',
+        title: 'Link Security',
+        sections: [
+          {
+            id: 'links',
+            title: 'Links',
+            blocks: [{ type: 'link-out', text: 'File URL', path: 'file:///etc/passwd' }],
+          },
+        ],
+      }),
+    );
+
+    const markdown = assertRenderedString(rendered);
+    expect(markdown).toContain('File URL');
+    expect(markdown).not.toContain('[File URL](');
+  });
+
+  it('renders entity-encoded javascript URL link targets as plain text', () => {
+    const rendered = renderMarkdown(
+      documentationFixtureToFragment({
+        kind: 'SectionedDocumentFixture',
+        documentType: 'security',
+        title: 'Link Security',
+        sections: [
+          {
+            id: 'links',
+            title: 'Links',
+            blocks: [
+              { type: 'link-out', text: 'Encoded JavaScript', path: 'javascript&#x3a;alert(1)' },
+            ],
+          },
+        ],
+      }),
+    );
+
+    const markdown = assertRenderedString(rendered);
+    expect(markdown).toContain('Encoded JavaScript');
+    expect(markdown).not.toContain('[Encoded JavaScript](');
+  });
+
+  it('renders control-character link targets as plain text', () => {
+    const rendered = renderMarkdown(
+      documentationFixtureToFragment({
+        kind: 'SectionedDocumentFixture',
+        documentType: 'security',
+        title: 'Link Security',
+        sections: [
+          {
+            id: 'links',
+            title: 'Links',
+            blocks: [
+              { type: 'link-out', text: 'Control Target', path: 'https://example.com/\u0000x' },
+            ],
+          },
+        ],
+      }),
+    );
+
+    const markdown = assertRenderedString(rendered);
+    expect(markdown).toContain('Control Target');
+    expect(markdown).not.toContain('[Control Target](');
+  });
 });

@@ -48,7 +48,7 @@ const SCENARIO_BOUNDARY = /^\s*(Scenario:|Scenario Outline:|Examples:|Rule:|Feat
  */
 export function checkHashInDescription(
   content: string,
-  filePath: string
+  filePath: string,
 ): readonly LintViolation[] {
   const violations: LintViolation[] = [];
   const lines = content.split('\n');
@@ -104,7 +104,7 @@ export function checkHashInDescription(
  */
 export function checkDuplicateAndSteps(
   content: string,
-  filePath: string
+  filePath: string,
 ): readonly LintViolation[] {
   const violations: LintViolation[] = [];
   const lines = content.split('\n');
@@ -239,7 +239,7 @@ export function checkHashInStepText(content: string, filePath: string): readonly
  */
 export function checkKeywordInDescription(
   content: string,
-  filePath: string
+  filePath: string,
 ): readonly LintViolation[] {
   const violations: LintViolation[] = [];
   const lines = content.split('\n');

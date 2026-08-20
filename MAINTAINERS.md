@@ -86,17 +86,28 @@ The workflow will:
 
 ## Pre-commit and Pre-push Hooks
 
-The repository uses Husky for git hooks:
+The repository uses Husky (installed automatically by the `prepare` script on
+`pnpm install`). Both hooks dispatch to composite scripts in `package.json`, so
+each gate is runnable by hand and stays in lockstep with CI.
 
-### Pre-commit
+### Pre-commit (`pnpm ci:pre-commit`)
 
-- Runs `lint-staged` (ESLint + Prettier on staged files)
-- Runs `typecheck`
-- Runs `lint:process` (FSM validation on staged files)
+- `lint-staged` — ESLint `--fix` on staged root-scoped `.ts` + Prettier
+  `--write` on all staged `.ts`/`.json`/`.md`/`.yml`/`.yaml`
+- `check:build` then `architect-guard --staged` — dist-freshness gate (loud-fails
+  if `src/` is ahead of `dist/`) then the FSM process guard on the staged transition
 
-### Pre-push
+### Pre-push (`pnpm ci:pre-push`)
 
-- Runs full test suite
+- `pnpm ci:verify` — the full correctness gate, the **same composite ci.yml and
+  publish.yml run** (build, format:check, lint, typecheck[:dogfood],
+  test[:dogfood], validate:all, guard:no-suppressions, check:skills, arch
+  dangling --strict, the `@libar-dev/architect` bin smoke via `pnpm test`,
+  audit:subtractive)
+- `pnpm docs:check` — projection determinism (writes nothing; fails on drift)
+
+Perf baselines are CI-only (they are latency budgets that flake on a loaded
+laptop). Never bypass a hook with `--no-verify`.
 
 ## Dry Run
 

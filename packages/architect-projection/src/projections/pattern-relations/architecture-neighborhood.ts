@@ -3,7 +3,7 @@
  * @architect-pattern ArchitectureNeighborhoodProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses PatternRelationsProjectionSupport, PatternRelationsFragmentContracts
+ * @architect-uses PatternRelationsProjectionSupport, PatternRelationsFragmentContracts, ArchitectureNeighborhood
  * @architect-bounded-context:projection
  *
  * ## Architecture neighborhood projection
@@ -32,7 +32,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects a single pattern's architectural neighborhood bundle, including relationship directions, same-context peers, and implementation refs.
  */
 
 import type { ProjectionContext } from '../../context/projection-context.js';
@@ -42,7 +42,7 @@ import { buildArchitectureNeighborhood } from './architecture-neighborhood.inter
 
 export function projectArchitectureNeighborhood(
   context: ProjectionContext,
-  pattern: string
+  pattern: string,
 ): ProjectionBundle<ArchitectureNeighborhood> {
   return projectSingle({
     kind: 'ArchitectureNeighborhood',

@@ -1,5 +1,13 @@
 import type { AcceptedStatusValue } from './status-values.js';
 
+/**
+ * @architect
+ * @architect-pattern MaturityLevelDomain
+ * @architect-status active
+ * @architect-role:contract
+ * @architect-bounded-context:domain
+ * @architect-uses StatusValueDomain
+ */
 export const MATURITY_VALUES = ['idea', 'plan', 'design', 'executable'] as const;
 
 export type MaturityLevel = (typeof MATURITY_VALUES)[number];
@@ -14,7 +22,7 @@ export const DEFAULT_MATURITY_BY_STATUS: Readonly<Record<AcceptedStatusValue, Ma
 
 export function inferMaturity(
   status: AcceptedStatusValue,
-  explicitMaturity?: string
+  explicitMaturity?: string,
 ): MaturityLevel {
   if (
     explicitMaturity !== undefined &&

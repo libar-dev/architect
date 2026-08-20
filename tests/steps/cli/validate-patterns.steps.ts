@@ -88,42 +88,6 @@ ${backgroundSection}
 `;
 }
 
-function createDoDGherkinPatternFile(
-  patternName: string,
-  _phase: number,
-  status: string,
-  options: {
-    deliverableStatus?: string;
-    includeAcceptanceCriteria?: boolean;
-  } = {}
-): string {
-  const { deliverableStatus = 'complete', includeAcceptanceCriteria = true } = options;
-
-  const backgroundSection =
-    status === 'completed'
-      ? `
-  Background: Deliverables
-    Given the following deliverables:
-      | Deliverable | Status | Tests | Location |
-      | Test deliverable | ${deliverableStatus} | 1 | src/test.ts |
-
-`
-      : '';
-
-  const scenarioTagLine = includeAcceptanceCriteria ? '  @acceptance-criteria\n' : '';
-
-  return `@architect
-@architect-pattern:${patternName}
-@architect-status:${status}
-Feature: ${patternName}
-  Test feature for validate-patterns CLI testing.
-${backgroundSection}${scenarioTagLine}  Scenario: Basic scenario
-    Given a test condition
-    When an action occurs
-    Then a result is expected
-`;
-}
-
 // =============================================================================
 // Feature Definition
 // =============================================================================
@@ -284,14 +248,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           filePath: string,
           patternName: string,
           phase: number,
-          status: string
+          status: string,
         ) => {
           await writeTempFile(
             getTempDir(),
             filePath,
-            createTypeScriptPatternFile(patternName, phase, status)
+            createTypeScriptPatternFile(patternName, phase, status),
           );
-        }
+        },
       );
 
       And(
@@ -301,14 +265,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           filePath: string,
           patternName: string,
           phase: number,
-          status: string
+          status: string,
         ) => {
           await writeTempFile(
             getTempDir(),
             filePath,
-            createGherkinPatternFile(patternName, phase, status)
+            createGherkinPatternFile(patternName, phase, status),
           );
-        }
+        },
       );
 
       When('running {string}', async (_ctx: unknown, cmd: string) => {
@@ -324,9 +288,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       });
     });
 
-    // Wave 1 retired phase-mismatch cross-source detection; the matching
-    // scenario was removed from the feature file. Status mismatch (below)
-    // remains the canonical mismatch signal exercised here.
+    // Cross-source phase-mismatch detection was retired with the numeric
+    // @architect-phase tag (ADR-013); the matching scenario was removed from the
+    // feature file. Status mismatch (below) is the canonical mismatch signal.
 
     RuleScenario('Detect status mismatch between sources', ({ Given, When, Then, And }) => {
       Given(
@@ -336,14 +300,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           filePath: string,
           patternName: string,
           phase: number,
-          status: string
+          status: string,
         ) => {
           await writeTempFile(
             getTempDir(),
             filePath,
-            createTypeScriptPatternFile(patternName, phase, status)
+            createTypeScriptPatternFile(patternName, phase, status),
           );
-        }
+        },
       );
 
       And(
@@ -353,14 +317,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           filePath: string,
           patternName: string,
           phase: number,
-          status: string
+          status: string,
         ) => {
           await writeTempFile(
             getTempDir(),
             filePath,
-            createGherkinPatternFile(patternName, phase, status)
+            createGherkinPatternFile(patternName, phase, status),
           );
-        }
+        },
       );
 
       When('running {string}', async (_ctx: unknown, cmd: string) => {
@@ -378,6 +342,54 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   });
 
   // ---------------------------------------------------------------------------
+  // Rule: Extraction diagnostics affect validation result
+  // ---------------------------------------------------------------------------
+
+  Rule('Extraction diagnostics affect validation result', ({ RuleScenario }) => {
+    RuleScenario('Extraction diagnostic errors fail validation', ({ Given, And, When, Then }) => {
+      Given(
+        'a TypeScript file {string} with content:',
+        async (_ctx: unknown, filePath: string, content: string) => {
+          await writeTempFile(getTempDir(), filePath, content);
+        },
+      );
+
+      And(
+        'a Gherkin file {string} with pattern {string} at phase {int} status {string}',
+        async (
+          _ctx: unknown,
+          filePath: string,
+          patternName: string,
+          phase: number,
+          status: string,
+        ) => {
+          await writeTempFile(
+            getTempDir(),
+            filePath,
+            createGherkinPatternFile(patternName, phase, status),
+          );
+        },
+      );
+
+      When('running {string}', async (_ctx: unknown, cmd: string) => {
+        await runCLICommand(cmd);
+      });
+
+      Then('exit code is {int}', (_ctx: unknown, code: number) => {
+        expect(getResult().exitCode).toBe(code);
+      });
+
+      And('stdout contains {string}', (_ctx: unknown, text: string) => {
+        expect(getResult().stdout).toContain(text);
+      });
+
+      And('stdout does not contain {string}', (_ctx: unknown, text: string) => {
+        expect(getResult().stdout).not.toContain(text);
+      });
+    });
+  });
+
+  // ---------------------------------------------------------------------------
   // Rule: CLI supports multiple output formats
   // ---------------------------------------------------------------------------
 
@@ -390,14 +402,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           filePath: string,
           patternName: string,
           phase: number,
-          status: string
+          status: string,
         ) => {
           await writeTempFile(
             getTempDir(),
             filePath,
-            createTypeScriptPatternFile(patternName, phase, status)
+            createTypeScriptPatternFile(patternName, phase, status),
           );
-        }
+        },
       );
 
       And(
@@ -407,14 +419,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           filePath: string,
           patternName: string,
           phase: number,
-          status: string
+          status: string,
         ) => {
           await writeTempFile(
             getTempDir(),
             filePath,
-            createGherkinPatternFile(patternName, phase, status)
+            createGherkinPatternFile(patternName, phase, status),
           );
-        }
+        },
       );
 
       When('running {string}', async (_ctx: unknown, cmd: string) => {
@@ -447,14 +459,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           filePath: string,
           patternName: string,
           phase: number,
-          status: string
+          status: string,
         ) => {
           await writeTempFile(
             getTempDir(),
             filePath,
-            createTypeScriptPatternFile(patternName, phase, status)
+            createTypeScriptPatternFile(patternName, phase, status),
           );
-        }
+        },
       );
 
       And(
@@ -464,14 +476,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           filePath: string,
           patternName: string,
           phase: number,
-          status: string
+          status: string,
         ) => {
           await writeTempFile(
             getTempDir(),
             filePath,
-            createGherkinPatternFile(patternName, phase, status)
+            createGherkinPatternFile(patternName, phase, status),
           );
-        }
+        },
       );
 
       When('running {string}', async (_ctx: unknown, cmd: string) => {
@@ -506,14 +518,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           filePath: string,
           patternName: string,
           phase: number,
-          status: string
+          status: string,
         ) => {
           await writeTempFile(
             getTempDir(),
             filePath,
-            createTypeScriptPatternFile(patternName, phase, status)
+            createTypeScriptPatternFile(patternName, phase, status),
           );
-        }
+        },
       );
 
       When('running {string}', async (_ctx: unknown, cmd: string) => {
@@ -539,14 +551,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           filePath: string,
           patternName: string,
           phase: number,
-          status: string
+          status: string,
         ) => {
           await writeTempFile(
             getTempDir(),
             filePath,
-            createTypeScriptPatternFile(patternName, phase, status)
+            createTypeScriptPatternFile(patternName, phase, status),
           );
-        }
+        },
       );
 
       And(
@@ -556,14 +568,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           filePath: string,
           patternName: string,
           phase: number,
-          status: string
+          status: string,
         ) => {
           await writeTempFile(
             getTempDir(),
             filePath,
-            createGherkinPatternFile(patternName, phase, status)
+            createGherkinPatternFile(patternName, phase, status),
           );
-        }
+        },
       );
 
       When('running {string}', async (_ctx: unknown, cmd: string) => {
@@ -581,58 +593,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
     });
   });
 
-  // ---------------------------------------------------------------------------
-  // Rule: CLI validates Definition of Done from PatternGraph
-  // ---------------------------------------------------------------------------
-
-  Rule('CLI validates Definition of Done from PatternGraph', ({ RuleScenario }) => {
-    RuleScenario(
-      'DoD passes for completed pattern with deliverables and acceptance criteria',
-      ({ Given, When, Then, And }) => {
-        Given(
-          'a TypeScript file {string} with pattern {string} at phase {int} status {string}',
-          async (
-            _ctx: unknown,
-            filePath: string,
-            patternName: string,
-            phase: number,
-            status: string
-          ) => {
-            await writeTempFile(
-              getTempDir(),
-              filePath,
-              createTypeScriptPatternFile(patternName, phase, status)
-            );
-          }
-        );
-
-        And(
-          'a completed DoD-ready Gherkin file {string} with pattern {string} at phase {int}',
-          async (_ctx: unknown, filePath: string, patternName: string, phase: number) => {
-            await writeTempFile(
-              getTempDir(),
-              filePath,
-              createDoDGherkinPatternFile(patternName, phase, 'completed')
-            );
-          }
-        );
-
-        When('running {string}', async (_ctx: unknown, cmd: string) => {
-          await runCLICommand(cmd);
-        });
-
-        Then('exit code is {int}', (_ctx: unknown, code: number) => {
-          expect(getResult().exitCode).toBe(code);
-        });
-
-        And('stdout contains {string}', (_ctx: unknown, text: string) => {
-          expect(getResult().stdout).toContain(text);
-        });
-      }
-    );
-
-    // Wave 1 retired phase-grouping for DoD validation; the matching
-    // scenario was removed from the feature file. The DoD-pass scenario
-    // above still exercises the live PatternGraph-backed DoD path.
-  });
+  // Rule 7 (CLI Definition of Done validation) was retired per ADR-013 — the
+  // phase-keyed DoD validator was removed, so its scenarios are gone.
 });

@@ -1,3 +1,26 @@
+/**
+ * @architect
+ * @architect-pattern DocDirectiveContract
+ * @architect-status active
+ * @architect-role:contract
+ * @architect-bounded-context:validation-schemas
+ * @architect-uses TagRegistrySchemas
+ *
+ * ## DocDirectiveContract - Parsed Shape of an @architect-* JSDoc Block
+ *
+ * `DocDirectiveSchema` is the canonical parsed shape of a single `@architect-*`
+ * JSDoc directive block — the event-store contract sitting at the boundary
+ * between raw source tags and the typed PatternGraph build. The scanner,
+ * extractor, `ExtractedPattern`, and the lint engine all consume this shape.
+ * Also owns `createPatternStatusSchema`, the registry-driven status enum that
+ * derives the accepted `@architect-status` values from the active tag registry.
+ *
+ * ### When to Use
+ *
+ * - Parsing or validating a raw `@architect-*` JSDoc block into a typed directive.
+ * - Resolving the legal `@architect-status` enum from a `TagRegistry`.
+ * - Defining the directive fields a downstream extractor / validator may read.
+ */
 import { z } from 'zod';
 
 import { ACCEPTED_STATUS_VALUES, type AcceptedStatusValue } from '../taxonomy/index.js';
@@ -18,7 +41,7 @@ export const PositionSchema = z
 export type Position = z.output<typeof PositionSchema>;
 
 export const createDirectiveTagSchema = (
-  tagPrefix: string
+  tagPrefix: string,
 ): z.ZodPipe<z.ZodString, z.ZodTransform<DirectiveTag, string>> =>
   z
     .string()
@@ -56,26 +79,16 @@ export const DocDirectiveSchema = z.strictObject({
   role: z.string().optional(),
   unlockReason: z.string().optional(),
   boundedContext: z.string().optional(),
-  useCases: z.array(z.string()).readonly().optional(),
   whenToUse: z.array(z.string()).readonly().optional(),
   uses: z.array(PatternReferenceSchema).readonly().optional(),
-  phase: z.number().int().positive().optional(),
   level: HierarchyLevelSchema.optional(),
   parent: PatternIdentifierSchema.optional(),
   implements: z.array(z.string()).readonly().optional(),
   extends: z.string().optional(),
   seeAlso: z.array(z.string()).readonly().optional(),
+  enforcesDecisions: z.array(z.string()).readonly().optional(),
   apiRef: z.array(z.string()).readonly().optional(),
-  quarter: z.string().optional(),
-  completed: z.string().optional(),
-  effort: z.string().optional(),
-  effortActual: z.string().optional(),
-  team: z.string().optional(),
-  workflow: z.string().optional(),
-  risk: z.string().optional(),
-  priority: z.string().optional(),
   target: z.string().optional(),
-  since: z.string().optional(),
   executableSpecs: z.array(z.string()).readonly().optional(),
   archRole: z.string().optional(),
   include: z.array(z.string().min(1)).readonly().optional(),

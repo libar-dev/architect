@@ -1,3 +1,10 @@
+/**
+ * @architect
+ * @architect-pattern PatternReferenceContract
+ * @architect-status active
+ * @architect-role:contract
+ * @architect-bounded-context:validation-schemas
+ */
 import { z } from 'zod';
 
 export const PATTERN_IDENTIFIER_REGEX = /^[A-Z][A-Za-z0-9]+$/u;

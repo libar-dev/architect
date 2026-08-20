@@ -1,5 +1,6 @@
 @architect
 @architect-pattern:CrossPackageEdgeClassification
+@architect-implements:PatternClassification
 @architect-status:active
 @architect-product-area:Annotation
 @behavior @taxonomy

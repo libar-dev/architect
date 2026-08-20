@@ -3,7 +3,7 @@
  * @architect-pattern ArchitectureComparisonProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses PatternRelationsProjectionSupport, PatternRelationsFragmentContracts
+ * @architect-uses PatternRelationsProjectionSupport, PatternRelationsFragmentContracts, ArchitectureComparison
  * @architect-bounded-context:projection
  *
  * ## Architecture comparison projection
@@ -28,7 +28,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects a side-by-side bounded-context comparison bundle from the pattern-relations fragment helpers.
  */
 
 import type { ProjectionContext } from '../../context/projection-context.js';
@@ -40,7 +40,7 @@ import { buildArchitectureComparison } from './architecture-comparison.internal.
 export function projectArchitectureComparison(
   context: ProjectionContext,
   leftContext: string,
-  rightContext: string
+  rightContext: string,
 ): ProjectionBundle<ArchitectureComparison> {
   return projectSingle(buildArchitectureComparison(context, leftContext, rightContext));
 }

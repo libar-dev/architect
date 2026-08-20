@@ -3,7 +3,7 @@
  * @architect-pattern ExecutionContextProjectionSupport
  * @architect-status completed
  * @architect-role:utility
- * @architect-uses ProjectionFragmentContracts
+ * @architect-uses ProjectionFragmentContracts, ExtractedPattern
  * @architect-bounded-context:projection
  *
  * ## Execution context projection support
@@ -32,9 +32,7 @@
  *   `normalizeDeliverables` helper and lifts each entry into a
  *   `Deliverable` fragment.
  *
- * ### When to Use
- *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * Execution-context projections use these helpers when they need shared test-file discovery or deliverable normalization.
  */
 
 import type { ExtractedPattern } from '@libar-dev/architect-core';
@@ -55,6 +53,6 @@ export function normalizeExecutionContextDeliverables(pattern: ExtractedPattern)
     (deliverable): Deliverable => ({
       kind: 'Deliverable',
       ...deliverable,
-    })
+    }),
   );
 }

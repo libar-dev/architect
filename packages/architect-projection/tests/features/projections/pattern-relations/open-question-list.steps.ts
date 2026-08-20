@@ -16,7 +16,7 @@ interface OpenQuestionListState {
 }
 
 const feature = await loadFeature(
-  'tests/features/projections/pattern-relations/open-question-list.feature'
+  'tests/features/projections/pattern-relations/open-question-list.feature',
 );
 
 let state: OpenQuestionListState | null = null;
@@ -35,6 +35,11 @@ function seedOpenQuestionContext(): ProjectionContext {
       createPattern('ParentEpic', {
         level: 'epic',
         children: ['ChildAlpha', 'ChildBeta'],
+        // Qualified heading (parenthetical before the colon) exercises the
+        // extractOpenQuestions regex tolerance — a literal `**Open Questions:**`
+        // match would silently drop the epic's own gating questions.
+        description:
+          '**Open Questions (resolved per use-case):**\n- What is the parent-level gating decision?',
       }),
       createPattern('EmptyEpic', {
         level: 'epic',
@@ -82,13 +87,20 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         expect(state!.bundle?.root).toEqual({
           kind: 'OpenQuestionList',
           filters: {},
-          count: 2,
+          count: 3,
           items: [
             {
               pattern: 'ChildAlpha',
               status: 'active',
               file: 'packages/architect-projection/fixtures/ChildAlpha.ts',
               questions: ['Who owns Alpha?', 'Which signal closes it?'],
+            },
+            {
+              // Matched despite the parenthetical-qualified heading (regex tolerance).
+              pattern: 'ParentEpic',
+              status: 'active',
+              file: 'packages/architect-projection/fixtures/ParentEpic.ts',
+              questions: ['What is the parent-level gating decision?'],
             },
             {
               pattern: 'UnrelatedPattern',
@@ -122,6 +134,39 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
     });
 
     RuleScenario(
+      'including the focal parent own questions with include-self',
+      ({ Given, When, Then }) => {
+        Given('an open question context with parent hierarchy', () => {
+          state!.context = seedOpenQuestionContext();
+        });
+
+        When('I project open questions for parent "ParentEpic" including self', () => {
+          state!.bundle = projectOpenQuestionList(state!.context!, {
+            parent: 'ParentEpic',
+            includeSelf: true,
+          });
+        });
+
+        Then(
+          'the open question list includes "ParentEpic" alongside its questioned descendants',
+          () => {
+            expect(state!.bundle?.root).toMatchObject({
+              filters: { parent: 'ParentEpic' },
+              count: 2,
+              items: [
+                {
+                  pattern: 'ChildAlpha',
+                  questions: ['Who owns Alpha?', 'Which signal closes it?'],
+                },
+                { pattern: 'ParentEpic', questions: ['What is the parent-level gating decision?'] },
+              ],
+            });
+          },
+        );
+      },
+    );
+
+    RuleScenario(
       'returning an empty list for a parent without questioned descendants',
       ({ Given, When, Then }) => {
         Given('an open question context with parent hierarchy', () => {
@@ -140,7 +185,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             items: [],
           });
         });
-      }
+      },
     );
 
     RuleScenario('rejecting an unknown parent', ({ Given, When, Then }) => {
@@ -161,9 +206,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         () => {
           expect(state!.caughtError).toBeInstanceOf(Error);
           expect((state!.caughtError as Error).message).toBe(
-            'Parent pattern not found: UnknownParent'
+            'Parent pattern not found: UnknownParent',
           );
-        }
+        },
       );
     });
   });

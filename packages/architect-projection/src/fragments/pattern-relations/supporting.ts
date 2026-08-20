@@ -4,21 +4,43 @@
  * @architect-status active
  * @architect-role:contract
  * @architect-bounded-context:pattern-relations
+ * @architect-uses Deliverable, DeliverableManifest
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Houses the shared pattern-relations helper schemas for sources, relationships, hierarchy, deliverables, stubs, dependency kinds, and dependency-context nodes.
  */
 import { z } from 'zod';
 
+import { DeliverableManifestSchema } from '../execution-context/deliverable-manifest.js';
+import { DeliverableSchema } from '../execution-context/deliverable.js';
+
+/**
+ * Whether a pattern originates from TypeScript source or a Gherkin feature.
+ *
+ * @architect-shape
+ */
 export const PatternSourceSchema = z.enum(['typescript', 'gherkin']);
 
+/**
+ * A reference to an artifact that implements a pattern — its name, file, and an
+ * optional description.
+ *
+ * @architect-shape
+ */
 export const ImplementationRefSchema = z.strictObject({
   name: z.string(),
   file: z.string(),
   description: z.string().optional(),
 });
 
+/**
+ * The full set of relationship edges for a pattern — forward and reverse
+ * dependency, usage, enablement, and implementation links, plus extension,
+ * see-also, and API references.
+ *
+ * @architect-shape
+ */
 export const PatternRelationshipsSchema = z.strictObject({
   dependsOn: z.array(z.string()),
   enables: z.array(z.string()),
@@ -32,12 +54,24 @@ export const PatternRelationshipsSchema = z.strictObject({
   apiRef: z.array(z.string()),
 });
 
+/**
+ * A pattern's place in the hierarchy — its level, optional parent, and member
+ * patterns.
+ *
+ * @architect-shape
+ */
 export const PatternHierarchySchema = z.strictObject({
   level: z.string().optional(),
   parent: z.string().optional(),
   members: z.array(z.string()),
 });
 
+/**
+ * A business rule embedded in a pattern detail — its name, invariant,
+ * rationale, the scenarios that verify it, and their count.
+ *
+ * @architect-shape
+ */
 export const EmbeddedRuleRefSchema = z.strictObject({
   name: z.string(),
   invariant: z.string().optional(),
@@ -46,26 +80,43 @@ export const EmbeddedRuleRefSchema = z.strictObject({
   scenarioCount: z.number().int().nonnegative(),
 });
 
-export const DeliverableSchema = z.strictObject({
-  name: z.string(),
-  status: z.string(),
-  tests: z.array(z.string()),
-  location: z.string(),
-  finding: z.string().optional(),
-  release: z.string().optional(),
+/**
+ * A deliverable embedded in a pattern detail — the deliverable shape without its
+ * standalone `kind` discriminator.
+ *
+ * @architect-shape
+ */
+export const EmbeddedDeliverableSchema = DeliverableSchema.omit({ kind: true });
+
+/**
+ * A deliverable manifest embedded in a pattern detail — the manifest without its
+ * `kind` discriminator, with its items replaced by embedded deliverables.
+ *
+ * @architect-shape
+ */
+export const EmbeddedDeliverableManifestSchema = DeliverableManifestSchema.omit({
+  kind: true,
+}).extend({
+  items: z.array(EmbeddedDeliverableSchema),
 });
 
-export const DeliverableManifestSchema = z.strictObject({
-  pattern: z.string(),
-  items: z.array(DeliverableSchema),
-});
-
+/**
+ * A reference to a generated stub — its stub file, its intended target path, and
+ * the declaration name.
+ *
+ * @architect-shape
+ */
 export const StubRefSchema = z.strictObject({
   stubFile: z.string(),
   targetPath: z.string(),
   name: z.string(),
 });
 
+/**
+ * The kind of relation a dependency edge represents.
+ *
+ * @architect-shape
+ */
 export const DependencyRelationKindSchema = z.enum([
   'depends-on',
   'uses',
@@ -76,22 +127,37 @@ export const DependencyRelationKindSchema = z.enum([
   'api-ref',
 ]);
 
-export interface DependencyTreeNode {
+/**
+ * One node in a recursive dependency-context forest. Defined as an interface so
+ * the Zod schema can reference it for its self-referential `children` type. The
+ * focal pattern is the root of both forests (named by the fragment's `focal`
+ * field) and is never represented as a node, so there is no per-node focal flag.
+ *
+ * @architect-shape
+ */
+export interface DependencyContextNode {
+  /** The pattern name this node represents. */
   name: string;
+  /** The pattern's lifecycle status, when known. */
   status?: string | undefined;
-  phase?: number | undefined;
-  isFocal: boolean;
+  /** Whether traversal stopped here because the depth limit was reached and
+   * unexpanded edges remain in this direction. */
   truncated: boolean;
-  children: DependencyTreeNode[];
+  /** This node's direct children in the same direction. */
+  children: DependencyContextNode[];
 }
 
-export const DependencyTreeNodeSchema: z.ZodType<DependencyTreeNode> = z.strictObject({
+/**
+ * The recursive Zod schema for a dependency-context node, validating the shape
+ * described by {@link DependencyContextNode} with lazily-evaluated children.
+ *
+ * @architect-shape
+ */
+export const DependencyContextNodeSchema: z.ZodType<DependencyContextNode> = z.strictObject({
   name: z.string(),
   status: z.string().optional(),
-  phase: z.number().int().optional(),
-  isFocal: z.boolean(),
   truncated: z.boolean(),
-  children: z.array(z.lazy(() => DependencyTreeNodeSchema)),
+  children: z.array(z.lazy(() => DependencyContextNodeSchema)),
 });
 
 export type PatternSource = z.infer<typeof PatternSourceSchema>;
@@ -99,7 +165,7 @@ export type ImplementationRef = z.infer<typeof ImplementationRefSchema>;
 export type PatternRelationships = z.infer<typeof PatternRelationshipsSchema>;
 export type PatternHierarchy = z.infer<typeof PatternHierarchySchema>;
 export type EmbeddedRuleRef = z.infer<typeof EmbeddedRuleRefSchema>;
-export type Deliverable = z.infer<typeof DeliverableSchema>;
-export type DeliverableManifest = z.infer<typeof DeliverableManifestSchema>;
+export type EmbeddedDeliverable = z.infer<typeof EmbeddedDeliverableSchema>;
+export type EmbeddedDeliverableManifest = z.infer<typeof EmbeddedDeliverableManifestSchema>;
 export type StubRef = z.infer<typeof StubRefSchema>;
 export type DependencyRelationKind = z.infer<typeof DependencyRelationKindSchema>;

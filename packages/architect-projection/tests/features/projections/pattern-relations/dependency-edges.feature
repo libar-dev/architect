@@ -2,7 +2,6 @@
 @architect-pattern:DependencyEdgeProjectionExecutableTests
 @architect-implements:DependencyEdgeProjection
 @architect-status:completed
-@architect-phase:49
 @architect-product-area:Projection
 @architect-role:projection
 @pattern-relations
@@ -45,7 +44,7 @@ Feature: Dependency edge projection
     @acceptance-criteria
     Scenario: dependency edges project every outgoing relation kind
       Given a dependency edge context with rich outgoing relationships
-      When I project the dependency edges for "PatternGraphAPI"
+      When I project the dependency edges for "WidgetService"
       Then the dependency edges should expose stable relationKind values
 
     Scenario: dependency edges fall back to raw pattern arrays when the relationship index is missing
@@ -54,6 +53,6 @@ Feature: Dependency edge projection
       Then the dependency edges should use the raw pattern relationship arrays
 
     Scenario: missing patterns return a suggested match for dependency edges
-      Given a dependency edge context with a pattern named "PatternGraphAPI"
-      When I project the dependency edges for the missing pattern "PatternGraphAp"
-      Then the dependency edge projection should fail with a suggestion for "PatternGraphAPI"
+      Given a dependency edge context with a pattern named "WidgetService"
+      When I project the dependency edges for the missing pattern "WidgetServic"
+      Then the dependency edge projection should fail with a suggestion for "WidgetService"

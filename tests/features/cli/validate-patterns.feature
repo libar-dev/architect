@@ -2,7 +2,6 @@
 @architect-pattern:ValidatorReadModelConsolidation
 @architect-status:completed
 @architect-unlock-reason:Retroactive-completion-during-rebrand
-@architect-phase:100
 @architect-product-area:Validation
 @architect-uses:ADR006SingleReadModelArchitecture
 @cli @validate-patterns
@@ -17,7 +16,7 @@ Feature: Validator Read Model Consolidation — validate-patterns CLI
   **Solution:**
   Refactored `validate-patterns.ts` to consume the PatternGraph as its
   data source for cross-source validation. The validator became a feature
-  consumer like codecs and the PatternGraphAPI — querying pre-computed
+  consumer like codecs and projections, querying pre-computed
   views and the relationship index instead of building its own maps.
 
   Command-line interface for cross-validating TypeScript patterns vs Gherkin feature files.
@@ -26,7 +25,6 @@ Feature: Validator Read Model Consolidation — validate-patterns CLI
     Given a temporary working directory
       | Deliverable                             | Status   | Tests | Location                                             |
       | PatternGraph-backed validation read model | complete | Yes   | packages/architect-guard/src/cli/validate-patterns.ts |
-      | DoD validation integration              | complete | Yes   | packages/architect-guard/src/validation/dod-validator.ts |
       | validate-patterns CLI behavior          | complete | Yes   | packages/architect/tests/features/cli/validate-patterns.feature |
 
   # ============================================================================
@@ -102,9 +100,9 @@ Feature: Validator Read Model Consolidation — validate-patterns CLI
       Then exit code is 0
       And stdout contains "All validations passed"
 
-    # Wave 1 retired phase-mismatch detection (the @architect-phase tag remains
-    # but cross-source phase-mismatch reporting was removed). Restoring it is
-    # tracked as a follow-up; the canonical mismatch signal stays on status.
+    # Cross-source phase-mismatch detection was retired with the numeric
+    # @architect-phase tag (ADR-013). The "phase" column in the steps below is
+    # vestigial (parsed, then discarded); status is the canonical mismatch signal.
 
     @validation
     Scenario: Detect status mismatch between sources
@@ -113,6 +111,32 @@ Feature: Validator Read Model Consolidation — validate-patterns CLI
       When running "validate-patterns -i src/*.ts -F features/*.feature"
       Then exit code is 1
       And stdout contains "Status mismatch"
+
+  Rule: Extraction diagnostics affect validation result
+
+    **Invariant:** Error-severity extraction diagnostics are validation failures and must produce a non-zero exit without claiming all validations passed.
+    **Rationale:** A malformed gated directive has already been rejected by the extraction boundary; treating that as success hides dropped source facts from CI.
+    **Verified by:** Extraction diagnostic errors fail validation
+
+    @validation
+    Scenario: Extraction diagnostic errors fail validation
+      Given a TypeScript file "src/malformed.ts" with content:
+        """
+        /** @architect */
+
+        /**
+         * @architect-status:completed
+         * @architect-role:utility
+         */
+        export function malformed(): boolean {
+          return true;
+        }
+        """
+      And a Gherkin file "features/test.feature" with pattern "CleanFeature" at phase 1 status "completed"
+      When running "validate-patterns -i src/*.ts -F features/*.feature"
+      Then exit code is 1
+      And stdout contains "invalid-pattern-name"
+      And stdout does not contain "All validations passed"
 
   # ============================================================================
   # RULE 4: Output Formats
@@ -182,24 +206,6 @@ Feature: Validator Read Model Consolidation — validate-patterns CLI
       And output contains "Warning"
 
   # ============================================================================
-  # RULE 7: Definition of Done Validation
+  # RULE 7 (Definition of Done Validation) was retired per ADR-013 — the
+  # phase-keyed DoD validator was unpopulated machinery and was removed.
   # ============================================================================
-
-  Rule: CLI validates Definition of Done from PatternGraph
-
-    **Invariant:** When `--dod` is enabled, the CLI must validate completed Gherkin patterns using the PatternGraph-backed DoD rules: completed patterns need terminal deliverables and at least one `@acceptance-criteria` scenario.
-    **Rationale:** The DoD path was migrated from raw Gherkin scans to PatternGraph. CLI coverage must prove the new path stays behaviorally correct.
-    **Verified by:** DoD passes for completed pattern with deliverables and acceptance criteria, DoD fails for completed pattern without acceptance criteria
-
-    @acceptance-criteria @happy-path
-    Scenario: DoD passes for completed pattern with deliverables and acceptance criteria
-      Given a TypeScript file "src/pattern.ts" with pattern "DoDPass" at phase 1 status "completed"
-      And a completed DoD-ready Gherkin file "features/test.feature" with pattern "DoDPass" at phase 1
-      When running "validate-patterns -i src/*.ts -F features/*.feature --dod"
-      Then exit code is 0
-      And stdout contains "DoD Validation Summary"
-
-    # Wave 1 retired phase-grouping for DoD validation, so the
-    # "completed pattern without acceptance criteria" failure path no longer
-    # fires through the same code path. Restoring DoD checks against the
-    # current grouping (status / bounded-context) is tracked as a follow-up.

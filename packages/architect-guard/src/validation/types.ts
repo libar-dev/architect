@@ -1,25 +1,24 @@
 /**
  * @architect
- * @architect-pattern DoDValidationTypes
+ * @architect-pattern AntiPatternValidationTypes
  * @architect-validation
  * @architect-status completed
  * @architect-role:contract
  * @architect-bounded-context:validation
  *
- * ## DoDValidationTypes - Type Definitions for DoD Validation
+ * ## AntiPatternValidationTypes - Type Definitions for Anti-Pattern Validation
  *
- * Types and schemas for Definition of Done (DoD) validation and anti-pattern detection.
- * Follows the project's schema-first pattern with Zod for runtime validation.
+ * Types and schemas for the anti-pattern detection contract — violation
+ * identifiers, thresholds, and result shapes. Follows the project's schema-first
+ * pattern with Zod for runtime validation.
  *
  * ### When to Use
  *
- * - When implementing DoD validation logic
  * - When extending anti-pattern detection rules
  * - When consuming validation results in CLI or reports
  */
 
 import { z } from 'zod';
-import type { Deliverable } from '@libar-dev/architect-core';
 import type { TagRegistry } from '@libar-dev/architect-core';
 
 // ============================================================================
@@ -46,6 +45,8 @@ import type { TagRegistry } from '@libar-dev/architect-core';
  *   readonly strict?: boolean;
  * }
  * ```
+ *
+ * @architect-shape
  */
 export interface WithTagRegistry {
   /** Tag registry for prefix-aware behavior (defaults to @architect- if not provided) */
@@ -65,20 +66,29 @@ export interface WithTagRegistry {
  * Compatibility note: the historical `tag-duplication` identifier is
  * intentionally not part of the split-package public contract because
  * `detectAntiPatterns()` does not emit it.
+ *
+ * @architect-shape
  */
 export type AntiPatternId =
   | 'process-in-code' // Process metadata in code (should be features-only)
   | 'removed-tag' // Removed tag still present in source (silent data loss)
+  | 'gherkin-tag-space-form' // Identity tag uses space-form on a .feature file; Gherkin requires colon form (silent data loss)
+  | 'ts-missing-architect-marker' // Pattern JSDoc lacks a leading bare @architect (silent file skip)
+  | 'ts-tags-after-prose' // Architect tags after description prose (silent tag drop)
+  | 'ts-uses-space-form' // Multi-target TypeScript @architect-uses uses spaces instead of commas (silent node drop)
+  | 'duplicate-pattern-identity' // Same @architect-pattern identity declared in >1 feature file (ADR-001)
   | 'magic-comments' // Generator hints in features
   | 'scenario-bloat' // Too many scenarios per feature
   | 'mega-feature'; // Feature file too large
 
 /**
- * Zod schema for anti-pattern thresholds
+ * Zod schema for anti-pattern thresholds.
  *
  * Configurable limits for detecting anti-patterns.
+ *
+ * @architect-shape
  */
-export const AntiPatternThresholdsSchema = z.object({
+export const AntiPatternThresholdsSchema = z.strictObject({
   /** Maximum scenarios per feature file before warning */
   scenarioBloatThreshold: z.number().int().positive().default(30),
   /** Maximum lines per feature file before warning */
@@ -90,7 +100,9 @@ export const AntiPatternThresholdsSchema = z.object({
 export type AntiPatternThresholds = z.infer<typeof AntiPatternThresholdsSchema>;
 
 /**
- * Default thresholds for anti-pattern detection
+ * Default thresholds applied when none are supplied to anti-pattern detection.
+ *
+ * @architect-shape
  */
 export const DEFAULT_THRESHOLDS: AntiPatternThresholds = {
   scenarioBloatThreshold: 30,
@@ -99,10 +111,12 @@ export const DEFAULT_THRESHOLDS: AntiPatternThresholds = {
 };
 
 /**
- * Anti-pattern detection result
+ * Anti-pattern detection result.
  *
  * Reports a specific anti-pattern violation with context
  * for remediation.
+ *
+ * @architect-shape
  */
 export interface AntiPatternViolation {
   /** Anti-pattern identifier */
@@ -117,57 +131,4 @@ export interface AntiPatternViolation {
   readonly severity: 'error' | 'warning';
   /** Fix guidance */
   readonly fix?: string;
-}
-
-/**
- * DoD validation result for a single phase/pattern
- *
- * Reports whether a completed phase meets Definition of Done criteria:
- * 1. All deliverables must have "complete" status
- * 2. At least one @acceptance-criteria scenario must exist
- */
-export interface DoDValidationResult {
-  /** Pattern name being validated */
-  readonly patternName: string;
-  /** Phase number being validated */
-  readonly phase: number;
-  /** True if all DoD criteria are met */
-  readonly isDoDMet: boolean;
-  /** All deliverables from Background table */
-  readonly deliverables: readonly Deliverable[];
-  /** Deliverables that are not yet complete */
-  readonly incompleteDeliverables: readonly Deliverable[];
-  /** True if no @acceptance-criteria scenarios found */
-  readonly missingAcceptanceCriteria: boolean;
-  /** Human-readable validation messages */
-  readonly messages: readonly string[];
-}
-
-/**
- * Aggregate DoD validation summary
- *
- * Summarizes validation across multiple phases for CLI output.
- */
-export interface DoDValidationSummary {
-  /** Per-phase validation results */
-  readonly results: readonly DoDValidationResult[];
-  /** Total phases validated */
-  readonly totalPhases: number;
-  /** Phases that passed DoD */
-  readonly passedPhases: number;
-  /** Phases that failed DoD */
-  readonly failedPhases: number;
-}
-
-/**
- * Get status emoji for phase-level aggregates.
- *
- * @param allComplete - Whether all patterns in the phase are complete
- * @param anyActive - Whether any patterns in the phase are active/in-progress
- * @returns Status emoji: ✅ if all complete, 🚧 if any active, 📋 otherwise
- */
-export function getPhaseStatusEmoji(allComplete: boolean, anyActive: boolean): string {
-  if (allComplete) return '✅';
-  if (anyActive) return '🚧';
-  return '📋';
 }

@@ -7,7 +7,6 @@
  * @architect-bounded-context:process-guard
  * @architect-implements ProcessGuardLinter
  * @architect-uses SessionStateReader, FSMValidator
- * @architect-uses:SessionStateReader,FSMValidator
  *
  * ## DeriveProcessState - Extract Process State from File Annotations
  *
@@ -83,7 +82,7 @@ export const DEFAULT_PROCESS_GUARD_SPEC_PATTERNS = [
  */
 export async function deriveProcessState(
   patternGraph: RuntimePatternGraph,
-  config: DeriveStateConfig
+  config: DeriveStateConfig,
 ): Promise<Result<ProcessState>> {
   // Derive file states
   const filesResult = deriveFileStates(patternGraph, config.baseDir);
@@ -115,7 +114,7 @@ export async function deriveProcessState(
  */
 export function deriveFileStates(
   patternGraph: RuntimePatternGraph,
-  baseDir: string
+  baseDir: string,
 ): Result<Map<string, FileState>> {
   const fileStates = new Map<string, FileState>();
 
@@ -160,7 +159,7 @@ export function getFileState(state: ProcessState, relativePath: string): FileSta
  */
 export function getFilesByProtection(
   state: ProcessState,
-  protection: ProtectionLevel
+  protection: ProtectionLevel,
 ): readonly FileState[] {
   const files: FileState[] = [];
   for (const file of state.files.values()) {

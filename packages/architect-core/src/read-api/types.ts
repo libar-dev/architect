@@ -1,12 +1,28 @@
-import type { DeliverableStatus } from '../taxonomy/index.js';
-import type { ExtractedPattern } from '../validation-schemas/extracted-pattern.js';
+/**
+ * @architect
+ * @architect-pattern ReadApiResultContract
+ * @architect-status active
+ * @architect-role:contract
+ * @architect-bounded-context:read-api
+ * @architect-uses PatternGraph
+ *
+ * ## ReadApiResultContract - Named read payloads
+ *
+ * Shared payload shapes used by pure read kernels and graph consumers:
+ * `PatternRelationships`, `StatusDistribution`, `NeighborEntry`,
+ * `TransitionCheck`, `ProtectionInfo`, and `BusinessRuleRef`. These contracts
+ * sit over the {@link PatternGraph} and never re-derive canonical state.
+ *
+ * ### When to Use
+ *
+ * - Shaping a named relationship, transition, protection, or inventory result.
+ */
 import type { ImplementationRef, StatusCounts } from '../validation-schemas/pattern-graph.js';
 import type { ProcessStatusValue } from '../taxonomy/index.js';
 
 export interface QueryMetadataExtra {
   readonly validation?: {
     readonly danglingReferenceCount: number;
-    readonly malformedPatternCount: number;
     readonly unknownStatusCount: number;
     readonly warningCount: number;
   };
@@ -25,22 +41,11 @@ export interface RoleInfo {
   readonly description?: string;
 }
 
-export interface QuerySuccess<T> {
-  success: true;
-  data: T;
-  metadata: {
-    timestamp: string;
-    patternCount: number;
-  } & QueryMetadataExtra;
-}
-
 export type QueryErrorCode =
   | 'INVALID_ARGUMENT'
   | 'INVALID_STATUS'
   | 'INVALID_TRANSITION'
   | 'PATTERN_NOT_FOUND'
-  | 'PHASE_NOT_FOUND'
-  | 'QUARTER_NOT_FOUND'
   | 'ROLE_NOT_FOUND'
   | 'CONTEXT_NOT_FOUND'
   | 'LAYER_NOT_FOUND'
@@ -49,35 +54,26 @@ export type QueryErrorCode =
   | 'CONTEXT_ASSEMBLY_ERROR'
   | 'UNKNOWN_METHOD';
 
-export interface QueryError {
-  success: false;
-  error: string;
-  code: QueryErrorCode;
-}
-
-export type QueryResult<T> = QuerySuccess<T> | QueryError;
-
-export type { PhaseGroup, StatusCounts } from '../validation-schemas/pattern-graph.js';
+export type { StatusCounts } from '../validation-schemas/pattern-graph.js';
 
 export interface StatusDistribution {
   counts: StatusCounts;
-  percentages: {
+  /**
+   * Percentages of the delivery pipeline (completed + active + planned), each
+   * over the delivery base `total - candidate`. These three fields share one
+   * denominator and sum to exactly 100 (when the delivery base is non-zero).
+   */
+  deliveryPercentages: {
     completed: number;
     active: number;
     planned: number;
-    candidate: number;
   };
-}
-
-export interface PhaseProgress {
-  phaseNumber: number;
-  phaseName: string | undefined;
-  completed: number;
-  active: number;
-  planned: number;
-  candidate: number;
-  total: number;
-  completionPercentage: number;
+  /**
+   * Candidate share over the grand total (`total`). Kept structurally separate
+   * from {@link StatusDistribution.deliveryPercentages} because it uses a
+   * different denominator — the two groups must never be summed together.
+   */
+  candidateShare: number;
 }
 
 export interface PatternDependencies {
@@ -100,27 +96,24 @@ export interface PatternRelationships {
   apiRef: readonly string[];
 }
 
-export interface PatternDeliverable {
-  name: string;
-  status: DeliverableStatus;
-  tests: number;
-  location: string;
-  finding: string | undefined;
-  release: string | undefined;
-}
-
-export interface QuarterGroup {
-  quarter: string;
-  patterns: ExtractedPattern[];
-  counts: StatusCounts;
+/**
+ * A lightweight reference to a business rule that enforces a decision — the
+ * owning pattern, the rule name, and an optional invariant string. Returned by
+ * the decision-scoped rule aggregation so the CLI/projection can resolve full
+ * rule fragments without the kernel needing the fragment layer.
+ */
+export interface BusinessRuleRef {
+  pattern: string;
+  ruleName: string;
+  invariant?: string;
 }
 
 export interface TransitionCheck {
-  from: ProcessStatusValue;
-  to: ProcessStatusValue;
+  from: string;
+  to: string;
   valid: boolean;
-  error: string | undefined;
-  validAlternatives: readonly ProcessStatusValue[] | undefined;
+  error?: string;
+  validAlternatives?: readonly ProcessStatusValue[];
 }
 
 export interface ProtectionInfo {
@@ -128,7 +121,13 @@ export interface ProtectionInfo {
   level: 'none' | 'scope' | 'hard';
   description: string;
   canAddDeliverables: boolean;
-  requiresUnlock: boolean;
+  /**
+   * Whether this protection level emits an advisory, unlock-suppressible warning
+   * on the commit path (PDR-006). True for `scope` (active scope creep) and
+   * `hard` (completed edits); `unlock-reason` is optional and suppresses it.
+   * Never a hard block on the commit path (CI `--strict` may promote it).
+   */
+  unlockSuppressesWarning: boolean;
 }
 
 export interface NeighborEntry {
@@ -137,30 +136,4 @@ export interface NeighborEntry {
   role: string | undefined;
   archContext: string | undefined;
   file: string | undefined;
-}
-
-export class QueryApiError extends Error {
-  constructor(
-    readonly code: QueryErrorCode,
-    message: string,
-    readonly details?: unknown
-  ) {
-    super(message);
-    this.name = 'QueryApiError';
-  }
-}
-
-export function createSuccess<T>(data: T, patternCount: number): QuerySuccess<T> {
-  return {
-    success: true,
-    data,
-    metadata: {
-      timestamp: new Date().toISOString(),
-      patternCount,
-    },
-  };
-}
-
-export function createError(code: QueryErrorCode, error: string): QueryError {
-  return { success: false, code, error };
 }

@@ -1,5 +1,5 @@
 import { describeFeature, loadFeature } from '@amiceli/vitest-cucumber';
-import { expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import {
   PatternSummarySchema,
@@ -11,6 +11,7 @@ import {
   type ProjectionBundle,
   type SessionContextBundle,
 } from '../../../src/index.js';
+import { isPlainObject } from '../../../src/shared/plain-object.js';
 
 interface RenderJsonState {
   input: Fragment | ProjectionBundle<Fragment> | null;
@@ -21,10 +22,33 @@ interface RenderJsonState {
   malformedBundleCandidate: unknown;
   malformedBundleDetectedAsBundle: boolean | null;
   malformedBundleError: string | null;
+  plainObjectCandidates: {
+    plainObject: unknown;
+    nullPrototype: unknown;
+    classInstance: unknown;
+    pollutedPrototype: unknown;
+  } | null;
+  plainObjectResults: {
+    plainObject: boolean;
+    nullPrototype: boolean;
+    classInstance: boolean;
+    pollutedPrototype: boolean;
+  } | null;
+}
+
+interface PlainObjectCandidates {
+  plainObject: Record<string, unknown>;
+  nullPrototype: Record<string, unknown>;
+  classInstance: CustomPrototypeValue;
+  pollutedPrototype: Record<string, unknown>;
 }
 
 class UnsupportedJsonValue {
   constructor(readonly label: string) {}
+}
+
+class CustomPrototypeValue {
+  readonly payload = 'custom';
 }
 
 const feature = await loadFeature('tests/features/renderers/render-json.feature');
@@ -41,6 +65,8 @@ function createState(): RenderJsonState {
     malformedBundleCandidate: null,
     malformedBundleDetectedAsBundle: null,
     malformedBundleError: null,
+    plainObjectCandidates: null,
+    plainObjectResults: null,
   };
 }
 
@@ -71,7 +97,6 @@ function createPatternSummaryFixture(): PatternSummary {
     patternName: 'RenderJsonProjection',
     status: 'active',
     role: 'service',
-    phase: 13,
     file: 'packages/architect-projection/src/renderers/render-json.ts',
     source: 'typescript',
   };
@@ -114,7 +139,6 @@ function createJsonRendererGuideFixture(): PatternSummary {
     patternName: 'JsonRendererGuide',
     status: 'completed',
     role: 'projection',
-    phase: 13,
     file: 'packages/architect-projection/src/renderers/render-json.ts',
     source: 'typescript',
   };
@@ -129,7 +153,6 @@ function createProgressiveDisclosureBundleFixture(): ProjectionBundle<PatternSum
         patternName: 'BusinessRulesJsonGuide',
         status: 'active',
         role: 'projection',
-        phase: 13,
         file: 'packages/architect-projection/src/renderers/render-json.ts',
         source: 'typescript',
       },
@@ -138,7 +161,6 @@ function createProgressiveDisclosureBundleFixture(): ProjectionBundle<PatternSum
         patternName: 'RequirementsSpecsJsonGuide',
         status: 'planned',
         role: 'projection',
-        phase: 13,
         file: 'packages/architect-projection/src/renderers/render-json.ts',
         source: 'typescript',
       },
@@ -164,7 +186,6 @@ function createBundleFixture(): ProjectionBundle<Fragment> {
         patternName: 'RenderJsonProjectionZeta',
         status: 'planned',
         role: 'service',
-        phase: 14,
         file: 'packages/architect-projection/src/renderers/render-json-zeta.ts',
         source: 'typescript',
       },
@@ -173,7 +194,6 @@ function createBundleFixture(): ProjectionBundle<Fragment> {
         patternName: 'RenderJsonProjectionAlpha',
         status: 'completed',
         role: 'service',
-        phase: 12,
         file: 'packages/architect-projection/src/renderers/render-json-alpha.ts',
         source: 'typescript',
       },
@@ -222,12 +242,30 @@ function createMalformedBundleCandidate(): unknown {
   };
 }
 
+function createPlainObjectCandidates(): PlainObjectCandidates {
+  const plainObject: Record<string, unknown> = { payload: 'plain' };
+  const nullPrototype = Object.create(null) as Record<string, unknown>;
+  const pollutedPrototype = Object.create({ polluted: true } as Record<string, unknown>) as Record<
+    string,
+    unknown
+  >;
+
+  nullPrototype['payload'] = 'null-prototype';
+  pollutedPrototype['payload'] = 'polluted';
+
+  return {
+    plainObject,
+    nullPrototype,
+    classInstance: new CustomPrototypeValue(),
+    pollutedPrototype,
+  };
+}
+
 const expectedPrettyJson = [
   '{',
   '  "file": "packages/architect-projection/src/renderers/render-json.ts",',
   '  "kind": "PatternSummary",',
   '  "patternName": "RenderJsonProjection",',
-  '  "phase": 13,',
   '  "role": "service",',
   '  "source": "typescript",',
   '  "status": "active"',
@@ -299,9 +337,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             ]);
 
             expect(SessionContextBundleSchema.safeParse(rendered).success).toBe(true);
-          }
+          },
         );
-      }
+      },
     );
 
     RuleScenario(
@@ -324,7 +362,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         And('the JSON object output should equal the original fragment fixture', () => {
           expect(state!.rendered).toEqual(state!.input);
         });
-      }
+      },
     );
 
     RuleScenario('Pretty mode returns a formatted JSON string', ({ Given, When, Then }) => {
@@ -368,7 +406,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               file: 'packages/architect-projection/src/renderers/render-json-alpha.ts',
               kind: 'PatternSummary',
               patternName: 'RenderJsonProjectionAlpha',
-              phase: 12,
               role: 'service',
               source: 'typescript',
               status: 'completed',
@@ -377,7 +414,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               file: 'packages/architect-projection/src/renderers/render-json-zeta.ts',
               kind: 'PatternSummary',
               patternName: 'RenderJsonProjectionZeta',
-              phase: 14,
               role: 'service',
               source: 'typescript',
               status: 'planned',
@@ -393,7 +429,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             rootRouteId: 'patterns:index',
           });
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -428,7 +464,45 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             rootRouteId: 'guide:index',
           });
         });
-      }
+      },
+    );
+  });
+
+  Rule('Plain-object checks stay shared and strict', ({ RuleScenario }) => {
+    RuleScenario(
+      'Shared plain-object checks allow safe records and reject unsafe object carriers',
+      ({ Given, When, Then, And }) => {
+        Given('plain-object helper candidates covering safe and unsafe object shapes', () => {
+          state!.plainObjectCandidates = createPlainObjectCandidates();
+        });
+
+        When('I evaluate the shared plain-object helper for each candidate', () => {
+          const candidates = state!.plainObjectCandidates!;
+
+          state!.plainObjectResults = {
+            plainObject: isPlainObject(candidates.plainObject),
+            nullPrototype: isPlainObject(candidates.nullPrototype),
+            classInstance: isPlainObject(candidates.classInstance),
+            pollutedPrototype: isPlainObject(candidates.pollutedPrototype),
+          };
+        });
+
+        Then('the helper should accept the plain object candidate', () => {
+          expect(state!.plainObjectResults?.plainObject).toBe(true);
+        });
+
+        And('the helper should accept the null-prototype candidate', () => {
+          expect(state!.plainObjectResults?.nullPrototype).toBe(true);
+        });
+
+        And('the helper should reject the class instance candidate', () => {
+          expect(state!.plainObjectResults?.classInstance).toBe(false);
+        });
+
+        And('the helper should reject the polluted-prototype candidate', () => {
+          expect(state!.plainObjectResults?.pollutedPrototype).toBe(false);
+        });
+      },
     );
   });
 
@@ -459,7 +533,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'renderJson encountered a non-JSON-safe UnsupportedJsonValue at $.file.',
           ]);
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -486,10 +560,41 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
         And('rendering the malformed bundle-like input should fail loudly', () => {
           expect(state!.malformedBundleError).toBe(
-            'renderJson encountered a non-JSON-safe function at $.routing.rootRouteId.'
+            'renderJson encountered a non-JSON-safe function at $.routing.rootRouteId.',
           );
         });
-      }
+      },
+    );
+  });
+});
+
+describe('renderJson adversarial security coverage', () => {
+  it('rejects class-instance custom-prototype nested objects', () => {
+    const input = {
+      ...createPatternSummaryFixture(),
+      file: new CustomPrototypeValue() as unknown as string,
+    };
+
+    expect(() => renderJson(input)).toThrow(
+      'renderJson encountered a non-JSON-safe CustomPrototypeValue at $.file.',
+    );
+  });
+
+  it('rejects prototype-polluted nested objects', () => {
+    const pollutedPrototype = { polluted: true };
+    const pollutedObject = Object.assign(
+      Object.create(pollutedPrototype) as Record<string, unknown>,
+      {
+        path: 'polluted.md',
+      },
+    );
+    const input = {
+      ...createPatternSummaryFixture(),
+      file: pollutedObject as unknown as string,
+    };
+
+    expect(() => renderJson(input)).toThrow(
+      'renderJson encountered a non-JSON-safe Object at $.file.',
     );
   });
 });

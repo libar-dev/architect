@@ -7,12 +7,22 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Houses the shared governance helper schemas for decisions, validation, taxonomy, FSMs, tags, and format types.
  */
 import { z } from 'zod';
 
+/**
+ * The kind of decision record: architecture, product, domain, or technical.
+ *
+ * @architect-shape
+ */
 export const DecisionTypeSchema = z.enum(['ADR', 'PDR', 'DDR', 'TDR']);
 
+/**
+ * Lifecycle status of a decision record.
+ *
+ * @architect-shape
+ */
 export const DecisionStatusSchema = z.enum([
   'proposed',
   'accepted',
@@ -21,24 +31,45 @@ export const DecisionStatusSchema = z.enum([
   'deprecated',
 ]);
 
-export const BusinessRuleScopeSchema = z.enum([
-  'all',
-  'package',
-  'product-area',
-  'phase',
-  'feature',
-]);
+/**
+ * The scope a business-rule set is gathered over.
+ *
+ * @architect-shape
+ */
+export const BusinessRuleScopeSchema = z.enum(['all', 'package', 'product-area', 'feature']);
 
-export const BusinessRuleGroupingSchema = z.enum(['package', 'product-area', 'phase', 'feature']);
+/**
+ * The dimension a business-rule set is grouped by.
+ *
+ * @architect-shape
+ */
+export const BusinessRuleGroupingSchema = z.enum(['package', 'product-area', 'feature']);
 
+/**
+ * Severity assigned to a validation rule.
+ *
+ * @architect-shape
+ */
 export const ValidationRuleSeveritySchema = z.enum(['error', 'warning']);
 
+/**
+ * One legal transition in an FSM graph — its `from`/`to` states and an optional
+ * human-readable description.
+ *
+ * @architect-shape
+ */
 export const FsmTransitionSchema = z.strictObject({
   from: z.string(),
   to: z.string(),
   description: z.string().optional(),
 });
 
+/**
+ * A finite-state-machine graph — its initial state, terminal states, full state
+ * list, and the set of legal transitions between them.
+ *
+ * @architect-shape
+ */
 export const FsmGraphSchema = z.strictObject({
   initialState: z.string(),
   terminalStates: z.array(z.string()),
@@ -46,6 +77,12 @@ export const FsmGraphSchema = z.strictObject({
   transitions: z.array(FsmTransitionSchema),
 });
 
+/**
+ * One validation-rule entry — its id, description, severity, and the optional
+ * roles it applies to.
+ *
+ * @architect-shape
+ */
 export const ValidationRuleEntrySchema = z.strictObject({
   id: z.string(),
   description: z.string(),
@@ -53,18 +90,42 @@ export const ValidationRuleEntrySchema = z.strictObject({
   appliesToRoles: z.array(z.string()).optional(),
 });
 
+/**
+ * How strongly a pattern is protected against change at a given lifecycle stage.
+ *
+ * @architect-shape
+ */
 export const ProtectionLevelSchema = z.enum(['none', 'scope', 'hard']);
 
+/**
+ * Maps a protection level to the statuses it covers and what it permits —
+ * whether deliverables may be added and whether the level emits an advisory,
+ * unlock-suppressible warning on the commit path (PDR-006).
+ *
+ * @architect-shape
+ */
 export const ProtectionLevelEntrySchema = z.strictObject({
   level: ProtectionLevelSchema,
   statuses: z.array(z.string()),
   meaning: z.string().optional(),
   canAddDeliverables: z.boolean(),
-  needsUnlock: z.boolean(),
+  unlockSuppressesWarning: z.boolean(),
 });
 
+/**
+ * The category a taxonomy tag belongs to.
+ *
+ * @architect-shape
+ */
 export const TagEntryKindSchema = z.enum(['role', 'metadata', 'aggregation']);
 
+/**
+ * One taxonomy tag entry — its kind, tag name, purpose, and the full set of
+ * optional documentation metadata (format, allowed values, default, example,
+ * aliases, and more).
+ *
+ * @architect-shape
+ */
 export const TagEntrySchema = z.strictObject({
   kind: TagEntryKindSchema,
   tag: z.string(),
@@ -82,13 +143,29 @@ export const TagEntrySchema = z.strictObject({
   targetDoc: z.string().optional(),
 });
 
+/**
+ * A named group of taxonomy tag entries.
+ *
+ * @architect-shape
+ */
 export const TagGroupEntrySchema = z.strictObject({
   groupName: z.string(),
   entries: z.array(TagEntrySchema),
 });
 
+/**
+ * The value format a tag accepts — bare value, enum, quoted value, csv, number,
+ * or boolean flag.
+ *
+ * @architect-shape
+ */
 export const FormatTypeSchema = z.enum(['value', 'enum', 'quoted-value', 'csv', 'number', 'flag']);
 
+/**
+ * Documents one tag value format with a description and an example.
+ *
+ * @architect-shape
+ */
 export const FormatTypeEntrySchema = z.strictObject({
   format: FormatTypeSchema,
   description: z.string(),

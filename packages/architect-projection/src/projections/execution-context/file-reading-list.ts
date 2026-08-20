@@ -3,7 +3,7 @@
  * @architect-pattern FileReadingListProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses ExecutionContextProjectionSupport, ProjectionFragmentContracts
+ * @architect-uses ExecutionContextProjectionSupport, ProjectionFragmentContracts, FileReadingList
  * @architect-bounded-context:projection
  *
  * **Value:** Assembles the canonical `FileReadingList` for a pattern —
@@ -27,7 +27,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects the reading-list fragment that orders a pattern's primary, dependency, and neighbor files.
  */
 
 import type { ProjectionContext } from '../../context/projection-context.js';
@@ -46,7 +46,7 @@ export type { FileReadingListOptions } from './file-reading-list.internal.js';
 
 export function projectFileReadingList(
   context: ProjectionContext,
-  options: FileReadingListOptions
+  options: FileReadingListOptions,
 ): ProjectionBundle<FileReadingList> | undefined {
   const fragment = buildFileReadingList(context, options);
   return fragment === undefined ? undefined : projectSingle(fragment);
@@ -55,5 +55,5 @@ export function projectFileReadingList(
 export const parseAndProjectFileReadingList = parseAndProject(
   FileReadingListOptionsSchema,
   projectFileReadingList,
-  'parseAndProjectFileReadingList'
+  'parseAndProjectFileReadingList',
 );

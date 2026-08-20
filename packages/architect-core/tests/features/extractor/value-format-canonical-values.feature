@@ -1,5 +1,6 @@
 @architect
 @architect-pattern:ValueFormatCanonicalValuesDispatch
+@architect-implements:GherkinExtractor
 @architect-status:active
 @architect-product-area:Annotation
 @architect-see-also:CanonicalValuesSync

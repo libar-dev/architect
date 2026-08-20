@@ -23,10 +23,12 @@ export {
 export { ExportInfoSchema, isExportInfo, type ExportInfo } from './export-info.js';
 export {
   SourceInfoSchema,
+  ExtractedPatternDraftSchema,
   ExtractedPatternSchema,
   BusinessRuleSchema,
   isExtractedPattern,
   type SourceInfo,
+  type ExtractedPatternDraft,
   type ExtractedPattern,
   type BusinessRule,
 } from './extracted-pattern.js';
@@ -71,16 +73,6 @@ export {
   type ScannedGherkinFile,
   type GherkinFileError,
   type GherkinScanResults,
-  ParsedStepSchema,
-  ParsedScenarioSchema,
-  ParsedBackgroundSchema,
-  ParsedFeatureSchema,
-  FeatureFileSchema,
-  type ParsedStep,
-  type ParsedScenario,
-  type ParsedBackground,
-  type ParsedFeature,
-  type FeatureFile,
 } from './feature.js';
 export {
   LintSeveritySchema,
@@ -102,38 +94,28 @@ export {
   type TagRegistry,
 } from './tag-registry.js';
 export {
-  RiskLevelSchema,
   ProcessMetadataSchema,
   DeliverableSchema,
-  CrossValidationErrorSchema,
   ValidationSummarySchema,
   HierarchyLevelSchema,
   type ProcessStatus,
-  type RiskLevel,
   type ProcessMetadata,
   type Deliverable,
-  type CrossValidationError,
   type ValidationSummary,
   type HierarchyLevel,
 } from './dual-source.js';
 export {
   WorkflowStatusSchema,
-  PhaseArtifactsSchema,
-  WorkflowPhaseSchema,
   WorkflowConfigSchema,
   createLoadedWorkflow,
   isWorkflowConfig,
   type WorkflowStatus,
-  type PhaseArtifacts,
-  type WorkflowPhase,
   type WorkflowConfig,
   type LoadedWorkflow,
 } from './workflow-config.js';
 export {
   createJsonInputCodec,
   createJsonOutputCodec,
-  createFileLoader,
-  formatCodecError,
   type CodecError,
   type JsonInputCodec,
   type JsonOutputCodec,
@@ -160,14 +142,12 @@ export {
 export {
   StatusGroupsSchema,
   StatusCountsSchema,
-  PhaseGroupSchema,
   SourceViewsSchema,
   RelationshipEntrySchema,
   PatternGraphSchema,
   type PatternGraph,
   type StatusGroups,
   type StatusCounts,
-  type PhaseGroup,
   type SourceViews,
   type RelationshipEntry,
 } from './pattern-graph.js';

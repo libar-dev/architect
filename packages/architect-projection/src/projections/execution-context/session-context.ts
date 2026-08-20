@@ -3,7 +3,7 @@
  * @architect-pattern SessionContextProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses ExecutionContextProjectionSupport, ProjectionFragmentContracts
+ * @architect-uses ExecutionContextProjectionSupport, ProjectionFragmentContracts, SessionContextBundle
  * @architect-bounded-context:projection
  *
  * **Value:** Assembles the `SessionContextBundle` that CLI, MCP, and UI
@@ -18,7 +18,7 @@
  *
  * **Behavior:**
  * - Resolves each focal pattern via `requirePattern` and emits
- *   `PatternContextMeta` with summary, status, phase, role, and file.
+ *   `PatternContextMeta` with summary, status, role, and file.
  * - Flattens per-pattern dependencies into a deduped `dependencies` list and
  *   a `sharedDependencies` subset (names appearing across multiple focal
  *   patterns).
@@ -28,7 +28,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects the session-opening context across patterns, dependencies, stubs, deliverables, and FSM data.
  */
 
 import type { ProjectionContext } from '../../context/projection-context.js';
@@ -47,7 +47,7 @@ export type { SessionContextOptions } from './session-context.internal.js';
 
 export function projectSessionContextBundle(
   context: ProjectionContext,
-  options: SessionContextOptions
+  options: SessionContextOptions,
 ): ProjectionBundle<SessionContextBundle> {
   return projectSingle(buildSessionContextBundle(context, options));
 }
@@ -55,5 +55,5 @@ export function projectSessionContextBundle(
 export const parseAndProjectSessionContext = parseAndProject(
   SessionContextOptionsSchema,
   projectSessionContextBundle,
-  'parseAndProjectSessionContext'
+  'parseAndProjectSessionContext',
 );

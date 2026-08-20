@@ -79,7 +79,7 @@ export async function createTempDir(options: TempDirOptions = {}): Promise<TempD
 export async function writeTempFile(
   dir: string,
   relativePath: string,
-  content: string
+  content: string,
 ): Promise<string> {
   const fullPath = path.join(dir, relativePath);
   await fs.mkdir(path.dirname(fullPath), { recursive: true });
@@ -167,7 +167,6 @@ export function createTsFileWithDirective(options: {
   description?: string;
   status?: string;
   dependsOn?: string[];
-  useCases?: string[];
   uses?: string[];
   usedBy?: string[];
   archRole?: string;
@@ -181,7 +180,6 @@ export function createTsFileWithDirective(options: {
     description = 'A test pattern.',
     status,
     dependsOn = [],
-    useCases = [],
     usedBy = [],
     uses = [],
     archRole,
@@ -215,10 +213,6 @@ export function createTsFileWithDirective(options: {
   // generated source so the resolver picks it up.
   if (dependsOn.length > 0) {
     lines.push(` * @architect-uses ${dependsOn.join(', ')}`);
-  }
-
-  for (const useCase of useCases) {
-    lines.push(` * @architect-usecase "${useCase}"`);
   }
 
   for (const uses_ of uses) {
@@ -271,28 +265,20 @@ export interface RegularType {
  * @example
  * ```typescript
  * const content = createFeatureFile({
- *   phase: 1,
  *   status: "completed",
- *   quarter: "Q4-2025",
  *   name: "Foundation Types",
  * });
  * ```
  */
 export function createFeatureFile(options: {
-  phase?: number;
   status?: string;
-  quarter?: string;
-  effort?: string;
   team?: string;
   name?: string;
   description?: string;
   deliverables?: Array<{ name: string; status: string; tests: number; location?: string }>;
 }): string {
   const {
-    phase = 1,
     status = 'completed',
-    quarter = 'Q4-2025',
-    effort = '1w',
     team = 'platform',
     name = 'Test Feature',
     description = 'A test feature for validation.',
@@ -302,10 +288,7 @@ export function createFeatureFile(options: {
   const lines: string[] = [];
 
   // Process tags (using @architect-* prefix per PDR-004)
-  lines.push(`@architect-phase:${phase}`);
   lines.push(`@architect-status:${status}`);
-  lines.push(`@architect-quarter:${quarter}`);
-  lines.push(`@architect-effort:${effort}`);
   lines.push(`@architect-team:${team}`);
   lines.push(`Feature: ${name}`);
   lines.push(`  ${description}`);

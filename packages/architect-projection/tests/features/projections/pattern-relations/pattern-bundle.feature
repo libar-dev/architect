@@ -34,3 +34,22 @@ Feature: Pattern bundle projection
       Given a pattern bundle context with parent hierarchy
       When I project the pattern bundle for "UnknownParent" with explicit includes
       Then the pattern bundle projection fails with "Pattern not found: \"UnknownParent\""
+
+  Rule: Review bundles surface a TS pattern's rules via the implementedBy edge
+
+    **Invariant:** A review-mode bundle for a TypeScript pattern that owns no
+    inline rules populates `blocks.rules` and `blocks.scenarios` from the rules
+    authored on the feature pattern that realizes it, resolved through the
+    derived `implementedBy` reverse edge.
+
+    **Rationale:** The bundle sources rules through the feature-scoped rule set;
+    reverse-trace through `implementedBy` means a review-mode projection (including
+    the `architect_bundle` MCP tool with `mode: "review"`) is no longer empty just
+    because the focal node owns no rules (ADR-002).
+
+    **Verified by:** review bundle for a TS pattern surfaces the realizing feature rules
+
+    Scenario: review bundle for a TS pattern surfaces the realizing feature rules
+      Given a pattern bundle context where a TS pattern is realized by a rule-owning feature
+      When I project the review-mode pattern bundle for "ReverseTraceApi"
+      Then the bundle root blocks should include the realizing feature's rules and scenarios

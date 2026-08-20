@@ -1,3 +1,11 @@
+/**
+ * @architect
+ * @architect-pattern ProjectConfigResolution
+ * @architect-status active
+ * @architect-role:service
+ * @architect-bounded-context:configuration
+ * @architect-uses ConfigDefaults, ContextInference, ProjectConfigContract
+ */
 import type { ContextInferenceRule } from '../generators/pipeline/context-inference.js';
 import type {
   ArchitectProjectConfig,
@@ -12,7 +20,7 @@ import { createArchitect, type CreateArchitectOptions } from './factory.js';
 
 export function resolveProjectConfig(
   raw: ArchitectProjectConfig,
-  options: { readonly configPath: string }
+  options: { readonly configPath: string },
 ): ResolvedConfig {
   const instanceOptions: CreateArchitectOptions = {};
   if (raw.tagPrefix !== undefined) instanceOptions.tagPrefix = raw.tagPrefix;

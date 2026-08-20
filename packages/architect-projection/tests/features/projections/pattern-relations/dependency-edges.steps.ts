@@ -16,7 +16,7 @@ interface DependencyEdgeState {
 }
 
 const feature = await loadFeature(
-  'tests/features/projections/pattern-relations/dependency-edges.feature'
+  'tests/features/projections/pattern-relations/dependency-edges.feature',
 );
 
 let state: DependencyEdgeState | null = null;
@@ -47,9 +47,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       ({ Given, When, Then }) => {
         Given('a dependency edge context with rich outgoing relationships', () => {
           state!.context = createProjectionContext({
-            patterns: [createPattern('PatternGraphAPI')],
+            patterns: [createPattern('WidgetService')],
             relationshipIndex: {
-              PatternGraphAPI: createRelationshipEntry({
+              WidgetService: createRelationshipEntry({
                 dependsOn: ['PatternGraph'],
                 uses: ['PatternHelpers'],
                 enables: ['ArchitectMcpServer'],
@@ -62,57 +62,57 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           });
         });
 
-        When('I project the dependency edges for "PatternGraphAPI"', () => {
-          state!.edges = projectDependencyEdges(state!.context!, 'PatternGraphAPI').root.items;
+        When('I project the dependency edges for "WidgetService"', () => {
+          state!.edges = projectDependencyEdges(state!.context!, 'WidgetService').root.items;
         });
 
         Then('the dependency edges should expose stable relationKind values', () => {
           expect(state!.edges).toEqual([
             {
               kind: 'DependencyEdge',
-              from: 'PatternGraphAPI',
+              from: 'WidgetService',
               to: 'PatternGraph',
               relationKind: 'depends-on',
             },
             {
               kind: 'DependencyEdge',
-              from: 'PatternGraphAPI',
+              from: 'WidgetService',
               to: 'PatternHelpers',
               relationKind: 'uses',
             },
             {
               kind: 'DependencyEdge',
-              from: 'PatternGraphAPI',
+              from: 'WidgetService',
               to: 'ArchitectMcpServer',
               relationKind: 'enables',
             },
             {
               kind: 'DependencyEdge',
-              from: 'PatternGraphAPI',
+              from: 'WidgetService',
               to: 'PatternGraphReadModel',
               relationKind: 'implements',
             },
             {
               kind: 'DependencyEdge',
-              from: 'PatternGraphAPI',
+              from: 'WidgetService',
               to: 'ContextAssemblerImpl',
               relationKind: 'see-also',
             },
             {
               kind: 'DependencyEdge',
-              from: 'PatternGraphAPI',
+              from: 'WidgetService',
               to: 'architect_pattern',
               relationKind: 'api-ref',
             },
             {
               kind: 'DependencyEdge',
-              from: 'PatternGraphAPI',
+              from: 'WidgetService',
               to: 'QuerySurface',
               relationKind: 'extends',
             },
           ]);
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -149,34 +149,34 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'extends',
           ]);
         });
-      }
+      },
     );
 
     RuleScenario(
       'missing patterns return a suggested match for dependency edges',
       ({ Given, When, Then }) => {
-        Given('a dependency edge context with a pattern named "PatternGraphAPI"', () => {
+        Given('a dependency edge context with a pattern named "WidgetService"', () => {
           state!.context = createProjectionContext({
-            patterns: [createPattern('PatternGraphAPI')],
+            patterns: [createPattern('WidgetService')],
           });
         });
 
-        When('I project the dependency edges for the missing pattern "PatternGraphAp"', () => {
+        When('I project the dependency edges for the missing pattern "WidgetServic"', () => {
           try {
-            state!.edges = projectDependencyEdges(state!.context!, 'PatternGraphAp').root.items;
+            state!.edges = projectDependencyEdges(state!.context!, 'WidgetServic').root.items;
           } catch (error) {
             state!.error = error;
           }
         });
 
         Then(
-          'the dependency edge projection should fail with a suggestion for "PatternGraphAPI"',
+          'the dependency edge projection should fail with a suggestion for "WidgetService"',
           () => {
             expect(state!.error).toBeInstanceOf(ProjectionError);
-            expect((state!.error as Error).message).toContain('Did you mean: PatternGraphAPI?');
-          }
+            expect((state!.error as Error).message).toContain('Did you mean: WidgetService?');
+          },
         );
-      }
+      },
     );
   });
 });

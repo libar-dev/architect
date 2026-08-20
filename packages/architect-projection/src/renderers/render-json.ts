@@ -4,6 +4,7 @@
  * @architect-status completed
  * @architect-role:codec
  * @architect-bounded-context:rendering
+ * @architect-uses ProjectionFragmentSchema
  *
  * Renders fragments as JSON-safe objects or stable JSON strings for structured tool output.
  * This renderer validates serializability and bundle routing metadata; it does not
@@ -11,10 +12,12 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - When MCP or CLI consumers need structured JSON output, including bundle
+ *   routing metadata, stable key order, or pretty-printed payloads.
  */
 import type { Fragment, ProjectionBundle } from '../fragments/index.js';
 import { isBundle } from '../fragments/index.js';
+import { isPlainObject } from '../shared/plain-object.js';
 
 import type { ProjectionInput, RenderJsonOptions } from './types.js';
 
@@ -42,13 +45,24 @@ const DEFAULT_OPTIONS: Required<RenderJsonOptions> = {
   stableKeyOrder: true,
 };
 
+/**
+ * Renders a projection fragment or bundle into a JSON-safe object or, when
+ * `pretty` is set, a pretty-printed JSON string. Validates serializability,
+ * preserves bundle routing metadata, and applies stable key ordering by default.
+ *
+ * @architect-shape
+ * @param input - The fragment or bundle to serialize.
+ * @param options - Output controls — `pretty` selects string output, `stableKeyOrder` sorts keys.
+ * @returns A JSON string when `pretty` is `true`, otherwise a JSON-safe object.
+ * @throws When `input` contains a non-JSON-safe value (bigint, function, symbol, Date, Map, Set, non-finite number, or non-plain object).
+ */
 export function renderJson(
   input: ProjectionInput,
-  options: RenderJsonOptions & { pretty: true }
+  options: RenderJsonOptions & { pretty: true },
 ): string;
 export function renderJson(
   input: ProjectionInput,
-  options?: RenderJsonOptions & { pretty?: false | undefined }
+  options?: RenderJsonOptions & { pretty?: false | undefined },
 ): object;
 export function renderJson(input: ProjectionInput, options?: RenderJsonOptions): string | object {
   const resolvedOptions = resolveOptions(options);
@@ -68,14 +82,14 @@ function resolveOptions(options: RenderJsonOptions | undefined): Required<Render
 
 function serializeBundle(
   bundle: ProjectionBundle<Fragment>,
-  options: Required<RenderJsonOptions>
+  options: Required<RenderJsonOptions>,
 ): JsonBundle {
   const childrenEntries = Object.entries(bundle.children);
   const serializedChildren = Object.fromEntries(
     orderEntries(childrenEntries, options.stableKeyOrder).map(([key, child]) => [
       key,
       serializeFragment(child, options, appendPath('$.children', key)),
-    ])
+    ]),
   ) as Record<string, JsonObject>;
 
   const serializedRoot = serializeFragment(bundle.root, options, '$.root');
@@ -88,7 +102,7 @@ function serializeBundle(
         orderEntries(childrenEntries, options.stableKeyOrder).map(([key]) => [
           key,
           routing.childRouteIds[key] ?? key,
-        ])
+        ]),
       ),
       childPathStrategy: routing.childPathStrategy,
       rootRouteId: routing.rootRouteId,
@@ -110,15 +124,15 @@ function serializeBundle(
 function serializeFragment(
   fragment: Fragment,
   options: Required<RenderJsonOptions>,
-  path: string
+  path: string,
 ): JsonObject {
-  return transformObject(fragment as Record<string, unknown>, options, path);
+  return transformObject(fragment, options, path);
 }
 
 function transformValue(
   value: unknown,
   options: Required<RenderJsonOptions>,
-  path: string
+  path: string,
 ): JsonValue {
   if (value === null) {
     return null;
@@ -171,7 +185,7 @@ function transformValue(
 function transformObject(
   value: Record<string, unknown>,
   options: Required<RenderJsonOptions>,
-  path: string
+  path: string,
 ): JsonObject {
   const result: JsonObject = {};
 
@@ -198,19 +212,6 @@ function appendPath(basePath: string, key: string): string {
   return /^[A-Za-z_$][A-Za-z0-9_$]*$/u.test(key)
     ? `${basePath}.${key}`
     : `${basePath}[${JSON.stringify(key)}]`;
-}
-
-function isPlainObject(value: unknown): value is Record<string, unknown> {
-  if (!isRecord(value)) {
-    return false;
-  }
-
-  const prototype: unknown = Object.getPrototypeOf(value);
-  return prototype === Object.prototype || prototype === null;
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
 function getConstructorName(value: object): string {

@@ -2,11 +2,14 @@
  * @architect
  * @architect-pattern ProjectionFragmentContracts
  * @architect-role:contract
+ * @architect-bounded-context:rendering
  * @architect-status active
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Re-exports the projection fragment contracts across pattern-relations,
+ *   delivery-reporting, governance, execution-context, operational-insights,
+ *   and documentation-composition.
  */
 export {
   ArchitectureComparisonSchema,
@@ -14,7 +17,7 @@ export {
   ArchitectureNeighborhoodSchema,
   DependencyEdgeSchema,
   DependencyEdgeSetSchema,
-  DependencyTreeSchema,
+  DependencyContextSchema,
   PatternBundleEntrySchema,
   OpenQuestionListSchema,
   OrphanPatternListSchema,
@@ -23,9 +26,7 @@ export {
   PatternSummarySchema,
 } from './pattern-relations/index.js';
 export {
-  PhaseProgressSchema,
   RoadmapTimelineSchema,
-  ReleaseNotesDigestSchema,
   StatusDistributionSchema,
   TraceabilityMatrixSchema,
 } from './delivery-reporting/index.js';
@@ -38,7 +39,6 @@ export {
   TaxonomyDigestCountSummarySchema,
   TaxonomyDigestSchema,
   ValidationRuleDigestSchema,
-  summarizeTaxonomyDigest,
 } from './governance/index.js';
 export {
   DeliverableManifestSchema,
@@ -61,20 +61,25 @@ export {
   TagUsageMatrixSchema,
 } from './operational-insights/index.js';
 export {
+  ApiReferenceDigestSchema,
+  ApiShapeSchema,
+  ApiShapeKindSchema,
   ArchitectureDiagramSchema,
   PrChangeReviewSchema,
   ProjectConfigSnapshotSchema,
 } from './documentation-composition/index.js';
 export { FragmentSchema } from './fragment-schema.internal.js';
-export { isBundle, projectSingle } from './base.js';
-export type { BundleRouting, ProjectionBundle, BundleRouteId } from './base.js';
+export { isBundle, projectSingle, BundleRoutingSchema } from './base.js';
+export type { BundleRouting, ProjectionBundle } from './base.js';
+export { EmissionDescriptorSchema } from './emission-descriptor.js';
+export type { EmissionDescriptor, MarkdownFileRoute } from './emission-descriptor.js';
 export type {
   ArchitectureComparison,
   BoundedContext,
   ArchitectureNeighborhood,
   DependencyEdge,
   DependencyEdgeSet,
-  DependencyTree,
+  DependencyContext,
   PatternBundleEntry,
   OpenQuestionList,
   OrphanPatternList,
@@ -83,9 +88,7 @@ export type {
   PatternSummary,
 } from './pattern-relations/index.js';
 export type {
-  PhaseProgress,
   RoadmapTimeline,
-  ReleaseNotesDigest,
   StatusDistribution,
   TraceabilityMatrix,
 } from './delivery-reporting/index.js';
@@ -120,6 +123,10 @@ export type {
   TagUsageMatrix,
 } from './operational-insights/index.js';
 export type {
+  ApiReferenceDigest,
+  ApiReferenceGroupingEntry,
+  ApiShape,
+  ApiShapeKind,
   ArchitectureDiagram,
   PrChangeReview,
   ProjectConfigSnapshot,

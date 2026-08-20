@@ -110,7 +110,7 @@ class CapturingMcpServer {
   registerTool(
     name: string,
     options: { description: string; inputSchema: unknown },
-    handler: (rawInput: unknown) => Promise<unknown>
+    handler: (rawInput: unknown) => Promise<unknown>,
   ): void {
     this.registrations.push({
       name,
@@ -142,7 +142,7 @@ function ruleNames(feature: ReturnType<typeof loadFeatureFromText>): Set<string>
         const name = (rule as { name?: unknown }).name;
         return typeof name === 'string' ? name : '';
       })
-      .filter((name): name is string => typeof name === 'string' && name.length > 0)
+      .filter((name): name is string => typeof name === 'string' && name.length > 0),
   );
 }
 
@@ -224,7 +224,7 @@ function readSource(relativePath: string): string {
 
 function readRemovedInputFixtures(): readonly RemovedInputFixture[] {
   return RemovedInputFixturesSchema.parse(
-    JSON.parse(readFileSync('tests/fixtures/legacy-taxonomy/removed-input.json', 'utf8'))
+    JSON.parse(readFileSync('tests/fixtures/legacy-taxonomy/removed-input.json', 'utf8')),
   );
 }
 
@@ -271,7 +271,7 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
             And('the tool output root kind is {string}', (_ctx: unknown, kind: string) => {
               expect(getOutputRoot()['kind']).toBe(kind);
             });
-          }
+          },
         );
 
         RuleScenario(
@@ -294,7 +294,7 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
                 expect(text).not.toContain(removed);
               }
             });
-          }
+          },
         );
 
         RuleScenario(
@@ -314,7 +314,7 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
             And('the tool output root kind is {string}', (_ctx: unknown, kind: string) => {
               expect(getOutputRoot()['kind']).toBe(kind);
             });
-          }
+          },
         );
 
         RuleScenario(
@@ -324,7 +324,7 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
               'I invoke the "architect_context" tool with a name arg targeting the seeded pattern',
               async () => {
                 await runTool('architect_context', { name: TEST_PATTERN_NAME, session: 'design' });
-              }
+              },
             );
             Then('the result text is non-empty', () => {
               expect(state!.result?.text.length ?? 0).toBeGreaterThan(0);
@@ -332,7 +332,7 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
             And('the result text mentions the seeded pattern name', () => {
               expect(state!.result!.text).toContain(TEST_PATTERN_NAME);
             });
-          }
+          },
         );
 
         RuleScenario(
@@ -342,7 +342,7 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
               'I invoke the "architect_files" tool with a name arg targeting the seeded pattern',
               async () => {
                 await runTool('architect_files', { name: TEST_PATTERN_NAME });
-              }
+              },
             );
             Then('the result text is non-empty', () => {
               expect(state!.result?.text.length ?? 0).toBeGreaterThan(0);
@@ -350,25 +350,31 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
             And('the result text references the seeded pattern file path', () => {
               expect(state!.result!.text).toContain('rich-pattern.feature');
             });
-          }
+          },
         );
 
         RuleScenario(
-          'architect_dep_tree returns a compact dependency tree for the seeded pattern',
+          'architect_dep_tree returns a focal-rooted bidirectional dependency context for the seeded pattern',
           ({ When, Then, And }) => {
             When(
               'I invoke the "architect_dep_tree" tool with a name arg targeting the seeded pattern',
               async () => {
                 await runTool('architect_dep_tree', { name: TEST_PATTERN_NAME });
-              }
+              },
             );
             Then('the result text is non-empty', () => {
               expect(state!.result?.text.length ?? 0).toBeGreaterThan(0);
             });
-            And('the result text mentions the seeded pattern name', () => {
-              expect(state!.result!.text).toContain(TEST_PATTERN_NAME);
-            });
-          }
+            And(
+              'the result text is a focal-rooted bidirectional dependency context for the seeded pattern',
+              () => {
+                const text = state!.result!.text;
+                expect(text).toContain(`${TEST_PATTERN_NAME} depends on`);
+                expect(text).toContain('DEPENDS ON (upstream)');
+                expect(text).toContain('REQUIRED BY (downstream)');
+              },
+            );
+          },
         );
 
         RuleScenario(
@@ -381,7 +387,7 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
                   name: TEST_PATTERN_NAME,
                   session: 'implement',
                 });
-              }
+              },
             );
             Then('the result text is non-empty', () => {
               expect(state!.result?.text.length ?? 0).toBeGreaterThan(0);
@@ -389,7 +395,7 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
             And('the result text mentions the seeded pattern name', () => {
               expect(state!.result!.text).toContain(TEST_PATTERN_NAME);
             });
-          }
+          },
         );
 
         RuleScenario(
@@ -399,7 +405,7 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
               'I invoke the "architect_pattern" tool with a name arg targeting the seeded pattern',
               async () => {
                 await runTool('architect_pattern', { name: TEST_PATTERN_NAME });
-              }
+              },
             );
             Then('the result text is non-empty', () => {
               expect(state!.result?.text.length ?? 0).toBeGreaterThan(0);
@@ -415,7 +421,7 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
             And('the result text mentions the seeded pattern name', () => {
               expect(state!.result!.text).toContain(TEST_PATTERN_NAME);
             });
-          }
+          },
         );
 
         RuleScenario(
@@ -436,7 +442,7 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
                   }
                   throw new Error(typeof caughtError === 'string' ? caughtError : 'Tool failed');
                 }
-              }
+              },
             );
             Then('the result text is non-empty', () => {
               expect(state!.result?.text.length ?? 0).toBeGreaterThan(0);
@@ -456,7 +462,7 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
                 TEST_PATTERN_NAME,
               ]);
             });
-          }
+          },
         );
 
         RuleScenario(
@@ -466,7 +472,7 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
               'I invoke the "architect_handoff" tool with a name arg targeting the seeded pattern',
               async () => {
                 await runTool('architect_handoff', { name: TEST_PATTERN_NAME });
-              }
+              },
             );
             Then('the result text is non-empty', () => {
               expect(state!.result?.text.length ?? 0).toBeGreaterThan(0);
@@ -477,7 +483,7 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
               expect(state!.result!.text).not.toContain('Status: unknown');
               expect(state!.result!.text).not.toContain('Date: unknown');
             });
-          }
+          },
         );
 
         RuleScenario(
@@ -487,7 +493,7 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
               'I invoke the "architect_search" tool with a query that matches the seeded pattern',
               async () => {
                 await runTool('architect_search', { query: 'Rich' });
-              }
+              },
             );
             Then('the result text is non-empty', () => {
               expect(state!.result?.text.length ?? 0).toBeGreaterThan(0);
@@ -497,7 +503,7 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
                 JSON.parse(state!.result!.text);
               }).not.toThrow();
             });
-          }
+          },
         );
 
         RuleScenario(
@@ -526,7 +532,7 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
               expect(filters['namesOnly']).toBe(false);
               expect(filters['count']).toBe(false);
             });
-          }
+          },
         );
 
         RuleScenario(
@@ -549,7 +555,7 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
             And('the result text mentions the seeded pattern name', () => {
               expect(state!.result!.text).toContain(TEST_PATTERN_NAME);
             });
-          }
+          },
         );
 
         RuleScenario(
@@ -566,7 +572,7 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
                 JSON.parse(state!.result!.text);
               }).not.toThrow();
             });
-          }
+          },
         );
 
         RuleScenario('architect_rules accepts product-area options', ({ When, Then, And }) => {
@@ -574,7 +580,7 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
             'I invoke the "architect_rules" tool with productArea {string}',
             async (_ctx: unknown, productArea: string) => {
               await runTool('architect_rules', { productArea });
-            }
+            },
           );
           Then('the result text is non-empty', () => {
             expect(state!.result?.text.length ?? 0).toBeGreaterThan(0);
@@ -616,7 +622,7 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
               expect(state!.result!.text).not.toContain('arch-layer');
               expect(state!.result!.text).not.toContain('maturity');
             });
-          }
+          },
         );
 
         RuleScenario(
@@ -626,7 +632,7 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
               'I invoke the "architect_arch_neighborhood" tool with a name arg targeting the seeded pattern',
               async () => {
                 await runTool('architect_arch_neighborhood', { name: TEST_PATTERN_NAME });
-              }
+              },
             );
             Then('the result text is non-empty', () => {
               expect(state!.result?.text.length ?? 0).toBeGreaterThan(0);
@@ -636,7 +642,7 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
                 JSON.parse(state!.result!.text);
               }).not.toThrow();
             });
-          }
+          },
         );
 
         RuleScenario(
@@ -653,7 +659,7 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
                 JSON.parse(state!.result!.text);
               }).not.toThrow();
             });
-          }
+          },
         );
 
         RuleScenario(
@@ -672,7 +678,7 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
               const after = state!.sessionManager!.getSession().buildTimeMs;
               expect(after).toBeGreaterThan(state!.capturedBuildTimeMs!);
             });
-          }
+          },
         );
 
         RuleScenario(
@@ -692,7 +698,7 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
             And('the tool output root kind is {string}', (_ctx: unknown, kind: string) => {
               expect(getOutputRoot()['kind']).toBe(kind);
             });
-          }
+          },
         );
 
         RuleScenario(
@@ -702,7 +708,7 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
               'I invoke the "architect_documentation" tool with documentType {string}',
               async (_ctx: unknown, documentType: string) => {
                 await runTool('architect_documentation', { documentType });
-              }
+              },
             );
             Then('the result text is non-empty', () => {
               expect(state!.result?.text.length ?? 0).toBeGreaterThan(0);
@@ -720,7 +726,7 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
               expect(parsed['children']).toBeDefined();
               expect(parsed['routing']).toBeDefined();
             });
-          }
+          },
         );
 
         RuleScenario(
@@ -733,14 +739,14 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
                 toolName: string,
                 documentType: string,
                 disclosure: string,
-                status: string
+                status: string,
               ) => {
                 await runTool(toolName as RegisteredToolName, {
                   documentType,
                   disclosure,
                   filter: { status: [status] },
                 });
-              }
+              },
             );
 
             Then('the result text is non-empty', () => {
@@ -760,7 +766,7 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
             And('the result text does not mention the seeded pattern name', () => {
               expect(state!.result!.text).not.toContain(TEST_PATTERN_NAME);
             });
-          }
+          },
         );
 
         RuleScenario(
@@ -785,9 +791,9 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
                 expect(state!.result!.text).toContain(name);
               }
             });
-          }
+          },
         );
-      }
+      },
     );
 
     ruleIfPresent('The registered tool inventory remains frozen', ({ RuleScenario }) => {
@@ -803,7 +809,7 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
           Then('the registered tool names match the frozen MCP contract inventory', () => {
             const registeredNames = state!.registrations.map((entry) => entry.name);
             expect(ARCHITECT_MCP_TOOLS.map((tool) => tool.name)).toEqual(
-              FROZEN_REGISTERED_TOOL_NAMES
+              FROZEN_REGISTERED_TOOL_NAMES,
             );
             expect(REGISTERED_TOOL_NAMES).toEqual(FROZEN_REGISTERED_TOOL_NAMES);
             expect(registeredNames).toEqual(FROZEN_REGISTERED_TOOL_NAMES);
@@ -812,7 +818,7 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
 
           And('each registered tool uses the documented description', () => {
             const descriptions = new Map<string, string>(
-              ARCHITECT_MCP_TOOLS.map((tool) => [tool.name, tool.description])
+              ARCHITECT_MCP_TOOLS.map((tool) => [tool.name, tool.description]),
             );
             for (const registration of state!.registrations) {
               expect(registration.description).toBe(descriptions.get(registration.name));
@@ -831,7 +837,7 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
               expect(helpText).not.toContain(removed);
             }
           });
-        }
+        },
       );
     });
 
@@ -861,7 +867,7 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
             expect(entry.error, `${entry.name} ${entry.variant}`).toBeNull();
             expect(
               entry.result?.text.length ?? 0,
-              `${entry.name} ${entry.variant}`
+              `${entry.name} ${entry.variant}`,
             ).toBeGreaterThan(0);
           }
         });
@@ -890,7 +896,7 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
             expect(state!.caughtError).toBeDefined();
             expect(state!.result).toBeNull();
           });
-        }
+        },
       );
 
       RuleScenario(
@@ -916,7 +922,7 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
                 pattern: TEST_PATTERN_NAME,
                 unknownExtraKey: true,
               });
-            }
+            },
           );
 
           Then('invokeTool and the registered handler both throw the same validation error', () => {
@@ -937,9 +943,9 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
               const message = (state!.caughtError as Error).message;
               expect(message.startsWith(first)).toBe(true);
               expect(message).toContain(second);
-            }
+            },
           );
-        }
+        },
       );
 
       RuleScenario('architect_open_questions rejects an unknown input key', ({ When, Then }) => {
@@ -977,14 +983,14 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
                 pattern: TEST_PATTERN_NAME,
                 productArea: 'Projection',
               });
-            }
+            },
           );
 
           Then('invokeTool throws the error {string}', (_ctx: unknown, expected: string) => {
             expect(state!.caughtError).toBeInstanceOf(Error);
             expect((state!.caughtError as Error).message).toContain(expected);
           });
-        }
+        },
       );
 
       RuleScenario(
@@ -996,7 +1002,7 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
               const server = new CapturingMcpServer();
               registerAllTools(server, createUnavailableSessionManager());
               state!.registrations = server.registrations;
-            }
+            },
           );
 
           And(
@@ -1006,7 +1012,7 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
                 pattern: TEST_PATTERN_NAME,
                 unknownExtraKey: true,
               });
-            }
+            },
           );
 
           Then(
@@ -1014,14 +1020,14 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
             () => {
               expect(state!.registeredCaughtError).toBeInstanceOf(Error);
               expect((state!.registeredCaughtError as Error).message).toContain(
-                'Invalid input for architect_rules:'
+                'Invalid input for architect_rules:',
               );
               expect((state!.registeredCaughtError as Error).message).not.toContain(
-                'Session state should not be read'
+                'Session state should not be read',
               );
-            }
+            },
           );
-        }
+        },
       );
 
       RuleScenario(
@@ -1035,14 +1041,14 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
                 disclosure: 'verbose',
                 filter: { status: ['unknown'] },
               });
-            }
+            },
           );
 
           Then('invokeTool throws a validation error', () => {
             expect(state!.caughtError).toBeDefined();
             expect(state!.result).toBeNull();
           });
-        }
+        },
       );
 
       RuleScenario('architect_documentation rejects empty filter values', ({ When, Then }) => {
@@ -1078,7 +1084,7 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
           for (const result of state!.removedInputResults) {
             expect(result.error, result.fixture.removedKey).toBeInstanceOf(Error);
             expect((result.error as Error).message).toContain(
-              `Invalid input for ${result.fixture.tool}:`
+              `Invalid input for ${result.fixture.tool}:`,
             );
             expect((result.error as Error).message).toContain(result.fixture.removedKey);
           }
@@ -1098,7 +1104,7 @@ function bindFeature(feature: ReturnType<typeof loadFeatureFromText>): void {
             state!.registrations.map((registration) => ({
               name: registration.name,
               description: registration.description,
-            }))
+            })),
           );
           const publicContractText = `${helpText}
 ${registrationsText}`;
@@ -1134,7 +1140,7 @@ ${registrationsText}`;
             ]);
           });
         });
-      }
+      },
     );
 
     ruleIfPresent(
@@ -1151,7 +1157,7 @@ ${registrationsText}`;
             ]);
           });
         });
-      }
+      },
     );
 
     ruleIfPresent(
@@ -1168,7 +1174,7 @@ ${registrationsText}`;
             ]);
           });
         });
-      }
+      },
     );
 
     ruleIfPresent(
@@ -1185,7 +1191,7 @@ ${registrationsText}`;
             ]);
           });
         });
-      }
+      },
     );
   });
 }

@@ -30,7 +30,7 @@ Feature: Gherkin AST Parser
     Scenario: Parse valid feature file with pattern metadata
       Given a Gherkin feature file with content:
         """
-        @architect-pattern:ProjectionCategories @architect-phase:15 @architect-status:roadmap
+        @architect-pattern:ProjectionCategories @architect-status:roadmap
         Feature: Projection Categories
           A taxonomy that categorizes projections by purpose.
 
@@ -50,7 +50,6 @@ Feature: Gherkin AST Parser
       And the feature tags should be:
         | tag                          |
         | pattern:ProjectionCategories |
-        | phase:15                     |
         | status:roadmap               |
       And 1 scenario should be parsed
       And scenario 1 should have properties:

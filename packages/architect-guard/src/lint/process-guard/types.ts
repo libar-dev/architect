@@ -44,6 +44,8 @@ import type { TagRegistry } from '@libar-dev/architect-core';
 /**
  * Complete process state derived from file annotations.
  * This is computed by scanning files, not stored separately.
+ *
+ * @architect-shape
  */
 export interface ProcessState {
   /** Map of file paths to their derived state */
@@ -55,7 +57,9 @@ export interface ProcessState {
 }
 
 /**
- * State for a single file derived from its @architect-* annotations.
+ * State for a single file derived from its `@architect-*` annotations.
+ *
+ * @architect-shape
  */
 export interface FileState {
   /** Absolute file path */
@@ -80,11 +84,17 @@ export interface FileState {
 // Session Types
 // =============================================================================
 
-/** Session status lifecycle */
+/**
+ * Lifecycle status of a work session.
+ *
+ * @architect-shape
+ */
 export type SessionStatus = 'draft' | 'active' | 'closed';
 
 /**
  * State for a work session that scopes modifications.
+ *
+ * @architect-shape
  */
 export interface SessionState {
   /** Session identifier from @architect-session-id */
@@ -104,7 +114,9 @@ export interface SessionState {
 // =============================================================================
 
 /**
- * Result of detecting changes from git diff.
+ * Result of detecting changes from a git diff.
+ *
+ * @architect-shape
  */
 export interface ChangeDetection {
   /** Files that were modified (relative paths) */
@@ -122,6 +134,8 @@ export interface ChangeDetection {
 /**
  * Location of a detected status tag in the git diff.
  * Used for debugging false positives and enhancing error messages.
+ *
+ * @architect-shape
  */
 export interface StatusTagLocation {
   /** Line number in the new file version */
@@ -134,6 +148,8 @@ export interface StatusTagLocation {
 
 /**
  * A status transition detected in a file.
+ *
+ * @architect-shape
  */
 export interface StatusTransition {
   readonly from: ProcessStatusValue;
@@ -150,10 +166,22 @@ export interface StatusTransition {
 
 /**
  * Deliverable changes detected in a file's Background table.
+ *
+ * @architect-shape
  */
 export interface DeliverableChange {
+  /** Deliverable names added in the change. */
   readonly added: readonly string[];
+  /**
+   * Names of added deliverables whose status column is `pending` (unbuilt
+   * scope). A subset of `added`; the advisory scope-creep rule warns only on
+   * these, since adding a deliverable that records real progress
+   * (in-progress/complete/deferred/superseded/n/a) is silent (PDR-006 Rule 3).
+   */
+  readonly addedPending: readonly string[];
+  /** Deliverable names removed in the change. */
   readonly removed: readonly string[];
+  /** Deliverable names whose definition changed. */
   readonly modified: readonly string[];
 }
 
@@ -161,11 +189,17 @@ export interface DeliverableChange {
 // Validation Result Types
 // =============================================================================
 
-/** Violation severity level */
+/**
+ * Severity level of a process guard violation.
+ *
+ * @architect-shape
+ */
 export type ViolationSeverity = 'error' | 'warning';
 
 /**
  * A validation violation from the process guard linter.
+ *
+ * @architect-shape
  */
 export interface ProcessViolation {
   /** Unique rule ID that triggered the violation */
@@ -182,6 +216,8 @@ export interface ProcessViolation {
 
 /**
  * Result of process guard validation.
+ *
+ * @architect-shape
  */
 export interface ValidationResult {
   /** Whether all checks passed (no errors) */
@@ -206,6 +242,8 @@ export interface ValidationResult {
  * Note: `taxonomy-locked-tag` and `taxonomy-enum-in-use` were removed when
  * taxonomy moved from JSON to TypeScript. TypeScript changes require
  * recompilation, making runtime validation unnecessary.
+ *
+ * @architect-shape
  */
 export type ProcessGuardRule =
   | 'completed-protection'
@@ -217,6 +255,8 @@ export type ProcessGuardRule =
 
 /**
  * A process guard validation rule.
+ *
+ * @architect-shape
  */
 export interface ProcessGuardRuleDefinition {
   /** Unique rule ID */
@@ -239,11 +279,17 @@ export interface ProcessGuardRuleDefinition {
 // CLI Types
 // =============================================================================
 
-/** CLI validation mode */
+/**
+ * CLI validation mode selecting which files the guard inspects.
+ *
+ * @architect-shape
+ */
 export type ValidationMode = 'staged' | 'all' | 'files';
 
 /**
- * CLI options for lint:process command.
+ * CLI options for the lint:process command.
+ *
+ * @architect-shape
  */
 export interface LintProcessOptions {
   /** Validation mode */
@@ -266,6 +312,8 @@ export interface LintProcessOptions {
 
 /**
  * Options for the process guard decider.
+ *
+ * @architect-shape
  */
 export interface DeciderOptions {
   /** Treat warnings as errors */
@@ -279,18 +327,26 @@ export interface DeciderOptions {
 /**
  * Input to the process guard decider.
  * Contains all information needed for validation.
+ *
+ * @architect-shape
  */
 export interface DeciderInput {
+  /** Process state derived from the scanned files. */
   readonly state: ProcessState;
+  /** Changes detected from the git diff. */
   readonly changes: ChangeDetection;
+  /** Decider configuration options. */
   readonly options: DeciderOptions;
 }
 
 /**
  * Output from the process guard decider.
  * Pure function result with no side effects.
+ *
+ * @architect-shape
  */
 export interface DeciderOutput {
+  /** The validation result. */
   readonly result: ValidationResult;
   /** Commands to emit (for logging/metrics) */
   readonly events: readonly DeciderEvent[];
@@ -298,6 +354,8 @@ export interface DeciderOutput {
 
 /**
  * Events emitted by the decider for observability.
+ *
+ * @architect-shape
  */
 export type DeciderEvent =
   | { type: 'validation_started'; fileCount: number }

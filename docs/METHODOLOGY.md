@@ -27,7 +27,7 @@ Event sourcing teaches us: **derive state, don't store it**. Apply this to docum
 
 - **Events** = Git commits (changes to annotated code)
 - **Projections** = Generated docs (PATTERNS.md, ROADMAP.md)
-- **Read Model** = PatternGraph (consumed by codecs, validators, and Data API CLI)
+- **Read Model** = PatternGraph (consumed by codecs, validators, and the graph CLI)
 
 When you run `architect-generate`, you're rebuilding read models from the event stream. The source annotations are always authoritative.
 
@@ -110,7 +110,6 @@ Run `pnpm docs:patterns` and these annotations become a searchable pattern regis
 | --------------------------- | ------------------------------------------ |
 | `@<prefix>-implements`      | Production file realizes the pattern       |
 | `@<prefix>-uses`            | Declared dependency edges to real patterns |
-| `@<prefix>-usecase`         | When and how to use the implementation     |
 | `@<prefix>-role`            | Implementation classification              |
 | `@<prefix>-bounded-context` | Structural grouping where helpful          |
 | `@<prefix>-decision`        | ADR or DD link                             |
@@ -242,7 +241,7 @@ This avoids `.skip()` (forbidden by test safety policy) while preserving plannin
 
 | Document                                     | Purpose                                      |
 | -------------------------------------------- | -------------------------------------------- |
-| [README.md](../README.md)                    | Quick start, FSM diagram, Data API CLI usage |
+| [README.md](../README.md)                    | Quick start, FSM diagram, graph CLI usage    |
 | [PROCESS-GUARD.md](./PROCESS-GUARD.md)       | FSM validation rules, protection levels, CLI |
 | [CONFIGURATION.md](./CONFIGURATION.md)       | Tag prefixes, role sets, customization       |
 | [GHERKIN-PATTERNS.md](./GHERKIN-PATTERNS.md) | Writing effective specs                      |

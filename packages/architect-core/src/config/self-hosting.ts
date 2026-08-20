@@ -1,8 +1,24 @@
+/**
+ * @architect
+ * @architect-pattern ArchitectWorkspaceSources
+ * @architect-status completed
+ * @architect-role:contract
+ * @architect-bounded-context:configuration
+ * @architect-uses TagRegistrySchemas
+ *
+ * ## ArchitectWorkspaceSources - Self-hosting source contract
+ *
+ * Defines the package family's canonical TypeScript, stub, and feature inputs
+ * used when Architect builds its own graph from the repository root.
+ *
+ * **When to Use:** Use when resolving the self-hosting workspace inputs or
+ * constructing the workspace tag registry for package-family graph builds.
+ */
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { createArchitect } from './factory.js';
-import type { RoleDefinition } from './role-constants.js';
+import type { RoleDefinition } from '../validation-schemas/tag-registry.js';
 
 const workspaceRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../');
 
@@ -80,8 +96,8 @@ export const PACKAGE_SELF_HOSTING_SOURCES = {
     'architect/specs/**/*.feature',
     'architect/slices/**/*.feature',
     'architect/decisions/*.feature',
-    'architect/releases/*.feature',
     'tests/features/**/*.feature',
+    'packages/*/tests/features/**/*.feature',
     `${workspaceRoot}/packages/architect-core/tests/features/**/*.feature`,
     `${workspaceRoot}/packages/architect-projection/tests/features/**/*.feature`,
     `${workspaceRoot}/packages/architect-guard/tests/features/**/*.feature`,

@@ -3,11 +3,10 @@
  * @architect-pattern ScopeReadinessReport
  * @architect-status active
  * @architect-role:contract
+ * @architect-uses ExecutionContextSupporting
  * @architect-bounded-context:execution-context
  *
- * ### When to Use
- *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * Defines the `ScopeReadinessReport` fragment shape for session readiness checks and verdicts.
  */
 import { z } from 'zod';
 import { ScopeTypeSchema } from '@libar-dev/architect-core';
@@ -15,6 +14,12 @@ import { ScopeTypeSchema } from '@libar-dev/architect-core';
 import { ScopeVerdictSchema } from './supporting.js';
 import { ScopeReadinessCheckSchema } from './scope-readiness-check.js';
 
+/**
+ * Fragment shape for a pattern's scope-readiness report — the session type
+ * being checked, the individual readiness checks, and the overall verdict.
+ *
+ * @architect-shape
+ */
 export const ScopeReadinessReportSchema = z.strictObject({
   kind: z.literal('ScopeReadinessReport'),
   pattern: z.string(),

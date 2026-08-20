@@ -1,4 +1,4 @@
-import type { SectionBlock } from './section-block.js';
+import type { Block } from './block.js';
 
 export const DIAGRAM_SOURCE_VALUES = [
   'fsm-lifecycle',
@@ -40,7 +40,7 @@ export interface ReferenceDocConfig {
   readonly includeTags?: readonly string[];
   readonly productArea?: string;
   readonly excludeSourcePaths?: readonly string[];
-  readonly preamble?: readonly SectionBlock[];
+  readonly preamble?: readonly Block[];
   readonly shapesFirst?: boolean;
 }
 
@@ -54,14 +54,13 @@ export interface DocumentEntry {
 
 export interface IndexCodecOptionsContract {
   readonly [key: string]: unknown;
-  readonly preamble?: readonly SectionBlock[];
+  readonly preamble?: readonly Block[];
   readonly includePackageMetadata?: boolean;
   readonly documentEntries?: readonly DocumentEntry[];
   readonly includeProductAreaStats?: boolean;
-  readonly includePhaseProgress?: boolean;
   readonly includeDocumentInventory?: boolean;
   readonly purposeText?: string;
-  readonly epilogue?: readonly SectionBlock[];
+  readonly epilogue?: readonly Block[];
   readonly packageMetadataOverrides?: Partial<Record<'name' | 'purpose' | 'license', string>>;
 }
 

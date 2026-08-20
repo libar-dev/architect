@@ -7,10 +7,17 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Defines the ProjectConfigSnapshot fragment shape for config, source glob,
+ *   and graph metrics.
  */
 import { z } from 'zod';
 
+/**
+ * A snapshot of project configuration and graph metrics — base directory,
+ * config path, source globs, build time, and pattern/role counts.
+ *
+ * @architect-shape
+ */
 export const ProjectConfigSnapshotSchema = z.strictObject({
   kind: z.literal('ProjectConfigSnapshot'),
   baseDir: z.string(),
@@ -18,7 +25,6 @@ export const ProjectConfigSnapshotSchema = z.strictObject({
   sourceGlobs: z.array(z.string()),
   buildTimeMs: z.number().int().nonnegative(),
   patternCount: z.number().int().nonnegative(),
-  phaseCount: z.number().int().nonnegative(),
   roleCount: z.number().int().nonnegative(),
   projectName: z.string().optional(),
 });

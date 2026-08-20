@@ -3,16 +3,22 @@
  * @architect-pattern HandoffRecord
  * @architect-status active
  * @architect-role:contract
+ * @architect-uses ExecutionContextSupporting
  * @architect-bounded-context:execution-context
  *
- * ### When to Use
- *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * Defines the `HandoffRecord` fragment shape for one pattern's session handoff summary.
  */
 import { z } from 'zod';
 
 import { HandoffSessionTypeSchema } from './supporting.js';
 
+/**
+ * Fragment shape for one pattern's session handoff summary — what was
+ * completed and in progress, the files modified, discoveries, blockers, and
+ * the recommended next session.
+ *
+ * @architect-shape
+ */
 export const HandoffRecordSchema = z.strictObject({
   kind: z.literal('HandoffRecord'),
   pattern: z.string(),

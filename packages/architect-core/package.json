@@ -24,16 +24,19 @@
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
+      "source": "./src/index.ts",
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
     "./config": {
+      "source": "./src/config/index.ts",
       "types": "./dist/config/index.d.ts",
       "import": "./dist/config/index.js"
     },
-    "./roles": {
-      "types": "./dist/roles.d.ts",
-      "import": "./dist/roles.js"
+    "./graph": {
+      "source": "./src/graph/index.ts",
+      "types": "./dist/graph/index.d.ts",
+      "import": "./dist/graph/index.js"
     },
     "./package.json": "./package.json"
   },
@@ -41,8 +44,10 @@
     "build": "tsc -b",
     "typecheck": "tsc --noEmit -p tsconfig.test.json",
     "lint": "eslint src",
-    "test": "vitest run",
-    "clean": "rm -rf dist *.tsbuildinfo"
+    "test": "pnpm test:jsdoc-boilerplate-audit && vitest run",
+    "test:jsdoc-boilerplate-audit": "node ../../scripts/jsdoc-boilerplate-audit.mjs src",
+    "clean": "rm -rf dist *.tsbuildinfo",
+    "prepack": "pnpm build"
   },
   "dependencies": {
     "@cucumber/gherkin": "^29.0.0",
@@ -62,6 +67,5 @@
   ],
   "engines": {
     "node": ">=20.0.0"
-  },
-  "prepack": "pnpm build"
+  }
 }

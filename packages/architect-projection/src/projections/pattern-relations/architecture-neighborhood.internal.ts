@@ -2,9 +2,7 @@
  * @architect-bounded-context:pattern-relations
  */
 /**
- * Private helpers used exclusively by the architecture-neighborhood fragment.
- *
- * Part of the PatternRelationsProjectionSupport utility surface.
+ * Builds the architectural neighborhood for one pattern, including relationships, peers, and implementation references.
  */
 
 import type { ProjectionContext } from '../../context/projection-context.js';
@@ -19,7 +17,7 @@ import {
 
 export function buildArchitectureNeighborhood(
   context: ProjectionContext,
-  patternName: string
+  patternName: string,
 ): {
   pattern: string;
   context: string | undefined;
@@ -29,6 +27,8 @@ export function buildArchitectureNeighborhood(
   usedBy: string[];
   dependsOn: string[];
   enables: string[];
+  seeAlso: string[];
+  enforcedBy: string[];
   sameContext: string[];
   implements: string[];
   implementedBy: ImplementationRef[];
@@ -53,6 +53,8 @@ export function buildArchitectureNeighborhood(
     usedBy: [...(relationships?.usedBy ?? [])],
     dependsOn: [...(relationships?.dependsOn ?? [])],
     enables: [...(relationships?.enables ?? [])],
+    seeAlso: [...(relationships?.seeAlso ?? [])],
+    enforcedBy: [...(relationships?.enforcedBy ?? [])],
     sameContext,
     implements: [...(relationships?.implementsPatterns ?? [])],
     implementedBy: (relationships?.implementedBy ?? []).map(normalizeImplementationRef),

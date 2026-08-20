@@ -1,9 +1,25 @@
+/**
+ * @architect
+ * @architect-pattern RegistryBuilder
+ * @architect-status active
+ * @architect-role:utility
+ * @architect-bounded-context:configuration
+ * @architect-uses HierarchyLevelDomain
+ *
+ * ## RegistryBuilder - Canonical TagRegistry Assembly
+ *
+ * Assembles the canonical `TagRegistry` from the repo's built-in role, metadata,
+ * and aggregation tag definitions. Exports `buildRegistry`, which composes role
+ * constants, status/hierarchy values, and format options into the immutable
+ * registry that drives tag classification and validation across the toolchain.
+ */
 import type {
   AggregationTagDefinition,
   MetadataTagDefinition,
   TagRegistry,
-} from '../config/tag-registry-contract.js';
-import { DEFAULT_ROLES, type RoleDefinition } from '../config/role-constants.js';
+  RoleDefinition,
+} from '../validation-schemas/tag-registry.js';
+import { BUILTIN_ROLES } from '../config/role-constants.js';
 import { DEFAULT_FILE_OPT_IN_TAG, DEFAULT_TAG_PREFIX } from '../config/defaults.js';
 import {
   ADR_LAYER_VALUES,
@@ -12,6 +28,7 @@ import {
   GLOBAL_FORMAT_OPTIONS,
 } from './generator-options.js';
 import { HIERARCHY_LEVELS } from './hierarchy-levels.js';
+import type { KnownTransformName } from './metadata-transforms.js';
 import { ACCEPTED_STATUS_VALUES, DEFAULT_STATUS } from './status-values.js';
 import { ADR_CATEGORY_VALUES } from './adr-category-values.js';
 
@@ -19,19 +36,19 @@ export type {
   AggregationTagDefinition as AggregationTagDefinitionForRegistry,
   MetadataTagDefinition as MetadataTagDefinitionForRegistry,
   TagRegistry,
-} from '../config/tag-registry-contract.js';
+} from '../validation-schemas/tag-registry.js';
 
 interface MutableTagRegistry {
   version: string;
-  roles: readonly RoleDefinition[];
+  roles: RoleDefinition[];
   metadataTags: MetadataTagDefinition[];
   aggregationTags: AggregationTagDefinition[];
-  formatOptions: readonly string[];
+  formatOptions: string[];
   tagPrefix: string;
   fileOptInTag: string;
 }
 
-function cloneRoleDefinitions(roles: readonly RoleDefinition[]): readonly RoleDefinition[] {
+function cloneRoleDefinitions(roles: readonly RoleDefinition[]): RoleDefinition[] {
   return roles.map((role) => ({
     ...role,
     aliases: [...(role.aliases ?? [])],
@@ -44,7 +61,7 @@ export interface RegisteredRoleValue {
 }
 
 export function buildRegisteredRoleValues(
-  roles: readonly RoleDefinition[]
+  roles: readonly RoleDefinition[],
 ): readonly RegisteredRoleValue[] {
   const registeredByTag = new Map<string, RegisteredRoleValue>();
 
@@ -63,9 +80,9 @@ export function buildRegisteredRoleValues(
 export const BOUNDED_CONTEXT_TAG = 'bounded-context';
 
 export const METADATA_TAGS_BY_GROUP = {
-  core: ['pattern', 'status', 'usecase'] as const,
-  relationship: ['uses', 'implements', 'extends', 'see-also'] as const,
-  process: ['completed'] as const,
+  core: ['pattern', 'status'] as const,
+  relationship: ['uses', 'implements', 'extends', 'see-also', 'enforces-decision'] as const,
+  process: [] as const,
   prd: ['product-area'] as const,
   adr: [
     'adr',
@@ -78,19 +95,19 @@ export const METADATA_TAGS_BY_GROUP = {
   ] as const,
   hierarchy: ['title'] as const,
   traceability: [] as const,
-  discovery: [] as const,
+  discovery: ['shape'] as const,
   architecture: ['role', BOUNDED_CONTEXT_TAG] as const,
   extraction: [] as const,
   stub: ['target'] as const,
   convention: [] as const,
 } as const;
 
-const padAdr = (value: string): string => value.padStart(3, '0');
-const stripQuotes = (value: string): string => value.replace(/^["']|["']$/g, '');
+const PAD_ADR_TRANSFORM: KnownTransformName = 'padAdr';
+const STRIP_QUOTES_TRANSFORM: KnownTransformName = 'stripQuotes';
 
 export function registerUnifiedRoleTaxonomy(
   registry: MutableTagRegistry,
-  roles: readonly RoleDefinition[]
+  roles: readonly RoleDefinition[],
 ): void {
   const registeredRoles = buildRegisteredRoleValues(roles);
 
@@ -104,7 +121,7 @@ export function registerUnifiedRoleTaxonomy(
         'context',
         'layer',
         BOUNDED_CONTEXT_TAG,
-      ].includes(tag.tag)
+      ].includes(tag.tag),
   );
 
   const exampleRoleValue = roles[0]?.tag ?? 'service';
@@ -143,7 +160,7 @@ export interface BuildRegistryOptions {
 }
 
 export function buildRegistry(options: BuildRegistryOptions = {}): TagRegistry {
-  const roles = options.roles ?? DEFAULT_ROLES;
+  const roles = options.roles ?? BUILTIN_ROLES;
   const productAreas = options.productAreas;
   const registry: MutableTagRegistry = {
     version: '2.0.0',
@@ -170,13 +187,6 @@ export function buildRegistry(options: BuildRegistryOptions = {}): TagRegistry {
         purpose: 'Reason for intentionally modifying a completed pattern despite hard lock',
         example: '@architect-unlock-reason "Correct post-completion process drift"',
         metadataKey: 'unlockReason',
-      },
-      {
-        tag: 'usecase',
-        format: 'quoted-value',
-        purpose: 'Use case association',
-        repeatable: true,
-        example: '@architect-usecase "When handling command failures"',
       },
       {
         tag: 'uses',
@@ -214,12 +224,6 @@ export function buildRegistry(options: BuildRegistryOptions = {}): TagRegistry {
         example: '@architect-extends ProjectionCategories',
       },
       {
-        tag: 'completed',
-        format: 'value',
-        purpose: 'Completion date (YYYY-MM-DD format)',
-        example: '@architect-completed 2026-01-08',
-      },
-      {
         tag: 'product-area',
         format: 'value',
         purpose: 'Product area for PRD grouping (per ADR-001 Rule 1)',
@@ -230,7 +234,7 @@ export function buildRegistry(options: BuildRegistryOptions = {}): TagRegistry {
         tag: 'adr',
         format: 'value',
         purpose: 'ADR/PDR number for decision tracking',
-        transform: padAdr,
+        transform: PAD_ADR_TRANSFORM,
         example: '@architect-adr 015',
       },
       {
@@ -252,14 +256,14 @@ export function buildRegistry(options: BuildRegistryOptions = {}): TagRegistry {
         tag: 'adr-supersedes',
         format: 'value',
         purpose: 'ADR/PDR number this decision supersedes',
-        transform: padAdr,
+        transform: PAD_ADR_TRANSFORM,
         example: '@architect-adr-supersedes 012',
       },
       {
         tag: 'adr-superseded-by',
         format: 'value',
         purpose: 'ADR/PDR number that supersedes this decision',
-        transform: padAdr,
+        transform: PAD_ADR_TRANSFORM,
         example: '@architect-adr-superseded-by 020',
       },
       {
@@ -280,7 +284,7 @@ export function buildRegistry(options: BuildRegistryOptions = {}): TagRegistry {
         tag: 'title',
         format: 'quoted-value',
         purpose: 'Human-readable display title (supports quoted values with spaces)',
-        transform: stripQuotes,
+        transform: STRIP_QUOTES_TRANSFORM,
         example: '@architect-title:"Process Guard Linter"',
       },
       {
@@ -290,10 +294,34 @@ export function buildRegistry(options: BuildRegistryOptions = {}): TagRegistry {
         example: '@architect-see-also AgentAsBoundedContext, CrossContextIntegration',
       },
       {
+        tag: 'enforces-decision',
+        format: 'csv',
+        purpose:
+          'Decision records (ADR/PDR/…) whose invariants this feature/pattern enforces — the structured ADR→enforcing-rule edge',
+        metadataKey: 'enforcesDecisions',
+        example:
+          '@architect-enforces-decision ADR009ProjectionTrustBoundary, ADR006SingleReadModelArchitecture',
+      },
+      {
+        tag: 'executable-specs',
+        format: 'csv',
+        purpose:
+          'Forward link from a design-tier spec to the executable Gherkin feature(s) that realize it — the value-transfer / spec-deletion gate edge',
+        metadataKey: 'executableSpecs',
+        example: '@architect-executable-specs:tests/features/cli/generate-docs.feature',
+      },
+      {
         tag: 'target',
         format: 'value',
         purpose: 'Target implementation path for stub files',
         example: '@architect-target src/api/stub-resolver.ts',
+      },
+      {
+        tag: 'shape',
+        format: 'flag',
+        purpose:
+          'Marks an exported declaration (interface / type / enum / const / function) for API-reference shape extraction. An optional trailing group label clusters related shapes; per-shape data is discovered from the AST, not from this presence marker.',
+        example: '@architect-shape',
       },
     ],
     aggregationTags: [

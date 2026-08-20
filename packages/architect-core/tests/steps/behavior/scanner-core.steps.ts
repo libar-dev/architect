@@ -111,7 +111,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
         'a file {string} with content:',
         async (_: unknown, filePath: string, content: string) => {
           await createFile(filePath, content);
-        }
+        },
       );
 
       When('scanning with pattern {string}', async (_: unknown, pattern: string) => {
@@ -133,7 +133,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
           const file = state!.scanResult!.files.find((f) => f.filePath.includes(fileName));
           expect(file).toBeDefined();
           expect(file!.directives).toHaveLength(count);
-        }
+        },
       );
 
       And('the directive should have tag {string}', (_: unknown, tag: string) => {
@@ -152,7 +152,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
         'a file {string} with content:',
         async (_: unknown, filePath: string, content: string) => {
           await createFile(filePath, content);
-        }
+        },
       );
 
       When('scanning with pattern {string}', async (_: unknown, pattern: string) => {
@@ -174,7 +174,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
         'a file {string} with content:',
         async (_: unknown, filePath: string, content: string) => {
           await createFile(filePath, content);
-        }
+        },
       );
 
       When('scanning with pattern {string}', async (_: unknown, pattern: string) => {
@@ -196,7 +196,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
           const directive = state!.scanResult!.files[0]!.directives[0]!;
           expect(directive.directive.tags).toContain(tag1);
           expect(directive.directive.tags).toContain(tag2);
-        }
+        },
       );
 
       And('the directive description should contain {string}', (_: unknown, text: string) => {
@@ -236,7 +236,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
           expect(directive.exports).toHaveLength(count);
           expect(directive.exports[0]!.name).toBe(name);
           expect(directive.exports[0]!.type).toBe(type);
-        }
+        },
       );
     });
   });
@@ -251,14 +251,14 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
         'a file {string} with content:',
         async (_: unknown, filePath: string, content: string) => {
           await createFile(filePath, content);
-        }
+        },
       );
 
       And(
         'a file {string} with content:',
         async (_: unknown, filePath: string, content: string) => {
           await createFile(filePath, content);
-        }
+        },
       );
 
       When('scanning with pattern {string}', async (_: unknown, pattern: string) => {
@@ -289,14 +289,14 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
         'a file {string} with content:',
         async (_: unknown, filePath: string, content: string) => {
           await createFile(filePath, content);
-        }
+        },
       );
 
       And(
         'a file {string} with content:',
         async (_: unknown, filePath: string, content: string) => {
           await createFile(filePath, content);
-        }
+        },
       );
 
       When('scanning with pattern {string}', async (_: unknown, pattern: string) => {
@@ -339,21 +339,21 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
         'a file {string} with content:',
         async (_: unknown, filePath: string, content: string) => {
           await createFile(filePath, content);
-        }
+        },
       );
 
       And(
         'a file {string} with content:',
         async (_: unknown, filePath: string, content: string) => {
           await createFile(filePath, content);
-        }
+        },
       );
 
       When(
         'scanning with pattern {string} excluding {string}',
         async (_: unknown, pattern: string, exclude: string) => {
           await runScan(pattern, [exclude]);
-        }
+        },
       );
 
       Then('the scan should succeed with {int} file', (_: unknown, count: number) => {
@@ -379,14 +379,14 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
           'a file {string} with content:',
           async (_: unknown, filePath: string, content: string) => {
             await createFile(filePath, content);
-          }
+          },
         );
 
         And(
           'a file {string} with content:',
           async (_: unknown, filePath: string, content: string) => {
             await createFile(filePath, content);
-          }
+          },
         );
 
         When('scanning with pattern {string}', async (_: unknown, pattern: string) => {
@@ -408,7 +408,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
             const file = state!.scanResult!.files.find((f) => f.filePath.includes(fileName));
             expect(file).toBeDefined();
             expect(file!.directives).toHaveLength(count);
-          }
+          },
         );
 
         And(
@@ -417,9 +417,9 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
             const file = state!.scanResult!.files.find((f) => f.filePath.includes(fileName));
             expect(file).toBeDefined();
             expect(file!.directives).toHaveLength(count);
-          }
+          },
         );
-      }
+      },
     );
   });
 
@@ -435,14 +435,14 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
           'a file {string} with content:',
           async (_: unknown, filePath: string, content: string) => {
             await createFile(filePath, content);
-          }
+          },
         );
 
         And(
           'a file {string} with content:',
           async (_: unknown, filePath: string, content: string) => {
             await createFile(filePath, content);
-          }
+          },
         );
 
         When('scanning with pattern {string}', async (_: unknown, pattern: string) => {
@@ -458,7 +458,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
           const file = state!.scanResult!.files.find((f) => f.filePath.includes(fileName));
           expect(file).toBeDefined();
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -468,14 +468,14 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
           'a file {string} with content:',
           async (_: unknown, filePath: string, content: string) => {
             await createFile(filePath, content);
-          }
+          },
         );
 
         And(
           'a file {string} with content:',
           async (_: unknown, filePath: string, content: string) => {
             await createFile(filePath, content);
-          }
+          },
         );
 
         When('scanning with pattern {string}', async (_: unknown, pattern: string) => {
@@ -495,7 +495,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
         And('the scan should have {int} errors', (_: unknown, count: number) => {
           expect(state!.scanResult!.errors).toHaveLength(count);
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -505,7 +505,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
           'a file {string} with content:',
           async (_: unknown, filePath: string, content: string) => {
             await createFile(filePath, content);
-          }
+          },
         );
 
         When('scanning with pattern {string}', async (_: unknown, pattern: string) => {
@@ -520,7 +520,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
         And('the scan should have {int} errors', (_: unknown, count: number) => {
           expect(state!.scanResult!.errors).toHaveLength(count);
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -530,7 +530,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
           'a file {string} with content:',
           async (_: unknown, filePath: string, content: string) => {
             await createFile(filePath, content);
-          }
+          },
         );
 
         When('scanning with pattern {string}', async (_: unknown, pattern: string) => {
@@ -548,7 +548,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
             const file = state!.scanResult!.files.find((f) => f.filePath.includes(fileName));
             expect(file).toBeDefined();
             expect(file!.directives).toHaveLength(count);
-          }
+          },
         );
 
         And('the directive should have tag {string}', (_: unknown, tag: string) => {
@@ -559,7 +559,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
         And('the scan should have {int} errors', (_: unknown, count: number) => {
           expect(state!.scanResult!.errors).toHaveLength(count);
         });
-      }
+      },
     );
   });
 });

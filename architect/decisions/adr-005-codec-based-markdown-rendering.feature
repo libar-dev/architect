@@ -2,10 +2,11 @@
 @architect-adr:005
 @architect-adr-status:accepted
 @architect-adr-category:architecture
+@architect-adr-layer:infrastructure
+@architect-adr-theme:projections
 @architect-pattern:ADR005CodecBasedMarkdownRendering
 @architect-status:completed
 @architect-unlock-reason:Retroactive-completion-during-rebrand
-@architect-completed:2025-12-15
 @architect-product-area:Generation
 Feature: ADR-005 - Codec-Based Markdown Rendering
 
@@ -41,22 +42,6 @@ Feature: ADR-005 - Codec-Based Markdown Rendering
   | Composability | Copy-paste between generators | CompositeCodec assembles children |
   | Format variants | Duplicate generator logic | Same codec, different renderer |
   | Progressive disclosure | Manual heading management | Heading depth auto-calculated |
-
-  # ===========================================================================
-  # DELIVERABLES
-  # ===========================================================================
-
-  Background: Deliverables
-    Given the following deliverables:
-      | Deliverable | Status | Location |
-      | RenderableDocument schema | complete | src/renderable/renderable-document.ts |
-      | Section block types (heading, table, paragraph, code, list) | complete | src/renderable/renderable-document.ts |
-      | Markdown renderer | complete | src/renderable/markdown-renderer.ts |
-      | PatternCodec (pattern detail pages) | complete | src/renderable/codecs/pattern.ts |
-      | RoadmapCodec (phase-grouped roadmap) | complete | src/renderable/codecs/roadmap.ts |
-      | ReferenceCodec (composite reference docs) | complete | src/renderable/codecs/reference.ts |
-      | CompositeCodec (codec composition) | complete | src/renderable/codecs/composite.ts |
-      | ADR codec (decision records) | complete | src/renderable/codecs/adr.ts |
 
   # ===========================================================================
   # RULE 1: Codec Contract

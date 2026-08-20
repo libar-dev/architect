@@ -68,17 +68,17 @@ export function camelCaseToTitleCase(text: string): string {
 
       result = result.replace(
         new RegExp('([a-z])' + escapedAcronym + '([A-Z])', 'g'),
-        '$1 ' + placeholder + ' $2'
+        '$1 ' + placeholder + ' $2',
       );
       result = result.replace(new RegExp(escapedAcronym + '([A-Z])', 'g'), placeholder + ' $1');
       result = result.replace(new RegExp(escapedAcronym + '(\\d)', 'g'), placeholder + ' $1');
       result = result.replace(
         new RegExp('([a-z])' + escapedAcronym + '(?![A-Za-z])', 'g'),
-        '$1 ' + placeholder
+        '$1 ' + placeholder,
       );
       result = result.replace(
         new RegExp('(?<![A-Za-z])' + escapedAcronym + '(?![A-Za-z])', 'g'),
-        placeholder
+        placeholder,
       );
     }
   }

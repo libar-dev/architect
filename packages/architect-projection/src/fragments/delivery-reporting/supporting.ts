@@ -3,17 +3,21 @@
  * @architect-pattern DeliveryReportingSupporting
  * @architect-status active
  * @architect-role:contract
+ * @architect-uses PatternSummary, Deliverable
  * @architect-bounded-context:delivery-reporting
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Defines shared delivery-reporting support schemas for counts,
+ *   percentages, and trace rows.
  */
 import { z } from 'zod';
 
-import { PatternSummarySchema } from '../pattern-relations/index.js';
-import { DeliverableSchema } from '../pattern-relations/supporting.js';
-
+/**
+ * Absolute pattern counts per delivery status, plus their total.
+ *
+ * @architect-shape
+ */
 export const StatusCountsSchema = z.strictObject({
   completed: z.number().int().nonnegative(),
   active: z.number().int().nonnegative(),
@@ -22,6 +26,11 @@ export const StatusCountsSchema = z.strictObject({
   total: z.number().int().nonnegative(),
 });
 
+/**
+ * Pattern share per delivery status, each a 0-100 percentage.
+ *
+ * @architect-shape
+ */
 export const StatusPercentagesSchema = z.strictObject({
   completed: z.number().min(0).max(100),
   active: z.number().min(0).max(100),
@@ -29,20 +38,12 @@ export const StatusPercentagesSchema = z.strictObject({
   candidate: z.number().min(0).max(100),
 });
 
-export const QuarterEntrySchema = z.strictObject({
-  quarter: z.string(),
-  patterns: z.array(PatternSummarySchema),
-  counts: StatusCountsSchema,
-});
-
-export const ReleaseEntrySchema = z.strictObject({
-  release: z.string(),
-  date: z.string().optional(),
-  patterns: z.array(PatternSummarySchema),
-  deliverables: z.array(DeliverableSchema),
-  notes: z.string().optional(),
-});
-
+/**
+ * One row of a traceability matrix — a pattern with its optional status and the
+ * tests, specs, and deliverables that trace to it.
+ *
+ * @architect-shape
+ */
 export const TraceRowSchema = z.strictObject({
   pattern: z.string(),
   status: z.string().optional(),
@@ -53,6 +54,4 @@ export const TraceRowSchema = z.strictObject({
 
 export type StatusCounts = z.infer<typeof StatusCountsSchema>;
 export type StatusPercentages = z.infer<typeof StatusPercentagesSchema>;
-export type QuarterEntry = z.infer<typeof QuarterEntrySchema>;
-export type ReleaseEntry = z.infer<typeof ReleaseEntrySchema>;
 export type TraceRow = z.infer<typeof TraceRowSchema>;

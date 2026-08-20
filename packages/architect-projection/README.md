@@ -2,9 +2,10 @@
 
 Fragment/Projection/Renderer pipeline for the Architect toolchain. Consumes a
 `PatternGraph` (from `@libar-dev/architect-core`) through typed projection
-functions. Prefer the validated public `parseAndProject*` entrypoints whenever a
+functions. Use the validated public `parseAndProject*` entrypoints whenever a
 projection exposes both validated and raw forms. Canonical `project*` exports
-remain public for projections that do not have a separate validated wrapper.
+remain public only for projections that do not have a separate validated
+wrapper.
 
 Replaces the deleted `@libar-dev/architect-presentation` codec stack and the
 `architect-query/api/*` assemblers with a single pipeline:
@@ -47,7 +48,8 @@ console.log(renderCompactText(bundle));
 ```
 
 `parseAndProject*` variants run `OptionsSchema.parse(options)` at the
-entrypoint; plain `project*` functions assume pre-validated options.
+entrypoint. Plain `project*` functions are internal helpers for projections that
+already own validated entrypoints.
 
 For surfaces without a validated/raw pair, use the canonical `project*` export,
 for example `projectOverviewDigest`, `projectStatusDistribution`, or
@@ -75,6 +77,26 @@ for example `projectOverviewDigest`, `projectStatusDistribution`, or
   on `Fragment`s only.
 - Runtime dependencies: `zod` + peer `@libar-dev/architect-core`. No filesystem,
   no network.
+
+### Enforced at lint time
+
+Four rule clusters in the repo-root `eslint.config.mjs` codify the renderer
+boundary mechanically. They scope to `src/renderers/**/*.ts`. Each error
+message carries a stable `[<scope>:<rule-id>]` tag — grep that tag to find
+the config, this section, or related discussion in `docs/MIGRATION.md` and
+`.pr-coordination/`.
+
+| Rule id                                            | What it forbids                                                                                                                                      | Why                                                                                                                                                                                                                                       |
+| -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `[arch-boundary:renderer-no-doc-composition]`      | Renderer files importing any module from `../projections/documentation-composition/`                                                                 | ADR-005 / ADR-009: renderers consume `Fragment` / `ProjectionBundle` only; doc-type metadata stays projection-side.                                                                                                                       |
+| `[arch-boundary:renderer-no-route-construction]`   | Renderer files importing `createIndexRouteId` / `createEntityRouteId` from `../routing/route-id.js`. Type-only `LogicalRouteId` imports are allowed. | Route construction is a projection-time concern; renderers receive routed paths in `bundle.routing`.                                                                                                                                      |
+| `[arch-boundary:renderer-no-cross-layer-internal]` | Renderer files importing `../**/*.internal.js`                                                                                                       | Renderer-private helpers must be local to `src/renderers/`; foreign `.internal.js` modules belong to their owning layer.                                                                                                                  |
+| `[trust-boundary:trusted-markdown-firewall]`       | Importing or exporting any symbol named `TRUSTED_MARKDOWN` (5 AST selectors)                                                                         | `TRUSTED_MARKDOWN` is the module-private marker that authorizes renderer-internal raw-markdown emission past the escaping pipeline (security invariant I3); letting it cross a module boundary defeats the Markdown trust boundary below. |
+
+Violations are errors, not warnings. There is no `eslint-disable` escape —
+the repo follows a no-BC posture (see root `CLAUDE.md` → "Engineering
+doctrine"). If a legitimate use case appears, amend the rule (and this
+table) in the same PR rather than suppressing the error inline.
 
 ## Markdown/content trust boundary
 

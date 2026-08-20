@@ -6,7 +6,7 @@
  * @architect-role:service
  * @architect-bounded-context:process-guard
  * @architect-implements ProcessGuardLinter
- * @architect-uses DeriveProcessState
+ * @architect-uses DeriveProcessState, GitNameStatusParser
  *
  * ## DetectChanges - Git Diff Change Detection
  *
@@ -38,8 +38,10 @@ import { globSync } from 'glob';
 import type { Result } from '@libar-dev/architect-core';
 import { Result as R } from '@libar-dev/architect-core';
 import {
+  BoundaryParseError,
   DEFAULT_STATUS,
-  PROCESS_STATUS_VALUES,
+  ProcessStatusSchema,
+  parseAtBoundary,
   type ProcessStatusValue,
 } from '@libar-dev/architect-core';
 import { execGitSafe, sanitizeBranchName, parseGitNameStatus } from '../../git/index.js';
@@ -64,6 +66,25 @@ export type ChangeDetectionOptions = WithTagRegistry & {
   readonly exclude?: readonly string[];
 };
 
+function tryParseProcessStatusValue(rawValue: string | undefined): ProcessStatusValue | undefined {
+  if (rawValue === undefined) {
+    return undefined;
+  }
+
+  try {
+    return parseAtBoundary(
+      ProcessStatusSchema,
+      rawValue.toLowerCase(),
+      `Invalid process status value in git diff: ${rawValue}`,
+    );
+  } catch (error: unknown) {
+    if (error instanceof BoundaryParseError) {
+      return undefined;
+    }
+    throw error;
+  }
+}
+
 // =============================================================================
 // Core Functions
 // =============================================================================
@@ -85,7 +106,7 @@ export type ChangeDetectionOptions = WithTagRegistry & {
  */
 export function detectStagedChanges(
   baseDir: string,
-  options?: ChangeDetectionOptions
+  options?: ChangeDetectionOptions,
 ): Result<ChangeDetection> {
   const tagPrefix = options?.registry?.tagPrefix ?? DEFAULT_TAG_PREFIX;
 
@@ -127,7 +148,7 @@ export function detectStagedChanges(
 export function detectBranchChanges(
   baseDir: string,
   baseBranch = 'main',
-  options?: ChangeDetectionOptions
+  options?: ChangeDetectionOptions,
 ): Result<ChangeDetection> {
   const tagPrefix = options?.registry?.tagPrefix ?? DEFAULT_TAG_PREFIX;
 
@@ -175,7 +196,7 @@ export function detectBranchChanges(
 export function detectFileChanges(
   baseDir: string,
   files: readonly string[],
-  options?: ChangeDetectionOptions
+  options?: ChangeDetectionOptions,
 ): Result<ChangeDetection> {
   const tagPrefix = options?.registry?.tagPrefix ?? DEFAULT_TAG_PREFIX;
 
@@ -253,7 +274,7 @@ function getProcessGuardFeaturePatterns(options?: ChangeDetectionOptions): reado
 function filterFeatureScopedFiles(
   baseDir: string,
   files: readonly string[],
-  options?: ChangeDetectionOptions
+  options?: ChangeDetectionOptions,
 ): string[] {
   const featurePatterns = getProcessGuardFeaturePatterns(options);
   if (featurePatterns.length === 0) {
@@ -265,7 +286,7 @@ function filterFeatureScopedFiles(
       cwd: baseDir,
       nodir: true,
       ignore: options?.exclude ? [...options.exclude] : [],
-    }).map((file) => path.normalize(file))
+    }).map((file) => path.normalize(file)),
   );
 
   return files.filter((file) => matchedFiles.has(path.normalize(file)));
@@ -323,7 +344,7 @@ interface DiffFileParseState {
 function detectStatusTransitions(
   diff: string,
   files: readonly string[],
-  tagPrefix: string = DEFAULT_TAG_PREFIX
+  tagPrefix: string = DEFAULT_TAG_PREFIX,
 ): [string, StatusTransition][] {
   const transitions: [string, StatusTransition][] = [];
   let currentFile = '';
@@ -410,8 +431,8 @@ function detectStatusTransitions(
     if (line.startsWith('+') && !line.startsWith('+++')) {
       const newMatch = statusPattern.exec(line);
       if (newMatch?.[1]) {
-        const toStatus = newMatch[1].toLowerCase();
-        if (PROCESS_STATUS_VALUES.includes(toStatus as ProcessStatusValue)) {
+        const toStatus = tryParseProcessStatusValue(newMatch[1]);
+        if (toStatus !== undefined) {
           const location: StatusTagLocation = {
             lineNumber: state.newLineNumber,
             insideDocstring: state.insideDocstring,
@@ -435,9 +456,8 @@ function detectStatusTransitions(
 
     // Extract status values
     const toMatch = statusPattern.exec(state.validAddedTag.rawLine);
-    const toStatusRaw = toMatch?.[1]?.toLowerCase();
-    if (!toStatusRaw) continue;
-    const toStatus = toStatusRaw as ProcessStatusValue;
+    const toStatus = tryParseProcessStatusValue(toMatch?.[1]);
+    if (toStatus === undefined) continue;
 
     const isNewFile = state.removedTag === null;
     let fromStatus: ProcessStatusValue;
@@ -448,8 +468,7 @@ function detectStatusTransitions(
     } else {
       // state.removedTag is guaranteed to exist here
       const fromMatch = statusPattern.exec(state.removedTag.rawLine);
-      const fromStatusRaw = fromMatch?.[1]?.toLowerCase();
-      fromStatus = fromStatusRaw ? (fromStatusRaw as ProcessStatusValue) : DEFAULT_STATUS;
+      fromStatus = tryParseProcessStatusValue(fromMatch?.[1]) ?? DEFAULT_STATUS;
     }
 
     // Skip if no actual change
@@ -488,7 +507,7 @@ function detectStatusTransitions(
  */
 export function detectDeliverableChanges(
   diff: string,
-  files: readonly string[]
+  files: readonly string[],
 ): [string, DeliverableChange][] {
   const changes: [string, DeliverableChange][] = [];
   let currentFile = '';
@@ -498,7 +517,10 @@ export function detectDeliverableChanges(
   // Matches: | Deliverable Name | Status | ... |
   const deliverablePattern = /^\s*\|([^|]+)\|([^|]+)\|/;
 
-  const fileChanges = new Map<string, { added: string[]; removed: string[]; modified: string[] }>();
+  const fileChanges = new Map<
+    string,
+    { added: string[]; addedPending: string[]; removed: string[]; modified: string[] }
+  >();
 
   for (const line of diff.split('\n')) {
     // Track current file
@@ -507,7 +529,7 @@ export function detectDeliverableChanges(
       currentFile = match?.[2] ?? '';
       inDeliverableTable = false;
       if (currentFile && !fileChanges.has(currentFile)) {
-        fileChanges.set(currentFile, { added: [], removed: [], modified: [] });
+        fileChanges.set(currentFile, { added: [], addedPending: [], removed: [], modified: [] });
       }
       continue;
     }
@@ -553,7 +575,15 @@ export function detectDeliverableChanges(
         const deliverable = match[1].trim();
         if (deliverable && !deliverable.includes('---')) {
           const fc = fileChanges.get(currentFile);
-          if (fc) fc.added.push(deliverable);
+          if (fc) {
+            fc.added.push(deliverable);
+            // A deliverable's status column drives the advisory scope-creep rule:
+            // only `pending` (unbuilt scope) — including the implicit default when
+            // the status cell is blank/absent — is warned on (PDR-006 Rule 3).
+            if (isPendingStatusCell(match[2])) {
+              fc.addedPending.push(deliverable);
+            }
+          }
         }
       }
     }
@@ -582,6 +612,7 @@ export function detectDeliverableChanges(
         // Same deliverable in both = status/path changed, not scope change
         change.modified.push(deliverable);
         change.added = change.added.filter((d) => d !== deliverable);
+        change.addedPending = change.addedPending.filter((d) => d !== deliverable);
         change.removed = change.removed.filter((d) => d !== deliverable);
       }
     }
@@ -595,6 +626,22 @@ export function detectDeliverableChanges(
   }
 
   return changes;
+}
+
+/**
+ * Classify a deliverable table's status cell as pending scope.
+ *
+ * A blank or absent status cell defaults to `pending` (the deliverable-status
+ * default), so it counts as pending too. Any recognized non-pending status
+ * (in-progress/complete/deferred/superseded/n/a) records real progress and is
+ * not pending (PDR-006 Rule 3).
+ */
+function isPendingStatusCell(rawStatusCell: string | undefined): boolean {
+  const status = rawStatusCell?.trim().toLowerCase() ?? '';
+  if (status === '') {
+    return true;
+  }
+  return status === 'pending';
 }
 
 // =============================================================================
@@ -633,7 +680,7 @@ export function fileWasModified(detection: ChangeDetection, relativePath: string
  */
 export function getStatusTransition(
   detection: ChangeDetection,
-  relativePath: string
+  relativePath: string,
 ): StatusTransition | undefined {
   return detection.statusTransitions.get(relativePath);
 }
@@ -643,7 +690,7 @@ export function getStatusTransition(
  */
 export function getDeliverableChanges(
   detection: ChangeDetection,
-  relativePath: string
+  relativePath: string,
 ): DeliverableChange | undefined {
   return detection.deliverableChanges.get(relativePath);
 }

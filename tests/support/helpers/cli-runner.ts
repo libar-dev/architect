@@ -59,8 +59,8 @@ const PROJECT_ROOT = path.resolve(__dirname, '../../..');
 /**
  * Path to the split CLI package source tree.
  */
-const CLI_PACKAGE_ROOT = path.resolve(__dirname, '../../../../architect-cli');
-const GUARD_PACKAGE_ROOT = path.resolve(__dirname, '../../../../architect-guard');
+const CLI_PACKAGE_ROOT = path.resolve(__dirname, '../../../packages/architect-cli');
+const GUARD_PACKAGE_ROOT = path.resolve(__dirname, '../../../packages/architect-guard');
 
 /**
  * Resolve the tsx binary from node_modules/.bin/ rather than relying on npx.
@@ -71,14 +71,13 @@ const GUARD_PACKAGE_ROOT = path.resolve(__dirname, '../../../../architect-guard'
 const TSX_BIN = path.join(PROJECT_ROOT, 'node_modules', '.bin', 'tsx');
 
 const LEGACY_CLI_BIN_ALIASES: Record<string, string> = {
-  'pattern-graph-cli': 'architect',
   'generate-docs': 'architect-generate',
   'lint-patterns': 'architect-lint-patterns',
   'validate-patterns': 'architect-validate',
   'lint-process': 'architect-guard',
 };
 
-const SOURCE_EXECUTED_CLIS = new Set(['pattern-graph-cli', 'lint-patterns']);
+const SOURCE_EXECUTED_CLIS = new Set(['graph-cli', 'lint-patterns']);
 
 function createChildEnv(env: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
   const childEnv: NodeJS.ProcessEnv = { ...env, FORCE_COLOR: '0' };
@@ -126,7 +125,7 @@ export function getCLIPath(cliName: string): string {
 export async function runCLI(
   cliName: string,
   args: string[],
-  options: CLIOptions = {}
+  options: CLIOptions = {},
 ): Promise<CLIResult> {
   const {
     cwd = process.cwd(),
@@ -264,7 +263,7 @@ export function parseCommand(commandString: string): { command: string; args: st
  */
 export async function runCommand(
   commandString: string,
-  options: CLIOptions = {}
+  options: CLIOptions = {},
 ): Promise<CLIResult> {
   const { command, args } = parseCommand(commandString);
   return runCLI(command, args, options);

@@ -87,21 +87,21 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
   const thenFilesEndingWithShouldBeFound = (_ctx: unknown, table: DataTableRow[]) => {
     for (const row of table) {
       expect(state!.foundFiles.some((file) => file.endsWith(getRequiredCell(row, 'ending')))).toBe(
-        true
+        true,
       );
     }
   };
   const thenFilesEndingWithShouldNotBeFound = (_ctx: unknown, table: DataTableRow[]) => {
     for (const row of table) {
       expect(state!.foundFiles.some((file) => file.endsWith(getRequiredCell(row, 'ending')))).toBe(
-        false
+        false,
       );
     }
   };
   const thenFilesContainingShouldBeFound = (_ctx: unknown, table: DataTableRow[]) => {
     for (const row of table) {
       expect(
-        state!.foundFiles.some((file) => file.includes(getRequiredCell(row, 'substring')))
+        state!.foundFiles.some((file) => file.includes(getRequiredCell(row, 'substring'))),
       ).toBe(true);
     }
   };

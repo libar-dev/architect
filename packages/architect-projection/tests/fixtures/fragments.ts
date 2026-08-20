@@ -15,7 +15,7 @@ import {
   DeliverableSchema,
   DependencyEdgeSchema,
   DependencyEdgeSetSchema,
-  DependencyTreeSchema,
+  DependencyContextSchema,
   FileReadingListSchema,
   HandoffRecordSchema,
   OpenQuestionListSchema,
@@ -24,10 +24,8 @@ import {
   PatternCatalogSchema,
   PatternDetailSchema,
   PatternSummarySchema,
-  PhaseProgressSchema,
   PrChangeReviewSchema,
   ProjectConfigSnapshotSchema,
-  ReleaseNotesDigestSchema,
   RequirementDigestSchema,
   RoleProfileCollectionSchema,
   RoleProfileSchema,
@@ -46,9 +44,7 @@ import {
 } from '../../src/index.js';
 
 export type PublicFragmentKind =
-  | 'PhaseProgress'
   | 'StatusDistribution'
-  | 'ReleaseNotesDigest'
   | 'TraceabilityMatrix'
   | 'ProjectConfigSnapshot'
   | 'BusinessRuleReference'
@@ -83,7 +79,7 @@ export type PublicFragmentKind =
   | 'PatternDetail'
   | 'DependencyEdge'
   | 'DependencyEdgeSet'
-  | 'DependencyTree'
+  | 'DependencyContext'
   | 'ArchitectureNeighborhood'
   | 'OpenQuestionList'
   | 'OrphanPatternList';
@@ -98,7 +94,6 @@ const validDeliverable: Fragment = {
   location:
     'packages/architect-projection/src/fragments/execution-context/session-context-bundle.ts',
   finding: 'Keeps context/session projection contracts strict and JSON-safe.',
-  release: '2026-Q2',
 };
 
 const validScopeReadinessCheck: Fragment = {
@@ -121,7 +116,6 @@ const validBusinessRule: Fragment = {
   verifiedBy: ['governance schema feature', 'package typecheck'],
   scenarioCount: 2,
   pattern: 'ProjectionMigration',
-  phase: 5,
   productArea: 'DeliveryProcess',
 };
 
@@ -147,10 +141,16 @@ const validArchitectureDiagramFixture: Fragment = {
   kind: 'ArchitectureDiagram',
   scope: 'bounded-context',
   scopeValue: 'projection',
-  diagram: {
-    type: 'mermaid',
-    content: 'graph TD; A[PatternGraph] --> B[ProjectionContext]; B --> C[ArchitectureDiagram]',
-  },
+  sections: [
+    {
+      title: 'Bounded context: projection (3 patterns)',
+      diagram: {
+        type: 'mermaid',
+        content: 'graph TD; A[PatternGraph] --> B[ProjectionContext]; B --> C[ArchitectureDiagram]',
+      },
+      patterns: ['WidgetService', 'ProjectionContext', 'ArchitectureDiagramProjection'],
+    },
+  ],
   legend: [
     {
       type: 'heading',
@@ -163,21 +163,10 @@ const validArchitectureDiagramFixture: Fragment = {
       ordered: false,
     },
   ],
-  patterns: ['PatternGraphAPI', 'ProjectionContext', 'ArchitectureDiagramProjection'],
+  patterns: ['WidgetService', 'ProjectionContext', 'ArchitectureDiagramProjection'],
 };
 
 export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
-  PhaseProgress: {
-    kind: 'PhaseProgress',
-    phaseNumber: 4,
-    phaseName: 'Projection Cutover',
-    completed: 6,
-    active: 2,
-    planned: 3,
-    candidate: 1,
-    total: 12,
-    completionPercentage: 50,
-  },
   StatusDistribution: {
     kind: 'StatusDistribution',
     counts: {
@@ -193,39 +182,6 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
       planned: 16.7,
       candidate: 5.5,
     },
-  },
-  ReleaseNotesDigest: {
-    kind: 'ReleaseNotesDigest',
-    releases: [
-      {
-        release: 'v4.7.0',
-        date: '2026-04-19',
-        patterns: [
-          {
-            kind: 'PatternSummary',
-            patternName: 'ProjectionMigration',
-            status: 'completed',
-            role: 'service',
-            phase: 4,
-            file: 'packages/architect-projection/src/index.ts',
-            source: 'typescript',
-          },
-        ],
-        deliverables: [
-          {
-            name: 'Projection package',
-            status: 'completed',
-            tests: [
-              'packages/architect-projection/tests/features/fragments/delivery-reporting-schemas.feature',
-            ],
-            location: 'packages/architect-projection/src/index.ts',
-            finding: 'Consolidates fragment schemas behind one package boundary.',
-            release: 'v4.7.0',
-          },
-        ],
-        notes: 'Introduces strict Delivery Reporting fragments for timeline and reporting outputs.',
-      },
-    ],
   },
   TraceabilityMatrix: {
     kind: 'TraceabilityMatrix',
@@ -250,7 +206,6 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
     sourceGlobs: ['src/**/*.ts', 'tests/features/**/*.feature', '!dist/**'],
     buildTimeMs: 184,
     patternCount: 47,
-    phaseCount: 7,
     roleCount: 6,
     projectName: 'architect-studio',
   },
@@ -278,81 +233,79 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
   },
   SessionContextBundle: {
     kind: 'SessionContextBundle',
-    patterns: ['PerspectiveAwareProjections'],
+    patterns: ['SessionContextProjection'],
     sessionType: 'implement',
     metadata: [
       {
-        name: 'PerspectiveAwareProjections',
-        status: 'active',
-        phase: 49,
-        role: 'service',
-        file: 'packages/architect-query/src/api/context-assembler.ts',
-        summary: 'Builds session-oriented context for implementation work.',
+        name: 'SessionContextProjection',
+        status: 'completed',
+        role: 'projection',
+        file: 'packages/architect-projection/src/projections/execution-context/session-context.ts',
+        summary:
+          'Builds session-oriented context bundles for planning, design, and implement sessions.',
       },
     ],
-    specFiles: ['architect/specs/perspective-aware-projections.feature'],
-    stubs: [
-      {
-        stubFile: 'architect/stubs/perspectives.stub.ts',
-        targetPath: 'packages/architect-query/src/api/context-assembler.ts',
-        name: 'PerspectiveAwareProjectionsStub',
-      },
+    specFiles: [
+      'packages/architect-projection/tests/features/projections/execution-context/context-session.feature',
     ],
+    stubs: [],
     dependencies: [
       {
-        name: 'EnforcementConfiguration',
+        name: 'ExecutionContextProjectionSupport',
         status: 'completed',
-        file: 'packages/architect-core/src/config/enforcement.ts',
-        kind: 'planning',
+        file: 'packages/architect-projection/src/projections/execution-context/execution-context-shared.internal.ts',
+        kind: 'implementation',
       },
     ],
     sharedDependencies: [
       {
-        name: 'EnforcementConfiguration',
-        status: 'completed',
-        file: 'packages/architect-core/src/config/enforcement.ts',
-        kind: 'planning',
+        name: 'ProjectionFragmentContracts',
+        status: 'active',
+        file: 'packages/architect-projection/src/fragments/index.ts',
+        kind: 'implementation',
       },
     ],
     consumers: [
       {
-        name: 'ArchitectMcpServer',
-        status: 'active',
-        file: 'packages/architect-mcp/src/tool-registry.ts',
-        kind: 'implementation',
+        name: 'ArchitectBriefDeterministicBundle',
+        status: 'candidate',
+        file: 'architect/specs/architect-brief-deterministic-bundle.feature',
+        kind: 'planning',
       },
     ],
     architectureNeighbors: [
       {
-        name: 'ContextAssemblerImpl',
-        status: 'active',
-        role: 'service',
-        archContext: 'api',
-        file: 'packages/architect-query/src/api/context-assembler.ts',
+        name: 'ScopeReadinessProjection',
+        status: 'completed',
+        role: 'projection',
+        archContext: 'execution-context',
+        file: 'packages/architect-projection/src/projections/execution-context/scope-readiness.ts',
       },
     ],
     deliverables: [validDeliverable],
     fsm: {
-      currentStatus: 'active',
-      validTransitions: ['completed', 'deferred'],
-      protectionLevel: 'scope',
+      currentStatus: 'completed',
+      validTransitions: [],
+      protectionLevel: 'hard',
     },
     fsmByPattern: [
       {
-        pattern: 'PerspectiveAwareProjections',
+        pattern: 'SessionContextProjection',
         fsm: {
-          currentStatus: 'active',
-          validTransitions: ['completed', 'deferred'],
-          protectionLevel: 'scope',
+          currentStatus: 'completed',
+          validTransitions: [],
+          protectionLevel: 'hard',
         },
       },
     ],
-    testFiles: ['tests/features/query/context.feature'],
+    testFiles: [
+      'packages/architect-projection/tests/features/projections/execution-context/context-session.feature',
+    ],
   },
   ScopeReadinessCheck: validScopeReadinessCheck,
   ScopeReadinessReport: {
     kind: 'ScopeReadinessReport',
-    pattern: 'PerspectiveAwareProjections',
+    pattern: 'ScopeReadinessProjection',
     sessionType: 'implement',
     checks: [
       validScopeReadinessCheck,
@@ -377,18 +330,18 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
   },
   HandoffRecord: {
     kind: 'HandoffRecord',
-    pattern: 'PerspectiveAwareProjections',
+    pattern: 'HandoffProjection',
     status: 'active',
     sessionType: 'review',
     completed: [
-      'Projection schema bundle (packages/architect-projection/src/fragments/execution-context)',
+      'Execution-context projection bundle (packages/architect-projection/src/projections/execution-context)',
     ],
     inProgress: [
-      'Projection schema tests (packages/architect-projection/tests/features/fragments/execution-context-schemas.feature)',
+      'Execution-context projection tests (packages/architect-projection/tests/features/projections/execution-context/context-session.feature)',
     ],
     filesModified: [
-      'packages/architect-projection/src/fragments/execution-context/handoff-record.ts',
-      'packages/architect-projection/tests/features/fragments/execution-context-schemas.feature.steps.ts',
+      'packages/architect-projection/src/projections/execution-context/handoff.ts',
+      'packages/architect-projection/tests/features/projections/execution-context/context-session.steps.ts',
     ],
     discovered: [
       'Scope readiness and handoff contracts must align to the plan, not the legacy formatter shape.',
@@ -399,19 +352,23 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
   },
   FileReadingList: {
     kind: 'FileReadingList',
-    pattern: 'PerspectiveAwareProjections',
+    pattern: 'FileReadingListProjection',
     primary: [
-      'packages/architect-query/src/api/context-assembler.ts',
-      'packages/architect-query/src/api/scope-validator.ts',
+      'packages/architect-projection/src/projections/execution-context/session-context.ts',
+      'packages/architect-projection/src/projections/execution-context/scope-readiness.ts',
     ],
-    completedDeps: ['packages/architect-core/src/config/enforcement.ts'],
-    roadmapDeps: ['architect/specs/enforcement-configuration.feature'],
-    architectureNeighbors: ['packages/architect-query/src/api/handoff-generator.ts'],
+    completedDeps: [
+      'packages/architect-projection/src/projections/execution-context/execution-context-shared.internal.ts',
+    ],
+    roadmapDeps: ['packages/architect-projection/src/fragments/index.ts'],
+    architectureNeighbors: [
+      'packages/architect-projection/src/projections/execution-context/handoff.ts',
+    ],
   },
   Deliverable: validDeliverable,
   DeliverableManifest: {
     kind: 'DeliverableManifest',
-    pattern: 'PerspectiveAwareProjections',
+    pattern: 'SessionContextProjection',
     items: [
       validDeliverable,
       {
@@ -463,7 +420,7 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
       },
     ],
     relatedDecisions: ['ADR-003', 'ADR-005'],
-    affectedPatterns: ['PerspectiveAwareProjections', 'McpOutputSchemaValidation'],
+    affectedPatterns: ['ProjectionFragmentContracts', 'McpOutputSchemaValidation'],
   },
   DecisionCatalog: {
     kind: 'DecisionCatalog',
@@ -494,7 +451,7 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
           },
         ],
         relatedDecisions: ['ADR-003'],
-        affectedPatterns: ['PerspectiveAwareProjections'],
+        affectedPatterns: ['ProjectionFragmentContracts'],
       },
     ],
   },
@@ -555,14 +512,15 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
         statuses: ['roadmap', 'deferred'],
         meaning: 'Planning statuses remain editable.',
         canAddDeliverables: true,
-        needsUnlock: false,
+        unlockSuppressesWarning: false,
       },
       {
         level: 'hard',
         statuses: ['completed'],
-        meaning: 'Completed work is locked without an explicit unlock reason.',
+        meaning:
+          'Completed work is hard-locked; editing or reopening warns, unlock reason is optional (advisory).',
         canAddDeliverables: false,
-        needsUnlock: true,
+        unlockSuppressesWarning: true,
       },
     ],
   },
@@ -620,7 +578,7 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
     ],
     exampleOverrides: {
       enum: '@architect-status active',
-      csv: '@architect-uses PatternGraphAPI, ProjectionBundle',
+      csv: '@architect-uses WidgetService, ProjectionBundle',
     },
   },
   OverviewDigest: {
@@ -633,19 +591,6 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
       candidate: 1,
       percentage: 46,
     },
-    activePhases: [
-      {
-        phase: 4,
-        name: 'Projection Cutover',
-        patternCount: 5,
-        activeCount: 2,
-      },
-      {
-        phase: 5,
-        patternCount: 3,
-        activeCount: 2,
-      },
-    ],
     blocking: [
       {
         pattern: 'OperationalInsightsProjectionBodies',
@@ -685,7 +630,7 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
       },
       {
         kind: 'TagUsageEntry',
-        tag: 'quarter',
+        tag: 'bounded-context',
         count: 0,
         values: null,
       },
@@ -728,7 +673,7 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
     priority: 20,
     count: 5,
     description: 'Coordinates use cases and delegates to lower layers.',
-    examples: ['PatternGraphAPI', 'ContextAssemblerImpl'],
+    examples: ['WidgetService', 'ContextAssemblerImpl'],
   },
   RoleProfileCollection: {
     kind: 'RoleProfileCollection',
@@ -740,7 +685,7 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
         priority: 20,
         count: 5,
         description: 'Coordinates use cases and delegates to lower layers.',
-        examples: ['PatternGraphAPI', 'ContextAssemblerImpl'],
+        examples: ['WidgetService', 'ContextAssemblerImpl'],
       },
     ],
   },
@@ -799,15 +744,14 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
       count: false,
     },
     count: 1,
-    names: ['PatternGraphAPI'],
+    names: ['WidgetService'],
     items: [
       {
         kind: 'PatternSummary',
-        patternName: 'PatternGraphAPI',
+        patternName: 'WidgetService',
         status: 'active',
         role: 'infra',
-        phase: 2,
-        file: 'packages/architect-query/src/pattern-graph-api.ts',
+        file: 'packages/architect-query/src/graph-handle.ts',
         source: 'typescript',
       },
     ],
@@ -818,7 +762,7 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
       {
         name: 'api',
         patternCount: 2,
-        patterns: ['ContextAssemblerImpl', 'PatternGraphAPI'],
+        patterns: ['ContextAssemblerImpl', 'WidgetService'],
         layers: ['application'],
         roles: ['service'],
       },
@@ -853,20 +797,18 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
   },
   PatternSummary: {
     kind: 'PatternSummary',
-    patternName: 'PatternGraphAPI',
+    patternName: 'WidgetService',
     status: 'active',
     role: 'service',
-    phase: 2,
-    file: 'packages/architect-query/src/pattern-graph-api.ts',
+    file: 'packages/architect-query/src/graph-handle.ts',
     source: 'typescript',
   },
   PatternDetail: {
     kind: 'PatternDetail',
-    patternName: 'PatternGraphAPI',
+    patternName: 'WidgetService',
     status: 'active',
     role: 'service',
-    phase: 2,
-    file: 'packages/architect-query/src/pattern-graph-api.ts',
+    file: 'packages/architect-query/src/graph-handle.ts',
     source: 'typescript',
     description: 'Primary query facade over the PatternGraph read model.',
     deliverables: [
@@ -874,9 +816,8 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
         name: 'PatternGraph API module',
         status: 'active',
         tests: ['tests/features/query/pattern-graph.feature'],
-        location: 'packages/architect-query/src/pattern-graph-api.ts',
+        location: 'packages/architect-query/src/graph-handle.ts',
         finding: 'Keeps read operations centralized.',
-        release: '2026-Q2',
       },
     ],
     relationships: {
@@ -887,8 +828,8 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
       implementsPatterns: ['PatternGraphReadModel'],
       implementedBy: [
         {
-          name: 'PatternGraphAPIImpl',
-          file: 'packages/architect-query/src/pattern-graph-api.ts',
+          name: 'WidgetServiceImpl',
+          file: 'packages/architect-query/src/graph-handle.ts',
           description: 'Concrete API adapter',
         },
       ],
@@ -908,73 +849,81 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
     ],
     stubs: [
       {
-        stubFile: 'architect/stubs/query/pattern-graph-api.stub.ts',
-        targetPath: 'packages/architect-query/src/pattern-graph-api.ts',
-        name: 'PatternGraphAPIStub',
+        stubFile: 'architect/stubs/query/graph-handle.stub.ts',
+        targetPath: 'packages/architect-query/src/graph-handle.ts',
+        name: 'WidgetServiceStub',
       },
     ],
     deliverableManifest: {
-      pattern: 'PatternGraphAPI',
+      pattern: 'WidgetService',
       items: [
         {
           name: 'PatternGraph API module',
           status: 'active',
           tests: ['tests/features/query/pattern-graph.feature'],
-          location: 'packages/architect-query/src/pattern-graph-api.ts',
+          location: 'packages/architect-query/src/graph-handle.ts',
           finding: 'Keeps read operations centralized.',
-          release: '2026-Q2',
         },
       ],
     },
   },
   DependencyEdge: {
     kind: 'DependencyEdge',
-    from: 'PatternGraphAPI',
+    from: 'WidgetService',
     to: 'PatternGraph',
     relationKind: 'depends-on',
   },
   DependencyEdgeSet: {
     kind: 'DependencyEdgeSet',
-    from: 'PatternGraphAPI',
+    from: 'WidgetService',
     items: [
       {
         kind: 'DependencyEdge',
-        from: 'PatternGraphAPI',
+        from: 'WidgetService',
         to: 'PatternGraph',
         relationKind: 'depends-on',
       },
     ],
   },
-  DependencyTree: {
-    kind: 'DependencyTree',
-    root: 'PatternGraph',
-    nodes: [
+  DependencyContext: {
+    kind: 'DependencyContext',
+    focal: 'WidgetService',
+    upstream: [
       {
         name: 'PatternGraph',
         status: 'completed',
-        phase: 1,
-        isFocal: false,
         truncated: false,
         children: [
           {
-            name: 'PatternGraphAPI',
+            name: 'PatternHelpers',
             status: 'active',
-            phase: 2,
-            isFocal: true,
-            truncated: false,
+            truncated: true,
             children: [],
           },
         ],
       },
     ],
+    downstream: [
+      {
+        name: 'ApiReferenceProjection',
+        status: 'active',
+        truncated: false,
+        children: [],
+      },
+    ],
+    summary: {
+      upstreamDirect: 1,
+      upstreamTransitive: 2,
+      downstreamDirect: 1,
+      downstreamTransitive: 1,
+    },
     options: {
       maxDepth: 3,
-      includeImplementationDeps: true,
     },
   },
   ArchitectureNeighborhood: {
     kind: 'ArchitectureNeighborhood',
-    pattern: 'PatternGraphAPI',
+    pattern: 'WidgetService',
     context: 'api',
     role: 'service',
     layer: 'application',
@@ -982,12 +931,14 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
     usedBy: ['PatternBrowserView'],
     dependsOn: ['PatternGraph'],
     enables: ['ArchitectMcpServer'],
+    seeAlso: [],
+    enforcedBy: [],
     sameContext: ['ContextAssemblerImpl'],
     implements: ['PatternGraphReadModel'],
     implementedBy: [
       {
-        name: 'PatternGraphAPIImpl',
-        file: 'packages/architect-query/src/pattern-graph-api.ts',
+        name: 'WidgetServiceImpl',
+        file: 'packages/architect-query/src/graph-handle.ts',
         description: 'Concrete API adapter',
       },
     ],
@@ -1018,18 +969,6 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
 };
 
 export const FRAGMENT_INVALID_FIXTURES: Record<PublicFragmentKind, unknown> = {
-  PhaseProgress: {
-    kind: 'PhaseProgress',
-    phaseNumber: 4,
-    phaseName: 'Projection Cutover',
-    completed: 6,
-    active: 2,
-    planned: 3,
-    candidate: 1,
-    total: 12,
-    completionPercentage: 50,
-    extraField: true,
-  },
   StatusDistribution: {
     kind: 'StatusDistribution',
     counts: {
@@ -1046,18 +985,6 @@ export const FRAGMENT_INVALID_FIXTURES: Record<PublicFragmentKind, unknown> = {
       candidate: 5.5,
       total: 100,
     },
-  },
-  ReleaseNotesDigest: {
-    kind: 'ReleaseNotesDigest',
-    releases: [
-      {
-        release: 'v4.7.0',
-        patterns: [],
-        deliverables: [],
-        notes: 'strict schema should reject unknown properties',
-        markdown: '### forbidden presentation field',
-      },
-    ],
   },
   TraceabilityMatrix: {
     kind: 'TraceabilityMatrix',
@@ -1083,7 +1010,6 @@ export const FRAGMENT_INVALID_FIXTURES: Record<PublicFragmentKind, unknown> = {
     },
     buildTimeMs: 184,
     patternCount: 47,
-    phaseCount: 7,
     roleCount: 6,
   },
   BusinessRuleReference: {
@@ -1095,11 +1021,17 @@ export const FRAGMENT_INVALID_FIXTURES: Record<PublicFragmentKind, unknown> = {
   ArchitectureDiagram: {
     kind: 'ArchitectureDiagram',
     scope: 'component',
-    diagram: {
-      type: 'paragraph',
-      text: 'This must be a mermaid block.',
-    },
-    patterns: ['PatternGraphAPI'],
+    sections: [
+      {
+        title: 'Context Map',
+        diagram: {
+          type: 'paragraph',
+          text: 'This must be a mermaid block.',
+        },
+        patterns: ['WidgetService'],
+      },
+    ],
+    patterns: ['WidgetService'],
   },
   PrChangeReview: {
     kind: 'PrChangeReview',
@@ -1112,20 +1044,20 @@ export const FRAGMENT_INVALID_FIXTURES: Record<PublicFragmentKind, unknown> = {
   },
   SessionContextBundle: {
     kind: 'SessionContextBundle',
-    patterns: ['PerspectiveAwareProjections'],
+    patterns: ['SessionContextProjection'],
     sessionType: 'implement',
     metadata: [
       {
-        name: 'PerspectiveAwareProjections',
+        name: 'SessionContextProjection',
         role: 'service',
-        file: 'packages/architect-query/src/api/context-assembler.ts',
+        file: 'packages/architect-projection/src/projections/execution-context/session-context.ts',
         summary: 'Builds session-oriented context for implementation work.',
       },
     ],
     specFiles: [],
     stubs: [],
     dependencies: [],
-    sharedDependencies: ['EnforcementConfiguration'],
+    sharedDependencies: ['ProjectionFragmentContracts'],
     consumers: [],
     architectureNeighbors: [],
     deliverables: [],
@@ -1143,7 +1075,7 @@ export const FRAGMENT_INVALID_FIXTURES: Record<PublicFragmentKind, unknown> = {
   },
   ScopeReadinessReport: {
     kind: 'ScopeReadinessReport',
-    pattern: 'PerspectiveAwareProjections',
+    pattern: 'ScopeReadinessProjection',
     sessionType: 'planning',
     checks: [
       {
@@ -1160,7 +1092,7 @@ export const FRAGMENT_INVALID_FIXTURES: Record<PublicFragmentKind, unknown> = {
   },
   HandoffRecord: {
     kind: 'HandoffRecord',
-    pattern: 'PerspectiveAwareProjections',
+    pattern: 'HandoffProjection',
     sessionType: 'review',
     completed: [],
     inProgress: [],
@@ -1170,7 +1102,7 @@ export const FRAGMENT_INVALID_FIXTURES: Record<PublicFragmentKind, unknown> = {
   },
   FileReadingList: {
     kind: 'FileReadingList',
-    pattern: 'PerspectiveAwareProjections',
+    pattern: 'FileReadingListProjection',
     primary: [],
     completedDeps: [],
     roadmapDeps: [],
@@ -1188,7 +1120,7 @@ export const FRAGMENT_INVALID_FIXTURES: Record<PublicFragmentKind, unknown> = {
   },
   DeliverableManifest: {
     kind: 'DeliverableManifest',
-    pattern: 'PerspectiveAwareProjections',
+    pattern: 'SessionContextProjection',
     items: [
       {
         kind: 'Deliverable',
@@ -1290,7 +1222,6 @@ export const FRAGMENT_INVALID_FIXTURES: Record<PublicFragmentKind, unknown> = {
       candidate: 1,
       percentage: 101,
     },
-    activePhases: [],
     blocking: [],
   },
   AnnotationCoverage: {
@@ -1361,7 +1292,7 @@ export const FRAGMENT_INVALID_FIXTURES: Record<PublicFragmentKind, unknown> = {
       count: false,
     },
     count: 1,
-    names: ['PatternGraphAPI'],
+    names: ['WidgetService'],
     items: [],
     unexpected: true,
   },
@@ -1371,7 +1302,7 @@ export const FRAGMENT_INVALID_FIXTURES: Record<PublicFragmentKind, unknown> = {
       {
         name: 'api',
         patternCount: '2',
-        patterns: ['PatternGraphAPI'],
+        patterns: ['WidgetService'],
         layers: ['application'],
         roles: ['service'],
       },
@@ -1406,17 +1337,17 @@ export const FRAGMENT_INVALID_FIXTURES: Record<PublicFragmentKind, unknown> = {
   },
   PatternSummary: {
     kind: 'PatternSummary',
-    patternName: 'PatternGraphAPI',
+    patternName: 'WidgetService',
     role: 'service',
-    file: 'packages/architect-query/src/pattern-graph-api.ts',
+    file: 'packages/architect-query/src/graph-handle.ts',
     source: 'typescript',
     extraField: true,
   },
   PatternDetail: {
     kind: 'PatternDetail',
-    patternName: 'PatternGraphAPI',
+    patternName: 'WidgetService',
     role: 'service',
-    file: 'packages/architect-query/src/pattern-graph-api.ts',
+    file: 'packages/architect-query/src/graph-handle.ts',
     source: 'typescript',
     deliverables: [],
     relationships: {
@@ -1437,37 +1368,41 @@ export const FRAGMENT_INVALID_FIXTURES: Record<PublicFragmentKind, unknown> = {
   },
   DependencyEdge: {
     kind: 'DependencyEdge',
-    from: 'PatternGraphAPI',
+    from: 'WidgetService',
     to: 'PatternGraph',
     relationKind: 'blocked-by',
   },
   DependencyEdgeSet: {
     kind: 'DependencyEdgeSet',
-    from: 'PatternGraphAPI',
+    from: 'WidgetService',
     items: 'not-an-array',
   },
-  DependencyTree: {
-    kind: 'DependencyTree',
-    root: 'PatternGraph',
-    nodes: [
+  DependencyContext: {
+    kind: 'DependencyContext',
+    focal: 'WidgetService',
+    upstream: [
       {
-        name: 'PatternGraphAPI',
+        name: 'PatternGraph',
         status: 'active',
-        phase: 2,
-        isFocal: true,
         truncated: false,
         children: [],
         extraField: 'not allowed',
       },
     ],
+    downstream: [],
+    summary: {
+      upstreamDirect: 1,
+      upstreamTransitive: 1,
+      downstreamDirect: 0,
+      downstreamTransitive: 0,
+    },
     options: {
       maxDepth: 3,
-      includeImplementationDeps: true,
     },
   },
   ArchitectureNeighborhood: {
     kind: 'ArchitectureNeighborhood',
-    pattern: 'PatternGraphAPI',
+    pattern: 'WidgetService',
     context: 'api',
     role: 'service',
     layer: 'application',
@@ -1475,9 +1410,11 @@ export const FRAGMENT_INVALID_FIXTURES: Record<PublicFragmentKind, unknown> = {
     usedBy: ['PatternBrowserView'],
     dependsOn: ['PatternGraph'],
     enables: ['ArchitectMcpServer'],
+    seeAlso: [],
+    enforcedBy: [],
     sameContext: ['ContextAssemblerImpl'],
     implements: ['PatternGraphReadModel'],
-    implementedBy: ['PatternGraphAPIImpl'],
+    implementedBy: ['WidgetServiceImpl'],
   },
   OpenQuestionList: {
     kind: 'OpenQuestionList',
@@ -1503,9 +1440,7 @@ export const FRAGMENT_INVALID_FIXTURES: Record<PublicFragmentKind, unknown> = {
 };
 
 export const FRAGMENT_SCHEMAS: Record<PublicFragmentKind, ZodType<Fragment>> = {
-  PhaseProgress: PhaseProgressSchema,
   StatusDistribution: StatusDistributionSchema,
-  ReleaseNotesDigest: ReleaseNotesDigestSchema,
   TraceabilityMatrix: TraceabilityMatrixSchema,
   ProjectConfigSnapshot: ProjectConfigSnapshotSchema,
   ArchitectureDiagram: ArchitectureDiagramSchema,
@@ -1540,14 +1475,14 @@ export const FRAGMENT_SCHEMAS: Record<PublicFragmentKind, ZodType<Fragment>> = {
   PatternDetail: PatternDetailSchema,
   DependencyEdge: DependencyEdgeSchema,
   DependencyEdgeSet: DependencyEdgeSetSchema,
-  DependencyTree: DependencyTreeSchema,
+  DependencyContext: DependencyContextSchema,
   ArchitectureNeighborhood: ArchitectureNeighborhoodSchema,
   OpenQuestionList: OpenQuestionListSchema,
   OrphanPatternList: OrphanPatternListSchema,
 };
 
 export const FRAGMENT_KINDS: readonly PublicFragmentKind[] = Object.keys(
-  FRAGMENT_SCHEMAS
+  FRAGMENT_SCHEMAS,
 ) as PublicFragmentKind[];
 
 export const INVALID_ARCHITECTURE_DIAGRAM_SCOPE_FIXTURE: unknown = {

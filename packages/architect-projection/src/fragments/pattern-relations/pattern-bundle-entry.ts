@@ -1,5 +1,10 @@
 /**
+ * @architect
+ * @architect-pattern PatternBundleEntry
+ * @architect-status completed
+ * @architect-role:contract
  * @architect-bounded-context:pattern-relations
+ * @architect-uses BusinessRule, PatternSummary, PatternRelationsSupporting
  */
 import { z } from 'zod';
 
@@ -36,6 +41,10 @@ export const BundleBlockTokenEstimateSchema = z.strictObject({
 
 export const PatternBundleBlocksSchema = z.strictObject({
   docstring: z.string().optional(),
+  // True when `docstring` is a projected head and the source directive carries more
+  // design prose (same signal as PatternDetail.descriptionTruncated). Lets a bundle
+  // consumer distinguish "this is the whole directive" from "read the source for the rest".
+  docstringTruncated: z.boolean().optional(),
   rules: z.array(BusinessRuleSchema).optional(),
   scenarios: z.array(BundleScenarioDigestSchema).optional(),
   deps: PatternRelationshipsSchema.optional(),

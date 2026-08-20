@@ -7,12 +7,17 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Defines the `TaxonomyDigest` fragment shape for summarized tag and format-type counts.
  */
 import { z } from 'zod';
 
 import { FormatTypeEntrySchema, TagGroupEntrySchema } from './supporting.js';
 
+/**
+ * Summarized tag counts by category (roles, metadata, aggregation) plus a total.
+ *
+ * @architect-shape
+ */
 export const TaxonomyDigestCountSummarySchema = z.strictObject({
   roles: z.number().int().nonnegative(),
   metadata: z.number().int().nonnegative(),
@@ -20,6 +25,12 @@ export const TaxonomyDigestCountSummarySchema = z.strictObject({
   total: z.number().int().nonnegative(),
 });
 
+/**
+ * A digest of the tag taxonomy — grouped tag entries, the supported format
+ * types, and optional per-tag example overrides.
+ *
+ * @architect-shape
+ */
 export const TaxonomyDigestSchema = z.strictObject({
   kind: z.literal('TaxonomyDigest'),
   tags: z.array(TagGroupEntrySchema),
@@ -29,17 +40,3 @@ export const TaxonomyDigestSchema = z.strictObject({
 
 export type TaxonomyDigest = z.infer<typeof TaxonomyDigestSchema>;
 export type TaxonomyDigestCountSummary = z.infer<typeof TaxonomyDigestCountSummarySchema>;
-
-export function summarizeTaxonomyDigest(digest: TaxonomyDigest): TaxonomyDigestCountSummary {
-  const allEntries = digest.tags.flatMap((group) => group.entries);
-  const roles = allEntries.filter((entry) => entry.kind === 'role').length;
-  const metadata = allEntries.filter((entry) => entry.kind === 'metadata').length;
-  const aggregation = allEntries.filter((entry) => entry.kind === 'aggregation').length;
-
-  return {
-    roles,
-    metadata,
-    aggregation,
-    total: roles + metadata + aggregation,
-  };
-}

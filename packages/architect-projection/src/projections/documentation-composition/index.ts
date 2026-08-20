@@ -1,60 +1,46 @@
 /**
  * @architect-bounded-context:documentation-composition
  */
-export {
-  parseAndProjectArchitectureDiagram,
-  projectArchitectureDiagram,
-} from './architecture-diagram.js';
+export { parseAndProjectArchitectureDiagram } from './architecture-diagram.js';
 export type { ProjectArchitectureDiagramOptions } from './architecture-diagram.js';
+export {
+  projectTaxonomyEmbeddedShapes,
+  taxonomyGroupSource,
+  TAXONOMY_CLASSIFICATION_SOURCE,
+  TAXONOMY_CLASSIFICATION_TAGS,
+  TAXONOMY_EMBEDDED_GENERATORS,
+  TAXONOMY_FORMAL_SPEC_GENERATOR,
+  TAXONOMY_FUNCTION_GROUPS,
+  TAXONOMY_ROLE_ENUM_SOURCE,
+  TAXONOMY_SKILL_GENERATOR,
+  TAXONOMY_TAG_COUNT_SOURCE,
+} from './taxonomy-embedded.js';
+export type { TaxonomyEmbeddedGeneratorInfo, TaxonomyEmbeddedShape } from './taxonomy-embedded.js';
 export {
   ProjectConfigOptionsSchema,
   SourceGlobGroupsSchema,
   parseAndProjectConfig,
-  projectConfig,
 } from './project-config.js';
 export {
   ProjectDocumentationBundleOptionsSchema,
   parseAndProjectDocumentationBundle,
-  projectDocumentationBundle,
 } from './documentation-bundle.js';
 export type { ProjectDocumentationBundleOptions } from './documentation-bundle.js';
-export { parseAndProjectPrChangeReview, projectPrChangeReview } from './pr-change-review.js';
-export {
-  ContentRichnessSchema,
-  DisclosureSpecSchema,
-  GroupingAxisSchema,
-} from './disclosure-spec.js';
+export { parseAndProjectPrChangeReview } from './pr-change-review.js';
 export {
   SupportedDocumentationTypeRegistryEntrySchema,
   SUPPORTED_DOCUMENTATION_TYPE_REGISTRY,
   SUPPORTED_DOCUMENTATION_TYPES,
   getDocumentationTypeMetadata,
   getSupportedDocumentationTypeMetadata,
-  resolveProjectionFilter,
-} from './documentation-types.js';
-export {
-  LogicalRouteIdSchema,
-  LogicalRouteSegmentSchema,
-  PROGRESSIVE_DISCLOSURE_LEVELS,
-  PROGRESSIVE_DISCLOSURE_POLICY,
-  ProgressiveDisclosureLevelSchema,
-  ProgressiveDisclosurePolicySchema,
-  createChildRouteId,
-  createEntityRouteId,
-  createIndexRouteId,
-  isLogicalRouteId,
-} from './progressive-disclosure.js';
+} from './documentation-type-registry.js';
+export { resolveProjectionFilter } from './projection-filter-resolver.js';
+export { assertGeneratorNotDegenerate, GeneratorDegenerateError } from './degenerate-guard.js';
 export type { ProjectPrChangeReviewOptions } from './pr-change-review.js';
 export type { ProjectConfigOptions, SourceGlobGroups } from './project-config.js';
-export type { ContentRichness, DisclosureSpec, GroupingAxis } from './disclosure-spec.js';
 export type {
   DocumentationTypeMetadata,
   SupportedDocumentationTypeRegistryEntry,
   SupportedDocumentationType,
   SupportedDocumentationTypeMetadata,
-} from './documentation-types.js';
-export type {
-  LogicalRouteId,
-  ProgressiveDisclosureLevel,
-  ProgressiveDisclosurePolicy,
-} from './progressive-disclosure.js';
+} from './documentation-type-registry.js';

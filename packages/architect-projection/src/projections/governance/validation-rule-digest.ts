@@ -3,7 +3,7 @@
  * @architect-pattern ValidationRuleDigestProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses GovernanceProjectionSupport, ProjectionFragmentContracts
+ * @architect-uses GovernanceProjectionSupport, ProjectionFragmentContracts, ValidationRuleDigest
  * @architect-bounded-context:projection
  *
  * **Value:** Produces a `ValidationRuleDigest` fragment that describes the
@@ -14,7 +14,7 @@
  * **Invariant:** The digest always reports `roadmap` as the initial state,
  * computes terminal states from `VALID_TRANSITIONS`, and exposes a
  * protection-level entry per `PROTECTION_LEVELS` bucket with matching
- * statuses plus `canAddDeliverables` and `needsUnlock` flags.
+ * statuses plus `canAddDeliverables` and `unlockSuppressesWarning` flags.
  *
  * **Behavior:**
  * - Materializes the fixed validation rule list (completed-protection,
@@ -24,11 +24,12 @@
  *   `VALID_TRANSITIONS[from]` entry to a `from → to` edge with a
  *   human-readable description.
  * - Describes protection levels explicitly: planning editable, scope-locked
- *   active work, hard-locked completed work requiring unlock reason.
+ *   active work (advisory warning), completed work whose edits warn — all
+ *   advisory and unlock-suppressible (PDR-006), never a commit block.
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects the governance validation digest from the fixed rule catalog, FSM transitions, and protection-level buckets.
  */
 
 import type { ProjectionContext } from '../../context/projection-context.js';
@@ -37,7 +38,7 @@ import type { ValidationRuleDigest } from '../../fragments/governance/index.js';
 import { buildValidationRuleDigest } from './validation-rule-digest.internal.js';
 
 export function projectValidationRuleDigest(
-  context: ProjectionContext
+  _context: ProjectionContext,
 ): ProjectionBundle<ValidationRuleDigest> {
-  return projectSingle(buildValidationRuleDigest(context));
+  return projectSingle(buildValidationRuleDigest());
 }

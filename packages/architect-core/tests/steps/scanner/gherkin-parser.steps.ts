@@ -87,7 +87,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
   const thenScenarioShouldHaveProperties = (
     _ctx: unknown,
     index: number,
-    table: DataTableRow[]
+    table: DataTableRow[],
   ) => {
     if (!state!.result?.ok) throw new Error('Parse did not succeed');
     const scenario = state!.result.value.scenarios[index - 1];
@@ -108,7 +108,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
     _ctx: unknown,
     scenarioIndex: number,
     stepIndex: number,
-    table: DataTableRow[]
+    table: DataTableRow[],
   ) => {
     if (!state!.result?.ok) throw new Error('Parse did not succeed');
     const step = state!.result.value.scenarios[scenarioIndex - 1]?.steps[stepIndex - 1];
@@ -121,7 +121,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
   const thenScenariosShouldHaveNames = (_ctx: unknown, table: DataTableRow[]) => {
     if (!state!.result?.ok) throw new Error('Parse did not succeed');
     expect(state!.result.value.scenarios.map((scenario) => scenario.name)).toEqual(
-      table.map((row) => row['name'])
+      table.map((row) => row['name']),
     );
   };
   const thenErrorShouldReferenceFile = (_ctx: unknown, fileName: string) => {

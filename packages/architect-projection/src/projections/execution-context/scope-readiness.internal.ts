@@ -2,9 +2,7 @@
  * @architect-bounded-context:execution-context
  */
 /**
- * Private helpers used exclusively by the scope-readiness fragment.
- *
- * Part of the ExecutionContextProjectionSupport utility surface.
+ * Builds the scope-readiness checks and verdicts for design and implement sessions.
  */
 
 import type { ExtractedPattern } from '@libar-dev/architect-core';
@@ -41,7 +39,7 @@ export type ScopeReadinessOptions = z.infer<typeof ScopeReadinessOptionsSchema>;
 
 export function buildScopeReadinessReport(
   context: ProjectionContext,
-  options: ScopeReadinessOptions
+  options: ScopeReadinessOptions,
 ): ScopeReadinessReport {
   const pattern = requirePattern(context, options.pattern);
   const patternName = getPatternName(pattern);
@@ -70,7 +68,7 @@ export function buildScopeReadinessReport(
 
 function buildDependenciesCompletedCheck(
   context: ProjectionContext,
-  patternName: string
+  patternName: string,
 ): ScopeReadinessCheck {
   const relationships = getRelationships(context, patternName);
   const dependencies = relationships?.dependsOn ?? [];
@@ -199,13 +197,13 @@ function buildFsmAllowsTransitionCheck(pattern: ExtractedPattern): ScopeReadines
 
 function buildDesignDecisionsRecordedCheck(
   context: ProjectionContext,
-  patternName: string
+  patternName: string,
 ): ScopeReadinessCheck {
   const stubPatterns = findStubPatterns(context, patternName);
   const decisionCount = stubPatterns.reduce(
     (count, stubPattern) =>
       count + extractDecisionReferences(stubPattern.directive.description).length,
-    0
+    0,
   );
 
   if (decisionCount > 0) {
@@ -259,7 +257,7 @@ function buildExecutableSpecsSetCheck(pattern: ExtractedPattern): ScopeReadiness
 
 function buildDependencyStubCheck(
   context: ProjectionContext,
-  pattern: ExtractedPattern
+  pattern: ExtractedPattern,
 ): ScopeReadinessCheck {
   const dependencies =
     getRelationships(context, getPatternName(pattern))?.dependsOn ?? pattern.uses ?? [];
@@ -307,7 +305,7 @@ function createScopeReadinessCheck(check: Omit<ScopeReadinessCheck, 'kind'>): Sc
 }
 
 function deriveScopeVerdict(
-  checks: readonly ScopeReadinessCheck[]
+  checks: readonly ScopeReadinessCheck[],
 ): ScopeReadinessReport['verdict'] {
   if (checks.some((check) => !check.passed && check.severity === 'error')) {
     return 'BLOCKED';
@@ -322,7 +320,9 @@ function deriveScopeVerdict(
 
 function promoteStrictScopeReadiness(report: ScopeReadinessReport): ScopeReadinessReport {
   const checks = report.checks.map((check) =>
-    !check.passed && check.severity === 'warning' ? { ...check, severity: 'error' as const } : check
+    !check.passed && check.severity === 'warning'
+      ? { ...check, severity: 'error' as const }
+      : check,
   );
 
   return {
@@ -334,15 +334,15 @@ function promoteStrictScopeReadiness(report: ScopeReadinessReport): ScopeReadine
 
 function findStubPatterns(
   context: ProjectionContext,
-  implementedPattern: string
+  implementedPattern: string,
 ): ExtractedPattern[] {
   const lowerImplementedPattern = implementedPattern.toLowerCase();
   return context.graph.patterns.filter(
     (pattern) =>
       pattern.source.file.includes('/stubs/') &&
       (pattern.implementsPatterns ?? []).some(
-        (entry) => entry.toLowerCase() === lowerImplementedPattern
-      )
+        (entry) => entry.toLowerCase() === lowerImplementedPattern,
+      ),
   );
 }
 

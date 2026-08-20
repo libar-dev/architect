@@ -29,7 +29,6 @@ interface PatternFixtureOptions {
   readonly status?: ExtractedPattern['status'];
   readonly maturity?: PatternMaturity;
   readonly role?: ExtractedPattern['role'];
-  readonly phase?: ExtractedPattern['phase'];
   readonly file?: string;
   readonly description?: string;
   readonly boundedContext?: ExtractedPattern['boundedContext'];
@@ -40,20 +39,14 @@ interface PatternFixtureOptions {
   readonly executableSpecs?: ExtractedPattern['executableSpecs'];
   readonly behaviorFile?: ExtractedPattern['behaviorFile'];
   readonly productArea?: ExtractedPattern['productArea'];
-  readonly userRole?: ExtractedPattern['userRole'];
-  readonly businessValue?: ExtractedPattern['businessValue'];
   readonly adr?: ExtractedPattern['adr'];
-  readonly quarter?: ExtractedPattern['quarter'];
   readonly team?: ExtractedPattern['team'];
-  readonly effort?: ExtractedPattern['effort'];
-  readonly priority?: ExtractedPattern['priority'];
-  readonly useCases?: readonly string[];
+  readonly workflow?: ExtractedPattern['workflow'];
   readonly rules?: readonly RuleFixture[];
 }
 
 interface ProjectionContextOptions {
   readonly patterns: readonly ExtractedPattern[];
-  readonly phaseNames?: Record<number, string>;
   readonly relationshipIndex?: Record<string, RelationshipEntry>;
   readonly tagRegistry?: TagRegistry;
   readonly packageResolver?: PackageResolver;
@@ -68,7 +61,6 @@ export function createPattern(name: string, options: PatternFixtureOptions = {})
     ...(options.status !== undefined ? { status: options.status } : {}),
     ...(options.maturity !== undefined ? { maturity: options.maturity } : {}),
     ...(options.role !== undefined ? { role: options.role } : {}),
-    ...(options.phase !== undefined ? { phase: options.phase } : {}),
     ...(options.description !== undefined ? { description: options.description } : {}),
     ...(options.boundedContext !== undefined ? { boundedContext: options.boundedContext } : {}),
     ...(options.adrLayer !== undefined ? { adrLayer: options.adrLayer } : {}),
@@ -78,14 +70,9 @@ export function createPattern(name: string, options: PatternFixtureOptions = {})
     ...(options.executableSpecs !== undefined ? { executableSpecs: options.executableSpecs } : {}),
     ...(options.behaviorFile !== undefined ? { behaviorFile: options.behaviorFile } : {}),
     ...(options.productArea !== undefined ? { productArea: options.productArea } : {}),
-    ...(options.userRole !== undefined ? { userRole: options.userRole } : {}),
-    ...(options.businessValue !== undefined ? { businessValue: options.businessValue } : {}),
     ...(options.adr !== undefined ? { adr: options.adr } : {}),
-    ...(options.quarter !== undefined ? { quarter: options.quarter } : {}),
     ...(options.team !== undefined ? { team: options.team } : {}),
-    ...(options.effort !== undefined ? { effort: options.effort } : {}),
-    ...(options.priority !== undefined ? { priority: options.priority } : {}),
-    ...(options.useCases !== undefined ? { useCases: options.useCases } : {}),
+    ...(options.workflow !== undefined ? { workflow: options.workflow } : {}),
     ...(options.rules !== undefined ? { rules: options.rules } : {}),
   });
   _nextPatternId += 1;
@@ -93,7 +80,7 @@ export function createPattern(name: string, options: PatternFixtureOptions = {})
 }
 
 export function createRelationshipEntry(
-  overrides: Partial<RelationshipEntry> = {}
+  overrides: Partial<RelationshipEntry> = {},
 ): RelationshipEntry {
   return {
     uses: overrides.uses ?? [],
@@ -106,6 +93,8 @@ export function createRelationshipEntry(
     extendedBy: overrides.extendedBy ?? [],
     seeAlso: overrides.seeAlso ?? [],
     apiRef: overrides.apiRef ?? [],
+    enforcesDecisions: overrides.enforcesDecisions ?? [],
+    enforcedBy: overrides.enforcedBy ?? [],
   };
 }
 
@@ -132,7 +121,6 @@ export function createProjectionContext(options: ProjectionContextOptions): Proj
 function createPatternGraph(options: ProjectionContextOptions): PatternGraph {
   return buildGraphFromPatterns({
     patterns: options.patterns,
-    phaseNames: options.phaseNames,
     relationshipIndex: options.relationshipIndex,
     tagRegistry: options.tagRegistry ?? createTagRegistry(),
   });

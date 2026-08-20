@@ -2,9 +2,8 @@
  * @architect-bounded-context:documentation-composition
  */
 /**
- * Private helpers used exclusively by the project-config fragment.
- *
- * Part of the DocumentationCompositionProjectionSupport utility surface.
+ * Builds the project-config options schema and snapshot helpers for
+ * documentation-composition projections.
  */
 
 import { z } from 'zod';
@@ -38,7 +37,7 @@ export type ProjectConfigOptions = z.infer<typeof ProjectConfigOptionsSchema>;
 
 export function buildProjectConfigSnapshot(
   context: ProjectionContext,
-  options: ProjectConfigOptions
+  options: ProjectConfigOptions,
 ): ProjectConfigSnapshot {
   return {
     kind: 'ProjectConfigSnapshot',
@@ -48,12 +47,11 @@ export function buildProjectConfigSnapshot(
       ...options.sourceGlobs.input,
       ...options.sourceGlobs.features,
       ...(options.sourceGlobs.exclude ?? []).map((entry) =>
-        entry.trim().startsWith('!') ? entry : `!${entry}`
+        entry.trim().startsWith('!') ? entry : `!${entry}`,
       ),
     ]),
     buildTimeMs: options.buildTimeMs,
     patternCount: context.graph.patterns.length,
-    phaseCount: context.graph.phaseCount,
     roleCount: context.graph.roleCount,
     ...(resolveProjectName(context, options.projectName) !== undefined
       ? { projectName: resolveProjectName(context, options.projectName) }
@@ -63,7 +61,7 @@ export function buildProjectConfigSnapshot(
 
 function resolveProjectName(
   context: ProjectionContext,
-  explicitProjectName: string | undefined
+  explicitProjectName: string | undefined,
 ): string | undefined {
   if (hasText(explicitProjectName)) {
     return explicitProjectName.trim();

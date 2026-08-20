@@ -48,8 +48,6 @@ function makeGraph(patterns: ExtractedPattern[]): PatternGraph {
     byStatus: { candidate: [], roadmap: [], active: patterns, completed: [], deferred: [] },
     byNormalizedStatus: { completed: [], active: patterns, planned: [], candidate: [] },
     byMaturity: {},
-    byPhase: [],
-    byQuarter: {},
     byRole: {},
     bySourceType: { typescript: patterns, gherkin: [], roadmap: [], prd: [] },
     byProductArea: {},
@@ -60,10 +58,8 @@ function makeGraph(patterns: ExtractedPattern[]): PatternGraph {
       candidate: 0,
       total: patterns.length,
     },
-    phaseCount: 0,
     roleCount: 0,
     relationshipIndex: {},
-    nameIndex: new Map(patterns.map((p) => [(p.patternName ?? p.name).toLowerCase(), p])),
   };
 
   PatternGraphSchema.parse(graph);
@@ -99,7 +95,7 @@ describeFeature(feature, ({ Background, Rule }) => {
         state.externality = classifyEdgeExternality(
           state.graph!,
           findPattern('AlphaCore'),
-          'BetaCore'
+          'BetaCore',
         );
       });
       Then('the edge externality equals "internal"', () => {
@@ -114,7 +110,7 @@ describeFeature(feature, ({ Background, Rule }) => {
         state.externality = classifyEdgeExternality(
           state.graph!,
           findPattern('AlphaCore'),
-          'GammaGuard'
+          'GammaGuard',
         );
       });
       Then('the edge externality equals "external"', () => {
@@ -129,7 +125,7 @@ describeFeature(feature, ({ Background, Rule }) => {
         state.externality = classifyEdgeExternality(
           state.graph!,
           findPattern('AlphaCore'),
-          'DeltaUnknown'
+          'DeltaUnknown',
         );
       });
       Then('the edge externality equals "dangling"', () => {
@@ -156,7 +152,7 @@ describeFeature(feature, ({ Background, Rule }) => {
             } finally {
               spy.mockRestore();
             }
-          }
+          },
         );
 
         Then('the declared-pattern index is built {int} time', (_ctx: unknown, count: number) => {
@@ -166,7 +162,7 @@ describeFeature(feature, ({ Background, Rule }) => {
         And('the classified edges equal "internal" and "external" in order', () => {
           expect(state.externalities).toEqual(['internal', 'external']);
         });
-      }
+      },
     );
   });
 });

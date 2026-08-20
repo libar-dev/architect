@@ -1,12 +1,12 @@
 # 02 — Artifact Types
 
-> **Architect Spec v0.2.0** — The four artifact types, their directory conventions, and naming rules.
+> **Architect Spec v0.2.0** — The three authored artifact types, their directory conventions, and naming rules.
 
 ---
 
 ## Overview
 
-The Architect Spec defines four artifact types. Each type serves a distinct purpose in the
+The Architect Spec defines three authored artifact types. Each type serves a distinct purpose in the
 architecture-connected specification system, has its own structural conventions, and lives
 in a designated directory.
 
@@ -15,10 +15,13 @@ in a designated directory.
 | **Feature Spec**                 | Gherkin `.feature` | `architect/specs/`        | Behavioral specification with architecture metadata |
 | **Architecture Decision Record** | Gherkin `.feature` | `architect/decisions/`    | Formalized architecture decision with rationale     |
 | **Design Stub**                  | TypeScript `.ts`   | `architect/stubs/<name>/` | Interface and type definitions as design artifacts  |
-| **Release Manifest**             | Gherkin `.feature` | `architect/releases/`     | Release staging and inventory tracking              |
 
-All four types use the same `@architect-*` tag system (§03) but differ in required tags,
+All three authored artifact types use the same `@architect-*` tag system (§03) but differ in required tags,
 structural sections, and lifecycle behavior.
+
+Release reporting is a **derived view**, not an authored artifact type. When a project needs
+release deltas or changelog material, it derives them from git tags and graph state instead of
+maintaining `architect/releases/` manifests.
 
 ## Canonical Directory Layout
 
@@ -33,7 +36,6 @@ project-root/
     decisions/              # Architecture Decision Records (.feature)
     stubs/                  # Design stubs (.ts), one directory per pattern (ephemeral)
       <pattern-name>/       # kebab-case directory matching pattern name
-    releases/               # Release manifests (.feature)
     briefs/                 # Optional: pre-candidate Markdown briefs
     tag-taxonomy.md         # OPTIONAL: project-specific tag taxonomy reference (informative)
   architect.config.ts       # Project configuration (§11)
@@ -75,13 +77,12 @@ natural grouping for related specs.
 
 A key distinction in the directory layout:
 
-| Location               | Lifecycle                                     | Purpose                                    |
-| ---------------------- | --------------------------------------------- | ------------------------------------------ |
-| `architect/specs/`     | **Ephemeral** — deleted during implementation | Candidate, plan, and design specs          |
-| `architect/stubs/`     | **Ephemeral** — deleted during implementation | Design-level interface definitions         |
-| `architect/decisions/` | **Permanent**                                 | Architecture decisions (historical record) |
-| `architect/releases/`  | **Permanent**                                 | Release tracking                           |
-| `tests/features/`      | **Permanent** — created during implementation | Executable specs (living tests)            |
+| Location               | Lifecycle                                                                                                                  | Purpose                                                                         |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `architect/specs/`     | **Ephemeral** — deleted during implementation                                                                              | Candidate, plan, and design specs                                               |
+| `architect/stubs/`     | **Promoted** — code/contract stub moves to `src/` during implementation (identity persists, ADR-003); staging copy removed | Design-level interface definitions, embryos of shipped code-originated patterns |
+| `architect/decisions/` | **Permanent**                                                                                                              | Architecture decisions (historical record)                                      |
+| `tests/features/`      | **Permanent** — created during implementation                                                                              | Executable specs (living tests)                                                 |
 
 During implementation, value transfers from ephemeral artifacts to permanent ones:
 
@@ -113,15 +114,15 @@ The executable spec is the permanent artifact. The design-level spec is construc
 
 **Required tags (Level 2):**
 
-| Tag                          | Purpose                       |
-| ---------------------------- | ----------------------------- |
-| `@architect`                 | Gate tag (opt-in)             |
-| `@architect-pattern`         | PascalCase pattern name       |
-| `@architect-status`          | FSM state                     |
-| `@architect-product-area`    | Product area grouping         |
-| `@architect-bounded-context` | Architecture grouping         |
+| Tag                          | Purpose                                                            |
+| ---------------------------- | ------------------------------------------------------------------ |
+| `@architect`                 | Gate tag (opt-in)                                                  |
+| `@architect-pattern`         | PascalCase pattern name                                            |
+| `@architect-status`          | FSM state                                                          |
+| `@architect-product-area`    | Product area grouping                                              |
+| `@architect-bounded-context` | Architecture grouping                                              |
 | `@architect-arch-layer`      | Architecture layer (`domain` \| `application` \| `infrastructure`) |
-| `@architect-role`            | Canonical role                |
+| `@architect-role`            | Canonical role                                                     |
 
 > _Informative:_ Earlier draft versions of this spec also listed `@architect-phase`,
 > `@architect-effort`, `@architect-priority`, and `@architect-release` as required.
@@ -151,15 +152,15 @@ for process-level rather than architecture-level decisions.
 
 **Required tags (Level 2):**
 
-| Tag                       | Purpose                                                             |
-| ------------------------- | ------------------------------------------------------------------- |
-| `@architect`              | Gate tag                                                            |
-| `@architect-adr`          | ADR number (e.g., `004`)                                            |
-| `@architect-adr-status`   | Decision status: `proposed`, `accepted`, `deprecated`, `superseded` |
-| `@architect-adr-category` | Category: `architecture`, `process`, `testing`, `documentation`     |
-| `@architect-pattern`      | Pattern name (ADR prefix convention: `ADR004PatternName`)           |
-| `@architect-status`       | FSM state (typically `completed` for accepted ADRs)                 |
-| `@architect-product-area` | Product area                                                        |
+| Tag                       | Purpose                                                                                                                                                |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `@architect`              | Gate tag                                                                                                                                               |
+| `@architect-adr`          | ADR number (e.g., `004`)                                                                                                                               |
+| `@architect-adr-status`   | Decision status: `proposed`, `accepted`, `deprecated` in live-state bootstrap deployments; append-only deployments may additionally model `superseded` |
+| `@architect-adr-category` | Category: `architecture`, `process`, `testing`, `documentation`                                                                                        |
+| `@architect-pattern`      | Pattern name (ADR prefix convention: `ADR004PatternName`)                                                                                              |
+| `@architect-status`       | FSM state (typically `completed` for accepted ADRs)                                                                                                    |
+| `@architect-product-area` | Product area                                                                                                                                           |
 
 **Required structural sections:**
 
@@ -197,44 +198,10 @@ plan-level to design-level. They MUST NOT be created for plan-level specs.
 
 1. Stub created in `architect/stubs/<name>/` during design-level spec work
 2. Stub used as reference during implementation
-3. Implementation created in `src/` (or equivalent) following the stub's contracts
-4. Stub deleted after implementation is complete and tests pass
+3. Implementation created in `src/` (or equivalent) at `@architect-target`, following the stub's contracts
+4. Stub **promoted**, not discarded: its `@architect-pattern` identity (role, decisions, use-cases) travels with the code to `src/` and persists there as a code-originated pattern (ADR-003), its `@architect-status` advancing `roadmap → completed`; only the now-redundant staging copy under `architect/stubs/` is removed once tests pass. (A _step-definition_ stub carries no `@architect-pattern` and is deleted outright — §08.)
 
 **Full format specification:** §07 — Stub Format.
-
-## Type 4: Release Manifest
-
-**File format:** Gherkin `.feature`
-**Directory:** `architect/releases/`
-**Naming:** `vX.Y.Z.feature` or `vNEXT.feature`
-
-Release manifests are lightweight Gherkin files that serve as staging areas for tracking
-what is included in a release. They are primarily descriptive — they contain no Rules
-and no Scenarios.
-
-**Required tags (Level 2):**
-
-| Tag                       | Purpose                                            |
-| ------------------------- | -------------------------------------------------- |
-| `@architect`              | Gate tag                                           |
-| `@architect-status`       | Typically `active` for the current staging release |
-| `@architect-product-area` | Product area                                       |
-
-> _Informative:_ The release version identifier comes from the file name
-> (`vNEXT.feature` / `vX.Y.Z.feature`) rather than a dedicated tag. Earlier drafts of
-> this spec listed `@architect-release` as a required tag; it is not part of the v0.2.0
-> canonical taxonomy.
-
-**Structural conventions:**
-
-- Feature title: `vX.Y.Z - Release Description`
-- Feature description: manifest of included specs, decisions, and stubs
-- No `Rule:` blocks, no `Scenario:` blocks, no `Background: Deliverables`
-- May include release process documentation as Gherkin prose
-
-> _Informative:_ Release manifests do not carry an `@architect-pattern` tag because
-> they represent a temporal grouping (what's in this release), not an architectural
-> pattern. This is intentional — releases are metadata, not architecture.
 
 ## File Naming Rules
 
@@ -244,7 +211,6 @@ and no Scenarios.
 | ADR           | `adr-NNN-kebab-case-title.feature`    | `adr-001-mcp-communication.feature`, `adr-004-lifecycle-architecture.feature` |
 | PDR           | `pdr-NNN-kebab-case-title.feature`    | `pdr-001-session-workflow.feature`                                            |
 | Design stub   | `kebab-case-name.ts` (in pattern dir) | `architect/stubs/ipc-bridge/architect-bridge.ts`                              |
-| Release       | `vVERSION.feature`                    | `vNEXT.feature`, `v1.0.0.feature`                                             |
 
 **Pattern name to file name mapping:**
 
@@ -260,5 +226,5 @@ and no Scenarios.
 | Recording an architecture or technology decision    | ADR                                          |
 | Recording a process or methodology decision         | PDR                                          |
 | Defining interfaces and types before implementation | Design Stub                                  |
-| Tracking what's included in the next release        | Release Manifest                             |
+| Tracking what shipped between releases              | Git tags + derived release reporting view    |
 | Capturing pre-plan intent before writing a spec     | Feature Brief (Markdown, outside spec scope) |

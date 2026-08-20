@@ -8,7 +8,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects a pattern bundle entry and exposes parse-and-project option handling for bundle mode and include selection.
  */
 
 import type { ProjectionContext } from '../../context/projection-context.js';
@@ -29,7 +29,7 @@ export type { PatternBundleOptions } from './bundle.internal.js';
 
 export function projectPatternBundle(
   context: ProjectionContext,
-  options: PatternBundleOptions
+  options: PatternBundleOptions,
 ): ProjectionBundle<PatternBundleEntry> {
   return buildPatternBundle(context, options);
 }
@@ -37,5 +37,5 @@ export function projectPatternBundle(
 export const parseAndProjectPatternBundle = parseAndProject(
   PatternBundleOptionsSchema,
   projectPatternBundle,
-  'parseAndProjectPatternBundle'
+  'parseAndProjectPatternBundle',
 );

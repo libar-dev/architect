@@ -3,7 +3,7 @@
  * @architect-pattern DeliverableProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses ExecutionContextProjectionSupport, ProjectionFragmentContracts
+ * @architect-uses ExecutionContextProjectionSupport, ProjectionFragmentContracts, Deliverable, DeliverableManifest
  * @architect-bounded-context:projection
  *
  * **Value:** Lets consumers render a pattern's full `DeliverableManifest` or
@@ -24,7 +24,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects deliverable manifests and single deliverable lookups for execution-context consumers.
  */
 
 import type { ProjectionContext } from '../../context/projection-context.js';
@@ -35,7 +35,7 @@ import { buildDeliverable, buildDeliverableManifest } from './deliverables.inter
 
 export function projectDeliverableManifest(
   context: ProjectionContext,
-  pattern: string
+  pattern: string,
 ): ProjectionBundle<DeliverableManifest> | undefined {
   const manifest = buildDeliverableManifest(context, pattern);
   return manifest === undefined ? undefined : projectSingle(manifest);
@@ -44,7 +44,7 @@ export function projectDeliverableManifest(
 export function projectDeliverable(
   context: ProjectionContext,
   pattern: string,
-  name: string
+  name: string,
 ): ProjectionBundle<Deliverable> | undefined {
   const deliverable = buildDeliverable(context, pattern, name);
   return deliverable === undefined ? undefined : projectSingle(deliverable);

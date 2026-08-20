@@ -4,10 +4,7 @@
  * @architect-status active
  * @architect-role:utility
  * @architect-bounded-context:read-api
- *
- * ### When to Use
- *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * @architect-uses ExtractedPattern, PatternGraph, PatternHelpers
  */
 import type { ExtractedPattern } from '../validation-schemas/extracted-pattern.js';
 import type { PatternGraph } from '../validation-schemas/pattern-graph.js';
@@ -63,11 +60,7 @@ export function aggregateTagUsage(dataset: PatternGraph): TagUsageReport {
     increment('status', pattern.status);
     if (pattern.role !== undefined) increment('role', pattern.role);
     if (pattern.boundedContext !== undefined) increment('arch-context', pattern.boundedContext);
-    if (pattern.phase !== undefined) increment('phase', String(pattern.phase));
-    if (pattern.priority !== undefined) increment('priority', pattern.priority);
-    if (pattern.quarter !== undefined) increment('quarter', pattern.quarter);
     if (pattern.team !== undefined) increment('team', pattern.team);
-    if (pattern.effort !== undefined) increment('effort', pattern.effort);
   }
 
   const tags: TagUsageEntry[] = [];

@@ -1,4 +1,30 @@
 /**
+ * @architect
+ * @architect-pattern BrandedIdentifiers
+ * @architect-status active
+ * @architect-role:contract
+ * @architect-bounded-context:domain
+ *
+ * ## BrandedIdentifiers - Nominal Identity Primitives
+ *
+ * Zod-branded nominal types — `PatternId`, `ModuleId`, `RoleName`,
+ * `SourceFilePath`, `OutputFilePath`, `RegistryFilePath`, `DirectiveTag` —
+ * paired with their `as*` smart constructors. This is the compile-time
+ * nominal-typing seam that keeps raw strings from masquerading as domain
+ * identifiers across the scanner, extractors, `ExtractedPattern` records,
+ * doc-directive parsing, and the config schemas. A foundational root primitive
+ * with no outbound pattern edges.
+ *
+ * ### When to Use
+ *
+ * - Branding a raw string into a typed identifier at a trust boundary
+ *   (`asPatternId`, `asSourceFilePath`, etc.).
+ * - Accepting or returning an identifier in a contract where nominal safety
+ *   matters more than the underlying `string`.
+ * - Composing schemas that need a branded identifier field.
+ */
+
+/**
  * Native Zod branded types for compile-time nominal safety.
  *
  */

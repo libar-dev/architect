@@ -1,3 +1,11 @@
+/**
+ * @architect
+ * @architect-pattern ProjectConfigSchema
+ * @architect-status active
+ * @architect-role:codec
+ * @architect-bounded-context:configuration
+ * @architect-uses ProjectConfigContract, PackageMatcherContract, FormatTypeDomain
+ */
 import { z } from 'zod';
 
 import type { ArchitectProjectConfig } from './project-config.js';
@@ -55,7 +63,7 @@ export const GeneratorSourceOverrideSchema = z
     {
       message:
         'replaceFeatures and additionalFeatures are mutually exclusive — use one or the other',
-    }
+    },
   );
 
 const ContextInferenceRuleSchema = z.strictObject({

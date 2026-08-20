@@ -3,7 +3,7 @@
  * @architect-pattern OperationalInsightsProjectionSupport
  * @architect-status completed
  * @architect-role:utility
- * @architect-uses ProjectionFragmentContracts
+ * @architect-uses ProjectionFragmentContracts, BusinessRuleReference, ExtractedPattern
  * @architect-bounded-context:projection
  *
  * ## Operational insights projection support
@@ -32,7 +32,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects the operational-insights support surface used by the fragment builders below.
  */
 
 import type { ExtractedPattern } from '@libar-dev/architect-core';
@@ -42,9 +42,10 @@ import {
   isPatternComplete,
   isPatternPlanned,
   normalizeStatus,
+  ProjectionError,
 } from '@libar-dev/architect-core';
 
-import { heading, list, paragraph, type Block } from '../../blocks/schema.js';
+import { heading, list, mermaid, paragraph, type Block } from '@libar-dev/architect-core';
 import type { ProjectionContext } from '../../context/projection-context.js';
 import type { BusinessRuleReference } from '../../fragments/governance/index.js';
 import { projectSingle, type ProjectionBundle } from '../../fragments/base.js';
@@ -62,7 +63,17 @@ import {
   type SourceInventoryEntry,
   type TagUsageMatrix,
 } from '../../fragments/operational-insights/index.js';
-import type { RequirementEntry } from '../../fragments/operational-insights/supporting.js';
+import type {
+  OrientationReference,
+  OverviewArchitecture,
+  OverviewOrientation,
+  RequirementEntry,
+  RoleCount,
+} from '../../fragments/operational-insights/supporting.js';
+import {
+  assembleContextMap,
+  collectComponentGraph,
+} from '../_shared/architecture-graph.internal.js';
 import { filterPatterns } from '../_shared/filter.js';
 import { getPatternName, getRelationships } from '../_shared/pattern-helpers.internal.js';
 import {
@@ -73,6 +84,7 @@ import {
   createRequirementPackageIndexRouteId,
   type RequirementDocumentationBucket,
 } from '../documentation-composition/requirement-routes.js';
+import { SUPPORTED_DOCUMENTATION_TYPE_IDENTITIES } from '../documentation-composition/documentation-type-registry.identity.js';
 
 type RoleDefinition = NonNullable<ProjectionContext['graph']['tagRegistry']['roles']>[number];
 
@@ -101,27 +113,205 @@ const SOURCE_TYPE_PRIORITY = new Map<string, number>([
 ]);
 
 const OVERVIEW_CLI_HINTS: readonly string[] = [
-  '=== DATA API — Use Instead of Explore Agents ===',
-  'pnpm architect:query -- <subcommand>',
+  '=== READ SURFACE — the graph handle (ADR-014; use instead of grep / Explore agents) ===',
+  "pnpm architect:q '<js>'             evaluate a script against the live graph handle (g)",
   '',
-  '  overview                             Project health (this output)',
-  '  context <pattern> --session <type>   Curated context bundle (planning/design/implement)',
-  '  scope-validate <pattern> <session>   Pre-flight check before starting work',
-  '  dep-tree <pattern>                   Dependency chains',
-  '  list --status roadmap                Available patterns to work on',
-  '  context <pattern> --session design   Includes stubs in the curated bundle',
-  '  files <pattern>                      File paths for a pattern',
-  '  rules                                Business rules from Gherkin',
-  '  arch blocking                        Patterns stuck on incomplete deps',
+  '  ORIENT',
+  '    g.graph.counts                        Status distribution · g.graph.byStatus.active current work',
+  "    g.findByConcept('<phrase>')           Fuzzy concept → ranked patterns",
+  '    docs-live/ARCHITECTURE.md             THE architecture map · docs-live/TAXONOMY.md the tag set',
+  '  INSPECT A PATTERN',
+  "    g.pattern('<Name>')                   Decoded node: status · role · edges · maturity",
+  "    g.graph.patterns.find(p => p.name === '<Name>')  Full canonical record",
+  "    g.invariantsOf('<Name>')              Invariants, labeled live-test vs authored",
+  '  NAVIGATE / IMPACT',
+  "    g.byFile('<path>') · g.bySymbol('<X>')  File / symbol → architectural context",
+  '    g.blastRadius(changedFiles)           Exhaustive impact + at-risk specs',
+  '  GATE',
+  '    g.fsm.isValidTransition(from, to)     Deterministic FSM check',
+  '    architect_scope_validate (MCP)        PASS / WARN / BLOCKED readiness verdict',
   '',
-  'Full reference: pnpm architect:query -- --help',
-  'Agent environments: load the `architect-data-api` skill for verb shapes, deterministic gates, and known quirks.',
+  'Named demos + the CI gate: pnpm architect:graph <census|blast|fan-in|drift|dangling|...>',
+  'Load the `architect-graph-handle` skill for the full surface, shapes, and recipes.',
 ];
+
+/**
+ * The high-signal generated docs a cold-start agent should read first, by
+ * documentation-type key. The overview owns this curation (which subset counts
+ * as "orientation" is a presentation concern), but the reference CONTENT —
+ * title and typed tool-call hint — is derived from the canonical documentation-type registry, and
+ * `buildOrientationReferences` fails loud if a key here is absent from the
+ * registry, so the two cannot silently drift.
+ */
+const ORIENTATION_DOC_KEYS: readonly string[] = [
+  'decisions',
+  'taxonomy',
+  'validation-rules',
+  'business-rules',
+  'api-reference',
+];
+
+/**
+ * One-line note teaching the typed `disclosure` input field on the
+ * `architect_documentation` MCP tool (the tier vocabulary the orientation docs
+ * accept).
+ */
+const OVERVIEW_DISCLOSURE_HINT =
+  'Call architect_documentation with { documentType, disclosure: "essential" | "important" | "useful" | "advanced" } to control depth.';
+
+/** Roadmap patterns to name in the "safe to start" sample before collapsing to a count. */
+const OVERVIEW_STARTABLE_SAMPLE_LIMIT = 8;
+
+/**
+ * The generated documentation surfaces this graph projects, each fetchable via
+ * `architect_documentation` (MCP) or `docs-live/`. Derived from the canonical
+ * documentation-type registry so the count and list never drift from the
+ * supported set. Rendered terse by default (one line) and itemized at `full`
+ * disclosure.
+ */
+const OVERVIEW_GENERATED_VIEWS: readonly { docType: string; verb: string; summary: string }[] =
+  SUPPORTED_DOCUMENTATION_TYPE_IDENTITIES.map((identity) => ({
+    docType: identity.key,
+    verb: `architect_documentation { documentType: "${identity.key}" }`,
+    summary: identity.description,
+  }));
+
+/**
+ * The one-line "explore via the live graph, not grep" pointer rendered under
+ * the architecture glimpse — names the handle / MCP cuts that drill from the
+ * chart into the PatternGraph.
+ */
+const OVERVIEW_ARCHITECTURE_POINTER =
+  "Explore via the live graph, not grep: `docs-live/ARCHITECTURE.md` · `g.pattern('<Name>')` · `architect_arch_neighborhood` · `architect_dep_tree`";
+
+/**
+ * Resolves the curated orientation-doc keys against the canonical
+ * documentation-type registry, deriving each reference's typed tool-call hint + title from the
+ * single source. Fails loud if a key in `ORIENTATION_DOC_KEYS` is not a
+ * supported documentation type, so the curated subset cannot silently drift
+ * away from the registry.
+ */
+function buildOrientationReferences(): OrientationReference[] {
+  return ORIENTATION_DOC_KEYS.map((key) => {
+    const identity = SUPPORTED_DOCUMENTATION_TYPE_IDENTITIES.find(
+      (candidate) => candidate.key === key,
+    );
+    if (identity === undefined) {
+      throw new Error(
+        `Orientation doc key "${key}" is not a supported documentation type — ` +
+          'update ORIENTATION_DOC_KEYS or the documentation-type registry.',
+      );
+    }
+    return {
+      docType: identity.key,
+      verb: `architect_documentation { documentType: "${identity.key}" }`,
+      title: identity.displayTitle,
+    };
+  });
+}
+
+/** Tallies the precomputed `@architect-role` of each pattern into a sorted distribution. */
+function buildRoleDistribution(patterns: readonly ExtractedPattern[]): RoleCount[] {
+  const counts = new Map<string, number>();
+  for (const pattern of patterns) {
+    if (pattern.role !== undefined) {
+      counts.set(pattern.role, (counts.get(pattern.role) ?? 0) + 1);
+    }
+  }
+  return [...counts.entries()]
+    .map(([role, count]) => ({ role, count }))
+    .sort((left, right) => right.count - left.count || left.role.localeCompare(right.role));
+}
+
+/**
+ * Builds the high-level architecture glimpse for the overview: a coarse
+ * package-level context map (always) plus the richer bounded-context map
+ * (identical grouping to `docs-live/ARCHITECTURE.md`). Both derive from ONE
+ * component-scope node/edge collection so the frequently requested projection pays a single
+ * graph walk; the renderer decides which chart each disclosure level shows.
+ *
+ * Best-effort: the glimpse needs every component node's source file to resolve
+ * to a configured workspace package. In a fully-configured repo it always does.
+ * In a consumer repo (or test fixture) that has not declared `packages`
+ * matchers, the shared resolver raises `UNMAPPED_PACKAGE` by design — so we omit
+ * the glimpse (returning `undefined`) rather than crash this resilience-critical
+ * health projection. The same config gap still fails LOUDLY in `docs:all` /
+ * `validate:all`, which share the resolver's hard-error contract, so omitting
+ * here hides nothing. Any other error is a real bug and propagates.
+ */
+function buildOverviewArchitecture(context: ProjectionContext): OverviewArchitecture | undefined {
+  const componentGraph = ((): ReturnType<typeof collectComponentGraph> | undefined => {
+    try {
+      return collectComponentGraph(context);
+    } catch (error) {
+      // The core `ProjectionError` is raised only for `UNMAPPED_PACKAGE` (its
+      // sole code), thrown by the package resolver — the architecture projection
+      // uses a *different* `ProjectionError` class, so this `instanceof` is
+      // precise. Any other error is a real bug and propagates.
+      if (error instanceof ProjectionError) {
+        return undefined;
+      }
+      throw error;
+    }
+  })();
+  if (componentGraph === undefined) {
+    return undefined;
+  }
+
+  const { nodes, edges } = componentGraph;
+  const packageChart = assembleContextMap(nodes, edges, 'package');
+  const contextMap = assembleContextMap(nodes, edges, 'component');
+
+  return {
+    packageChart: mermaid(packageChart.mermaid),
+    packageCount: packageChart.groupCount,
+    contextMap: mermaid(contextMap.mermaid),
+    contextNodeCount: contextMap.groupCount,
+    pointer: OVERVIEW_ARCHITECTURE_POINTER,
+  };
+}
 
 export function buildOverviewDigest(context: ProjectionContext): OverviewDigest {
   const patterns = filterPatterns(context.graph.patterns, context.projectionFilter);
   const counts = createStatusCounts(patterns);
   const total = counts.total - counts.candidate;
+  const architecture = buildOverviewArchitecture(context);
+
+  const blocking = patterns.flatMap((pattern) => {
+    if (isPatternComplete(pattern.status)) {
+      return [];
+    }
+
+    const patternName = getPatternName(pattern);
+    const relationships = getRelationships(context, patternName);
+    if (relationships === undefined) {
+      return [];
+    }
+
+    const blockedBy = relationships.dependsOn.filter((dependencyName) => {
+      const dependency = findPatternByName(context.graph, dependencyName);
+      return dependency !== undefined && !isPatternComplete(dependency.status);
+    });
+
+    return blockedBy.length === 0
+      ? []
+      : [{ pattern: patternName, status: pattern.status, blockedBy }];
+  });
+
+  // "Safe to start": roadmap-status patterns that are NOT blocked (complement of
+  // BLOCKING). Surfaced with equal prominence to BLOCKING so a cold-start agent
+  // sees workable items, not only the wall of work it cannot begin.
+  const blockedNames = new Set(blocking.map((entry) => entry.pattern));
+  const startableNames = patterns
+    .filter((pattern) => pattern.status === 'roadmap' && !blockedNames.has(getPatternName(pattern)))
+    .map((pattern) => getPatternName(pattern));
+
+  const orientation: OverviewOrientation = {
+    references: buildOrientationReferences(),
+    disclosureHint: OVERVIEW_DISCLOSURE_HINT,
+    startableCount: startableNames.length,
+    startableSample: startableNames.slice(0, OVERVIEW_STARTABLE_SAMPLE_LIMIT),
+  };
 
   return {
     kind: 'OverviewDigest',
@@ -133,55 +323,18 @@ export function buildOverviewDigest(context: ProjectionContext): OverviewDigest 
       candidate: counts.candidate,
       percentage: total > 0 ? Math.round((counts.completed / total) * 100) : 0,
     },
-    activePhases: context.graph.byPhase
-      .map((group) => {
-        const phasePatterns = filterPatterns(group.patterns, context.projectionFilter);
-        return {
-          group,
-          phasePatterns,
-          counts: createStatusCounts(phasePatterns),
-        };
-      })
-      .filter(({ counts }) => counts.active > 0)
-      .map((group) => ({
-        phase: group.group.phaseNumber,
-        name: group.group.phaseName,
-        patternCount: group.phasePatterns.length,
-        activeCount: group.counts.active,
-      })),
-    blocking: patterns.flatMap((pattern) => {
-      if (isPatternComplete(pattern.status)) {
-        return [];
-      }
-
-      const patternName = getPatternName(pattern);
-      const relationships = getRelationships(context, patternName);
-      if (relationships === undefined) {
-        return [];
-      }
-
-      const blockedBy = relationships.dependsOn.filter((dependencyName) => {
-        const dependency = findPatternByName(context.graph, dependencyName);
-        return dependency !== undefined && !isPatternComplete(dependency.status);
-      });
-
-      return blockedBy.length === 0
-        ? []
-        : [
-            {
-              pattern: patternName,
-              status: pattern.status,
-              blockedBy,
-            },
-          ];
-    }),
+    blocking,
+    orientation,
+    roleDistribution: buildRoleDistribution(patterns),
+    ...(architecture !== undefined ? { architecture } : {}),
+    generatedViews: OVERVIEW_GENERATED_VIEWS.map((view) => ({ ...view })),
     cliHints: [...OVERVIEW_CLI_HINTS],
   };
 }
 
 export function buildAnnotationCoverage(context: ProjectionContext): AnnotationCoverage {
   const files = collectSourceFileEntries(
-    filterPatterns(context.graph.patterns, context.projectionFilter)
+    filterPatterns(context.graph.patterns, context.projectionFilter),
   );
   const requiredTags = resolveRequiredCoverageTags(context);
   const gapsByTag = new Map<string, string[]>();
@@ -219,7 +372,7 @@ export function buildAnnotationCoverage(context: ProjectionContext): AnnotationC
         .map(([tag, filePaths]) => [
           tag,
           [...filePaths].sort((left, right) => left.localeCompare(right)),
-        ])
+        ]),
     ),
   };
 }
@@ -234,11 +387,8 @@ export function buildTagUsageMatrix(context: ProjectionContext): TagUsageMatrix 
     if (pattern.boundedContext !== undefined)
       incrementTagUsage(tagMap, 'arch-context', pattern.boundedContext);
     if (pattern.adrLayer !== undefined) incrementTagUsage(tagMap, 'arch-layer', pattern.adrLayer);
-    if (pattern.phase !== undefined) incrementTagUsage(tagMap, 'phase', String(pattern.phase));
-    if (pattern.priority !== undefined) incrementTagUsage(tagMap, 'priority', pattern.priority);
-    if (pattern.quarter !== undefined) incrementTagUsage(tagMap, 'quarter', pattern.quarter);
     if (pattern.team !== undefined) incrementTagUsage(tagMap, 'team', pattern.team);
-    if (pattern.effort !== undefined) incrementTagUsage(tagMap, 'effort', pattern.effort);
+    if (pattern.workflow !== undefined) incrementTagUsage(tagMap, 'workflow', pattern.workflow);
   }
 
   return {
@@ -286,13 +436,13 @@ export function buildSourceInventory(context: ProjectionContext): SourceInventor
         right.count - left.count ||
         (SOURCE_TYPE_PRIORITY.get(left.type) ?? Number.MAX_SAFE_INTEGER) -
           (SOURCE_TYPE_PRIORITY.get(right.type) ?? Number.MAX_SAFE_INTEGER) ||
-        left.type.localeCompare(right.type)
+        left.type.localeCompare(right.type),
     );
 }
 
 export function buildRoleProfile(
   context: ProjectionContext,
-  role: string
+  role: string,
 ): RoleProfile | undefined {
   const definition = resolveRoleDefinition(context, role);
   if (definition === undefined) {
@@ -304,27 +454,29 @@ export function buildRoleProfile(
 
 export function buildRoleProfiles(context: ProjectionContext): RoleProfile[] {
   return context.graph.tagRegistry.roles.map((definition) =>
-    createRoleProfile(context, definition)
+    createRoleProfile(context, definition),
   );
 }
 
 export function buildRequirementDigest(
   context: ProjectionContext,
-  productArea?: string
+  productArea?: string,
 ): RequirementDigest {
   const sourceEntries = createRequirementSourceEntries(context, productArea);
 
   return createRequirementDigest(
     productArea ?? 'All Product Areas',
     sourceEntries.map(({ entry }) => entry),
-    sourceEntries.flatMap(({ pattern }) => createBusinessRuleReferencesForPattern(context, pattern))
+    sourceEntries.flatMap(({ pattern }) =>
+      createBusinessRuleReferencesForPattern(context, pattern),
+    ),
   );
 }
 
 function incrementTagUsage(
   tagMap: Map<string, Map<string, number>>,
   tag: string,
-  value: string
+  value: string,
 ): void {
   const values = tagMap.get(tag) ?? new Map<string, number>();
   values.set(value, (values.get(value) ?? 0) + 1);
@@ -332,7 +484,7 @@ function incrementTagUsage(
 }
 
 function collectSourceFileEntries(
-  patterns: readonly ExtractedPattern[]
+  patterns: readonly ExtractedPattern[],
 ): Map<string, readonly ExtractedPattern[]> {
   const grouped = new Map<string, ExtractedPattern[]>();
 
@@ -345,7 +497,7 @@ function collectSourceFileEntries(
   return new Map(
     [...grouped.entries()]
       .sort(([left], [right]) => left.localeCompare(right))
-      .map(([file, filePatterns]) => [file, [...filePatterns]] as const)
+      .map(([file, filePatterns]) => [file, [...filePatterns]] as const),
   );
 }
 
@@ -368,7 +520,7 @@ function resolveRequiredCoverageTags(context: ProjectionContext): string[] {
 function fileSatisfiesTag(
   context: ProjectionContext,
   patterns: readonly ExtractedPattern[],
-  tag: string
+  tag: string,
 ): boolean {
   return patterns.some((pattern) => patternSatisfiesTag(context, pattern, tag));
 }
@@ -376,7 +528,7 @@ function fileSatisfiesTag(
 function patternSatisfiesTag(
   context: ProjectionContext,
   pattern: ExtractedPattern,
-  tag: string
+  tag: string,
 ): boolean {
   switch (tag) {
     case 'status':
@@ -388,39 +540,14 @@ function patternSatisfiesTag(
     case 'arch-layer':
     case 'layer':
       return hasNonEmptyString(pattern.adrLayer);
-    case 'phase':
-      return pattern.phase !== undefined;
-    case 'priority':
-      return hasNonEmptyString(pattern.priority);
-    case 'quarter':
-      return hasNonEmptyString(pattern.quarter);
     case 'team':
       return hasNonEmptyString(pattern.team);
-    case 'effort':
-      return hasNonEmptyString(pattern.effort);
-    case 'effort-actual':
-      return hasNonEmptyString(pattern.effortActual);
     case 'product-area':
       return hasNonEmptyString(pattern.productArea);
-    case 'user-role':
-      return hasNonEmptyString(pattern.userRole);
-    case 'business-value':
-      return hasNonEmptyString(pattern.businessValue);
     case 'workflow':
       return hasNonEmptyString(pattern.workflow);
-    case 'risk':
-      return hasNonEmptyString(pattern.risk);
-    case 'release':
-      return hasNonEmptyString(pattern.release);
-    case 'completed':
-      return hasNonEmptyString(pattern.completed);
     case 'target-path':
       return hasNonEmptyString(pattern.targetPath);
-    case 'since':
-      return hasNonEmptyString(pattern.since);
-    case 'usecase':
-    case 'use-case':
-      return (pattern.useCases?.length ?? 0) > 0;
     case 'depends-on': {
       const relationships = getRelationships(context, getPatternName(pattern));
       return (relationships?.dependsOn.length ?? pattern.uses?.length ?? 0) > 0;
@@ -492,12 +619,12 @@ function deriveLocationPattern(files: readonly string[]): string {
 
 function resolveRoleDefinition(
   context: ProjectionContext,
-  role: string
+  role: string,
 ): RoleDefinition | undefined {
   const normalizedRole = role.toLowerCase();
   return context.graph.tagRegistry.roles.find(
     (definition) =>
-      definition.tag === normalizedRole || definition.aliases?.includes(normalizedRole) === true
+      definition.tag === normalizedRole || definition.aliases?.includes(normalizedRole) === true,
   );
 }
 
@@ -517,7 +644,7 @@ function createRoleProfile(context: ProjectionContext, definition: RoleDefinitio
 
 function resolvePatternsForRole(
   context: ProjectionContext,
-  definition: RoleDefinition
+  definition: RoleDefinition,
 ): ExtractedPattern[] {
   const indexed = context.graph.byRole[definition.tag];
   if (indexed !== undefined) {
@@ -528,12 +655,12 @@ function resolvePatternsForRole(
     (pattern) =>
       pattern.role !== undefined &&
       (pattern.role.toLowerCase() === definition.tag ||
-        definition.aliases?.includes(pattern.role.toLowerCase()) === true)
+        definition.aliases?.includes(pattern.role.toLowerCase()) === true),
   );
 }
 
 function createStatusCounts(
-  patterns: readonly ExtractedPattern[]
+  patterns: readonly ExtractedPattern[],
 ): ProjectionContext['graph']['counts'] {
   return {
     completed: patterns.filter((pattern) => isPatternComplete(pattern.status)).length,
@@ -546,7 +673,7 @@ function createStatusCounts(
 
 function createRequirementSourceEntries(
   context: ProjectionContext,
-  productArea?: string
+  productArea?: string,
 ): RequirementSourceEntry[] {
   return resolveRequirementPatterns(context, productArea).map((pattern) => {
     const packageId = context.packageResolver(pattern.source.file).id;
@@ -560,7 +687,7 @@ function createRequirementSourceEntries(
 }
 
 function createRequirementProjectionSourceData(
-  context: ProjectionContext
+  context: ProjectionContext,
 ): RequirementProjectionSourceData {
   const sourceEntries = createRequirementSourceEntries(context);
 
@@ -578,7 +705,7 @@ function createRequirementProjectionSourceData(
 function createRequirementDigest(
   productArea: string,
   requirements: readonly RequirementEntry[],
-  businessRuleReferences: readonly BusinessRuleReference[] = []
+  businessRuleReferences: readonly BusinessRuleReference[] = [],
 ): RequirementDigest {
   return {
     kind: 'RequirementDigest',
@@ -589,14 +716,14 @@ function createRequirementDigest(
 }
 
 function dedupeBusinessRuleReferences(
-  businessRuleReferences: readonly BusinessRuleReference[]
+  businessRuleReferences: readonly BusinessRuleReference[],
 ): BusinessRuleReference[] {
   const deduped = new Map<string, BusinessRuleReference>();
 
   for (const reference of businessRuleReferences) {
     deduped.set(
       `${reference.ownerRouteId}::${reference.feature}::${reference.ruleName}`,
-      reference
+      reference,
     );
   }
 
@@ -605,11 +732,11 @@ function dedupeBusinessRuleReferences(
 
 function createBusinessRuleReferencesForPattern(
   context: ProjectionContext,
-  pattern: ExtractedPattern
+  pattern: ExtractedPattern,
 ): readonly BusinessRuleReference[] {
   const feature = getPatternName(pattern);
   const ownerRouteId = createBusinessRuleOwnerRouteId(
-    context.packageResolver(pattern.source.file).id
+    context.packageResolver(pattern.source.file).id,
   );
 
   return (pattern.rules ?? []).map((rule) => ({
@@ -622,21 +749,15 @@ function createBusinessRuleReferencesForPattern(
 
 function resolveRequirementPatterns(
   context: ProjectionContext,
-  productArea: string | undefined
+  productArea: string | undefined,
 ): ExtractedPattern[] {
   const patterns =
     productArea !== undefined
       ? [...(context.graph.byProductArea[productArea] ?? [])]
-      : context.graph.patterns.filter(
-          (pattern) =>
-            hasNonEmptyString(pattern.productArea) ||
-            hasNonEmptyString(pattern.userRole) ||
-            hasNonEmptyString(pattern.businessValue)
-        );
+      : context.graph.patterns.filter((pattern) => hasNonEmptyString(pattern.productArea));
 
   return filterPatterns(patterns, context.projectionFilter)
     .filter((pattern) => pattern.adr === undefined)
-    .filter((pattern) => !ARCHITECT_RELEASE_RE.test(pattern.source.file))
     .sort((left, right) => {
       if (productArea === undefined) {
         const areaCompare = (left.productArea ?? '').localeCompare(right.productArea ?? '');
@@ -689,15 +810,10 @@ function createRequirementOwnerRouteId(pattern: ExtractedPattern, packageId: str
 function buildRequirementDescription(pattern: ExtractedPattern): Block[] {
   const blocks: Block[] = [];
   const description = pattern.directive.description.trim();
-  const useCases = pattern.useCases ?? [];
   const rules = pattern.rules ?? [];
 
   if (description.length > 0) {
     blocks.push(heading(2, 'Requirement'), paragraph(description));
-  }
-
-  if (useCases.length > 0) {
-    blocks.push(heading(3, 'Use Cases'), list([...useCases]));
   }
 
   if (rules.length > 0) {
@@ -731,7 +847,7 @@ function resolveRequirementTestFiles(pattern: ExtractedPattern): string[] {
  * @architect-pattern AnnotationCoverageProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses OperationalInsightsProjectionSupport
+ * @architect-uses OperationalInsightsProjectionSupport, AnnotationCoverage
  * @architect-bounded-context:projection
  *
  * ## Annotation coverage projection
@@ -758,10 +874,10 @@ function resolveRequirementTestFiles(pattern: ExtractedPattern): string[] {
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects the annotation coverage fragment for CI gates and dashboards.
  */
 export function projectAnnotationCoverage(
-  context: ProjectionContext
+  context: ProjectionContext,
 ): ProjectionBundle<AnnotationCoverage> {
   return projectSingle(buildAnnotationCoverage(context));
 }
@@ -771,19 +887,21 @@ export function projectAnnotationCoverage(
  * @architect-pattern OverviewProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses OperationalInsightsProjectionSupport
+ * @architect-uses OperationalInsightsProjectionSupport, OverviewDigest, ArchitectureDiagram
  * @architect-bounded-context:projection
  *
  * ## Overview projection
  *
  * **Value:** Assembles the canonical `architect_overview` payload — delivery
- * progress, active phases, blocked patterns, and the CLI-hints block — as an
- * `OverviewDigest` fragment that session-start workflows consume directly.
+ * progress, blocked patterns, a high-level architecture glimpse, and the
+ * CLI-hints block — as an `OverviewDigest` fragment that session-start
+ * workflows consume directly.
  *
  * **Invariant:** `progress` always excludes candidates from the total;
- * `activePhases` only lists phases with `active > 0`; `blocking` only lists
- * non-complete patterns whose `dependsOn` targets are themselves not
- * complete; `cliHints` is a copy of the shared bootstrap list.
+ * `blocking` only lists non-complete patterns whose `dependsOn` targets are
+ * themselves not complete; the `architecture` glimpse derives from one
+ * component-scope graph walk (test-features + decision-records excluded);
+ * `cliHints` is a copy of the shared bootstrap list.
  *
  * **Behavior:**
  * - Pulls `graph.counts` for the delivery-total progress block, rounding the
@@ -791,15 +909,18 @@ export function projectAnnotationCoverage(
  * - Walks each incomplete pattern's relationships via `getRelationships`,
  *   filtering `dependsOn` for dependencies that are not complete, and emits
  *   a `{pattern, status, blockedBy}` entry when any exist.
+ * - Builds a coarse package-level context map plus the bounded-context map
+ *   (mirroring `docs-live/ARCHITECTURE.md`) via the shared architecture-graph
+ *   helpers, so the renderer can show the architecture shape at a glance.
  * - Copies `OVERVIEW_CLI_HINTS` into the fragment so consumers do not need
  *   to re-derive the bootstrap command list.
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects the overview digest used by session-start workflows and CLI bootstrap hints.
  */
 export function projectOverviewDigest(
-  context: ProjectionContext
+  context: ProjectionContext,
 ): ProjectionBundle<OverviewDigest> {
   return projectSingle(buildOverviewDigest(context));
 }
@@ -809,7 +930,7 @@ export function projectOverviewDigest(
  * @architect-pattern RequirementDigestProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses OperationalInsightsProjectionSupport
+ * @architect-uses OperationalInsightsProjectionSupport, RequirementDigest
  * @architect-bounded-context:projection
  *
  * ## Requirement digest projection
@@ -830,7 +951,7 @@ export function projectOverviewDigest(
  * **Behavior:**
  * - Filters patterns by `graph.byProductArea[productArea]` when a product
  *   area is supplied, otherwise includes any pattern with a non-empty
- *   `productArea`, `userRole`, or `businessValue`.
+ *   `productArea`.
  * - Builds each description from the pattern's directive description, use
  *   cases, and rule names using the `heading`/`paragraph`/`list` block
  *   helpers, falling back to a single placeholder paragraph when nothing
@@ -842,11 +963,11 @@ export function projectOverviewDigest(
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects the general requirement digest used by Studio UI and MCP consumers.
  */
 export function projectRequirementDigest(
   context: ProjectionContext,
-  productArea?: string
+  productArea?: string,
 ): ProjectionBundle<RequirementDigest> {
   return projectSingle(buildRequirementDigest(context, productArea));
 }
@@ -856,7 +977,7 @@ export function projectRequirementDigest(
  * @architect-pattern RequirementExecutableDigestProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses OperationalInsightsProjectionSupport
+ * @architect-uses OperationalInsightsProjectionSupport, RequirementDigest
  * @architect-bounded-context:projection
  *
  * ## Executable requirement digest projection
@@ -882,10 +1003,10 @@ export function projectRequirementDigest(
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects the executable requirements digest for implemented patterns.
  */
 export function projectRequirementExecutableDigest(
-  context: ProjectionContext
+  context: ProjectionContext,
 ): ProjectionBundle<RequirementDigest> {
   return projectBucketedRequirementDigest(context, 'executable');
 }
@@ -895,7 +1016,7 @@ export function projectRequirementExecutableDigest(
  * @architect-pattern RequirementSpecsDigestProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses OperationalInsightsProjectionSupport
+ * @architect-uses OperationalInsightsProjectionSupport, RequirementDigest
  * @architect-bounded-context:projection
  *
  * ## Spec-tier requirement digest projection
@@ -919,10 +1040,10 @@ export function projectRequirementExecutableDigest(
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects the spec-tier requirements digest for design-level patterns.
  */
 export function projectRequirementSpecsDigest(
-  context: ProjectionContext
+  context: ProjectionContext,
 ): ProjectionBundle<RequirementDigest> {
   return projectBucketedRequirementDigest(context, 'specs');
 }
@@ -941,11 +1062,10 @@ export function projectRequirementSpecsDigest(
  *                durable artifact (executable Gherkin or annotated TypeScript
  *                source) exists and is being maintained or has shipped.
  *
- * ADRs (`pattern.adr !== undefined`), release notes, and pattern-area
- * filtering are applied upstream by `createRequirementSourceEntries`.
+ * ADRs (`pattern.adr !== undefined`) and pattern-area filtering are applied
+ * upstream by `createRequirementSourceEntries`.
  */
-const ARCHITECT_RELEASE_RE = /(^|\/)architect\/releases\//u;
-const ARCHITECT_DESIGN_TIER_RE = /(^|\/)architect\/(specs|slices|stubs|releases)\//u;
+const ARCHITECT_DESIGN_TIER_RE = /(^|\/)architect\/(specs|slices|stubs)\//u;
 
 function isPlannedStatus(status: string | undefined): boolean {
   const normalizedStatus = normalizeStatus(status);
@@ -954,14 +1074,14 @@ function isPlannedStatus(status: string | undefined): boolean {
 
 function projectBucketedRequirementDigest(
   context: ProjectionContext,
-  bucket: RequirementDocumentationBucket
+  bucket: RequirementDocumentationBucket,
 ): ProjectionBundle<RequirementDigest> {
   return createBucketedRequirementDigest(createRequirementProjectionSourceData(context), bucket);
 }
 
 function createBucketedRequirementDigest(
   sourceData: RequirementProjectionSourceData,
-  bucket: RequirementDocumentationBucket
+  bucket: RequirementDocumentationBucket,
 ): ProjectionBundle<RequirementDigest> {
   const bucketLabel =
     bucket === 'executable' ? REQUIREMENTS_EXECUTABLE_AREA_LABEL : REQUIREMENTS_SPECS_AREA_LABEL;
@@ -976,7 +1096,7 @@ function createBucketedRequirementDigest(
     const root = createRequirementDigest(
       bucketLabel,
       rootEntries,
-      bucketEntries.flatMap((entry) => entry.businessRuleReferences)
+      bucketEntries.flatMap((entry) => entry.businessRuleReferences),
     );
 
     const flatChildren: Record<string, RequirementDigest> = {};
@@ -986,7 +1106,7 @@ function createBucketedRequirementDigest(
       ] = createRequirementDigest(
         sourceEntry.entry.pattern,
         [sourceEntry.entry],
-        sourceEntry.businessRuleReferences
+        sourceEntry.businessRuleReferences,
       );
     }
 
@@ -1020,14 +1140,14 @@ function createBucketedRequirementDigest(
     children[createRequirementPackageIndexRouteId(bucket, pkgId)] = createRequirementDigest(
       pkgId,
       perPackageIndexEntries,
-      entries.flatMap((entry) => entry.businessRuleReferences)
+      entries.flatMap((entry) => entry.businessRuleReferences),
     );
     for (const sourceEntry of entries) {
       children[createRequirementPackageDetailRouteId(bucket, pkgId, sourceEntry.entry.pattern)] =
         createRequirementDigest(
           sourceEntry.entry.pattern,
           [sourceEntry.entry],
-          sourceEntry.businessRuleReferences
+          sourceEntry.businessRuleReferences,
         );
     }
   }
@@ -1035,7 +1155,7 @@ function createBucketedRequirementDigest(
   const root = createRequirementDigest(
     bucketLabel,
     rootEntries,
-    bucketEntries.flatMap((entry) => entry.businessRuleReferences)
+    bucketEntries.flatMap((entry) => entry.businessRuleReferences),
   );
 
   if (Object.keys(children).length === 0) {
@@ -1062,7 +1182,7 @@ function usesFlatSpecsRoute(pattern: ExtractedPattern): boolean {
 function createRequirementChildRouteIdForBucket(
   bucket: RequirementDocumentationBucket,
   packageId: string,
-  pattern: ExtractedPattern
+  pattern: ExtractedPattern,
 ): string {
   const feature = getPatternName(pattern);
 
@@ -1078,7 +1198,7 @@ function createRequirementChildRouteIdForBucket(
  * @architect-pattern RoleProfileProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses OperationalInsightsProjectionSupport
+ * @architect-uses OperationalInsightsProjectionSupport, RoleProfile, RoleProfileCollection
  * @architect-bounded-context:projection
  *
  * ## Role profile projection
@@ -1105,18 +1225,18 @@ function createRequirementChildRouteIdForBucket(
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects role profile output for one configured role or the full role catalog.
  */
 export function projectRoleProfile(
   context: ProjectionContext,
-  role: string
+  role: string,
 ): ProjectionBundle<RoleProfile> | undefined {
   const profile = buildRoleProfile(context, role);
   return profile === undefined ? undefined : projectSingle(profile);
 }
 
 export function projectRoleProfiles(
-  context: ProjectionContext
+  context: ProjectionContext,
 ): ProjectionBundle<RoleProfileCollection> {
   return projectSingle({
     kind: 'RoleProfileCollection',
@@ -1129,7 +1249,7 @@ export function projectRoleProfiles(
  * @architect-pattern SourceInventoryProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses OperationalInsightsProjectionSupport
+ * @architect-uses OperationalInsightsProjectionSupport, SourceInventoryDigest
  * @architect-bounded-context:projection
  *
  * ## Source inventory projection
@@ -1156,10 +1276,10 @@ export function projectRoleProfiles(
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects the tag usage matrix that summarizes metadata-tag counts across the graph.
  */
 export function projectSourceInventoryDigest(
-  context: ProjectionContext
+  context: ProjectionContext,
 ): ProjectionBundle<SourceInventoryDigest> {
   return projectSingle({
     kind: 'SourceInventoryDigest',
@@ -1172,15 +1292,15 @@ export function projectSourceInventoryDigest(
  * @architect-pattern TagUsageProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses OperationalInsightsProjectionSupport
+ * @architect-uses OperationalInsightsProjectionSupport, TagUsageMatrix
  * @architect-bounded-context:projection
  *
  * ## Tag usage projection
  *
  * **Value:** Produces a `TagUsageMatrix` that counts every metadata-tag
  * value across the pattern graph — status, role, arch-context, arch-layer,
- * phase, priority, quarter, team, effort — so dashboards can surface
- * dominant conventions and outliers at a glance.
+ * team, workflow — so dashboards can surface dominant conventions
+ * and outliers at a glance.
  *
  * **Invariant:** Every pattern contributes exactly one increment per
  * populated tag; tag entries and per-value lists are sorted by count
@@ -1190,16 +1310,14 @@ export function projectSourceInventoryDigest(
  * **Behavior:**
  * - Walks `graph.patterns` once, incrementing the `(tag, value)` counter
  *   only when a field is populated (e.g. skipping a pattern with no
- *   `quarter`).
- * - Stringifies numeric phase values so the matrix stays homogeneous,
- *   allowing renderers to treat every tag value as a string key.
+ *   `team`).
  * - Sorts tag and value lists with a deterministic
  *   count-then-alphabetical comparator so outputs are reproducible across
  *   runs.
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects the tag usage matrix that summarizes metadata-tag counts across the graph.
  */
 export function projectTagUsage(context: ProjectionContext): ProjectionBundle<TagUsageMatrix> {
   return projectSingle(buildTagUsageMatrix(context));

@@ -10,7 +10,12 @@ import {
   type ProjectionBundle,
   type ProjectionContext,
 } from '../../../../src/index.js';
-import { createPattern, createProjectionContext, createRule } from './support.js';
+import {
+  createPattern,
+  createProjectionContext,
+  createRelationshipEntry,
+  createRule,
+} from './support.js';
 
 interface DecisionProjectionState {
   context: ProjectionContext | null;
@@ -35,20 +40,28 @@ function createState(): DecisionProjectionState {
 function createDecisionContext(): ProjectionContext {
   return createProjectionContext({
     patterns: [
+      createPattern('ADR005CodecBasedMarkdownRendering', {
+        title: 'Codec-based Markdown Rendering',
+        status: 'completed',
+        productArea: 'Generation',
+        file: 'architect/decisions/adr-005-codec-based-markdown-rendering.feature',
+        adr: '005',
+        adrStatus: 'accepted',
+        adrCategory: 'architecture',
+        description: '**Context:** Markdown rendering went through a codec.',
+      }),
       createPattern('ADR006SingleReadModelArchitecture', {
         title: 'Single Read Model Architecture',
         status: 'completed',
-        phase: 49,
         productArea: 'Generation',
         file: 'architect/decisions/adr-006-single-read-model-architecture.feature',
         adr: '006',
         adrStatus: 'accepted',
         adrCategory: 'architecture',
-        adrSupersedes: '005',
-        adrSupersededBy: '007',
-        dependsOn: ['ADR005CodecBasedMarkdownRendering'],
-        uses: ['PatternGraphAPI'],
-        seeAlso: ['McpOutputSchemaValidation'],
+        uses: ['WidgetService'],
+        // Two see-also links: one to a decision (ADR-005, the governance chain)
+        // and one to a non-decision pattern (filtered out of relatedDecisions).
+        seeAlso: ['ADR005CodecBasedMarkdownRendering', 'McpOutputSchemaValidation'],
         description: `
 **Context:**
 The PatternGraph already computes relationship data for every consumer.
@@ -77,7 +90,6 @@ All read paths should project from the PatternGraph instead of rebuilding their 
       createPattern('PDR001SessionWorkflowCommands', {
         title: 'Session Workflow Commands Design Decisions',
         status: 'completed',
-        phase: 49,
         productArea: 'DeliveryProcess',
         file: 'architect/decisions/pdr-001-session-workflow-commands.feature',
         adr: '001',
@@ -86,6 +98,15 @@ All read paths should project from the PatternGraph instead of rebuilding their 
         description: '**Context:** Session commands coordinate workflow orchestration.',
       }),
     ],
+    // ADR-006 is enforced by a rule-owning feature; the computed reverse edge
+    // (enforcedBy) is what makes the decision record navigable to its rules.
+    relationshipIndex: {
+      ADR006SingleReadModelArchitecture: createRelationshipEntry({
+        uses: ['WidgetService'],
+        seeAlso: ['ADR005CodecBasedMarkdownRendering', 'McpOutputSchemaValidation'],
+        enforcedBy: ['ApiReferenceProjectionExecutableTests'],
+      }),
+    },
   });
 }
 
@@ -120,8 +141,16 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             type: 'ADR',
             status: 'accepted',
             title: 'Single Read Model Architecture',
-            relatedDecisions: ['ADR-005', 'ADR-007'],
-            affectedPatterns: ['McpOutputSchemaValidation', 'PatternGraphAPI'],
+            // relatedDecisions is the governance chain: the see-also targets that
+            // are themselves decisions (ADR-005), not the non-decision link.
+            relatedDecisions: ['ADR-005'],
+            // affectedPatterns now includes the computed enforcedBy reverse edge.
+            affectedPatterns: [
+              'ADR005CodecBasedMarkdownRendering',
+              'ApiReferenceProjectionExecutableTests',
+              'McpOutputSchemaValidation',
+              'WidgetService',
+            ],
           });
           expect(state!.decision?.context[0]).toEqual({
             type: 'paragraph',
@@ -143,7 +172,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             ],
           });
         });
-      }
+      },
     );
 
     RuleScenario('Missing decisions surface the available ids', ({ Given, When, Then }) => {
@@ -162,7 +191,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       Then('the decision projection should fail with the available ids', () => {
         expect(state!.error).toBeInstanceOf(ProjectionError);
         expect((state!.error as Error).message).toContain('Decision not found: "ADR-999"');
-        expect((state!.error as Error).message).toContain('Available decisions: ADR-006, PDR-001');
+        expect((state!.error as Error).message).toContain(
+          'Available decisions: ADR-005, ADR-006, PDR-001',
+        );
       });
     });
   });
@@ -181,6 +212,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         expect(state!.bundle?.root).toMatchObject({
           kind: 'DecisionCatalog',
           decisions: [
+            { kind: 'DecisionRecord', id: 'ADR-005' },
             { kind: 'DecisionRecord', id: 'ADR-006' },
             { kind: 'DecisionRecord', id: 'PDR-001' },
           ],
@@ -188,7 +220,11 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       });
 
       And('the decision catalog child keys should be deterministic', () => {
-        expect(Object.keys(state!.bundle?.children ?? {})).toEqual(['adr-006', 'pdr-001']);
+        expect(Object.keys(state!.bundle?.children ?? {})).toEqual([
+          'adr-005',
+          'adr-006',
+          'pdr-001',
+        ]);
       });
     });
   });

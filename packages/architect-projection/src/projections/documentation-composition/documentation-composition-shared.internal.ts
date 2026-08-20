@@ -14,7 +14,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Provides shared string helpers for documentation-composition projections.
  */
 export function dedupeStrings(values: readonly string[]): string[] {
   const seen = new Set<string>();

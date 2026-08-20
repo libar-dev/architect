@@ -11,29 +11,11 @@ export const WorkflowStatusSchema = z.strictObject({
 
 export type WorkflowStatus = z.infer<typeof WorkflowStatusSchema>;
 
-export const PhaseArtifactsSchema = z.strictObject({
-  reads: z.array(z.string()).optional(),
-  writes: z.array(z.string()).optional(),
-});
-
-export type PhaseArtifacts = z.infer<typeof PhaseArtifactsSchema>;
-
-export const WorkflowPhaseSchema = z.strictObject({
-  name: z.string().min(1),
-  description: z.string().optional(),
-  statusOnEntry: z.string().optional(),
-  artifacts: PhaseArtifactsSchema.optional(),
-  order: z.number().int().nonnegative().optional(),
-});
-
-export type WorkflowPhase = z.infer<typeof WorkflowPhaseSchema>;
-
 export const WorkflowConfigSchema = z.strictObject({
   name: z.string().min(1),
   version: z.string().regex(/^\d+\.\d+\.\d+$/, 'Version must be semver format'),
   description: z.string().optional(),
   statuses: z.array(WorkflowStatusSchema).min(1),
-  phases: z.array(WorkflowPhaseSchema).min(1),
   defaultStatus: z.string().optional(),
   metadata: z
     .object({
@@ -49,7 +31,6 @@ export type WorkflowConfig = z.infer<typeof WorkflowConfigSchema>;
 export interface LoadedWorkflow {
   readonly config: WorkflowConfig;
   readonly statusMap: Map<string, WorkflowStatus>;
-  readonly phaseMap: Map<string, WorkflowPhase>;
 }
 
 export function createLoadedWorkflow(config: WorkflowConfig): LoadedWorkflow {
@@ -58,15 +39,9 @@ export function createLoadedWorkflow(config: WorkflowConfig): LoadedWorkflow {
     statusMap.set(status.name.toLowerCase(), status);
   }
 
-  const phaseMap = new Map<string, WorkflowPhase>();
-  for (const phase of config.phases) {
-    phaseMap.set(phase.name.toLowerCase(), phase);
-  }
-
   return {
     config,
     statusMap,
-    phaseMap,
   };
 }
 

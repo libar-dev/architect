@@ -27,7 +27,7 @@ import { countBraceBalance } from './utils.js';
 export function checkScenarioOutlineFunctionParams(
   featureContent: string,
   stepContent: string,
-  stepFilePath: string
+  stepFilePath: string,
 ): readonly LintViolation[] {
   // Only check if the feature actually has Scenario Outline
   if (!/^\s*(Scenario Outline|Scenario Template):/m.test(featureContent)) {
@@ -62,7 +62,7 @@ export function checkScenarioOutlineFunctionParams(
       // The pattern: a step keyword, string arg, then a callback with 2+ params
       const paramMatch =
         /(?:Given|When|Then|And|But)\s*\(\s*['"][^'"]*['"]\s*,\s*\(\s*_?ctx\s*(?::\s*\w+)?\s*,\s*(\w+)/.exec(
-          line
+          line,
         );
       if (paramMatch !== null) {
         const paramName = paramMatch[1] ?? 'unknown';
@@ -96,7 +96,7 @@ export function checkScenarioOutlineFunctionParams(
 export function checkMissingAndDestructuring(
   featureContent: string,
   stepContent: string,
-  stepFilePath: string
+  stepFilePath: string,
 ): readonly LintViolation[] {
   // Check if feature has any And steps
   const hasAndSteps = /^\s+And\s+/m.test(featureContent);
@@ -147,7 +147,7 @@ export function checkMissingAndDestructuring(
 export function checkMissingRuleWrapper(
   featureContent: string,
   stepContent: string,
-  stepFilePath: string
+  stepFilePath: string,
 ): readonly LintViolation[] {
   // Check if feature has any Rule: blocks
   const hasRuleBlocks = /^\s*Rule:\s/m.test(featureContent);
@@ -159,7 +159,7 @@ export function checkMissingRuleWrapper(
   // Pattern: describeFeature(feature, ({ ... Rule ... }) =>
   // We look for Rule in any destructuring pattern, since it could appear anywhere
   const destructuresRule = /describeFeature\s*\([^,]*,\s*\(\s*\{[^}]*\bRule\b[^}]*\}/.test(
-    stepContent
+    stepContent,
   );
   if (destructuresRule) {
     return [];
@@ -201,7 +201,7 @@ const FEATURE_STEP_LINE = /^\s+(Given|When|Then|And|But)\s+(.+)$/;
  */
 function extractOutlineExamplesColumns(
   lines: readonly string[],
-  outlineStartIndex: number
+  outlineStartIndex: number,
 ): ReadonlySet<string> {
   const columns = new Set<string>();
   let inExamples = false;
@@ -265,7 +265,7 @@ export function checkOutlineQuotedValues(
   featureContent: string,
   _stepContent: string,
   stepFilePath: string,
-  featurePath?: string
+  featurePath?: string,
 ): readonly LintViolation[] {
   // Only check if the feature actually has Scenario Outline
   if (!/^\s*(Scenario Outline|Scenario Template):/m.test(featureContent)) {
@@ -342,7 +342,7 @@ export function runCrossChecks(
   featureContent: string,
   stepContent: string,
   stepFilePath: string,
-  featurePath?: string
+  featurePath?: string,
 ): readonly LintViolation[] {
   return [
     ...checkScenarioOutlineFunctionParams(featureContent, stepContent, stepFilePath),

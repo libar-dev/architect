@@ -2,7 +2,7 @@
 @architect-pattern:DocumentationCompositionProjectionExecutableTests
 @architect-implements:DocumentationCompositionProjectionSupport,ProjectConfigProjection,DocumentationBundle,ArchitectureDiagramProjection,PrChangeReviewProjection
 @architect-status:completed
-@architect-phase:49
+@architect-unlock-reason:Evolve-architecture-diagram-invariant-for-WS3-restructure-D14
 @architect-product-area:Projection
 @architect-role:projection
 @documentation-composition
@@ -53,11 +53,12 @@ Feature: Documentation Composition projection bodies
   Rule: Documentation dispatch only supports the retained Documentation Composition document types
 
     **Invariant:** `projectDocumentationBundle` dispatches only on the retained
-    Documentation Composition document types (architecture, decisions,
-    business-rules, patterns, roadmap, current-work, requirements-executable,
-    requirements-specs, validation-rules, taxonomy, changelog, traceability) and throws
-    `UnknownDocumentType` for both intentionally dropped types (reference,
-    product-areas, design-review, product-requirements) and any unknown type.
+    Documentation Composition document types (architecture, design-review,
+    api-reference, decisions, business-rules, patterns, roadmap, current-work,
+    requirements-executable, requirements-specs, validation-rules, taxonomy,
+    changelog, traceability) and throws `UnknownDocumentType` for both
+    intentionally dropped types (reference, product-areas, product-requirements)
+    and any unknown type.
 
     **Rationale:** The supported set is the durable contract between Studio and
     documentation consumers; silently accepting dropped or unknown types would
@@ -74,6 +75,7 @@ Feature: Documentation Composition projection bodies
       And each supported disclosure matrix should define maturity and status filter defaults
       And each supported documentation default disclosure level should exist in its disclosure matrix
       And committed false disclosure levels should only appear on opt-in detail surfaces
+      And flat-catalog documentation types should declare emitChildren false at every level
       And the patterns documentation bundle should expose per-pattern detail additional files
       And the requirements executable documentation links should resolve to emitted files
       And the requirements specs documentation should omit roadmap requirements by default
@@ -112,6 +114,216 @@ Feature: Documentation Composition projection bodies
       When I project architecture diagrams for each supported scope
       Then each architecture diagram should preserve the requested scope
       And the bounded-context and product-area diagrams should filter patterns by the explicit scope value
+
+  Rule: The architecture view splits into a context map plus per-group detail diagrams
+
+    **Invariant:** A component architecture projection emits an ordered set of
+    diagram sections — a context map first, then one detail diagram per group —
+    and never a single diagram containing every pattern. The detail sections
+    partition the pattern set: each pattern appears in exactly one detail diagram.
+
+    **Rationale:** A single all-pattern Mermaid graph exceeds the renderer's
+    maximum text size and is unreadable; splitting by bounded-context (with a
+    role fallback for un-contextualized patterns) keeps every block renderable
+    and navigable. See DECISIONS D-14.
+
+    **Verified by:** projecting the component diagram and asserting the section
+    structure and the pattern partition.
+
+    Scenario: the component view splits into a context map and per-group detail diagrams
+      Given a Documentation Composition architecture context with bounded contexts layers and product areas
+      When I project the component architecture diagram
+      Then the component diagram should lead with a context map section
+      And the remaining sections should partition the patterns into per-group detail diagrams
+
+  Rule: The context map aggregates only forward dependency edges between groups
+
+    **Invariant:** The context map collapses each ordered group pair to one solid
+    arrow and the legend reads a solid arrow as a dependency, so the map
+    aggregates only forward structural edges (`depends-on` / `uses`, dependant →
+    dependency). Non-directional `see-also` edges are excluded from the map but
+    remain in the per-group detail diagrams; derived reverse `enables` edges are
+    excluded from the map and the per-group detail diagrams alike (see the
+    forward-only detail-diagram rule below).
+
+    **Rationale:** Rendering a derived reverse `enables` edge as a forward arrow
+    draws a back-arrow for a relationship the forward edge already captures,
+    producing contradictory bidirectional pairs and a dependency direction that
+    is exactly inverted. See DECISIONS D-15.
+
+    **Verified by:** projecting a context with a forward cross-group dependency
+    and an opposing cross-group enablement, then asserting the map keeps only the
+    forward arrow.
+
+    Scenario: the context map keeps forward dependencies and omits derived reverse edges
+      Given a Documentation Composition architecture context with opposing cross-group dependency and enablement edges
+      When I project the component architecture diagram for the cross-group context
+      Then the context map should contain the forward cross-group dependency arrow
+      And the context map should omit the derived reverse enablement arrow
+
+  Rule: Architecture diagrams encode sourced labels destined for Mermaid nodes
+
+    **Invariant:** Sourced annotation text (bounded-context / role / package names)
+    rendered into a Mermaid node label is encoded with Mermaid entity codes, so a
+    `"`, `<`, `>`, `[`, `]`, or `#` cannot break out of the `id["…"]` node or inject
+    markup. Renderer-authored markup (`<br/>`, the `(role)` parens, the `(N)` count)
+    is added around the escaped value and stays live.
+
+    **Rationale:** Mermaid renders quoted-string node labels, so an unescaped sourced
+    quote terminates the node and the remainder injects arbitrary diagram syntax — the
+    raw-content counterpart of the ADR-009 markdown trust boundary.
+
+    **Verified by:** projecting a component diagram whose bounded-context name carries
+    Mermaid-breaking characters, then asserting the context-map node label encodes them
+    and never contains the raw sourced substring.
+
+    Scenario: a hostile bounded-context name is encoded inside the context-map node label
+      Given an architecture context with a bounded-context name carrying Mermaid-breaking characters
+      When I project the component architecture diagram
+      Then the context-map node label should encode the Mermaid-breaking characters
+      And the context-map diagram should not contain the raw sourced label
+
+  Rule: The architecture view surfaces fan-in for the most-depended-on patterns
+
+    **Invariant:** The architecture fragment carries a fan-in ranking of in-view
+    patterns by how many in-view peers depend on them (usedBy), sorted by descending
+    dependant count then name and limited to the top entries; patterns with no in-view
+    dependants are omitted and each row's dependant list is restricted to in-view peers
+    so the ranking never dangles.
+
+    **Rationale:** Hub patterns render as edgeless leaves in the per-group detail
+    diagrams because their dependants live in other groups; the fan-in ranking restores
+    that signal without a cross-group edge explosion.
+
+    **Verified by:** projecting a component view with a hub pattern depended on by
+    several in-view peers and asserting the hub ranks first with its dependant count and
+    sorted dependant list.
+
+    Scenario: fan-in ranks in-view hub patterns by in-view dependant count
+      Given an architecture context with a hub pattern depended on by several in-view peers
+      When I project the component architecture diagram
+      Then the fan-in list should rank the hub pattern first with its in-view dependant count
+      And patterns with no in-view dependants are omitted from fan-in
+
+  Rule: The architecture view flags bounded contexts that span multiple packages
+
+    **Invariant:** The architecture fragment lists every bounded context whose in-view
+    patterns resolve to two or more workspace packages, with the sorted package set and
+    pattern count; a context confined to a single package is omitted.
+
+    **Rationale:** A bounded context implemented across package seams is an architectural
+    signal (intentional shared kernel or accidental coupling) that the per-group diagrams,
+    grouped by context, cannot surface.
+
+    **Verified by:** projecting a component view with one context split across two packages
+    and one confined to a single package, asserting only the former is flagged with its
+    package set.
+
+    Scenario: cross-package contexts list the packages a context spans
+      Given an architecture context with one bounded context split across two packages
+      When I project the component architecture diagram
+      Then the cross-package list should include the spanning context with its packages
+      And a context confined to a single package is not flagged
+
+  Rule: The architecture documentation projects a routed tree of lens views
+
+    **Invariant:** The architecture documentation type projects a component-view root plus
+    one routed child doc per non-empty lens (package-seam, layered, by-theme) under the
+    architecture child directory; a lens with no patterns is omitted and the root links each
+    emitted lens.
+
+    **Rationale:** A single ARCHITECTURE.md cannot hold the component, package-seam, layered,
+    and themed lenses legibly; routing them as child docs keeps each Mermaid view focused while
+    the root stays the navigable overview.
+
+    **Verified by:** projecting the architecture documentation bundle for a graph spanning
+    packages, layers, and themes, asserting a component root and routed package-seam + layered
+    + by-theme children under the architecture directory.
+
+    Scenario: the architecture bundle emits a component root and lens children
+      Given a documentation context with patterns spanning packages, layers, and themes
+      When I project the architecture documentation bundle
+      Then the architecture root should be the component view
+      And the architecture bundle should route the package-seam, layered, and by-theme lens docs
+      And only the root links the lens docs — children carry no related-view links
+
+  Rule: Per-group detail diagrams draw only forward dependency edges
+
+    **Invariant:** A per-group detail diagram collapses the `depends-on` and
+    `uses` edges between an ordered pair of same-group nodes to one solid forward
+    arrow, drops the derived reverse `enables` edge entirely, and keeps
+    `see-also` as a distinct dotted reference line. A genuine mutual dependency
+    survives as two arrows (one each direction).
+
+    **Rationale:** A single `@architect-uses` edge yields co-directional
+    `depends-on` and `uses` relationships, and `enables` is the derived inverse
+    of a forward edge already shown — so drawing all three turns each
+    relationship into three arrows (one of them a contradictory back-arrow) and a
+    small group into a hairball. Generalizes the context map's forward-only rule
+    to the detail diagrams. See DECISIONS D-19.
+
+    **Verified by:** projecting a single-group context whose two nodes carry a
+    forward `depends-on`/`uses` edge and an opposing derived `enables` edge, then
+    asserting the detail diagram has exactly one forward arrow and no bold/reverse
+    arrow.
+
+    Scenario: a detail diagram collapses co-directional edges and drops the reverse enablement
+      Given a Documentation Composition architecture context with same-group dependency and enablement edges
+      When I project the component architecture diagram for the intra-group context
+      Then the detail diagram should contain one forward dependency arrow between the pair
+      And the detail diagram should omit the dotted usage arrow
+      And the detail diagram should omit the bold enablement arrow
+      And the detail diagram should omit the reverse arrow
+
+  Rule: The component view shows production components, not test-feature patterns
+
+    **Invariant:** The component architecture diagram excludes patterns whose
+    identity is an executable Gherkin feature under `tests/features/` — that
+    verification surface realizes production patterns but is not itself a
+    component. Production patterns are retained, including sub-modules that
+    `@architect-implements` a barrel pattern (an implements edge alone does not
+    mark a pattern as a test).
+
+    **Rationale:** A component view answers "what are the production components
+    and how do they relate"; including test-feature patterns buried the real
+    components under dozens of `*ExecutableTests` nodes. Test→production
+    traceability lives in the traceability / requirements-executable docs. See
+    DECISIONS D-15.
+
+    **Verified by:** projecting a component diagram from a context mixing a
+    production pattern with a test-feature pattern and asserting the partition.
+
+    Scenario: the component view omits patterns defined by test feature files
+      Given a Documentation Composition architecture context mixing a production pattern and a test-feature pattern
+      When I project the component architecture diagram for the mixed context
+      Then the component diagram should include the production pattern
+      And the component diagram should omit the test-feature pattern
+
+  Rule: The component view omits decision-record patterns
+
+    **Invariant:** The component architecture diagram excludes patterns whose
+    identity is an ADR/PDR Gherkin feature under `architect/decisions/`. These
+    are durable architectural decisions, not production components, and are
+    projected by the dedicated `decisions` document.
+
+    **Rationale:** A component view answers "what are the production components
+    and how do they relate". Decision records are a different artifact class —
+    they carry execution/temporal context the component view should not surface
+    and have their own generated doc. See DECISIONS D-16.
+
+    **Verified by:** projecting a component diagram from a context mixing a
+    production pattern with a decision-record pattern and asserting the partition.
+
+    Scenario: the component view omits patterns defined by decision-record files
+      Given a Documentation Composition architecture context mixing a production pattern and a decision-record pattern
+      When I project the component architecture diagram for the decision-mixed context
+      Then the component diagram should include the production pattern
+      And the component diagram should omit the decision-record pattern
+
+    Scenario: the component view is empty when every pattern is a decision record
+      Given a Documentation Composition architecture context of only decision-record patterns
+      When I project the component architecture diagram for the decision-only context
+      Then the component diagram should contain no patterns
 
   Rule: PR change review projections derive affected patterns from explicit options
 

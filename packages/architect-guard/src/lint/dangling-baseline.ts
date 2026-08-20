@@ -1,3 +1,19 @@
+/**
+ * @architect
+ * @architect-pattern DanglingBaseline
+ * @architect-status completed
+ * @architect-role:service
+ * @architect-bounded-context:validation
+ * @architect-uses PipelineDatasetContract
+ *
+ * ## DanglingBaseline - Baseline comparison service
+ *
+ * Reads, normalizes, writes, and compares the persisted dangling-reference
+ * baseline used by the strict graph-integrity gate.
+ *
+ * **When to Use:** Use when the dangling gate needs deterministic baseline
+ * comparison or explicit baseline regeneration.
+ */
 import fs from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 
@@ -70,7 +86,7 @@ function createDanglingEntryKey(entry: DanglingBaselineEntry): string {
 }
 
 export function normalizeDanglingBaselineEntries(
-  entries: readonly DanglingReference[]
+  entries: readonly DanglingReference[],
 ): DanglingBaselineEntry[] {
   return entries
     .map((entry) => ({
@@ -82,7 +98,7 @@ export function normalizeDanglingBaselineEntries(
 }
 
 export async function readDanglingBaseline(
-  options: DanglingBaselineFileOptions = {}
+  options: DanglingBaselineFileOptions = {},
 ): Promise<readonly DanglingBaselineEntry[]> {
   let content: string;
   const baselinePath = options.baselinePath ?? BASELINE_RESOURCE_PATH;
@@ -92,7 +108,7 @@ export async function readDanglingBaseline(
   } catch (error) {
     if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
       throw new Error(
-        `Dangling baseline file not found at ${baselinePath}. Run architect-validate --base-dir . --update-baseline to create it.`
+        `Dangling baseline file not found at ${baselinePath}. Run architect dangling --write-baseline to create it.`,
       );
     }
 
@@ -105,7 +121,7 @@ export async function readDanglingBaseline(
 
 export async function writeDanglingBaseline(
   entries: readonly DanglingReference[],
-  options: DanglingBaselineFileOptions = {}
+  options: DanglingBaselineFileOptions = {},
 ): Promise<readonly DanglingBaselineEntry[]> {
   const normalized = normalizeDanglingBaselineEntries(entries);
   const nextContent = `${JSON.stringify(normalized, null, 2)}\n`;
@@ -119,7 +135,7 @@ export async function writeDanglingBaseline(
 
 export async function compareDanglingBaseline(
   entries: readonly DanglingReference[],
-  options: DanglingBaselineFileOptions = {}
+  options: DanglingBaselineFileOptions = {},
 ): Promise<DanglingBaselineComparison> {
   const baseline = await readDanglingBaseline(options);
   const current = normalizeDanglingBaselineEntries(entries);
@@ -127,7 +143,7 @@ export async function compareDanglingBaseline(
   const currentKeys = new Set(current.map(createDanglingEntryKey));
   const newEntries = current.filter((entry) => !baselineKeys.has(createDanglingEntryKey(entry)));
   const removedEntries = baseline.filter(
-    (entry) => !currentKeys.has(createDanglingEntryKey(entry))
+    (entry) => !currentKeys.has(createDanglingEntryKey(entry)),
   );
 
   return {

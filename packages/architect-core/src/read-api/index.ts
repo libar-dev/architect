@@ -1,39 +1,42 @@
 export type {
-  QuerySuccess,
-  QueryError,
   QueryErrorCode,
-  QueryResult,
   QueryMetadataExtra,
   RoleInfo,
   StatusDistribution,
-  PhaseProgress,
   PatternDependencies,
   PatternRelationships,
-  PatternDeliverable,
-  QuarterGroup,
+  BusinessRuleRef,
   TransitionCheck,
   ProtectionInfo,
   NeighborEntry,
 } from './types.js';
 
-export { createSuccess, createError, QueryApiError } from './types.js';
+export { getDependencyContext } from './dependency-context.js';
+export type { DependencyContext, DependencyContextNode } from './dependency-context.js';
 
-export type { PatternGraphAPI } from './pattern-graph-api.js';
-export { createPatternGraphAPI } from './pattern-graph-api.js';
+export {
+  resolveImplementingFeatures,
+  getRulesForPattern,
+  ProvenancedRuleSchema,
+} from './rule-aggregation.js';
+export type { ProvenancedRule } from './rule-aggregation.js';
 
 export {
   getPatternName,
   findPatternByName,
   findPatternParseFailure,
-  getCanonicalRelationshipIndex,
   getRelationshipsForPattern,
   getRelationships,
-  allPatternNames,
   resolveRoleDefinition,
-  resolveCanonicalRole,
   suggestPattern,
-  firstImplements,
 } from './pattern-helpers.js';
+
+export {
+  isDecisionPattern,
+  listDecisionPatterns,
+  resolveDecisionPattern,
+  canonicalDecisionKey,
+} from './decision-resolution.js';
 
 export type { NeighborhoodResult, ContextComparison } from './architecture-inspection.js';
 export { computeNeighborhood, compareContexts } from './architecture-inspection.js';

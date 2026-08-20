@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Fast, staged-scoped gate. The real sequence lives in package.json so it is
+# versioned, manually runnable (`pnpm ci:pre-commit`), and identical to what CI
+# enforces. Never bypass with --no-verify (No-BC doctrine): if a gate is wrong,
+# fix the gate.
+#
+#   ci:pre-commit = lint-staged (eslint --fix on root-scoped .ts + prettier on
+#                   all staged files) && check:build (dist-freshness gate, so the
+#                   guard never runs from stale compiled code and answers wrong)
+#                   && architect-guard --staged (FSM process guard on the staged
+#                   transition).
+pnpm ci:pre-commit

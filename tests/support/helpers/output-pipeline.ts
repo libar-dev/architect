@@ -104,7 +104,6 @@ function summarizePattern(pattern: ExtractedPattern): Record<string, unknown> {
     name: pattern.name,
     status: pattern.status,
     role: pattern.role ?? 'uncategorized',
-    phase: pattern.phase,
     filePath: pattern.source.file,
   };
 }

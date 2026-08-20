@@ -1,3 +1,7 @@
+@architect
+@architect-pattern:FragmentSchemaMirrorExecutableTests
+@architect-status:active
+@architect-implements:ProjectionFragmentSchema
 @projection
 Feature: Fragment schema mirror
   Every projection FragmentKind must parse strictly, reject extras, and survive
@@ -18,9 +22,7 @@ Feature: Fragment schema mirror
 
       Examples:
         | kind                     |
-        | PhaseProgress            |
         | StatusDistribution       |
-        | ReleaseNotesDigest       |
         | TraceabilityMatrix       |
         | ProjectConfigSnapshot    |
         | ArchitectureDiagram      |
@@ -54,7 +56,7 @@ Feature: Fragment schema mirror
         | PatternDetail            |
         | DependencyEdge           |
         | DependencyEdgeSet        |
-        | DependencyTree           |
+        | DependencyContext        |
         | ArchitectureNeighborhood |
         | OpenQuestionList         |
         | OrphanPatternList        |
@@ -67,9 +69,7 @@ Feature: Fragment schema mirror
 
       Examples:
         | kind                     |
-        | PhaseProgress            |
         | StatusDistribution       |
-        | ReleaseNotesDigest       |
         | TraceabilityMatrix       |
         | ProjectConfigSnapshot    |
         | ArchitectureDiagram      |
@@ -103,7 +103,7 @@ Feature: Fragment schema mirror
         | PatternDetail            |
         | DependencyEdge           |
         | DependencyEdgeSet        |
-        | DependencyTree           |
+        | DependencyContext        |
         | ArchitectureNeighborhood |
         | OpenQuestionList         |
         | OrphanPatternList        |
@@ -116,9 +116,7 @@ Feature: Fragment schema mirror
 
       Examples:
         | kind                     |
-        | PhaseProgress            |
         | StatusDistribution       |
-        | ReleaseNotesDigest       |
         | TraceabilityMatrix       |
         | ProjectConfigSnapshot    |
         | ArchitectureDiagram      |
@@ -152,7 +150,7 @@ Feature: Fragment schema mirror
         | PatternDetail            |
         | DependencyEdge           |
         | DependencyEdgeSet        |
-        | DependencyTree           |
+        | DependencyContext        |
         | ArchitectureNeighborhood |
         | OpenQuestionList         |
         | OrphanPatternList        |

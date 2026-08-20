@@ -5,12 +5,16 @@
  * @architect-role:contract
  * @architect-bounded-context:execution-context
  *
- * ### When to Use
- *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * Defines the `Deliverable` fragment shape for one execution-context deliverable record.
  */
 import { z } from 'zod';
 
+/**
+ * Fragment shape for one execution-context deliverable record — its name,
+ * status, the tests that cover it, its source location, and optional finding.
+ *
+ * @architect-shape
+ */
 export const DeliverableSchema = z.strictObject({
   kind: z.literal('Deliverable'),
   name: z.string(),
@@ -18,7 +22,6 @@ export const DeliverableSchema = z.strictObject({
   tests: z.array(z.string()),
   location: z.string(),
   finding: z.string().optional(),
-  release: z.string().optional(),
 });
 
 export type Deliverable = z.infer<typeof DeliverableSchema>;

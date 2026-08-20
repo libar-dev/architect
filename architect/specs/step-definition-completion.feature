@@ -81,7 +81,6 @@ Feature: Step Definition Completion
       Given tests/features/behavior/remaining-work-enhancement.feature
       When step definitions are created
       Then priority-based sorting scenarios pass
-      And quarter-based grouping scenarios pass
 
     @acceptance-criteria @happy-path
     Scenario: session-handoffs.steps.ts implements handoff context

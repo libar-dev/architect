@@ -5,14 +5,19 @@
  * @architect-role:contract
  * @architect-bounded-context:operational-insights
  *
- * ### When to Use
- *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * Defines the `TagUsageEntry` fragment shape for one metadata tag and its counted values.
  */
 import { z } from 'zod';
 
 import { TagValueCountSchema } from './supporting.js';
 
+/**
+ * Fragment shape for one metadata tag's usage — the tag name, the count of
+ * patterns carrying it, and the counted distinct values (null when values are
+ * not enumerated).
+ *
+ * @architect-shape
+ */
 export const TagUsageEntrySchema = z.strictObject({
   kind: z.literal('TagUsageEntry'),
   tag: z.string(),

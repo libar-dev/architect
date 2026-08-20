@@ -3,7 +3,7 @@ import { expect } from 'vitest';
 
 import {
   parseAndProjectBusinessRuleSet,
-  projectDocumentationBundle,
+  parseAndProjectDocumentationBundle,
   renderJson,
   renderMarkdown,
   renderUi,
@@ -40,9 +40,9 @@ function createState(): RendererState {
 
 function projectBusinessRulesAt(
   context: ProjectionContext,
-  disclosureLevel: ProgressiveDisclosureLevel
+  disclosureLevel: ProgressiveDisclosureLevel,
 ): ProjectionBundle<Fragment> {
-  return projectDocumentationBundle(context, {
+  return parseAndProjectDocumentationBundle(context, {
     documentType: 'business-rules',
     disclosureLevel,
   });
@@ -140,9 +140,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             const projected = projectBusinessRulesAt(state!.context!, level);
             const json = renderJson(projected, { pretty: true });
             expect(json).toBe(state!.jsonBaseline);
-          }
+          },
         );
-      }
+      },
     );
   });
 
@@ -154,7 +154,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         ({ When, Then }, examples: Record<string, unknown>) => {
           When('I project the business-rules bundle at disclosure "essential"', () => {
             state!.uiBaseline = uiSnapshot(
-              renderUi(projectBusinessRulesAt(state!.context!, 'essential'))
+              renderUi(projectBusinessRulesAt(state!.context!, 'essential')),
             );
           });
 
@@ -165,10 +165,10 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               const projected = projectBusinessRulesAt(state!.context!, level);
               const snapshot = uiSnapshot(renderUi(projected));
               expect(snapshot).toBe(state!.uiBaseline);
-            }
+            },
           );
-        }
+        },
       );
-    }
+    },
   );
 });

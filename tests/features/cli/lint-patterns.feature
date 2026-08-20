@@ -2,6 +2,7 @@
 @architect-pattern:LintPatternsCliBehavior
 @architect-status:completed
 @architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-implements:LintPatternsCLI
 @architect-product-area:DataAPI
 @cli @lint-patterns
 Feature: lint-patterns CLI
@@ -38,14 +39,21 @@ Feature: lint-patterns CLI
   Rule: CLI requires input patterns
 
     **Invariant:** The lint-patterns CLI must fail with a clear error when the --input flag is not provided.
-    **Rationale:** Without input paths, the linter has nothing to validate — failing early prevents confusing "no violations" output that falsely implies clean annotations.
-    **Verified by:** Fail without --input flag
+    **Rationale:** Without input paths, the linter has nothing to validate — failing early prevents confusing "no violations" output that falsely implies clean annotations. Invalid argument values must also fail through the canonical CLI error path so users get a human-readable message instead of a raw stack trace.
+    **Verified by:** Fail without --input flag, Reject invalid output format without stack trace
 
     @validation
     Scenario: Fail without --input flag
       When running "lint-patterns"
       Then exit code is 1
       And output contains "No input patterns"
+
+    @validation
+    Scenario: Reject invalid output format without stack trace
+      When running "lint-patterns --format xml"
+      Then exit code is 1
+      And output contains "Invalid format: xml"
+      And output does not contain raw stack markers
 
   # ============================================================================
   # RULE 3: Lint Passes

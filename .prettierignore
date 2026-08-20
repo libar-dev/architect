@@ -8,3 +8,18 @@ coverage
 .changeset/*.md
 pnpm-lock.yaml
 *.tsbuildinfo
+
+# Generated documentation projection (committed, but the generator owns its format)
+docs-live/
+
+# Ephemeral working / review artifacts (not part of the published surface)
+.cleanup-review/
+.full-review/
+.scratch/
+.pr-coordination/
+.omo/
+
+# Operational feedback log — append-only, and full of literal glob/tag patterns
+# (e.g. `*-values.ts`, `adr-*`) that prettier's markdown parser would silently
+# rewrite as emphasis (`_-values.ts`, `adr-_`), corrupting the recorded text.
+FEEDBACK.md

@@ -5,7 +5,6 @@ export {
 export type { ContextInferenceRule } from './context-inference.js';
 export type {
   DanglingReference,
-  MalformedPattern,
   RawDataset,
   RuntimePatternGraph,
   TransformResult,

@@ -1,3 +1,10 @@
+/**
+ * @architect
+ * @architect-pattern SlugCanonicalization
+ * @architect-status completed
+ * @architect-role:utility
+ * @architect-bounded-context:rendering
+ */
 export function slugForRouteSegment(value: string): string {
   const segment = slugForFilename(value);
 

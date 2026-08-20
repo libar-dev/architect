@@ -1,4 +1,8 @@
 /**
+ * @architect
+ * @architect-pattern OpenQuestionList
+ * @architect-status completed
+ * @architect-role:contract
  * @architect-bounded-context:pattern-relations
  */
 import { z } from 'zod';

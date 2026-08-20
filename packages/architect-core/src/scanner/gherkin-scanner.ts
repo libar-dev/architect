@@ -4,6 +4,7 @@
  * @architect-status active
  * @architect-role:service
  * @architect-bounded-context:scanner
+ * @architect-uses GherkinScanResultContract
  *
  * ## GherkinScanner - Feature File Discovery
  *
@@ -58,7 +59,7 @@ export async function findFeatureFiles(config: GherkinScannerConfig): Promise<re
 }
 
 export async function scanGherkinFiles(
-  config: GherkinScannerConfig
+  config: GherkinScannerConfig,
 ): Promise<Result<GherkinScanResults, never>> {
   const files = await findFeatureFiles(config);
   const results = await Promise.all(files.map((filePath) => scanGherkinFile(filePath)));
@@ -69,7 +70,7 @@ export async function scanGherkinFiles(
 }
 
 async function scanGherkinFile(
-  filePath: string
+  filePath: string,
 ): Promise<{ scanned?: ScannedGherkinFile; error?: GherkinFileError }> {
   try {
     const content = await fs.readFile(filePath, 'utf-8');

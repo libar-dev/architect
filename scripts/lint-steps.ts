@@ -20,7 +20,7 @@ async function collectFeatureFiles(dir: string): Promise<string[]> {
 
 async function main(): Promise<void> {
   const baseDir = process.cwd();
-  const roots = ['tests/features', 'architect/specs', 'architect/decisions', 'architect/releases'];
+  const roots = ['tests/features', 'architect/specs', 'architect/decisions'];
   let parsed = 0;
 
   for (const root of roots) {

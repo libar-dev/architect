@@ -33,7 +33,7 @@ type BundleRouting = {
 
 ## Decision 1: Delivery-reporting view splitting stays at the projection layer
 
-`projectCompletedMilestones` and `projectCurrentWork` stay explicit public projection entrypoints because their retained delivery-reporting views must remain deterministic. The roadmap view stays inside `parseAndProjectDocumentationBundle({ documentType: 'roadmap' })`, where the package can keep the internal timeline helper without re-exposing it as a public projector.
+`projectChangelog` and `projectCurrentWork` stay explicit public projection entrypoints because their retained delivery-reporting views must remain deterministic. The roadmap view stays inside `parseAndProjectDocumentationBundle({ documentType: 'roadmap' })`, where the package can keep the internal timeline helper without re-exposing it as a public projector.
 
 We do not create a single projection function that switches behavior from a runtime `view` option. That keeps routing, naming, and downstream renderer expectations deterministic.
 

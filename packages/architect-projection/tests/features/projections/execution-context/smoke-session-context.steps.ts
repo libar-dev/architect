@@ -16,7 +16,7 @@ interface SmokeState {
 }
 
 const feature = await loadFeature(
-  'tests/features/projections/execution-context/smoke-session-context.feature'
+  'tests/features/projections/execution-context/smoke-session-context.feature',
 );
 
 let state: SmokeState | null = null;
@@ -43,7 +43,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               createPattern('CoreModule', {
                 status: 'active',
                 role: 'service',
-                phase: 1,
                 file: 'architect/specs/core-module.feature',
                 deliverables: [
                   {
@@ -57,7 +56,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               createPattern('HelperModule', {
                 status: 'active',
                 role: 'utility',
-                phase: 1,
                 file: 'architect/specs/helper-module.feature',
                 dependsOn: ['CoreModule'],
               }),
@@ -87,8 +85,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             expect(state!.bundle!.root.sessionType).toBe('implement');
             expect(state!.bundle!.root.metadata).toHaveLength(2);
           });
-        }
+        },
       );
-    }
+    },
   );
 });

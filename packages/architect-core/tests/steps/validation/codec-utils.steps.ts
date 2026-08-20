@@ -111,7 +111,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
           expect(state!.parseResult!.error.validationErrors).toBeDefined();
           expect(state!.parseResult!.error.validationErrors!.length).toBeGreaterThan(0);
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -125,7 +125,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
           'I parse the JSON string \'{"age": 30}\' with source "config.json" using the input codec',
           () => {
             state!.parseResult = state!.inputCodec!.parse('{"age": 30}', 'config.json');
-          }
+          },
         );
         Then('the parse result should be err', () => {
           expect(state!.parseResult!.ok).toBe(false);
@@ -134,7 +134,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
           if (state!.parseResult!.ok) throw new Error('Expected err result');
           expect(state!.parseResult!.error.message).toContain('config.json');
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -153,7 +153,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
         And('the safeParse result name should be "Bob"', () => {
           expect(state!.safeParseResult!.name).toBe('Bob');
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -169,7 +169,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
         Then('the safeParse result should be undefined', () => {
           expect(state!.safeParseResult).toBeUndefined();
         });
-      }
+      },
     );
   });
 
@@ -191,7 +191,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
         And('the formatted error should contain "Invalid JSON"', () => {
           expect(state!.formattedError).toContain('Invalid JSON');
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -207,7 +207,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
               validationErrors: ['  - name: Required'],
             };
             state!.formattedError = formatCodecError(error);
-          }
+          },
         );
         Then('the formatted error should contain "Schema validation failed"', () => {
           expect(state!.formattedError).toContain('Schema validation failed');
@@ -215,7 +215,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
         And('the formatted error should contain "Validation errors"', () => {
           expect(state!.formattedError).toContain('Validation errors');
         });
-      }
+      },
     );
   });
 });

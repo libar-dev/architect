@@ -1,29 +1,53 @@
+/**
+ * @architect
+ * @architect-pattern MarkdownRouteProfile
+ * @architect-status active
+ * @architect-role:service
+ * @architect-bounded-context:rendering
+ * @architect-uses LogicalRouteId, EmissionDescriptor
+ *
+ * ## MarkdownRouteProfile - Logical Route to On-Disk Markdown Path Resolver
+ *
+ * The default resolver that turns a sink-agnostic `LogicalRouteId` into the
+ * file-sink's on-disk markdown layout. `defaultMarkdownRouteProfile` adapts the
+ * route profile interface to `resolveLogicalRoutePath`, which parses the route
+ * id and emits the index / entity / child markdown path, honoring the
+ * `EmissionDescriptor`-derived `MarkdownFileRoute` overrides (root target,
+ * child directory, nested-index layout). The precise boundary where logical
+ * routing becomes the markdown directory tree.
+ *
+ * ### When to Use
+ *
+ * - Mapping a `LogicalRouteId` to the markdown file path the renderer writes.
+ * - Resolving the default on-disk layout for an index, entity, or child route.
+ * - Applying `MarkdownFileRoute` overrides from an emission descriptor to the
+ *   computed path.
+ */
 import type { MarkdownRouteProfile } from './types.js';
 import { slugForFilename } from '../_internal/slug.js';
-import { getDocumentationTypeMetadata } from '../projections/documentation-composition/documentation-types.js';
-import type { LogicalRouteId } from '../projections/documentation-composition/progressive-disclosure.js';
+import type { MarkdownFileRoute } from '../fragments/emission-descriptor.js';
+import { parseLogicalRouteId, type LogicalRouteId } from '../routing/route-id.js';
 
 export const defaultMarkdownRouteProfile: MarkdownRouteProfile = {
-  mapPath(routeId) {
-    return resolveLogicalRoutePath(routeId);
+  mapPath(routeId, _kind, _key, markdownRoute) {
+    return resolveLogicalRoutePath(routeId, markdownRoute);
   },
 };
 
-export function resolveLogicalRoutePath(routeId: LogicalRouteId): string {
+export function resolveLogicalRoutePath(
+  routeId: LogicalRouteId,
+  markdownRoute: MarkdownFileRoute | undefined,
+): string {
   const route = parseLogicalRouteId(routeId);
-  const metadata = getDocumentationTypeMetadata(route.documentType);
-  const directory =
-    metadata?.status === 'supported' && 'childDirectory' in metadata
-      ? metadata.childDirectory
-      : undefined;
-  const resolvedDirectory = directory ?? route.documentType;
 
   if (route.kind === 'index') {
-    return resolveRootMarkdownPath(route.documentType);
+    return resolveRootMarkdownPath(route.documentType, markdownRoute);
   }
 
+  const resolvedDirectory = markdownRoute?.childDirectory ?? route.documentType;
+
   if (route.kind === 'entity') {
-    if (route.documentType === 'requirements-executable') {
+    if (markdownRoute?.entityPathLayout === 'nested-index') {
       return `${resolvedDirectory}/${slugForFilename(route.stableEntityId)}/INDEX.md`;
     }
 
@@ -39,53 +63,13 @@ export function resolveLogicalRoutePath(routeId: LogicalRouteId): string {
     : `${slugForFilename(route.stableEntityId)}/${childFileName}.md`;
 }
 
-function resolveRootMarkdownPath(documentType: string): string {
-  const metadata = getDocumentationTypeMetadata(documentType);
-  if (metadata?.status === 'supported') {
-    return metadata.markdownRootTarget;
-  }
-
-  if (documentType === 'milestones') {
-    return 'COMPLETED-MILESTONES.md';
+function resolveRootMarkdownPath(
+  documentType: string,
+  markdownRoute: MarkdownFileRoute | undefined,
+): string {
+  if (markdownRoute?.rootTarget !== undefined) {
+    return markdownRoute.rootTarget;
   }
 
   return `${documentType.toUpperCase()}.md`;
-}
-
-function parseLogicalRouteId(routeId: LogicalRouteId):
-  | { documentType: string; kind: 'index' }
-  | { documentType: string; kind: 'entity'; stableEntityId: string }
-  | {
-      documentType: string;
-      kind: 'child';
-      stableEntityId: string;
-      childKind: string;
-      stableChildId: string;
-    } {
-  const parts = routeId.split(':');
-  const [documentType, second, third, fourth] = parts;
-
-  if (documentType === undefined || second === undefined) {
-    throw new Error(`Invalid logical route id: ${routeId}`);
-  }
-
-  if (parts.length === 2 && second === 'index') {
-    return { documentType, kind: 'index' };
-  }
-
-  if (parts.length === 2) {
-    return { documentType, kind: 'entity', stableEntityId: second };
-  }
-
-  if (parts.length === 4 && third !== undefined && fourth !== undefined) {
-    return {
-      documentType,
-      kind: 'child',
-      stableEntityId: second,
-      childKind: third,
-      stableChildId: fourth,
-    };
-  }
-
-  throw new Error(`Invalid logical route id: ${routeId}`);
 }

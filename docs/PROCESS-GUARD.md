@@ -1,6 +1,6 @@
 # Process Guard
 
-> **Deprecated:** This document is superseded by the auto-generated [Process Guard Reference](../docs-live/reference/PROCESS-GUARD-REFERENCE.md) which includes quick reference tables, error guides, CLI usage, and programmatic API. This file is preserved for reference only.
+> **Deprecated:** This document is superseded by the auto-generated [Process Guard Reference](../docs-live/reference/PROCESS-GUARD-REFERENCE.md) which includes quick reference tables, error guides, CLI usage, and programmatic API. This file is preserved for reference only and should be read as advisory-era guidance, not the authoritative source.
 
 Process Guard validates delivery workflow changes at commit time. For FSM concepts and state definitions, see [METHODOLOGY.md](./METHODOLOGY.md#fsm-enforced-workflow).
 
@@ -10,30 +10,30 @@ Process Guard validates delivery workflow changes at commit time. For FSM concep
 
 ### Protection Levels
 
-| Status      | Level | Allowed                    | Blocked                               |
-| ----------- | ----- | -------------------------- | ------------------------------------- |
-| `roadmap`   | none  | Full editing               | -                                     |
-| `deferred`  | none  | Full editing               | -                                     |
-| `active`    | scope | Edit existing deliverables | Adding new deliverables               |
-| `completed` | hard  | Nothing                    | Any change without `@*-unlock-reason` |
+| Status      | Signal | Allowed                                        | Warned / Blocked                                          |
+| ----------- | ------ | ---------------------------------------------- | --------------------------------------------------------- |
+| `roadmap`   | none   | Full editing                                   | -                                                         |
+| `deferred`  | none   | Full editing                                   | -                                                         |
+| `active`    | scope  | Edit existing deliverables and record progress | New pending deliverables warn; invalid FSM jumps block    |
+| `completed` | reopen | Reopen/edit completed work                     | Missing `@*-unlock-reason` warns; invalid FSM jumps block |
 
 ### Valid Transitions
 
-| From        | To                     | Notes                           |
-| ----------- | ---------------------- | ------------------------------- |
-| `roadmap`   | `active`, `deferred`   | Start work or postpone          |
-| `active`    | `completed`, `roadmap` | Finish or regress if blocked    |
-| `deferred`  | `roadmap`              | Resume planning                 |
-| `completed` | _(none)_               | Terminal — use unlock to modify |
+| From        | To                     | Notes                        |
+| ----------- | ---------------------- | ---------------------------- |
+| `roadmap`   | `active`, `deferred`   | Start work or postpone       |
+| `active`    | `completed`, `roadmap` | Finish or regress if blocked |
+| `deferred`  | `roadmap`              | Resume planning              |
+| `completed` | `active`, `roadmap`    | Advisory reopen path         |
 
 ### Escape Hatches
 
-| Situation                     | Solution                           | Example                                       |
-| ----------------------------- | ---------------------------------- | --------------------------------------------- |
-| Fix bug in completed spec     | Add `@*-unlock-reason:'reason'`    | `@architect-unlock-reason:'Fix typo'`         |
-| Modify outside session scope  | `--ignore-session` flag            | `architect-guard --staged --ignore-session`   |
-| CI treats warnings as errors  | `--strict` flag                    | `architect-guard --all --strict`              |
-| Skip workflow (legacy import) | Multiple transitions in one commit | Set `roadmap` then `completed` in same commit |
+| Situation                     | Solution                                                             | Example                                       |
+| ----------------------------- | -------------------------------------------------------------------- | --------------------------------------------- |
+| Fix bug in completed spec     | Reopen/edit; add `@*-unlock-reason` to suppress the advisory warning | `@architect-unlock-reason:'Fix typo'`         |
+| Modify outside session scope  | `--ignore-session` flag                                              | `architect-guard --staged --ignore-session`   |
+| CI treats warnings as errors  | `--strict` flag                                                      | `architect-guard --all --strict`              |
+| Skip workflow (legacy import) | Multiple transitions in one commit                                   | Set `roadmap` then `completed` in same commit |
 
 ---
 
@@ -45,13 +45,13 @@ Process Guard validates delivery workflow changes at commit time. For FSM concep
 
 ```text
 [ERROR] specs/phase-state-machine.feature
-  Cannot modify completed spec without unlock reason
-  Suggestion: Add @architect-unlock-reason:'reason for modification'
+  Completed pattern changed without unlock-reason
+  Suggestion: Add @architect-unlock-reason:'reason for modification' to suppress the warning
 ```
 
-**Cause:** File has `@architect-status:completed` but no unlock annotation.
+**Cause:** File has `@architect-status:completed` and was changed without an unlock annotation.
 
-**Fix:** Add unlock reason explaining why modification is necessary:
+**Fix:** Add unlock reason if you want to suppress the advisory warning and record intent:
 
 ```gherkin
 @architect
@@ -65,9 +65,9 @@ Feature: Phase State Machine
 
 - Minimum **10 characters** (short reasons like "fix" are rejected)
 - Cannot be a placeholder: `test`, `xxx`, `bypass`, `temp`, `todo`, `fixme`
-- If the reason is invalid, the error still fires — Process Guard treats it as no unlock reason
+- If the reason is invalid, the warning still fires — Process Guard treats it as no unlock reason
 
-**Alternative:** If this should be new work, create a new spec instead of modifying completed work.
+**Alternative:** If this should be a larger change, reopen the pattern to `roadmap` or `active` rather than editing it in place silently.
 
 ---
 
@@ -100,7 +100,7 @@ Feature: Phase State Machine
 | `roadmap->completed`  | Must go through `active`     | `roadmap->active->completed`           |
 | `deferred->active`    | Must return to roadmap first | `deferred->roadmap->active`            |
 | `deferred->completed` | Cannot skip two states       | `deferred->roadmap->active->completed` |
-| `completed->*`        | Terminal state               | Use `@*-unlock-reason` to modify       |
+| `completed->deferred` | No direct path               | Reopen via `roadmap` if needed         |
 
 ---
 

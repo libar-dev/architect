@@ -32,10 +32,15 @@
 // See src/cli/error-handler.ts for the unified handler.
 // ────────────────────────────────────────────────────────────────────────
 
-import { printVersionAndExit, handleCliError, isDirectCliEntrypoint } from './shared.js';
-import { getPatternName, getRelationships } from '@libar-dev/architect-core';
-import { scanPatterns } from '@libar-dev/architect-core';
-import { scanGherkinFiles } from '@libar-dev/architect-core';
+import {
+  exitWithProcessError,
+  getPatternName,
+  getRelationships,
+  scanGherkinFiles,
+  scanPatterns,
+  findFilesToScan,
+} from '@libar-dev/architect-core';
+import { printVersionAndExit, isDirectCliEntrypoint } from './shared.js';
 import {
   loadConfig,
   applyProjectSourceDefaults,
@@ -52,14 +57,11 @@ import {
 import { normalizeStatus } from '@libar-dev/architect-core';
 import type { DanglingReference, RuntimePatternGraph } from '@libar-dev/architect-core';
 import {
-  validateDoD,
-  formatDoDSummary,
   detectAntiPatterns,
   formatAntiPatternReport,
   toValidationIssues,
   DEFAULT_THRESHOLDS,
 } from '../validation/index.js';
-import { getDeliverableWorkflowPatterns } from '../validation/dod-validator.js';
 import {
   DANGLING_BASELINE_SOURCE_PATH,
   compareDanglingBaseline,
@@ -129,10 +131,6 @@ export interface ValidateCLIConfig {
   format: 'pretty' | 'json';
   /** Show help */
   help: boolean;
-  /** Enable DoD validation mode */
-  dod: boolean;
-  /** Specific phases to validate (empty = all completed phases) */
-  phases: number[];
   /** Enable anti-pattern detection */
   antiPatterns: boolean;
   /** Override scenario bloat threshold */
@@ -161,8 +159,6 @@ export function parseArgs(argv: string[] = process.argv.slice(2)): ValidateCLICo
     strict: false,
     format: 'pretty',
     help: false,
-    dod: false,
-    phases: [],
     antiPatterns: false,
     scenarioBloatThreshold: DEFAULT_THRESHOLDS.scenarioBloatThreshold,
     megaFeatureLineThreshold: DEFAULT_THRESHOLDS.megaFeatureLineThreshold,
@@ -212,18 +208,6 @@ export function parseArgs(argv: string[] = process.argv.slice(2)): ValidateCLICo
         throw new Error(`Invalid format: ${nextArg}. Use "pretty" or "json"`);
       }
       config.format = nextArg;
-    } else if (arg === '--dod') {
-      config.dod = true;
-    } else if (arg === '--phase') {
-      const nextArg = argv[++i];
-      if (!nextArg) {
-        throw new Error(`Missing value for ${arg} flag`);
-      }
-      const phaseNum = parseInt(nextArg, 10);
-      if (isNaN(phaseNum) || phaseNum < 1) {
-        throw new Error(`Invalid phase number: ${nextArg}. Must be a positive integer.`);
-      }
-      config.phases.push(phaseNum);
     } else if (arg === '--anti-patterns') {
       config.antiPatterns = true;
     } else if (arg === '--scenario-threshold') {
@@ -292,10 +276,6 @@ Options:
   -h, --help                  Show this help message
   -v, --version               Show version number
 
-DoD Validation:
-  --dod                       Enable Definition of Done validation
-  --phase <N>                 Validate specific phase (repeatable, default: all completed)
-
 Anti-Pattern Detection:
   --anti-patterns             Enable anti-pattern detection
   --scenario-threshold <N>    Max scenarios per feature (default: 30)
@@ -308,21 +288,16 @@ Exit Codes:
   2  Warnings found (with --strict)
 
 Cross-Source Validation Checks:
-  error    phase-mismatch               Phase number differs between sources
   error    status-mismatch              Status differs between sources
-  warning  missing-pattern-in-gherkin   Pattern in TypeScript has no matching feature
-  warning  missing-deliverables         Completed phase has no deliverables defined
-  warning  deliverable-missing-fields   Deliverable missing required fields
   info     missing-pattern-in-ts        Pattern in Gherkin has no matching TypeScript
   info     unmatched-dependency         Dependency references non-existent pattern
-
-DoD Validation Checks (--dod):
-  error    incomplete-deliverables      Completed phase has incomplete deliverables
-  error    missing-acceptance-criteria  Completed phase has no @acceptance-criteria scenarios
 
 Anti-Pattern Detection (--anti-patterns):
   error    process-in-code              Process metadata in code (should be features-only)
   error    removed-tag                  Removed tag still present (silent data loss)
+  error    ts-missing-architect-marker  Pattern JSDoc lacks leading @architect
+  error    ts-tags-after-prose          Architect tags after description prose
+  error    ts-uses-space-form           Space-separated TypeScript @architect-uses
   warning  magic-comments               Too many generator hints in features
   warning  scenario-bloat               Too many scenarios per feature
   warning  mega-feature                 Feature file too large
@@ -331,17 +306,11 @@ Examples:
   # Cross-source validation
   architect-validate -i "src/**/*.ts" -F "tests/features/**/*.feature"
 
-  # DoD validation for all completed phases
-  architect-validate -i "src/**/*.ts" -F "features/**/*.feature" --dod
-
-  # DoD validation for specific phase
-  architect-validate -i "src/**/*.ts" -F "features/**/*.feature" --dod --phase 14
-
   # Anti-pattern detection
   architect-validate -i "src/**/*.ts" -F "features/**/*.feature" --anti-patterns
 
-  # Full validation (cross-source + DoD + anti-patterns)
-  architect-validate -i "src/**/*.ts" -F "features/**/*.feature" --dod --anti-patterns --strict
+  # Full validation (cross-source + anti-patterns)
+  architect-validate -i "src/**/*.ts" -F "features/**/*.feature" --anti-patterns --strict
 
   # JSON output for tooling
   architect-validate -i "src/**/*.ts" -F "features/**/*.feature" --format json
@@ -356,7 +325,7 @@ Examples:
  */
 function isDirectNameMatch(
   patternName: string,
-  counterpart: ExtractedPattern | undefined
+  counterpart: ExtractedPattern | undefined,
 ): counterpart is ExtractedPattern {
   if (counterpart === undefined) {
     return false;
@@ -378,7 +347,7 @@ function isDirectNameMatch(
 function hasCrossSourceRelationshipMatch(
   patternName: string,
   counterpartByName: ReadonlyMap<string, ExtractedPattern>,
-  dataset: RuntimePatternGraph
+  dataset: RuntimePatternGraph,
 ): boolean {
   const relationships = getRelationships(dataset, patternName);
   if (relationships === undefined) {
@@ -405,9 +374,7 @@ function hasCrossSourceRelationshipMatch(
  *
  * Compares TypeScript patterns against Gherkin patterns to find:
  * - Missing patterns in either source (with implements-aware resolution)
- * - Phase number mismatches
  * - Status mismatches (after normalization)
- * - Missing deliverables for completed phases
  * - Invalid dependencies
  *
  * DD-2: Consumes RuntimePatternGraph instead of raw scanner/extractor output.
@@ -434,7 +401,7 @@ export function validatePatterns(dataset: RuntimePatternGraph): ValidationSummar
   }
 
   let matched = 0;
-  let missingInGherkinCount = 0;
+  const missingInGherkinCount = 0;
 
   // Check TypeScript patterns against Gherkin
   for (const tsPattern of tsPatterns) {
@@ -445,34 +412,12 @@ export function validatePatterns(dataset: RuntimePatternGraph): ValidationSummar
       : undefined;
 
     if (!gherkinMatch) {
-      // Phase 2: Check implements relationships before reporting
+      // Phase 2: Check implements relationships before counting as matched.
       if (hasCrossSourceRelationshipMatch(tsName, gherkinByName, dataset)) {
         matched++;
-      } else if (tsPattern.phase !== undefined) {
-        // Only report for roadmap patterns (those with phase numbers)
-        missingInGherkinCount++;
-        issues.push({
-          severity: 'warning',
-          message: `Pattern "${tsName}" in TypeScript has no matching Gherkin feature`,
-          source: 'cross-source',
-          pattern: tsName,
-          file: tsPattern.source.file,
-        });
       }
     } else {
       matched++;
-
-      // Check phase consistency
-      if (tsPattern.phase !== undefined && gherkinMatch.phase !== undefined) {
-        if (tsPattern.phase !== gherkinMatch.phase) {
-          issues.push({
-            severity: 'error',
-            message: `Phase mismatch for "${tsName}": TypeScript=${String(tsPattern.phase)}, Gherkin=${String(gherkinMatch.phase)}`,
-            source: 'cross-source',
-            pattern: tsName,
-          });
-        }
-      }
 
       // Check status consistency
       const tsStatus = normalizeStatus(tsPattern.status);
@@ -515,34 +460,6 @@ export function validatePatterns(dataset: RuntimePatternGraph): ValidationSummar
     }
   }
 
-  // Check deliverables for completed roadmap patterns (those with phase numbers).
-  // Test features and ADRs are completed but don't participate in the deliverables workflow.
-  for (const gherkinPattern of getDeliverableWorkflowPatterns(dataset)) {
-    const deliverables = gherkinPattern.deliverables ?? [];
-    const name = getPatternName(gherkinPattern);
-    if (deliverables.length === 0) {
-      issues.push({
-        severity: 'warning',
-        message: `Completed pattern "${name}" has no deliverables defined`,
-        source: 'gherkin',
-        pattern: name,
-        file: gherkinPattern.source.file,
-      });
-    } else {
-      // Validate deliverable fields
-      for (const d of deliverables) {
-        if (!d.name || d.name.trim() === '') {
-          issues.push({
-            severity: 'warning',
-            message: `Deliverable in "${name}" missing name`,
-            source: 'gherkin',
-            pattern: name,
-          });
-        }
-      }
-    }
-  }
-
   // Check dependencies exist
   const allPatternNames = new Set([...tsByName.keys(), ...gherkinByName.keys()]);
 
@@ -576,7 +493,7 @@ export function validatePatterns(dataset: RuntimePatternGraph): ValidationSummar
 /**
  * Format summary for pretty output
  */
-function formatPretty(output: ValidatePatternsOutput, verbose = false): string {
+function formatPretty(output: ValidatePatternsOutput, verbose = false, strict = false): string {
   const lines: string[] = [];
   const { issues, stats, diagnostics } = output;
 
@@ -594,6 +511,8 @@ function formatPretty(output: ValidatePatternsOutput, verbose = false): string {
   const errors = issues.filter((i) => i.severity === 'error');
   const warnings = issues.filter((i) => i.severity === 'warning');
   const infos = issues.filter((i) => i.severity === 'info');
+  const diagnosticErrors = diagnostics.filter((diagnostic) => diagnostic.severity === 'error');
+  const diagnosticWarnings = diagnostics.filter((diagnostic) => diagnostic.severity === 'warning');
 
   if (errors.length > 0) {
     lines.push(`Errors (${String(errors.length)}):`);
@@ -621,7 +540,7 @@ function formatPretty(output: ValidatePatternsOutput, verbose = false): string {
     lines.push(`Extraction Diagnostics (${String(diagnostics.length)}):`);
     for (const diagnostic of diagnostics) {
       lines.push(
-        `  [${diagnostic.severity.toUpperCase()}] ${diagnostic.code}: ${diagnostic.message}`
+        `  [${diagnostic.severity.toUpperCase()}] ${diagnostic.code}: ${diagnostic.message}`,
       );
       lines.push(`          at ${diagnostic.filePath}`);
       if (diagnostic.suggestion) {
@@ -643,11 +562,16 @@ function formatPretty(output: ValidatePatternsOutput, verbose = false): string {
   }
 
   // Summary line
-  if (errors.length === 0 && warnings.length === 0) {
+  if (
+    errors.length === 0 &&
+    warnings.length === 0 &&
+    diagnosticErrors.length === 0 &&
+    (!strict || diagnosticWarnings.length === 0)
+  ) {
     lines.push('All validations passed.');
   } else {
     lines.push(
-      `Found ${String(errors.length)} error(s), ${String(warnings.length)} warning(s), ${String(infos.length)} info message(s).`
+      `Found ${String(errors.length + diagnosticErrors.length)} error(s), ${String(warnings.length + diagnosticWarnings.length)} warning(s), ${String(infos.length)} info message(s).`,
     );
   }
 
@@ -682,7 +606,7 @@ function formatDanglingEntry(entry: DanglingReference): string {
 async function enforceDanglingBaseline(
   summary: ValidationSummary,
   entries: readonly DanglingReference[],
-  updateBaseline: boolean
+  updateBaseline: boolean,
 ): Promise<{ updatedEntryCount: number | null }> {
   let updatedEntryCount: number | null = null;
 
@@ -728,7 +652,7 @@ async function main(): Promise<void> {
 
   if (!configApplied && config.input.length === 0) {
     console.error(
-      '  (No architect.config.ts or architect.config.js found; provide -i/--input flags)'
+      '  (No architect.config.ts or architect.config.js found; provide -i/--input flags)',
     );
   }
 
@@ -736,14 +660,14 @@ async function main(): Promise<void> {
   if (config.input.length === 0) {
     console.error('Error: No TypeScript sources specified.');
     console.error(
-      'Provide -i/--input flags or configure sources in architect.config.ts or architect.config.js'
+      'Provide -i/--input flags or configure sources in architect.config.ts or architect.config.js',
     );
     process.exit(1);
   }
   if (config.features.length === 0) {
     console.error('Error: No feature files specified.');
     console.error(
-      'Provide -F/--features flags or configure sources in architect.config.ts or architect.config.js'
+      'Provide -F/--features flags or configure sources in architect.config.ts or architect.config.js',
     );
     process.exit(1);
   }
@@ -779,7 +703,7 @@ async function main(): Promise<void> {
     });
     if (!pipelineResult.ok) {
       throw new Error(
-        `Pipeline error [${pipelineResult.error.step}]: ${pipelineResult.error.message}`
+        `Pipeline error [${pipelineResult.error.step}]: ${pipelineResult.error.message}`,
       );
     }
     const {
@@ -807,44 +731,19 @@ async function main(): Promise<void> {
     const { updatedEntryCount } = await enforceDanglingBaseline(
       summary,
       pipelineValidation.danglingReferences,
-      config.updateBaseline
+      config.updateBaseline,
     );
 
     // Output cross-source results
     if (config.format === 'pretty') {
       if (updatedEntryCount !== null) {
         process.stdout.write(
-          `Updated dangling baseline at ${DANGLING_BASELINE_SOURCE_PATH} with ${String(updatedEntryCount)} entries.\n\n`
+          `Updated dangling baseline at ${DANGLING_BASELINE_SOURCE_PATH} with ${String(updatedEntryCount)} entries.\n\n`,
         );
       }
-      process.stdout.write(`${formatPretty({ ...summary, diagnostics }, config.verbose)}\n`);
-    }
-
-    // Run DoD validation if enabled
-    let dodHasErrors = false;
-    if (config.dod) {
-      const dodSummary = validateDoD(dataset, config.phases);
-
-      if (config.format === 'pretty') {
-        process.stdout.write(`${formatDoDSummary(dodSummary)}\n`);
-      }
-
-      // Add DoD failures to issues
-      for (const result of dodSummary.results) {
-        if (!result.isDoDMet) {
-          dodHasErrors = true;
-          for (const msg of result.messages) {
-            if (!msg.startsWith('DoD met')) {
-              summary.issues.push({
-                severity: 'error',
-                message: `[DoD] Phase ${String(result.phase)} (${result.patternName}): ${msg}`,
-                source: 'gherkin',
-                pattern: result.patternName,
-              });
-            }
-          }
-        }
-      }
+      process.stdout.write(
+        `${formatPretty({ ...summary, diagnostics }, config.verbose, config.strict)}\n`,
+      );
     }
 
     // Run anti-pattern detection if enabled.
@@ -876,7 +775,17 @@ async function main(): Promise<void> {
         magicCommentThreshold: config.magicCommentThreshold,
       };
 
-      const violations = detectAntiPatterns(scanResult.value.files, gherkinScanResult.value.files, {
+      // Integrity detectors read raw JSDoc. Include globbed files the opt-in
+      // scanner skipped (pattern JSDoc with no leading bare @architect).
+      const globbedTypeScriptFiles = await findFilesToScan(scannerConfig);
+      const scannedByPath = new Map(
+        scanResult.value.files.map((file) => [file.filePath, file] as const),
+      );
+      const filesForAntiPatterns = globbedTypeScriptFiles.map(
+        (filePath) => scannedByPath.get(filePath) ?? { filePath, directives: [] },
+      );
+
+      const violations = detectAntiPatterns(filesForAntiPatterns, gherkinScanResult.value.files, {
         registry,
         thresholds,
       });
@@ -903,9 +812,16 @@ async function main(): Promise<void> {
     }
 
     // Determine exit code based on all validation results
+    const hasDiagnosticErrors = diagnostics.some((diagnostic) => diagnostic.severity === 'error');
+    const hasDiagnosticWarnings = diagnostics.some(
+      (diagnostic) => diagnostic.severity === 'warning',
+    );
     const hasErrors =
-      summary.issues.some((i) => i.severity === 'error') || dodHasErrors || antiPatternHasErrors;
-    const hasWarnings = summary.issues.some((i) => i.severity === 'warning');
+      summary.issues.some((i) => i.severity === 'error') ||
+      antiPatternHasErrors ||
+      hasDiagnosticErrors;
+    const hasWarnings =
+      summary.issues.some((i) => i.severity === 'warning') || hasDiagnosticWarnings;
 
     if (hasErrors) {
       process.exit(1);
@@ -915,13 +831,13 @@ async function main(): Promise<void> {
       process.exit(0);
     }
   } catch (error) {
-    handleCliError(error, 1);
+    exitWithProcessError(error, 1);
   }
 }
 
 // Entry point — catch ensures parseArgs errors reach the unified handler
 export async function runValidatePatternsCli(
-  argv: string[] = process.argv.slice(2)
+  argv: string[] = process.argv.slice(2),
 ): Promise<void> {
   process.argv = [process.argv[0] ?? 'node', process.argv[1] ?? 'architect-validate', ...argv];
   await main();
@@ -929,6 +845,6 @@ export async function runValidatePatternsCli(
 
 if (isDirectCliEntrypoint(import.meta.url)) {
   void main().catch((error: unknown) => {
-    handleCliError(error, 1);
+    exitWithProcessError(error, 1);
   });
 }

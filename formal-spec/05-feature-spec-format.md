@@ -33,13 +33,18 @@ A feature spec file has this structure, from top to bottom:
 The tag header block appears before the `Feature:` keyword. Tags follow the ordering
 convention defined in §03.
 
-**Level 1 minimum (candidate):**
+**Level 1 minimum (candidate tier — the baseline five):**
 
 ```gherkin
 @architect
 @architect-pattern:UserRegistration
 @architect-status:candidate
+@architect-product-area:<area>
+@architect-parent:<EpicName>
 ```
+
+(The idea tier adds explicit `@architect-maturity:idea`; the candidate tier drops it and
+derives maturity to `idea` from `status:candidate`.)
 
 **Level 1 minimum (accepted):**
 
@@ -125,8 +130,8 @@ Design-level specs use `**Problem:**` and `**Solution:**`:
 ```gherkin
 Feature: McpServerIntegration - MCP server lifecycle and tool dispatch
 
-  **Problem:** The desktop app needs to query the PatternGraphAPI for live
-  architecture data, but the API runs as a Node.js module that must be
+  **Problem:** The desktop app needs to query the frozen Graph for live
+  architecture data, but the Graph runs as a Node.js module that must be
   initialized with project configuration, watched for file changes, and
   gracefully shut down.
 
@@ -134,7 +139,7 @@ Feature: McpServerIntegration - MCP server lifecycle and tool dispatch
   1. **Initialization** — On project connection, the main process loads
      `architect.config.ts` and calls `buildPatternGraph()`.
   2. **Query dispatch** — Renderer process sends typed IPC requests that
-     the main process routes to PatternGraphAPI methods.
+     the main process routes to Graph fields, FSM operations, and pure kernels.
   3. **File watching** — A file watcher triggers automatic rebuilds when
      annotated files change.
   4. **Shutdown** — On app close, the watcher is disposed and resources freed.
@@ -242,11 +247,11 @@ Every Level 2+ rule MUST contain these three metadata blocks:
     **Verified by:** Registration with existing email, case-insensitive check.
 ```
 
-| Block              | Required | Description                                                     |
-| ------------------ | -------- | --------------------------------------------------------------- |
-| `**Invariant:**`   | MUST     | A single sentence stating the non-negotiable constraint         |
-| `**Rationale:**`   | MUST     | 1-3 sentences explaining WHY — what breaks if violated          |
-| `**Verified by:**` | MUST     | Comma-separated list of scenario names that prove the invariant |
+| Block              | Required | Description                                                                                   |
+| ------------------ | -------- | --------------------------------------------------------------------------------------------- |
+| `**Invariant:**`   | MUST     | A single sentence stating the non-negotiable constraint                                       |
+| `**Rationale:**`   | MUST     | 1-3 sentences explaining WHY — what breaks if violated; must NOT merely restate the Invariant |
+| `**Verified by:**` | MUST     | Comma-separated list of scenario names that prove the invariant                               |
 
 ### Design-Level Rule Additions
 

@@ -27,7 +27,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects the bounded-context catalog bundle that powers context lists and summaries.
  */
 
 import type { ProjectionContext } from '../../context/projection-context.js';
@@ -38,7 +38,7 @@ import { buildBoundedContext } from './architecture-context.internal.js';
 
 export function projectBoundedContext(
   context: ProjectionContext,
-  scope?: string
+  scope?: string,
 ): ProjectionBundle<BoundedContext> {
   return projectSingle(buildBoundedContext(context, scope));
 }

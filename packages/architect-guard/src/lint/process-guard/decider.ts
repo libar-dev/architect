@@ -7,7 +7,6 @@
  * @architect-bounded-context:lint
  * @architect-implements ProcessGuardLinter
  * @architect-uses FSMValidator, DeriveProcessState, DetectChanges
- * @architect-uses:FSMValidator,DeriveProcessState,DetectChanges
  *
  * ## ProcessGuardDecider - Pure Validation Logic
  *
@@ -29,90 +28,20 @@
  *
  * ### Rules Implemented
  *
- * 1. **Protection Level** - Completed files require unlock-reason
- * 2. **Status Transition** - Transitions must follow PDR-005 FSM
- * 3. **Scope Creep** - Active specs cannot add new deliverables
+ * 1. **Protection Level** - Modifying a completed spec warns (advisory);
+ *    unlock-reason suppresses it (PDR-006)
+ * 2. **Status Transition** - Transitions must follow the FSM (PDR-005, as
+ *    revised by PDR-006: completed reopens to active/roadmap)
+ * 3. **Scope Creep** - Adding pending scope to an active spec warns (advisory);
+ *    adding real-progress scope is silent; unlock-reason suppresses (PDR-006)
  * 4. **Session Scope** - Modifications outside session scope warn
+ * 5. **Session Exclusion** - Explicitly excluded files are a hard error
+ * 6. **Deliverable Removal** - Removing a deliverable from an active spec warns;
+ *    unlock-reason suppresses (PDR-006)
  *
- * ### Error Guide Content (convention: process-guard-errors)
- *
- * ## completed-protection
- *
- * **Invariant:** Completed specs are immutable without an explicit unlock
- * reason. The unlock reason must be at least 10 characters and cannot be
- * a placeholder.
- *
- * **Rationale:** The `completed` status represents verified, accepted work.
- * Allowing silent modification undermines the terminal-state guarantee.
- * Requiring an unlock reason creates an audit trail and forces the developer
- * to justify why completed work needs revisiting.
- *
- * | Situation | Solution | Example |
- * |-----------|----------|---------|
- * | Fix typo in completed spec | Add unlock reason tag | `@architect-unlock-reason:Fix-typo-in-FSM-diagram` |
- * | Spec needs rework | Create new spec instead | New feature file with `roadmap` status |
- * | Legacy import | Multiple transitions in one commit | Set `roadmap` then `completed` |
- *
- * ## invalid-status-transition
- *
- * **Invariant:** Status transitions must follow the PDR-005 FSM path.
- * The only valid paths are: roadmap to active, roadmap to deferred,
- * active to completed, active to roadmap, deferred to roadmap.
- *
- * **Rationale:** The FSM enforces a deliberate progression through
- * planning, implementation, and completion. Skipping states (e.g.,
- * roadmap to completed) means work was never tracked as active, breaking
- * session scoping and deliverable validation.
- *
- * | Attempted | Why Invalid | Valid Path |
- * |-----------|-------------|------------|
- * | roadmap to completed | Must go through active | roadmap to active to completed |
- * | deferred to active | Must return to roadmap first | deferred to roadmap to active |
- * | deferred to completed | Cannot skip two states | deferred to roadmap to active to completed |
- *
- * ## scope-creep
- *
- * **Invariant:** Active specs cannot add new deliverables. Scope is locked
- * when status transitions to `active`.
- *
- * **Rationale:** Prevents scope creep during implementation. Plan fully
- * before starting; implement what was planned. Adding deliverables mid-
- * implementation signals inadequate planning and risks incomplete work.
- *
- * | Situation | Solution | Example |
- * |-----------|----------|---------|
- * | Need new deliverable | Revert to roadmap first | Change status to roadmap, add deliverable, then back to active |
- * | Discovered work during implementation | Create new spec | New feature file for the discovered work |
- *
- * ## session-scope
- *
- * **Invariant:** Files outside the active session scope trigger warnings
- * to prevent accidental cross-session modifications.
- *
- * **Rationale:** Session scoping ensures focused work. Modifying files
- * outside the session scope often indicates scope creep or working on
- * the wrong task. The warning is informational (not blocking) to allow
- * intentional cross-scope changes with `--ignore-session`.
- *
- * ## session-excluded
- *
- * **Invariant:** Files explicitly excluded from a session cannot be
- * modified in that session. This is a hard error, not a warning.
- *
- * **Rationale:** Explicit exclusion is a deliberate decision to protect
- * certain files from modification during a session. Unlike session-scope
- * (warning), exclusion represents a conscious boundary that should not
- * be violated without changing the session configuration.
- *
- * ## deliverable-removed
- *
- * **Invariant:** Removing a deliverable from an active spec triggers a
- * warning to ensure the removal is intentional and documented.
- *
- * **Rationale:** Deliverable removal during active implementation may
- * indicate descoping or completion elsewhere. The warning ensures
- * visibility -- the commit message should document why the deliverable
- * was removed.
+ * The invariants and rationale for each rule are the load-bearing narrative
+ * in `tests/features/process-guard-rules.feature`
+ * (`@architect-pattern:ProcessGuardRulesExecutableTests`).
  */
 
 import {
@@ -234,10 +163,13 @@ export function validateChanges(input: DeciderInput): DeciderOutput {
 }
 
 /**
- * Check protection level violations.
+ * Check protection level (completed-spec) advisory.
  *
- * - Completed (hard) files require unlock-reason tag
- * - Returns error if modified without unlock
+ * Modifying or reopening a completed (hard-protected) spec surfaces a warning,
+ * never a commit-blocking error (PDR-006 Rule 1/2). `@architect-unlock-reason`
+ * is optional: when present it records intent and suppresses the warning; when
+ * absent the guard warns but does not block. `--strict` promotes the warning to
+ * blocking via the shared severity model in `validateChanges`.
  *
  * @param state - Current process state
  * @param changes - Detected changes
@@ -246,7 +178,7 @@ export function validateChanges(input: DeciderInput): DeciderOutput {
 function checkProtectionLevel(
   state: ProcessState,
   changes: ChangeDetection,
-  registry?: TagRegistry
+  registry?: TagRegistry,
 ): ProcessViolation[] {
   const tagPrefix = registry?.tagPrefix ?? DEFAULT_TAG_PREFIX;
   const violations: ProcessViolation[] = [];
@@ -255,7 +187,7 @@ function checkProtectionLevel(
     const fileState = state.files.get(file);
     if (!fileState) continue;
 
-    // Check hard protection (completed)
+    // Check hard protection (completed) — unlock-reason suppresses the warning
     if (fileState.protection === 'hard' && !fileState.hasUnlockReason) {
       // Exempt files transitioning TO a terminal state — this is a completion, not a post-completion edit
       const transition = changes.statusTransitions.get(file);
@@ -265,11 +197,11 @@ function checkProtectionLevel(
       violations.push(
         createViolation(
           'completed-protection',
-          'error',
-          `Cannot modify completed spec '${file}' without unlock reason`,
+          'warning',
+          `Modifying completed spec '${file}'`,
           file,
-          `Add ${tagPrefix}unlock-reason:'your reason' to proceed`
-        )
+          `Add ${tagPrefix}unlock-reason:'your reason' to record intent and suppress this warning`,
+        ),
       );
     }
   }
@@ -327,7 +259,7 @@ function checkStatusTransitions(state: ProcessState, changes: ChangeDetection): 
       }
 
       violations.push(
-        createViolation('invalid-status-transition', 'error', message, file, suggestion)
+        createViolation('invalid-status-transition', 'error', message, file, suggestion),
       );
     }
   }
@@ -336,9 +268,15 @@ function checkStatusTransitions(state: ProcessState, changes: ChangeDetection): 
 }
 
 /**
- * Check for scope creep (new deliverables in active specs).
+ * Check active-spec scope changes (advisory).
  *
- * Active specs cannot add new deliverables.
+ * Expanding the scope of an active (scope-locked) spec is advisory (PDR-006
+ * Rule 3): adding a deliverable whose status is `pending` (unbuilt scope)
+ * warns; adding a deliverable that records real progress
+ * (in-progress/complete/deferred/superseded/n/a) is silent; removing a
+ * deliverable warns. `@architect-unlock-reason` suppresses these warnings, and
+ * `--strict` promotes them to blocking. No deliverable change to an active spec
+ * blocks a commit on the commit path.
  */
 function checkScopeCreep(state: ProcessState, changes: ChangeDetection): ProcessViolation[] {
   const violations: ProcessViolation[] = [];
@@ -347,16 +285,21 @@ function checkScopeCreep(state: ProcessState, changes: ChangeDetection): Process
     const fileState = state.files.get(file);
     if (!fileState) continue;
 
-    // Only check active specs (scope-locked)
-    if (fileState.protection === 'scope' && deliverableChange.added.length > 0) {
+    // Only active specs (scope-locked) are advised on; unlock-reason suppresses.
+    if (fileState.protection !== 'scope' || fileState.hasUnlockReason) {
+      continue;
+    }
+
+    // Adding pending (unbuilt) scope warns; adding real-progress scope is silent.
+    if (deliverableChange.addedPending.length > 0) {
       violations.push(
         createViolation(
           'scope-creep',
-          'error',
-          `Cannot add deliverables to active spec '${file}': ${deliverableChange.added.join(', ')}`,
+          'warning',
+          `Adding pending scope to active spec '${file}': ${deliverableChange.addedPending.join(', ')}`,
           file,
-          'Create new spec or revert to roadmap status first'
-        )
+          'Confirm this scope is intentional, or add @architect-unlock-reason to suppress this warning.',
+        ),
       );
     }
 
@@ -368,8 +311,8 @@ function checkScopeCreep(state: ProcessState, changes: ChangeDetection): Process
           'warning',
           `Deliverable removed from '${file}': ${deliverableChange.removed.join(', ')}`,
           file,
-          'Was this completed or descoped? Consider documenting the reason.'
-        )
+          'Was this completed or descoped? Consider documenting the reason.',
+        ),
       );
     }
   }
@@ -397,8 +340,8 @@ function checkSessionScope(state: ProcessState, changes: ChangeDetection): Proce
           'warning',
           `File '${file}' is not in session scope`,
           file,
-          `Add to session '${state.activeSession.id}' scope or use --ignore-session flag`
-        )
+          `Add to session '${state.activeSession.id}' scope or use --ignore-session flag`,
+        ),
       );
     }
   }
@@ -426,8 +369,8 @@ function checkSessionExcluded(state: ProcessState, changes: ChangeDetection): Pr
           'error',
           `File '${file}' is explicitly excluded from session '${state.activeSession.id}'`,
           file,
-          'This file was explicitly excluded and cannot be modified in this session'
-        )
+          'This file was explicitly excluded and cannot be modified in this session',
+        ),
       );
     }
   }
@@ -447,7 +390,7 @@ function createViolation(
   severity: ViolationSeverity,
   message: string,
   file: string,
-  suggestion?: string
+  suggestion?: string,
 ): ProcessViolation {
   // Build violation (handle exactOptionalPropertyTypes)
   const violation: ProcessViolation = { rule, severity, message, file };
@@ -490,7 +433,7 @@ export function getAllIssues(result: ValidationResult): readonly ProcessViolatio
  */
 export function getViolationsByRule(
   result: ValidationResult,
-  rule: ProcessGuardRule
+  rule: ProcessGuardRule,
 ): readonly ProcessViolation[] {
   return result.violations.filter((v) => v.rule === rule);
 }

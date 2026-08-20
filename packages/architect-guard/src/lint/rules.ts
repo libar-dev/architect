@@ -5,6 +5,7 @@
  * @architect-status completed
  * @architect-role:service
  * @architect-bounded-context:lint
+ * @architect-uses HierarchyLevelDomain, LintViolationContract
  *
  * ## LintRules - Annotation Quality Rules
  *
@@ -91,7 +92,7 @@ export interface LintRule {
     directive: DocDirective,
     file: string,
     line: number,
-    context?: LintContext
+    context?: LintContext,
   ) => LintViolation | LintViolation[] | null;
 }
 
@@ -103,7 +104,7 @@ function violation(
   severity: LintSeverity,
   message: string,
   file: string,
-  line: number
+  line: number,
 ): LintViolation {
   return { rule, severity, message, file, line };
 }
@@ -141,7 +142,7 @@ export const missingPatternName: LintRule = {
         'error',
         `Pattern missing explicit name. Add ${tagPrefix}pattern YourPatternName`,
         file,
-        line
+        line,
       );
     }
     return null;
@@ -166,7 +167,7 @@ export const missingStatus: LintRule = {
         'warning',
         `No ${tagPrefix}status found. Add: ${tagPrefix}status roadmap|active|completed|deferred`,
         file,
-        line
+        line,
       );
     }
     return null;
@@ -194,7 +195,7 @@ export const invalidStatus: LintRule = {
         'error',
         `Invalid status '${directive.status}'. Valid values: ${ACCEPTED_STATUS_VALUES.join(', ')}.`,
         file,
-        line
+        line,
       );
     }
     return null;
@@ -219,7 +220,7 @@ export const missingWhenToUse: LintRule = {
         'warning',
         'No "When to Use" section found. Add ### When to Use or **When to use:** in description',
         file,
-        line
+        line,
       );
     }
     return null;
@@ -266,7 +267,7 @@ export const tautologicalDescription: LintRule = {
         'error',
         `Description repeats pattern name "${directive.patternName}". Provide meaningful context.`,
         file,
-        line
+        line,
       );
     }
     return null;
@@ -292,7 +293,7 @@ export const missingRelationships: LintRule = {
         'info',
         `Consider adding relationship tags: ${tagPrefix}uses`,
         file,
-        line
+        line,
       );
     }
     return null;
@@ -339,7 +340,7 @@ export const patternConflictInImplements: LintRule = {
           `Pattern '${patternName}' cannot implement itself. ` +
             `Remove either ${tagPrefix}pattern or ${tagPrefix}implements for this pattern.`,
           file,
-          line
+          line,
         );
       }
       // Different patterns: OK - this is a sub-pattern implementing a parent spec
@@ -378,8 +379,8 @@ export const missingRelationshipTarget: LintRule = {
             'error',
             `Relationship target '${target}' not found in known patterns`,
             file,
-            line
-          )
+            line,
+          ),
         );
       }
     }
@@ -393,8 +394,8 @@ export const missingRelationshipTarget: LintRule = {
             'error',
             `Implementation target '${target}' not found in known patterns`,
             file,
-            line
-          )
+            line,
+          ),
         );
       }
     }
@@ -442,7 +443,7 @@ export const hierarchyParentLevelMismatch: LintRule = {
           'error',
           `@architect-parent target '${parentName}' is missing @architect-level. Hierarchy parents must declare a level (epic|phase|task|slice).`,
           file,
-          line
+          line,
         );
       }
       return null;
@@ -460,7 +461,7 @@ export const hierarchyParentLevelMismatch: LintRule = {
         'error',
         `@architect-parent '${parentName}' has @architect-level '${targetLevel}' which is not strictly higher than declarer level '${declarerLabel}'. Hierarchy is epic > phase > task > slice.`,
         file,
-        line
+        line,
       );
     }
 
@@ -504,7 +505,7 @@ export const severityOrder: Record<LintSeverity, number> = {
  */
 export function filterRulesBySeverity(
   rules: readonly LintRule[],
-  minSeverity: LintSeverity
+  minSeverity: LintSeverity,
 ): LintRule[] {
   const minLevel = severityOrder[minSeverity];
   return rules.filter((rule) => severityOrder[rule.severity] <= minLevel);

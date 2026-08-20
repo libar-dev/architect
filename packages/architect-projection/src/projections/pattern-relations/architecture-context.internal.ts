@@ -2,9 +2,7 @@
  * @architect-bounded-context:pattern-relations
  */
 /**
- * Private helpers used exclusively by the architecture-context fragment.
- *
- * Part of the PatternRelationsProjectionSupport utility surface.
+ * Builds bounded-context catalog entries with per-context pattern counts, layers, and roles.
  */
 
 import type { ExtractedPattern } from '@libar-dev/architect-core';
@@ -35,7 +33,7 @@ export function buildBoundedContext(context: ProjectionContext, scope?: string):
         layers: uniqueSortedStrings(
           patternNames
             .flatMap((patternName) => layersByPattern.get(patternName) ?? [])
-            .filter(isDefined)
+            .filter(isDefined),
         ),
         roles: uniqueSortedStrings(patterns.map((pattern) => pattern.role).filter(isDefined)),
       };
@@ -62,7 +60,7 @@ export function buildBoundedContext(context: ProjectionContext, scope?: string):
 }
 
 function buildLayersByPatternName(
-  patternsByLayer: Record<string, readonly ExtractedPattern[]>
+  patternsByLayer: Record<string, readonly ExtractedPattern[]>,
 ): Map<string, string[]> {
   const layersByPattern = new Map<string, Set<string>>();
 
@@ -79,6 +77,6 @@ function buildLayersByPatternName(
     [...layersByPattern.entries()].map(([patternName, layers]) => [
       patternName,
       uniqueSortedStrings([...layers]),
-    ])
+    ]),
   );
 }

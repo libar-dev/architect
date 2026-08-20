@@ -67,7 +67,7 @@ describeFeature(feature, ({ Background, Rule }) => {
               name: `Pattern${i}`,
               status: 'active',
               filePath: `src/p${i}.ts`,
-            })
+            }),
           );
         });
 
@@ -86,14 +86,14 @@ describeFeature(feature, ({ Background, Rule }) => {
             expect(item['patternName']).toBeDefined();
           }
         });
-      }
+      },
     );
 
     RuleScenario('Count modifier returns integer', ({ Given, When, Then }) => {
       Given('{int} patterns in the pipeline', (_ctx: unknown, count: number) => {
         state = initState();
         state.patterns = Array.from({ length: count }, (_, i) =>
-          createTestPattern({ name: `P${i}`, filePath: `src/p${i}.ts` })
+          createTestPattern({ name: `P${i}`, filePath: `src/p${i}.ts` }),
         );
       });
 
@@ -113,9 +113,9 @@ describeFeature(feature, ({ Background, Rule }) => {
         (_ctx: unknown, _count: number, a: string, b: string, c: string) => {
           state = initState();
           state.patterns = [a, b, c].map((name) =>
-            createTestPattern({ name, filePath: `src/${name.toLowerCase()}.ts` })
+            createTestPattern({ name, filePath: `src/${name.toLowerCase()}.ts` }),
           );
-        }
+        },
       );
 
       When('I apply the output pipeline with names-only modifier', () => {
@@ -130,7 +130,7 @@ describeFeature(feature, ({ Background, Rule }) => {
         'the output is an array of strings {string}, {string}, {string}',
         (_ctx: unknown, a: string, b: string, c: string) => {
           expect(state!.output).toEqual([a, b, c]);
-        }
+        },
       );
     });
 
@@ -142,7 +142,7 @@ describeFeature(feature, ({ Background, Rule }) => {
             name: `P${i}`,
             status: 'active',
             filePath: `src/p${i}.ts`,
-          })
+          }),
         );
       });
 
@@ -155,7 +155,7 @@ describeFeature(feature, ({ Background, Rule }) => {
             ...DEFAULT_OUTPUT_MODIFIERS,
             fields,
           });
-        }
+        },
       );
 
       Then(
@@ -165,7 +165,7 @@ describeFeature(feature, ({ Background, Rule }) => {
             const keys = Object.keys(item);
             expect(keys.sort()).toEqual([key1, key2].sort());
           }
-        }
+        },
       );
     });
 
@@ -173,7 +173,7 @@ describeFeature(feature, ({ Background, Rule }) => {
       Given('{int} patterns in the pipeline', (_ctx: unknown, count: number) => {
         state = initState();
         state.patterns = Array.from({ length: count }, (_, i) =>
-          createTestPattern({ name: `P${i}`, filePath: `src/p${i}.ts` })
+          createTestPattern({ name: `P${i}`, filePath: `src/p${i}.ts` }),
         );
       });
 
@@ -215,7 +215,7 @@ describeFeature(feature, ({ Background, Rule }) => {
               name: `Pattern${i}`,
               status: 'active',
               filePath: `src/p${i}.ts`,
-            })
+            }),
           );
         });
 
@@ -228,7 +228,7 @@ describeFeature(feature, ({ Background, Rule }) => {
               ...DEFAULT_OUTPUT_MODIFIERS,
               fields,
             });
-          }
+          },
         );
 
         Then('each result object has exactly {int} key', (_ctx: unknown, keyCount: number) => {
@@ -236,7 +236,7 @@ describeFeature(feature, ({ Background, Rule }) => {
             expect(Object.keys(item).length).toBe(keyCount);
           }
         });
-      }
+      },
     );
   });
 
@@ -284,7 +284,7 @@ describeFeature(feature, ({ Background, Rule }) => {
           } catch (e) {
             state.error = e instanceof Error ? e : new Error(String(e));
           }
-        }
+        },
       );
 
       Then('validation fails with {string}', (_ctx: unknown, expected: string) => {
@@ -323,18 +323,18 @@ describeFeature(feature, ({ Background, Rule }) => {
                 name: `Active${i}`,
                 status: 'active',
                 filePath: `src/a${i}.ts`,
-              })
+              }),
             ),
             ...Array.from({ length: roadmapCount }, (_, i) =>
               createTestPattern({
                 name: `Roadmap${i}`,
                 status: 'roadmap',
                 filePath: `src/r${i}.ts`,
-              })
+              }),
             ),
           ];
           state.dataset = createTestPatternGraph({ patterns });
-        }
+        },
       );
 
       When('I apply list filters with status {string}', (_ctx: unknown, status: string) => {
@@ -375,7 +375,7 @@ describeFeature(feature, ({ Background, Rule }) => {
             }),
           ];
           state.dataset = createTestPatternGraph({ patterns });
-        }
+        },
       );
 
       When(
@@ -386,7 +386,7 @@ describeFeature(feature, ({ Background, Rule }) => {
             status,
             role,
           });
-        }
+        },
       );
 
       Then('only core patterns are returned', () => {
@@ -411,7 +411,7 @@ describeFeature(feature, ({ Background, Rule }) => {
             name: `Roadmap${i}`,
             status: 'roadmap',
             filePath: `src/r${i}.ts`,
-          })
+          }),
         );
         state.dataset = createTestPatternGraph({ patterns });
       });
@@ -424,7 +424,7 @@ describeFeature(feature, ({ Background, Rule }) => {
             limit,
             offset,
           });
-        }
+        },
       );
 
       Then(
@@ -435,7 +435,7 @@ describeFeature(feature, ({ Background, Rule }) => {
           // Verify the offset is correct — patterns are named Roadmap0..Roadmap9
           const firstPattern = results[0]!;
           expect(firstPattern.name).toBe(`Roadmap${startIndex}`);
-        }
+        },
       );
     });
 
@@ -447,7 +447,7 @@ describeFeature(feature, ({ Background, Rule }) => {
             name: `Roadmap${i}`,
             status: 'roadmap',
             filePath: `src/r${i}.ts`,
-          })
+          }),
         );
         state.dataset = createTestPatternGraph({ patterns });
       });
@@ -461,7 +461,7 @@ describeFeature(feature, ({ Background, Rule }) => {
             limit,
             offset,
           });
-        }
+        },
       );
 
       Then('{int} patterns are returned', (_ctx: unknown, count: number) => {

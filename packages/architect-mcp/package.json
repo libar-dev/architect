@@ -1,7 +1,7 @@
 {
   "name": "@libar-dev/architect-mcp",
   "version": "2.0.0-pre.1",
-  "description": "MCP server for the Libar Architect package family — 18 tools, tool registry, file watcher, pipeline session.",
+  "description": "MCP server for the Libar Architect package family — 21 tools, tool registry, file watcher, pipeline session.",
   "license": "MIT",
   "author": "Libar AI",
   "repository": {

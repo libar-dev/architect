@@ -24,19 +24,15 @@ interface PatternFixtureOptions {
   readonly status?: ExtractedPattern['status'];
   readonly maturity?: PatternMaturity;
   readonly role?: ExtractedPattern['role'];
-  readonly phase?: ExtractedPattern['phase'];
-  readonly quarter?: ExtractedPattern['quarter'];
-  readonly release?: ExtractedPattern['release'];
-  readonly completed?: ExtractedPattern['completed'];
   readonly file?: string;
   readonly description?: string;
   readonly boundedContext?: ExtractedPattern['boundedContext'];
   readonly adrLayer?: ExtractedPattern['adrLayer'];
+  readonly adrTheme?: ExtractedPattern['adrTheme'];
   readonly archContext?: string;
   readonly archLayer?: string;
+  readonly archTheme?: string;
   readonly productArea?: ExtractedPattern['productArea'];
-  readonly userRole?: ExtractedPattern['userRole'];
-  readonly businessValue?: ExtractedPattern['businessValue'];
   readonly deliverables?: ExtractedPattern['deliverables'];
   readonly executableSpecs?: ExtractedPattern['executableSpecs'];
   readonly behaviorFile?: ExtractedPattern['behaviorFile'];
@@ -46,14 +42,12 @@ interface PatternFixtureOptions {
   readonly usedBy?: readonly string[];
   readonly enables?: readonly string[];
   readonly implementsPatterns?: ExtractedPattern['implementsPatterns'];
-  readonly useCases?: readonly string[];
   readonly rules?: readonly RuleFixture[];
   readonly adr?: ExtractedPattern['adr'];
 }
 
 interface ProjectionContextOptions {
   readonly patterns: readonly ExtractedPattern[];
-  readonly phaseNames?: Record<number, string>;
   readonly relationshipIndex?: Record<string, RelationshipEntry>;
   readonly tagRegistry?: TagRegistry;
   readonly projectMetadata?: ProjectMetadata;
@@ -65,7 +59,7 @@ export function createPattern(name: string, options: PatternFixtureOptions = {})
 }
 
 export function createRelationshipEntry(
-  overrides: Partial<RelationshipEntry> = {}
+  overrides: Partial<RelationshipEntry> = {},
 ): RelationshipEntry {
   return {
     uses: overrides.uses ?? [],
@@ -78,6 +72,8 @@ export function createRelationshipEntry(
     extendedBy: overrides.extendedBy ?? [],
     seeAlso: overrides.seeAlso ?? [],
     apiRef: overrides.apiRef ?? [],
+    enforcesDecisions: overrides.enforcesDecisions ?? [],
+    enforcedBy: overrides.enforcedBy ?? [],
   };
 }
 
@@ -98,7 +94,6 @@ export function createProjectionContext(options: ProjectionContextOptions): Proj
   return {
     graph: buildGraphFromPatterns({
       patterns: options.patterns,
-      phaseNames: options.phaseNames,
       relationshipIndex: options.relationshipIndex,
       tagRegistry: options.tagRegistry ?? createTagRegistry(),
     }),

@@ -3,7 +3,7 @@
  * @architect-pattern DependencyEdgeProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses PatternRelationsProjectionSupport, PatternRelationsFragmentContracts
+ * @architect-uses PatternRelationsProjectionSupport, PatternRelationsFragmentContracts, DependencyEdge, DependencyEdgeSet
  * @architect-bounded-context:projection
  *
  * ## Dependency edge projection
@@ -29,7 +29,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects the outgoing dependency edge set for one pattern as stable `DependencyEdge` rows.
  */
 
 import type { ProjectionContext } from '../../context/projection-context.js';
@@ -39,7 +39,7 @@ import { projectOutgoingEdges } from './dependency-edges.internal.js';
 
 export function projectDependencyEdges(
   context: ProjectionContext,
-  from: string
+  from: string,
 ): ProjectionBundle<DependencyEdgeSet> {
   const items: DependencyEdge[] = projectOutgoingEdges(context, from).map((edge) => ({
     kind: 'DependencyEdge',

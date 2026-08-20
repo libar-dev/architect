@@ -1,0 +1,3 @@
+# The handle builds the graph LIVE in-process — no dump is read or written.
+# Ad-hoc scripts live in scratch/ (see scratch/.gitignore).
+.DS_Store

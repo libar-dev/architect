@@ -16,22 +16,9 @@ function readGuardPackageJson(): { version?: string; name?: string } {
 export function printVersionAndExit(cliName: string): never {
   const packageJson = readGuardPackageJson();
   process.stdout.write(
-    `${cliName} (${packageJson.name ?? '@libar-dev/architect-guard'}) v${packageJson.version ?? 'unknown'}\n`
+    `${cliName} (${packageJson.name ?? '@libar-dev/architect-guard'}) v${packageJson.version ?? 'unknown'}\n`,
   );
   process.exit(0);
-}
-
-export function handleCliError(error: unknown, exitCode = 1): never {
-  if (error instanceof Error) {
-    console.error('Error:', error.message);
-    if (process.env['DEBUG']) {
-      console.error('Stack trace:', error.stack);
-    }
-  } else {
-    console.error('Error:', String(error));
-  }
-
-  process.exit(exitCode);
 }
 
 export function isDirectCliEntrypoint(metaUrl: string): boolean {

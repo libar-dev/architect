@@ -16,7 +16,7 @@ interface PatternBundleState {
 }
 
 const feature = await loadFeature(
-  'tests/features/projections/pattern-relations/pattern-bundle.feature'
+  'tests/features/projections/pattern-relations/pattern-bundle.feature',
 );
 
 let state: PatternBundleState | null = null;
@@ -73,6 +73,42 @@ function seedBundleContext(): ProjectionContext {
       ParentEpic: createRelationshipEntry(),
       ChildAlpha: createRelationshipEntry({ uses: ['ChildBeta'] }),
       ChildBeta: createRelationshipEntry(),
+    },
+  });
+}
+
+const reverseTraceFeatureFile =
+  'packages/architect-core/tests/features/read-api/reverse-trace-api.feature';
+
+function seedReverseTraceBundleContext(): ProjectionContext {
+  return createProjectionContext({
+    patterns: [
+      createPattern('ReverseTraceApi', {
+        file: 'packages/architect-core/src/read-api/reverse-trace-api.ts',
+        description:
+          '**Problem:** A TS pattern owns no inline rules.\n\n**Solution:** Follow implementedBy.',
+      }),
+      createPattern('ReverseTraceApiExecutableTests', {
+        file: reverseTraceFeatureFile,
+        implementsPatterns: ['ReverseTraceApi'],
+        rules: [
+          {
+            name: 'Reverse trace surfaces realizing rules',
+            description:
+              '**Invariant:** The realizing feature owns the rule.\n\n**Verified by:** Reverse trace scenario',
+            scenarioCount: 1,
+            scenarioNames: ['Reverse trace scenario'],
+          },
+        ],
+      }),
+    ],
+    relationshipIndex: {
+      ReverseTraceApi: createRelationshipEntry({
+        implementedBy: [{ name: 'ReverseTraceApiExecutableTests', file: reverseTraceFeatureFile }],
+      }),
+      ReverseTraceApiExecutableTests: createRelationshipEntry({
+        implementsPatterns: ['ReverseTraceApi'],
+      }),
     },
   });
 }
@@ -134,9 +170,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 openQuestions: ['What beta rollout signal is durable?'],
               },
             });
-          }
+          },
         );
-      }
+      },
     );
 
     RuleScenario('mode defaults populate implement includes', ({ Given, When, Then, And }) => {
@@ -152,7 +188,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             mode: 'implement',
             estimateTokens: true,
           });
-        }
+        },
       );
 
       Then('the bundle root should use the implement default includes', () => {
@@ -163,19 +199,22 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           'deps',
           'open-questions',
         ]);
+        // docstring carries its truncation signal whenever the block is included.
+        expect(typeof state!.bundle?.root.blocks.docstring).toBe('string');
+        expect(typeof state!.bundle?.root.blocks.docstringTruncated).toBe('boolean');
       });
 
       And('the bundle token estimates should use the char/4 heuristic', () => {
         expect(state!.bundle?.root.bundleTokenEstimate?.method).toBe('char/4');
         expect(state!.bundle?.root.tokenEstimate?.method).toBe('char/4');
         for (const child of Object.values(
-          (state!.bundle?.children ?? {}) as Record<string, PatternBundleEntry>
+          (state!.bundle?.children ?? {}) as Record<string, PatternBundleEntry>,
         )) {
           expect(child.tokenEstimate?.method).toBe('char/4');
           expect(
             child.blockTokenEstimates?.every(
-              (entry: { estimate: { method?: string } }) => entry.estimate.method === 'char/4'
-            )
+              (entry: { estimate: { method?: string } }) => entry.estimate.method === 'char/4',
+            ),
           ).toBe(true);
         }
       });
@@ -202,10 +241,53 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         () => {
           expect(state!.caughtError).toBeInstanceOf(Error);
           expect((state!.caughtError as Error).message).toContain(
-            'Pattern not found: "UnknownParent"'
+            'Pattern not found: "UnknownParent"',
           );
-        }
+        },
       );
     });
   });
+
+  Rule(
+    "Review bundles surface a TS pattern's rules via the implementedBy edge",
+    ({ RuleScenario }) => {
+      RuleScenario(
+        'review bundle for a TS pattern surfaces the realizing feature rules',
+        ({ Given, When, Then }) => {
+          Given(
+            'a pattern bundle context where a TS pattern is realized by a rule-owning feature',
+            () => {
+              state!.context = seedReverseTraceBundleContext();
+            },
+          );
+
+          When('I project the review-mode pattern bundle for "ReverseTraceApi"', () => {
+            state!.bundle = projectPatternBundle(state!.context!, {
+              pattern: 'ReverseTraceApi',
+              mode: 'review',
+            });
+          });
+
+          Then(
+            "the bundle root blocks should include the realizing feature's rules and scenarios",
+            () => {
+              expect(state!.bundle?.root.blocks.rules).toEqual([
+                expect.objectContaining({
+                  ruleName: 'Reverse trace surfaces realizing rules',
+                  feature: 'ReverseTraceApiExecutableTests',
+                }),
+              ]);
+              expect(state!.bundle?.root.blocks.scenarios).toEqual([
+                {
+                  ruleName: 'Reverse trace surfaces realizing rules',
+                  scenarios: ['Reverse trace scenario'],
+                  count: 1,
+                },
+              ]);
+            },
+          );
+        },
+      );
+    },
+  );
 });

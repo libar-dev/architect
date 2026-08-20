@@ -6,14 +6,10 @@
  * @architect-uses FSMTransitions, FSMStates
  * @architect-role:decider
  * @architect-bounded-context:validation
- *
- * ### When to Use
- *
- * - As a typed contract / data shape consumed by projection or render layers.
  */
 
 import { PROCESS_STATUS_VALUES, type ProcessStatusValue } from '../../taxonomy/index.js';
-import type { TagRegistry } from '../../config/tag-registry-contract.js';
+import type { TagRegistry } from '../../validation-schemas/tag-registry.js';
 import {
   VALID_TRANSITIONS,
   getValidTransitionsFrom,
@@ -29,27 +25,25 @@ export interface StatusValidationResult {
   warnings?: string[];
 }
 
-export interface TransitionValidationResult {
-  valid: boolean;
-  from: ProcessStatusValue;
-  to: ProcessStatusValue;
-  error?: string;
-  validAlternatives?: readonly ProcessStatusValue[];
-}
-
-export interface CompletionMetadataValidationResult {
-  valid: boolean;
-  warnings: string[];
-}
+export type TransitionValidationResult =
+  | {
+      valid: true;
+      from: ProcessStatusValue;
+      to: ProcessStatusValue;
+    }
+  | {
+      valid: false;
+      from: string;
+      to: string;
+      error: string;
+      validAlternatives?: readonly ProcessStatusValue[];
+    };
 
 export interface PatternMetadata {
   status: string;
-  completed?: string;
-  effortActual?: string;
-  effortPlanned?: string;
 }
 
-function isValidStatusValue(status: string): status is ProcessStatusValue {
+export function isValidStatusValue(status: string): status is ProcessStatusValue {
   return (PROCESS_STATUS_VALUES as readonly string[]).includes(status);
 }
 
@@ -59,7 +53,7 @@ export interface FSMValidationOptions {
 
 export function validateStatus(
   status: string,
-  options?: FSMValidationOptions
+  options?: FSMValidationOptions,
 ): StatusValidationResult {
   const tagPrefix = options?.registry?.tagPrefix ?? DEFAULT_TAG_PREFIX;
 
@@ -74,7 +68,8 @@ export function validateStatus(
   const warnings: string[] = [];
   if (isTerminalState(status)) {
     warnings.push(
-      `Status 'completed' is a terminal state. Use ${tagPrefix}unlock-reason to modify.`
+      `Status 'completed' is the settled end state; it reopens to active or roadmap. ` +
+        `Editing or reopening it warns (advisory) — ${tagPrefix}unlock-reason is optional and suppresses the warning.`,
     );
   }
 
@@ -89,8 +84,8 @@ export function validateTransition(from: string, to: string): TransitionValidati
   if (!isValidStatusValue(from)) {
     return {
       valid: false,
-      from: from as ProcessStatusValue,
-      to: to as ProcessStatusValue,
+      from,
+      to,
       error: `Invalid source status '${from}'. Valid values: ${PROCESS_STATUS_VALUES.join(', ')}.`,
     };
   }
@@ -99,7 +94,7 @@ export function validateTransition(from: string, to: string): TransitionValidati
     return {
       valid: false,
       from,
-      to: to as ProcessStatusValue,
+      to,
       error: `Invalid target status '${to}'. Valid values: ${PROCESS_STATUS_VALUES.join(', ')}.`,
     };
   }
@@ -118,74 +113,60 @@ export function validateTransition(from: string, to: string): TransitionValidati
   };
 }
 
-export function validateCompletionMetadata(
-  pattern: PatternMetadata,
-  options?: FSMValidationOptions
-): CompletionMetadataValidationResult {
-  const tagPrefix = options?.registry?.tagPrefix ?? DEFAULT_TAG_PREFIX;
-  const warnings: string[] = [];
-
-  if (pattern.status !== 'completed') {
-    return { valid: true, warnings: [] };
-  }
-
-  if (!pattern.completed) {
-    warnings.push(`Completed pattern missing ${tagPrefix}completed date.`);
-  }
-
-  if (pattern.effortPlanned && !pattern.effortActual) {
-    warnings.push(
-      `Pattern has ${tagPrefix}effort but missing ${tagPrefix}effort-actual. ` +
-        'Consider adding actual effort for tracking.'
-    );
-  }
-
-  return { valid: true, warnings };
-}
-
 export function validatePatternStatus(
   pattern: PatternMetadata,
-  options?: FSMValidationOptions
+  options?: FSMValidationOptions,
 ): {
   valid: boolean;
   statusResult: StatusValidationResult;
-  completionResult: CompletionMetadataValidationResult;
   allWarnings: string[];
 } {
   const statusResult = validateStatus(pattern.status, options);
-  const completionResult = validateCompletionMetadata(pattern, options);
-  const allWarnings = [...(statusResult.warnings ?? []), ...completionResult.warnings];
+  const allWarnings = [...(statusResult.warnings ?? [])];
 
   return {
-    valid: statusResult.valid && completionResult.valid,
+    valid: statusResult.valid,
     statusResult,
-    completionResult,
     allWarnings,
   };
 }
 
+/**
+ * Summarize the protection a status carries, under the advisory model (PDR-006).
+ *
+ * Protection LEVEL (`none`/`scope`/`hard`) is the FSM-derived strength of
+ * guarding and is independent of ENFORCEMENT SEVERITY: on the commit path,
+ * scope-creep (active) and completed-spec edits surface advisory WARNINGS, not
+ * blocks. `${prefix}unlock-reason` is optional and, when present, suppresses the
+ * warning — it is never required. (`--strict`, used by CI, may promote these
+ * warnings to blocking, but that is a mode lever, not a property of the level.)
+ *
+ * `unlockSuppressesWarning` reports whether this level emits an advisory,
+ * unlock-suppressible warning — true for `scope` (active scope creep) and `hard`
+ * (completed edits), mirroring `ProcessGuardDecider` exactly.
+ */
 export function getProtectionSummary(
   status: ProcessStatusValue,
-  options?: FSMValidationOptions
+  options?: FSMValidationOptions,
 ): {
   level: ProtectionLevel;
   description: string;
   canAddDeliverables: boolean;
-  requiresUnlock: boolean;
+  unlockSuppressesWarning: boolean;
 } {
   const tagPrefix = options?.registry?.tagPrefix ?? DEFAULT_TAG_PREFIX;
   const level = getProtectionLevel(status);
 
   const descriptions: Record<ProtectionLevel, string> = {
     none: 'Fully editable - no restrictions',
-    scope: 'Scope-locked - cannot add new deliverables',
-    hard: `Hard-locked - requires ${tagPrefix}unlock-reason to modify`,
+    scope: `Scope-locked (advisory) - adding pending deliverables warns; ${tagPrefix}unlock-reason suppresses it`,
+    hard: `Completed (advisory) - editing or reopening warns; ${tagPrefix}unlock-reason is optional and suppresses it`,
   };
 
   return {
     level,
     description: descriptions[level],
     canAddDeliverables: level === 'none',
-    requiresUnlock: level === 'hard',
+    unlockSuppressesWarning: level !== 'none',
   };
 }

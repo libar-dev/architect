@@ -60,7 +60,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               displayName: titleize(id),
               match: new RegExp(pattern, 'u'),
             });
-          }
+          },
         );
 
         When('resolving the source file {string}', (_ctx: unknown, sourceFile: string) => {
@@ -75,9 +75,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           'the resolved package displayName should be {string}',
           (_ctx: unknown, displayName: string) => {
             expect(state!.resolved?.displayName).toBe(displayName);
-          }
+          },
         );
-      }
+      },
     );
 
     RuleScenario(
@@ -87,7 +87,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           'a resolver configured with entry {string} matching prefix {string}',
           (_ctx: unknown, id: string, prefix: string) => {
             state!.entries.push({ id, displayName: titleize(id), match: prefix });
-          }
+          },
         );
 
         When('resolving the source file {string}', (_ctx: unknown, sourceFile: string) => {
@@ -97,7 +97,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         Then('the resolved package id should be {string}', (_ctx: unknown, id: string) => {
           expect(state!.resolved?.id).toBe(id);
         });
-      }
+      },
     );
 
     RuleScenario('First match wins when multiple entries could match', ({ Given, When, Then }) => {
@@ -137,7 +137,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             displayName: titleize(id),
             match: new RegExp(pattern, 'u'),
           });
-        }
+        },
       );
 
       When('resolving the source file {string}', (_ctx: unknown, sourceFile: string) => {
@@ -153,14 +153,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         (_ctx: unknown, code: string) => {
           expect(state!.caughtError).toBeInstanceOf(ProjectionError);
           expect((state!.caughtError as ProjectionError).code).toBe(code);
-        }
+        },
       );
 
       And(
         'the error message should mention the source file {string}',
         (_ctx: unknown, sourceFile: string) => {
           expect((state!.caughtError as Error).message).toContain(sourceFile);
-        }
+        },
       );
 
       And('the error message should list the matcher for {string}', (_ctx: unknown, id: string) => {
@@ -188,9 +188,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           (_ctx: unknown, code: string) => {
             expect(state!.caughtError).toBeInstanceOf(ProjectionError);
             expect((state!.caughtError as ProjectionError).code).toBe(code);
-          }
+          },
         );
-      }
+      },
     );
   });
 
@@ -204,7 +204,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             displayName: titleize(id),
             match: new RegExp(pattern, 'u'),
           });
-        }
+        },
       );
 
       When('resolving the source file {string}', (_ctx: unknown, sourceFile: string) => {

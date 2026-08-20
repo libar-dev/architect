@@ -1,4 +1,18 @@
-import type { SectionBlock } from '../config/section-block.js';
+/**
+ * @architect
+ * @architect-pattern MarkdownBlockParser
+ * @architect-status active
+ * @architect-role:codec
+ * @architect-bounded-context:rendering
+ *
+ * ## MarkdownBlockParser - Markdown to Structured Blocks
+ *
+ * Parses markdown text into structured `Block` content. Exports
+ * `parseMarkdownToBlocks`, a line-driven state machine that recognizes
+ * headings, code fences, tables, ordered/unordered lists, separators, and
+ * paragraphs, emitting typed `Block` values for the rendering pipeline.
+ */
+import type { Block } from '../config/block.js';
 
 type ParserState = 'idle' | 'in-code-fence' | 'in-table' | 'in-paragraph' | 'in-list';
 
@@ -24,6 +38,20 @@ const CODE_FENCE_CLOSE_REGEX = /^```\s*$/;
 const UNORDERED_LIST_REGEX = /^[-*]\s+(.*)$/;
 const ORDERED_LIST_REGEX = /^\d+\.\s+(.*)$/;
 const TABLE_SEPARATOR_REGEX = /^\|[\s:]*-+[\s:|-]*\|$/;
+// Mirrors CodeBlockSchema.language: identifier-shaped, 1-64 chars. A code-fence
+// info string that does not reduce to a conforming token yields no language.
+const FENCE_LANGUAGE_REGEX = /^[A-Za-z0-9_+\-.]{1,64}$/u;
+
+/**
+ * Normalize a code-fence info string to a single identifier-shaped language
+ * token. CommonMark treats the first word of the info string as the language;
+ * any first token that is not identifier-shaped (≤64 chars) is dropped so the
+ * emitted `CodeBlock` always validates against the canonical `BlockSchema`.
+ */
+function normalizeFenceLanguage(infoString: string | undefined): string {
+  const firstToken = (infoString ?? '').trim().split(/\s+/u)[0] ?? '';
+  return FENCE_LANGUAGE_REGEX.test(firstToken) ? firstToken : '';
+}
 
 function isTableStart(line: string, nextLine: string | undefined): boolean {
   return line.startsWith('|') && nextLine !== undefined && TABLE_SEPARATOR_REGEX.test(nextLine);
@@ -56,11 +84,11 @@ function isOrderedListItem(line: string): boolean {
   return ORDERED_LIST_REGEX.test(line);
 }
 
-function flushParagraph(paragraphLines: string[]): SectionBlock {
+function flushParagraph(paragraphLines: string[]): Block {
   return { type: 'paragraph', text: paragraphLines.join(' ') };
 }
 
-function flushCodeFence(acc: CodeFenceAccumulator): SectionBlock {
+function flushCodeFence(acc: CodeFenceAccumulator): Block {
   const content = acc.lines.join('\n');
   if (acc.language === 'mermaid') {
     return { type: 'mermaid', content };
@@ -73,17 +101,28 @@ function flushCodeFence(acc: CodeFenceAccumulator): SectionBlock {
   return { type: 'code', content };
 }
 
-function flushTable(acc: TableAccumulator): SectionBlock {
+function flushTable(acc: TableAccumulator): Block {
   return { type: 'table', columns: acc.columns, rows: acc.rows };
 }
 
-function flushList(acc: ListAccumulator): SectionBlock {
+function flushList(acc: ListAccumulator): Block {
   return { type: 'list', ordered: acc.ordered, items: acc.items };
 }
 
-export function parseMarkdownToBlocks(content: string): readonly SectionBlock[] {
+/**
+ * Parse markdown text into an ordered list of typed `Block` values.
+ *
+ * Runs a line-driven state machine that recognizes headings, code fences
+ * (including mermaid), pipe tables, ordered/unordered lists, separators, and
+ * paragraphs for the rendering pipeline.
+ *
+ * @architect-shape
+ * @param content - Raw markdown text to parse.
+ * @returns The recognized blocks in document order.
+ */
+export function parseMarkdownToBlocks(content: string): readonly Block[] {
   const lines = content.split('\n');
-  const blocks: SectionBlock[] = [];
+  const blocks: Block[] = [];
 
   let state: ParserState = 'idle';
   let paragraphLines: string[] = [];
@@ -165,7 +204,7 @@ export function parseMarkdownToBlocks(content: string): readonly SectionBlock[] 
     const codeFenceMatch = CODE_FENCE_OPEN_REGEX.exec(line);
     if (codeFenceMatch !== null && !CODE_FENCE_CLOSE_REGEX.test(line)) {
       state = 'in-code-fence';
-      codeFence = { language: (codeFenceMatch[1] ?? '').trim(), lines: [] };
+      codeFence = { language: normalizeFenceLanguage(codeFenceMatch[1]), lines: [] };
       continue;
     }
 

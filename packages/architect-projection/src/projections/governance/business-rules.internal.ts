@@ -1,22 +1,34 @@
 /**
+ * @architect
+ * @architect-pattern BusinessRuleSetAssembly
+ * @architect-status completed
+ * @architect-role:service
  * @architect-bounded-context:governance
+ * @architect-uses DecisionResolution, PatternHelpers, RuleAggregation, ExtractedPattern, ProjectionContext, ProjectionBundle, BusinessRuleSet, BusinessRule, GovernanceSupporting, ProjectionFilter, GroupedRoutedBundleSupport, ProjectionError, GovernanceProjectionSupport, LogicalRouteId
  */
 /**
- * Private helpers used exclusively by the business-rules fragment.
- *
- * Part of the GovernanceProjectionSupport utility surface.
+ * Builds governance business-rule fragments and sets from extracted patterns and annotation metadata.
  */
 
 import type { ExtractedPattern } from '@libar-dev/architect-core';
-import { findPatternByName } from '@libar-dev/architect-core';
+import {
+  canonicalDecisionKey,
+  findPatternByName,
+  isDecisionPattern,
+  resolveImplementingFeatures,
+} from '@libar-dev/architect-core';
 import { z } from 'zod';
 
 import type { ProjectionContext } from '../../context/projection-context.js';
 import { ProjectionError } from '../errors.js';
-import { type ProjectionBundle } from '../../fragments/base.js';
+import { projectSingle, type BundleRouting, type ProjectionBundle } from '../../fragments/base.js';
 import { type BusinessRule, type BusinessRuleSet } from '../../fragments/governance/index.js';
 import { BusinessRuleGroupingSchema } from '../../fragments/governance/supporting.js';
 import { filterPattern, filterPatterns } from '../_shared/filter.js';
+import {
+  buildGroupedRoutedBundle,
+  type GroupDescriptor,
+} from '../_shared/grouped-routed-bundle.internal.js';
 
 import {
   getPatternName,
@@ -24,24 +36,16 @@ import {
   normalizeLineEndings,
   slugify,
 } from './governance-shared.internal.js';
-import {
-  createEntityRouteId,
-  createIndexRouteId,
-} from '../documentation-composition/progressive-disclosure.js';
+import { createEntityRouteId, createIndexRouteId } from '../../routing/route-id.js';
 
 type ExtractedRule = NonNullable<ExtractedPattern['rules']>[number];
 
 type ScopedRuleSet =
   | Extract<BusinessRuleSet, { scope: 'package' }>
   | Extract<BusinessRuleSet, { scope: 'product-area' }>
-  | Extract<BusinessRuleSet, { scope: 'phase' }>
   | Extract<BusinessRuleSet, { scope: 'feature' }>;
 
-interface GroupedBusinessRuleChild {
-  readonly key: string;
-  readonly sortKey: string;
-  readonly root: ScopedRuleSet;
-}
+type BusinessRuleGrouping = NonNullable<BusinessRuleSetOptions['groupedBy']>;
 
 interface BusinessRuleAnnotations {
   readonly invariant?: string;
@@ -69,15 +73,15 @@ export const BusinessRuleSetOptionsSchema = z
       onlyInvariants: z.boolean().optional(),
     }),
     z.strictObject({
-      scope: z.literal('phase'),
-      scopeValue: z.number().int(),
+      scope: z.literal('feature'),
+      scopeValue: z.string(),
+      featureMatch: z.enum(['name', 'path']).optional(),
       groupedBy: BusinessRuleGroupingSchema.optional(),
       onlyInvariants: z.boolean().optional(),
     }),
     z.strictObject({
-      scope: z.literal('feature'),
+      scope: z.literal('decision'),
       scopeValue: z.string(),
-      featureMatch: z.enum(['name', 'path']).optional(),
       groupedBy: BusinessRuleGroupingSchema.optional(),
       onlyInvariants: z.boolean().optional(),
     }),
@@ -98,7 +102,7 @@ const NUMERIC_BASE_COLLATOR = new Intl.Collator(undefined, {
 export function buildBusinessRule(
   context: ProjectionContext,
   feature: string,
-  ruleName: string
+  ruleName: string,
 ): BusinessRule | undefined {
   const pattern = requirePatternByName(context, feature);
 
@@ -107,13 +111,13 @@ export function buildBusinessRule(
   }
 
   const rule = (pattern.rules ?? []).find(
-    (entry) => entry.name.toLowerCase() === ruleName.toLowerCase()
+    (entry) => entry.name.toLowerCase() === ruleName.toLowerCase(),
   );
 
   if (rule === undefined) {
     throw new ProjectionError(
       'RULE_NOT_FOUND',
-      `Business rule not found: "${ruleName}" in feature "${getPatternName(pattern)}".`
+      `Business rule not found: "${ruleName}" in feature "${getPatternName(pattern)}".`,
     );
   }
 
@@ -122,80 +126,167 @@ export function buildBusinessRule(
 
 export function buildBusinessRuleSet(
   context: ProjectionContext,
-  options: BusinessRuleSetOptions = { scope: 'all' }
+  options: BusinessRuleSetOptions = { scope: 'all' },
 ): ProjectionBundle<BusinessRuleSet> {
   const groupedBy = options.groupedBy;
-  const rules = filterBusinessRules(collectBusinessRules(context, options), options);
-  const groupedChildren =
-    groupedBy === undefined ? [] : createBusinessRuleChildren(rules, groupedBy, options);
-  const root = createBusinessRuleSetRoot(
-    options,
-    rules,
-    groupedBy === undefined
-      ? undefined
-      : createBusinessRuleGroupingEntries(groupedChildren, groupedBy)
-  );
-  const children = Object.fromEntries(
-    groupedChildren.map(({ key, root: childRoot }) => [key, childRoot])
-  );
+  const rules = filterBusinessRules(context, collectBusinessRules(context, options), options);
 
+  // Ungrouped: a single flat rule set with no child routing.
+  if (groupedBy === undefined) {
+    return projectSingle(createBusinessRuleSetRoot(options, rules));
+  }
+
+  return buildGroupedRoutedBundle<BusinessRule, BusinessRuleSet>({
+    items: rules,
+    groupKey: (rule) => businessRuleGroupKey(rule, groupedBy),
+    compareGroups: (left, right) =>
+      NUMERIC_BASE_COLLATOR.compare(
+        businessRuleGroupFacets(left, groupedBy).sortKey,
+        businessRuleGroupFacets(right, groupedBy).sortKey,
+      ),
+    buildRoot: (items, groups) =>
+      createBusinessRuleSetRoot(options, items, businessRuleGroupingEntries(groups, groupedBy)),
+    buildGroupChild: (group) => createScopedBusinessRuleSet(group, groupedBy, options),
+    buildRouting: businessRuleRouting,
+  });
+}
+
+function businessRuleRouting(childKeys: readonly string[]): BundleRouting {
   return {
-    root,
-    children,
-    ...(Object.keys(children).length > 0
-      ? {
-          routing: {
-            rootRouteId: createIndexRouteId('business-rules'),
-            childRouteIds: Object.fromEntries(
-              groupedChildren.map(({ key }) => [key, createEntityRouteId('business-rules', key)])
-            ),
-            childPathStrategy: 'nested' as const,
-            anchorStrategy: 'heading-slug' as const,
-          },
-        }
-      : {}),
+    rootRouteId: createIndexRouteId('business-rules'),
+    childRouteIds: Object.fromEntries(
+      childKeys.map((key) => [key, createEntityRouteId('business-rules', key)]),
+    ),
+    childPathStrategy: 'nested',
+    anchorStrategy: 'heading-slug',
   };
 }
 
 function collectBusinessRules(
   context: ProjectionContext,
-  options: BusinessRuleSetOptions
+  options: BusinessRuleSetOptions,
 ): BusinessRule[] {
   return filterPatterns(context.graph.patterns, context.projectionFilter)
     .filter((pattern) => (pattern.rules?.length ?? 0) > 0)
     .filter((pattern) => patternMatchesRuleSetScope(context, pattern, options))
     .flatMap((pattern) =>
-      (pattern.rules ?? []).map((rule) => createBusinessRuleFragment(context, pattern, rule))
+      (pattern.rules ?? []).map((rule) => createBusinessRuleFragment(context, pattern, rule)),
     )
     .filter((rule) => options.onlyInvariants !== true || rule.invariant !== undefined)
     .sort(compareBusinessRules);
 }
 
+/**
+ * The distinct product areas the `architect_rules` MCP `productArea` filter can
+ * match — every business rule's `productArea`
+ * (`pattern.productArea ?? DEFAULT_PRODUCT_AREA`), deduped and sorted. This is
+ * the fail-loud accepted set for the typed filter: it INCLUDES the
+ * `DEFAULT_PRODUCT_AREA` bucket that the
+ * pattern-keyed `graph.byProductArea` omits (a pattern with no `productArea` is
+ * absent from `byProductArea`, yet its rules still bucket under the default), so
+ * the accepted set equals the filter target by construction — a valid area never
+ * false-rejects as "invalid".
+ */
+export function collectBusinessRuleProductAreas(context: ProjectionContext): readonly string[] {
+  const areas = new Set<string>();
+  for (const rule of collectBusinessRules(context, { scope: 'all' })) {
+    areas.add(rule.productArea ?? DEFAULT_PRODUCT_AREA);
+  }
+  return [...areas].sort((left, right) => left.localeCompare(right));
+}
+
 function patternMatchesRuleSetScope(
   context: ProjectionContext,
   pattern: ExtractedPattern,
-  options: BusinessRuleSetOptions
+  options: BusinessRuleSetOptions,
 ): boolean {
   if (options.scope === 'package') {
-    const canonicalPackageName = inferWorkspacePackageName(pattern.source.file);
-    if (canonicalPackageName !== undefined) {
-      return canonicalPackageName === options.scopeValue;
-    }
-    const packageId = context.packageResolver(pattern.source.file).id;
-    return packageId.startsWith('@') && packageId === options.scopeValue;
+    return context.packageResolver(pattern.source.file).id === options.scopeValue;
   }
 
-  if (options.scope === 'feature' && options.featureMatch === 'path') {
-    return matchesFeaturePath(pattern.source.file, options.scopeValue);
+  if (options.scope === 'feature') {
+    if (options.featureMatch === 'path') {
+      return matchesFeaturePath(pattern.source.file, options.scopeValue);
+    }
+    return resolveFeatureScopeNames(context, options.scopeValue).has(
+      getPatternName(pattern).toLowerCase(),
+    );
+  }
+
+  if (options.scope === 'decision') {
+    return patternEnforcesDecision(context, pattern, options.scopeValue);
   }
 
   return true;
 }
 
+/**
+ * The set of lowercased canonical feature names a pattern-scoped rule query
+ * resolves to: the named pattern itself plus every pattern that realizes it via
+ * the derived `implementedBy` reverse edge (ADR-002/ADR-003). This lets the
+ * `architect_rules` MCP tool aggregate rules authored on the implementing
+ * `.feature` specs for a TypeScript pattern, not just the focal node's own rules.
+ */
+function resolveFeatureScopeNames(context: ProjectionContext, scopeValue: string): Set<string> {
+  const names = new Set<string>([scopeValue.toLowerCase()]);
+
+  const focal = findPatternByName(context.graph, scopeValue);
+  if (focal !== undefined) {
+    names.add(getPatternName(focal).toLowerCase());
+    for (const implementer of resolveImplementingFeatures(context.graph, getPatternName(focal))) {
+      names.add(implementer.toLowerCase());
+    }
+  }
+
+  return names;
+}
+
+/**
+ * A pattern is in a decision's rule set when it authors the decision in its
+ * `enforcesDecisions` forward edge, or when it IS the decision record itself
+ * (so the decision feature's own rules are included).
+ *
+ * The query input and each `enforcesDecisions` value are normalized to the
+ * canonical decision-pattern identity (ADR-006), so a human-typed ADR id
+ * (`ADR-009`, `009`), the canonical pattern name (`ADR009ProjectionTrustBoundary`),
+ * and a bare-id `@architect-enforces-decision:777` all resolve to the same key.
+ * The decision-record self-match compares canonical pattern identity rather than
+ * the bare `adr` tag, because a numeric shared by an ADR and a PDR (`005` →
+ * `ADR-005` / `PDR-005`) makes the bare tag ambiguous and unresolvable.
+ */
+function patternEnforcesDecision(
+  context: ProjectionContext,
+  pattern: ExtractedPattern,
+  decision: string,
+): boolean {
+  const target = canonicalDecisionKey(context.graph, decision);
+
+  // Self-match: the pattern IS the decision record. Compare by canonical pattern
+  // IDENTITY first — a bare numeric `adr` tag (e.g. "005") shared by an ADR and a
+  // PDR (`ADR-005` / `PDR-005`) is ambiguous, so re-canonicalizing the bare tag
+  // refuses (`resolveDecisionPattern` won't guess) and would never equal the
+  // resolved target. The kernel's `resolvePatternsByDecision` self-includes the
+  // decision pattern by identity for exactly this reason; mirror it here.
+  if (isDecisionPattern(pattern) && getPatternName(pattern).toLowerCase() === target) {
+    return true;
+  }
+
+  // Fallback self-match by the bare `adr` tag: an unresolvable fixture decision
+  // (e.g. bare `777` on both query and tag) has no canonical pattern name, so its
+  // target IS the raw value and only the tag comparison links it.
+  if (pattern.adr !== undefined && canonicalDecisionKey(context.graph, pattern.adr) === target) {
+    return true;
+  }
+
+  return (pattern.enforcesDecisions ?? []).some(
+    (value) => canonicalDecisionKey(context.graph, value) === target,
+  );
+}
+
 function createBusinessRuleFragment(
   context: ProjectionContext,
   pattern: ExtractedPattern,
-  rule: ExtractedRule
+  rule: ExtractedRule,
 ): BusinessRule {
   const annotations = parseBusinessRuleAnnotations(rule.description);
 
@@ -209,40 +300,40 @@ function createBusinessRuleFragment(
     verifiedBy: deduplicateScenarioNames(rule.scenarioNames, annotations.verifiedBy),
     scenarioCount: rule.scenarioCount,
     pattern: getPatternName(pattern),
-    ...(pattern.phase !== undefined ? { phase: pattern.phase } : {}),
     productArea: pattern.productArea ?? DEFAULT_PRODUCT_AREA,
   };
 }
 
 function filterBusinessRules(
+  context: ProjectionContext,
   rules: readonly BusinessRule[],
-  options: BusinessRuleSetOptions
+  options: BusinessRuleSetOptions,
 ): BusinessRule[] {
   switch (options.scope) {
     case 'all':
       return [...rules];
     case 'product-area':
       return rules.filter(
-        (rule) => rule.productArea?.toLowerCase() === options.scopeValue.toLowerCase()
+        (rule) => rule.productArea?.toLowerCase() === options.scopeValue.toLowerCase(),
       );
     case 'package':
       return [...rules];
-    case 'phase':
-      return rules.filter((rule) => rule.phase === options.scopeValue);
-    case 'feature':
+    case 'feature': {
       if (options.featureMatch === 'path') {
         return [...rules];
       }
-      return rules.filter(
-        (rule) => rule.feature.toLowerCase() === options.scopeValue.toLowerCase()
-      );
+      const featureNames = resolveFeatureScopeNames(context, options.scopeValue);
+      return rules.filter((rule) => featureNames.has(rule.feature.toLowerCase()));
+    }
+    case 'decision':
+      return [...rules];
   }
 }
 
 function createBusinessRuleSetRoot(
   options: BusinessRuleSetOptions,
   rules: readonly BusinessRule[],
-  groupingEntries?: BusinessRuleSet['groupingEntries']
+  groupingEntries?: BusinessRuleSet['groupingEntries'],
 ): BusinessRuleSet {
   switch (options.scope) {
     case 'all':
@@ -271,15 +362,6 @@ function createBusinessRuleSetRoot(
         ...(options.groupedBy !== undefined ? { groupedBy: options.groupedBy } : {}),
         ...(groupingEntries !== undefined ? { groupingEntries } : {}),
       };
-    case 'phase':
-      return {
-        kind: 'BusinessRuleSet',
-        scope: 'phase',
-        scopeValue: options.scopeValue,
-        rules: [...rules],
-        ...(options.groupedBy !== undefined ? { groupedBy: options.groupedBy } : {}),
-        ...(groupingEntries !== undefined ? { groupingEntries } : {}),
-      };
     case 'feature':
       return {
         kind: 'BusinessRuleSet',
@@ -289,136 +371,115 @@ function createBusinessRuleSetRoot(
         ...(options.groupedBy !== undefined ? { groupedBy: options.groupedBy } : {}),
         ...(groupingEntries !== undefined ? { groupingEntries } : {}),
       };
+    case 'decision':
+      return {
+        kind: 'BusinessRuleSet',
+        scope: 'decision',
+        scopeValue: options.scopeValue,
+        rules: [...rules],
+        ...(options.groupedBy !== undefined ? { groupedBy: options.groupedBy } : {}),
+        ...(groupingEntries !== undefined ? { groupingEntries } : {}),
+      };
   }
 }
 
-function createBusinessRuleChildren(
-  rules: readonly BusinessRule[],
-  groupedBy: NonNullable<BusinessRuleSetOptions['groupedBy']>,
-  options: BusinessRuleSetOptions
-): GroupedBusinessRuleChild[] {
-  if (groupedBy === 'phase' && rules.some((rule) => rule.phase === undefined)) {
-    throw new ProjectionError(
-      'INVALID_SCOPE',
-      'Cannot group business rules by phase when one or more projected rules have no phase.'
-    );
+/** The stable child key (and route segment) for a rule under the grouping axis. */
+function businessRuleGroupKey(rule: BusinessRule, groupedBy: BusinessRuleGrouping): string {
+  switch (groupedBy) {
+    case 'package':
+      return slugify(rule.package);
+    case 'product-area':
+      return slugify(rule.productArea ?? DEFAULT_PRODUCT_AREA);
+    case 'feature':
+      return slugify(rule.feature);
   }
-
-  const grouped = new Map<string, { root: ScopedRuleSet; sortKey: string }>();
-
-  for (const rule of rules) {
-    if (groupedBy === 'package') {
-      const key = slugify(rule.package);
-      const existing = grouped.get(key);
-      if (existing === undefined) {
-        grouped.set(key, {
-          sortKey: rule.package,
-          root: {
-            kind: 'BusinessRuleSet',
-            scope: 'package',
-            scopeValue: rule.package,
-            rules: [rule],
-            ...(options.scope === 'all' ? {} : { groupedBy }),
-          },
-        });
-      } else {
-        existing.root.rules.push(rule);
-      }
-      continue;
-    }
-
-    if (groupedBy === 'product-area') {
-      const area = rule.productArea ?? DEFAULT_PRODUCT_AREA;
-      const key = slugify(area);
-      const existing = grouped.get(key);
-      if (existing === undefined) {
-        grouped.set(key, {
-          sortKey: area,
-          root: {
-            kind: 'BusinessRuleSet',
-            scope: 'product-area',
-            scopeValue: area,
-            rules: [rule],
-            ...(options.scope === 'all' ? {} : { groupedBy }),
-          },
-        });
-      } else {
-        existing.root.rules.push(rule);
-      }
-      continue;
-    }
-
-    if (groupedBy === 'phase' && rule.phase !== undefined) {
-      const key = `phase-${String(rule.phase)}`;
-      const existing = grouped.get(key);
-      if (existing === undefined) {
-        grouped.set(key, {
-          sortKey: key,
-          root: {
-            kind: 'BusinessRuleSet',
-            scope: 'phase',
-            scopeValue: rule.phase,
-            rules: [rule],
-            ...(options.scope === 'all' ? {} : { groupedBy }),
-          },
-        });
-      } else {
-        existing.root.rules.push(rule);
-      }
-      continue;
-    }
-
-    if (groupedBy === 'feature') {
-      const key = slugify(rule.feature);
-      const existing = grouped.get(key);
-      if (existing === undefined) {
-        grouped.set(key, {
-          sortKey: rule.feature,
-          root: {
-            kind: 'BusinessRuleSet',
-            scope: 'feature',
-            scopeValue: rule.feature,
-            rules: [rule],
-            ...(options.scope === 'all' ? {} : { groupedBy }),
-          },
-        });
-      } else {
-        existing.root.rules.push(rule);
-      }
-    }
-  }
-
-  return [...grouped.entries()]
-    .sort((left, right) => NUMERIC_BASE_COLLATOR.compare(left[1].sortKey, right[1].sortKey))
-    .map(([key, value]) => ({
-      key,
-      sortKey: value.sortKey,
-      root: {
-        ...value.root,
-        rules: [...value.root.rules].sort(compareBusinessRules),
-        ...(options.scope === 'all' ? {} : { groupedBy }),
-      },
-    }));
 }
 
-function createBusinessRuleGroupingEntries(
-  children: readonly GroupedBusinessRuleChild[],
-  groupedBy: NonNullable<BusinessRuleSetOptions['groupedBy']>
+/**
+ * The group's deterministic ordering key and human-facing label, both derived
+ * from its first-seen rule.
+ */
+function businessRuleGroupFacets(
+  group: GroupDescriptor<BusinessRule>,
+  groupedBy: BusinessRuleGrouping,
+): { readonly sortKey: string; readonly label: string } {
+  const first = group.items[0];
+  switch (groupedBy) {
+    case 'package': {
+      const value = first?.package ?? '';
+      return { sortKey: value, label: value };
+    }
+    case 'product-area': {
+      const value = first?.productArea ?? DEFAULT_PRODUCT_AREA;
+      return { sortKey: value, label: value };
+    }
+    case 'feature': {
+      const value = first?.feature ?? '';
+      return { sortKey: value, label: value };
+    }
+  }
+}
+
+function createScopedBusinessRuleSet(
+  group: GroupDescriptor<BusinessRule>,
+  groupedBy: BusinessRuleGrouping,
+  options: BusinessRuleSetOptions,
+): ScopedRuleSet {
+  const rules = [...group.items].sort(compareBusinessRules);
+  // Scoped child queries echo their grouping axis; the documentation `scope:'all'`
+  // root does not, matching the prior projection's child shape.
+  const groupedByField = options.scope === 'all' ? {} : { groupedBy };
+  const first = group.items[0];
+
+  switch (groupedBy) {
+    case 'package':
+      return {
+        kind: 'BusinessRuleSet',
+        scope: 'package',
+        scopeValue: first?.package ?? '',
+        rules,
+        ...groupedByField,
+      };
+    case 'product-area':
+      return {
+        kind: 'BusinessRuleSet',
+        scope: 'product-area',
+        scopeValue: first?.productArea ?? DEFAULT_PRODUCT_AREA,
+        rules,
+        ...groupedByField,
+      };
+    case 'feature':
+      return {
+        kind: 'BusinessRuleSet',
+        scope: 'feature',
+        scopeValue: first?.feature ?? '',
+        rules,
+        ...groupedByField,
+      };
+  }
+}
+
+function businessRuleGroupingEntries(
+  groups: readonly GroupDescriptor<BusinessRule>[],
+  groupedBy: BusinessRuleGrouping,
 ): NonNullable<BusinessRuleSet['groupingEntries']> | undefined {
-  if (children.length === 0) {
+  if (groups.length === 0) {
     return undefined;
   }
 
-  return children.map(({ key, root }) => ({
-    childKey: key,
-    label: getBusinessRuleSetScopeValue(root),
-    ...(groupedBy === 'feature'
-      ? { secondaryLabel: root.rules[0]?.productArea ?? DEFAULT_PRODUCT_AREA }
-      : {}),
-    featureCount: new Set(root.rules.map((rule) => rule.feature)).size,
-    ruleCount: root.rules.length,
-    invariantCount: root.rules.filter((rule) => hasText(rule.invariant)).length,
-  }));
+  return groups.map((group) => {
+    const sortedRules = [...group.items].sort(compareBusinessRules);
+    return {
+      childKey: group.key,
+      label: businessRuleGroupFacets(group, groupedBy).label,
+      ...(groupedBy === 'feature'
+        ? { secondaryLabel: sortedRules[0]?.productArea ?? DEFAULT_PRODUCT_AREA }
+        : {}),
+      featureCount: new Set(group.items.map((rule) => rule.feature)).size,
+      ruleCount: group.items.length,
+      invariantCount: group.items.filter((rule) => hasText(rule.invariant)).length,
+    };
+  });
 }
 
 function compareBusinessRules(left: BusinessRule, right: BusinessRule): number {
@@ -426,28 +487,12 @@ function compareBusinessRules(left: BusinessRule, right: BusinessRule): number {
     [
       BASE_COLLATOR.compare(
         left.productArea ?? DEFAULT_PRODUCT_AREA,
-        right.productArea ?? DEFAULT_PRODUCT_AREA
+        right.productArea ?? DEFAULT_PRODUCT_AREA,
       ),
-      (left.phase ?? Number.MAX_SAFE_INTEGER) - (right.phase ?? Number.MAX_SAFE_INTEGER),
       BASE_COLLATOR.compare(left.feature, right.feature),
       BASE_COLLATOR.compare(left.ruleName, right.ruleName),
     ].find((value) => value !== 0) ?? 0
   );
-}
-
-function inferWorkspacePackageName(sourceFile: string): string | undefined {
-  const normalized = normalizePosixPath(sourceFile);
-  const packageSegment =
-    /(?:^|\/)packages\/(architect(?:-[^/]+)?)\//u.exec(normalized)?.[1] ??
-    /^\.\.\/(architect(?:-[^/]+)?)\//u.exec(normalized)?.[1];
-
-  if (packageSegment === undefined) {
-    return undefined;
-  }
-
-  return packageSegment === 'architect'
-    ? '@libar-dev/architect-dev'
-    : `@libar-dev/${packageSegment}`;
 }
 
 function matchesFeaturePath(sourceFile: string, filter: string): boolean {
@@ -523,16 +568,6 @@ function requirePatternByName(context: ProjectionContext, feature: string): Extr
   throw new ProjectionError('RULE_NOT_FOUND', `Feature not found: "${feature}".`);
 }
 
-function getBusinessRuleSetScopeValue(fragment: ScopedRuleSet): string {
-  switch (fragment.scope) {
-    case 'package':
-    case 'product-area':
-    case 'feature':
-    case 'phase':
-      return String(fragment.scopeValue);
-  }
-}
-
 function hasText(value: string | undefined): boolean {
   return value !== undefined && value.trim().length > 0;
 }
@@ -549,7 +584,7 @@ function parseBusinessRuleAnnotations(description: string): BusinessRuleAnnotati
   } = {};
 
   for (const match of normalizeLineEndings(description).matchAll(
-    BUSINESS_RULE_ANNOTATION_PATTERN
+    BUSINESS_RULE_ANNOTATION_PATTERN,
   )) {
     const label = match[1]?.toLowerCase();
     const rawValue = match[2] ?? '';
@@ -583,7 +618,7 @@ function parseBusinessRuleAnnotations(description: string): BusinessRuleAnnotati
 
 function deduplicateScenarioNames(
   scenarioNames: readonly string[],
-  verifiedBy: readonly string[] | undefined
+  verifiedBy: readonly string[] | undefined,
 ): string[] {
   const seen = new Map<string, string>();
 

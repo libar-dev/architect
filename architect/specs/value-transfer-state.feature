@@ -2,21 +2,21 @@
 @architect-pattern:ValueTransferState
 @architect-status:candidate
 @architect-product-area:Projection
-@architect-uses:MCPToolRegistry,PatternGraphCliSubcommands
+@architect-uses:MCPToolRegistry,GraphHandleCli
 @architect-bounded-context:projection
 @architect-see-also:ADR006SingleReadModelArchitecture,ArchitectBriefDeterministicBundle
 Feature: ValueTransferState
 
   **Problem:**
   Three load-bearing rules about the design-level spec lifecycle exist
-  today only as prose in CLAUDE.md and the
-  `architect-claude-plugin` skills: **zombie design spec**,
-  **broken forward/reverse link**, and **retroactive plan-level spec**.
+  today only as prose in CLAUDE.md and the Architect skills: **zombie
+  design spec**, **broken forward/reverse link**, and **retroactive
+  plan-level spec**.
   All three are fully computable from existing scanner output (specs,
-  executable Gherkin, annotated TS) but no Data API verb returns the
+  executable Gherkin, annotated TS) but no deterministic read returns the
   derivation, so cleanup is a manual audit. The doctrine itself lives
   in
-  `packages/architect-claude-plugin/skills/_shared/value-transfer.md`
+  `.agents/skills/architect-sessions/references/ephemeral-spec-deletion.md`
   — this spec mechanizes the detection so consumers (skills, brief
   bundle, future Studio Dashboard) get a deterministic verdict.
 
@@ -44,9 +44,11 @@ Feature: ValueTransferState
     to host
 
   Surfaces:
-  1. `pkg:query value-transfer <pattern>` CLI verb (governance sibling
-     of `rules` and `taxonomy`).
-  2. `architect_value_transfer` MCP tool with the same input shape.
+  1. `projectValueTransferState` and `parseAndProjectValueTransferState` as
+     pure projection entry points over the single read model.
+  2. `architect_value_transfer` MCP tool with the same validated input shape.
+     No named CLI command, graph-handle method, or q-import surface is added;
+     plain-JS q bodies cannot import this planned projection (ADR-014).
   3. The fragment is consumed by `ArchitectBriefDeterministicBundle`
      (sibling candidate) so every brief response surfaces the
      value-transfer state of the focal pattern, making the load-bearing
@@ -55,7 +57,7 @@ Feature: ValueTransferState
 
   **Business Value:**
   | Benefit | Impact |
-  | Anti-patterns become enforceable | `architect-implement-spec` and `architect-review-implementation` skills can refuse to delete a spec when `deletionReady` is false |
+  | Anti-patterns become enforceable | the `architect-sessions` implement and review-implementation references can refuse to delete a spec when `deletionReady` is false |
   | Zombie cleanup is mechanical | Listing every pattern with `zombie-design-spec` becomes one query, not a manual audit |
   | Pre-deletion link integrity is binary | Replaces "I think this is safe to delete" with a deterministic verdict |
   | Retroactive plan-level is detectable | Catches the inverted-pipeline anti-pattern at scope-validate time |
@@ -63,7 +65,7 @@ Feature: ValueTransferState
 
   **Worked example:**
   The MCPServerIntegration cleanup completed manually in 2026-04 is the
-  motivating case — `pkg:query value-transfer MCPServerIntegration`
+  motivating case — the value-transfer read for `MCPServerIntegration`
   would have returned `deletionReady: true` with the forward/reverse
   links resolved, instead of requiring a hand audit. Future cleanups
   (the overview implies several — 37 active patterns out of 174 total,
@@ -81,12 +83,11 @@ Feature: ValueTransferState
       | governance fragment barrel export | pending | packages/architect-projection/src/fragments/governance/index.ts | Yes | typecheck |
       | governance projection barrel export | pending | packages/architect-projection/src/projections/governance/index.ts | Yes | typecheck |
       | top-level fragments barrel export | pending | packages/architect-projection/src/fragments/index.ts | Yes | typecheck |
-      | value-transfer CLI verb registration | pending | packages/architect-cli/src/cli/pattern-graph-cli-commands.ts | Yes | integration |
-      | value-transfer CLI command definition | pending | packages/architect-cli/src/cli/commands/governance.ts | Yes | integration |
+      | architect_value_transfer MCP tool definition | pending | packages/architect-mcp/src/tool-registry.ts | Yes | integration |
       | architect_value_transfer MCP input shape | pending | packages/architect-mcp/src/tool-input-schemas.ts | Yes | integration |
       | architect_value_transfer MCP handler | pending | packages/architect-mcp/src/tool-registry.ts | Yes | integration |
       | architect_value_transfer metadata entry | pending | packages/architect-mcp/src/tool-metadata.ts | Yes | integration |
-      | CLI value-transfer scenarios | pending | packages/architect/tests/features/cli/data-api-help.feature | Yes | integration |
+      | pure value-transfer projection scenarios | pending | packages/architect-projection/tests/features/projections/governance/value-transfer-state.feature | Yes | unit |
       | MCP architect_value_transfer scenarios | pending | packages/architect-mcp/tests/features/architect-mcp-integration.feature.steps.ts | Yes | integration |
 
   # ============================================================================
@@ -179,14 +180,14 @@ Feature: ValueTransferState
     least one production source file carries `@architect-pattern:<P>`
     OR the executable feature carries the rule content the design spec
     used to host (annotations are additive per split-ownership; see
-    `packages/architect-claude-plugin/skills/_shared/annotation-ownership.md`);
+    `.agents/skills/architect-base/references/annotation-ownership.md`);
     (e) the antipatterns array does not contain `broken-forward-link`
     or `broken-reverse-link`. If any condition fails, `deletionReady`
     is false. There is no partial readiness.
 
     **Rationale:** The full doctrine for ephemerality and the
     deletion gate lives at
-    `packages/architect-claude-plugin/skills/_shared/value-transfer.md`.
+    `.agents/skills/architect-sessions/references/ephemeral-spec-deletion.md`.
     This rule mechanizes that gate.
 
     **Verified by:** deletionReady is true for fully-transferred
@@ -214,30 +215,29 @@ Feature: ValueTransferState
   # RULE 4: Output Behaviour Matches Governance-Subdomain Conventions
   # ============================================================================
 
-  Rule: value-transfer verb and architect_value_transfer tool follow rules / taxonomy conventions
+  Rule: the pure projection and architect_value_transfer tool follow governance conventions
 
-    **Invariant:** The CLI verb supports `--format json` (pretty JSON)
-    and the default text rendering via `writeProjectionOutput`,
-    mirroring `pkg:query rules` and `pkg:query taxonomy`. The MCP tool
-    returns the fragment via `renderJsonToolResult`, mirroring
-    `architect_rules` and `architect_taxonomy`. The MCP input shape is
-    composed via `createStrictReadonlyObjectSchema` referencing
-    `ValueTransferStateOptionsSchema.shape` -- single source of truth
-    for the option contract.
+    **Invariant:** `projectValueTransferState` returns a projection bundle whose
+    root is the plain `ValueTransferState` fragment. The MCP tool renders that
+    bundle through `renderJsonToolResult`, mirroring `architect_rules` and
+    `architect_taxonomy`. Its strict input schema is composed from
+    `ValueTransferStateOptionsSchema.shape`, keeping the planned projection and
+    typed-tool option contract single-sourced. No graph-handle operation is part
+    of this contract.
 
     **Rationale:** Sibling projections in the same DDD subdomain
-    (governance) expose identical surface conventions. Convention
-    parity > novelty.
+    (governance) expose identical projection and typed-MCP conventions.
+    Convention parity > novelty.
 
-    **Verified by:** CLI value-transfer scenarios in data-api-help.feature,
-    MCP architect_value_transfer scenario, MCP input schema is the
+    **Verified by:** pure value-transfer projection scenario, MCP
+    architect_value_transfer scenario, MCP input schema is the
     spread of ValueTransferStateOptionsSchema.shape
 
     @acceptance-criteria @happy-path
-    Scenario: CLI verb supports --format json
-      When running "pkg:query value-transfer <pattern> --format json"
-      Then the output is valid JSON parseable as ValueTransferState
-      And the output has "kind": "ValueTransferState"
+    Scenario: the pure projection returns the plain fragment at its root
+      When projecting ValueTransferState for "<pattern>" through projectValueTransferState
+      Then the projection root is the plain ValueTransferState fragment
+      And the projection root has "kind": "ValueTransferState"
 
     @acceptance-criteria @happy-path
     Scenario: MCP tool returns valid JSON via renderJsonToolResult

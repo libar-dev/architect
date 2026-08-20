@@ -1,0 +1,134 @@
+{
+    "skills": {
+        "sources": [
+            {
+                "path": ".opencode/skills/*/SKILL.md",
+                "recursive": false
+            }
+        ],
+        "enable": [
+            "architect-base",
+            "architect-graph-handle",
+            "architect-sessions"
+        ]
+    },
+    "agents": {
+        "build": {
+            "skills": [
+                "architect-base",
+                "architect-graph-handle",
+                "architect-sessions"
+            ]
+        },
+        "hephaestus": {
+            "skills": [
+                "architect-base",
+                "architect-graph-handle",
+                "architect-sessions"
+            ]
+        },
+        "oracle": {
+            "skills": [
+                "architect-base",
+                "architect-graph-handle",
+                "architect-sessions"
+            ]
+        },
+        "librarian": {
+            "skills": [
+                "architect-base",
+                "architect-graph-handle",
+                "architect-sessions"
+            ]
+        },
+        "explore": {
+            "skills": [
+                "architect-base",
+                "architect-graph-handle",
+                "architect-sessions"
+            ]
+        },
+        "multimodal-looker": {
+            "skills": [
+                "architect-base",
+                "architect-graph-handle",
+                "architect-sessions"
+            ]
+        },
+        "atlas": {
+            "skills": [
+                "architect-base",
+                "architect-graph-handle",
+                "architect-sessions"
+            ]
+        },
+        "prometheus": {
+            "skills": [
+                "architect-base",
+                "architect-graph-handle",
+                "architect-sessions"
+            ]
+        },
+        "sisyphus": {
+            "skills": [
+                "architect-base",
+                "architect-graph-handle",
+                "architect-sessions"
+            ]
+        },
+        "sisyphus-junior": {
+            "skills": [
+                "architect-base",
+                "architect-graph-handle",
+                "architect-sessions"
+            ]
+        },
+        "metis": {
+            "skills": [
+                "architect-base",
+                "architect-graph-handle",
+                "architect-sessions"
+            ]
+        },
+        "momus": {
+            "skills": [
+                "architect-base",
+                "architect-graph-handle",
+                "architect-sessions"
+            ]
+        },
+        "plan": {
+            "skills": [
+                "architect-base",
+                "architect-graph-handle",
+                "architect-sessions"
+            ]
+        }
+    },
+    "categories": {
+        "quick": {
+            "prompt_append": "file://./prompts/architect-kernel-bootstrap.md"
+        },
+        "deep": {
+            "prompt_append": "file://./prompts/architect-kernel-bootstrap.md"
+        },
+        "ultrabrain": {
+            "prompt_append": "file://./prompts/architect-kernel-bootstrap.md"
+        },
+        "artistry": {
+            "prompt_append": "file://./prompts/architect-kernel-bootstrap.md"
+        },
+        "visual-engineering": {
+            "prompt_append": "file://./prompts/architect-kernel-bootstrap.md"
+        },
+        "writing": {
+            "prompt_append": "file://./prompts/architect-kernel-bootstrap.md"
+        },
+        "unspecified-low": {
+            "prompt_append": "file://./prompts/architect-kernel-bootstrap.md"
+        },
+        "unspecified-high": {
+            "prompt_append": "file://./prompts/architect-kernel-bootstrap.md"
+        }
+    }
+}

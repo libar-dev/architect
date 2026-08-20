@@ -3,8 +3,8 @@
  * @architect-role:contract
  * @architect-pattern ResultMonadTypes
  * @architect-status completed
- * @architect-implements ResultMonad
  * @architect-product-area CoreTypes
+ * @architect-bounded-context:domain
  *
  * ## Result Monad - Type Definitions
  *
@@ -15,31 +15,42 @@
  */
 
 /**
- * Success result containing a value
+ * Success branch of a {@link Result} — carries the produced value.
+ *
+ * @architect-shape
  */
 export interface Ok<T> {
+  /** Discriminant marking this as the success branch. */
   ok: true;
+  /** The successfully produced value. */
   value: T;
 }
 
 /**
- * Error result containing an error
+ * Error branch of a {@link Result} — carries the failure.
+ *
+ * @architect-shape
  */
 export interface Err<E> {
+  /** Discriminant marking this as the error branch. */
   ok: false;
+  /** The error describing the failure. */
   error: E;
 }
 
 /**
- * Result type representing either success (Ok) or failure (Err)
+ * Result type representing either success (Ok) or failure (Err).
  *
+ * @architect-shape
  * @typeParam T - The success value type
  * @typeParam E - The error type (defaults to Error)
  */
 export type Result<T, E = Error> = Ok<T> | Err<E>;
 
 /**
- * Result utilities for creating and inspecting Result values
+ * Result utilities for creating and inspecting Result values.
+ *
+ * @architect-shape
  */
 export const Result = {
   /**

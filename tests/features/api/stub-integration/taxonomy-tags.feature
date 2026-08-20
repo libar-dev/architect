@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:StubTaxonomyTagTests
 @architect-status:active
+@architect-implements:RegistryBuilder
 @architect-product-area:DataAPI
 Feature: Stub Integration Taxonomy Tags
 

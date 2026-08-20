@@ -2,11 +2,13 @@
  * @architect
  * @architect-pattern ProjectionFragmentSchema
  * @architect-role:contract
+ * @architect-bounded-context:rendering
  * @architect-status active
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Defines the discriminated union that collects every projection fragment
+ *   kind into one read model.
  */
 import { z } from 'zod';
 
@@ -16,7 +18,7 @@ import {
   ArchitectureNeighborhoodSchema,
   DependencyEdgeSchema,
   DependencyEdgeSetSchema,
-  DependencyTreeSchema,
+  DependencyContextSchema,
   PatternBundleEntrySchema,
   OpenQuestionListSchema,
   OrphanPatternListSchema,
@@ -24,12 +26,7 @@ import {
   PatternDetailSchema,
   PatternSummarySchema,
 } from './pattern-relations/index.js';
-import {
-  PhaseProgressSchema,
-  ReleaseNotesDigestSchema,
-  StatusDistributionSchema,
-  TraceabilityMatrixSchema,
-} from './delivery-reporting/index.js';
+import { StatusDistributionSchema, TraceabilityMatrixSchema } from './delivery-reporting/index.js';
 import { RoadmapTimelineSchema as InternalRoadmapTimelineSchema } from './delivery-reporting/roadmap-timeline.js';
 import {
   BusinessRuleReferenceSchema,
@@ -61,6 +58,7 @@ import {
   TagUsageMatrixSchema,
 } from './operational-insights/index.js';
 import {
+  ApiReferenceDigestSchema,
   ArchitectureDiagramSchema,
   PrChangeReviewSchema,
   ProjectConfigSnapshotSchema,
@@ -74,14 +72,12 @@ export const FragmentSchema = z.discriminatedUnion('kind', [
   PatternBundleEntrySchema,
   PatternDetailSchema,
   DependencyEdgeSchema,
-  DependencyTreeSchema,
+  DependencyContextSchema,
   ArchitectureNeighborhoodSchema,
   OpenQuestionListSchema,
   OrphanPatternListSchema,
-  PhaseProgressSchema,
   StatusDistributionSchema,
   InternalRoadmapTimelineSchema,
-  ReleaseNotesDigestSchema,
   TraceabilityMatrixSchema,
   DecisionRecordSchema,
   DecisionCatalogSchema,
@@ -108,6 +104,7 @@ export const FragmentSchema = z.discriminatedUnion('kind', [
   RequirementDigestSchema,
   ProjectConfigSnapshotSchema,
   ArchitectureDiagramSchema,
+  ApiReferenceDigestSchema,
   PrChangeReviewSchema,
   DependencyEdgeSetSchema,
 ]);

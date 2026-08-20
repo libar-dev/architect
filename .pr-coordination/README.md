@@ -1,44 +1,58 @@
-# Docs generation campaign — coordination
+# PR Coordination — Re-enable Architect Core Functionality
 
-Pause-point context for the documentation-generation consolidation work. Captured 2026-05-17 during the W1.5 → W4 transition.
+Committed coordination package for the PR on `campaign/docs-and-skills-consolidation`.
+Self-contained: does **not** rely on `.scratch/` (maintainer tmp, gitignored + `.claudeignore`'d).
 
-## What this is
+**Context:** ~30 refactoring PRs stripped production `@architect-*` annotations — the
+PatternGraph kept pattern identities but lost edges/shapes/invariants (~40% orphans), so the
+Data API couldn't be used for context-gathering. This PR re-enables core functionality
+(annotations + skills + docs together).
 
-A focused design-session input set for the next time we pick up documentation generation. The user is wrapping up two prerequisites first (core package extraction, skills consolidation), then returning to this.
+**Current state:** WS-0/1/2 **DONE**. **WS-3 (universal doc generation) is an in-progress capability, not
+done** — the goal is to replace the entire manual `docs/` corpus with universal generators, and ADR-010
+(composable-helper composition) + the `api-reference` shape tier are only **step 1**. Its hard-won
+foundation lives here and stays live: `DOCS-IA-FINDINGS.md` (the information-architecture base — source map,
+overlap matrix, generator ledger, target-state corpus, roadmap), `HUD-IDEATION.md` (the read-surface
+disclosure model), and `EXECUTION-PLAN.md` (the WS-3 plan + gates). The PatternGraph carriers below are the
+spec-graph **entry points** into that work, not a replacement for the base. Campaign-resolved residue (the
+WS-5/6/7 handoffs) is archived; the standing-rules digest is consolidated. See `CONSOLIDATION-2026-05-27.md`.
 
-## Read order
+## Fresh session — read this, in order
 
-1. **`DEEP-DIVE.md`** — the headline finding, the architectural reframe, and the answers to the two big questions ("can PatternGraph extract what we need?" and "annotation-config vs rethink to something more flexible?"). Start here.
-2. **`INVENTORY.md`** — concrete catalog: what exists in the post-W1.5 packages, what was dropped during the lift, what the pre-refactor monolith proved was possible. Use this for cross-reference while reading DEEP-DIVE.
-3. **`PROPOSED-DESIGN.md`** — sketches of the new `DocDefinition` API, the extractor catalog, the multi-target output surface, and the wave breakdown for execution.
+1. **`PREAMBLE.md`** — load the mandatory skills (`architect-base`, `architect-data-api`,
+   `architect-sessions`); commit to API-first.
+2. **`DECISIONS.md`** — the "Key durable decisions" digest = the standing rules all work must respect.
+3. **`DOCS-IA-FINDINGS.md`** — the IA base + target-state corpus + roadmap (R1, R3–R7; R2 escaping shipped)
+   driving the manual-docs → universal-generator replacement.
+4. **`EXECUTION-PLAN.md` §6** — the gate sequence to run before any commit.
 
-## Status
+Spec-graph entry points for the doc-gen capability: the `DocumentationProjection` epic (carries the guiding
+principle + MVP discipline + corpus scope), `TaxonomyDocumentationCluster` (the MVP first proof-point — one
+source, many audience shapes), `ApiReferenceShapeCoverage` (the `@architect-shape` pass),
+`ArchitectBriefDeterministicBundle` (`Q-TOKEN-BUDGET-SIGNAL`, from `HUD-IDEATION.md`), and
+`DecisionRecordTemporalHygiene`.
 
-**Blocking decisions:** none — design space is well-understood, the user has approved restoring the dropped capability and intends to extend rather than clone the pre-refactor design.
+## Files
 
-**Prerequisites in flight (not blocking this work but should land first):**
-- Core package extraction finalization (W1.5.x hardening backlog)
-- Skills consolidation (W9)
+| File                               | Purpose                                                                                                                |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `PREAMBLE.md`                      | **Read first every session** — mandatory skills + API-first discipline                                                 |
+| `DECISIONS.md`                     | Standing-rules digest (all decisions resolved); resolved bodies in `archive/`                                          |
+| `DOCS-IA-FINDINGS.md`              | **The doc-gen capability base** — IA audit, overlap matrix, generator ledger, target-state corpus, roadmap (R1, R3–R7) |
+| `HUD-IDEATION.md`                  | Read-surface progressive-disclosure model (steps 1–2 shipped; 3–4 → `ArchitectBriefDeterministicBundle`)               |
+| `EXECUTION-PLAN.md`                | Why/diagnosis, workstream status, **§6 gates**, method guardrails                                                      |
+| `CONSOLIDATION-2026-05-27.md`      | Disposition of every doc + what is base-vs-archived + pre-deletion checklist                                           |
+| `SESSION-REPORTS-AND-LEARNINGS.md` | Append-only session log                                                                                                |
+| `state.json`                       | Phase tracking + metrics                                                                                               |
+| `archive/`                         | Completed-work history — WS-0/1/2 log, resolved decisions, WS-1 strategy, the WS-5/6/7 handoffs, session prompts       |
 
-**Implementation target:** Wave 4 of the REMAINING-WORK.md campaign, resequenced. See `PROPOSED-DESIGN.md` § Wave breakdown.
+## How to run a session
 
-## Key external references
+1. Read `PREAMBLE.md` (load skills; commit to API-first), then the read-path above.
+2. Execute the scoped doc-gen work; capture any judgment call in `DECISIONS.md` before the code.
+3. Run the full gate sequence (`EXECUTION-PLAN.md §6` / architect-base §6) before committing — never `--no-verify`.
+4. Append a tight entry to `SESSION-REPORTS-AND-LEARNINGS.md`; bump `state.json`.
 
-- **Pre-refactor proof artifacts** (the regression source — read-only reference):
-  - `/Users/darkomijic/dev-projects/delivery-process/architect.config.ts` — the 9-entry `referenceDocConfigs` array that produced working reference docs.
-  - `/Users/darkomijic/dev-projects/delivery-process/docs-live/reference/REFERENCE-SAMPLE.md` — 1,135-line kitchen-sink output showing all 5 Mermaid diagram types, TypeScript shape extraction with JSDoc preservation, behavior-spec collapsibles, ADR rendering.
-  - `/Users/darkomijic/dev-projects/delivery-process/src/renderable/codecs/` — the 19 codec source files that were dropped during the package split.
-  - `/Users/darkomijic/dev-projects/delivery-process/src/generators/built-in/` — the 7 generator source files including `claude-modules` (dual-target output) and the 3 dropped doc generators.
-  - `/Users/darkomijic/dev-projects/delivery-process/docs-live/reference/*.md` — 11 docs, 4,430 total lines, all auto-generated pre-refactor. Use as the target output corpus.
-
-- **Surviving in post-refactor (architecturally important):**
-  - `packages/architect-core/src/config/presentation-contracts.ts` — `ReferenceDocConfig`, `DiagramScope`, diagram-type enum, shape-group enum. Schema still defined, no consumer.
-  - `packages/architect-core/src/utils/markdown-parser.ts` — `parseMarkdownToBlocks()`, the foundation for preamble support.
-  - `packages/architect-projection/src/projections/documentation-composition/documentation-bundle.internal.ts:64` — the hardcoded 12-entry generator dispatch table that's the current ceiling on `architect-generate` output.
-  - `packages/architect-core/src/extractor/shape-extractor.ts` — `extractShapes()` + `discoverTaggedShapes()` (which already walks JSDoc for `@architect-extract-shapes`).
-
-## Out of scope here
-
-- The W9 skills consolidation work. Touches doc generation only insofar as agent-context modules might be a generator target (covered in PROPOSED-DESIGN § dual-target output).
-- The W7 publish/cutover. Doc generation should be working before publish but the campaign is self-contained.
-- Studio coordination (W8).
+> At PR/campaign close, the doctrine's full archive (gitignored sibling
+> `.pr-coordination-archive-<date>/`) replaces this interim `archive/` subfolder —
+> see `architect-refactor-session/references/multi-session-coordination.md`.

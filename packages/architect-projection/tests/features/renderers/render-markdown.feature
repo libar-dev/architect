@@ -1,3 +1,8 @@
+@architect
+@architect-pattern:MarkdownRendererExecutableTests
+@architect-implements:MarkdownRenderer
+@architect-status:active
+@architect-role:projection
 @projection
 Feature: renderMarkdown renders canonical markdown blocks
   The markdown renderer should preserve the current codec semantics for the canonical block vocabulary.
@@ -23,16 +28,40 @@ Feature: renderMarkdown renders canonical markdown blocks
       And the markdown output should block unsafe link targets
 
     @security
-    Scenario: Release notes trusted markdown escapes interpolated fragment values
-      Given a ReleaseNotesDigest fixture containing hostile release metadata
-      When I render the fragment as markdown
-      Then the release notes markdown should escape trusted interpolation values
-
-    @security
     Scenario: Requirement digests escape interpolated trusted markdown values
       Given a RequirementDigest fixture containing hostile requirement values
       When I render the hostile requirement bundle as markdown without H2 splitting
       Then the requirement markdown should escape trusted interpolation values
+
+  Rule: Renderer-authored markdown renders live while sourced text stays escaped
+
+    @regression
+    Scenario: Decision catalog renders live ADR links and escapes hostile link text
+      Given a DecisionCatalog fixture with a normal and a hostile decision id
+      When I render the fragment as markdown
+      Then the decision catalog markdown should render the ADR link as a live link
+      And the decision catalog markdown should escape the hostile decision link text
+
+    @regression
+    Scenario: Architecture diagram trusts renderer-authored description and legend
+      Given an ArchitectureDiagram fixture with a code-span description and a legend
+      When I render the fragment as markdown
+      Then the architecture markdown should render the description code spans unescaped
+      And the architecture markdown should render the legend parentheses unescaped
+
+    @regression
+    Scenario: Architecture diagram escapes sourced section titles but keeps the pattern-count suffix live
+      Given an ArchitectureDiagram fixture with a hostile sourced section title
+      When I render the fragment as markdown
+      Then the architecture markdown should escape the sourced section title
+      And the architecture markdown should keep the renderer-authored count suffix live
+
+    @regression
+    Scenario: Taxonomy tag code spans render live but sourced tag text cannot inject
+      Given a TaxonomyDigest fixture with a safe tag and a backtick-bearing hostile tag
+      When I render the fragment as markdown
+      Then the taxonomy markdown should render the safe tag as a live code span
+      And the taxonomy markdown should not let the hostile tag inject a live link
 
   Rule: Routed markdown output can auto-split oversized files at H2 boundaries
 
@@ -42,6 +71,7 @@ Feature: renderMarkdown renders canonical markdown blocks
       When I render the bundle as markdown with an H2 size budget
       Then the markdown output should be a routed file record
       And the oversized child file should split at H2 boundaries
+      And each split-path routed fragment should render at most twice
 
   Rule: Routed documentation roots follow progressive disclosure policy
 
@@ -63,7 +93,7 @@ Feature: renderMarkdown renders canonical markdown blocks
         | essential | 2       |
         | important | 3       |
         | useful    | 5       |
-        | advanced  | 9       |
+        | advanced  | 8       |
 
     @routing
     Scenario: Duplicate routed child paths are disambiguated by stable child ids

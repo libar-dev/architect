@@ -1,28 +1,41 @@
 /**
+ * @architect
+ * @architect-pattern PatternCatalogAssembly
+ * @architect-status completed
+ * @architect-role:service
  * @architect-bounded-context:pattern-relations
+ * @architect-uses DomainEnumSchemas, PatternHelpers, StatusNormalization, ProjectionContext, PatternCatalog, ProjectionFilter, PatternRelationsProjectionSupport
  */
 /**
- * Private helpers used exclusively by the pattern-catalog fragment.
- *
- * Part of the PatternRelationsProjectionSupport utility surface.
+ * Builds the filtered pattern catalog and its name-resolution helpers for list and search surfaces.
  */
 
-import { AcceptedStatusSchema, findPatternByName, MaturitySchema } from '@libar-dev/architect-core';
+import {
+  findPatternByName,
+  MaturitySchema,
+  normalizeStatus,
+  StatusFilterSchema,
+  type StatusFilterValue,
+} from '@libar-dev/architect-core';
 import { z } from 'zod';
 
 import type { ProjectionContext } from '../../context/projection-context.js';
 import type { PatternCatalog } from '../../fragments/pattern-relations/index.js';
 
 import { filterPatterns } from '../_shared/filter.js';
-import { createPatternSummaryFragment } from '../_shared/pattern-helpers.internal.js';
+import {
+  buildFileToPackageMap,
+  createPatternSummaryFragment,
+  getPatternName,
+} from '../_shared/pattern-helpers.internal.js';
 
 export const PatternCatalogOptionsSchema = z
   .strictObject({
-    status: AcceptedStatusSchema.optional(),
+    status: StatusFilterSchema.optional(),
     maturity: MaturitySchema.optional(),
-    phase: z.number().int().optional(),
     role: z.string().optional(),
     parent: z.string().optional(),
+    package: z.string().optional(),
     namesOnly: z.boolean().optional(),
     count: z.boolean().optional(),
   })
@@ -32,19 +45,23 @@ export type PatternCatalogOptions = z.infer<typeof PatternCatalogOptionsSchema>;
 
 export function buildPatternCatalog(
   context: ProjectionContext,
-  options: PatternCatalogOptions = {}
+  options: PatternCatalogOptions = {},
 ): PatternCatalog {
   const canonicalRole = resolveCanonicalRoleFilter(context, options.role);
   const parentChildNames = resolveParentChildNames(context, options.parent);
+  const byPackage = context.graph.archIndex?.byPackage;
+  const fileToPackage: ReadonlyMap<string, string> =
+    byPackage !== undefined ? buildFileToPackageMap(byPackage) : new Map();
+  const packageFilter = options.package;
   const items = filterPatterns(context.graph.patterns, context.projectionFilter)
-    .map(createPatternSummaryFragment)
+    .map((pattern) => createPatternSummaryFragment(pattern, fileToPackage.get(pattern.source.file)))
     .filter(
       (summary) =>
-        (options.status === undefined || summary.status === options.status) &&
+        statusFilterMatches(summary.status, options.status) &&
         (options.maturity === undefined || summary.maturity === options.maturity) &&
-        (options.phase === undefined || summary.phase === options.phase) &&
         (canonicalRole === undefined || summary.role.toLowerCase() === canonicalRole) &&
-        (parentChildNames === undefined || parentChildNames.has(summary.patternName))
+        (parentChildNames === undefined || parentChildNames.has(summary.patternName)) &&
+        (packageFilter === undefined || summary.package === packageFilter),
     )
     .sort((left, right) => left.patternName.localeCompare(right.patternName));
 
@@ -53,9 +70,9 @@ export function buildPatternCatalog(
     filters: {
       ...(options.status !== undefined ? { status: options.status } : {}),
       ...(options.maturity !== undefined ? { maturity: options.maturity } : {}),
-      ...(options.phase !== undefined ? { phase: options.phase } : {}),
       ...(canonicalRole !== undefined ? { role: canonicalRole } : {}),
       ...(options.parent !== undefined ? { parent: options.parent } : {}),
+      ...(packageFilter !== undefined ? { package: packageFilter } : {}),
       namesOnly: options.namesOnly === true,
       count: options.count === true,
     },
@@ -65,9 +82,29 @@ export function buildPatternCatalog(
   };
 }
 
+/**
+ * Resolves an incoming typed `status` filter against a pattern's authored status.
+ * The normalized bucket word `planned` matches the roadmap ∪ deferred union via
+ * `normalizeStatus`; every FSM-authored value (candidate/roadmap/active/
+ * completed/deferred) matches exactly. `undefined` matches everything.
+ */
+function statusFilterMatches(
+  patternStatus: string | undefined,
+  filter: StatusFilterValue | undefined,
+): boolean {
+  if (filter === undefined) {
+    return true;
+  }
+  if (filter === 'planned') {
+    return normalizeStatus(patternStatus) === 'planned';
+  }
+  return patternStatus === filter;
+}
+
 export function resolveParentChildNames(
   context: ProjectionContext,
-  parent: string | undefined
+  parent: string | undefined,
+  includeSelf = false,
 ): ReadonlySet<string> | undefined {
   if (parent === undefined) {
     return undefined;
@@ -78,12 +115,18 @@ export function resolveParentChildNames(
     throw new Error(`Parent pattern not found: ${parent}`);
   }
 
-  return new Set(parentPattern.children ?? []);
+  const childNames = new Set(parentPattern.children ?? []);
+  if (includeSelf) {
+    // Use the canonical name so the set matches getPatternName(pattern) during the
+    // candidate filter — the caller may have passed a punctuation-variant of the name.
+    childNames.add(getPatternName(parentPattern));
+  }
+  return childNames;
 }
 
 function resolveCanonicalRoleFilter(
   context: ProjectionContext,
-  role: string | undefined
+  role: string | undefined,
 ): string | undefined {
   if (role === undefined) {
     return undefined;
@@ -91,7 +134,7 @@ function resolveCanonicalRoleFilter(
 
   const normalized = role.toLowerCase();
   const definition = context.graph.tagRegistry.roles.find(
-    (entry) => entry.tag === normalized || entry.aliases?.includes(normalized) === true
+    (entry) => entry.tag === normalized || entry.aliases?.includes(normalized) === true,
   );
 
   return definition?.tag ?? normalized;

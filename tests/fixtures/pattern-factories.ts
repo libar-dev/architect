@@ -30,8 +30,7 @@ import {
 /**
  * Deliverable structure for timeline testing
  *
- * Matches the Deliverable type from dual-source.ts, with release
- * now tracked at the deliverable level (not pattern level).
+ * Matches the Deliverable type from dual-source.ts.
  */
 export interface TestDeliverable {
   name: string;
@@ -39,8 +38,6 @@ export interface TestDeliverable {
   tests: number;
   location: string;
   finding?: string | undefined;
-  /** Release version this deliverable belongs to (e.g., "v0.2.0") */
-  release?: string | undefined;
 }
 
 /**
@@ -71,37 +68,25 @@ export interface TestPatternOptions {
   lines?: readonly [number, number];
   /** Export information (default: single function export) */
   exports?: ExportInfo[] | undefined;
-  /** Use cases (default: none) */
-  useCases?: string[] | undefined;
   /** Scenarios (default: none) */
   scenarios?: readonly ScenarioRef[] | undefined;
   /** Uses relationships (default: none) */
   uses?: string[] | undefined;
   /** Used-by relationships (default: none) */
   usedBy?: string[] | undefined;
-  /** Phase number (default: none) */
-  phase?: number | undefined;
   /** When to use bullets (default: none) */
   whenToUse?: string[] | undefined;
   /** Depends on patterns (default: none) */
   dependsOn?: string[] | undefined;
   /** Enables patterns (default: none) */
   enables?: string[] | undefined;
-  // Timeline-specific fields
-  /** Completion date in YYYY-MM-DD format (default: none) */
-  completed?: string | undefined;
-  /** Quarter identifier like "Q1-2026" (default: none) */
-  quarter?: string | undefined;
-  /** Effort estimate like "2w", "3d", "1m" (default: none) */
-  effort?: string | undefined;
+  // Process and hierarchy fields
   /** Team responsible (default: none) */
   team?: string | undefined;
   /** Deliverables list (default: none) */
   deliverables?: TestDeliverable[] | undefined;
-  /** Workflow type for changelog mapping (default: none) */
+  /** Workflow label for package requirement documentation (default: none) */
   workflow?: string | undefined;
-  /** Priority level for process tracking (default: none) */
-  priority?: 'critical' | 'high' | 'medium' | 'low' | undefined;
   /** Hierarchy level for grouping (default: none) */
   level?: 'epic' | 'phase' | 'task' | undefined;
   /** Patterns this code implements (realization relationship, default: none) */
@@ -124,12 +109,8 @@ export interface TestPatternOptions {
   discoveredLearnings?: string[] | undefined;
   /** Discovered risks during implementation (default: none) */
   discoveredRisks?: string[] | undefined;
-  /** Business value statement (default: none) */
-  businessValue?: string | undefined;
   /** Target implementation path for stub files (default: none) */
   targetPath?: string | undefined;
-  /** Design session that created this pattern (default: none) */
-  since?: string | undefined;
   /** Related patterns for cross-reference (default: none) */
   seeAlso?: string[] | undefined;
   // Architecture fields
@@ -163,8 +144,6 @@ export interface PatternSetOptions {
   patternsPerCategory?: number;
   /** Include relationship data (default: false) */
   withRelationships?: boolean;
-  /** Include use case data (default: false) */
-  withUseCases?: boolean;
   /** Include all optional features (default: false) */
   withAllFeatures?: boolean;
 }
@@ -187,7 +166,7 @@ let patternCounter = 0;
  * const customPattern = createTestPattern({
  *   name: "CommandOrchestrator",
  *   category: "core",
- *   useCases: ["When implementing a new command"],
+ *   description: "Coordinates command execution.",
  * });
  * ```
  */
@@ -207,22 +186,16 @@ export function createTestPattern(options: TestPatternOptions = {}): ExtractedPa
     filePath = `packages/@libar-dev/platform-${category}/src/test.ts`,
     lines = [1, 10] as const,
     exports = [{ name: name.replace(/\s+/g, ''), type: 'function' as const }],
-    useCases,
     scenarios,
     uses,
     usedBy,
-    phase,
     whenToUse,
     dependsOn,
     enables,
-    // Timeline-specific fields
-    completed,
-    quarter,
-    effort,
+    // Process and hierarchy fields
     team,
     deliverables,
     workflow,
-    priority,
     level,
     implementsPatterns,
     // Display and traceability fields
@@ -235,10 +208,8 @@ export function createTestPattern(options: TestPatternOptions = {}): ExtractedPa
     discoveredImprovements,
     discoveredLearnings,
     discoveredRisks,
-    businessValue,
     // Stub metadata
     targetPath,
-    since,
     seeAlso,
     // Architecture fields
     archRole,
@@ -264,20 +235,18 @@ export function createTestPattern(options: TestPatternOptions = {}): ExtractedPa
     description,
     examples: [],
     position: { startLine: lines[0], endLine: lines[1] },
-    ...(useCases && useCases.length > 0 ? { useCases } : {}),
     ...(mergedUses.length > 0 ? { uses: mergedUses } : {}),
-    ...(phase !== undefined ? { phase } : {}),
     ...(whenToUse && whenToUse.length > 0 ? { whenToUse } : {}),
     ...(targetPath ? { target: targetPath } : {}),
-    ...(since ? { since } : {}),
     ...(seeAlso && seeAlso.length > 0 ? { seeAlso } : {}),
     ...(executableSpecs && executableSpecs.length > 0 ? { executableSpecs } : {}),
   };
 
   // Wave 1: maturity, archContext, archLayer were retired from the schema
   // (maturity derives from status at projection time; arch* collapsed into
-  // bounded-context). Options remain accepted for backward-compat but are
-  // not spread onto the returned ExtractedPattern (schema is strictObject).
+  // bounded-context). ADR-013 retired the numeric `phase` and the `quarter`
+  // temporal axis. Options remain accepted for backward-compat but are not
+  // spread onto the returned ExtractedPattern (schema is strictObject).
   void maturity;
   void archContext;
   void archLayer;
@@ -300,19 +269,12 @@ export function createTestPattern(options: TestPatternOptions = {}): ExtractedPa
     extractedAt: new Date().toISOString(),
     patternName: patternName ?? name,
     ...(scenarios && scenarios.length > 0 ? { scenarios } : {}),
-    ...(useCases && useCases.length > 0 ? { useCases } : {}),
     ...(mergedUses.length > 0 ? { uses: mergedUses } : {}),
-    ...(phase !== undefined ? { phase } : {}),
     ...(whenToUse && whenToUse.length > 0 ? { whenToUse } : {}),
-    // Timeline-specific fields
-    ...(completed ? { completed } : {}),
-    ...(quarter ? { quarter } : {}),
-    ...(effort ? { effort } : {}),
+    // Process and hierarchy fields
     ...(team ? { team } : {}),
-    // Deliverables with release tracking (release is at deliverable level, not pattern level)
     ...(deliverables && deliverables.length > 0 ? { deliverables } : {}),
     ...(workflow ? { workflow } : {}),
-    ...(priority ? { priority } : {}),
     ...(level ? { level } : {}),
     ...(implementsPatterns && implementsPatterns.length > 0 ? { implementsPatterns } : {}),
     // Display and traceability fields
@@ -327,10 +289,8 @@ export function createTestPattern(options: TestPatternOptions = {}): ExtractedPa
       : {}),
     ...(discoveredLearnings && discoveredLearnings.length > 0 ? { discoveredLearnings } : {}),
     ...(discoveredRisks && discoveredRisks.length > 0 ? { discoveredRisks } : {}),
-    ...(businessValue ? { businessValue } : {}),
     // Stub metadata
     ...(targetPath ? { targetPath } : {}),
-    ...(since ? { since } : {}),
     ...(seeAlso && seeAlso.length > 0 ? { seeAlso } : {}),
     // Architecture fields — Wave 1 retired archContext/archLayer; the
     // options are accepted for backward-compat but no longer set on the
@@ -341,7 +301,7 @@ export function createTestPattern(options: TestPatternOptions = {}): ExtractedPa
     ...(convention && convention.length > 0 ? { convention } : {}),
     ...(rules && rules.length > 0 ? { rules } : {}),
     ...(extractedShapes && extractedShapes.length > 0 ? { extractedShapes } : {}),
-  } as ExtractedPattern;
+  };
 }
 
 /**
@@ -370,7 +330,6 @@ export function createTestPatternSet(options: PatternSetOptions = {}): Extracted
     categories = ['core', 'ddd'],
     patternsPerCategory = 2,
     withRelationships = false,
-    withUseCases = false,
     withAllFeatures = false,
   } = options;
 
@@ -402,14 +361,6 @@ export function createTestPatternSet(options: PatternSetOptions = {}): Extracted
         exports: [{ name: name.replace(/\s+/g, ''), type: 'function' as const }],
       };
 
-      // Add use cases
-      if (withUseCases || withAllFeatures) {
-        patternOptions.useCases = [
-          `When implementing ${category} logic`,
-          `When refactoring existing ${category} code`,
-        ];
-      }
-
       // Add relationships
       if (withRelationships || withAllFeatures) {
         if (i > 0) {
@@ -422,7 +373,6 @@ export function createTestPatternSet(options: PatternSetOptions = {}): Extracted
 
       // Add all features
       if (withAllFeatures) {
-        patternOptions.phase = Math.floor(i / 2) + 1;
         patternOptions.whenToUse = [
           `When you need ${category} functionality`,
           `When integrating with external systems`,
@@ -509,21 +459,18 @@ export function createRoadmapPatterns(): ExtractedPattern[] {
       name: 'Foundation Types',
       category: 'core',
       status: 'completed',
-      phase: 1,
     }),
     createTestPattern({
       id: 'pattern-ba5e0102',
       name: 'Base Utilities',
       category: 'core',
       status: 'completed',
-      phase: 1,
     }),
     createTestPattern({
       id: 'pattern-d0da0201',
       name: 'Domain Model',
       category: 'ddd',
       status: 'active',
-      phase: 2,
       dependsOn: ['Foundation Types'],
     }),
     createTestPattern({
@@ -531,49 +478,17 @@ export function createRoadmapPatterns(): ExtractedPattern[] {
       name: 'Advanced Features',
       category: 'saga',
       status: 'roadmap',
-      phase: 3,
       dependsOn: ['Domain Model', 'Base Utilities'],
     }),
   ];
 }
 
 /**
- * Create patterns with comprehensive use case coverage
- */
-export function createUseCasePatterns(): ExtractedPattern[] {
-  return [
-    createTestPattern({
-      id: 'pattern-c0a0d001',
-      name: 'Command Handler',
-      category: 'cqrs',
-      useCases: [
-        'When implementing a new command',
-        'When adding validation logic',
-        'When orchestrating multiple services',
-      ],
-      whenToUse: [
-        'Complex business operations',
-        'Operations that modify state',
-        'Operations requiring transaction boundaries',
-      ],
-    }),
-    createTestPattern({
-      id: 'pattern-00e27002',
-      name: 'Query Handler',
-      category: 'cqrs',
-      useCases: ['When implementing read operations', 'When optimizing for performance'],
-      whenToUse: ['Read-only operations', 'Operations that benefit from caching'],
-    }),
-  ];
-}
-
-/**
- * Create patterns representing completed timeline milestones with deliverables
+ * Create patterns representing completed delivery milestones with deliverables
  *
  * Useful for testing:
  * - completed-phases section renderer
- * - timeline-summary section renderer
- * - Status filtering with timeline metadata
+ * - status filtering with delivery metadata
  */
 export function createTimelinePatterns(): ExtractedPattern[] {
   return [
@@ -582,10 +497,6 @@ export function createTimelinePatterns(): ExtractedPattern[] {
       name: 'Foundation Types',
       category: 'core',
       status: 'completed',
-      phase: 1,
-      completed: '2025-12-15',
-      quarter: 'Q4-2025',
-      effort: '2w',
       team: 'platform',
       deliverables: [
         { name: 'Decider interface', status: 'complete', tests: 1, location: 'src/decider/' },
@@ -597,10 +508,6 @@ export function createTimelinePatterns(): ExtractedPattern[] {
       name: 'CMS Integration',
       category: 'core',
       status: 'completed',
-      phase: 2,
-      completed: '2026-01-02',
-      quarter: 'Q1-2026',
-      effort: '1w',
       team: 'platform',
       deliverables: [{ name: 'CMS types', status: 'complete', tests: 1, location: 'src/cms/' }],
     }),
@@ -609,9 +516,6 @@ export function createTimelinePatterns(): ExtractedPattern[] {
       name: 'Event Store Enhancement',
       category: 'event-sourcing',
       status: 'active',
-      phase: 3,
-      quarter: 'Q1-2026',
-      effort: '3w',
       team: 'platform',
       dependsOn: ['Foundation Types', 'CMS Integration'],
     }),
@@ -620,9 +524,6 @@ export function createTimelinePatterns(): ExtractedPattern[] {
       name: 'Advanced Projections',
       category: 'projection',
       status: 'roadmap',
-      phase: 4,
-      quarter: 'Q2-2026',
-      effort: '2w',
       team: 'platform',
       dependsOn: ['Event Store Enhancement'],
     }),
@@ -661,7 +562,7 @@ export function mergePatterns(...patternSets: ExtractedPattern[][]): ExtractedPa
  */
 export function filterByCategory(
   patterns: ExtractedPattern[],
-  category: string
+  category: string,
 ): ExtractedPattern[] {
   return patterns.filter((p) => p.role === category);
 }

@@ -1,6 +1,7 @@
 import { describeFeature, loadFeature } from '@amiceli/vitest-cucumber';
-import { expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
+import { CodeBlockSchema } from '@libar-dev/architect-core';
 import { ArchitectureDiagramSchema, FragmentSchema, type Fragment } from '../../../src/index.js';
 import {
   FRAGMENT_INVALID_FIXTURES,
@@ -82,7 +83,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               data: state!.fixture,
             });
           });
-        }
+        },
       );
 
       RuleScenarioOutline(
@@ -104,7 +105,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           Then('the schema parse should fail', () => {
             expect(state!.parseResult).toEqual({ success: false });
           });
-        }
+        },
       );
 
       RuleScenarioOutline(
@@ -124,9 +125,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           Then('the round-tripped fragment should equal the original fixture', () => {
             expect(state!.roundTripResult).toEqual(state!.fixture);
           });
-        }
+        },
       );
-    }
+    },
   );
 
   Rule(
@@ -148,7 +149,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           expect(state!.parseResult).toEqual({ success: false });
         });
       });
-    }
+    },
   );
 
   Rule('FragmentSchema discriminated union narrows on the kind tag', ({ RuleScenario }) => {
@@ -188,5 +189,24 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         });
       });
     });
+  });
+});
+
+describe('Fragment schema mirror adversarial security coverage', () => {
+  it('rejects hostile code languages and accepts identifier-shaped languages', () => {
+    expect(
+      CodeBlockSchema.safeParse({
+        type: 'code',
+        language: 'ts\n```\n<script>',
+        content: 'console.log("x");',
+      }).success,
+    ).toBe(false);
+    expect(
+      CodeBlockSchema.safeParse({
+        type: 'code',
+        language: 'tsx+react-18.2',
+        content: 'console.log("x");',
+      }).success,
+    ).toBe(true);
   });
 });

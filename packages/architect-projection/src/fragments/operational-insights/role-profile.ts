@@ -5,12 +5,17 @@
  * @architect-role:contract
  * @architect-bounded-context:operational-insights
  *
- * ### When to Use
- *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * Defines the `RoleProfile` fragment shape for one configured role, including counts, priority, description, and examples.
  */
 import { z } from 'zod';
 
+/**
+ * Fragment shape for one configured role — its tag, domain, optional sort
+ * priority, the count of patterns carrying it, an optional description, and
+ * example pattern names.
+ *
+ * @architect-shape
+ */
 export const RoleProfileSchema = z.strictObject({
   kind: z.literal('RoleProfile'),
   tag: z.string(),

@@ -33,8 +33,7 @@ function initState(): DualSourceMergeState {
 
 function createCodePattern(
   patternName: string,
-  phase: number,
-  status: 'candidate' | 'roadmap' | 'active' | 'completed' | 'deferred' = 'roadmap'
+  status: 'candidate' | 'roadmap' | 'active' | 'completed' | 'deferred' = 'roadmap',
 ): ExtractedPattern {
   patternCounter += 1;
   return {
@@ -53,14 +52,12 @@ function createCodePattern(
     source: { file: `src/${patternName.toLowerCase()}.ts`, lines: [1, 3] },
     exports: [{ type: 'const', name: patternName }],
     extractedAt: '2026-01-01T00:00:00.000Z',
-    phase,
   } as unknown as ExtractedPattern;
 }
 
 function createFeatureFile(
   patternName: string,
-  phase: number,
-  options: { status?: string; deliverable?: string } = {}
+  options: { status?: string; deliverable?: string } = {},
 ): ScannedGherkinFile {
   const headers = ['Deliverable', 'Status', 'Tests', 'Location'];
   const rows =
@@ -80,11 +77,7 @@ function createFeatureFile(
     feature: {
       name: `${patternName} feature`,
       description: '',
-      tags: [
-        `pattern:${patternName}`,
-        `phase:${String(phase).padStart(2, '0')}`,
-        `status:${options.status ?? 'roadmap'}`,
-      ],
+      tags: [`pattern:${patternName}`, `status:${options.status ?? 'roadmap'}`],
       language: 'en',
       line: 1,
     },
@@ -134,7 +127,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         'Annotation-only roadmap pattern warns about missing feature coverage',
         ({ Given, When, Then, And }) => {
           Given('an annotation-only roadmap pattern {string}', (_ctx: unknown, name: string) => {
-            state!.codePatterns = [createCodePattern(name, 22)];
+            state!.codePatterns = [createCodePattern(name)];
           });
 
           When('I combine and validate the dual-source inputs', () => {
@@ -155,19 +148,19 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             (_ctx: unknown, count: number) => {
               expect(state!.summary!.warnings).toHaveLength(count);
               expect(state!.summary!.warnings[0]).toContain('has code stub but no feature file');
-            }
+            },
           );
-        }
+        },
       );
 
       RuleScenario(
         'Spec-only roadmap pattern warns about missing code coverage',
         ({ Given, When, Then, And }) => {
           Given(
-            'a spec-only roadmap feature for pattern {string} in phase {int}',
-            (_ctx: unknown, name: string, phase: number) => {
-              state!.featureFiles = [createFeatureFile(name, phase)];
-            }
+            'a spec-only roadmap feature for pattern {string}',
+            (_ctx: unknown, name: string) => {
+              state!.featureFiles = [createFeatureFile(name)];
+            },
           );
 
           When('I combine and validate the dual-source inputs', () => {
@@ -187,24 +180,21 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             expect(state!.summary!.warnings).toHaveLength(count);
             expect(state!.summary!.warnings[0]).toContain('has no code stub');
           });
-        }
+        },
       );
 
       RuleScenario(
         'Matching code and feature merge process metadata and deliverables',
         ({ Given, And, When, Then }) => {
-          Given(
-            'a code pattern {string} in phase {int}',
-            (_ctx: unknown, name: string, phase: number) => {
-              state!.codePatterns = [createCodePattern(name, phase)];
-            }
-          );
+          Given('a code pattern {string}', (_ctx: unknown, name: string) => {
+            state!.codePatterns = [createCodePattern(name)];
+          });
 
           And(
-            'a feature file for pattern {string} in phase {int} with deliverable {string}',
-            (_ctx: unknown, name: string, phase: number, deliverable: string) => {
-              state!.featureFiles = [createFeatureFile(name, phase, { deliverable })];
-            }
+            'a feature file for pattern {string} with deliverable {string}',
+            (_ctx: unknown, name: string, deliverable: string) => {
+              state!.featureFiles = [createFeatureFile(name, { deliverable })];
+            },
           );
 
           When('I combine and validate the dual-source inputs', () => {
@@ -216,64 +206,23 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             expect(state!.results!.patterns).toHaveLength(count);
           });
 
-          And(
-            'combined pattern {string} has process phase {int}',
-            (_ctx: unknown, name: string, phase: number) => {
-              expect(getCombinedPattern(name).process?.phase).toBe(phase);
-            }
-          );
+          And('combined pattern {string} has process metadata', (_ctx: unknown, name: string) => {
+            expect(getCombinedPattern(name).process?.pattern).toBe(name);
+          });
 
           And(
             'combined pattern {string} has {int} deliverable',
             (_ctx: unknown, name: string, count: number) => {
               expect(getCombinedPattern(name).deliverables).toHaveLength(count);
-            }
+            },
           );
 
           And('validation passes without errors', () => {
             expect(state!.summary!.isValid).toBe(true);
             expect(state!.summary!.errors).toHaveLength(0);
           });
-        }
+        },
       );
-
-      RuleScenario(
-        'Phase mismatch reports a validation error while keeping the merged pattern',
-        ({ Given, And, When, Then }) => {
-          Given(
-            'a code pattern {string} in phase {int}',
-            (_ctx: unknown, name: string, phase: number) => {
-              state!.codePatterns = [createCodePattern(name, phase)];
-            }
-          );
-
-          And(
-            'a feature file for pattern {string} in phase {int}',
-            (_ctx: unknown, name: string, phase: number) => {
-              state!.featureFiles = [createFeatureFile(name, phase)];
-            }
-          );
-
-          When('I combine and validate the dual-source inputs', () => {
-            state!.results = combineSources(state!.codePatterns, state!.featureFiles);
-            state!.summary = validateDualSource(state!.results);
-          });
-
-          Then('{int} combined patterns are produced', (_ctx: unknown, count: number) => {
-            expect(state!.results!.patterns).toHaveLength(count);
-          });
-
-          And('{int} phase validation error exists', (_ctx: unknown, count: number) => {
-            expect(state!.results!.validationErrors).toHaveLength(count);
-            expect(state!.results!.validationErrors[0]?.message).toContain('Phase mismatch');
-          });
-
-          And('validation fails with {int} error', (_ctx: unknown, count: number) => {
-            expect(state!.summary!.isValid).toBe(false);
-            expect(state!.summary!.errors).toHaveLength(count);
-          });
-        }
-      );
-    }
+    },
   );
 });

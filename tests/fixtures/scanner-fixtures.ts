@@ -262,7 +262,7 @@ export function hasTag(tag: string): boolean {
  * Build content with multiple directives in same file.
  */
 export function buildContentWithMultipleDirectives(
-  items: Array<{ category: string; name: string; description: string }>
+  items: Array<{ category: string; name: string; description: string }>,
 ): string {
   return items
     .map(
@@ -272,7 +272,7 @@ export function buildContentWithMultipleDirectives(
  */
 export function ${item.name}() {
   return '${item.name}';
-}`
+}`,
     )
     .join('\n\n');
 }
@@ -385,14 +385,8 @@ export interface GherkinContentOptions {
   featureName?: string;
   /** Feature description */
   description?: string;
-  /** Phase number */
-  phase?: number;
   /** Status (completed, in_progress, planned) */
   status?: string;
-  /** Quarter (Q1-2025, etc.) */
-  quarter?: string;
-  /** Effort estimate (1w, 2d, etc.) */
-  effort?: string;
   /** Team (platform, frontend, etc.) */
   team?: string;
   /** Pattern name from @libar-pattern tag */
@@ -418,7 +412,6 @@ export interface GherkinContentOptions {
  * ```typescript
  * const content = buildGherkinContent({
  *   featureName: "Order Processing",
- *   phase: 1,
  *   status: "completed",
  *   scenarios: [{ name: "Create order" }],
  * });
@@ -428,10 +421,7 @@ export function buildGherkinContent(options: GherkinContentOptions = {}): string
   const {
     featureName = 'Test Feature',
     description = 'A test feature',
-    phase,
     status,
-    quarter,
-    effort,
     team,
     patternName,
     dependencies = [],
@@ -457,17 +447,8 @@ Scenario: Orphan scenario
   const lines: string[] = [];
 
   // Process metadata tags (using @architect-* prefix per PDR-004)
-  if (phase !== undefined) {
-    lines.push(`@architect-phase:${phase}`);
-  }
   if (status) {
     lines.push(`@architect-status:${status}`);
-  }
-  if (quarter) {
-    lines.push(`@architect-quarter:${quarter}`);
-  }
-  if (effort) {
-    lines.push(`@architect-effort:${effort}`);
   }
   if (team) {
     lines.push(`@architect-team:${team}`);
@@ -516,7 +497,7 @@ import type { ScannerScenarioState } from '../support/world.js';
  * Used by step definitions to initialize module-level state.
  */
 export function createScannerState(
-  overrides: Partial<ScannerScenarioState> = {}
+  overrides: Partial<ScannerScenarioState> = {},
 ): ScannerScenarioState {
   return {
     tempDir: null,

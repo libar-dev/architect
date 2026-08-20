@@ -2,15 +2,197 @@ import tseslint from 'typescript-eslint';
 import eslintConfigPrettier from 'eslint-config-prettier';
 import importPlugin from 'eslint-plugin-import';
 
+// No-BC doctrine: source files must not carry suppression or
+// backwards-compatibility marker comments. See AGENTS.md → "Engineering
+// doctrine → No-BC" and `scripts/guard-no-suppressions.mjs` for the
+// out-of-band ratcheting guard with the same rule pattern.
+const SUPPRESSION_COMMENT_PATTERN = /(?:eslint-disable|@ts-ignore|@ts-expect-error|@ts-nocheck)/u;
+
+const architectLocalPlugin = {
+  rules: {
+    'no-suppression-comments': {
+      meta: {
+        type: 'problem',
+        docs: {
+          description: 'Disallow suppression and backwards-compatibility marker comments.',
+        },
+        messages: {
+          forbidden:
+            '[no-bc:no-suppression-comments] Do not add suppression or backwards-compatibility marker comments (`eslint-disable`, `@ts-ignore`, `@ts-expect-error`, `@ts-nocheck`). Fix the root cause. See AGENTS.md → "Engineering doctrine → No-BC".',
+        },
+        schema: [],
+      },
+      create(context) {
+        return {
+          Program() {
+            const sourceCode = context.sourceCode;
+            for (const comment of sourceCode.getAllComments()) {
+              if (SUPPRESSION_COMMENT_PATTERN.test(comment.value)) {
+                context.report({
+                  loc: comment.loc,
+                  messageId: 'forbidden',
+                });
+              }
+            }
+          },
+        };
+      },
+    },
+  },
+};
+
 export default tseslint.config(
   // Ignore patterns
   {
-    ignores: ['**/node_modules/**', '**/dist/**', '**/*.js', '**/*.mjs'],
+    ignores: ['**/node_modules/**', '**/dist/**', '**/*.js', '**/*.mjs', 'playground/**'],
   },
 
   // Base recommended configs
   ...tseslint.configs.strictTypeChecked,
   ...tseslint.configs.stylisticTypeChecked,
+
+  // Register the local plugin globally; specific rule activation lives in
+  // file-scoped blocks below so test/fixture surfaces stay opt-in.
+  {
+    plugins: {
+      'architect-local': architectLocalPlugin,
+    },
+  },
+
+  // No-suppression doctrine — production source only. Tests stay free to use
+  // type-narrowing tools the rule would otherwise forbid.
+  {
+    files: ['packages/*/src/**/*.ts', 'src/**/*.ts'],
+    ignores: ['**/tests/**', '**/*.steps.ts', '**/*.spec.ts', '**/*.test.ts'],
+    rules: {
+      'architect-local/no-suppression-comments': 'error',
+    },
+  },
+
+  // No circular imports doctrine (CLAUDE.md → "Engineering doctrine → TypeScript
+  // strictness") — production source only. The same rule lives in the
+  // `tests/scripts/architect.config.ts` block below for those surfaces;
+  // pre-existing source cycles are tracked separately under P1-12.
+  {
+    files: ['packages/*/src/**/*.ts'],
+    plugins: {
+      import: importPlugin,
+    },
+    settings: {
+      'import/resolver': {
+        typescript: {
+          alwaysTryTypes: true,
+          project: ['./tsconfig.json', './tsconfig.eslint.json'],
+        },
+      },
+    },
+    rules: {
+      'import/no-cycle': ['warn', { ignoreExternal: true }],
+    },
+  },
+
+  // architect-projection src — honour the `_`-prefix unused convention used by factory wrappers
+  {
+    files: ['src/**/*.ts'],
+    rules: {
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+        },
+      ],
+    },
+  },
+
+  // architect-projection boundary rules — each message carries a `[arch-boundary:<id>]` tag
+  // so contributors can grep the codebase (and `packages/architect-projection/README.md` →
+  // "Architecture invariants → Enforced at lint time") for the rule by id.
+  {
+    files: ['src/renderers/**/*.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: '../projections/documentation-composition/architecture-diagram.js',
+              message:
+                '[arch-boundary:renderer-no-doc-composition] Renderers must not import documentation-composition projections or its registry. See packages/architect-projection/README.md "Architecture invariants → Enforced at lint time".',
+            },
+            {
+              name: '../projections/documentation-composition/documentation-bundle.js',
+              message:
+                '[arch-boundary:renderer-no-doc-composition] Renderers must not import documentation-composition projections or its registry. See packages/architect-projection/README.md "Architecture invariants → Enforced at lint time".',
+            },
+            {
+              name: '../projections/documentation-composition/documentation-type-registry.js',
+              message:
+                '[arch-boundary:renderer-no-doc-composition] Renderers must not import documentation-composition projections or its registry. See packages/architect-projection/README.md "Architecture invariants → Enforced at lint time".',
+            },
+            {
+              name: '../projections/documentation-composition/index.js',
+              message:
+                '[arch-boundary:renderer-no-doc-composition] Renderers must not import documentation-composition projections or its registry. See packages/architect-projection/README.md "Architecture invariants → Enforced at lint time".',
+            },
+            {
+              name: '../projections/documentation-composition/pr-change-review.js',
+              message:
+                '[arch-boundary:renderer-no-doc-composition] Renderers must not import documentation-composition projections or its registry. See packages/architect-projection/README.md "Architecture invariants → Enforced at lint time".',
+            },
+            {
+              name: '../projections/documentation-composition/project-config.js',
+              message:
+                '[arch-boundary:renderer-no-doc-composition] Renderers must not import documentation-composition projections or its registry. See packages/architect-projection/README.md "Architecture invariants → Enforced at lint time".',
+            },
+            {
+              name: '../routing/route-id.js',
+              importNames: ['createIndexRouteId', 'createEntityRouteId'],
+              message:
+                '[arch-boundary:renderer-no-route-construction] Renderers must not construct route ids directly; keep route construction in projection helpers. Type-only `LogicalRouteId` imports are allowed. See packages/architect-projection/README.md "Architecture invariants → Enforced at lint time".',
+            },
+          ],
+          patterns: [
+            {
+              group: ['../**/*.internal.js'],
+              message:
+                '[arch-boundary:renderer-no-cross-layer-internal] Renderers must not import foreign `.internal.js` modules; keep renderer-private wrappers local to `src/renderers/`. See packages/architect-projection/README.md "Architecture invariants → Enforced at lint time".',
+            },
+          ],
+        },
+      ],
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: 'ImportSpecifier[imported.name="TRUSTED_MARKDOWN"]',
+          message:
+            '[trust-boundary:trusted-markdown-firewall] `TRUSTED_MARKDOWN` is renderer-private and must not be imported or exported; it authorizes raw-markdown emission strictly within the renderer module that owns it. See packages/architect-projection/README.md "Markdown/content trust boundary".',
+        },
+        {
+          selector: 'ExportSpecifier[local.name="TRUSTED_MARKDOWN"]',
+          message:
+            '[trust-boundary:trusted-markdown-firewall] `TRUSTED_MARKDOWN` is renderer-private and must not be imported or exported. See packages/architect-projection/README.md "Markdown/content trust boundary".',
+        },
+        {
+          selector: 'ExportSpecifier[exported.name="TRUSTED_MARKDOWN"]',
+          message:
+            '[trust-boundary:trusted-markdown-firewall] `TRUSTED_MARKDOWN` is renderer-private and must not be imported or exported. See packages/architect-projection/README.md "Markdown/content trust boundary".',
+        },
+        {
+          selector:
+            'ExportNamedDeclaration > VariableDeclaration > VariableDeclarator[id.name="TRUSTED_MARKDOWN"]',
+          message:
+            '[trust-boundary:trusted-markdown-firewall] `TRUSTED_MARKDOWN` is renderer-private and must not be imported or exported. See packages/architect-projection/README.md "Markdown/content trust boundary".',
+        },
+        {
+          selector: 'ExportNamedDeclaration > FunctionDeclaration[id.name="TRUSTED_MARKDOWN"]',
+          message:
+            '[trust-boundary:trusted-markdown-firewall] `TRUSTED_MARKDOWN` is renderer-private and must not be imported or exported. See packages/architect-projection/README.md "Markdown/content trust boundary".',
+        },
+      ],
+    },
+  },
 
   // TypeScript files configuration
   {
@@ -270,5 +452,5 @@ export default tseslint.config(
   },
 
   // Prettier config - must be last to override style rules
-  eslintConfigPrettier
+  eslintConfigPrettier,
 );

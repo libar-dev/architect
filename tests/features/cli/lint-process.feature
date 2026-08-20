@@ -2,6 +2,7 @@
 @architect-pattern:LintProcessCliBehavior
 @architect-status:completed
 @architect-unlock-reason:Retroactive-completion-during-rebrand
+@architect-implements:LintProcessCLI
 @architect-product-area:DataAPI
 @cli @lint-process
 Feature: lint-process CLI

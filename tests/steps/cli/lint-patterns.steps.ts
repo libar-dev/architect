@@ -216,7 +216,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   async function copyLegacyFixture(fixtureName: string, relativePath: string): Promise<void> {
     const fixturePath = path.resolve('tests/fixtures/legacy-taxonomy', fixtureName);
     const fixture = await import('node:fs/promises').then((fs) =>
-      fs.readFile(fixturePath, 'utf-8')
+      fs.readFile(fixturePath, 'utf-8'),
     );
     await writeTempFile(getTempDir(), relativePath, fixture);
   }
@@ -270,6 +270,27 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         expect(combined).toContain(text);
       });
     });
+
+    RuleScenario('Reject invalid output format without stack trace', ({ When, Then, And }) => {
+      When('running {string}', async (_ctx: unknown, cmd: string) => {
+        await runCLICommand(cmd);
+      });
+
+      Then('exit code is {int}', (_ctx: unknown, code: number) => {
+        expect(getResult().exitCode).toBe(code);
+      });
+
+      And('output contains {string}', (_ctx: unknown, text: string) => {
+        const combined = getResult().stdout + getResult().stderr;
+        expect(combined).toContain(text);
+      });
+
+      And('output does not contain raw stack markers', () => {
+        const combined = getResult().stdout + getResult().stderr;
+        expect(combined).not.toContain('at parseArgs');
+        expect(combined).not.toContain('Node.js v');
+      });
+    });
   });
 
   // ---------------------------------------------------------------------------
@@ -282,7 +303,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         'a TypeScript file {string} with complete annotations',
         async (_ctx: unknown, relativePath: string) => {
           await writeTempFile(getTempDir(), relativePath, createCompletePatternFile());
-        }
+        },
       );
 
       When('running {string}', async (_ctx: unknown, cmd: string) => {
@@ -309,7 +330,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         'a TypeScript file {string} without pattern name',
         async (_ctx: unknown, relativePath: string) => {
           await writeTempFile(getTempDir(), relativePath, createMissingPatternNameFile());
-        }
+        },
       );
 
       When('running {string}', async (_ctx: unknown, cmd: string) => {
@@ -330,7 +351,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         'a TypeScript file {string} with unresolved uses',
         async (_ctx: unknown, relativePath: string) => {
           await writeTempFile(getTempDir(), relativePath, createUnresolvedUsesFile());
-        }
+        },
       );
 
       When('running {string}', async (_ctx: unknown, cmd: string) => {
@@ -351,7 +372,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         'a TypeScript file {string} with invalid pattern name',
         async (_ctx: unknown, relativePath: string) => {
           await writeTempFile(getTempDir(), relativePath, createInvalidPatternNameFile());
-        }
+        },
       );
 
       When('running {string}', async (_ctx: unknown, cmd: string) => {
@@ -372,7 +393,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         'the legacy taxonomy fixture {string} is copied to {string}',
         async (_ctx: unknown, fixtureName: string, relativePath: string) => {
           await copyLegacyFixture(fixtureName, relativePath);
-        }
+        },
       );
 
       When('running {string}', async (_ctx: unknown, cmd: string) => {
@@ -395,7 +416,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           'the legacy taxonomy fixture {string} is copied to {string}',
           async (_ctx: unknown, fixtureName: string, relativePath: string) => {
             await copyLegacyFixture(fixtureName, relativePath);
-          }
+          },
         );
 
         When('running {string}', async (_ctx: unknown, cmd: string) => {
@@ -409,7 +430,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         And('stdout contains {string}', (_ctx: unknown, text: string) => {
           expect(getResult().stdout).toContain(text);
         });
-      }
+      },
     );
   });
 
@@ -423,7 +444,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         'a TypeScript file {string} with complete annotations',
         async (_ctx: unknown, relativePath: string) => {
           await writeTempFile(getTempDir(), relativePath, createCompletePatternFile());
-        }
+        },
       );
 
       When('running {string}', async (_ctx: unknown, cmd: string) => {
@@ -453,7 +474,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         'a TypeScript file {string} with complete annotations',
         async (_ctx: unknown, relativePath: string) => {
           await writeTempFile(getTempDir(), relativePath, createCompletePatternFile());
-        }
+        },
       );
 
       When('running {string}', async (_ctx: unknown, cmd: string) => {
@@ -480,7 +501,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         'a TypeScript file {string} with missing status',
         async (_ctx: unknown, relativePath: string) => {
           await writeTempFile(getTempDir(), relativePath, createMissingStatusFile());
-        }
+        },
       );
 
       When('running {string}', async (_ctx: unknown, cmd: string) => {
@@ -497,7 +518,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         'a TypeScript file {string} with missing status',
         async (_ctx: unknown, relativePath: string) => {
           await writeTempFile(getTempDir(), relativePath, createMissingStatusFile());
-        }
+        },
       );
 
       When('running {string}', async (_ctx: unknown, cmd: string) => {

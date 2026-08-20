@@ -7,7 +7,8 @@
 ## Overview
 
 The pattern graph is the **single read model** computed from all annotated source files,
-Gherkin specs, stubs, ADRs, and release manifests. It is the sole data structure consumed
+Gherkin specs, stubs, ADRs, and executable features when a project chooses to project them.
+It is the sole data structure consumed
 by all downstream tools: CLI queries, MCP servers, documentation generators, ProcessGuard,
 and desktop UI views.
 
@@ -54,23 +55,23 @@ of the architecture — the fundamental unit from which everything else is deriv
 
 ### Status and Lifecycle
 
-| Field          | Type                                                              | Description                     |
-| -------------- | ----------------------------------------------------------------- | ------------------------------- |
-| `status`       | `'candidate' \| 'roadmap' \| 'active' \| 'completed' \| 'deferred'` | FSM state                       |
-| `maturity`     | `'idea' \| 'plan' \| 'design' \| 'executable'`?                    | Spec maturity (auto-defaulted from status when absent — see §04) |
-| `completed`    | ISO8601?                                                           | Completion date                 |
-| `unlockReason` | string?                                                            | Required when modifying a `completed` pattern (§09) |
+| Field          | Type                                                                | Description                                                      |
+| -------------- | ------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| `status`       | `'candidate' \| 'roadmap' \| 'active' \| 'completed' \| 'deferred'` | FSM state                                                        |
+| `maturity`     | `'idea' \| 'plan' \| 'design' \| 'executable'`?                     | Spec maturity (auto-defaulted from status when absent — see §04) |
+| `completed`    | ISO8601?                                                            | Completion date                                                  |
+| `unlockReason` | string?                                                             | Required when modifying a `completed` pattern (§09)              |
 
 ### Relationships
 
-| Field                | Type     | Description                                                  |
-| -------------------- | -------- | ------------------------------------------------------------ |
-| `uses`               | string[] | Pattern names this depends on / uses (authored)              |
-| `usedBy`             | string[] | Pattern names that declare `uses` of this (derived reverse)  |
-| `implementsPatterns` | string[] | Spec patterns this code or stub realizes (authored)          |
-| `implementedBy`      | string[] | Pattern names that implement this (derived reverse)          |
-| `extendsPattern`     | string?  | Pattern this extends or specializes (authored)               |
-| `seeAlso`            | string[] | Related pattern names — informational cross-reference        |
+| Field                | Type     | Description                                                 |
+| -------------------- | -------- | ----------------------------------------------------------- |
+| `uses`               | string[] | Pattern names this depends on / uses (authored)             |
+| `usedBy`             | string[] | Pattern names that declare `uses` of this (derived reverse) |
+| `implementsPatterns` | string[] | Spec patterns this code or stub realizes (authored)         |
+| `implementedBy`      | string[] | Pattern names that implement this (derived reverse)         |
+| `extendsPattern`     | string?  | Pattern this extends or specializes (authored)              |
+| `seeAlso`            | string[] | Related pattern names — informational cross-reference       |
 
 > _Informative:_ Earlier drafts surfaced separate `dependsOn`, `enables`, and `apiRef`
 > fields. In v0.2.0 the authored vocabulary collapses to `@architect-uses`; reverse
@@ -78,13 +79,13 @@ of the architecture — the fundamental unit from which everything else is deriv
 
 ### Architecture
 
-| Field            | Type                                                  | Description                                    |
-| ---------------- | ----------------------------------------------------- | ---------------------------------------------- |
-| `roleDefinition` | RoleDefinition?                                       | Resolved role metadata (diagram shape, labels) |
-| `archContext`    | string?                                                | Bounded context                                |
-| `archLayer`      | `'domain' \| 'application' \| 'infrastructure'`?       | Layer                                          |
-| `productArea`    | string?                                                | Product area                                   |
-| `boundedContext` | string?                                                | Bounded context (alias)                        |
+| Field            | Type                                             | Description                                    |
+| ---------------- | ------------------------------------------------ | ---------------------------------------------- |
+| `roleDefinition` | RoleDefinition?                                  | Resolved role metadata (diagram shape, labels) |
+| `archContext`    | string?                                          | Bounded context                                |
+| `archLayer`      | `'domain' \| 'application' \| 'infrastructure'`? | Layer                                          |
+| `productArea`    | string?                                          | Product area                                   |
+| `boundedContext` | string?                                          | Bounded context (alias)                        |
 
 > **Historical note:** `archRole` appears in legacy extraction aliases and preserved reference docs only.
 
@@ -122,21 +123,21 @@ Each `Deliverable`:
 
 ### ADR Fields (when applicable)
 
-| Field             | Type                                                        | Description              |
-| ----------------- | ----------------------------------------------------------- | ------------------------ |
-| `adr`             | string?                                                     | ADR number               |
-| `adrStatus`       | `'proposed' \| 'accepted' \| 'deprecated' \| 'superseded'`? | ADR lifecycle            |
-| `adrCategory`     | string?                                                     | ADR category             |
-| `adrSupersedes`   | string?                                                     | ADR this supersedes      |
-| `adrSupersededBy` | string?                                                     | ADR that supersedes this |
+| Field             | Type                                                        | Description                                                                                         |
+| ----------------- | ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `adr`             | string?                                                     | ADR number                                                                                          |
+| `adrStatus`       | `'proposed' \| 'accepted' \| 'deprecated' \| 'superseded'`? | ADR lifecycle (`superseded` is append-only, not authored during bootstrap live-state consolidation) |
+| `adrCategory`     | string?                                                     | ADR category                                                                                        |
+| `adrSupersedes`   | string?                                                     | ADR this supersedes (append-only deployments)                                                       |
+| `adrSupersededBy` | string?                                                     | ADR that supersedes this (append-only deployments)                                                  |
 
 ### Hierarchy
 
-| Field      | Type                                          | Description                    |
-| ---------- | --------------------------------------------- | ------------------------------ |
-| `level`    | `'epic' \| 'phase' \| 'task' \| 'slice'`?     | Hierarchy level                |
-| `parent`   | string?                                        | Parent pattern name            |
-| `children` | string[]?                                      | Child pattern names (computed) |
+| Field      | Type                                      | Description                    |
+| ---------- | ----------------------------------------- | ------------------------------ |
+| `level`    | `'epic' \| 'phase' \| 'task' \| 'slice'`? | Hierarchy level                |
+| `parent`   | string?                                   | Parent pattern name            |
+| `children` | string[]?                                 | Child pattern names (computed) |
 
 > _Informative:_ Earlier drafts of this spec also surfaced "Product & Business" and
 > "Discovery" field groups (`businessValue`, `userRole`, `constraints`,
@@ -156,11 +157,10 @@ are computed once during graph building and provide O(1) lookups.
 | `byStatus.active`    | ExtractedPattern[] | All active patterns             |
 | `byStatus.planned`   | ExtractedPattern[] | All roadmap + deferred patterns |
 
-### Phase Views
+### Retired Timeline Views
 
-| View      | Type                            | Description               |
-| --------- | ------------------------------- | ------------------------- |
-| `byPhase` | Map<number, ExtractedPattern[]> | Patterns grouped by phase |
+> _Informative:_ Earlier drafts exposed `byPhase`. Numeric phase grouping is retired and is not
+> part of the v0.2 live read model.
 
 ### Role Views
 

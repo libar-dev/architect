@@ -27,7 +27,24 @@ const HOT_PATH_BUDGETS = {
   graphBuild: { field: 'avgMs', budget: 2000, unit: 'ms' },
 };
 
+const RENDER_MARKDOWN_BUNDLE_BUDGETS = {
+  patterns: { field: 'avgMs', budget: 1, unit: 'ms' },
+  decisions: { field: 'avgMs', budget: 1, unit: 'ms' },
+  'requirements-executable': { field: 'avgMs', budget: 1, unit: 'ms' },
+};
+
 const BASELINE_MULTIPLIER = 1.5;
+
+/**
+ * Absolute noise headroom added on top of the relative (1.5x) budget, per unit
+ * (~50 microseconds). Relative gating is meaningless for microsecond-scale
+ * operations: a few µs of timer/scheduler jitter is a large *relative* swing on
+ * a 10 µs op but is not a real regression. The effective budget is therefore
+ * `max(baseline * 1.5, baseline + slack)` — tiny metrics get absolute headroom
+ * while large metrics (e.g. graphBuild ~376 ms) stay governed by the tight 1.5x
+ * relative gate. The hard budget still caps everything above.
+ */
+const ABSOLUTE_SLACK_BY_UNIT = { ms: 0.05, us: 50 };
 
 const [report, baseline] = await Promise.all([
   readJson(reportPath, 'perf report'),
@@ -40,6 +57,7 @@ const failures = [
   checkAverageMetric('renderPretty'),
   checkScalarMetric('isBundleP50Micros'),
   ...Object.keys(HOT_PATH_BUDGETS).map((metricName) => checkHotPathAverageMetric(metricName)),
+  ...checkRenderMarkdownBundleMetrics(report),
 ].filter((failure) => failure !== undefined);
 
 if (failures.length > 0) {
@@ -60,68 +78,106 @@ async function readJson(filePath, label) {
 
 function checkAverageMetric(metricName) {
   const budget = HARD_BUDGETS[metricName];
-  const actual = getMetricValue(report, metricName, budget.field);
-  const baselineValue = getMetricValue(baseline, metricName, budget.field);
-  const baselineBudget = baselineValue * BASELINE_MULTIPLIER;
-  const allowed = Math.min(budget.budget, baselineBudget);
   const label = `${metricName}.${budget.field}`;
 
-  if (actual > allowed) {
-    console.error(
-      `FAIL ${label}: ${format(actual, budget.unit)} exceeds ${format(allowed, budget.unit)} ` +
-        `(hard ${format(budget.budget, budget.unit)}, baseline ${format(baselineBudget, budget.unit)})`
-    );
-    return `${label} ${format(actual, budget.unit)} > ${format(allowed, budget.unit)}`;
-  }
-
-  console.log(
-    `PASS ${label}: ${format(actual, budget.unit)} <= ${format(allowed, budget.unit)} ` +
-      `(hard ${format(budget.budget, budget.unit)}, baseline ${format(baselineBudget, budget.unit)})`
-  );
-  return undefined;
+  return checkBudget({
+    label,
+    actual: getMetricValue(report, metricName, budget.field),
+    baselineValue: getMetricValue(baseline, metricName, budget.field),
+    hardBudget: budget.budget,
+    unit: budget.unit,
+  });
 }
 
 function checkScalarMetric(metricName) {
   const budget = HARD_BUDGETS[metricName];
-  const actual = getNumber(report, metricName);
-  const baselineValue = getNumber(baseline, metricName);
-  const baselineBudget = baselineValue * BASELINE_MULTIPLIER;
-  const allowed = Math.min(budget.budget, baselineBudget);
 
-  if (actual > allowed) {
-    console.error(
-      `FAIL ${metricName}: ${format(actual, budget.unit)} exceeds ${format(allowed, budget.unit)} ` +
-        `(hard ${format(budget.budget, budget.unit)}, baseline ${format(baselineBudget, budget.unit)})`
-    );
-    return `${metricName} ${format(actual, budget.unit)} > ${format(allowed, budget.unit)}`;
-  }
-
-  console.log(
-    `PASS ${metricName}: ${format(actual, budget.unit)} <= ${format(allowed, budget.unit)} ` +
-      `(hard ${format(budget.budget, budget.unit)}, baseline ${format(baselineBudget, budget.unit)})`
-  );
-  return undefined;
+  return checkBudget({
+    label: metricName,
+    actual: getNumber(report, metricName),
+    baselineValue: getNumber(baseline, metricName),
+    hardBudget: budget.budget,
+    unit: budget.unit,
+  });
 }
 
 function checkHotPathAverageMetric(metricName) {
   const budget = HOT_PATH_BUDGETS[metricName];
-  const actual = getMetricValue(report.projectionHotPaths, metricName, budget.field);
-  const baselineValue = getMetricValue(baseline.projectionHotPaths, metricName, budget.field);
-  const baselineBudget = baselineValue * BASELINE_MULTIPLIER;
-  const allowed = Math.min(budget.budget, baselineBudget);
   const label = `projectionHotPaths.${metricName}.${budget.field}`;
 
-  if (actual > allowed) {
-    console.error(
-      `FAIL ${label}: ${format(actual, budget.unit)} exceeds ${format(allowed, budget.unit)} ` +
-        `(hard ${format(budget.budget, budget.unit)}, baseline ${format(baselineBudget, budget.unit)})`
+  return checkBudget({
+    label,
+    actual: getMetricValue(report.projectionHotPaths, metricName, budget.field),
+    baselineValue: getMetricValue(baseline.projectionHotPaths, metricName, budget.field),
+    hardBudget: budget.budget,
+    unit: budget.unit,
+  });
+}
+
+function checkRenderMarkdownBundleMetrics(source) {
+  const expectedDocumentTypes = Object.keys(RENDER_MARKDOWN_BUNDLE_BUDGETS);
+  const bundles = source.renderMarkdownBundles;
+
+  if (bundles === undefined || typeof bundles !== 'object' || bundles === null) {
+    throw new Error('Missing renderMarkdownBundles section in perf report');
+  }
+
+  const actualDocumentTypes = Object.keys(bundles).sort();
+  const expectedSortedDocumentTypes = [...expectedDocumentTypes].sort();
+
+  if (JSON.stringify(actualDocumentTypes) !== JSON.stringify(expectedSortedDocumentTypes)) {
+    throw new Error(
+      `Expected renderMarkdownBundles for ${expectedSortedDocumentTypes.join(', ')}, got ${actualDocumentTypes.join(', ')}`
     );
-    return `${label} ${format(actual, budget.unit)} > ${format(allowed, budget.unit)}`;
+  }
+
+  return expectedDocumentTypes.map((documentType) => {
+    const budget = RENDER_MARKDOWN_BUNDLE_BUDGETS[documentType];
+    const label = `renderMarkdownBundles.${documentType}.${budget.field}`;
+
+    assertMetricFieldsPresent(bundles, documentType, ['p50Ms', 'iterations']);
+
+    return checkBudget({
+      label,
+      actual: getMetricValue(bundles, documentType, budget.field),
+      baselineValue: getMetricValue(baseline.renderMarkdownBundles, documentType, budget.field),
+      hardBudget: budget.budget,
+      unit: budget.unit,
+    });
+  });
+}
+
+function assertMetricFieldsPresent(metricsHost, key, fields) {
+  for (const field of fields) {
+    getMetricValue(metricsHost, key, field);
+  }
+}
+
+/**
+ * @param {object} args
+ * @param {string} args.label
+ * @param {number} args.actual
+ * @param {number} args.baselineValue
+ * @param {number} args.hardBudget
+ * @param {string} args.unit
+ * @returns {string | undefined}
+ */
+function checkBudget({ label, actual, baselineValue, hardBudget, unit }) {
+  const slack = ABSOLUTE_SLACK_BY_UNIT[unit] ?? 0;
+  const baselineBudget = Math.max(baselineValue * BASELINE_MULTIPLIER, baselineValue + slack);
+  const effectiveBudget = Math.min(hardBudget, baselineBudget);
+
+  if (actual > effectiveBudget) {
+    console.error(
+      `FAIL ${label}: ${format(actual, unit)} exceeds ${format(effectiveBudget, unit)} ` +
+        `(hard ${format(hardBudget, unit)}, baseline ${format(baselineBudget, unit)})`
+    );
+    return `${label} ${format(actual, unit)} > ${format(effectiveBudget, unit)}`;
   }
 
   console.log(
-    `PASS ${label}: ${format(actual, budget.unit)} <= ${format(allowed, budget.unit)} ` +
-      `(hard ${format(budget.budget, budget.unit)}, baseline ${format(baselineBudget, budget.unit)})`
+    `PASS ${label}: ${format(actual, unit)} <= ${format(effectiveBudget, unit)} ` +
+      `(hard ${format(hardBudget, unit)}, baseline ${format(baselineBudget, unit)})`
   );
   return undefined;
 }

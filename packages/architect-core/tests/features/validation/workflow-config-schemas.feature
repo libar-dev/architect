@@ -6,22 +6,22 @@
 @validation @workflow
 Feature: Workflow Config Schema Validation
   The workflow configuration module defines Zod schemas for validating
-  delivery workflow definitions with statuses, phases, and metadata.
-  It provides runtime type guards and efficient lookup map construction
-  for loaded workflows.
+  delivery workflow definitions with statuses and metadata. It provides
+  runtime type guards and efficient lookup map construction for loaded
+  workflows.
 
   Background:
     Given a workflow config test context
 
   Rule: WorkflowConfigSchema validates workflow configurations
 
-    **Invariant:** WorkflowConfigSchema accepts objects with a name, semver version, at least one status, and at least one phase, and rejects objects missing any required field or with invalid semver format.
-    **Rationale:** Workflow configurations drive FSM validation and phase-based document routing. Malformed configs would cause silent downstream failures in process guard and documentation generation.
-    **Verified by:** Valid workflow config passes schema validation, Config without name is rejected, Config with invalid semver version is rejected, Config without statuses is rejected, Config without phases is rejected
+    **Invariant:** WorkflowConfigSchema accepts objects with a name, semver version, and at least one status, and rejects objects missing any required field or with invalid semver format.
+    **Rationale:** Workflow configurations drive FSM validation. Malformed configs would cause silent downstream failures in process guard and documentation generation.
+    **Verified by:** Valid workflow config passes schema validation, Config without name is rejected, Config with invalid semver version is rejected, Config without statuses is rejected
 
     @schema:WorkflowConfigSchema @happy-path
     Scenario: Valid workflow config passes schema validation
-      When I validate a workflow config with name "standard" and version "1.0.0" with 1 status and 1 phase
+      When I validate a workflow config with name "standard" and version "1.0.0" with 1 status
       Then the workflow config should be valid
 
     @schema:WorkflowConfigSchema @error-case
@@ -39,16 +39,11 @@ Feature: Workflow Config Schema Validation
       When I validate a workflow config with name "standard" and version "1.0.0" with 0 statuses
       Then the workflow config should be invalid
 
-    @schema:WorkflowConfigSchema @error-case
-    Scenario: Config without phases is rejected
-      When I validate a workflow config with name "standard" and version "1.0.0" with 0 phases
-      Then the workflow config should be invalid
-
   Rule: createLoadedWorkflow builds efficient lookup maps
 
-    **Invariant:** createLoadedWorkflow produces a LoadedWorkflow whose statusMap and phaseMap contain all statuses and phases from the config, keyed by lowercase name for case-insensitive lookup.
-    **Rationale:** O(1) status and phase lookup eliminates repeated linear scans during validation and rendering, where each pattern may reference multiple statuses.
-    **Verified by:** Loaded workflow has status lookup map, Status lookup is case-insensitive, Loaded workflow has phase lookup map, Phase lookup is case-insensitive
+    **Invariant:** createLoadedWorkflow produces a LoadedWorkflow whose statusMap contains all statuses from the config, keyed by lowercase name for case-insensitive lookup.
+    **Rationale:** O(1) status lookup eliminates repeated linear scans during validation and rendering, where each pattern may reference multiple statuses.
+    **Verified by:** Loaded workflow has status lookup map, Status lookup is case-insensitive
 
     @function:createLoadedWorkflow @happy-path
     Scenario: Loaded workflow has status lookup map
@@ -64,21 +59,6 @@ Feature: Workflow Config Schema Validation
       When I create a loaded workflow
       Then the status map should contain "roadmap"
       And the status map should contain "active"
-
-    @function:createLoadedWorkflow
-    Scenario: Loaded workflow has phase lookup map
-      Given a valid workflow config with phase "Inception" and phase "Construction"
-      When I create a loaded workflow
-      Then the phase map should contain "inception"
-      And the phase map should contain "construction"
-      And the phase map should have 2 entries
-
-    @function:createLoadedWorkflow
-    Scenario: Phase lookup is case-insensitive
-      Given a valid workflow config with phase "Inception" and phase "Construction"
-      When I create a loaded workflow
-      Then the phase map should contain "inception"
-      And the phase map should contain "construction"
 
   Rule: isWorkflowConfig type guard validates at runtime
 

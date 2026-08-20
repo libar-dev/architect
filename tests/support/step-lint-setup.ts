@@ -14,7 +14,7 @@ export function setup(): void {
   if (hasFailures(summary, false)) {
     const output = formatPretty(summary, { quiet: true });
     throw new Error(
-      `Step lint: ${summary.errorCount} error(s) found in feature/step files.\n\n${output}\n\nFix the issues above before running tests.`
+      `Step lint: ${summary.errorCount} error(s) found in feature/step files.\n\n${output}\n\nFix the issues above before running tests.`,
     );
   }
 }

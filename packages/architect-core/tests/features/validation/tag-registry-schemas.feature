@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:TagRegistrySchemasValidation
 @architect-status:active
+@architect-implements:TagRegistrySchemas
 @architect-product-area:Validation
 @validation @tag-registry
 Feature: Tag Registry Schema Validation

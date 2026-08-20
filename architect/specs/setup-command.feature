@@ -155,7 +155,7 @@ Feature: Interactive Setup Command
 
   Rule: Npm scripts are injected using bin command names
 
-    **Invariant:** Injected scripts reference bin names (pattern-graph-cli, generate-docs)
+    **Invariant:** Injected scripts reference bin names (architect, architect-generate)
     resolved via node_modules/.bin, not dist paths. Existing scripts are preserved.
     The package.json "type" field is preserved. ESM migration is an explicit
     opt-in via --esm flag.
@@ -174,7 +174,7 @@ Feature: Interactive Setup Command
     Scenario: Injected scripts use bin command names
       Given a package.json with no Architect scripts
       When the init command injects scripts
-      Then package.json contains architect:query using "pattern-graph-cli"
+      Then package.json contains architect:q using the "architect" bin
       And contains docs:all using "generate-docs"
       And preserves the existing "type" field
 
@@ -204,12 +204,12 @@ Feature: Interactive Setup Command
     @acceptance-criteria @happy-path
     Scenario: Example annotation file is detected by the pipeline
       Given the init command generated an example annotated file
-      When running pattern-graph-cli overview
+      When running architect census
       Then the output shows 1 pattern detected
 
   Rule: Init validates the complete setup by running the pipeline
 
-    **Invariant:** After all files are generated, init runs pattern-graph-cli overview and
+    **Invariant:** After all files are generated, init runs `architect census` and
     reports whether the pipeline detected the example pattern. Success prints a
     summary and next steps. Failure prints diagnostic information.
 

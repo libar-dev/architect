@@ -3,7 +3,7 @@
  * @architect-pattern HandoffProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses ExecutionContextProjectionSupport, ProjectionFragmentContracts
+ * @architect-uses ExecutionContextProjectionSupport, ProjectionFragmentContracts, HandoffRecord
  * @architect-bounded-context:projection
  *
  * **Value:** Projects a flat `HandoffRecord` per pattern + session type so
@@ -28,7 +28,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects the handoff record used to share completed work, blockers, and next-session context.
  */
 
 import type { ProjectionContext } from '../../context/projection-context.js';
@@ -47,7 +47,7 @@ export type { HandoffOptions } from './handoff.internal.js';
 
 export function projectHandoffRecord(
   context: ProjectionContext,
-  options: HandoffOptions
+  options: HandoffOptions,
 ): ProjectionBundle<HandoffRecord> {
   return projectSingle(buildHandoffRecord(context, options));
 }
@@ -55,5 +55,5 @@ export function projectHandoffRecord(
 export const parseAndProjectHandoffRecord = parseAndProject(
   HandoffOptionsSchema,
   projectHandoffRecord,
-  'parseAndProjectHandoffRecord'
+  'parseAndProjectHandoffRecord',
 );

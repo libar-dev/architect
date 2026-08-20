@@ -2,7 +2,7 @@
 @architect-pattern:OperationalInsightsProjectionExecutableTests
 @architect-implements:OperationalInsightsProjectionSupport,OverviewProjection,AnnotationCoverageProjection,TagUsageProjection,SourceInventoryProjection,RoleProfileProjection,RequirementDigestProjection
 @architect-status:completed
-@architect-phase:49
+@architect-unlock-reason:Add-overview-architecture-glimpse-rendering-WS3-S15
 @architect-product-area:Projection
 @architect-role:projection
 @operational-insights
@@ -16,8 +16,8 @@ Feature: Operational Insights reporting projections
   without reaching into the raw PatternGraph.
 
   **How It Works:** Each projection runs against the in-memory graph and tag
-  registry. Overview aggregates progress, active phases, and blocked
-  patterns; annotation coverage compares source files against required tags;
+  registry. Overview aggregates progress and blocked patterns; annotation
+  coverage compares source files against required tags;
   tag usage counts `(tag, value)` pairs across patterns; source inventory
   categorises files by type; role profiles normalize configured roles with
   their pattern examples; requirement digests structure product-area
@@ -32,10 +32,12 @@ Feature: Operational Insights reporting projections
   Rule: Overview ports the legacy progress and blocking semantics into the fragment shape
 
     **Invariant:** `OverviewDigest` always carries a `progress` block
-    (delivery-total counts and a percentage that excludes candidates),
-    `activePhases` limited to phases with active work, a `blocking` array of
-    incomplete patterns whose `dependsOn` targets are incomplete, and the
-    embedded CLI-hints list for session bootstrap.
+    (delivery-total counts and a percentage that excludes candidates), a
+    `blocking` array of incomplete patterns whose `dependsOn` targets are
+    incomplete, an `architecture` glimpse (a coarse package-level context map
+    plus the bounded-context map, both pre-rendered Mermaid, derived from a
+    production-only component graph), a `generatedViews` index of the fetchable
+    documentation surfaces, and the embedded CLI-hints list for session bootstrap.
 
     **Rationale:** These fields are the canonical session-start payload;
     omitting any of them forces consumers back into raw graph queries.
@@ -44,10 +46,37 @@ Feature: Operational Insights reporting projections
 
     @acceptance-criteria
     Scenario: projecting an overview digest for mixed delivery work
-      Given a Operational Insights overview context with active phases and blocking dependencies
+      Given a Operational Insights overview context with blocking dependencies
       When I project the overview digest
-      Then the overview digest should expose delivery progress active phases and blocking entries
-      And the overview digest should preserve unnamed active phase parity
+      Then the overview digest should expose delivery progress and blocking entries
+
+  Rule: Overview compact rendering honors disclosure richness
+
+    **Invariant:** Rendering the overview digest at `name-only` emits the
+    progress section alone (no architecture glimpse); at `summary` it truncates
+    the blocking list to the first few entries with a "more" pointer, collapses
+    the generated-views index to a single line, and shows the coarse
+    package-level architecture chart (one Mermaid block) with an
+    API-promoting pointer; at `full` it emits every blocking entry, the itemized
+    generated-views index, and both architecture charts (package chart plus the
+    bounded-context map). Disclosure shapes how much is rendered, never what the
+    digest contains.
+
+    **Rationale:** The overview is the session-bootstrap call; a terse default
+    keeps it a heads-up display while `full` preserves the complete payload. The
+    architecture glimpse promotes the app architecture + Data API so agents
+    query the graph instead of grepping. See DECISIONS D-17 and D-18.
+
+    **Verified by:** rendering one overview digest at each richness level and
+    asserting blocking truncation, the generated-views shape, and the
+    disclosure-gated architecture charts (none / package / package + context).
+
+    Scenario: rendering the overview digest at each disclosure level
+      Given an Operational Insights overview context with six blocking dependencies
+      When I render the overview digest at name-only summary and full
+      Then the name-only rendering contains only the progress section
+      And the summary rendering truncates blocking and shows a one-line generated-views index
+      And the full rendering shows every blocking entry and the itemized generated-views index
 
   Rule: Annotation coverage stays numeric and graph-only
 
@@ -120,7 +149,7 @@ Feature: Operational Insights reporting projections
     area then normalized status (completed → active → planned → candidate)
     then pattern name,
     structures each requirement's description as a block list
-    (Requirement / Use Cases / Business Rules) with resolved `testFiles`
+    (Requirement / Business Rules) with resolved `testFiles`
     from executable specs or the behaviour file, and exposes governance-owned
     `businessRuleReferences` instead of embedding `BusinessRule` child fragments;
     for duplicate feature names across packages, all-areas digests aggregate
@@ -140,7 +169,7 @@ Feature: Operational Insights reporting projections
       When I project the requirement digests for all areas and for "Projection Platform"
       Then the all-areas requirement digest should aggregate every non-ADR product requirement
       And the filtered requirement digest should keep structured blocks and test file references
-      And the all-areas requirement digest should include product-metadata requirements without a product area
+      And the all-areas requirement digest should exclude requirements without a product area
 
     Scenario: requirement digests aggregate business-rule references for duplicate feature names
       Given a Operational Insights requirement context with duplicate feature names across packages
@@ -167,7 +196,7 @@ Feature: Operational Insights reporting projections
       When I project the requirements-executable digest
       Then the executable requirement digest should use the resolver-derived package id for routes
 
-    Scenario: package scoped architect releases stay out of requirement digests
-      Given a Operational Insights requirement context with a nested architect release pattern
+    Scenario: nested architect decisions stay out of requirement digests
+      Given a Operational Insights requirement context with a nested architect decision pattern
       When I project the requirement digest for all areas
-      Then the nested architect release pattern should be excluded from the all-areas requirement digest
+      Then the nested architect decision pattern should be excluded from the all-areas requirement digest

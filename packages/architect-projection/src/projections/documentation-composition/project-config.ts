@@ -14,9 +14,9 @@
  * **Invariant:** `projectConfig` always flattens `input`, `features`, and
  * `exclude` globs into a single deduped `sourceGlobs` list (prefixing
  * exclude entries with `!`), preserves caller-supplied metadata, and carries
- * graph-derived `patternCount`, `phaseCount`, and `roleCount` from the
- * projection context; `parseAndProjectConfig` rejects malformed glob groups
- * via `ProjectConfigOptionsSchema`.
+ * graph-derived `patternCount` and `roleCount` from the projection context;
+ * `parseAndProjectConfig` rejects malformed glob groups via
+ * `ProjectConfigOptionsSchema`.
  *
  * **Behavior:**
  * - Resolves the project name from explicit options first, then from
@@ -27,7 +27,8 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects a normalized ProjectConfigSnapshot bundle from config input and
+ *   graph metadata.
  */
 
 import type { ProjectionContext } from '../../context/projection-context.js';
@@ -46,7 +47,7 @@ export { SourceGlobGroupsSchema } from './project-config.internal.js';
 
 export function projectConfig(
   context: ProjectionContext,
-  options: ProjectConfigOptions
+  options: ProjectConfigOptions,
 ): ProjectionBundle<ProjectConfigSnapshot> {
   return projectSingle(buildProjectConfigSnapshot(context, options));
 }
@@ -54,7 +55,7 @@ export function projectConfig(
 export const parseAndProjectConfig = parseAndProject(
   ProjectConfigOptionsSchema,
   projectConfig,
-  'parseAndProjectConfig'
+  'parseAndProjectConfig',
 );
 
 export type { ProjectConfigOptions } from './project-config.internal.js';

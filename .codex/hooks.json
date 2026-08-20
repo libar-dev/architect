@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '/Users/darkomijic/dev-projects/architect/.codex/hooks/architect-api-first.sh'",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}

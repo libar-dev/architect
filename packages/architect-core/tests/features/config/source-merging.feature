@@ -1,6 +1,7 @@
 @architect
 @architect-pattern:SourceMerging
 @architect-status:completed
+@architect-implements:SourceMerge
 @architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:Configuration
 @behavior @config

@@ -4,42 +4,28 @@
 import { z } from 'zod';
 
 import type { ProjectionContext } from '../../context/projection-context.js';
-import { projectSingle, type ProjectionBundle } from '../../fragments/base.js';
+import type { ProjectionBundle } from '../../fragments/base.js';
+import type { MarkdownFileRoute } from '../../fragments/emission-descriptor.js';
 import type { Fragment } from '../../fragments/index.js';
-import { projectPatternCatalog } from '../pattern-relations/pattern-catalog.js';
 import { ProjectionError } from '../errors.js';
-import {
-  projectCurrentWork,
-  projectReleaseNotesDigest,
-  projectRoadmapTimeline,
-  projectTraceabilityMatrix,
-} from '../delivery-reporting/index.js';
-import { projectDecisionCatalog, projectValidationRuleDigest } from '../governance/index.js';
-import { projectBusinessRuleSet } from '../governance/business-rules.js';
-import { projectTaxonomyDigest } from '../governance/taxonomy-digest.js';
-import {
-  projectRequirementExecutableDigest,
-  projectRequirementSpecsDigest,
-} from '../operational-insights/index.js';
 
-import { buildArchitectureDiagram } from './architecture-diagram.internal.js';
+import { getDocumentationDefinition } from './documentation-definition.internal.js';
 import {
   getDocumentationTypeMetadata,
-  isDroppedDocumentationType,
-  resolveProjectionFilter,
   SUPPORTED_DOCUMENTATION_TYPES,
   type SupportedDocumentationType,
-} from './documentation-types.js';
-import { ProgressiveDisclosureLevelSchema } from './progressive-disclosure.js';
+} from './documentation-type-registry.js';
+import { resolveProjectionFilter } from './projection-filter-resolver.js';
+import { ProgressiveDisclosureLevelSchema } from '../../disclosure/levels.js';
 
-export type { SupportedDocumentationType } from './documentation-types.js';
+export type { SupportedDocumentationType } from './documentation-type-registry.js';
 
 export const ProjectDocumentationBundleOptionsSchema = z
   .strictObject({
     documentType: z.custom<SupportedDocumentationType>(
       (value): value is SupportedDocumentationType =>
         typeof value === 'string' && getDocumentationTypeMetadata(value) !== undefined,
-      { message: `Supported types: ${SUPPORTED_DOCUMENTATION_TYPES.join(', ')}` }
+      { message: `Supported types: ${SUPPORTED_DOCUMENTATION_TYPES.join(', ')}` },
     ),
     disclosureLevel: ProgressiveDisclosureLevelSchema.optional(),
   })
@@ -59,57 +45,69 @@ type RawProjectDocumentationBundleOptions = z.infer<
   typeof RawProjectDocumentationBundleOptionsSchema
 >;
 
-type DocumentationProjectionFactory = (context: ProjectionContext) => ProjectionBundle<Fragment>;
-
-const DOCUMENTATION_PROJECTION_FACTORIES = {
-  architecture: (context) =>
-    projectSingle(buildArchitectureDiagram(context, { scope: 'component' })),
-  decisions: (context) => projectDecisionCatalog(context),
-  'business-rules': (context) =>
-    projectBusinessRuleSet(context, { scope: 'all', groupedBy: 'package' }),
-  patterns: (context) => projectPatternCatalog(context),
-  roadmap: (context) => projectRoadmapTimeline(context),
-  'current-work': (context) => projectCurrentWork(context),
-  'requirements-executable': (context) => projectRequirementExecutableDigest(context),
-  'requirements-specs': (context) => projectRequirementSpecsDigest(context),
-  'validation-rules': (context) => projectValidationRuleDigest(context),
-  taxonomy: (context) => projectTaxonomyDigest(context),
-  changelog: (context) => projectReleaseNotesDigest(context),
-  traceability: (context) => projectTraceabilityMatrix(context),
-} satisfies Record<SupportedDocumentationType, DocumentationProjectionFactory>;
-
 export function assertSupportedDocumentType(documentType: string): SupportedDocumentationType {
-  if (isDroppedDocumentationType(documentType)) {
-    throw new ProjectionError(
-      'UNKNOWN_DOCUMENT_TYPE',
-      `Document type "${documentType}" was intentionally dropped. Supported types: ${SUPPORTED_DOCUMENTATION_TYPES.join(', ')}.`
-    );
-  }
-
-  const metadata = getDocumentationTypeMetadata(documentType);
-  if (metadata !== undefined) {
-    return metadata.key;
+  const definition = getDocumentationDefinition(documentType);
+  if (definition !== undefined) {
+    return definition.key;
   }
 
   throw new ProjectionError(
     'UNKNOWN_DOCUMENT_TYPE',
-    `Unknown document type "${documentType}". Supported types: ${SUPPORTED_DOCUMENTATION_TYPES.join(', ')}.`
+    `Unknown document type "${documentType}". Supported types: ${SUPPORTED_DOCUMENTATION_TYPES.join(', ')}.`,
   );
 }
 
 export function projectDocumentationBundleInternal(
   context: ProjectionContext,
-  options: RawProjectDocumentationBundleOptions
+  options: RawProjectDocumentationBundleOptions,
 ): ProjectionBundle<Fragment> {
   const documentType = assertSupportedDocumentType(options.documentType);
+  const definition = getDocumentationDefinition(documentType);
+
+  if (definition === undefined) {
+    throw new ProjectionError(
+      'UNKNOWN_DOCUMENT_TYPE',
+      `Unknown document type "${documentType}". Supported types: ${SUPPORTED_DOCUMENTATION_TYPES.join(', ')}.`,
+    );
+  }
+
   const filteredContext = withDocumentationFilter(context, documentType, options.disclosureLevel);
-  return DOCUMENTATION_PROJECTION_FACTORIES[documentType](filteredContext);
+  const bundle = definition.project(filteredContext);
+
+  if (bundle.routing !== undefined) {
+    const level = options.disclosureLevel ?? definition.defaultDisclosureLevel;
+    const childDirectory = 'childDirectory' in definition ? definition.childDirectory : undefined;
+    const entityPathLayout =
+      'entityPathLayout' in definition ? definition.entityPathLayout : undefined;
+    // The file-sink specifics (which `.md` file, child dir, entity layout) move OFF
+    // `routing` and ONTO the optional `emission` descriptor (the `BundleRouting` split).
+    // `routing` keeps only the logical `disclosureSpec`; `emission` is the whole-artifact
+    // markdown-file overlay built from the registry definition.
+    const markdownFileRoute: MarkdownFileRoute = {
+      rootTarget: definition.markdownRootTarget,
+      ...(childDirectory !== undefined ? { childDirectory } : {}),
+      ...(entityPathLayout !== undefined ? { entityPathLayout } : {}),
+    };
+    return {
+      ...bundle,
+      routing: {
+        ...bundle.routing,
+        disclosureSpec: definition.disclosureMatrix[level],
+      },
+      emission: {
+        mode: 'whole-artifact',
+        markdownFileRoute,
+      },
+    };
+  }
+
+  return bundle;
 }
 
 function withDocumentationFilter(
   context: ProjectionContext,
   documentType: SupportedDocumentationType,
-  disclosureLevel: ProjectDocumentationBundleOptions['disclosureLevel']
+  disclosureLevel: ProjectDocumentationBundleOptions['disclosureLevel'],
 ): ProjectionContext {
   const projectionFilter = resolveProjectionFilter(context, documentType, disclosureLevel);
 

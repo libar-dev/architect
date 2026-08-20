@@ -3,7 +3,7 @@
  * @architect-pattern OrphanPatternListProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses PatternRelationsProjectionSupport, PatternRelationsFragmentContracts
+ * @architect-uses PatternRelationsProjectionSupport, PatternRelationsFragmentContracts, OrphanPatternList
  * @architect-bounded-context:projection
  *
  * ## Orphan pattern list projection
@@ -25,7 +25,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects the list of disconnected patterns with no incoming or outgoing relationships.
  */
 
 import type { ProjectionContext } from '../../context/projection-context.js';
@@ -35,7 +35,7 @@ import type { OrphanPatternList } from '../../fragments/pattern-relations/index.
 import { buildOrphanPatternList } from './orphan-pattern-list.internal.js';
 
 export function projectOrphanPatternList(
-  context: ProjectionContext
+  context: ProjectionContext,
 ): ProjectionBundle<OrphanPatternList> {
   return projectSingle(buildOrphanPatternList(context));
 }

@@ -3,7 +3,7 @@
  * @architect-pattern DecisionCatalogProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses GovernanceProjectionSupport, ProjectionFragmentContracts
+ * @architect-uses GovernanceProjectionSupport, ProjectionFragmentContracts, DecisionCatalog, DecisionRecord
  * @architect-bounded-context:projection
  *
  * **Value:** Gives consumers a single entry point for looking up one
@@ -26,7 +26,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects a single decision record or the full decision catalog, with missing ids failing fast and catalog children routed by id.
  */
 
 import type { ProjectionContext } from '../../context/projection-context.js';
@@ -36,13 +36,13 @@ import { buildDecisionCatalog, buildDecisionRecord } from './decision-records.in
 
 export function projectDecisionRecord(
   context: ProjectionContext,
-  id: string
+  id: string,
 ): ProjectionBundle<DecisionRecord> {
   return projectSingle(buildDecisionRecord(context, id));
 }
 
 export function projectDecisionCatalog(
-  context: ProjectionContext
+  context: ProjectionContext,
 ): ProjectionBundle<DecisionCatalog> {
   return buildDecisionCatalog(context);
 }

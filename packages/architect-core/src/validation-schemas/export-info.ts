@@ -1,3 +1,10 @@
+/**
+ * @architect
+ * @architect-pattern ExportInfoContract
+ * @architect-status active
+ * @architect-role:contract
+ * @architect-bounded-context:validation-schemas
+ */
 import { z } from 'zod';
 
 const FunctionExportSchema = z.strictObject({

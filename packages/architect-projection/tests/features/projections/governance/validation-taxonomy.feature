@@ -2,7 +2,7 @@
 @architect-pattern:GovernanceValidationTaxonomyProjectionExecutableTests
 @architect-implements:ValidationRuleDigestProjection,TaxonomyDigestProjection
 @architect-status:completed
-@architect-phase:49
+@architect-unlock-reason:Strengthen-count-summary-invariant-pin-derivation-from-digest-entries
 @architect-product-area:Projection
 @architect-role:projection
 @governance
@@ -36,7 +36,7 @@ Feature: Governance validation and taxonomy projections
     `fsm` reflects `VALID_TRANSITIONS` (with initial state `roadmap` and
     terminal states computed from transitions), and whose `protectionLevels`
     expose each `PROTECTION_LEVELS` bucket with `canAddDeliverables` and
-    `needsUnlock` flags.
+    `unlockSuppressesWarning` flags.
 
     **Rationale:** Validation surfaces must render a deterministic, core-driven
     view of the lifecycle so FSM changes propagate through one projection
@@ -108,3 +108,10 @@ Feature: Governance validation and taxonomy projections
       Given a taxonomy projection context with roles metadata tags and aggregation tags
       When I project the taxonomy digest
       Then the taxonomy digest count summary should match the visible tag entries
+
+    @happy-path @acceptance-criteria
+    Scenario: the count summary is a self-consistent function of the digest's own entries
+      Given a taxonomy projection context with roles metadata tags and aggregation tags
+      When I project the taxonomy digest
+      Then the count summary equals the role, metadata, and aggregation entries enumerated from the digest itself
+      And the total equals the sum of those three counts, so the count surface cannot diverge from the enumerated surface

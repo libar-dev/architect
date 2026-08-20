@@ -20,7 +20,6 @@ interface PatternSeed {
   readonly status: ExtractedPattern['status'];
   readonly maturity: 'idea' | 'plan' | 'design' | 'executable';
   readonly productArea: string;
-  readonly phase: number;
   readonly rules: readonly RuleSeed[];
 }
 
@@ -38,7 +37,6 @@ const PARITY_PATTERN_SEEDS: readonly PatternSeed[] = [
     status: 'completed',
     maturity: 'executable',
     productArea: 'Projection',
-    phase: 49,
     rules: [
       {
         name: 'Bundles stay JSON-safe',
@@ -62,7 +60,6 @@ const PARITY_PATTERN_SEEDS: readonly PatternSeed[] = [
     status: 'active',
     maturity: 'executable',
     productArea: 'Projection',
-    phase: 49,
     rules: [
       {
         name: 'Package grouping is config-driven',
@@ -79,7 +76,6 @@ const PARITY_PATTERN_SEEDS: readonly PatternSeed[] = [
     status: 'active',
     maturity: 'executable',
     productArea: 'CLI',
-    phase: 49,
     rules: [
       {
         name: 'CLI flags reach the projection boundary',
@@ -100,12 +96,9 @@ export function createParityContext(overrides: Partial<ProjectionContext> = {}):
       file: seed.file,
       status: seed.status,
       maturity: seed.maturity,
-      phase: seed.phase,
       productArea: seed.productArea,
-      userRole: 'developer',
-      businessValue: 'demonstrates parity invariants',
       rules: seed.rules.map((rule) => buildBusinessRuleStub(rule)),
-    })
+    }),
   );
   return {
     graph: buildGraphFromPatterns({

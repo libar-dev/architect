@@ -25,7 +25,6 @@ export interface GeneratedDocManifestGenerator {
 
 export interface GeneratedDocsManifest {
   readonly version: 1;
-  readonly updatedAt: string;
   readonly generators: Record<string, GeneratedDocManifestGenerator>;
 }
 
@@ -40,7 +39,7 @@ export interface UpsertGeneratedDocManifestOptions {
 }
 
 export async function loadGeneratedDocsManifest(
-  outputDir: string
+  outputDir: string,
 ): Promise<GeneratedDocsManifest | null> {
   const manifestPath = resolveGeneratedDocsManifestPath(outputDir);
 
@@ -56,43 +55,68 @@ export async function loadGeneratedDocsManifest(
   }
 }
 
-export async function upsertGeneratedDocsManifest(
-  options: UpsertGeneratedDocManifestOptions
-): Promise<void> {
-  const existing = (await loadGeneratedDocsManifest(options.outputDir)) ?? {
-    version: 1 as const,
-    updatedAt: new Date(0).toISOString(),
-    generators: {},
+/** The empty manifest used as the upsert base when no manifest exists yet. */
+export const EMPTY_GENERATED_DOCS_MANIFEST: GeneratedDocsManifest = {
+  version: 1,
+  generators: {},
+};
+
+/** The single generator-entry shape an upsert folds into a manifest (no I/O concerns). */
+export type GeneratedDocsManifestUpsert = Pick<
+  UpsertGeneratedDocManifestOptions,
+  'generatorName' | 'kind' | 'rootPath' | 'entries' | 'documentType'
+>;
+
+/**
+ * Pure manifest fold — returns `existing` with `upsert`'s generator entry added or
+ * replaced. Shared by the write path (`upsertGeneratedDocsManifest`) and the
+ * read-only `--check` path so the expected manifest is computed identically.
+ */
+export function applyGeneratedDocsManifestUpsert(
+  existing: GeneratedDocsManifest,
+  upsert: GeneratedDocsManifestUpsert,
+): GeneratedDocsManifest {
+  return {
+    version: 1,
+    generators: {
+      ...existing.generators,
+      [upsert.generatorName]: {
+        generatorName: upsert.generatorName,
+        kind: upsert.kind,
+        rootPath: upsert.rootPath,
+        entries: [...upsert.entries].sort((left, right) => left.path.localeCompare(right.path)),
+        ...(upsert.documentType !== undefined ? { documentType: upsert.documentType } : {}),
+      },
+    },
   };
+}
+
+/** Canonical on-disk serialization of a manifest (must match the write path byte-for-byte). */
+export function serializeGeneratedDocsManifest(manifest: GeneratedDocsManifest): string {
+  return JSON.stringify(manifest, null, 2) + '\n';
+}
+
+export async function upsertGeneratedDocsManifest(
+  options: UpsertGeneratedDocManifestOptions,
+): Promise<void> {
+  const existing =
+    (await loadGeneratedDocsManifest(options.outputDir)) ?? EMPTY_GENERATED_DOCS_MANIFEST;
 
   const previousEntries = existing.generators[options.generatorName]?.entries ?? [];
   if (options.pruneStaleFiles === true) {
     await pruneStaleGeneratedFiles(options.outputDir, previousEntries, options.entries);
   }
 
-  const next: GeneratedDocsManifest = {
-    version: 1,
-    updatedAt: new Date().toISOString(),
-    generators: {
-      ...existing.generators,
-      [options.generatorName]: {
-        generatorName: options.generatorName,
-        kind: options.kind,
-        rootPath: options.rootPath,
-        entries: [...options.entries].sort((left, right) => left.path.localeCompare(right.path)),
-        ...(options.documentType !== undefined ? { documentType: options.documentType } : {}),
-      },
-    },
-  };
+  const next = applyGeneratedDocsManifestUpsert(existing, options);
 
   const manifestPath = resolveGeneratedDocsManifestPath(options.outputDir);
   await mkdir(path.dirname(manifestPath), { recursive: true });
-  await writeFile(manifestPath, JSON.stringify(next, null, 2) + '\n', 'utf8');
+  await writeFile(manifestPath, serializeGeneratedDocsManifest(next), 'utf8');
 }
 
 export function createPublishedEntries(
   rootPath: string,
-  filePaths: readonly string[]
+  filePaths: readonly string[],
 ): GeneratedDocManifestEntry[] {
   return [...new Set(filePaths)]
     .sort((left, right) => left.localeCompare(right))
@@ -110,7 +134,7 @@ export function createPublishedEntries(
             audience: 'published' as const,
             tracking: 'commit' as const,
             parentPath: rootPath,
-          }
+          },
     );
 }
 
@@ -121,7 +145,7 @@ export function resolveGeneratedDocsManifestPath(outputDir: string): string {
 async function pruneStaleGeneratedFiles(
   outputDir: string,
   previousEntries: readonly GeneratedDocManifestEntry[],
-  nextEntries: readonly GeneratedDocManifestEntry[]
+  nextEntries: readonly GeneratedDocManifestEntry[],
 ): Promise<void> {
   const nextPaths = new Set(nextEntries.map((entry) => entry.path));
   const stale = previousEntries

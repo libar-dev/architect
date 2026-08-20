@@ -1,0 +1,1212 @@
+{
+  "specs": [
+    {
+      "cluster": "N1 — dep-tree becomes a smart bidirectional transitive dependency-context view",
+      "currentBehavior": "`pnpm -s architect:query dep-tree MarkdownRenderer --format json` returns a tree rooted NOT at MarkdownRenderer but at things that USE it (ApiReferenceProjection, GenerateDocsCli's MCP chain, etc.) — it walks the reverse/dependent direction, contradicting the verb name. Ground-truth forward deps via `query getPatternDependencies MarkdownRenderer` → dependsOn:[FragmentRendererDispatch, ProjectionFragmentSchema, BlockSchema], usedBy/enables:[GenerateDocsCli] (live output captured this run). Live proof of the inversion: the dep-tree JSON root nodes are ApiReferenceProjection + the MCPServer/MCPFileWatcher chain — none of MarkdownRenderer's three real dependsOn targets appear. `pnpm -s architect:query query getReverseDependents MarkdownRenderer` exits 1 with `Unknown API method` — the whitelist QUERY_METHODS (packages/architect-cli/src/cli/commands/_shared/structured.ts:35-69) has no reverse-dependents method. The inversion lives in packages/architect-projection/src/projections/pattern-relations/dependency-tree.internal.ts: `findDependencyTreeRoot` (lines 55-88) walks UP via dependsOn/uses to find the topmost ancestor, then `buildTreeNode` (lines 90-169) expands children DOWN via `enables`/`usedBy` (lines 136-145). So the focal pattern is re-rooted at its furthest dependency and the tree then fans out over dependents — neither a clean forward nor a clean reverse view, and the focal node is buried mid-tree (isFocal flag set but not the root). There is NO transitive-closure helper in the kernel read-api (packages/architect-core/src/read-api/pattern-graph-api.ts only exposes single-hop getPatternDependencies/getPatternRelationships/getRelatedPatterns).",
+      "rootCause": "packages/architect-projection/src/projections/pattern-relations/dependency-tree.internal.ts — `findDependencyTreeRoot` (55-88) + `buildTreeNode` (90-169). The projection re-roots away from the focal pattern (up dependsOn) and expands the wrong direction (down enables/usedBy), producing a single ambiguous tree that is effectively the reverse-dependent view. The naming `dep-tree` implies \"what X depends on\" but the impl yields \"what depends on X (re-rooted)\". Both the direction bug and the missing reverse-dependents capability are the same root defect: there is no single focal-rooted accessor that gives both directions transitively. The kernel has no transitive-closure helper, so the projection hand-rolls a one-directional walk.",
+      "proposedDesign": "Replace the single ambiguous tree with ONE focal-rooted bidirectional dependency-context fragment. The consumer never specifies direction; `dep-tree X` always returns X at the root with TWO clearly-labeled transitive sections. This is a deliberate BREAKING change (No-BC): the old `DependencyTree` fragment shape `{kind, root, nodes, options}` and its re-rooting traversal are DELETED, not aliased.\n\nNEW KERNEL CAPABILITY (ADR-006: add at the read model so CLI, MCP, projection, and Studio all benefit). Add a cycle-safe transitive-closure accessor to PatternGraphAPI:\n  `getDependencyContext(name: string, opts?: { maxDepth?: number }): DependencyContext | undefined`\nreturning a focal-rooted structure with two transitively-expanded forests:\n  - `upstream`: recursive closure over `dependsOn` (what X needs → prerequisites / safe-to-start). Each node = { name, status?, phase?, truncated, children }.\n  - `downstream`: recursive closure over `usedBy` (what needs X → blast radius). Same node shape.\n  - `summary`: precomputed counts { upstreamDirect, upstreamTransitive, downstreamDirect, downstreamTransitive }.\nThe walk is BFS/DFS with a per-direction `visited: Set<string>` (cycle-safe, dedupes diamonds), depth-capped by maxDepth (default 10 to match the current MCP default), sets `truncated: true` on a node when it has further unexpanded edges in that direction beyond the cap. `uses`/`enables` are the implementation-edge twins — fold them into the SAME upstream/downstream closures (uses → upstream, enables → downstream) so there is no `includeImplementationDeps` knob to push internals onto the consumer; the canonical relationship index already separates declared (dependsOn/usedBy) from implementation (uses/enables) edges, and the design goal is \"smart enough not to require understanding of internals\", so we merge them and drop the flag. Direction-flag is explicitly NOT added (per directive); `--depth` is the only knob.\n\nWHY THIS IS BEST: (1) one focal-rooted response answers both \"what does X need\" and \"what breaks if X changes\" without the consumer reasoning about graph internals; (2) putting the closure in the kernel (not the projection) means the projection becomes a thin transform and Studio/MCP get the same cycle-safe semantics for free (ADR-006); (3) deleting the re-rooting walk removes the only place that mutated the focal node's position — the focal is now unambiguously the root of both forests; (4) summary line gives agents instant blast-radius sizing without re-walking.\n\nFRAGMENT (projection layer): replace DependencyTreeSchema with `DependencyContextSchema = z.strictObject({ kind: z.literal('DependencyContext'), focal: z.string(), upstream: z.array(DependencyContextNodeSchema), downstream: z.array(DependencyContextNodeSchema), summary: z.strictObject({ upstreamDirect: int>=0, upstreamTransitive: int>=0, downstreamDirect: int>=0, downstreamTransitive: int>=0 }), options: z.strictObject({ maxDepth: int>=0 }) })`. `DependencyContextNodeSchema` keeps the recursive z.lazy node shape (name, status?, phase?, truncated, children) MINUS the now-meaningless `isFocal` (focal is always the forest root, named by `focal`). The projection `projectDependencyContext(context, { pattern, maxDepth })` calls the new kernel accessor and maps to the fragment; `parseAndProjectDependencyContext` stays as the raw-input trust boundary. DELETE `DepTreeOptions.includeImplementationDeps`.\n\nRENDERER (compact-text, AI-facing): `renderDependencyContext` emits a one-line summary header (\"FocalX depends on N (M transitive); P depend on FocalX (Q transitive)\") then two labeled sections \"DEPENDS ON (upstream)\" and \"REQUIRED BY (downstream)\", each an indented tree with `... (depth limit reached)` markers preserved from the existing truncation rendering. Focal name printed once at the header, not per-node.\n\nCLI/MCP: rename the dep-tree command's projection call to `projectDependencyContext` (drop includeImplementationDeps), keep `--depth`. MCP `architect_dep_tree` handler likewise. Optionally surface the kernel accessor through the `query` whitelist as `getDependencyContext` (closes the missing-reverse-dependents gap via the typed passthrough too). No `--direction` flag anywhere.",
+      "edits": [
+        {
+          "file": "packages/architect-core/src/read-api/types.ts",
+          "change": "Add DependencyContext + DependencyContextNode type definitions (recursive node interface mirroring DependencyTreeNode minus isFocal; DependencyContext = { focal, upstream: DependencyContextNode[], downstream: DependencyContextNode[], summary: {upstreamDirect,upstreamTransitive,downstreamDirect,downstreamTransitive}, options:{maxDepth} }).",
+          "rationale": "Kernel owns the read-model contract; types flow to PatternGraphAPI signature."
+        },
+        {
+          "file": "packages/architect-core/src/read-api/pattern-graph-api.ts",
+          "change": "Add `getDependencyContext(name: string, opts?: { maxDepth?: number }): DependencyContext | undefined` to the PatternGraphAPI interface (after line 67) and implement it in createPatternGraphAPI (near getPatternDependencies, lines 205-237): two cycle-safe transitive walks over the relationship index — upstream = dependsOn∪uses closure, downstream = usedBy∪enables closure — each with its own visited Set, depth cap, and truncated marker; precompute summary counts. Return undefined when the focal pattern has no relationship entry (mirrors getPatternDependencies).",
+          "rationale": "ADR-006: add the transitive-closure capability at the single read model so every consumer (CLI, MCP, projection, Studio) gets cycle-safe bidirectional context, not just dep-tree. This is the load-bearing new accessor."
+        },
+        {
+          "file": "packages/architect-projection/src/fragments/pattern-relations/supporting.ts",
+          "change": "Replace DependencyTreeNode interface + DependencyTreeNodeSchema (lines 130-164) with DependencyContextNode interface + DependencyContextNodeSchema — same recursive z.lazy shape but DROP the `isFocal` field (focal is the forest root, not a per-node flag).",
+          "rationale": "Focal is now unambiguously the root; per-node isFocal is dead context once re-rooting is removed."
+        },
+        {
+          "file": "packages/architect-projection/src/fragments/pattern-relations/dependency-tree.ts",
+          "change": "Rename file concept: replace DependencyTreeSchema (lines 23-31) with DependencyContextSchema (kind:'DependencyContext', focal, upstream[], downstream[], summary{4 counts}, options{maxDepth}). Update @architect-pattern to DependencyContext and the docstring (the @architect-shape JSDoc block is projected into docs-live api-reference — rewrite it to describe the bidirectional context). Rename the file to dependency-context.ts (No-BC: delete old name).",
+          "rationale": "New z.strictObject fragment shape; the docstring change ripples docs-live/api-reference."
+        },
+        {
+          "file": "packages/architect-projection/src/projections/pattern-relations/dependency-tree.internal.ts",
+          "change": "DELETE findDependencyTreeRoot (55-88) and buildTreeNode (90-169) — the re-rooting + wrong-direction walk. Replace with a thin `buildDependencyContext(context, { pattern, maxDepth })` that calls the new kernel accessor `getDependencyContext` via context.graph's API (or maps the relationship index directly if the projection holds the raw graph) and shapes the fragment. Replace DepTreeOptionsSchema (20-26): drop `includeImplementationDeps`, keep pattern + maxDepth. Rename file to dependency-context.internal.ts.",
+          "rationale": "Root cause is here. Delete the inverted traversal; delegate to the kernel closure (ADR-006). Drop the includeImplementationDeps knob — directive says no internals on the consumer."
+        },
+        {
+          "file": "packages/architect-projection/src/projections/pattern-relations/dependency-tree.ts",
+          "change": "Rename projectDependencyTree → projectDependencyContext and parseAndProjectDependencyTree → parseAndProjectDependencyContext. Build the fragment { kind:'DependencyContext', focal, upstream, downstream, summary, options } from buildDependencyContext. Rewrite the @architect docstring (Value/Invariant/Behavior) to describe the focal-rooted bidirectional context and DELETE all 'legacy traversal semantics' wording. Rename file to dependency-context.ts.",
+          "rationale": "Projection becomes a thin transform; docstring ripples docs-live. 'legacy traversal' is dead context per CLAUDE.md."
+        },
+        {
+          "file": "packages/architect-projection/src/renderers/render-compact-text.ts",
+          "change": "Replace COMPACT_NORMALIZERS entry 'DependencyTree' (line 50) with 'DependencyContext'. Replace renderDependencyTree/renderDependencyTreeNode (406-437) with renderDependencyContext that prints the summary header line + two labeled sections (DEPENDS ON / REQUIRED BY) each rendered with the existing indented-tree + '... (depth limit reached)' truncation style.",
+          "rationale": "AI-facing compact output must show both directions and the one-line summary per the design goal."
+        },
+        {
+          "file": "packages/architect-projection/src/fragments/index.ts and src/projections/index.ts and src/fragments/pattern-relations/index.ts and src/projections/pattern-relations/index.ts",
+          "change": "Update barrels: export DependencyContextSchema/DependencyContext and projectDependencyContext/parseAndProjectDependencyContext; remove the old DependencyTree* exports.",
+          "rationale": "No-BC: old exported names are deleted, not re-exported. Verbatim import-type strictness preserved."
+        },
+        {
+          "file": "packages/architect-cli/src/cli/commands/reporting.ts",
+          "change": "In the 'dep-tree' command (108-142): import projectDependencyContext instead of projectDependencyTree; call it with { pattern, maxDepth } only — DELETE includeImplementationDeps:false (line 138). Keep --depth and the verb name 'dep-tree' (the verb is fine; only its semantics changed).",
+          "rationale": "Wire the CLI to the corrected projection; drop the internals knob."
+        },
+        {
+          "file": "packages/architect-mcp/src/tool-registry.ts",
+          "change": "architect_dep_tree handler (413-426): import/call projectDependencyContext with { pattern:name, maxDepth: maxDepth ?? 10 } — DELETE includeImplementationDeps (line 423). Input schema keeps name + OptionalDepthShape.",
+          "rationale": "MCP twin must match CLI semantics; no direction flag, depth default 10 preserved."
+        },
+        {
+          "file": "packages/architect-cli/src/cli/commands/_shared/structured.ts",
+          "change": "Add 'getDependencyContext' to QUERY_METHODS (35-69) and a case in executeQueryMethod (after getPatternDependencies, ~224) calling api.getDependencyContext(requireArg(...), { maxDepth: optional 2nd arg }).",
+          "rationale": "Exposes the transitive closure through the typed query passthrough — this is what closes the `Unknown API method: getReverseDependents` gap (a single bidirectional method supersedes both forward and reverse single-purpose verbs)."
+        }
+      ],
+      "newContracts": [
+        {
+          "name": "getDependencyContext",
+          "kind": "kernel-method",
+          "shape": "getDependencyContext(name: string, opts?: { maxDepth?: number }): DependencyContext | undefined — cycle-safe transitive closure on PatternGraphAPI; upstream = dependsOn∪uses recursive, downstream = usedBy∪enables recursive, per-direction visited Set, depth-capped, truncated markers, precomputed summary counts. Returns undefined when no relationship entry (mirrors getPatternDependencies)."
+        },
+        {
+          "name": "DependencyContextSchema",
+          "kind": "zod-schema",
+          "shape": "z.strictObject({ kind: z.literal('DependencyContext'), focal: z.string(), upstream: z.array(DependencyContextNodeSchema), downstream: z.array(DependencyContextNodeSchema), summary: z.strictObject({ upstreamDirect: z.number().int().nonnegative(), upstreamTransitive: z.number().int().nonnegative(), downstreamDirect: z.number().int().nonnegative(), downstreamTransitive: z.number().int().nonnegative() }), options: z.strictObject({ maxDepth: z.number().int().nonnegative() }) })"
+        },
+        {
+          "name": "DependencyContextNodeSchema",
+          "kind": "zod-schema",
+          "shape": "z.ZodType<DependencyContextNode> = z.strictObject({ name: z.string(), status: z.string().optional(), phase: z.number().int().optional(), truncated: z.boolean(), children: z.array(z.lazy(() => DependencyContextNodeSchema)) }) — drops the old isFocal field"
+        },
+        {
+          "name": "DepTreeOptionsSchema (revised)",
+          "kind": "zod-schema",
+          "shape": "z.strictObject({ pattern: z.string(), maxDepth: z.number().int() }).readonly() — includeImplementationDeps DELETED"
+        },
+        {
+          "name": "getDependencyContext (query passthrough)",
+          "kind": "cli-flag",
+          "shape": "Added to QUERY_METHODS enum; `architect query getDependencyContext <name> [maxDepth]`. dep-tree CLI/MCP keep only --depth; NO --direction flag."
+        }
+      ],
+      "executableSpecChanges": [
+        {
+          "file": "packages/architect-projection/tests/features/projections/pattern-relations/dependency-tree.feature",
+          "change": "Rewrite as dependency-context.feature (executable spec is source of truth; bidirectional focal-rooted semantics PROVEN here). Feature/@architect-pattern → DependencyContextProjectionExecutableTests, @architect-implements → DependencyContextProjection. DELETE all 'legacy traversal semantics' / 'walks upward' wording from Business Value, How It Works, Rule/Invariant/Rationale. New Rule: 'Dependency context is focal-rooted and bidirectional'. New scenarios: (1) 'focal is the root of both forests' — focal===MiddleService, NOT buried mid-tree; (2) 'upstream lists transitive dependsOn' — prerequisites recursively, summary counts correct; (3) 'downstream lists transitive dependents' — what requires focal recursively (the previously-missing capability); (4) 'maxDepth truncates both directions with markers'; (5) 'cycles stop recursion in both directions without malformed output'; (6) 'pattern with no relationship entry yields empty upstream/downstream with focal set and zeroed summary'."
+        },
+        {
+          "file": "packages/architect-projection/tests/features/projections/pattern-relations/dependency-tree.steps.ts",
+          "change": "Rewrite as dependency-context.steps.ts. Import parseAndProjectDependencyContext + DependencyContext. Replace the three old expectations (which assert re-rooting at PatternGraph and isFocal flags — these encode the bug) with assertions on { focal, upstream, downstream, summary }: focal is the requested pattern, upstream contains transitive dependsOn closure, downstream contains transitive usedBy closure, truncated markers at the depth cap, no isFocal field present."
+        },
+        {
+          "file": "packages/architect-projection/tests/features/projections/pattern-relations/smoke-dependency-tree.feature and smoke-dependency-tree.steps.ts",
+          "change": "Update to dependency-context: validate fragment against DependencyContextSchema; assert root === focal (MiddleService), upstream root is the prerequisite (RootLib), downstream contains LeafConsumer. DELETE the 'root should be the ancestor of the chain' assertion (root==='RootLib' encodes the re-rooting bug and must flip to MiddleService)."
+        },
+        {
+          "file": "packages/architect-core/tests/features/** (read-api kernel coverage)",
+          "change": "Add executable/unit coverage for getDependencyContext (verify exact location during impl — the closure lives in the kernel per ADR-006, so cycle-safety + depth must be proven at the read-model layer): assert bidirectional transitive closure, cycle-safety (diamond + mutual back-edge), depth cap + truncated marker, undefined for unknown pattern."
+        }
+      ],
+      "determinismRipple": true,
+      "filesOwned": [
+        "packages/architect-core/src/read-api/pattern-graph-api.ts",
+        "packages/architect-core/src/read-api/types.ts",
+        "packages/architect-projection/src/fragments/pattern-relations/dependency-tree.ts (→ dependency-context.ts)",
+        "packages/architect-projection/src/fragments/pattern-relations/supporting.ts",
+        "packages/architect-projection/src/projections/pattern-relations/dependency-tree.ts (→ dependency-context.ts)",
+        "packages/architect-projection/src/projections/pattern-relations/dependency-tree.internal.ts (→ dependency-context.internal.ts)",
+        "packages/architect-projection/src/renderers/render-compact-text.ts",
+        "packages/architect-projection/tests/features/projections/pattern-relations/dependency-tree.feature (→ dependency-context.feature)",
+        "packages/architect-projection/tests/features/projections/pattern-relations/dependency-tree.steps.ts",
+        "packages/architect-projection/tests/features/projections/pattern-relations/smoke-dependency-tree.feature",
+        "packages/architect-projection/tests/features/projections/pattern-relations/smoke-dependency-tree.steps.ts",
+        "docs-live/api-reference/architect-projection.md (regenerated)",
+        "docs-live/business-rules/architect-projection.md (regenerated)",
+        "docs-live/PATTERNS.md (regenerated)",
+        "docs-live/REQUIREMENTS-EXECUTABLE.md (regenerated)"
+      ],
+      "conflictsWith": [
+        "Any cluster touching packages/architect-cli/src/cli/commands/_shared/structured.ts (QUERY_METHODS whitelist + executeQueryMethod) — I add getDependencyContext there; a sibling reworking the query passthrough will collide.",
+        "Any cluster touching packages/architect-cli/src/cli/commands/reporting.ts (dep-tree command block).",
+        "Any cluster touching packages/architect-mcp/src/tool-registry.ts (architect_dep_tree handler).",
+        "Any cluster touching packages/architect-projection/src/renderers/render-compact-text.ts (COMPACT_NORMALIZERS dispatch + fragment renderers) — shared renderer file.",
+        "Any cluster touching packages/architect-projection/src/fragments/pattern-relations/supporting.ts (shared pattern-relations helper schemas — I edit DependencyTreeNode there; siblings editing PatternRelationships/other shapes collide).",
+        "Any cluster touching the projection/fragments barrels (index.ts) for pattern-relations exports.",
+        "All docs-live regeneration clusters share the docs-live/ determinism gate — coordinate a single `pnpm docs:all` regen."
+      ],
+      "risk": "Medium. Breaking change by design (No-BC): the DependencyTree fragment kind/shape is removed, so any out-of-cluster consumer keying on kind:'DependencyTree' or reading {root, nodes, options}/isFocal breaks — must be migrated in the same change. Renderer dispatch is keyed on fragment kind, so a missed call site fails the strictObject parse at runtime (caught by tests). The kernel transitive walk must be cycle-safe per direction (diamond dependencies, mutual edges) and depth-bounded or it can blow stack/latency — the existing perf gate (36-pattern/108-rule fixture, baseline×1.5) will catch a regression; the closure must reuse the relationshipIndex (no per-node graph scans). exactOptionalPropertyTypes: status/phase must remain optional-with-spread (the existing `...(x !== undefined ? {x} : {})` idiom), not `x: undefined`. Determinism gate WILL fail unless docs-live is regenerated in the same commit (api-reference + business-rules + PATTERNS + REQUIREMENTS-EXECUTABLE all carry DependencyTree/DependencyContext text and the 'legacy traversal semantics' rule line).",
+      "verifyCommands": [
+        "pnpm -s architect:query dep-tree MarkdownRenderer --format json   # focal must now be MarkdownRenderer at the root; upstream must contain FragmentRendererDispatch, ProjectionFragmentSchema, BlockSchema; downstream must contain GenerateDocsCli",
+        "pnpm -s architect:query query getDependencyContext MarkdownRenderer   # must succeed (no 'Unknown API method'), return upstream+downstream+summary",
+        "pnpm -s architect:query dep-tree MarkdownRenderer   # compact text: one-line summary + DEPENDS ON / REQUIRED BY sections, MarkdownRenderer named once at the header",
+        "pnpm --filter @libar-dev/architect-projection test   # dependency-context.feature + smoke + fragment-schema specs green",
+        "pnpm --filter @libar-dev/architect-core test   # kernel getDependencyContext cycle-safety + depth coverage green",
+        "pnpm typecheck   # strict: verbatimModuleSyntax, exactOptionalPropertyTypes, no DependencyTree dangling refs",
+        "pnpm build   # workspace build proves all barrels/consumers migrated off the deleted DependencyTree names",
+        "pnpm docs:all && git diff --exit-code docs-live   # determinism gate clean after regen"
+      ]
+    },
+    {
+      "cluster": "N2 — resolve rules / bundle / context / files through implementedBy (reverse-trace from a TS pattern)",
+      "currentBehavior": "A reverse-trace question that starts at a TS pattern returns empty because every consumer keys rules/specs strictly by the pattern's OWN name, never following the derived `implementedBy` reverse edge.\n\nLive evidence (graph at HEAD, 2026-05-29):\n- `pnpm -s architect:query rules --pattern PatternGraphApi` → `=== Rules ===` block is empty. Yet `rules --pattern PatternGraphApiReverseLookup` returns 4 rules/4 scenarios and `rules --pattern PatternGraphApiConsistencyExecutableTests` returns 8 rules/20 scenarios — 12 rules / 24 scenarios total, all keyed to the two FEATURE patterns that realize `PatternGraphApi` via `@architect-implements:PatternGraphApi` (pattern-graph-api.feature:3, pattern-graph-api-consistency.feature).\n- `pnpm -s architect:query bundle PatternGraphApi --mode review --format json` → `root.blocks.rules=[]`, `root.blocks.scenarios=[]`, yet `root.blocks.deps.implementedBy` lists BOTH feature files (pattern-graph-api-consistency.feature / pattern-graph-api.feature). The data to follow is right there in the same payload.\n- `pnpm -s architect:query context PatternGraphApi` → no `specFiles`/`testFiles` (empty). `getPattern PatternGraphApi` confirms `executableSpecs: None`, `behaviorFile: None`, so the only link to the .feature files is `relationshipIndex.implementedBy`.\n- `pnpm -s architect:query files PatternGraphApi --related` → PRIMARY lists only the .ts; the two implementing .feature paths are absent.\n\nWhy each is empty:\n- rules: meta.ts rules verb → `buildBusinessRuleSetProjectionOptions` (projection-options.ts:72-78) maps `--pattern X` to `{ scope:'feature', scopeValue:X }`. `business-rules.internal.ts` `collectBusinessRules` (line 163-175) keeps only patterns that own rules, and `filterBusinessRules` (line 239-241) keeps only `rule.feature === scopeValue`. The TS pattern owns zero rules → empty.\n- bundle review: bundle.internal.ts:114-120 sources rules via `projectBusinessRuleSet(context,{scope:'feature',scopeValue:patternName})` — same name-equality miss; scenarios are derived from those rules (line 124,158-164) so they go empty too.\n- context: session-context.internal.ts:93-98 pushes to `specFiles` only when the FOCAL pattern's own `source.file.endsWith('.feature')`; testFiles (line 130-136) come only from `resolveTestFiles(pattern)` on the focal TS pattern (empty for it). Neither walks `implementedBy`.\n- files: file-reading-list.internal.ts:45-54 builds `primary` from the focal pattern's own source/testFiles/deliverables/stubs; it walks `implementedBy` only for completed *dependencies* (line 79-81), never for the focal pattern's own realizing features.",
+      "rootCause": "The graph has the edge but no shared accessor follows it. The single root cause is the absence of a reverse-trace rule accessor at the read-model layer: `packages/architect-core/src/read-api/pattern-helpers.ts` exports `getRelationshipsForPattern`/`getRelationships` (which expose `implementedBy`) but NO function that, given a TS pattern, returns the rules owned by the patterns that implement it. Every consumer therefore re-implements name-equality lookup against `ExtractedPattern.rules` and stops at the focal node:\n- business-rules.internal.ts `collectBusinessRules`/`filterBusinessRules` (feature-scope name match)\n- bundle.internal.ts `buildBundleEntry` (line 114-120)\n- session-context.internal.ts (specFiles line 93-98, testFiles line 130-136)\n- file-reading-list.internal.ts (primary block, line 45-54)",
+      "proposedDesign": "Add the reverse-trace capability ONCE at the read-model layer (ADR-006: prefer kernel so all consumers benefit), then have each projection consume it. Two coordinated kernel additions in architect-core read-api, then four projection edits that call them.\n\nA. KERNEL (architect-core, pure graph functions — projections only receive `graph`, not the `PatternGraphAPI`, per ProjectionContext at projection-context.ts:74-81, so these MUST be standalone exported functions, not just interface methods).\n\nNew file `packages/architect-core/src/read-api/rule-aggregation.ts`:\n- `resolveImplementingFeatures(graph, patternName): readonly string[]` — returns the canonical names of patterns that realize `patternName`, read from `relationshipIndex[patternName].implementedBy[].name`, deduped, in declared order. Returns `[]` when the pattern has no implementers; throws the existing `read-api invariant violated: canonical relationship entry missing for pattern <name>` (reuse `createMissingCanonicalRelationshipEntryError`, pattern-helpers.ts:25) when the pattern itself is absent from the index — so the verb fails loudly for a typo rather than silently empty (matches the existing reverse-lookup invariant in pattern-graph-api.feature:35-41).\n- `getRulesForPattern(graph, patternName): readonly ProvenancedRule[]` — the load-bearing reverse-trace. Resolution set = `{patternName}` ∪ `resolveImplementingFeatures(graph, patternName)` (self-inclusion keeps a feature pattern queried directly working unchanged, and lets a TS pattern that ALSO owns inline rules contribute them). For each name in the set, look up the pattern (`findPatternByName`) and emit each of its `pattern.rules` as a `ProvenancedRule` carrying the raw rule plus `sourcePattern` (the owning feature name) and `sourceFile` (its `source.file`). DEDUPE semantics: a rule is identified by the tuple `(sourcePattern, rule.name)` lowercased — the same rule name under two different features is two distinct rules (legitimate; e.g. both consistency + reverse-lookup features could name a rule similarly), but the same rule never appears twice from one feature. Ordering is deterministic: resolution-set order (self first, then implementedBy declared order), then rule declaration order within each pattern. PROVENANCE: `sourcePattern` is the provenance tag — it tells every downstream which feature a rule came from; the existing `BusinessRule.feature` fragment field (business-rule.ts:24) already carries exactly this, so no fragment-schema change is needed.\n\nNew contract `ProvenancedRule` (zod, in extracted-pattern.ts or rule-aggregation.ts): `z.strictObject({ rule: BusinessRuleSchema, sourcePattern: z.string(), sourceFile: z.string() })` where `BusinessRuleSchema` is the existing kernel `ExtractedPattern` rule schema (extracted-pattern.ts:39). Export the inferred type.\n\nAlso add `getRulesForPattern(name)` to the `PatternGraphAPI` interface + impl (pattern-graph-api.ts:47-79, 126-313), delegating to the pure function with `frozenGraph`, so the `query getRulesForPattern <name>` passthrough and MCP twin get it for free (add to QUERY_METHODS in structured.ts:35-69 and its switch).\n\nExport both new functions + the type from read-api/index.ts (after line 31).\n\nB. PROJECTION: business-rules.internal.ts (the rules verb + bundle source). Change the `scope:'feature'` resolution so name-match expands through implementedBy. Concretely: in `collectBusinessRules` (line 163), when `options.scope==='feature' && options.featureMatch!=='path'`, resolve the target feature-name SET via the kernel `resolveImplementingFeatures(context.graph, options.scopeValue)` ∪ `{scopeValue}`, then keep patterns whose canonical name is in that set (instead of the line-239 single-name equality in `filterBusinessRules`). The fragment built by `createBusinessRuleFragment` (line 198-218) already stamps `feature`/`pattern` = the OWNING feature, so provenance is automatic and correct. `--only-invariants` (line 173) and grouping are untouched. This is the SHARED edit with N3 (see conflictsWith).\n\nC. PROJECTION: bundle.internal.ts:114-120. Because the bundle sources rules through `projectBusinessRuleSet(context,{scope:'feature',scopeValue:patternName})`, fixing B automatically fixes review-bundle `blocks.rules` AND `blocks.scenarios` (scenarios derive from rules at line 124/158-164). No edit to bundle.internal.ts is required beyond verifying the include-set; leave it as the single call site. (Design choice: route the bundle through the same fixed projection rather than re-walking the graph — one resolution path, ADR-006.)\n\nD. PROJECTION: session-context.internal.ts. After computing `relationships` (line 89), for the focal pattern resolve implementing features via `resolveImplementingFeatures(context.graph, patternName)`. For design+implement sessions, push each implementer's `source.file` into `specFiles` (the implementers ARE the .feature specs). For implement sessions, also push each implementer's `resolveTestFiles(...)` (and the implementer's own `source.file` when it is a `.feature`) into `testFiles`. Keep the existing focal-pattern behavior (line 93-98, 130-136) for the case where the focal IS a feature. Dedupe via the same pushUnique discipline.\n\nE. PROJECTION: file-reading-list.internal.ts:45-54. After the focal-pattern primary pushes, walk `relationships.implementedBy` for the FOCAL pattern (relationships already fetched at line 59) and `pushUnique(primary, implementationRef.file)` for each. This adds the two .feature paths to PRIMARY for a TS pattern. This is independent of `--related` (the .feature files realizing the pattern are primary reading, not \"related\").\n\nWhy kernel-first beats per-projection patching: four consumers currently each stop at the focal node; a single `getRulesForPattern`/`resolveImplementingFeatures` makes the reverse-trace one definition with one dedupe/provenance/ordering rule, queryable directly via `query getRulesForPattern`, and impossible to drift between consumers.\n\nBREAKING CHANGES (No-BC, intended): (1) `rules --pattern <TsPattern>` now returns the realizing features' rules instead of empty — a behavior change for any caller that relied on emptiness (none legitimately do). (2) `bundle <TsPattern> --mode review` blocks.rules/scenarios populate. (3) context specFiles/testFiles and files primary grow for TS patterns. No aliases, no flags, no parallel path — the old empty results are simply deleted by being correct.",
+      "edits": [
+        {
+          "file": "packages/architect-core/src/read-api/rule-aggregation.ts",
+          "change": "NEW FILE. Export `resolveImplementingFeatures(graph, patternName): readonly string[]` (reads relationshipIndex[name].implementedBy[].name via getRelationships/resolveIndexedEntry; throws the canonical 'read-api invariant violated' error for a missing pattern; returns [] for a pattern with no implementers). Export `getRulesForPattern(graph, patternName): readonly ProvenancedRule[]` doing the {self} ∪ implementers resolution, mapping each owning pattern's `rules` to ProvenancedRule with sourcePattern/sourceFile, deduped by (sourcePattern, rule.name)-lowercased, ordered self-first then implementedBy-declared then rule-declaration order. Define+export `ProvenancedRuleSchema = z.strictObject({ rule: BusinessRuleSchema, sourcePattern: z.string(), sourceFile: z.string() })` and `type ProvenancedRule = z.infer<...>`.",
+          "rationale": "ADR-006: add reverse-trace at the read-model so all four consumers share one resolution/dedupe/provenance rule. Pure graph function because ProjectionContext exposes only `graph`."
+        },
+        {
+          "file": "packages/architect-core/src/read-api/pattern-graph-api.ts",
+          "change": "Add `getRulesForPattern(name: string): readonly ProvenancedRule[]` to the `PatternGraphAPI` interface (after line 68) and implement it in the returned object (after getApiReferences, ~line 242) by delegating to the pure `getRulesForPattern(frozenGraph, name)`. Add the type import.",
+          "rationale": "Exposes the reverse-trace on the typed kernel surface so `query getRulesForPattern` + MCP twin get it (ADR-006 single read model)."
+        },
+        {
+          "file": "packages/architect-core/src/read-api/index.ts",
+          "change": "After line 31, re-export `resolveImplementingFeatures`, `getRulesForPattern` and `type ProvenancedRule`/`ProvenancedRuleSchema` from './rule-aggregation.js'.",
+          "rationale": "Projection package imports kernel accessors from the package barrel (e.g. getRelationshipsForPattern at bundle.internal.ts:4)."
+        },
+        {
+          "file": "packages/architect-projection/src/projections/governance/business-rules.internal.ts",
+          "change": "In `collectBusinessRules` (line 163), when `options.scope==='feature' && options.featureMatch!=='path'`, compute the target name set = `resolveImplementingFeatures(context.graph, options.scopeValue)` ∪ `{options.scopeValue}` (lowercased compare via getPatternName) and keep patterns in that set; correspondingly relax `filterBusinessRules` feature branch (line 235-241) to keep rules whose `feature` is in that set instead of single-name equality. Import the kernel function.",
+          "rationale": "Fixes `rules --pattern <TsPattern>` AND the review-bundle (which sources rules via this projection). SHARED with N3."
+        },
+        {
+          "file": "packages/architect-projection/src/projections/execution-context/session-context.internal.ts",
+          "change": "After line 89, resolve `resolveImplementingFeatures(context.graph, patternName)`; for design|implement push each implementer's `source.file` into `specFiles`; for implement also push each implementer's `resolveTestFiles(...)`/`.feature` source into `testFiles`. Dedupe with pushUnique discipline. Import the kernel function (and findPatternByName for the implementer lookup, already imported).",
+          "rationale": "Populates context specFiles/testFiles for a TS pattern by following implementedBy."
+        },
+        {
+          "file": "packages/architect-projection/src/projections/execution-context/file-reading-list.internal.ts",
+          "change": "After the focal primary pushes (line 54), iterate `relationships.implementedBy` (relationships fetched at line 59 — move the fetch up or reuse) and `pushUnique(primary, ref.file)` for each. Place implementing .feature paths in PRIMARY (not gated by --related).",
+          "rationale": "`files <TsPattern>` must list the realizing .feature files as primary reading."
+        },
+        {
+          "file": "packages/architect-cli/src/cli/commands/_shared/structured.ts",
+          "change": "Add `'getRulesForPattern'` to QUERY_METHODS (line 47-54, pattern-name lookups group) and a `case 'getRulesForPattern': return api.getRulesForPattern(requireArg(args[1], 'Usage: architect query getRulesForPattern <name>'));` in executeQueryMethod (~line 243).",
+          "rationale": "Exposes the deterministic reverse-trace as a query passthrough + MCP twin."
+        }
+      ],
+      "newContracts": [
+        {
+          "name": "ProvenancedRuleSchema / ProvenancedRule",
+          "kind": "zod-schema",
+          "shape": "z.strictObject({ rule: BusinessRuleSchema (existing ExtractedPattern rule: name/description/scenarioCount/scenarioNames/tags?), sourcePattern: z.string(), sourceFile: z.string() }) — sourcePattern is the provenance tag (which feature the rule came from); dedupe key is (sourcePattern, rule.name) lowercased"
+        },
+        {
+          "name": "resolveImplementingFeatures",
+          "kind": "kernel-method",
+          "shape": "(graph: PatternGraph, patternName: string) => readonly string[] — canonical names from relationshipIndex[name].implementedBy[].name, deduped, declared order; throws 'read-api invariant violated: canonical relationship entry missing for pattern <name>' for an unknown pattern; [] when no implementers"
+        },
+        {
+          "name": "getRulesForPattern (pure fn + PatternGraphAPI method)",
+          "kind": "kernel-method",
+          "shape": "(graph: PatternGraph, patternName: string) => readonly ProvenancedRule[]; API twin: getRulesForPattern(name: string): readonly ProvenancedRule[] — resolution set {self} ∪ implementers, dedupe by (sourcePattern, rule.name)-lowercased, deterministic order"
+        },
+        {
+          "name": "query getRulesForPattern",
+          "kind": "cli-flag",
+          "shape": "architect query getRulesForPattern <name> → structured envelope .data = ProvenancedRule[]; MCP twin architect_query getRulesForPattern"
+        }
+      ],
+      "executableSpecChanges": [
+        {
+          "file": "packages/architect-core/tests/features/read-api/pattern-graph-api.feature",
+          "change": "Add a Rule 'Rule aggregation follows the implementedBy reverse edge' with scenarios: (1) happy-path — given a TS pattern realized by two feature patterns that own rules, `getRulesForPattern(TsPattern)` returns all of them tagged with the owning feature as sourcePattern; (2) self-inclusion — querying a feature pattern directly returns its own rules unchanged; (3) dedupe/order — a rule appears once per (sourcePattern,name) and resolution is self-first then implementedBy order; (4) error-path — `getRulesForPattern('GhostCore')` for a pattern absent from the relationship index throws the canonical 'read-api invariant violated...' message (mirrors the existing line 35-41 invariant). These are the source-of-truth for the new kernel behavior."
+        },
+        {
+          "file": "packages/architect-core/tests/steps/read-api/pattern-graph-api.steps.ts",
+          "change": "Extend the synthetic-graph harness: enrich `makePattern` to accept `rules` and `implementedBy`, and `buildRelationshipIndex` to populate `implementedBy` ImplementationRefs (name/file) from an explicit map. Add step defs that call `getRulesForPattern(state.graph, name)` and assert the aggregated rule names, their `sourcePattern` provenance, dedupe, ordering, and the thrown invariant for an unknown pattern. Reuse existing ExtractedPatternSchema.parse + PatternGraphSchema.parse plumbing (lines 42-88)."
+        },
+        {
+          "file": "packages/architect-projection/tests/features/governance/business-rules.feature (+ steps)",
+          "change": "Add a scenario proving `projectBusinessRuleSet({scope:'feature', scopeValue:<TsPattern>})` returns the union of the implementing features' rules with each fragment's `feature` field carrying the owning feature (provenance). If a focused execution-context feature exists for session-context/file-reading-list, add scenarios asserting specFiles/testFiles and primary include the implementing .feature paths; otherwise add steps to the nearest existing execution-context feature. (Verify the exact feature path with `grep -rl business-rules packages/architect-projection/tests/features` before editing.)"
+        }
+      ],
+      "determinismRipple": false,
+      "filesOwned": [
+        "packages/architect-core/src/read-api/rule-aggregation.ts",
+        "packages/architect-core/src/read-api/pattern-graph-api.ts",
+        "packages/architect-core/tests/features/read-api/pattern-graph-api.feature",
+        "packages/architect-core/tests/steps/read-api/pattern-graph-api.steps.ts",
+        "packages/architect-projection/src/projections/pattern-relations/bundle.internal.ts",
+        "packages/architect-projection/src/projections/execution-context/session-context.internal.ts",
+        "packages/architect-projection/src/projections/execution-context/file-reading-list.internal.ts",
+        "packages/architect-cli/src/cli/commands/_shared/structured.ts"
+      ],
+      "conflictsWith": ["N3-adr-rules"],
+      "risk": "Shared-file conflict with N3-adr-rules on `packages/architect-projection/src/projections/governance/business-rules.internal.ts` (both clusters edit the feature-scope collect/filter path) and on `packages/architect-cli/src/cli/commands/_shared/projection-options.ts` + `BusinessRuleSetOptionsSchema` if N3 adds a `--decision`/scope variant — synthesizer must merge: N2 expands the feature-name set via implementedBy; N3 adds a decision-scoped path; they compose if both branch on `options.scope` rather than rewriting `collectBusinessRules` wholesale. read-api/index.ts is a low-risk shared barrel (append-only). Behavioral risk: self-inclusion in the resolution set means a pattern that is BOTH a TS pattern with inline rules AND has implementers contributes both — intended, dedupe keeps it clean. Perf: getRulesForPattern is O(implementers × rules), bounded and called per-pattern, well inside the projection perf budget. Edge: a feature pattern queried directly must keep returning exactly its own rules (covered by the self-inclusion scenario) to avoid regressing the existing 12-rule feature-pattern queries.",
+      "verifyCommands": [
+        "pnpm -s architect:query rules --pattern PatternGraphApi  # now lists all 12 rules from the two implementing features",
+        "pnpm -s architect:query rules --pattern PatternGraphApi --count  # expect 12",
+        "pnpm -s architect:query bundle PatternGraphApi --mode review --format json | jq '.root.blocks.rules | length, (.root.blocks.scenarios | length)'  # both > 0",
+        "pnpm -s architect:query context PatternGraphApi --session implement | grep -E 'specFiles|testFiles|pattern-graph-api'  # implementing .feature paths present",
+        "pnpm -s architect:query files PatternGraphApi --related | grep 'pattern-graph-api'  # both .feature paths in PRIMARY",
+        "pnpm -s architect:query query getRulesForPattern PatternGraphApi | jq '.data | length, (.data[0].sourcePattern)'  # aggregated + provenance",
+        "pnpm -s architect:query rules --pattern PatternGraphApiReverseLookup --count  # still 4 (self-inclusion regression guard)",
+        "pnpm -C packages/architect-core test -- pattern-graph-api",
+        "pnpm typecheck && pnpm test",
+        "pnpm docs:all && git diff --exit-code docs-live  # PROVES no determinism ripple"
+      ]
+    },
+    {
+      "cluster": "N3 — ADR → enforcing-rule navigability",
+      "currentBehavior": "The ADR→enforcing-rule link exists only as free text; there is NO structured edge.\n\n(1) `@architect-decision:` is not a recognized metadata tag anywhere. The ONLY `@architect-decision` occurrence is a no-op JSDoc comment at packages/architect-core/src/generators/pipeline/build-pipeline.ts:8 (`* @architect-decision core-deps`). In the tag registry, `decision` exists only as an AGGREGATION tag (registry-builder.ts:322, targetDoc DECISIONS.md) — a legacy doc-routing concept, not a graph field. Neither the TS scanner (ast-parser.ts) nor the gherkin parser (gherkin-ast-parser.ts) maps any `decision` tag to a graph field. grep confirms zero `@architect-decision:` usages across packages/*/tests/features, tests/features, architect/.\n\n(2) ADRs express cross-links via `@architect-see-also:` (e.g. architect/decisions/adr-010-...feature:10 sees ADR005,ADR006,ADR009; adr-009...feature header sees ADR005,ADR006). seeAlso flows into the graph: relationship-resolver.ts:106 copies it into RelationshipEntry.seeAlso (schema pattern-graph.ts:145).\n\n(3) `arch neighborhood ADR009ProjectionTrustBoundary` returns all-empty edges. Verified live: uses/usedBy/dependsOn/enables/sameContext/implements/implementedBy all []. Root cause: computeNeighborhood (architecture-inspection.ts:105-117) builds its result WITHOUT seeAlso — NeighborhoodResult (interface at architecture-inspection.ts:34-46) has no seeAlso/governs field, so ADR-009's two seeAlso edges are dropped at the read-api layer.\n\n(4) `pattern ADR009ProjectionTrustBoundary` Relationships shows seeAlso:[ADR005,ADR006] (that path DOES surface seeAlso via getPatternRelationships) but everything else empty.\n\n(5) `dep-tree ADR009ProjectionTrustBoundary` shows it isolated (no children) while `dep-tree ADR005CodecBasedMarkdownRendering` traverses ADR005→ADR006→ValidatorReadModelConsolidation. Root cause: dep-tree edges come from dependency-edges.internal.ts which DOES emit see-also edges (line 33), but the dependency-TREE walk only follows dependsOn/uses; ADR009 has empty uses, so the governance chain via seeAlso is never walked.\n\n(6) `rules --pattern ADR009ProjectionTrustBoundary` returns exactly 1 rule (ADR-009's own feature rule \"Parse once at external projection boundaries\"). It MISSES the markdown-escaping rule \"Sourced shape text is escaped and code fences are guarded (ADR-009)\" owned by ApiReferenceProjectionExecutableTests (packages/architect-projection/tests/features/projections/documentation-composition/api-reference.feature:60-76) — that rule cites ADR-009 ONLY in its rule name + rationale free text (line 67 \"ADR-009 treats sourced text as untrusted\"), with no structured tag.\n\n(7) `documentation decisions --format json` shows relatedDecisions:[] for every ADR (derived only from adrSupersedes/adrSupersededBy at decision-records.internal.ts:236-242 — no ADR sets either, so always empty) and affectedPatterns derived from the union of uses/implementsPatterns/seeAlso/apiRef/extendsPattern (decision-records.internal.ts:244-254). Verified: adr-009.md docs-live render shows \"## Affected Patterns: ADR005, ADR006\" (its seeAlso targets) and no Related Decisions section.",
+      "rootCause": "Three distinct origin points, all from the same gap (no structured decision-enforcement edge in the graph):\n\n1. ENFORCEMENT-LINK SOURCE MISSING: packages/architect-core/src/taxonomy/registry-builder.ts metadataTags array has no `enforces-decision` (or `decision`) metadata tag, so the parsers (gherkin-ast-parser.ts switch at lines 588-628 / 651-720; ast-parser.ts) never populate a graph field. The ADR→rule link is unrepresentable except as free text.\n\n2. NEIGHBORHOOD DROPS seeAlso: packages/architect-core/src/read-api/architecture-inspection.ts:34-46 (NeighborhoodResult interface) and :105-117 (computeNeighborhood return) omit seeAlso entirely.\n\n3. AGGREGATION ABSENT: There is no kernel method to aggregate rules-by-decision or patterns-by-decision. packages/architect-core/src/read-api/pattern-graph-api.ts (interface lines 47-79) has getPatternRelationships/getRelatedPatterns but nothing keyed on a decision. The rules CLI command (packages/architect-cli/src/cli/commands/meta.ts:23-86) and projection scope mapper (packages/architect-cli/src/cli/commands/_shared/projection-options.ts:50-106) only scope by pattern/product-area/package/feature.\n\nrelatedDecisions root cause: packages/architect-projection/src/projections/governance/decision-records.internal.ts:236-242 — sourced only from adrSupersedes/adrSupersededBy.",
+      "proposedDesign": "DESIGN: introduce ONE structured, TypeScript-owned CSV enforcement tag `@architect-enforces-decision:<ADR…>` authored on the rule-owning FEATURE (Gherkin), make it a first-class graph relation, then build all three deliverables on top of that one edge. This is the source-first answer the cluster prompt prefers (structured tag over scraping rationale text).\n\nWHY this tag (not reusing `decision`/`adr`): `@architect-adr:` already MEANS \"this feature DEFINES decision NNN\" (it is what collectDecisionPatterns keys on, decision-records.internal.ts:96). We need the orthogonal \"this feature ENFORCES decision NNN\". Overloading `adr` would make every enforcing feature masquerade as a decision record. The aggregation tag `decision` (registry-builder.ts:322) is doc-routing and must stay untouched. So a NEW, distinctly-named metadata tag is correct. Name: `enforces-decision`, format `csv` (multiple ADRs per feature), metadataKey `enforcesDecisions`, value = ADR pattern names or numbers (canonical: ADR pattern names like ADR009ProjectionTrustBoundary, matching seeAlso vocabulary; the existing PAD_ADR_TRANSFORM is for bare numbers and is NOT applied here).\n\nThe edge is DIRECTIONAL and DERIVED-REVERSED, exactly like implements/implementedBy:\n- forward: pattern.enforcesDecisions = [ADR009...] (authored)\n- reverse (computed in relationship-resolver): on the target ADR's RelationshipEntry, enforcedBy = [ApiReferenceProjectionExecutableTests, …]\n\nDELIVERABLE 1 — `rules --decision <ADR>`: aggregate ALL rules whose owning pattern carries enforcesDecisions containing that ADR, PLUS the ADR's own feature rules (the decision feature itself). New kernel method getRulesByDecision returns the owning-pattern set; the CLI maps `--decision` to a new BusinessRuleSet scope `decision`.\n\nDELIVERABLE 2 — navigable affectedPatterns / governance chain: add seeAlso (and the new enforcedBy) to NeighborhoodResult + computeNeighborhood so `arch neighborhood` surfaces the ADR-005→006→009→010 chain, AND make dep-tree walk seeAlso for decision patterns. affectedPatterns on the decision record gains the enforcedBy set (rules that enforce this ADR) — making it the navigable inverse of enforces-decision.\n\nDELIVERABLE 3 — relatedDecisions: KEEP but FIX its source. Today it is dead ([] always). Repurpose it to surface the ADR's seeAlso targets that are THEMSELVES decision patterns (the governance chain: ADR-009 relatedDecisions = [ADR-005, ADR-006]). This is the No-BC choice that gives it real meaning rather than deleting a field the Studio decision view wants. (If the synthesizer prefers deletion, the alternative is: remove relatedDecisions from DecisionRecordSchema at decision-record.ts:35 + decision-records.internal.ts:113 + getRelatedDecisionIds:236-242 + the renderer section — that is a clean No-BC delete and ripples docs-live identically.)\n\nBREAKING CHANGES (encouraged, documented):\n- New tag added to the registry → TAXONOMY.md docs-live regenerates.\n- NeighborhoodResult/RelationshipEntry schemas gain fields → any consumer reading the strictObject must accept the new keys (strictObject is on OUTPUT side; adding fields is additive to the producer, but the architecture-neighborhood FRAGMENT schema and its renderer must add seeAlso/enforcedBy or strictObject validation fails — that is the load-bearing change).\n- relatedDecisions semantics change (was supersession, now governance-chain) → docs-live decision pages regenerate.\n\nAUTHORING the source-of-truth edge: add `@architect-enforces-decision:ADR009ProjectionTrustBoundary` to the api-reference feature header (packages/architect-projection/tests/features/projections/documentation-composition/api-reference.feature:1-8). This is the event-store write that makes the link real.",
+      "edits": [
+        {
+          "file": "packages/architect-core/src/taxonomy/registry-builder.ts",
+          "change": "In the metadataTags array (near the see-also entry at lines 295-300), add a new metadata tag definition: { tag: 'enforces-decision', format: 'csv', purpose: 'Decision records (ADR/PDR/…) whose invariants this feature/pattern enforces — the structured ADR→enforcing-rule edge', metadataKey: 'enforcesDecisions', example: '@architect-enforces-decision ADR009ProjectionTrustBoundary, ADR006SingleReadModelArchitecture' }. Do NOT touch the existing aggregationTags `decision` entry at line 322.",
+          "rationale": "Single source of every tag definition; this is where a tag becomes parseable instead of unknown-custom-metadata."
+        },
+        {
+          "file": "packages/architect-core/src/scanner/gherkin-ast-parser.ts",
+          "change": "(a) Add `enforcesDecisions: z.array(z.string()).readonly().optional()` to FeatureTagMetadataSchema (near seeAlso at line 117). (b) Declare `let enforcesDecisions: readonly string[] | undefined;` alongside seeAlso (~line 465). (c) In the csv switch (lines 588-628) add `case 'enforcesDecisions': enforcesDecisions = appendStringValues(enforcesDecisions, transformed); break;`. (d) Emit it in the returned metadata object (near line 756) with the `...(enforcesDecisions !== undefined ? { enforcesDecisions } : {})` spread.",
+          "rationale": "Wires the new csv tag through the Gherkin extractor into FeatureTagMetadata; ADR-enforcing rules are authored on .feature files so the gherkin path is the primary one."
+        },
+        {
+          "file": "packages/architect-core/src/scanner/ast-parser.ts",
+          "change": "Add the TS-source equivalent: read `enforces-decision` as a csv metadata value (mirror the `see-also`→seeAlso read at ast-parser.ts:321) so production TS files (e.g. a projection enforcing an ADR) can also carry the edge.",
+          "rationale": "ADR-003: TypeScript owns pattern identity; the enforcement tag must be available on TS source too, not only on features, for symmetry with @architect-uses/@architect-implements."
+        },
+        {
+          "file": "packages/architect-core/src/validation-schemas/extracted-pattern.ts",
+          "change": "Add `enforcesDecisions: z.array(z.string()).readonly().optional()` to ExtractedPatternSchema near the seeAlso field (line 121).",
+          "rationale": "The canonical per-pattern record contract must carry the authored forward edge."
+        },
+        {
+          "file": "packages/architect-core/src/validation-schemas/pattern-graph.ts",
+          "change": "In RelationshipEntrySchema (z.strictObject at line 136-147) add two fields: `enforcesDecisions: z.array(z.string())` (forward) and `enforcedBy: z.array(z.string())` (computed reverse).",
+          "rationale": "Makes the enforcement edge a first-class relationship the read model carries, so ALL consumers (neighborhood, dep-tree, decision records, rules) benefit — ADR-006 single-read-model."
+        },
+        {
+          "file": "packages/architect-core/src/generators/pipeline/relationship-resolver.ts",
+          "change": "(a) In createRelationshipEntry (line 96-109) add `enforcesDecisions: [...(pattern.enforcesDecisions ?? [])]` and `enforcedBy: []`. (b) In buildReverseLookups (line 124-184) add a pass: for each pattern, for each name in entry.enforcesDecisions, push patternKey onto relationshipIndex[name].enforcedBy (guarding against dupes), then sort enforcedBy in the final sort loop at 186-193.",
+          "rationale": "Computes the derived reverse edge (ADR → list of enforcing patterns) the same way implementedBy/enables are built — never hand-authored, ADR-003."
+        },
+        {
+          "file": "packages/architect-core/src/read-api/architecture-inspection.ts",
+          "change": "(a) Add `readonly seeAlso: readonly NeighborEntry[]` and `readonly enforcedBy: readonly NeighborEntry[]` to NeighborhoodResult (interface lines 34-46). (b) In computeNeighborhood (lines 105-117) map relationships.seeAlso and relationships.enforcedBy through resolveNeighborEntry and include them in the returned object.",
+          "rationale": "Root-cause fix for empty `arch neighborhood ADR009`: seeAlso edges existed in the index but were dropped at the read-api layer; enforcedBy makes the ADR navigable to its enforcing rules."
+        },
+        {
+          "file": "packages/architect-core/src/read-api/pattern-graph-api.ts",
+          "change": "Add to PatternGraphAPI interface (lines 47-79) and implementation (createPatternGraphAPI ~line 111): getRulesByDecision(decision: string): readonly BusinessRuleRef[] and getPatternsByDecision(decision: string): readonly string[]. getPatternsByDecision = relationshipIndex[normalize(decision)].enforcedBy ∪ the decision pattern itself. getRulesByDecision returns, for each such pattern, its rule names (from pattern.rules) — a lightweight {pattern, ruleName, invariant?} ref so the CLI/projection can resolve full fragments.",
+          "rationale": "Kernel-layer aggregation so MCP and CLI both get the new query; ADR-006 prefers capability at the read-model."
+        },
+        {
+          "file": "packages/architect-projection/src/fragments/pattern-relations/architecture-neighborhood.ts",
+          "change": "Add seeAlso and enforcedBy arrays to the ArchitectureNeighborhood fragment z.strictObject so the neighborhood projection can carry the new edges; update the projection (architecture-neighborhood.internal.ts) to populate them from computeNeighborhood.",
+          "rationale": "strictObject would REJECT the new fields if the fragment schema is not extended; required for the neighborhood projection output to surface them."
+        },
+        {
+          "file": "packages/architect-projection/src/projections/governance/business-rules.internal.ts",
+          "change": "(a) Add a `decision` scope to BusinessRuleSetOptionsSchema (the discriminatedUnion at lines 47-80): z.strictObject({ scope: z.literal('decision'), scopeValue: z.string(), groupedBy: …optional, onlyInvariants: …optional }). (b) In patternMatchesRuleSetScope (177-196) match patterns whose enforcesDecisions includes scopeValue OR whose own adr equals scopeValue (so the ADR's own feature rules are included). (c) Add 'decision' branches to filterBusinessRules (220-243) and createBusinessRuleSetRoot (245-296). (d) Add `decision?: string` to the BusinessRule fragment derivation if surfacing the enforced ADR per-rule is wanted.",
+          "rationale": "Implements deliverable 1 at the projection layer (shared engine), so docs-live + CLI + MCP all gain --decision aggregation. SHARED FILE with N2-implementedby."
+        },
+        {
+          "file": "packages/architect-cli/src/cli/commands/_shared/schemas.ts",
+          "change": "Add `decision: z.string().optional()` to RulesFlagsSchema (z.strictObject at lines 80-90).",
+          "rationale": "CLI input is a strictObject; the new flag must be declared or parsing rejects it."
+        },
+        {
+          "file": "packages/architect-cli/src/cli/commands/_shared/projection-options.ts",
+          "change": "In buildBusinessRuleSetProjectionOptions (50-106): add `decision` to the typedFlags type and the mutual-exclusion scopeFilters check (61-70), and add a branch mapping typedFlags.decision → { scope: 'decision', scopeValue: typedFlags.decision, onlyInvariants }.",
+          "rationale": "Maps the --decision flag to the new projection scope."
+        },
+        {
+          "file": "packages/architect-cli/src/cli/commands/meta.ts",
+          "change": "In the rules CommandDef (23-86): add `--decision` to usage/helpSignature strings (lines 27-30) and to flagParsers (32-60) as { kind: 'value', key: 'decision' }.",
+          "rationale": "Surfaces the flag on the rules verb. SHARED FILE with N2-implementedby (the rules command def)."
+        },
+        {
+          "file": "packages/architect-projection/src/projections/governance/decision-records.internal.ts",
+          "change": "(a) getRelatedDecisionIds (236-242): replace adrSupersedes/adrSupersededBy source with the subset of pattern.seeAlso that are themselves decision patterns (resolve via the graph's adr-bearing patterns), giving the governance chain. (b) getAffectedPatterns (244-254): add the computed enforcedBy set (rules enforcing this ADR) to the union so 'Affected Patterns' shows the enforcing rules, not just seeAlso targets.",
+          "rationale": "Deliverable 3 (relatedDecisions made meaningful, No-BC repurpose) and deliverable 2 (affectedPatterns becomes navigable to enforcing rules)."
+        },
+        {
+          "file": "packages/architect-projection/src/projections/pattern-relations/dependency-tree.internal.ts",
+          "change": "Allow the dependency-tree walk to follow seeAlso edges for decision (adr-bearing) patterns, so `dep-tree ADR009` surfaces the ADR-005→006→009→010 governance chain instead of an isolated node. dependency-edges.internal.ts:33 already emits see-also edges; the tree walker must include them (at minimum for adr patterns) when building child nodes.",
+          "rationale": "Root-cause fix for `dep-tree ADR009` showing isolated: the chain lives in seeAlso, which the tree walk currently ignores."
+        }
+      ],
+      "newContracts": [
+        {
+          "name": "@architect-enforces-decision",
+          "kind": "cli-flag",
+          "shape": "New csv metadata tag. registry-builder.ts metadataTags entry: { tag:'enforces-decision', format:'csv', metadataKey:'enforcesDecisions' }. Authored on a rule-owning feature/TS file: @architect-enforces-decision:ADR009ProjectionTrustBoundary,ADR006SingleReadModelArchitecture"
+        },
+        {
+          "name": "enforcesDecisions / enforcedBy",
+          "kind": "graph-edge",
+          "shape": "RelationshipEntrySchema gains enforcesDecisions: z.array(z.string()) (forward, authored) and enforcedBy: z.array(z.string()) (reverse, computed in relationship-resolver buildReverseLookups). ExtractedPatternSchema gains enforcesDecisions: z.array(z.string()).readonly().optional()"
+        },
+        {
+          "name": "getRulesByDecision",
+          "kind": "kernel-method",
+          "shape": "getRulesByDecision(decision: string): readonly { pattern: string; ruleName: string; invariant?: string }[] — every rule whose owning pattern enforces the decision, plus the decision feature's own rules"
+        },
+        {
+          "name": "getPatternsByDecision",
+          "kind": "kernel-method",
+          "shape": "getPatternsByDecision(decision: string): readonly string[] — relationshipIndex[decision].enforcedBy ∪ { the decision pattern itself }"
+        },
+        {
+          "name": "BusinessRuleSetOptions decision scope",
+          "kind": "zod-schema",
+          "shape": "Add to the discriminatedUnion in business-rules.internal.ts: z.strictObject({ scope: z.literal('decision'), scopeValue: z.string(), groupedBy: BusinessRuleGroupingSchema.optional(), onlyInvariants: z.boolean().optional() })"
+        },
+        {
+          "name": "RulesFlagsSchema.decision",
+          "kind": "cli-flag",
+          "shape": "RulesFlagsSchema (z.strictObject) gains decision: z.string().optional(); surfaced as `architect rules --decision <ADR>`"
+        },
+        {
+          "name": "NeighborhoodResult.seeAlso / .enforcedBy",
+          "kind": "zod-schema",
+          "shape": "NeighborhoodResult interface + ArchitectureNeighborhood fragment strictObject gain seeAlso: readonly NeighborEntry[] and enforcedBy: readonly NeighborEntry[]"
+        }
+      ],
+      "executableSpecChanges": [
+        {
+          "file": "packages/architect-projection/tests/features/projections/documentation-composition/api-reference.feature",
+          "change": "Add `@architect-enforces-decision:ADR009ProjectionTrustBoundary` to the feature header tags (lines 1-8). This is the source-of-truth write that makes the markdown-escaping rule (Rule at line 60) discoverable via `rules --decision ADR009ProjectionTrustBoundary`. Add a scenario under that rule proving the rule appears in the decision's aggregated rule set."
+        },
+        {
+          "file": "packages/architect-projection/tests/features/governance/business-rule-set-by-decision.feature (NEW) + .feature.steps.ts",
+          "change": "New executable spec for `buildBusinessRuleSet({ scope:'decision', scopeValue })`: Scenario 'A decision aggregates rules across all enforcing patterns' — Given patterns A (own ADR feature) and B (@architect-enforces-decision:ADRX) each with rules, When projecting the decision-scoped rule set, Then both A's and B's rules appear. Scenario 'Unrelated rules are excluded'. Steps assert ruleName membership + counts."
+        },
+        {
+          "file": "packages/architect-core/tests/features/extractor/external-relationship-tags.feature (or sibling) + .steps.ts",
+          "change": "Add scenarios: '@architect-enforces-decision parses to enforcesDecisions csv array' on a feature; 'enforcedBy reverse edge is computed on the target decision pattern' verifying relationshipIndex[ADR].enforcedBy contains the enforcing pattern. This proves the extractor→relationship-resolver wiring."
+        },
+        {
+          "file": "packages/architect-projection/tests/features/pattern-relations/architecture-neighborhood.feature (+ steps)",
+          "change": "Add scenario 'A decision neighborhood surfaces its seeAlso governance chain and enforcedBy rules' — Given a decision pattern with seeAlso to two other ADRs and an enforcedBy from one rule pattern, When computing the neighborhood, Then seeAlso lists the two ADRs and enforcedBy lists the rule pattern (proving the empty-neighborhood bug is fixed)."
+        },
+        {
+          "file": "packages/architect-projection/tests/features/governance/decision-record.feature (+ steps)",
+          "change": "Add scenario 'relatedDecisions surfaces seeAlso targets that are decisions' (governance chain) and 'affectedPatterns includes enforcedBy rule patterns'. Replaces/updates any existing scenario that asserted relatedDecisions derives from supersession."
+        },
+        {
+          "file": "packages/architect-cli/tests/features/cli-flag-parsing.feature (+ steps)",
+          "change": "Add scenario asserting `rules --decision <ADR>` parses to RulesFlagsSchema.decision and is mutually exclusive with --pattern/--product-area/--package/--feature."
+        }
+      ],
+      "determinismRipple": true,
+      "filesOwned": [
+        "packages/architect-core/src/taxonomy/registry-builder.ts",
+        "packages/architect-core/src/scanner/gherkin-ast-parser.ts",
+        "packages/architect-core/src/scanner/ast-parser.ts",
+        "packages/architect-core/src/validation-schemas/extracted-pattern.ts",
+        "packages/architect-core/src/validation-schemas/pattern-graph.ts",
+        "packages/architect-core/src/generators/pipeline/relationship-resolver.ts",
+        "packages/architect-core/src/read-api/architecture-inspection.ts",
+        "packages/architect-core/src/read-api/pattern-graph-api.ts",
+        "packages/architect-projection/src/fragments/pattern-relations/architecture-neighborhood.ts",
+        "packages/architect-projection/src/projections/pattern-relations/architecture-neighborhood.internal.ts",
+        "packages/architect-projection/src/projections/pattern-relations/dependency-tree.internal.ts",
+        "packages/architect-projection/src/projections/governance/decision-records.internal.ts",
+        "packages/architect-projection/src/fragments/governance/decision-record.ts",
+        "packages/architect-projection/tests/features/projections/documentation-composition/api-reference.feature",
+        "packages/architect-projection/tests/features/governance/decision-record.feature",
+        "packages/architect-projection/tests/features/pattern-relations/architecture-neighborhood.feature"
+      ],
+      "conflictsWith": ["N2-implementedby"],
+      "risk": "SHARED FILES with N2-implementedby (declared conflict): packages/architect-projection/src/projections/governance/business-rules.internal.ts (BusinessRuleSetOptions discriminatedUnion — both clusters add a new scope), packages/architect-cli/src/cli/commands/meta.ts (rules CommandDef flagParsers — both add a flag), packages/architect-cli/src/cli/commands/_shared/projection-options.ts (buildBusinessRuleSetProjectionOptions scope mapping), packages/architect-cli/src/cli/commands/_shared/schemas.ts (RulesFlagsSchema). Synthesizer must merge these so both --decision and N2's flag coexist in one discriminatedUnion / one flagParsers map / one scopeFilters mutual-exclusion list. Other risks: (1) determinism gate — TAXONOMY.md (new tag), decisions/*.md (relatedDecisions + affectedPatterns), business-rules/*.md (if BusinessRule gains a decision field) and any neighborhood-rendered docs-live ALL regenerate; pnpm docs:all must run in the same change and git diff --exit-code docs-live must be clean. (2) strictObject: extending RelationshipEntrySchema / ArchitectureNeighborhood fragment / NeighborhoodResult requires updating EVERY producer and the renderer in lockstep or validation/typecheck fails (no-BC, no shims). (3) relatedDecisions semantic repurpose is a behavior change — any test pinning the old supersession source must be updated, not silenced. (4) dep-tree following seeAlso for ALL patterns (not just decisions) could explode tree size / break the perf gate — scope the seeAlso-walk to adr-bearing patterns. (5) enforcedBy must dedupe + sort deterministically (mirror implementedBy at relationship-resolver.ts:186-193) or docs-live churns.",
+      "verifyCommands": [
+        "pnpm -s architect:query rules --decision ADR009ProjectionTrustBoundary --format json | jq '.root.rules | map(.ruleName)'  # expect BOTH 'Parse once at external projection boundaries' AND 'Sourced shape text is escaped and code fences are guarded (ADR-009)'",
+        "pnpm -s architect:query arch neighborhood ADR009ProjectionTrustBoundary | jq '.data.seeAlso, .data.enforcedBy'  # expect seeAlso=[ADR005,ADR006], enforcedBy includes ApiReferenceProjectionExecutableTests",
+        "pnpm -s architect:query dep-tree ADR009ProjectionTrustBoundary  # expect children via seeAlso governance chain, not isolated",
+        "pnpm -s architect:query pattern ApiReferenceProjectionExecutableTests | grep -i enforces  # expect enforcesDecisions surfaced",
+        "pnpm -s architect:query documentation decisions --format json | jq '.children[\"adr-009\"].relatedDecisions, .children[\"adr-009\"].affectedPatterns'  # relatedDecisions now non-empty (governance chain)",
+        "pnpm -s architect:query taxonomy | grep enforces-decision  # new tag registered",
+        "pnpm build && pnpm typecheck  # strictObject + verbatimModuleSyntax pass",
+        "pnpm test  # the new/updated .feature specs pass",
+        "pnpm docs:all && git diff --exit-code docs-live  # determinism gate clean after regen"
+      ]
+    },
+    {
+      "cluster": "T1 — fail-loud package filters + reconcile the package label to one canonical key",
+      "currentBehavior": "pattern.package is ALREADY fully derived from the source file path — there are zero hand-authored @architect-package tags (grep across packages/architect-core/src returned nothing). transform-dataset.ts:197-212 builds archIndex.byPackage keyed by `packageResolver(pattern.source.file).id`; the resolver (package-resolver.ts:34-60) maps a source file to a config-declared `{id, displayName}` via `architect.config.ts:32-48` (ids: architect-core, architect-projection, architect-cli, architect-mcp, architect-guard, architect-dev, architect-pkg-content). So the \"ADR009 vs ApiReference\" difference is CORRECT source-derivation: ADR009 lives in architect/decisions/ → matches `match:'architect/'` → id `architect-pkg-content`; ApiReference lives in packages/architect-projection/ → id `architect-projection`.\n\nThe real defects are (1) THREE divergent package-key conventions and (2) silent empty on a non-resolving arg:\n\nTHREE KEYS. (a) Resolver `pkg.id` (UNSCOPED, e.g. `architect-core`) is the de-facto canonical key: it backs `arch packages` (structured.ts:457-467, keys = byPackage keys), `list --package` (pattern-catalog.internal.ts:42-54 via buildFileToPackageMap → pattern-helpers.internal.ts:123-133 keyed by pkgId), the BusinessRule.package field (business-rules.internal.ts:209), the package GROUPING that produces docs-live (businessRuleGroupKey:301-302, businessRuleGroupFacets:324-326, scopeValue:357), AND docs-live filenames/headings (docs-live/business-rules/architect-core.md `# architect-core Business Rules`; docs-live/api-reference/architect-projection.md `143 shapes across 51 patterns in architect-projection`). (b) `inferWorkspacePackageName` (business-rules.internal.ts:425-438) RE-DERIVES a SCOPED `@libar-dev/architect-core` via regex, ignoring the config, and ONLY for files under packages/architect-*/ (returns undefined for architect/decisions/, tests/features/). It is used ONLY by the `--package` scope FILTER (line 182-185). (c) The fallback at line 188 `packageId.startsWith('@') && packageId === scopeValue` requires an @-prefixed resolver id, which the config never produces — dead branch.\n\nCONSEQUENCE (verified live): `rules --package architect-core --count` = 0 (filter expects the scoped `@libar-dev/architect-core`, which DOES return 97); `rules --package @libar-dev/architect-projection --count` = 56. Meanwhile `list --package architect-core --count` = 56 (works only with UNSCOPED id) and `list --package \"@libar-dev/architect-core\"` = [] (the scoped form fails). The CLI executable spec tests/features/cli/pattern-graph-cli-rules-subcommand.feature:99-114 enshrines the WRONG convention — it calls `--package @libar-dev/architect-cli` \"canonical package name\". So `list` and `rules` literally disagree on what a package key is.\n\nSILENT EMPTY: arch packages on a non-key arg returns `success:true,data:[]` (structured.ts:451-454, `byPackage[packageName]` undefined → `[]`); `list --package <bad>` returns `success:true,data:[]` (catalog filter just yields nothing); `rules --package <bad>` returns 0. No accepted-value set is ever surfaced, unlike the z.enum self-documenting path in _shared/schemas.ts:144-159 (parseSchemaValue + acceptedEnumValues:137-142).",
+      "rootCause": "Two roots. (1) The package key is canonical-by-accident as resolver `pkg.id`, but ONE consumer — the `rules --package` scope match in packages/architect-projection/src/projections/governance/business-rules.internal.ts:177-189 (`patternMatchesRuleSetScope`, helper `inferWorkspacePackageName` at 425-438) — re-derives a *different*, scoped key instead of asking the resolver, so it filters against a value space no other surface uses. (2) No surface validates the `--package` / `arch packages <arg>` value against the live accepted set (the keys of context.build.graph.archIndex.byPackage); the silent-empty originates at packages/architect-cli/src/cli/commands/_shared/structured.ts:451-454 (arch packages), packages/architect-projection/src/projections/pattern-relations/pattern-catalog.internal.ts:44-54 (list, no resolve step) and the rules path through buildBusinessRuleSetProjectionOptions at packages/architect-cli/src/cli/commands/_shared/projection-options.ts:86-92 (no resolve step before scope:'package').",
+      "proposedDesign": "Pick ONE canonical package key = the resolver `pkg.id` (UNSCOPED, config-declared, e.g. `architect-core`). This is the key docs-live, arch packages, and list already use; it is the only definition that does not require a second source of truth. Reject the scoped `@libar-dev/...` form (No-BC: delete it, do not alias it).\n\n(A) RECONCILE — delete the divergent re-derivation. In business-rules.internal.ts, rewrite `patternMatchesRuleSetScope` package branch (lines 182-189) to `return context.packageResolver(pattern.source.file).id === options.scopeValue;` and DELETE `inferWorkspacePackageName` (425-438) entirely (No-BC — no @-prefix branch, no regex re-derivation). This makes the `--package` FILTER use the same key as the package GROUPING/rendering and the BusinessRule.package field. Verified-clean determinism: docs generation calls projectBusinessRuleSet({scope:'all', groupedBy:'package'}) (documentation-definition.internal.ts:49) which never touches the scoped filter, so docs-live business-rules output is byte-identical after this change.\n\n(B) FAIL LOUD — add ONE kernel read-model method that enumerates accepted package ids from the graph, then route all three CLI surfaces through a resolve step that throws the accepted set on a miss (the dynamic analogue of acceptedEnumValues). Add `listPackages(): readonly string[]` to the PatternGraphAPI kernel (packages/architect-core/src/read-api/) returning `Object.keys(graph.archIndex?.byPackage ?? {}).sort()`. Add a CLI helper `resolvePackageFilter(accepted: readonly string[], value: string): string` in _shared/schemas.ts that throws `--package: invalid value \"<v>\". Accepted: <a, b, ...>` (mirrors parseSchemaValue:153-155 message shape) when value ∉ accepted, else returns value. Wire: (1) arch packages — in structured.ts:451-454, before `byPackage[packageName]`, call resolvePackageFilter(Object.keys(byPackage).sort(), packageName) and throw on miss; (2) list — in read.ts list.execute (line 296-303) resolve flags.package against context.api.listPackages() before projecting; (3) rules — in projection-options.ts buildBusinessRuleSetProjectionOptions (86-92) the CLI command (meta.ts) must resolve typedFlags.package against listPackages() before constructing scope:'package'. Because all three now validate against the SAME live key set, \"Architect Projection\" (displayName) and \"@libar-dev/architect-projection\" (scope) both fail loud with `Accepted: architect-cli, architect-core, architect-dev, architect-guard, architect-mcp, architect-pkg-content, architect-projection`.\n\n(C) NO new annotation tag, NO derived-vs-authored migration needed — package is already derived. The cluster's \"drop @architect-package\" sub-goal is a no-op (none exist); state this explicitly so the synthesizer does not chase a phantom tag.\n\nBREAKING CHANGE (intended, No-BC): `rules --package @libar-dev/architect-cli` stops working; callers must use `rules --package architect-cli`. The CLI executable spec tests/features/cli/pattern-graph-cli-rules-subcommand.feature:99-114 must be rewritten to the unscoped id (see executableSpecChanges). Migration note: scoped `@libar-dev/<pkg>` → unscoped `<pkg>` everywhere; the accepted set is now `architect:query arch packages` keys.",
+      "edits": [
+        {
+          "file": "packages/architect-projection/src/projections/governance/business-rules.internal.ts",
+          "change": "Rewrite patternMatchesRuleSetScope package branch (lines 182-189) to: `if (options.scope === 'package') { return context.packageResolver(pattern.source.file).id === options.scopeValue; }`. DELETE the helper inferWorkspacePackageName (lines 425-438) and its only call (the canonicalPackageName lines 183-186). No @-prefix branch.",
+          "rationale": "Make the --package FILTER use the canonical resolver pkg.id, identical to the grouping/rendering/BusinessRule.package paths. Removes the third divergent key convention. No-BC delete of the regex re-derivation."
+        },
+        {
+          "file": "packages/architect-core/src/read-api/",
+          "change": "Add kernel method listPackages(): readonly string[] on PatternGraphAPI returning Object.keys(graph.archIndex?.byPackage ?? {}).sort(). Export the type via packages/architect-core/src/index.ts. This is the runtime accepted-value source (ADR-006: capability at the read-model layer so CLI + MCP both benefit).",
+          "rationale": "Single deterministic enumeration of accepted package ids from the graph; the dynamic analogue of z.enum.options. Lives at the kernel so MCP twins of these verbs get fail-loud for free."
+        },
+        {
+          "file": "packages/architect-cli/src/cli/commands/_shared/schemas.ts",
+          "change": "Add export function resolvePackageFilter(accepted: readonly string[], value: string): string that returns value if accepted.includes(value), else throws new Error(`--package: invalid value ${JSON.stringify(value)}. Accepted: ${[...accepted].sort().join(', ')}`). Mirror the message shape of parseSchemaValue (lines 153-155).",
+          "rationale": "Reuse the established self-documenting whitelist pattern for a dynamic (non-enum) value space. Single helper shared by all three surfaces so the fail-loud message is identical."
+        },
+        {
+          "file": "packages/architect-cli/src/cli/commands/_shared/structured.ts",
+          "change": "In the arch packages branch (lines 451-454), when packageName !== undefined, call resolvePackageFilter(Object.keys(byPackage).sort(), packageName) before lookup; on success return toCompactSummaries(byPackage[packageName]). The throw replaces the silent `: []`.",
+          "rationale": "arch packages stops returning success:true,data:[] for a bad arg; surfaces the accepted set."
+        },
+        {
+          "file": "packages/architect-cli/src/cli/commands/read.ts",
+          "change": "In the list command execute (lines 287-310), before projecting, if flags.package !== undefined call resolvePackageFilter(requireCliContext(context).api.listPackages(), flags.package).",
+          "rationale": "list --package fails loud; also fixes that list silently accepted the unscoped id but not the scoped one — now exactly one form is valid and documented."
+        },
+        {
+          "file": "packages/architect-cli/src/cli/commands/meta.ts",
+          "change": "In the rules command execute (where buildBusinessRuleSetProjectionOptions is called), if the --package flag is set, call resolvePackageFilter(context.api.listPackages(), value) before constructing options. Update the usage strings (meta.ts:28,30,41) to drop any '@libar-dev/' implication — value is now <workspace-package-id> e.g. architect-core.",
+          "rationale": "rules --package fails loud and now uses the canonical unscoped id consistent with list/arch packages."
+        },
+        {
+          "file": "packages/architect-cli/src/cli/commands/_shared/projection-options.ts",
+          "change": "No logic change to scope construction (lines 86-92); the resolve step happens in the command (meta.ts) before this is called. Optionally accept a pre-validated value. Confirm scopeValue is the unscoped id.",
+          "rationale": "Keep the trust-boundary resolve in the CLI command; projection options stay a pure mapping."
+        }
+      ],
+      "newContracts": [
+        {
+          "name": "listPackages",
+          "kind": "kernel-method",
+          "shape": "PatternGraphAPI.listPackages(): readonly string[]  // sorted keys of graph.archIndex.byPackage; the canonical accepted package-id set"
+        },
+        {
+          "name": "resolvePackageFilter",
+          "kind": "cli-flag",
+          "shape": "resolvePackageFilter(accepted: readonly string[], value: string): string  // returns value or throws `--package: invalid value \"<v>\". Accepted: <sorted, comma-joined>`"
+        }
+      ],
+      "executableSpecChanges": [
+        {
+          "file": "tests/features/cli/pattern-graph-cli-rules-subcommand.feature",
+          "change": "Rewrite scenarios at lines 99-114: change `rules --package @libar-dev/architect-cli` → `rules --package architect-cli` (the canonical UNSCOPED id) in both the 'Rules filters by canonical package name' and 'Rules package filter works with count' scenarios; the expected count (2) and CoreUtilsTest assertions stay. This is the source-of-truth behavior change proving the reconciled key."
+        },
+        {
+          "file": "tests/features/cli/pattern-graph-cli-rules-subcommand.feature",
+          "change": "Add a Rule + @validation scenario 'Rules rejects an unknown package with the accepted set': When running `rules --package @libar-dev/architect-cli` (the now-invalid scoped form) Then exit code is non-zero And output contains `--package: invalid value` And output contains `Accepted:`. Proves fail-loud + that the scoped form is dead."
+        },
+        {
+          "file": "packages/architect-projection/tests/features/fragments/business-rule-set-package-scope.feature",
+          "change": "Add a Scenario under the existing 'Runtime package config swap' Rule asserting the --package scope FILTER matches by resolver pkg.id (e.g. scopeValue 'architect-core' selects patterns under packages/architect-core), and a negative scenario that scopeValue '@libar-dev/architect-core' matches NOTHING (proves inferWorkspacePackageName is gone). Update business-rule-set-package-scope.feature.steps.ts accordingly."
+        },
+        {
+          "file": "tests/features/cli/ (new or existing arch feature)",
+          "change": "Add an executable spec for `arch packages <id>` fail-loud (currently UNTESTED): Scenario passing a bad arg (e.g. 'Architect Projection') Then exit code non-zero And output contains 'Accepted:'; and a happy-path scenario with a valid unscoped id returning that package's patterns. Add matching steps in tests/steps/."
+        }
+      ],
+      "determinismRipple": false,
+      "filesOwned": [
+        "packages/architect-projection/src/projections/governance/business-rules.internal.ts",
+        "packages/architect-cli/src/cli/commands/read.ts",
+        "packages/architect-cli/src/cli/commands/meta.ts",
+        "packages/architect-cli/src/cli/commands/_shared/projection-options.ts",
+        "packages/architect-projection/tests/features/fragments/business-rule-set-package-scope.feature",
+        "packages/architect-projection/tests/features/fragments/business-rule-set-package-scope.feature.steps.ts",
+        "tests/features/cli/pattern-graph-cli-rules-subcommand.feature"
+      ],
+      "conflictsWith": [
+        "any cluster editing packages/architect-cli/src/cli/commands/_shared/schemas.ts (parseSchemaValue / value-validation helpers)",
+        "any cluster editing packages/architect-cli/src/cli/commands/_shared/structured.ts (arch command dispatch)",
+        "any cluster adding kernel methods in packages/architect-core/src/read-api/ or exports in packages/architect-core/src/index.ts",
+        "any cluster touching packages/architect-projection/src/projections/pattern-relations/pattern-catalog.internal.ts (list package filter)"
+      ],
+      "risk": "Medium. The reconcile is a true breaking change to the --package value space (scoped → unscoped); any external caller, doc, or MCP client passing @libar-dev/<pkg> breaks — intended and documented. Shared-file contention is the main coordination risk: schemas.ts and structured.ts are hot files other clusters likely touch (synthesizer must merge the resolvePackageFilter helper + arch-packages throw without clobbering sibling edits). Low correctness risk: docs-live is provably unaffected (grouping path, not the filter), so the determinism gate stays green without regenerating. Edge case to verify: ensure listPackages() and arch packages keys are identical sets when archIndex is absent (both → []).",
+      "verifyCommands": [
+        "pnpm -s architect:query rules --package architect-core --count   # expect a positive number (was 0), proving the reconciled unscoped key filters",
+        "pnpm -s architect:query rules --package @libar-dev/architect-core --count   # expect NON-ZERO EXIT + 'Accepted:' (was 97) — scoped form now rejected",
+        "pnpm -s architect:query list --package architect-projection --count   # expect 103 (unchanged, canonical id works)",
+        "pnpm -s architect:query list --package \"@libar-dev/architect-core\"   # expect NON-ZERO EXIT + 'Accepted:' (was silent [])",
+        "pnpm -s architect:query arch packages \"Architect Projection\"   # expect NON-ZERO EXIT + 'Accepted: architect-cli, architect-core, ...' (was success:true,data:[])",
+        "pnpm -s architect:query arch packages architect-projection --format json   # expect the package's patterns (happy path unchanged)",
+        "pnpm docs:all && git diff --exit-code docs-live   # expect CLEAN — proves no determinism ripple",
+        "pnpm -s architect:query query listPackages   # expect [\"architect-cli\",\"architect-core\",\"architect-dev\",\"architect-guard\",\"architect-mcp\",\"architect-pkg-content\",\"architect-projection\"]",
+        "pnpm test --filter @libar-dev/architect-projection   # business-rule-set-package-scope.feature green",
+        "pnpm test:dogfood   # pattern-graph-cli-rules-subcommand.feature green with unscoped ids"
+      ]
+    },
+    {
+      "cluster": "T2 — status-vocabulary reconciliation (one consumer-facing vocabulary)",
+      "currentBehavior": "Three words for two concepts split the surfaces. The AUTHORED FSM vocabulary is `roadmap`/`deferred` (proven: `pnpm -s architect:query taxonomy` advertises status values `[\"candidate\",\"roadmap\",\"active\",\"completed\",\"deferred\"]` with default `roadmap`; `@architect-status` only accepts these). The DERIVED reporting bucket is `planned` = roadmap ∪ deferred (taxonomy/normalized-status.ts:5-11 STATUS_NORMALIZATION_MAP maps roadmap→planned, deferred→planned).\n\nThe break, reproduced live:\n- `pnpm -s architect:query overview` prints `266 delivery patterns (118 completed, 129 active, 19 planned) = 44%` — the word `planned` (render-compact-text.ts:116).\n- `pnpm -s architect:query list --status planned` → `Error: Expected accepted status value... Accepted: candidate, roadmap, active, completed, deferred` — `planned` is rejected (read.ts:264 → parseAcceptedStatusValue → AcceptedStatusSchema, schemas.ts:185-190).\n- `pnpm -s architect:query query getStatusDistribution` reports `counts.planned: 19` and `deliveryPercentages.planned: 7` (pattern-graph-api.ts:144, types.ts:60-78).\n- `pnpm -s architect:query query getPatternsByNormalizedStatus planned` → returns 19; `list --status roadmap --count` → 19; `list --status deferred --count` → 0. So today planned==roadmap because deferred is empty, but the FSM keeps deferred live (roadmap→deferred→roadmap, transitions.ts:25-29).\n\nThe obvious cold-start chain overview → list → isValidTransition breaks at step two: the exact word the agent just read (`planned`) is not a word `list`/MCP `architect_status` will accept. Even widening the enum alone would not fix it: the catalog filters by EXACT status (pattern-catalog.internal.ts:49 `summary.status === options.status`) and no pattern carries literal status `planned`, so `--status planned` would still match zero.",
+      "rootCause": "Two independent root causes that must both be fixed:\n1. Vocabulary asymmetry: list/search/MCP status filtering speaks ONLY the authored FSM vocabulary (packages/architect-cli/src/cli/commands/_shared/schemas.ts:64 ListFlagsSchema.status = AcceptedStatusSchema; packages/architect-mcp/src/tool-input-schemas.ts:91 ListFilterShape.status = AcceptedStatusSchema), while overview/getStatusDistribution speak ONLY the normalized bucket vocabulary (`planned`). No bridge word is legal on both sides.\n2. Exact-match filtering: packages/architect-projection/src/projections/pattern-relations/pattern-catalog.internal.ts:49 matches `summary.status === options.status` against the raw `@architect-status`, so a normalized bucket name can never match even if accepted by the schema.",
+      "proposedDesign": "CHOSEN: Option (b) — make the catalog status filter normalization-aware and accept the normalized bucket word `planned` as a first-class `--status` value alongside the FSM authored values, so EVERY word the agent reads in `overview`/`getStatusDistribution` is a legal `list`/MCP filter, AND the FSM authored values (`roadmap`/`deferred`) keep working for transitions and exact filtering. Add explicit FSM labeling to the progress line so the agent learns the bridge once.\n\nWhy this over the alternatives:\n- Option (c) rename bucket `planned`→`roadmap` is REJECTED: the bucket aggregates roadmap ∪ deferred, so naming it `roadmap` is dishonest whenever deferred is non-empty (the FSM keeps deferred live; today it is 0 by accident, not by design). It trades the third-word trap for a name that lies, and it ripples docs-live schema field names + business-rule prose (api-reference/architect-core.md:1207, architect-projection.md prose) for no semantic gain.\n- Option (a) surface BOTH with \"(reported as planned)\" labels everywhere is RETAINED as a SUPPLEMENT, not the core fix: it teaches the agent the two-word relationship but, without (b), `list --status planned` still 404s — so it documents the trap instead of removing it.\n- Option (b) removes the trap at the read-model/shared layer so ALL consumers benefit at once (ADR-006): the single edit to the catalog filter fixes CLI `list`, MCP `architect_status`, and MCP `search` (all route through projectPatternCatalog). The FSM stays the single authority on transitions (the transition verbs keep using ProcessStatusSchema — candidate→roadmap remains a human acceptance gate / maturity flip, NOT an FSM transition, so it is correctly absent from VALID_TRANSITIONS).\n\nConcrete shape of the reconciliation — introduce one new schema `StatusFilterSchema` (= the union of AcceptedStatusValue ∪ the normalized-only word `planned`) used ONLY by catalog/list/search/MCP-status filtering. It is distinct from AcceptedStatusSchema (still the authored-tag validator) and ProcessStatusSchema (still the transition validator). The catalog filter resolves the incoming value through a small `statusFilterMatches(patternStatus, filterValue)` helper: if filterValue is an FSM value, exact-match; if filterValue is `planned`, match `normalizeStatus(patternStatus) === 'planned'` (i.e. roadmap ∪ deferred). The error message for an unknown value enumerates `candidate, roadmap, active, completed, deferred, planned` — six words, the full legal set — so a typo self-documents the bridge.\n\nProgress-line labeling (option-a supplement): change render-compact-text.ts:116 to render `19 planned (roadmap+deferred)` so the agent reading the digest sees, in one glance, that `planned` is the bucket over `roadmap`+`deferred` and that either word filters. This is CLI-runtime text, not a docs-live projection.\n\nBREAKING CHANGE (No-BC, embraced): the catalog `status` filter and MCP `architect_status` status input now accept `planned`; the rejection error set grows from five to six. This is purely additive at the input boundary (no previously-valid call breaks), so it is a soft break — but the new `StatusFilterSchema` replaces the bare `AcceptedStatusSchema` reference in ListFlagsSchema / PatternCatalogOptionsSchema / DocumentationFilterSchema(no — only the list/search path) / ListFilterShape, and those references are DELETED, not aliased.",
+      "edits": [
+        {
+          "file": "packages/architect-core/src/taxonomy/normalized-status.ts",
+          "change": "Export a reusable predicate the filter layer can call without re-deriving: keep normalizeStatus as-is; this file already exports isPatternPlanned(status) (line 26-28) which the catalog helper will reuse. No edit strictly required here, but add an exported const `NORMALIZED_ONLY_STATUS_VALUES = ['planned'] as const` so the union schema can be built from a named source rather than a string literal.",
+          "rationale": "Schema-source-of-truth: the new StatusFilterSchema must be built from named taxonomy constants, not inline literals, matching the domain-enums.ts pattern (every enum primitive sourced from taxonomy/)."
+        },
+        {
+          "file": "packages/architect-core/src/domain-enums.ts",
+          "change": "Add `export const StatusFilterSchema = z.enum([...ACCEPTED_STATUS_VALUES, ...NORMALIZED_ONLY_STATUS_VALUES]); export type StatusFilterValue = z.infer<typeof StatusFilterSchema>;` importing NORMALIZED_ONLY_STATUS_VALUES from taxonomy/normalized-status.js. Do NOT touch AcceptedStatusSchema/ProcessStatusSchema/StatusValueSchema — they remain the authored-tag and transition validators.",
+          "rationale": "One canonical cross-package Zod schema for consumer-facing status FILTERING, distinct from the authored-tag and FSM-transition vocabularies. Types flow via z.infer per Zod-first doctrine."
+        },
+        {
+          "file": "packages/architect-projection/src/projections/pattern-relations/pattern-catalog.internal.ts",
+          "change": "Change PatternCatalogOptionsSchema.status (line 22) from AcceptedStatusSchema to StatusFilterSchema (import from @libar-dev/architect-core). Replace the exact-match predicate at line 49 `summary.status === options.status` with a call to a new helper `statusFilterMatches(summary.status, options.status)`: returns true when options.status is undefined; when options.status === 'planned' returns `normalizeStatus(summary.status) === 'planned'`; otherwise exact-match. Update the filters echo (line 61) to pass through the resolved filter word unchanged.",
+          "rationale": "Root cause #2 lives here (exact-match). Fixing it at the catalog (shared by CLI list, MCP architect_status, MCP search) means every consumer benefits from one edit — ADR-006 read-model-layer fix."
+        },
+        {
+          "file": "packages/architect-cli/src/cli/commands/_shared/schemas.ts",
+          "change": "Change ListFlagsSchema.status (line 64) from AcceptedStatusSchema to StatusFilterSchema. Add `parseStatusFilterValue(value): StatusFilterValue` mirroring parseAcceptedStatusValue (lines 185-191) but wrapping StatusFilterSchema with message `Expected status filter value, received: ${value}` — parseSchemaValue auto-enumerates the six accepted words via acceptedEnumValues (line 137-142).",
+          "rationale": "The list --status boundary parser. The self-documenting error (schemas.ts:148-156) now lists all six legal words, so a cold-start agent who typos learns the bridge from the error itself."
+        },
+        {
+          "file": "packages/architect-cli/src/cli/commands/read.ts",
+          "change": "At the list command flagParser (line 264) swap `parse: parseAcceptedStatusValue` for `parse: parseStatusFilterValue`; update the `status?` field type on the execute() flags cast (line 289) from AcceptedStatusValue to StatusFilterValue; update import (line 32) accordingly.",
+          "rationale": "Wires the widened filter into the CLI list command so `list --status planned` returns the 19 roadmap+deferred patterns instead of erroring."
+        },
+        {
+          "file": "packages/architect-mcp/src/tool-input-schemas.ts",
+          "change": "Change ListFilterShape.status (line 91) from AcceptedStatusSchema.optional() to StatusFilterSchema.optional(); update the import (line 8).",
+          "rationale": "MCP architect_status (tool-registry.ts:463-496) feeds this straight into projectPatternCatalog; without this edit the MCP twin of `list` keeps the old break. Same word legal on CLI and MCP."
+        },
+        {
+          "file": "packages/architect-projection/src/renderers/render-compact-text.ts",
+          "change": "Change the progress line (line 116) label from `...active, ${progress.planned} planned) = ...` to `...active, ${progress.planned} planned (roadmap+deferred)) = ...` (option-a supplement). CLI-runtime text only — not a docs-live projection (verified: the rendered string is absent from docs-live).",
+          "rationale": "Teaches the bridge inline: the agent reading overview sees that `planned` is the bucket over roadmap+deferred, both of which (plus `planned` itself) are now legal list filters."
+        },
+        {
+          "file": "packages/architect-cli/src/cli/commands/planning.ts",
+          "change": "Update the getPatternsByNormalizedStatus usage hint (line 132) if it pins on the five-word list to mention that list --status now also accepts the normalized words; verify no other inline status-word list in this file goes stale.",
+          "rationale": "Keep the in-CLI help consistent with the widened filter so the help surface does not re-introduce the trap."
+        }
+      ],
+      "newContracts": [
+        {
+          "name": "StatusFilterSchema",
+          "kind": "zod-schema",
+          "shape": "z.enum([...ACCEPTED_STATUS_VALUES, ...NORMALIZED_ONLY_STATUS_VALUES]) = z.enum(['candidate','roadmap','active','completed','deferred','planned']); type StatusFilterValue = z.infer<typeof StatusFilterSchema>. Lives in packages/architect-core/src/domain-enums.ts. Consumer-facing status FILTERING vocabulary only — distinct from AcceptedStatusSchema (authored-tag validation) and ProcessStatusSchema (FSM transitions)."
+        },
+        {
+          "name": "NORMALIZED_ONLY_STATUS_VALUES",
+          "kind": "audit-rule",
+          "shape": "export const NORMALIZED_ONLY_STATUS_VALUES = ['planned'] as const in taxonomy/normalized-status.ts — the normalized bucket words that are NOT authored FSM values, the named source the filter union is built from."
+        },
+        {
+          "name": "statusFilterMatches",
+          "kind": "kernel-method",
+          "shape": "statusFilterMatches(patternStatus: string, filter: StatusFilterValue | undefined): boolean — undefined ⇒ true; filter==='planned' ⇒ normalizeStatus(patternStatus)==='planned' (roadmap ∪ deferred); else patternStatus===filter. Lives in pattern-catalog.internal.ts (or _shared/filter.ts if shared with other filtered projections). Reuses taxonomy/normalize-status."
+        },
+        {
+          "name": "parseStatusFilterValue",
+          "kind": "cli-flag",
+          "shape": "parseStatusFilterValue(value: string): StatusFilterValue — boundary parser for list --status, wraps StatusFilterSchema; error 'Expected status filter value, received: X. Accepted: candidate, roadmap, active, completed, deferred, planned'."
+        }
+      ],
+      "executableSpecChanges": [
+        {
+          "file": "packages/architect-projection/tests/features/projections/pattern-relations/ (NEW: pattern-catalog-status-filter.feature + .steps.ts)",
+          "change": "Add a Feature 'Pattern catalog status filter speaks both FSM and normalized words' with Rules: (1) 'The normalized bucket word filters the union' — Scenario: filtering by `planned` returns exactly the patterns whose normalized status is planned, i.e. status roadmap OR deferred; assert count equals roadmap-bucket + deferred-bucket. (2) 'FSM authored words still exact-match' — Scenario: `roadmap` returns only roadmap patterns, `deferred` returns only deferred patterns, and roadmap∪deferred == planned-filter result. (3) 'candidate stays pre-FSM' — Scenario: `candidate` returns only candidate patterns and is excluded from the planned bucket. This is the source-of-truth proof that list/search/MCP now accept the normalized vocabulary."
+        },
+        {
+          "file": "packages/architect-core/tests/features/read-api/pattern-graph-api-consistency.feature",
+          "change": "Add a Scenario under the existing 'The status partition is exact' Rule (line 30): 'The planned bucket equals roadmap plus deferred exact buckets' — assert getPatternsByNormalizedStatus('planned').length == getPatternsByStatus('roadmap').length + getPatternsByStatus('deferred').length. Pins the bucket↔FSM-words identity that the new filter relies on so the vocabulary bridge is correct-by-guardrail, not by-accident. Update .steps.ts (pattern-graph-api-consistency.feature.steps.ts) with the new Then binding. No existing scenario wording changes — `planned` stays the bucket word in this kernel spec."
+        },
+        {
+          "file": "packages/architect-cli/tests (or dogfood tests/features) — list-status acceptance",
+          "change": "If a CLI-level executable spec exercises `list --status`, add a Scenario asserting `list --status planned --count` succeeds and equals the roadmap+deferred count, and that `list --status planned` no longer errors. If no such .feature exists, the projection-level pattern-catalog-status-filter.feature is the binding proof and the dogfood smoke (scripts) should assert exit-0 for `list --status planned`."
+        }
+      ],
+      "determinismRipple": false,
+      "filesOwned": [
+        "packages/architect-core/src/domain-enums.ts",
+        "packages/architect-core/src/taxonomy/normalized-status.ts",
+        "packages/architect-projection/src/projections/pattern-relations/pattern-catalog.internal.ts",
+        "packages/architect-projection/src/renderers/render-compact-text.ts",
+        "packages/architect-cli/src/cli/commands/_shared/schemas.ts",
+        "packages/architect-cli/src/cli/commands/read.ts",
+        "packages/architect-cli/src/cli/commands/planning.ts",
+        "packages/architect-mcp/src/tool-input-schemas.ts",
+        "packages/architect-projection/tests/features/projections/pattern-relations/pattern-catalog-status-filter.feature",
+        "packages/architect-core/tests/features/read-api/pattern-graph-api-consistency.feature"
+      ],
+      "conflictsWith": [
+        "Any cluster editing packages/architect-core/src/domain-enums.ts (status/maturity enum schemas) — T2 adds StatusFilterSchema there.",
+        "Any cluster editing packages/architect-cli/src/cli/commands/_shared/schemas.ts (shared CLI flag schemas / parse helpers).",
+        "Any cluster editing packages/architect-cli/src/cli/commands/read.ts (the list/search/pattern command table).",
+        "Any cluster editing packages/architect-mcp/src/tool-input-schemas.ts (MCP tool input shapes).",
+        "Any cluster editing packages/architect-projection/src/projections/pattern-relations/pattern-catalog.internal.ts or render-compact-text.ts (catalog filtering / compact overview rendering).",
+        "Any cluster editing packages/architect-core/tests/features/read-api/pattern-graph-api-consistency.feature (the kernel-consistency executable spec — high-traffic shared spec)."
+      ],
+      "risk": "Low-to-medium. The change is additive at every input boundary (no previously-valid call breaks), so the No-BC break is soft — the only removal is the bare AcceptedStatusSchema reference in four filter-schema sites, replaced (not aliased) by StatusFilterSchema. Main risks: (1) verbatimModuleSyntax/exactOptionalPropertyTypes — StatusFilterValue must be imported as `import type` where used as a type and the optional `status?` field must stay structurally optional (no implicit undefined). (2) The new union must NOT leak into transition or authored-tag paths — ProcessStatusSchema (isValidTransition/checkTransition/getValidTransitionsFrom) and AcceptedStatusSchema (@architect-status validation) MUST be left untouched, else a non-FSM word like `planned` could be passed to a transition and crash VALID_TRANSITIONS index access. The statusFilterMatches helper and StatusFilterSchema are scoped to filtering only. (3) z.strictObject boundary — adding the new schema must not relax any strictObject. No circular import: domain-enums already imports from taxonomy/, and taxonomy/normalized-status.ts has no inbound dep on domain-enums, so adding NORMALIZED_ONLY_STATUS_VALUES there is safe.",
+      "verifyCommands": [
+        "pnpm -s architect:query list --status planned --count   # expect 19 (roadmap 19 + deferred 0), no error",
+        "pnpm -s architect:query list --status roadmap --count    # expect 19, still works",
+        "pnpm -s architect:query list --status deferred --count   # expect 0, still works",
+        "pnpm -s architect:query list --status bogus              # error must enumerate: candidate, roadmap, active, completed, deferred, planned",
+        "pnpm -s architect:query overview | grep 'planned (roadmap+deferred)'   # progress line now labels the bridge",
+        "pnpm -s architect:query query isValidTransition roadmap active   # expect true — FSM untouched",
+        "pnpm -s architect:query query isValidTransition planned active   # expect error 'Expected process status value' — planned is NOT an FSM word",
+        "pnpm -s architect:query query getPatternsByNormalizedStatus planned | <count> == list --status planned --count",
+        "pnpm typecheck && pnpm test",
+        "pnpm test:dogfood",
+        "pnpm docs:all && git diff --exit-code docs-live   # must be clean — determinism ripple is false"
+      ]
+    },
+    {
+      "cluster": "T3 — populate (or honestly gate) documentation traceability",
+      "currentBehavior": "`documentation traceability --format json` returns `{root:{kind:\"TraceabilityMatrix\", rows:[]}}` (0 rows), and the committed `docs-live/TRACEABILITY.md` reads \"Traceability matrix covering 0 pattern rows.\" with an empty table — a silent-empty TRUST failure on a view that advertises itself as THE traceability matrix.\n\nROOT CAUSE is the row-building filter in `buildTraceRows` (packages/architect-projection/src/projections/delivery-reporting/index.ts:379-396): it iterates `context.graph.bySourceType.gherkin` AND requires `pattern.phase !== undefined`. The dogfood repo uses ZERO `@architect-phase` tags, so the phase filter eliminates every candidate. Verified live: `pnpm -s architect:query query getAllPhases` → `[]` and `getActivePhases` → `[]` (graph has no phase groups). FEEDBACK.md:135 confirms it independently: \"current-work + traceability emit empty docs because they project over the quarter/phase pattern dimensions that were removed from ExtractedPattern.\"\n\nBeyond the empty filter, the DESIGN is wrong relative to doctrine: the current matrix iterates TEST/Gherkin patterns keyed on their own `source.file` (specs) + `executableSpecs`/`behaviorFile` (tests). The doctrine traceability matrix is prod-pattern ↔ implementing-feature rows from the `@architect-implements` realization edges, which live as `relationshipIndex[name].implementedBy: ImplementationRef[]` and are demonstrably POPULATED: `pnpm -s architect:query query getPatternRelationships PatternGraphApi` → implementedBy `[\"PatternGraphApiConsistencyExecutableTests\",\"PatternGraphApiReverseLookup\"]`; `TraceabilityMatrixProjection` → `[\"TraceabilityMatrixProjectionExecutableTests\"]`; `DeliveryReportingProjectionSupport` → 2 refs. Sampling the first 40 graph patterns, 8 carry realization edges — so a populate from `implementedBy` yields meaningful rows. No emptiness gate exists in the docs:all runner (generate-docs.ts only guards file-path collisions, lines 597-613, and `sources.typescript.length === 0`, line 564).",
+      "rootCause": "packages/architect-projection/src/projections/delivery-reporting/index.ts → `buildTraceRows()` (lines 379-396): the `bySourceType.gherkin` source + `pattern.phase !== undefined` filter; phase is never populated in this repo, so the matrix is structurally always empty. The edges that SHOULD drive the matrix (`implementedBy` realization edges) live in `PatternGraph.relationshipIndex` (validation-schemas/pattern-graph.ts:142, `RelationshipEntrySchema.implementedBy: ImplementationRef[]`) and are read via the existing helper `getRelationships(context, name)` in projections/_shared/pattern-helpers.internal.ts:97-102.",
+      "proposedDesign": "POPULATE (the edges exist; do not delete). Two coordinated changes plus an emptiness gate.\n\n(1) Reorient `buildTraceRows` to iterate production patterns and source rows from realization edges. New row semantics: ONE row per production pattern that carries ≥1 `implementedBy` ref. Iterate `context.graph.bySourceType.typescript` (production patterns) — or, more robustly, iterate ALL patterns and key on `getRelationships(context, name).implementedBy.length > 0` so TypeScript-identified AND Gherkin-identified production patterns that have realization edges both appear. For each pattern:\n  - `pattern`: pattern name (getPatternName)\n  - `status`: pattern.status\n  - `tests`: the `implementedBy` ref FILES (deduped), i.e. the executable features/steps that realize the pattern — this is the realization edge the matrix is supposed to expose\n  - `specs`: `[pattern.source.file]` (where the production pattern is identified)\n  - `deliverables`: deduped `deliverable.location` values (unchanged shape)\nDrop the `pattern.phase !== undefined` filter entirely (No-BC: delete the dead dimension dependency, do not gate behind a flag). Sort by pattern name (phase is gone; keep `sortPatterns` but it degrades to name-sort since phase is always undefined — acceptable, deterministic). The `TraceRowSchema` (fragments/delivery-reporting/supporting.ts:76-82) stays unchanged — `pattern/status/tests/specs/deliverables` already fit the new content; only the SOURCE of `tests` changes from executableSpecs+behaviorFile to implementedBy ref files. This reuses the kernel-level read-model edge (`relationshipIndex.implementedBy`) so the change sits at the read-model consumption layer — every consumer of the matrix benefits (ADR-006 alignment).\n\n(2) Add a universal emptiness/degeneracy gate to the docs:all runner. Hook it into generate-docs.ts main() right after Phase 1 rendering (after line 595, before the collision guard at 597) so it runs for `--all` AND single-generator runs. The gate inspects each `execution`'s rendered ProjectionBundle root fragment and FAILS LOUD (throw, non-zero exit via existing handleCliError) when a generator that declares itself row/collection-bearing produces a degenerate (count===0) root. To keep it principled and not magic-string-based, introduce a per-document-type `expectsNonEmpty` predicate keyed off the fragment kind: a small `assertGeneratorNotDegenerate(documentType, rootFragment)` in projection that knows, per fragment kind, where its \"primary collection\" lives (TraceabilityMatrix→rows, RoadmapTimeline→quarters, ReleaseNotesDigest→releases, PatternCatalog→items, BusinessRuleSet→rules, etc.) and throws `GeneratorDegenerateError(documentType, \"0 rows\")` when that collection is empty. This is the detection verb FEEDBACK.md:89-93 asks for, enforced at gen time.\n\nBREAKING-CHANGE / COORDINATION NOTE: the gate will ALSO fire on `roadmap` and `current-work`, which are degenerate for the SAME removed-`quarter` reason (verified: both → `quarters:0`). Introducing the gate therefore REQUIRES those two be fixed or the gate cannot land green. This is intentional fail-loud, but it means the gate edit must NOT land before roadmap/current-work are repopulated (a sibling concern). The honest scoping: T3 ships the traceability populate + the gate MECHANISM and its executable spec, and either (a) the gate's initial allow-set is the set of currently-degenerate-by-design generators IF a sibling cluster owns roadmap/current-work fix in the same campaign, or (b) the gate lands only after those are fixed. I recommend NO allow-list (no soft-gating dead generators — that re-creates the silent-empty escape hatch the gate exists to kill); instead the synthesizer sequences the gate edit after roadmap/current-work are repopulated. Flag both to the synthesizer.",
+      "edits": [
+        {
+          "file": "packages/architect-projection/src/projections/delivery-reporting/index.ts",
+          "change": "Rewrite buildTraceRows() (lines 379-396): remove the `bySourceType.gherkin` + `pattern.phase !== undefined` filter; iterate context.graph.patterns, keep only patterns where getRelationships(context, getPatternName(pattern)).implementedBy.length > 0; build each TraceRow with tests = deduped implementedBy ref files (uniqueSortedStrings over ref.file), specs = [pattern.source.file], deliverables = deduped deliverable.location, status = pattern.status; sort by pattern name. Import getRelationships from ../_shared/pattern-helpers.internal.js.",
+          "rationale": "Sources rows from the realization edges that demonstrably exist (relationshipIndex.implementedBy) instead of the never-populated phase dimension; aligns the matrix with doctrine (prod-pattern ↔ implementing-feature)."
+        },
+        {
+          "file": "packages/architect-projection/src/projections/delivery-reporting/index.ts",
+          "change": "Update the projectTraceabilityMatrix JSDoc (lines 706-744) Invariant/Behavior prose: rows now cover every production pattern with realization edges, tests derive from implementedBy ref files, no phase filter. Drop 'only patterns from bySourceType.gherkin with a numeric phase appear'.",
+          "rationale": "Annotations are additive source-of-truth context; leaving the old phase prose would be stale dead context (No-BC)."
+        },
+        {
+          "file": "packages/architect-cli/src/cli/generate-docs.ts",
+          "change": "After Phase-1 render (after line 595), before the collision guard (line 597), add a loop calling assertGeneratorNotDegenerate(execution.generator, execution) for projection-kind generators; on degenerate output throw so handleCliError exits non-zero. Import the assert + GeneratorDegenerateError from @libar-dev/architect-projection.",
+          "rationale": "Hooks the emptiness gate into both --all and single-generator runs at doc-gen time, failing loud so rows:[] cannot regress silently (FEEDBACK.md:89-93)."
+        },
+        {
+          "file": "packages/architect-projection/src/projections/documentation-composition/degenerate-guard.ts",
+          "change": "NEW file: export assertGeneratorNotDegenerate(documentType, rootFragment) and GeneratorDegenerateError. A per-fragment-kind primary-collection map (TraceabilityMatrix→rows, RoadmapTimeline→quarters, ReleaseNotesDigest→releases, PatternCatalog→items, BusinessRuleSet→rules, RequirementDigest→entries, …) that throws when the primary collection length === 0.",
+          "rationale": "Centralizes degeneracy knowledge in projection (which owns fragment shapes) rather than the CLI; one principled assertion per fragment kind, no magic strings in the runner."
+        },
+        {
+          "file": "packages/architect-projection/src/index.ts",
+          "change": "Re-export assertGeneratorNotDegenerate and GeneratorDegenerateError from the new degenerate-guard module.",
+          "rationale": "generate-docs.ts consumes them across the package seam; must be on the public barrel."
+        },
+        {
+          "file": "packages/architect-projection/tests/features/projections/delivery-reporting/traceability-matrix.feature",
+          "change": "Rewrite the feature: drop @architect-phase:49 framing in the prose; change scenario to 'projecting the traceability matrix from realization edges'; Background/Given builds patterns whose relationshipIndex carries implementedBy refs; Then asserts rows are the production patterns with realization edges, tests = the implementedBy ref files, specs = the pattern source file; And asserts deterministic child keys (pattern-name slugs).",
+          "rationale": "The executable spec is the source of truth — the behavior change (edge source) must be proven by the feature, and the old phase-based scenario must be deleted not kept."
+        },
+        {
+          "file": "packages/architect-projection/tests/features/projections/delivery-reporting/traceability-matrix.steps.ts",
+          "change": "Update the Given to inject implementedBy via the relationshipIndex override (not phase); update the Then expectations to the new row shape (tests = ref files, specs = source file, no phase ordering); update child-key expectation to pattern-name slugs.",
+          "rationale": "Steps must match the rewritten feature and exercise the implementedBy code path."
+        },
+        {
+          "file": "packages/architect-projection/tests/features/projections/delivery-reporting/support.ts",
+          "change": "Extend createProjectionContext/ProjectionContextOptions and createPattern to thread a relationshipIndex override (and/or implementsPatterns) into buildGraphFromPatterns so fixtures can set implementedBy refs.",
+          "rationale": "The test-graph-builder only sets implementedBy from an explicit relationshipIndex override (test-graph-builder.ts:339 `override?.implementedBy ?? []`); the support helper currently doesn't pass one through, so the fixture cannot populate realization edges without this."
+        },
+        {
+          "file": "packages/architect-cli/tests OR packages/architect-projection/tests (degenerate guard executable spec)",
+          "change": "NEW executable feature+steps proving the emptiness gate: given a documentation projection whose root collection is empty, assertGeneratorNotDegenerate throws GeneratorDegenerateError naming the document type; given a populated root, it passes.",
+          "rationale": "The gate is new behavior and must be proven by an executable spec (source-of-truth doctrine)."
+        }
+      ],
+      "newContracts": [
+        {
+          "name": "assertGeneratorNotDegenerate",
+          "kind": "kernel-method",
+          "shape": "(documentType: SupportedDocumentationType, rootFragment: Fragment) => void  // throws GeneratorDegenerateError when the fragment's primary collection (rows/quarters/releases/items/rules/entries per kind) has length 0; lives in packages/architect-projection/src/projections/documentation-composition/degenerate-guard.ts, exported from the package barrel"
+        },
+        {
+          "name": "GeneratorDegenerateError",
+          "kind": "audit-rule",
+          "shape": "class GeneratorDegenerateError extends Error { readonly documentType: SupportedDocumentationType; readonly reason: string }  // thrown by the docs:all runner so handleCliError yields a non-zero exit and a loud message identifying the degenerate generator"
+        },
+        {
+          "name": "buildTraceRows (reoriented)",
+          "kind": "kernel-method",
+          "shape": "buildTraceRows(context: ProjectionContext): TraceRow[]  // now iterates context.graph.patterns filtered by getRelationships(...).implementedBy.length>0; TraceRow.tests = deduped implementedBy ref files; no phase filter. TraceRowSchema (pattern/status/tests/specs/deliverables) is UNCHANGED — contract shape stable, content source changes."
+        }
+      ],
+      "executableSpecChanges": [
+        {
+          "file": "packages/architect-projection/tests/features/projections/delivery-reporting/traceability-matrix.feature",
+          "change": "Replace the phase-based scenario with an implementedBy-realization-edge scenario; new Invariant: every production pattern with ≥1 realization edge yields one row; tests column = the realizing feature/steps files; deterministic name-slug child keys. Delete the 'only phased gherkin rows' assertion."
+        },
+        {
+          "file": "packages/architect-projection/tests/features/projections/delivery-reporting/traceability-matrix.steps.ts",
+          "change": "Inject implementedBy refs via relationshipIndex override; assert new row shape and child keys."
+        },
+        {
+          "file": "packages/architect-projection/tests/features/projections/delivery-reporting/support.ts",
+          "change": "Thread relationshipIndex/implementsPatterns through createProjectionContext + createPattern."
+        },
+        {
+          "file": "NEW degenerate-guard feature+steps (architect-projection tests)",
+          "change": "Prove assertGeneratorNotDegenerate throws on an empty root collection and passes on a populated one, naming the document type in the error."
+        }
+      ],
+      "determinismRipple": true,
+      "filesOwned": [
+        "packages/architect-projection/src/projections/delivery-reporting/index.ts (buildTraceRows + buildTraceabilityMatrix + projectTraceabilityMatrix JSDoc)",
+        "packages/architect-projection/src/projections/documentation-composition/degenerate-guard.ts (NEW)",
+        "packages/architect-projection/tests/features/projections/delivery-reporting/traceability-matrix.feature",
+        "packages/architect-projection/tests/features/projections/delivery-reporting/traceability-matrix.steps.ts",
+        "docs-live/TRACEABILITY.md (regenerated output)",
+        "docs-live/traceability/ (regenerated per-row children)"
+      ],
+      "conflictsWith": [
+        "N2 (implementedBy resolution) — shares the relationshipIndex.implementedBy read path and the getRelationships/normalizeImplementationRef accessors in projections/_shared/pattern-helpers.internal.ts; if N2 introduces a shared kernel accessor for implementedBy resolution, buildTraceRows should consume THAT accessor rather than reading relationshipIndex directly. Coordinate so there is one implementedBy resolver.",
+        "Any cluster owning roadmap / current-work repopulation — the emptiness gate (degenerate-guard.ts + the generate-docs.ts hook) will FAIL those two degenerate generators (verified quarters:0). The gate edit in generate-docs.ts must be sequenced AFTER roadmap/current-work are fixed, or it cannot land green. Shares packages/architect-cli/src/cli/generate-docs.ts.",
+        "Any cluster touching packages/architect-projection/src/index.ts (barrel) — new exports added.",
+        "Any cluster touching support.ts test fixture in delivery-reporting (shared test helper)."
+      ],
+      "risk": "MEDIUM. The traceability populate is low-risk and self-contained (one helper, schema unchanged). The emptiness GATE is the coordination hazard: it is intentionally universal and will surface roadmap/current-work as degenerate, so landing it without sequencing turns CI red across sibling work. Mitigation: ship the gate mechanism + its executable spec in T3 but flag to the synthesizer that the generate-docs.ts hook activation must follow the roadmap/current-work fix (recommend NO soft allow-list — that would re-open the silent-empty hole). Determinism ripple is certain: docs-live/TRACEABILITY.md + docs-live/traceability/* regenerate (TRACEABILITY.md goes from '0 pattern rows' to a populated matrix), so docs:all + git diff --exit-code docs-live must be re-run in the same change. Perf gate (architect-projection 36-pattern fixture) is unaffected — buildTraceRows still O(patterns) with a constant relationshipIndex lookup.",
+      "verifyCommands": [
+        "pnpm -s architect:query documentation traceability --format json | jq '.root.rows | length'   # MUST be > 0",
+        "pnpm -s architect:query documentation traceability --format json | jq -c '.root.rows[0]'   # row carries pattern/status/tests(realizing feature files)/specs/deliverables",
+        "pnpm --filter @libar-dev/architect-projection test   # traceability-matrix.feature + degenerate-guard feature pass",
+        "pnpm docs:all && git diff --exit-code docs-live   # determinism gate clean after regenerating TRACEABILITY.md",
+        "pnpm exec architect-generate --base-dir . -g traceability -f   # single-generator run succeeds (non-degenerate)",
+        "node -e \"...\" OR pnpm exec architect-generate -g <a-known-degenerate-type> -f   # MUST exit non-zero with GeneratorDegenerateError naming the type (gate fires once roadmap/current-work fixed or against a forced-empty fixture)"
+      ]
+    },
+    {
+      "cluster": "A1 — backfill decider/read-api invariants + extend the jsdoc-boilerplate audit to architect-core",
+      "currentBehavior": "Two distinct gaps, both verified live.\n\n(1) DECIDER/READ-API SLICES ARE EMPTY. `pnpm -s architect:query rules --pattern ProcessGuardDecider --only-invariants` and `... --pattern FSMValidator --only-invariants` both return zero rules (live: both print \"=== Rules ===\" with nothing under it). Root reason confirmed by reading the extractor: rules attach to the FEATURE node's `@architect-pattern` name, NOT the `@architect-implements` target. business-rules.internal.ts:163-175 `collectBusinessRules` iterates `context.graph.patterns`, keeps patterns with `rules?.length > 0`, and createBusinessRuleFragment (lines 198-218) sets `feature`/`pattern` = `getPatternName(pattern)` of the pattern that OWNS the rule. The deciders are TS pattern nodes (ProcessGuardDecider at decider.ts:4, role:decider; FSMValidator at validator.ts:4, role:decider) that carry NO Rule blocks (Rule blocks only live in `.feature` files). Proof the mechanism works as designed: `rules --pattern PatternGraphApiConsistencyExecutableTests --only-invariants` returns 9 BusinessRule rows, but `rules --pattern PatternGraphApi` (the implemented TS pattern) returns []. So invariants surface under the `*ExecutableTests` feature pattern, never the TS pattern it implements. ProcessGuardDecider's rich prose invariants exist only as JSDoc (decider.ts:36-114, the \"Error Guide Content\" block) which the graph does NOT parse into rules. The 4 process-guard invariants ALREADY exist as proper Rule blocks but under `ProcessGuardRulesExecutableTests` (process-guard-rules.feature:2, `@architect-implements:ProcessGuardLinter`) — verified: `rules --pattern ProcessGuardRulesExecutableTests --only-invariants` returns 4 rows. FSMValidator has NO executable feature at all — its transition logic is covered only by a plain vitest test (fsm-contract.test.ts) whose assertions never become graph invariants.\n\n(2) JSDOC BOILERPLATE AUDIT IS PROJECTION-ONLY. packages/architect-projection/scripts/jsdoc-boilerplate-audit.mjs hardcodes srcRoot to its own package (`resolve(packageRoot,'src')`, lines 6-7) and flags 3 phrases: 'As a typed contract', 'data shape consumed by projection or render layers', 'Private helpers used exclusively' (lines 8-12). It is wired ONLY into projection's test script (packages/architect-projection/package.json:73-75: `test: ... && pnpm test:jsdoc-boilerplate-audit && ...`). Running it live: projection is clean (153 files, 0 flagged, exit 0). But architect-core carries the SAME boilerplate in 15 src files — confirmed by grep for the 3 phrases — including all 5 read-api kernel files (pattern-graph-api.ts:11, architecture-inspection.ts:11, pattern-classification.ts:11, graph-inventory.ts:11, pattern-helpers.ts:11 each carry the identical line \"* - As a typed contract / data shape consumed by projection or render layers.\") plus the FSM nodes (validator.ts:12, transitions.ts:11, states.ts:11). architect-core's package.json test script is just `vitest run` (line 42) — no audit. So the doctrine is enforced for one package and silently violated in the read-model core.",
+      "rootCause": "Two roots. (1) Rule-extraction binds invariants to the feature's `@architect-pattern` node: business-rules.internal.ts:163-218 (collectBusinessRules + createBusinessRuleFragment). The deciders have no executable feature whose `@architect-pattern` is the decider name, so their slices are empty — and the existing FSM coverage (packages/architect-core/tests/validation/fsm-contract.test.ts) is a plain vitest test, invisible to the graph. (2) The audit's scan scope is hardcoded to its package: packages/architect-projection/scripts/jsdoc-boilerplate-audit.mjs:6-7 (`packageRoot`/`srcRoot`), wired only via packages/architect-projection/package.json:73-75; architect-core never invokes it.",
+      "proposedDesign": "Two coordinated changes, both following established repo conventions; breaking-change-friendly (No-BC) — delete boilerplate JSDoc rather than soften it.\n\nPART 1 — EXTEND THE AUDIT TO ARCHITECT-CORE (and make it workspace-reusable).\nThe boilerplate audit is a workspace doctrine check, not projection-specific. Hoist it to a single shared, parameterized script and invoke it per-package.\n- Move packages/architect-projection/scripts/jsdoc-boilerplate-audit.mjs → scripts/jsdoc-boilerplate-audit.mjs (root). Change it to accept the src root as a CLI arg (`process.argv[2]`), erroring if absent. Keep the 3 boilerplate phrases and the recursive .ts collector unchanged. No-BC move: old path DELETED, not aliased.\n- Update packages/architect-projection/package.json:75 from `node ./scripts/jsdoc-boilerplate-audit.mjs` to `node ../../scripts/jsdoc-boilerplate-audit.mjs packages/architect-projection/src` (keep it in projection's `test` chain at line 73 unchanged).\n- Add to packages/architect-core/package.json a script `test:jsdoc-boilerplate-audit: node ../../scripts/jsdoc-boilerplate-audit.mjs packages/architect-core/src` and prepend it to its `test` script: `test: pnpm test:jsdoc-boilerplate-audit && vitest run`. Wires it into CI automatically (ci.yml:30 `pnpm test` = `pnpm -r --filter './packages/**' test`).\nOnce wired, core's audit FAILS immediately (15 flagged files) — that failure is the lever forcing Part 2's cleanup.\n\nPART 2 — DELETE BOILERPLATE JSDOC + BACKFILL SUBSTANTIVE INVARIANTS AT THE RIGHT HOME.\nDoctrine: annotations are ADDITIVE; a completed pattern may carry zero JSDoc if its executable feature carries the surface. The 5 read-api files and 3 FSM files carry ONLY boilerplate JSDoc (the \"When to Use / As a typed contract\" stanza) — pure noise. DELETE that stanza from all 8 (keeping the @architect-* tag lines). The substance belongs in executable Rule blocks, surfaced under `*ExecutableTests` patterns per the proven PatternGraphApiConsistencyExecutableTests convention.\n\n2a. FSMValidator — author NEW executable feature `packages/architect-core/tests/features/validation/fsm-transitions.feature` tagged `@architect-pattern:FSMTransitionsExecutableTests` + `@architect-implements:FSMValidator`, with Rule blocks carrying the ACTUAL invariants, and a matching steps file promoting the existing fsm-contract.test.ts assertions. DELETE fsm-contract.test.ts (coverage moves into the feature — No-BC, no parallel impl). Invariants (grounded in transitions.ts:22-29 and states.ts:18-23):\n  • Rule \"Lifecycle transitions follow the four-state FSM\" — Invariant: validateTransition is valid only for roadmap→active, roadmap→deferred, active→completed, active→roadmap, deferred→roadmap; every other (from,to) over real status values is rejected; completed is terminal (no outgoing). Rationale: the FSM encodes the delivery process — planning(roadmap)→implementation(active)→verified terminal(completed), with deferred as a parking state re-entered via roadmap; skipping states bypasses planning/scope gates. Verified by: the legal- and illegal-transition scenarios.\n  • Rule \"Unknown status values are preserved, not coerced\" — Invariant: validateTransition with a from/to outside {roadmap,active,completed,deferred} returns valid:false echoing the raw value verbatim plus the canonical valid-values list. Rationale: silently casting a typo to a fake state hides author error; the raw echo makes it diagnosable. Verified by: the candidate-source and candidate-target rejection scenarios.\n  • Rule \"Illegal-but-typed transitions surface valid alternatives\" — Invariant: a well-typed but illegal transition (e.g. roadmap→completed) returns validAlternatives = getValidTransitionsFrom(from) and a directive error (\"Must go through 'active' first\"). Rationale: the decider's errors must guide the author to the legal next step. Verified by: the alternatives scenario.\n  • Rule \"Protection level is a pure function of status\" — Invariant: getProtectionLevel maps roadmap/deferred→none, active→scope, completed→hard; isTerminalState true iff completed. Rationale: protection is what ProcessGuardDecider keys enforcement off (completed→hard→unlock required; active→scope→no new deliverables); it must be a stable total function. Verified by: a protection-level scenario.\n\n2b. ProcessGuardDecider — the 4 enforcement invariants ALREADY exist as Rule blocks under ProcessGuardRulesExecutableTests. The decider behavior NOT yet captured: session-excluded (hard error, decider.ts:413-435) and deliverable-removed (warning, decider.ts:362-373) — present in JSDoc (decider.ts:96-114) but ABSENT from process-guard-rules.feature (verified: exactly 4 Rule blocks). ADD two Rule blocks to process-guard-rules.feature:\n  • Rule \"Session Exclusion\" — Invariant: files explicitly excluded from the active session are a hard error (not a warning), unless --ignore-session is set. Rationale: explicit exclusion is a deliberate protective boundary; unlike the soft session-scope warning, crossing it requires changing session config, not a drive-by override. Verified by: the guard-runtime session-excluded path.\n  • Rule \"Deliverable Removal\" — Invariant: removing a deliverable from a scope-locked (active) spec emits a warning, never an error. Rationale: removal may be legitimate (descoped/completed elsewhere) but warrants author attention so the commit documents intent. Verified by: the guard-runtime deliverable-removal path.\nThen DELETE the redundant \"Error Guide Content\" prose invariant block from decider.ts JSDoc (decider.ts:36-114) — it duplicates the executable Rule blocks and is the canonical example of dead/duplicated surface (keep the concise overview lines 11-34, which is not boilerplate-phrase-flagged).\n\nIMPORTANT framing note for the synthesizer: this design does NOT make `rules --pattern FSMValidator` or `rules --pattern ProcessGuardDecider` return rows — architecturally impossible given the feature→pattern binding (confirmed: even `rules --pattern PatternGraphApi` returns [] while its ExecutableTests sibling returns 9). Invariants correctly surface under FSMTransitionsExecutableTests / ProcessGuardRulesExecutableTests. The decider slices stay lean by design (additive annotations). If the repo wants the TS-pattern query to resolve to its implementing feature's rules, that is a SEPARATE kernel change (a query-time join pattern→implementedBy→rules) and is OUT OF SCOPE here to avoid colliding with A2-adr006; flagged as a follow-up.",
+      "edits": [
+        {
+          "file": "scripts/jsdoc-boilerplate-audit.mjs",
+          "change": "NEW file (moved from packages/architect-projection/scripts/jsdoc-boilerplate-audit.mjs). Parameterize: read src root from process.argv[2] instead of hardcoding resolve(packageRoot,'src'); error if arg missing. Keep the 3 boilerplate phrases and recursive .ts collector. Delete the projection-local copy.",
+          "rationale": "One shared workspace doctrine check, invoked per-package — DRY, No-BC (old path deleted not aliased)."
+        },
+        {
+          "file": "packages/architect-projection/scripts/jsdoc-boilerplate-audit.mjs",
+          "change": "DELETE (hoisted to root).",
+          "rationale": "No parallel copies; the audit is workspace-wide, not projection-specific."
+        },
+        {
+          "file": "packages/architect-projection/package.json",
+          "change": "Line 75: change test:jsdoc-boilerplate-audit to `node ../../scripts/jsdoc-boilerplate-audit.mjs packages/architect-projection/src`.",
+          "rationale": "Point projection at the hoisted parameterized script; behavior identical."
+        },
+        {
+          "file": "packages/architect-core/package.json",
+          "change": "Add script test:jsdoc-boilerplate-audit = `node ../../scripts/jsdoc-boilerplate-audit.mjs packages/architect-core/src`; change test (line 42) from `vitest run` to `pnpm test:jsdoc-boilerplate-audit && vitest run`.",
+          "rationale": "Wires the audit into CI (ci.yml:30 pnpm test) for the read-model core where ADR-006 doctrine matters most."
+        },
+        {
+          "file": "packages/architect-core/src/read-api/pattern-graph-api.ts",
+          "change": "Delete the boilerplate JSDoc stanza lines 9-11 (### When to Use / - As a typed contract...); keep the @architect-* tag lines 1-7.",
+          "rationale": "Boilerplate is pure noise on a completed read-model pattern; annotations are additive, executable feature carries the surface."
+        },
+        {
+          "file": "packages/architect-core/src/read-api/architecture-inspection.ts",
+          "change": "Delete boilerplate JSDoc stanza lines 9-11.",
+          "rationale": "Same boilerplate cleanup; flagged by the now-extended audit."
+        },
+        {
+          "file": "packages/architect-core/src/read-api/pattern-classification.ts",
+          "change": "Delete boilerplate JSDoc stanza (### When to Use / - As a typed contract..., ~lines 9-11).",
+          "rationale": "Same boilerplate cleanup."
+        },
+        {
+          "file": "packages/architect-core/src/read-api/graph-inventory.ts",
+          "change": "Delete boilerplate JSDoc stanza (~lines 9-11).",
+          "rationale": "Same boilerplate cleanup."
+        },
+        {
+          "file": "packages/architect-core/src/read-api/pattern-helpers.ts",
+          "change": "Delete boilerplate JSDoc stanza (~lines 9-11).",
+          "rationale": "Same boilerplate cleanup."
+        },
+        {
+          "file": "packages/architect-core/src/validation/fsm/validator.ts",
+          "change": "Delete boilerplate JSDoc stanza lines 10-12 (### When to Use / - As a typed contract...); keep @architect-* tags lines 1-8.",
+          "rationale": "Substance moves to fsm-transitions.feature; the FSMValidator slice stays lean by design."
+        },
+        {
+          "file": "packages/architect-core/src/validation/fsm/transitions.ts",
+          "change": "Delete boilerplate JSDoc stanza lines 9-11.",
+          "rationale": "Same; FSMTransitions invariants now in the executable feature."
+        },
+        {
+          "file": "packages/architect-core/src/validation/fsm/states.ts",
+          "change": "Delete boilerplate JSDoc stanza lines 9-11.",
+          "rationale": "Same; protection-level invariant captured in the executable feature."
+        },
+        {
+          "file": "packages/architect-core/src (7 remaining flagged files)",
+          "change": "For the other architect-core files the audit flags (extractor/dual-source-extractor.ts, extractor/layer-inference.ts, extractor/shape-extractor.ts, scanner/ast-parser.ts, scanner/gherkin-ast-parser.ts, generators/pipeline/build-pipeline.ts, package/package-resolver.ts): delete the same boilerplate phrase stanza wherever it appears.",
+          "rationale": "The extended audit fails on ALL 15 files; all must be cleaned for green CI. (These 7 are outside the decider/read-api focus but must be swept in the same change.)"
+        },
+        {
+          "file": "packages/architect-guard/src/lint/process-guard/decider.ts",
+          "change": "Delete the duplicated 'Error Guide Content (convention: process-guard-errors)' invariant block, lines 36-114; keep the concise overview lines 11-34.",
+          "rationale": "That prose duplicates the executable Rule blocks in process-guard-rules.feature; dead/duplicated surface (the read model carries only live state)."
+        }
+      ],
+      "newContracts": [
+        {
+          "name": "FSMTransitionsExecutableTests",
+          "kind": "graph-edge",
+          "shape": "New gherkin pattern node (tests/features/validation/fsm-transitions.feature) with edge @architect-implements:FSMValidator -> adds implementsPatterns:[FSMValidator] / implementedBy edge on FSMValidator, and 4 BusinessRule rows queryable via `rules --pattern FSMTransitionsExecutableTests`."
+        },
+        {
+          "name": "ProcessGuardRulesExecutableTests: Session Exclusion + Deliverable Removal",
+          "kind": "audit-rule",
+          "shape": "Two new BusinessRule rows under ProcessGuardRulesExecutableTests, each {ruleName, invariant, rationale, verifiedBy[]} parsed from **Invariant:**/**Rationale:**/**Verified by:** markers - raising that pattern's rule count from 4 to 6."
+        },
+        {
+          "name": "jsdoc-boilerplate-audit (parameterized)",
+          "kind": "audit-rule",
+          "shape": "scripts/jsdoc-boilerplate-audit.mjs <srcRoot>: recursively scans <srcRoot> .ts files for any of 3 boilerplate phrases; exit 1 + flagged-file report on match. Invoked per-package in each package test script; now enforced for architect-core."
+        }
+      ],
+      "executableSpecChanges": [
+        {
+          "file": "packages/architect-core/tests/features/validation/fsm-transitions.feature",
+          "change": "NEW executable feature. Header: @architect @architect-pattern:FSMTransitionsExecutableTests @architect-implements:FSMValidator @architect-status:active @architect-product-area:Validation. Four Rule blocks each with **Invariant:**/**Rationale:**/**Verified by:** markers (parsed by business-rules.internal.ts:86 BUSINESS_RULE_ANNOTATION_PATTERN) covering: (1) Lifecycle transitions follow the four-state FSM, (2) Unknown status values are preserved not coerced, (3) Illegal-but-typed transitions surface valid alternatives, (4) Protection level is a pure function of status (exact invariant text in proposedDesign 2a). Each Rule contains the concrete Scenarios that promote the fsm-contract.test.ts assertions."
+        },
+        {
+          "file": "packages/architect-core/tests/steps/validation/fsm-transitions.steps.ts",
+          "change": "NEW steps file using @amiceli/vitest-cucumber describeFeature/loadFeature (mirror tests/steps/read-api/pattern-graph-api-consistency.steps.ts harness). Import validateTransition, getValidTransitionsFrom, isValidStatusValue from src/validation/fsm/index.js and getProtectionLevel/isTerminalState from src/validation/fsm/states.js. Bind the legal-transition, candidate-source/target rejection, roadmap-to-completed alternatives, and protection-level scenarios, promoting the exact assertions currently in fsm-contract.test.ts."
+        },
+        {
+          "file": "packages/architect-core/tests/validation/fsm-contract.test.ts",
+          "change": "DELETE. Coverage fully promoted into fsm-transitions.feature + steps (No-BC: no parallel test of identical behavior). Grep-verified no other suite imports from it."
+        },
+        {
+          "file": "packages/architect-guard/tests/features/process-guard-rules.feature",
+          "change": "ADD two Rule blocks after the existing four: 'Session Exclusion' and 'Deliverable Removal', each with **Invariant:**/**Rationale:**/**Verified by:** (exact text in proposedDesign 2b). These capture decider.ts:413-435 (session-excluded hard error) and decider.ts:362-373 (deliverable-removed warning) as graph invariants. Runtime behavior already exists in decider.ts and is exercised by guard-runtime.steps.ts (validateChanges at line 207) so no new steps needed; Verified-by points at guard-runtime scenarios."
+        }
+      ],
+      "determinismRipple": true,
+      "filesOwned": [
+        "scripts/jsdoc-boilerplate-audit.mjs",
+        "packages/architect-projection/scripts/jsdoc-boilerplate-audit.mjs",
+        "packages/architect-projection/package.json",
+        "packages/architect-core/package.json",
+        "packages/architect-core/tests/features/validation/fsm-transitions.feature",
+        "packages/architect-core/tests/steps/validation/fsm-transitions.steps.ts",
+        "packages/architect-core/tests/validation/fsm-contract.test.ts",
+        "packages/architect-core/src/validation/fsm/validator.ts",
+        "packages/architect-core/src/validation/fsm/transitions.ts",
+        "packages/architect-core/src/validation/fsm/states.ts",
+        "packages/architect-guard/tests/features/process-guard-rules.feature",
+        "packages/architect-guard/src/lint/process-guard/decider.ts",
+        "packages/architect-core/src/extractor/dual-source-extractor.ts",
+        "packages/architect-core/src/extractor/layer-inference.ts",
+        "packages/architect-core/src/extractor/shape-extractor.ts",
+        "packages/architect-core/src/scanner/ast-parser.ts",
+        "packages/architect-core/src/scanner/gherkin-ast-parser.ts",
+        "packages/architect-core/src/generators/pipeline/build-pipeline.ts",
+        "packages/architect-core/src/package/package-resolver.ts"
+      ],
+      "conflictsWith": ["A2-adr006"],
+      "risk": "SHARED-SURFACE CONFLICT with A2-adr006: this cluster edits the JSDoc header of the 5 read-api/*.ts files (pattern-graph-api.ts, architecture-inspection.ts, pattern-classification.ts, graph-inventory.ts, pattern-helpers.ts) — deleting their boilerplate 'When to Use' stanza. A2-adr006 also annotates the read-api surface (per the cluster brief). Resolution rule for the synthesizer: A1 only DELETES the boilerplate stanza (lines ~9-11) and never touches the @architect-* tag lines; A2-adr006 owns tag-line semantics. If A2 ADDS richer JSDoc rationale to these files, apply A1's deletion first, then layer A2's additions on the cleaned header. DETERMINISM RIPPLE (true): the two new FSM Rule blocks + two new process-guard Rule blocks change docs-live/business-rules/architect-core.md (rule count rises from 97) and docs-live/business-rules/architect-guard.md (ProcessGuardRulesExecutableTests rows 4->6), plus any rule rollups (VALIDATION-RULES.md) — `pnpm docs:all` MUST run in the same change or the determinism gate (ci.yml:33 `pnpm docs:all` + git-diff-clean expectation) fails. SECONDARY: deleting fsm-contract.test.ts removes a vitest file — grep-clean, only self-references. The 7 extra non-read-api flagged files MUST be swept too or core's `test` goes red the moment the audit is wired.",
+      "verifyCommands": [
+        "node scripts/jsdoc-boilerplate-audit.mjs packages/architect-core/src",
+        "node scripts/jsdoc-boilerplate-audit.mjs packages/architect-projection/src",
+        "pnpm --filter @libar-dev/architect-core test",
+        "pnpm -s architect:query rules --pattern FSMTransitionsExecutableTests --only-invariants",
+        "pnpm -s architect:query rules --pattern ProcessGuardRulesExecutableTests --only-invariants",
+        "pnpm docs:all && git diff --exit-code docs-live",
+        "pnpm test",
+        "pnpm typecheck"
+      ]
+    },
+    {
+      "cluster": "A2 — ADR-006 → PatternGraph navigable edge + schema-contract-vs-runtime-read-model annotation",
+      "currentBehavior": "ADR-006's slice is prose-only about the PatternGraph but has NO graph edge to it. Verified live: `pnpm -s architect:query dep-tree ADR006SingleReadModelArchitecture` returns only `ADR005CodecBasedMarkdownRendering` (uses) and `ValidatorReadModelConsolidation` (enables) — the `PatternGraph` pattern the entire ADR is about is absent. `pattern ADR006SingleReadModelArchitecture` Relationships shows `\"seeAlso\":[]`, `\"uses\":[\"ADR005CodecBasedMarkdownRendering\"]`. The ADR feature header (architect/decisions/adr-006-single-read-model-architecture.feature:1-9) ends at `@architect-uses:ADR005CodecBasedMarkdownRendering` with no `@architect-see-also`.\n\nThe conflation is real and twofold:\n1. `search RuntimePatternGraph` → [] and `search relationshipIndex` → []. The ADR-006 prose Good/Bad code block (feature file, the \"\"\"typescript block) literally references `dataset: RuntimePatternGraph` and `dataset.relationshipIndex` — but `RuntimePatternGraph` is only `export type RuntimePatternGraph = PatternGraph;` (transform-types.ts:26), a pure ALIAS, never an `@architect-pattern`. So the runtime read model is invisible to the graph.\n2. `search PatternGraph` exact-match resolves to ONE pattern: validation-schemas/pattern-graph.ts (`@architect-pattern PatternGraph`, `@architect-role:contract`, self-described as \"PatternGraph - Read Model Schema / Zod schema for the canonical read model produced by buildPatternGraph()\", pattern-graph.ts:3-13). The ASSEMBLED runtime read model that ADR-006 calls \"the read model\" is produced by `transformToPatternGraph()` (generators/pipeline/transform-dataset.ts:88, returns `RuntimePatternGraph`) and served by `createPatternGraphAPI()` / the `PatternGraphAPI` facade (read-api/pattern-graph-api.ts:47-79,111, `@architect-pattern PatternGraphApi`, `@architect-role:utility`). An API-only agent reading `pattern PatternGraph` sees \"contract / Zod schema\" and cannot distinguish the schema contract from the live assembled graph + relationshipIndex + precomputed views — exactly the ADR-006 read model.",
+      "rootCause": "Two missing/imprecise annotations, not a code bug. (1) architect/decisions/adr-006-single-read-model-architecture.feature header carries no `@architect-see-also` edge to PatternGraph (the link is prose-only). (2) The schema-contract-vs-assembled-read-model distinction is undocumented at the annotation layer: pattern-graph.ts:9-13 conflates \"Zod schema\" with \"the canonical read model\" in one breath, and PatternGraphApi (read-api/pattern-graph-api.ts:1-12) does not state in its JSDoc that it is the live read-model facade ADR-006 references. No separate runtime type exists (`RuntimePatternGraph = PatternGraph` alias, transform-types.ts:26) so the missing distinction is purely doctrinal/annotation, not structural.",
+      "proposedDesign": "Lightest-correct modeling: DO NOT mint a new pattern for the runtime read model. `RuntimePatternGraph` is a pure type alias of `PatternGraph` (transform-types.ts:26) — there is no distinct runtime type to annotate, and the two existing patterns already cover both halves: `PatternGraph` (role:contract — the Zod schema that VALIDATES the read model) and `PatternGraphApi` (role:utility — the facade that SERVES the assembled read model). Minting a third pattern on `transformToPatternGraph()` would create dead modeling (a pattern whose only output type is an alias) and violate lightest-correct.\n\nInstead, do exactly three annotation edits:\n\n(1) NAVIGABLE EDGE — add `@architect-see-also:PatternGraph` to the ADR-006 feature header. Verified `see-also` is the correct relationship semantic: taxonomy defines it as \"Related patterns for cross-reference WITHOUT dependency implication\" (registry-builder.ts:296-299), which is exactly right — an ADR does not build-time depend on the schema, it documents it. Chosen over `@architect-uses` because `uses` is copied into `dependsOn` (relationship-resolver.ts:100), reverse-computed into `usedBy` (lines 175-183), and would falsely assert a build dependency + pollute PatternGraph's usedBy. `see-also` is one-directional (no reverse lookup computed for it — buildReverseLookups lines 130-184 cover only implements/extends/dependsOn/uses), so the edge appears on ADR-006 only, which is the correct directionality: the ADR points at the read model it governs, the schema does not need a back-pointer to every ADR. Target `PatternGraph` is a declared pattern name (verified exact-match search hit) so the dangling-reference check (relationship-resolver.ts:223-226, asserts ref ∈ allPatternNames) passes — no dangling, CI-clean. The cross-source see-also (gherkin ADR → TS schema) is proven to work: ADR-009 already carries `@architect-see-also:ADR005...,ADR006...` and its graph edge resolves (verified `pattern ADR009ProjectionTrustBoundary` shows seeAlso populated).\n\n(2) TEACH THE DISTINCTION on the contract — sharpen the PatternGraph schema JSDoc (pattern-graph.ts:9-13) to name itself unambiguously as the CONTRACT that validates the read model, and to point at the assembled runtime read model + its facade. Add one prose sentence (no new tag) distinguishing \"this Zod schema is the contract; the assembled runtime read model — graph + relationshipIndex + precomputed views — is the value `transformToPatternGraph()` produces and `PatternGraphApi` serves.\" This makes the ADR-006 slice teach the difference instead of conflating it.\n\n(3) TEACH THE DISTINCTION on the facade — sharpen PatternGraphApi JSDoc (read-api/pattern-graph-api.ts:9-11) so its body states it is the read-model FACADE that serves the assembled `PatternGraph` value per ADR-006 (it already `@architect-uses PatternGraph`). One prose sentence; no tag change.\n\nBREAKING-CHANGE NOTE: none structural — these are annotation edits only. The ADR-006 prose still references `RuntimePatternGraph`/`relationshipIndex` in its code examples; that is acceptable (illustrative pseudo-code referencing real type+field names) and does NOT need its own pattern. If a future cluster wants `relationshipIndex` navigable, that is the `@architect-shape RelationshipEntrySchema` already exported (pattern-graph.ts:136) — out of scope here.",
+      "edits": [
+        {
+          "file": "architect/decisions/adr-006-single-read-model-architecture.feature",
+          "change": "Insert a new header line `@architect-see-also:PatternGraph` immediately after line 8 (`@architect-uses:ADR005CodecBasedMarkdownRendering`) and before line 9 (`@architect-unlock-reason:...`). Use the colon-no-space-comma form matching ADR-009/ADR-010 convention. This adds the navigable ADR-006 → PatternGraph seeAlso edge.",
+          "rationale": "Makes the slice traversable: dep-tree/neighborhood and `pattern ADR006...` Relationships will surface PatternGraph. see-also is the correct cross-reference-without-dependency semantic; target is a declared pattern so no dangling."
+        },
+        {
+          "file": "packages/architect-core/src/validation-schemas/pattern-graph.ts",
+          "change": "Rewrite the JSDoc body (lines 9-13) so it explicitly separates contract from value: e.g. 'PatternGraph is the Zod CONTRACT (role:contract) for the assembled read model. The assembled runtime read model itself — patterns + relationshipIndex + precomputed views — is the value produced by transformToPatternGraph() (generators/pipeline) and served read-only by the PatternGraphApi facade (read-api). Per ADR-006 that assembled value, not this schema, is the single read model all consumers query.' Keep all tags unchanged (still @architect-role:contract, @architect-uses ExtractedPattern).",
+          "rationale": "Teaches the schema-vs-read-model distinction at the exact pattern an API-only agent lands on. Pure prose; no edge/tag change so PatternGraph's relationship set is unchanged."
+        },
+        {
+          "file": "packages/architect-core/src/read-api/pattern-graph-api.ts",
+          "change": "Expand the JSDoc body (lines 9-11) to state the facade's role: e.g. 'PatternGraphApi is the read-model FACADE (role:utility): createPatternGraphAPI(dataset: PatternGraph) wraps the assembled, deep-frozen read model and exposes typed read methods. This is the live read model ADR-006 names — the PatternGraph schema is its contract, this facade is how consumers query it.' Keep tags unchanged (still @architect-role:utility, @architect-uses ExtractedPattern, PatternHelpers, PatternGraph).",
+          "rationale": "Completes the distinction on the serving side. Note: this file is in read-api/ and SHARED with cluster A1-core-annotate — coordinate to avoid a JSDoc collision."
+        }
+      ],
+      "newContracts": [
+        {
+          "name": "ADR006SingleReadModelArchitecture.seeAlso[PatternGraph]",
+          "kind": "graph-edge",
+          "shape": "New seeAlso relationship edge: ADR006SingleReadModelArchitecture --seeAlso--> PatternGraph. Authored via @architect-see-also:PatternGraph on the ADR feature header. One-directional (no reverse edge computed). Resolves against allPatternNames (no dangling)."
+        }
+      ],
+      "executableSpecChanges": [
+        {
+          "file": "packages/architect-projection/tests/features/projections/governance/decision-records.steps.ts",
+          "change": "NO functional change required for the projection mechanism — the synthetic ADR-006 fixture (lines 38-51) already sets seeAlso and asserts affectedPatterns is the sorted union (line 124: `affectedPatterns: ['McpOutputSchemaValidation', 'PatternGraphAPI']`), proving seeAlso→affectedPatterns flow. OPTIONAL hardening: add `PatternGraph` to the fixture's seeAlso array (line 51) and to the asserted affectedPatterns (line 124, sorted) so the executable spec mirrors the real ADR-006 edge and pins that a schema-contract pattern is a legal see-also target. This keeps the projection spec faithful to the dogfood change."
+        },
+        {
+          "file": "tests/features/cli/validate-patterns.feature",
+          "change": "VERIFY (no edit expected): this dogfood feature gates dangling references. Confirm the new see-also edge produces zero dangling (PatternGraph is a declared name). If the suite snapshots the dangling count or ADR edge set, no change is needed because the edge resolves cleanly; if it pins ADR-006's exact relationship set, update that expectation to include the PatternGraph seeAlso edge."
+        }
+      ],
+      "determinismRipple": true,
+      "filesOwned": [
+        "architect/decisions/adr-006-single-read-model-architecture.feature",
+        "packages/architect-core/src/validation-schemas/pattern-graph.ts"
+      ],
+      "conflictsWith": ["A1-core-annotate"],
+      "risk": "Low. All edits are annotation/JSDoc — no runtime behavior change. The single real ripple is the determinism gate: adding @architect-see-also:PatternGraph feeds getAffectedPatterns (decision-records.internal.ts:244-254, unions uses+implements+seeAlso+apiRef+extends, sorted) so docs-live/decisions/adr-006.md 'Affected Patterns' list gains a `- PatternGraph` entry (sorted after ADR005CodecBasedMarkdownRendering). MUST run `pnpm docs:all` in the same change and commit the regenerated docs-live or `git diff --exit-code docs-live` fails CI. SHARED-FILE RISK: read-api/pattern-graph-api.ts JSDoc edit overlaps cluster A1-core-annotate's annotation surface — synthesizer must merge the two JSDoc rewrites into one coherent block rather than apply both blindly. Secondary risk: if any test pins ADR-006's exact relationship/dep-tree set, it must be updated to include the new seeAlso edge.",
+      "verifyCommands": [
+        "pnpm -s architect:query pattern ADR006SingleReadModelArchitecture | grep -A1 Relationships   # expect seeAlso to include PatternGraph",
+        "pnpm -s architect:query query getPatternRelationships --name ADR006SingleReadModelArchitecture   # confirm edge resolves, no dangling",
+        "pnpm -s architect:query arch dangling   # expect ADR-006 seeAlso:PatternGraph NOT listed",
+        "pnpm -s architect:query dep-tree ADR006SingleReadModelArchitecture   # PatternGraph now reachable from the slice",
+        "pnpm docs:all && git diff --exit-code docs-live   # determinism gate: must be clean AFTER regenerating; adr-006.md gains '- PatternGraph' under Affected Patterns",
+        "pnpm test --filter architect-projection -- decision-records   # projection spec still green (seeAlso→affectedPatterns)",
+        "pnpm test:dogfood   # validate-patterns dangling gate stays green"
+      ]
+    }
+  ],
+  "blueprint": {
+    "lanes": [
+      {
+        "laneName": "L0-kernel-contracts (architect-core read-model + schemas — STRICTLY SEQUENCED, single lane)",
+        "clusters": ["A2", "N3", "N1", "N2", "T1", "T2", "A1"],
+        "files": [
+          "packages/architect-core/src/read-api/pattern-graph-api.ts",
+          "packages/architect-core/src/read-api/types.ts",
+          "packages/architect-core/src/read-api/index.ts",
+          "packages/architect-core/src/read-api/architecture-inspection.ts",
+          "packages/architect-core/src/read-api/rule-aggregation.ts (NEW, N2)",
+          "packages/architect-core/src/read-api/pattern-classification.ts",
+          "packages/architect-core/src/read-api/graph-inventory.ts",
+          "packages/architect-core/src/read-api/pattern-helpers.ts",
+          "packages/architect-core/src/domain-enums.ts",
+          "packages/architect-core/src/taxonomy/normalized-status.ts",
+          "packages/architect-core/src/taxonomy/registry-builder.ts",
+          "packages/architect-core/src/scanner/gherkin-ast-parser.ts",
+          "packages/architect-core/src/scanner/ast-parser.ts",
+          "packages/architect-core/src/validation-schemas/extracted-pattern.ts",
+          "packages/architect-core/src/validation-schemas/pattern-graph.ts",
+          "packages/architect-core/src/generators/pipeline/relationship-resolver.ts",
+          "packages/architect-core/src/index.ts"
+        ],
+        "parallelSafe": false,
+        "note": "Every cluster except T3 adds a kernel method or schema field to architect-core read-api/schemas, and pattern-graph-api.ts is shared by N1/N2/T1/A1/A2. This lane MUST run as one sequenced unit, NOT in parallel, because pattern-graph-api.ts (interface + createPatternGraphAPI body), read-api/index.ts (barrel), and src/index.ts (public exports) are append-points contended by 5 clusters. Internal sequence: (1) A2 JSDoc-only edits to pattern-graph.ts/pattern-graph-api.ts FIRST so A1's later boilerplate-stanza DELETE on the same read-api headers composes on top (A1 deletes the 'When to Use' stanza lines ~9-11; A2 rewrites the substantive JSDoc body — apply A2 body-rewrite, then A1 stanza-delete, on each shared read-api file). (2) N3 schema fields: registry-builder enforces-decision tag, gherkin/ast parsers, extracted-pattern.ts enforcesDecisions, pattern-graph.ts RelationshipEntrySchema {enforcesDecisions, enforcedBy}, relationship-resolver reverse edge. (3) N1 getDependencyContext + types.ts DependencyContext types. (4) N2 rule-aggregation.ts NEW + getRulesForPattern + resolveImplementingFeatures. (5) T1 listPackages(). (6) T2 StatusFilterSchema in domain-enums + NORMALIZED_ONLY_STATUS_VALUES in normalized-status. (7) N3/A1 architecture-inspection.ts NeighborhoodResult.seeAlso/enforcedBy. (8) A1 deletes boilerplate JSDoc on the remaining read-api + extractor + scanner files LAST so it sweeps the headers all other edits already touched. pattern-graph-api.ts interface getsappend block once with ALL new methods (getDependencyContext, getRulesForPattern, getRulesByDecision, getPatternsByDecision, listPackages) to avoid five separate merge points. read-api/index.ts and src/index.ts barrels get one consolidated export block. THIS LANE GATES EVERYTHING: nothing in L1/L2/L3 compiles until it lands and `pnpm --filter @libar-dev/architect-core build` is green."
+      },
+      {
+        "laneName": "L1-projection-pattern-relations (dep-context + neighborhood + dep-tree-walk — SEQUENCED within lane)",
+        "clusters": ["N1", "N3"],
+        "files": [
+          "packages/architect-projection/src/fragments/pattern-relations/dependency-tree.ts (→ dependency-context.ts, N1)",
+          "packages/architect-projection/src/fragments/pattern-relations/supporting.ts (N1)",
+          "packages/architect-projection/src/fragments/pattern-relations/architecture-neighborhood.ts (N3)",
+          "packages/architect-projection/src/projections/pattern-relations/dependency-tree.internal.ts (→ dependency-context.internal.ts, N1 + N3 seeAlso-walk)",
+          "packages/architect-projection/src/projections/pattern-relations/dependency-tree.ts (→ dependency-context.ts, N1)",
+          "packages/architect-projection/src/projections/pattern-relations/architecture-neighborhood.internal.ts (N3)",
+          "packages/architect-projection/src/renderers/render-compact-text.ts (N1 + T2 — see sharedFiles)",
+          "packages/architect-projection/src/fragments/index.ts + fragments/pattern-relations/index.ts (N1 barrels)",
+          "packages/architect-projection/src/projections/index.ts + projections/pattern-relations/index.ts (N1 barrels)"
+        ],
+        "parallelSafe": false,
+        "note": "N1 and N3 BOTH edit dependency-tree.internal.ts: N1 deletes findDependencyTreeRoot/buildTreeNode and renames the file to dependency-context.internal.ts; N3 wants the tree-walk to follow seeAlso edges for ADR patterns. These are the SAME file and one renames it — they cannot run in parallel. Sequence: N1 lands first (deletes the inverted walk, renames file, builds buildDependencyContext delegating to kernel getDependencyContext), THEN N3 layers the seeAlso-following onto the NEW dependency-context.internal.ts (scoped to adr-bearing patterns only, per N3 risk note, to protect the perf gate). N3's neighborhood fragment/projection edits (architecture-neighborhood.*) are disjoint from N1 and can be done anytime within the lane. render-compact-text.ts is co-owned with T2 (L2) — see sharedFiles resolution. Depends on L0 (getDependencyContext + NeighborhoodResult.seeAlso/enforcedBy)."
+      },
+      {
+        "laneName": "L2-projection-governance+execution-context+CLI/MCP-rules (reverse-trace + decision-scope + package-key + status-filter — SEQUENCED)",
+        "clusters": ["N2", "N3", "T1", "T2"],
+        "files": [
+          "packages/architect-projection/src/projections/governance/business-rules.internal.ts (N2 + N3 + T1 — triple-shared)",
+          "packages/architect-projection/src/projections/pattern-relations/bundle.internal.ts (N2)",
+          "packages/architect-projection/src/projections/execution-context/session-context.internal.ts (N2)",
+          "packages/architect-projection/src/projections/execution-context/file-reading-list.internal.ts (N2)",
+          "packages/architect-projection/src/projections/governance/decision-records.internal.ts (N3)",
+          "packages/architect-projection/src/fragments/governance/decision-record.ts (N3)",
+          "packages/architect-projection/src/projections/pattern-relations/pattern-catalog.internal.ts (T1 list-filter? no — T2 owns; see note)",
+          "packages/architect-cli/src/cli/commands/_shared/structured.ts (N1 already in L0-adjacent? no — CLI; N2 + T1 + N1 query passthrough)",
+          "packages/architect-cli/src/cli/commands/_shared/schemas.ts (T1 resolvePackageFilter + T2 StatusFilter + parse helpers)",
+          "packages/architect-cli/src/cli/commands/_shared/projection-options.ts (N3 + T1)",
+          "packages/architect-cli/src/cli/commands/meta.ts (N3 + T1)",
+          "packages/architect-cli/src/cli/commands/read.ts (T1 + T2)",
+          "packages/architect-cli/src/cli/commands/reporting.ts (N1 dep-tree command)",
+          "packages/architect-cli/src/cli/commands/planning.ts (T2 help text)",
+          "packages/architect-mcp/src/tool-registry.ts (N1 dep-tree handler)",
+          "packages/architect-mcp/src/tool-input-schemas.ts (T2 StatusFilter)"
+        ],
+        "parallelSafe": false,
+        "note": "This is the heavy-contention lane. business-rules.internal.ts is touched by THREE clusters (N2 expands feature-scope via implementedBy; N3 adds a 'decision' scope to the discriminatedUnion + patternMatchesRuleSetScope; T1 rewrites the 'package' branch of patternMatchesRuleSetScope and DELETES inferWorkspacePackageName). They COMPOSE because each touches a different scope branch — merge so the discriminatedUnion gains BOTH the decision literal (N3) and keeps feature/package; collectBusinessRules/filterBusinessRules branch on options.scope (N2 feature-set expansion, N3 decision, T1 package-by-pkg.id) rather than any cluster rewriting the function wholesale. structured.ts QUERY_METHODS gets ONE consolidated append: getDependencyContext (N1), getRulesForPattern (N2), getRulesByDecision/getPatternsByDecision (N3 optional), listPackages (T1) — plus the resolvePackageFilter throw in the arch-packages branch (T1). schemas.ts merges resolvePackageFilter (T1) + StatusFilterSchema swap + parseStatusFilterValue (T2). meta.ts/projection-options.ts merge --decision (N3) + --package resolve+unscoped-id (T1). read.ts merges list --package resolve (T1) + list --status StatusFilter parse (T2). pattern-catalog.internal.ts is co-owned by T1(no logic, list path is via read.ts), T2(statusFilterMatches + StatusFilterSchema), T3(read path only) — T2 is the sole-owner of the filter logic; see sharedFiles. Sequence within lane: T1 package-reconcile + T2 status-filter first (they touch schemas/read/catalog), then N2 reverse-trace, then N3 decision-scope last (it extends the discriminatedUnion N2/T1 already touched). Depends fully on L0."
+      },
+      {
+        "laneName": "L3-delivery-reporting+docs-gate (traceability populate + degenerate guard)",
+        "clusters": ["T3"],
+        "files": [
+          "packages/architect-projection/src/projections/delivery-reporting/index.ts (buildTraceRows + JSDoc)",
+          "packages/architect-projection/src/projections/documentation-composition/degenerate-guard.ts (NEW)",
+          "packages/architect-projection/src/index.ts (barrel — degenerate-guard exports)",
+          "packages/architect-cli/src/cli/generate-docs.ts (gate hook)",
+          "packages/architect-projection/tests/features/projections/delivery-reporting/traceability-matrix.feature",
+          "packages/architect-projection/tests/features/projections/delivery-reporting/traceability-matrix.steps.ts",
+          "packages/architect-projection/tests/features/projections/delivery-reporting/support.ts"
+        ],
+        "parallelSafe": true,
+        "note": "T3 is file-disjoint from L1 and L2 (delivery-reporting/ + documentation-composition/degenerate-guard.ts + generate-docs.ts are touched by no other cluster) EXCEPT packages/architect-projection/src/index.ts barrel, which is low-contention append-only (T3 adds degenerate-guard exports; N1 touches fragment/projection sub-barrels not this top barrel). buildTraceRows consumes relationshipIndex.implementedBy — it SHOULD consume N2's getRulesForPattern/resolveImplementingFeatures-adjacent accessor if one exists, but T3 only needs implementedBy ref FILES (read via existing getRelationships helper), which N2 does not modify, so T3 can read the existing helper directly and is independent of N2's new accessor. CRITICAL SEQUENCING CONSTRAINT: the degenerate-guard GATE HOOK in generate-docs.ts will fail roadmap/current-work (verified quarters:0, removed-phase dimension). NO cluster in this chunk repopulates roadmap/current-work, so the generate-docs.ts gate-activation MUST be held back (ship the guard mechanism + degenerate-guard.feature spec, but DO NOT wire the throw into generate-docs.ts main() until a sibling campaign fixes roadmap/current-work). T3 ships: buildTraceRows populate (safe, ripples docs-live TRACEABILITY.md) + degenerate-guard.ts module + its executable spec; the generate-docs.ts hook is DEFERRED. This lane can run fully parallel to L1/L2 once L0 is green (it needs no L0 kernel method — implementedBy already exists — so it could even start before L0, but gate it after L0 to keep one build baseline)."
+      },
+      {
+        "laneName": "L4-pure-annotation+test-authoring (executable specs, JSDoc deletes, audit hoist — projection-disjoint)",
+        "clusters": ["A1", "A2", "N1", "N2", "N3", "T1", "T2", "T3"],
+        "files": [
+          "scripts/jsdoc-boilerplate-audit.mjs (NEW, A1 hoist)",
+          "packages/architect-projection/scripts/jsdoc-boilerplate-audit.mjs (A1 DELETE)",
+          "packages/architect-projection/package.json (A1)",
+          "packages/architect-core/package.json (A1)",
+          "packages/architect-core/src/validation/fsm/validator.ts + transitions.ts + states.ts (A1 JSDoc delete)",
+          "packages/architect-core/src/extractor/*.ts + scanner/*.ts (A1 boilerplate sweep — shared with L0; see note)",
+          "packages/architect-guard/src/lint/process-guard/decider.ts (A1 JSDoc delete)",
+          "packages/architect-guard/tests/features/process-guard-rules.feature (A1)",
+          "packages/architect-core/tests/features/validation/fsm-transitions.feature + steps (A1 NEW)",
+          "packages/architect-core/tests/validation/fsm-contract.test.ts (A1 DELETE)",
+          "architect/decisions/adr-006-single-read-model-architecture.feature (A2)",
+          "packages/architect-projection/tests/features/projections/documentation-composition/api-reference.feature (N3 @architect-enforces-decision)",
+          "all *.feature + *.steps.ts executable specs owned by N1/N2/N3/T1/T2 (per each spec's executableSpecChanges)"
+        ],
+        "parallelSafe": true,
+        "note": "Pure-annotation + executable-spec authoring is projection-code-disjoint and runs in its own lane AFTER L0/L1/L2/L3 source lands (specs assert against the new kernel/projection behavior, so they must follow the impl). HARD OVERLAP with L0: A1's boilerplate-JSDoc sweep targets architect-core scanner/ast-parser.ts, scanner/gherkin-ast-parser.ts, extractor/*.ts, generators/pipeline/build-pipeline.ts, package/package-resolver.ts — several of which L0 (N3) also edits (ast-parser.ts, gherkin-ast-parser.ts). RESOLUTION: A1's JSDoc-stanza DELETE on those files is folded INTO L0's sequence (A1 runs LAST inside L0 on the scanner/extractor files it shares), NOT in L4. Only A1's package.json/audit-hoist/fsm-feature/decider edits and the test-authoring stay in L4. api-reference.feature gets @architect-enforces-decision (N3) here — it is the event-store write that makes rules --decision ADR009 work, so it must land before the N3 verify step but is test-tree-disjoint from all source. This lane is internally parallel-safe (each cluster owns distinct .feature/.steps files; no two clusters share a spec file — verified against filesOwned). T2 touches the shared kernel spec pattern-graph-api-consistency.feature (additive scenario only); A1 touches pattern-graph-api.feature region? No — A1 authors fsm-transitions.feature (new). N2 extends pattern-graph-api.feature; coordinate with no one else (N2 sole owner of that core spec)."
+      }
+    ],
+    "globalOrder": [
+      "L0-kernel-contracts (architect-core schemas + read-model methods: A2 JSDoc → N3 enforces-decision tag/edges → N1 getDependencyContext → N2 rule-aggregation → T1 listPackages → T2 StatusFilterSchema → N3/A1 NeighborhoodResult.seeAlso/enforcedBy → A1 boilerplate-JSDoc delete on shared core files; build+typecheck architect-core green)",
+      "L1-projection-pattern-relations (N1 dep-context rewrite+rename FIRST, then N3 seeAlso-walk + neighborhood fragment) ∥ L3-delivery-reporting (T3 buildTraceRows populate + degenerate-guard module, generate-docs.ts hook DEFERRED) — these two lanes are file-disjoint and run in parallel",
+      "L2-projection-governance+CLI/MCP (T1 package-key + T2 status-filter → N2 reverse-trace → N3 decision-scope; one merged business-rules.internal.ts, one merged structured.ts QUERY_METHODS, one merged schemas.ts/meta.ts/read.ts) — runs after L0, may overlap L1/L3 only on render-compact-text.ts and pattern-catalog.internal.ts which are assigned single in-lane owners (see sharedFiles)",
+      "L4-pure-annotation+executable-specs (all *.feature/*.steps authoring + A1 audit-hoist/fsm-feature/decider + A2 ADR-006 see-also + N3 api-reference @architect-enforces-decision) — runs after all source lanes so specs assert real behavior; internally parallel across clusters",
+      "DOCS-LIVE-REGEN (single `pnpm docs:all` over the unified tree, then `git diff --exit-code docs-live`) — LAST, exactly once; determinism gate runs over the merged result of N1+N3+T3+A1+A2 ripples"
+    ],
+    "sharedFiles": [
+      {
+        "file": "packages/architect-core/src/read-api/pattern-graph-api.ts",
+        "clusters": ["N1", "N2", "N3", "T1", "A1", "A2"],
+        "resolution": "SOLE-OWNER = L0 lane, single sequenced edit. Interface (line 47-79) + createPatternGraphAPI body get ONE consolidated append block adding all new methods: getDependencyContext (N1), getRulesForPattern (N2), getRulesByDecision + getPatternsByDecision (N3), listPackages (T1). JSDoc body rewrite (A2) applied first, then A1's boilerplate-stanza delete on the cleaned header. No cluster edits this file outside L0."
+      },
+      {
+        "file": "packages/architect-core/src/read-api/index.ts",
+        "clusters": ["N2", "T1"],
+        "resolution": "SOLE-OWNER = L0, append-only. One export block re-exporting rule-aggregation.ts (N2: resolveImplementingFeatures, getRulesForPattern, ProvenancedRule/ProvenancedRuleSchema) plus listPackages type if surfaced (T1)."
+      },
+      {
+        "file": "packages/architect-core/src/index.ts",
+        "clusters": ["T1", "N2"],
+        "resolution": "SOLE-OWNER = L0, append-only public-barrel export of listPackages type (T1) and ProvenancedRule (N2). Single block."
+      },
+      {
+        "file": "packages/architect-core/src/read-api/architecture-inspection.ts",
+        "clusters": ["N3", "A1"],
+        "resolution": "L0 in-lane sequence: N3 adds NeighborhoodResult.seeAlso + enforcedBy (interface lines 34-46) and computeNeighborhood mapping (105-117) FIRST; A1 deletes the boilerplate JSDoc stanza (lines ~9-11) on the same header AFTER. Disjoint regions, sequence avoids merge conflict."
+      },
+      {
+        "file": "packages/architect-core/src/read-api/pattern-graph-api.ts JSDoc header (lines ~9-11)",
+        "clusters": ["A1", "A2"],
+        "resolution": "Declared conflict A1↔A2. In L0: A2 rewrites the substantive JSDoc BODY (facade-vs-contract distinction); A1 deletes the boilerplate 'When to Use / As a typed contract' stanza. Apply A2 body-rewrite first, then A1 removes the now-redundant boilerplate lines — the merged header keeps A2's substantive prose and drops A1's boilerplate. A1 never touches @architect-* tag lines."
+      },
+      {
+        "file": "packages/architect-core/src/scanner/ast-parser.ts + scanner/gherkin-ast-parser.ts",
+        "clusters": ["N3", "A1"],
+        "resolution": "L0 in-lane: N3 adds the enforces-decision csv parsing (FeatureTagMetadataSchema field, switch case, emit) FIRST; A1 deletes the boilerplate JSDoc stanza on the same files AFTER. Disjoint line regions (parser body vs file-header JSDoc)."
+      },
+      {
+        "file": "packages/architect-core/src/extractor/*.ts + generators/pipeline/build-pipeline.ts + package/package-resolver.ts",
+        "clusters": ["A1"],
+        "resolution": "SOLE-OWNER = A1 (boilerplate sweep), executed inside L0 so the architect-core build is green before dependent lanes. No other cluster edits these (T1's package-resolver claim is read-only — it does not edit package-resolver.ts; it only adds listPackages in read-api)."
+      },
+      {
+        "file": "packages/architect-projection/src/projections/pattern-relations/dependency-tree.internal.ts (→ dependency-context.internal.ts)",
+        "clusters": ["N1", "N3"],
+        "resolution": "IN-LANE SEQUENCE (L1): N1 owns the file FIRST — deletes findDependencyTreeRoot/buildTreeNode, renames to dependency-context.internal.ts, delegates to kernel getDependencyContext. N3 THEN layers seeAlso-edge-following onto the NEW dependency-context.internal.ts (scoped to adr-bearing patterns to protect perf gate). N3 must target the renamed file, not the old name."
+      },
+      {
+        "file": "packages/architect-projection/src/renderers/render-compact-text.ts",
+        "clusters": ["N1", "T2"],
+        "resolution": "CROSS-LANE shared (L1 N1 + L2 T2). SOLE-OWNER = N1 (L1) for fragment-renderer logic: replaces COMPACT_NORMALIZERS 'DependencyTree' entry + renderDependencyTree→renderDependencyContext. T2's edit is ONE line (progress-line label at line 116 'planned (roadmap+deferred)') in a disjoint function. RESOLUTION: assign render-compact-text.ts to L1 (N1) sole-ownership; T2's one-line progress-label change is applied by L1 as a pre-agreed micro-edit (orchestrator hands T2's exact diff to the L1 implementer), OR L2 waits for L1 to finish this file then applies the 1-liner. Disjoint functions — trivial sequence."
+      },
+      {
+        "file": "packages/architect-projection/src/projections/governance/business-rules.internal.ts",
+        "clusters": ["N2", "N3", "T1"],
+        "resolution": "TRIPLE-SHARED, SOLE-LANE = L2, sequenced. T1 first (rewrite 'package' branch of patternMatchesRuleSetScope to context.packageResolver(...).id === scopeValue; DELETE inferWorkspacePackageName). N2 second (feature-scope: expand name-set via resolveImplementingFeatures in collectBusinessRules + relax filterBusinessRules feature branch). N3 last (add 'decision' literal to BusinessRuleSetOptionsSchema discriminatedUnion + 'decision' branches in patternMatchesRuleSetScope/filterBusinessRules/createBusinessRuleSetRoot). All three branch on options.scope — no wholesale rewrite — so they compose into one file."
+      },
+      {
+        "file": "packages/architect-cli/src/cli/commands/_shared/structured.ts",
+        "clusters": ["N1", "N2", "T1"],
+        "resolution": "SOLE-LANE = L2, one consolidated edit. QUERY_METHODS enum (35-69) gets a single append: getDependencyContext (N1), getRulesForPattern (N2), listPackages + getRulesByDecision/getPatternsByDecision (T1/N3). executeQueryMethod (180+) gets one matching case block. arch-packages branch (451-454) gets T1's resolvePackageFilter throw. One implementer owns this file."
+      },
+      {
+        "file": "packages/architect-cli/src/cli/commands/_shared/schemas.ts",
+        "clusters": ["T1", "T2"],
+        "resolution": "SOLE-LANE = L2, merged. T1 adds export resolvePackageFilter(accepted, value). T2 swaps ListFlagsSchema.status AcceptedStatusSchema→StatusFilterSchema and adds parseStatusFilterValue. Disjoint additions — one implementer applies both."
+      },
+      {
+        "file": "packages/architect-cli/src/cli/commands/_shared/projection-options.ts",
+        "clusters": ["N3", "T1"],
+        "resolution": "SOLE-LANE = L2. N3 adds --decision→{scope:'decision'} branch + scopeFilters mutual-exclusion entry. T1 confirms scopeValue is unscoped id (the resolve step lives in meta.ts). buildBusinessRuleSetProjectionOptions scopeFilters array (61-70) gains the decision entry; both compose."
+      },
+      {
+        "file": "packages/architect-cli/src/cli/commands/meta.ts",
+        "clusters": ["N3", "T1"],
+        "resolution": "SOLE-LANE = L2. rules CommandDef flagParsers: N3 adds --decision value parser + usage string; T1 adds --package resolvePackageFilter(listPackages()) resolve before options construct + drops '@libar-dev/' from usage strings. Both edit the same flagParsers map / execute body — one implementer merges."
+      },
+      {
+        "file": "packages/architect-cli/src/cli/commands/read.ts",
+        "clusters": ["T1", "T2"],
+        "resolution": "SOLE-LANE = L2. T1 adds list --package resolvePackageFilter(api.listPackages()) before projecting. T2 swaps the list --status flagParser parseAcceptedStatusValue→parseStatusFilterValue + flags-cast type. Disjoint flag handlers in the same execute() — one implementer merges."
+      },
+      {
+        "file": "packages/architect-projection/src/projections/pattern-relations/pattern-catalog.internal.ts",
+        "clusters": ["T1", "T2", "T3"],
+        "resolution": "SOLE-OWNER = T2 (L2) for the filter LOGIC: change PatternCatalogOptionsSchema.status→StatusFilterSchema + statusFilterMatches helper replacing exact-match (line 49). T1 does NOT edit this file (its list-package resolve lives in read.ts, not the catalog). T3 only READS this code path (no edit). So effectively single-owner T2; T1/T3 listed because briefs referenced the file but neither edits it."
+      },
+      {
+        "file": "packages/architect-projection/src/index.ts (top package barrel)",
+        "clusters": ["T3", "N1"],
+        "resolution": "Low-contention append-only. T3 (L3) adds assertGeneratorNotDegenerate + GeneratorDegenerateError exports. N1 (L1) touches fragments/index.ts and projections/index.ts SUB-barrels, NOT this top barrel — so no real overlap. T3 sole-owner of the top barrel addition."
+      },
+      {
+        "file": "packages/architect-core/tests/features/read-api/pattern-graph-api-consistency.feature",
+        "clusters": ["T2", "A1?"],
+        "resolution": "L4. T2 adds an additive scenario (planned-bucket = roadmap+deferred). A1 does NOT touch this file (A1 authors fsm-transitions.feature, new). N2 touches pattern-graph-api.feature (sibling, different file). No real conflict — T2 sole owner of the consistency-spec scenario addition."
+      },
+      {
+        "file": "docs-live/** (TRACEABILITY.md, PATTERNS.md, REQUIREMENTS-EXECUTABLE.md, api-reference/*, business-rules/*, decisions/adr-006.md, TAXONOMY.md, traceability/*)",
+        "clusters": ["N1", "N3", "T3", "A1", "A2"],
+        "resolution": "SINGLE regeneration step at the very end (after L4). Five clusters ripple docs-live; running `pnpm docs:all` once over the unified tree produces the merged deterministic output. NO cluster hand-edits docs-live. `git diff --exit-code docs-live` is the one gate, run once."
+      }
+    ],
+    "determinismClusters": [
+      "N1 (DependencyContext fragment + @architect-shape/docstring rewrite ripples docs-live/api-reference/architect-projection.md, business-rules/architect-projection.md, PATTERNS.md, REQUIREMENTS-EXECUTABLE.md)",
+      "N3 (new enforces-decision tag ripples TAXONOMY.md; relatedDecisions/affectedPatterns repurpose ripples docs-live/decisions/*.md; neighborhood/business-rule decision-scope may ripple business-rules/*.md)",
+      "T3 (buildTraceRows populate ripples docs-live/TRACEABILITY.md from '0 pattern rows' to populated matrix + docs-live/traceability/* per-row children)",
+      "A1 (two new FSM Rule blocks + two new process-guard Rule blocks ripple docs-live/business-rules/architect-core.md rule count + business-rules/architect-guard.md ProcessGuardRulesExecutableTests 4→6 + any VALIDATION-RULES rollup)",
+      "A2 (@architect-see-also:PatternGraph ripples docs-live/decisions/adr-006.md Affected Patterns gains '- PatternGraph')"
+    ],
+    "kernelFirst": [
+      "A2 JSDoc body rewrite on pattern-graph.ts + pattern-graph-api.ts (annotation-only, no contract; do first so A1's boilerplate-delete composes)",
+      "N3 enforces-decision metadata tag in registry-builder.ts (tag must be registered before parsers can populate it)",
+      "N3 enforcesDecisions/enforcedBy fields on ExtractedPatternSchema + RelationshipEntrySchema (pattern-graph.ts strictObject) + relationship-resolver reverse-edge computation",
+      "N3 gherkin-ast-parser.ts + ast-parser.ts enforces-decision csv parsing (depends on registry tag + schema field)",
+      "N1 getDependencyContext(name, opts) on PatternGraphAPI + DependencyContext/DependencyContextNode types in read-api/types.ts (consumed by L1 projection)",
+      "N2 rule-aggregation.ts (NEW): resolveImplementingFeatures + getRulesForPattern + ProvenancedRuleSchema/ProvenancedRule (consumed by L2 governance + execution-context projections)",
+      "N3 getRulesByDecision + getPatternsByDecision on PatternGraphAPI (consumed by L2 rules --decision)",
+      "T1 listPackages(): readonly string[] on PatternGraphAPI (consumed by L2 resolvePackageFilter in read.ts/meta.ts/structured.ts)",
+      "T2 NORMALIZED_ONLY_STATUS_VALUES in taxonomy/normalized-status.ts + StatusFilterSchema/StatusFilterValue in domain-enums.ts (consumed by L2 pattern-catalog.internal.ts statusFilterMatches + schemas.ts/read.ts/tool-input-schemas.ts)",
+      "N3 + A1 NeighborhoodResult.seeAlso + enforcedBy on architecture-inspection.ts (consumed by L1 architecture-neighborhood fragment/projection)",
+      "read-api/index.ts + src/index.ts consolidated barrel exports (must land before any architect-projection/architect-cli import compiles)"
+    ],
+    "risks": [
+      "pattern-graph-api.ts is contended by 5 clusters (N1/N2/N3/T1/A1+A2 JSDoc) — if not serialized into one L0 edit, parallel implementers WILL clobber the interface block; orchestrator must assign a single L0 owner that applies all method-appends in one pass.",
+      "STATUS-ENUM RIPPLE: T2 introduces StatusFilterSchema as a SEPARATE schema and MUST NOT touch ProcessStatusSchema (FSM transitions) or AcceptedStatusSchema (@architect-status validation). A1 simultaneously authors fsm-transitions.feature asserting the exact FSM vocabulary {roadmap,active,completed,deferred} — if T2 accidentally widened ProcessStatusSchema, A1's FSM transition scenarios and isValidTransition would break. Keep StatusFilterSchema scoped to catalog/list/search filtering only.",
+      "RelationshipEntrySchema strictObject change (N3 adds enforcesDecisions/enforcedBy) ripples into EVERY producer + the dep-tree fragment + neighborhood fragment + any consumer keying on the relationship entry; a missed producer fails strictObject parse at runtime. N1's DependencyContext walk reads the SAME relationshipIndex — if N3's new edges land after N1's getDependencyContext, ensure N1 does not assume a fixed RelationshipEntry shape (it reads dependsOn/uses/usedBy/enables, disjoint from enforces* — safe, but both must agree the index is the canonical source).",
+      "business-rules.internal.ts triple-edit (N2+N3+T1): if any cluster rewrites collectBusinessRules/patternMatchesRuleSetScope wholesale instead of branching on options.scope, the other two clusters' branches are lost. Enforce branch-on-scope discipline.",
+      "T3 degenerate-guard GATE will RED-fail roadmap/current-work (verified quarters:0) — NO cluster in this chunk repopulates them. Activating the generate-docs.ts hook before a sibling campaign fixes those turns CI red across the whole tree. MITIGATION: ship guard mechanism + spec, DEFER the generate-docs.ts hook wiring (documented in L3 note).",
+      "N1 is a BREAKING fragment-kind change (DependencyTree→DependencyContext): the renderer dispatch is keyed on fragment kind, so any missed call site fails strictObject parse at runtime. The CLI dep-tree command (reporting.ts) + MCP handler (tool-registry.ts) + all barrels must migrate in the same lane or build/tests fail. These live in L2/L1 — ensure reporting.ts (L2) and tool-registry.ts (L2) are updated in the SAME merge as the fragment rename (L1).",
+      "T1 is a BREAKING --package value-space change (scoped @libar-dev/... → unscoped id). The dogfood executable spec tests/features/cli/pattern-graph-cli-rules-subcommand.feature enshrines the OLD scoped convention — it MUST be rewritten in L4 or test:dogfood goes red. Cross-check no L0/L2 verify step runs the old scoped form expecting success.",
+      "render-compact-text.ts (N1 fragment-renderer + T2 progress-label) and pattern-catalog.internal.ts (T2 sole logic owner) cross the L1/L2 lane boundary — if L1 and L2 run truly concurrently they touch render-compact-text.ts simultaneously. Serialize: L1 finishes render-compact-text.ts, then L2 applies T2's 1-line progress-label edit (or hand it to L1).",
+      "Perf gate (architect-projection 36-pattern/108-rule fixture, baseline×1.5): N1's kernel transitive closure must reuse relationshipIndex (no per-node graph scans) and be cycle-safe per direction; N3's dep-tree seeAlso-walk must be scoped to adr-bearing patterns or it explodes tree size. Both ripple the same projection perf test — profile after the merged L1.",
+      "exactOptionalPropertyTypes: N1 node status/phase and T2 optional status field must use the `...(x!==undefined?{x}:{})` spread idiom, never `x: undefined`. verbatimModuleSyntax: all new cross-file type imports (DependencyContext, ProvenancedRule, StatusFilterValue, NeighborEntry) must be `import type`.",
+      "DETERMINISM: 5 clusters ripple docs-live (N1, N3, T3, A1, A2). A single `pnpm docs:all` MUST run LAST over the fully-merged tree; running it per-lane produces partial diffs that conflict. The git-tracked docs-live is the gate — regenerate once, commit once."
+    ],
+    "summary": "Fan out into 5 lanes with one hard kernel gate up front. LANE L0 (architect-core schemas + read-model methods) is SEQUENCED-NOT-PARALLEL and must land first: pattern-graph-api.ts is contended by 6 clusters, so a single owner appends ALL new kernel methods (getDependencyContext, getRulesForPattern, getRulesByDecision/getPatternsByDecision, listPackages) in one pass, adds the N3 enforces-decision tag+schema fields+reverse-edge, the T2 StatusFilterSchema, and the N3/A1 NeighborhoodResult.seeAlso/enforcedBy; A2's JSDoc body-rewrite is applied before A1's boilerplate-stanza delete on the shared read-api headers; A1's core boilerplate sweep on scanner/extractor files folds into L0 last. Build architect-core green before anything else moves. THEN run L1 (pattern-relations projection: N1 rewrites+renames dependency-tree.internal→dependency-context.internal FIRST, then N3 layers the adr-scoped seeAlso-walk + neighborhood fragment) in PARALLEL with L3 (delivery-reporting: T3 populates buildTraceRows from implementedBy + ships the degenerate-guard module/spec but DEFERS the generate-docs.ts gate hook since roadmap/current-work stay degenerate). L1 and L3 are file-disjoint. THEN L2 (governance + CLI/MCP: the heavy-contention lane) merges the triple-shared business-rules.internal.ts (T1 package-by-pkg.id → N2 implementedBy feature-expansion → N3 decision-scope, all branching on options.scope), the triple-shared structured.ts QUERY_METHODS (one consolidated append + T1 arch-packages throw), and the shared schemas.ts/meta.ts/read.ts/projection-options.ts (T1 package-reconcile + T2 status-filter + N3 --decision), plus the N1 dep-tree CLI/MCP wiring (reporting.ts, tool-registry.ts) that must migrate in lockstep with the L1 fragment rename. render-compact-text.ts and pattern-catalog.internal.ts are assigned single in-lane owners (N1 owns the renderer, T2 owns the catalog filter + the 1-line progress label) to resolve the L1/L2 boundary crossing. THEN L4 (pure annotation + executable specs) authors all *.feature/*.steps, A1's audit-hoist/fsm-feature/decider edits, A2's ADR-006 see-also, and N3's api-reference @architect-enforces-decision — internally parallel since every cluster owns disjoint spec files. FINALLY run `pnpm docs:all` exactly once over the unified tree and `git diff --exit-code docs-live` — the determinism gate over the merged N1+N3+T3+A1+A2 ripples. Critical watch-items: serialize pattern-graph-api.ts, keep StatusFilterSchema off the FSM/authored-tag schemas, enforce branch-on-scope in business-rules.internal.ts, defer the T3 docs-gate hook, and migrate the DependencyTree→DependencyContext fragment-kind rename across renderer+CLI+MCP+barrels in one merge.\""
+  }
+}

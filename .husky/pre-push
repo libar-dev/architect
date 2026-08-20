@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Full correctness gate, mirroring CI so a push only leaves your machine once it
+# would pass ci.yml. The sequence lives in package.json (`pnpm ci:pre-push`) so
+# it stays in lockstep with the CI workflow, which calls the same `ci:verify`
+# composite. Never bypass with --no-verify (No-BC doctrine).
+#
+#   ci:pre-push = ci:verify (build, format:check, lint, typecheck[:dogfood],
+#                 test[:dogfood], validate:all, guard:no-suppressions,
+#                 check:skills, architect:graph dangling --strict, umbrella bin smoke,
+#                 audit:subtractive) && docs:check (projection determinism,
+#                 in-place / writes nothing — the mid-changeset-safe variant of
+#                 the CI `docs:all && git diff` gate).
+#
+# Perf baselines are intentionally left to CI: they are latency budgets that go
+# flaky on a loaded laptop. If pre-push latency hurts, trim ci:pre-push (the
+# first candidates are test:dogfood and audit:subtractive) — do not --no-verify.
+pnpm ci:pre-push

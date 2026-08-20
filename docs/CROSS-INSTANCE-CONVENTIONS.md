@@ -59,8 +59,7 @@ The retired Wave 1 codemod command is intentionally not coming back; validate th
 post-campaign state with this recipe instead:
 
 ```bash
-pnpm pkg:query -- taxonomy --format json
-pnpm --filter @libar-dev/architect-dev architect:lint-patterns
-pnpm --filter @libar-dev/architect-dev validate:anti-patterns
-pnpm pkg:query -- arch dangling --baseline packages/architect-guard/src/lint/dangling-baseline.json
+pnpm architect:q 'g.graph.tagRegistry'
+pnpm validate:all
+pnpm architect:graph dangling --baseline packages/architect-guard/src/lint/dangling-baseline.json --strict
 ```

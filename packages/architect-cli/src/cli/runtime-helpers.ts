@@ -21,28 +21,14 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-export interface PackageMetadata {
-  readonly name: string;
-  readonly version: string;
-}
+import {
+  readPackageMetadata,
+  resolveInvocationDir,
+  type PackageMetadata,
+} from '@libar-dev/architect-core';
 
 export function readCliPackageMetadata(): PackageMetadata {
-  return JSON.parse(fs.readFileSync(new URL('../../package.json', import.meta.url), 'utf8')) as {
-    name: string;
-    version: string;
-  };
-}
-
-export function resolveInvocationDir(): string {
-  const pwd = process.env['PWD'];
-  const initCwd = process.env['INIT_CWD'];
-  if (pwd !== undefined && pwd.length > 0) {
-    return pwd;
-  }
-  if (initCwd !== undefined && initCwd.length > 0) {
-    return initCwd;
-  }
-  return process.cwd();
+  return readPackageMetadata(new URL('../../package.json', import.meta.url));
 }
 
 export function resolveWorkspaceRoot(): string {

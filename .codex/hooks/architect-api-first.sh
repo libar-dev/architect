@@ -1,0 +1,1 @@
+../../.claude/hooks/architect-api-first.sh

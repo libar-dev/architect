@@ -13,11 +13,13 @@
 // Context types that are shared across subdomains (ProjectionContext,
 // TagExampleOverride, etc.) stay explicitly enumerated below.
 
-export * from './blocks/schema.js';
+export * from './disclosure/index.js';
+export * from './routing/index.js';
 export * from './fragments/index.js';
 export * from './projections/index.js';
 export * from './renderers/index.js';
 
+export { PerspectiveHintSchema, ProjectionContextSchema } from './context/projection-context.js';
 export type {
   PerspectiveHint,
   ProjectionContext,
@@ -25,6 +27,7 @@ export type {
   TagExampleOverrides,
 } from './context/projection-context.js';
 export type {
+  MarkdownRenderEvent,
   ProjectionInput,
   RenderCompactOptions,
   RenderJsonOptions,

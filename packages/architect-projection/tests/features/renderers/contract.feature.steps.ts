@@ -1,12 +1,15 @@
 import { readFile } from 'node:fs/promises';
 
 import { describeFeature, loadFeature } from '@amiceli/vitest-cucumber';
-import { expect, expectTypeOf } from 'vitest';
+import { describe, expect, expectTypeOf, it } from 'vitest';
 
+import * as publicSurface from '../../../src/index.js';
 import {
   type BundleRouting,
   isBundle,
   type Fragment,
+  type MarkdownFileRoute,
+  type MarkdownRenderEvent,
   type PatternSummary,
   type ProjectionBundle,
   type RenderCompactOptions,
@@ -14,14 +17,15 @@ import {
   type RenderMarkdownOptions,
   type RenderUiOptions,
 } from '../../../src/index.js';
+import * as rendererSurface from '../../../src/renderers/index.js';
 import type {
   renderCompactText,
   renderJson,
   renderMarkdown,
   renderUi,
 } from '../../../src/index.js';
-import type { LogicalRouteId } from '../../../src/projections/documentation-composition/progressive-disclosure.js';
-import type { DisclosureSpec } from '../../../src/projections/documentation-composition/disclosure-spec.js';
+import type { LogicalRouteId } from '../../../src/routing/route-id.js';
+import type { ContentRichness, DisclosureSpec } from '../../../src/disclosure/spec.js';
 import { defaultMarkdownRouteProfile } from '../../../src/renderers/markdown-paths.js';
 import { dispatchByKind } from '../../../src/renderers/_shared/dispatch.js';
 import { projectSingle } from '../../../src/fragments/base.js';
@@ -64,14 +68,13 @@ function createState(): ContractState {
 
 function createPatternSummary(
   patternName: string,
-  status: 'completed' | 'active' | 'planned' | 'candidate'
+  status: 'completed' | 'active' | 'planned' | 'candidate',
 ): PatternSummary {
   return {
     kind: 'PatternSummary',
     patternName,
     status,
     role: 'service',
-    phase: 10,
     file: `packages/architect-projection/src/projections/${patternName}.ts`,
     source: 'typescript',
   };
@@ -90,7 +93,7 @@ function createRouting(): BundleRouting {
 }
 
 function materializeMarkdownRecord(
-  bundle: ProjectionBundle<PatternSummary>
+  bundle: ProjectionBundle<PatternSummary>,
 ): Record<string, string> {
   const fileMap: Record<string, string> = {};
   const routing = bundle.routing;
@@ -100,7 +103,11 @@ function materializeMarkdownRecord(
   }
 
   fileMap[
-    defaultMarkdownRouteProfile.mapPath(routing.rootRouteId as LogicalRouteId, bundle.root.kind)
+    defaultMarkdownRouteProfile.mapPath(
+      routing.rootRouteId as LogicalRouteId,
+      bundle.root.kind,
+      undefined,
+    )
   ] = `root:${bundle.root.patternName}`;
 
   for (const [key, child] of Object.entries(bundle.children)) {
@@ -150,7 +157,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         And('the bundle should not define routing', () => {
           expect(state!.bundle?.routing).toBeUndefined();
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -163,7 +170,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             children: {
               'projection-renderer-contract': createPatternSummary(
                 'ProjectionRendererContractDetail',
-                'completed'
+                'completed',
               ),
             },
             routing: createRouting(),
@@ -187,7 +194,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         And('bundle discrimination should expose the bundle root kind', () => {
           expect(state!.discriminatedRootKind).toBe('PatternSummary');
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -207,14 +214,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 `direct:${value.kind}:${options.label}`,
             },
             (value, options) => `fallback:${value.kind}:${options.label}`,
-            { label: 'renderer-contract' }
+            { label: 'renderer-contract' },
           );
 
           state!.dispatchFallbackResult = dispatchByKind(
             fragment,
             {},
             (value, options: { label: string }) => `fallback:${value.kind}:${options.label}`,
-            { label: 'renderer-contract' }
+            { label: 'renderer-contract' },
           );
         });
 
@@ -225,7 +232,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         And('dispatchByKind should use the fallback when the kind handler is omitted', () => {
           expect(state!.dispatchFallbackResult).toBe('fallback:PatternSummary:renderer-contract');
         });
-      }
+      },
     );
   });
 
@@ -244,14 +251,21 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               disclosureLevel?: 'essential' | 'important' | 'useful' | 'advanced';
               disclosureSpec?: DisclosureSpec;
               routeProfile?: {
-                mapPath: (routeId: LogicalRouteId, kind: Fragment['kind'], key?: string) => string;
+                mapPath: (
+                  routeId: LogicalRouteId,
+                  kind: Fragment['kind'],
+                  key: string | undefined,
+                  markdownRoute?: MarkdownFileRoute,
+                ) => string;
               };
+              onRenderDocument?: (event: MarkdownRenderEvent) => void;
             }>().toEqualTypeOf<RenderMarkdownOptions>();
 
             expectTypeOf<RenderCompactOptions>().toEqualTypeOf<{
               sectionSeparator?: '===' | '---' | 'none';
               includeHeader?: boolean;
               wrapLines?: number;
+              richness?: ContentRichness;
             }>();
 
             expectTypeOf<RenderJsonOptions>().toEqualTypeOf<{
@@ -266,25 +280,25 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             expectTypeOf<typeof renderMarkdown>().toEqualTypeOf<
               (
                 input: Fragment | ProjectionBundle<Fragment>,
-                options?: RenderMarkdownOptions
+                options?: RenderMarkdownOptions,
               ) => string | Record<string, string>
             >();
 
             expectTypeOf<typeof renderCompactText>().toEqualTypeOf<
               (
                 input: Fragment | ProjectionBundle<Fragment>,
-                options?: RenderCompactOptions
+                options?: RenderCompactOptions,
               ) => string
             >();
 
             expectTypeOf<typeof renderJson>().toEqualTypeOf<{
               (
                 input: Fragment | ProjectionBundle<Fragment>,
-                options: RenderJsonOptions & { pretty: true }
+                options: RenderJsonOptions & { pretty: true },
               ): string;
               (
                 input: Fragment | ProjectionBundle<Fragment>,
-                options?: RenderJsonOptions & { pretty?: false | undefined }
+                options?: RenderJsonOptions & { pretty?: false | undefined },
               ): object;
             }>();
 
@@ -298,7 +312,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           Then('the renderer contract assertions should compile', () => {
             expect(state!.contractAssertionsRan).toBe(true);
           });
-        }
+        },
       );
 
       RuleScenario(
@@ -310,11 +324,11 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               children: {
                 'projection-bundle-contract': createPatternSummary(
                   'ProjectionBundleContract',
-                  'completed'
+                  'completed',
                 ),
                 'progressive-disclosure-doc': createPatternSummary(
                   'ProgressiveDisclosureDoc',
-                  'planned'
+                  'planned',
                 ),
               },
               routing: createRouting(),
@@ -339,9 +353,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             const paths = Object.keys(state!.markdownRecord);
             expect(new Set(paths).size).toBe(paths.length);
           });
-        }
+        },
       );
-    }
+    },
   );
 
   Rule(
@@ -354,14 +368,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             state!.documentation = await readFile(
               new URL(
                 '../../../tests/fixtures/renderers/progressive-disclosure.md',
-                import.meta.url
+                import.meta.url,
               ),
-              'utf8'
+              'utf8',
             );
           });
 
           When('I inspect the delivery-reporting splitting decision', () => {
-            expect(state!.documentation).toContain('projectCompletedMilestones');
+            expect(state!.documentation).toContain('projectChangelog');
             expect(state!.documentation).toContain('projectCurrentWork');
           });
 
@@ -369,16 +383,16 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'the document should name the retained public delivery-reporting projection entrypoints',
             () => {
               expect(state!.documentation).toContain('explicit public projection entrypoints');
-            }
+            },
           );
 
           And(
             'the document should keep roadmap generation inside documentation composition',
             () => {
               expect(state!.documentation).toContain("documentType: 'roadmap'");
-            }
+            },
           );
-        }
+        },
       );
 
       RuleScenario(
@@ -388,9 +402,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             state!.documentation = await readFile(
               new URL(
                 '../../../tests/fixtures/renderers/progressive-disclosure.md',
-                import.meta.url
+                import.meta.url,
               ),
-              'utf8'
+              'utf8',
             );
           });
 
@@ -400,7 +414,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
           Then('the document should mark oversized splitting as markdown-only', () => {
             expect(state!.documentation).toContain(
-              'Oversized-document splitting stays a Markdown concern.'
+              'Oversized-document splitting stays a Markdown concern.',
             );
           });
 
@@ -410,16 +424,16 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               expect(state!.documentation).toContain('Compact text does not split.');
               expect(state!.documentation).toContain('JSON does not split.');
               expect(state!.documentation).toContain('UI does not split.');
-            }
+            },
           );
-        }
+        },
       );
 
       RuleScenario('Additional files flatten only for markdown', ({ Given, When, Then, And }) => {
         Given('the progressive disclosure contract document', async () => {
           state!.documentation = await readFile(
             new URL('../../../tests/fixtures/renderers/progressive-disclosure.md', import.meta.url),
-            'utf8'
+            'utf8',
           );
         });
 
@@ -436,6 +450,13 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           expect(state!.documentation).toContain('UI keeps the structured');
         });
       });
-    }
+    },
   );
+});
+
+describe('Renderer and progressive disclosure contract adversarial coverage', () => {
+  it('keeps TRUSTED_MARKDOWN private to the markdown renderer module API', () => {
+    expect(Object.hasOwn(publicSurface, 'TRUSTED_MARKDOWN')).toBe(false);
+    expect(Object.hasOwn(rendererSurface, 'TRUSTED_MARKDOWN')).toBe(false);
+  });
 });

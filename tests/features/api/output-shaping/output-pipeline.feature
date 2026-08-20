@@ -3,7 +3,6 @@
 @architect-status:completed
 @architect-implements:DataAPIOutputShaping
 @architect-unlock-reason:Value-transfer-from-spec
-@architect-phase:25a
 @architect-product-area:DataAPI
 Feature: Output Modifier Pipeline
 

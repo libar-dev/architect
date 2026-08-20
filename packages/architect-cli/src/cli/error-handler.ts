@@ -8,7 +8,6 @@
  * @architect-role:utility
  * @architect-bounded-context:cli
  * @architect-uses ErrorFactoryTypes
- * ValidatePatternsCLI, DocumentationGeneratorCLI
  *
  * ## CLIErrorHandler - Unified CLI Error Handling Utilities
  *
@@ -23,7 +22,11 @@
  * - When checking if an unknown error is a DocError
  */
 
-import type { DocError } from '@libar-dev/architect-core';
+import {
+  exitWithErrorMessage,
+  exitWithProcessError,
+  type DocError,
+} from '@libar-dev/architect-core';
 
 function stringifyJsonValue(value: unknown): string {
   if (value === undefined) {
@@ -193,40 +196,20 @@ export function formatDocError(error: DocError): string {
 }
 
 /**
- * Unified CLI error handler that formats and exits
+ * Unified CLI error handler that formats and exits.
  *
- * Handles both DocError instances and generic Error/unknown values.
- * Outputs structured error information and exits with specified code.
+ * `architect-generate` is the only caller; it has no `--format json` mode.
+ * DocError values keep their structured text; everything else goes through
+ * `exitWithProcessError`.
  *
  * @param error - Error to handle (DocError, Error, or unknown)
  * @param exitCode - Process exit code (default: 1)
  * @returns Never - always calls process.exit
- *
- * @example
- * ```typescript
- * async function main(): Promise<void> {
- *   try {
- *     await doWork();
- *   } catch (error) {
- *     handleCliError(error, 1);
- *   }
- * }
- * ```
  */
 export function handleCliError(error: unknown, exitCode = 1): never {
   if (isDocError(error)) {
-    // Structured DocError - format with full context
-    console.error(formatDocError(error));
-  } else if (error instanceof Error) {
-    // Standard Error - use message and optionally stack
-    console.error('Error:', error.message);
-    if (process.env['DEBUG']) {
-      console.error('Stack trace:', error.stack);
-    }
-  } else {
-    // Unknown error type - stringify
-    console.error('Error:', String(error));
+    return exitWithErrorMessage(formatDocError(error), exitCode);
   }
 
-  process.exit(exitCode);
+  return exitWithProcessError(error, exitCode);
 }

@@ -4,10 +4,7 @@
  * @architect-status active
  * @architect-role:utility
  * @architect-bounded-context:read-api
- *
- * ### When to Use
- *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * @architect-uses ExtractedPattern, PatternGraph
  */
 import type { ExtractedPattern } from '../validation-schemas/extracted-pattern.js';
 import type { PatternGraph } from '../validation-schemas/pattern-graph.js';
@@ -32,7 +29,7 @@ const declaredPatternIndexCache = new WeakMap<
 >();
 
 function getDeclaredPatternIndex(
-  graph: PatternGraph
+  graph: PatternGraph,
 ): ReadonlyMap<string, readonly DeclaredPatternTarget[]> {
   const cached = declaredPatternIndexCache.get(graph);
   if (cached !== undefined) return cached;
@@ -54,13 +51,13 @@ function getDeclaredPatternIndex(
 export function classifyEdgeExternality(
   graph: PatternGraph,
   sourcePattern: ExtractedPattern,
-  reference: string
+  reference: string,
 ): EdgeExternality {
   const declaredTargetsByName = getDeclaredPatternIndex(graph);
   const resolved = relationshipResolver.resolveUsesTarget(
     sourcePattern,
     reference,
-    declaredTargetsByName
+    declaredTargetsByName,
   );
   if (resolved === undefined) return 'dangling';
 

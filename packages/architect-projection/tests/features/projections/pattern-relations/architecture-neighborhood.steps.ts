@@ -24,7 +24,7 @@ interface ArchitectureNeighborhoodState {
 }
 
 const feature = await loadFeature(
-  'tests/features/projections/pattern-relations/architecture-neighborhood.feature'
+  'tests/features/projections/pattern-relations/architecture-neighborhood.feature',
 );
 
 let state: ArchitectureNeighborhoodState | null = null;
@@ -60,7 +60,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           Given('an architecture neighborhood context with full direction coverage', () => {
             state!.context = createProjectionContext({
               patterns: [
-                createPattern('PatternGraphAPI', {
+                createPattern('WidgetService', {
                   archContext: 'api',
                   archLayer: 'application',
                 }),
@@ -70,7 +70,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 }),
               ],
               relationshipIndex: {
-                PatternGraphAPI: createRelationshipEntry({
+                WidgetService: createRelationshipEntry({
                   uses: ['PatternHelpers'],
                   usedBy: ['PatternBrowserView'],
                   dependsOn: ['PatternGraph'],
@@ -78,8 +78,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   implementsPatterns: ['PatternGraphReadModel'],
                   implementedBy: [
                     {
-                      name: 'PatternGraphAPIImpl',
-                      file: 'packages/architect-query/src/pattern-graph-api.ts',
+                      name: 'WidgetServiceImpl',
+                      file: 'packages/architect-query/src/graph-handle.ts',
                       description: 'Concrete API adapter',
                     },
                   ],
@@ -89,8 +89,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             });
           });
 
-          When('I project the architecture neighborhood for "PatternGraphAPI"', () => {
-            state!.bundle = projectArchitectureNeighborhood(state!.context!, 'PatternGraphAPI');
+          When('I project the architecture neighborhood for "WidgetService"', () => {
+            state!.bundle = projectArchitectureNeighborhood(state!.context!, 'WidgetService');
           });
 
           Then(
@@ -98,7 +98,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             () => {
               expect(state!.bundle?.root).toEqual({
                 kind: 'ArchitectureNeighborhood',
-                pattern: 'PatternGraphAPI',
+                pattern: 'WidgetService',
                 context: 'api',
                 role: 'service',
                 layer: 'application',
@@ -106,19 +106,21 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 usedBy: ['PatternBrowserView'],
                 dependsOn: ['PatternGraph'],
                 enables: ['ArchitectMcpServer'],
+                seeAlso: [],
+                enforcedBy: [],
                 sameContext: ['ContextAssemblerImpl'],
                 implements: ['PatternGraphReadModel'],
                 implementedBy: [
                   {
-                    name: 'PatternGraphAPIImpl',
-                    file: 'packages/architect-query/src/pattern-graph-api.ts',
+                    name: 'WidgetServiceImpl',
+                    file: 'packages/architect-query/src/graph-handle.ts',
                     description: 'Concrete API adapter',
                   },
                 ],
               });
-            }
+            },
           );
-        }
+        },
       );
 
       RuleScenario(
@@ -127,7 +129,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           Given('an architecture neighborhood context without a relationship index', () => {
             state!.context = createProjectionContext({
               patterns: [
-                createPattern('PatternGraphAPI', {
+                createPattern('WidgetService', {
                   archContext: 'api',
                   archLayer: 'application',
                 }),
@@ -140,15 +142,15 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             });
           });
 
-          When('I project the architecture neighborhood for "PatternGraphAPI"', () => {
-            state!.bundle = projectArchitectureNeighborhood(state!.context!, 'PatternGraphAPI');
+          When('I project the architecture neighborhood for "WidgetService"', () => {
+            state!.bundle = projectArchitectureNeighborhood(state!.context!, 'WidgetService');
           });
 
           Then(
             'the architecture neighborhood should keep empty directional arrays and preserve same-context neighbors',
             () => {
               expect(state!.bundle?.root).toMatchObject({
-                pattern: 'PatternGraphAPI',
+                pattern: 'WidgetService',
                 context: 'api',
                 sameContext: ['ContextAssemblerImpl'],
                 uses: [],
@@ -158,9 +160,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 implements: [],
                 implementedBy: [],
               });
-            }
+            },
           );
-        }
+        },
       );
 
       RuleScenario(
@@ -169,7 +171,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           Given('an architecture neighborhood context without an architecture index', () => {
             state!.context = createProjectionContext({
               patterns: [
-                createPattern('PatternGraphAPI', {
+                createPattern('WidgetService', {
                   archContext: 'api',
                   archLayer: 'application',
                 }),
@@ -179,22 +181,73 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 }),
               ],
               relationshipIndex: {
-                PatternGraphAPI: createRelationshipEntry({ uses: ['PatternHelpers'] }),
+                WidgetService: createRelationshipEntry({ uses: ['PatternHelpers'] }),
               },
             });
           });
 
-          When('I project the architecture neighborhood for "PatternGraphAPI"', () => {
-            state!.bundle = projectArchitectureNeighborhood(state!.context!, 'PatternGraphAPI');
+          When('I project the architecture neighborhood for "WidgetService"', () => {
+            state!.bundle = projectArchitectureNeighborhood(state!.context!, 'WidgetService');
           });
 
           Then('the architecture neighborhood should keep sameContext empty', () => {
             expect(state!.bundle?.root.sameContext).toEqual([]);
             expect(state!.bundle?.root.uses).toEqual(['PatternHelpers']);
           });
-        }
+        },
       );
-    }
+
+      RuleScenario(
+        'a decision neighborhood surfaces its see-also governance chain and enforcedBy rules',
+        ({ Given, When, Then }) => {
+          Given(
+            'an architecture neighborhood context for a decision with see-also links and enforcing rules',
+            () => {
+              state!.context = createProjectionContext({
+                patterns: [
+                  createPattern('ADR009ProjectionTrustBoundary'),
+                  createPattern('ADR005CodecBasedMarkdownRendering'),
+                  createPattern('ADR006SingleReadModelArchitecture'),
+                  createPattern('ApiReferenceProjectionExecutableTests'),
+                ],
+                relationshipIndex: {
+                  ADR009ProjectionTrustBoundary: createRelationshipEntry({
+                    seeAlso: [
+                      'ADR005CodecBasedMarkdownRendering',
+                      'ADR006SingleReadModelArchitecture',
+                    ],
+                    enforcedBy: ['ApiReferenceProjectionExecutableTests'],
+                  }),
+                },
+              });
+            },
+          );
+
+          When(
+            'I project the architecture neighborhood for "ADR009ProjectionTrustBoundary"',
+            () => {
+              state!.bundle = projectArchitectureNeighborhood(
+                state!.context!,
+                'ADR009ProjectionTrustBoundary',
+              );
+            },
+          );
+
+          Then(
+            'the architecture neighborhood should list its see-also decisions and the rules that enforce it',
+            () => {
+              expect(state!.bundle?.root.seeAlso).toEqual([
+                'ADR005CodecBasedMarkdownRendering',
+                'ADR006SingleReadModelArchitecture',
+              ]);
+              expect(state!.bundle?.root.enforcedBy).toEqual([
+                'ApiReferenceProjectionExecutableTests',
+              ]);
+            },
+          );
+        },
+      );
+    },
   );
 
   Rule('Bounded-context navigation stays projection-owned', ({ RuleScenario }) => {
@@ -281,7 +334,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             ],
           });
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -296,7 +349,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               configurable: true,
               value: () => {
                 throw new Error(
-                  'layer bucket some() should not be used during bounded-context assembly'
+                  'layer bucket some() should not be used during bounded-context assembly',
                 );
               },
             });
@@ -335,7 +388,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             ],
           });
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -391,7 +444,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             ],
           });
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -405,7 +458,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           state!.comparison = projectArchitectureComparison(
             state!.context!,
             'scanner',
-            'codec'
+            'codec',
           ).root;
         });
 
@@ -446,9 +499,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 },
               ],
             });
-          }
+          },
         );
-      }
+      },
     );
   });
 });

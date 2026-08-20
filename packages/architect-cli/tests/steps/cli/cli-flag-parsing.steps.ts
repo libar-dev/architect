@@ -15,22 +15,34 @@ describeFeature(
     });
 
     Rule('Flags are parsed and validated at the CLI boundary', ({ RuleScenario }) => {
-      RuleScenario('--format json on overview produces JSON output', ({ When, Then, And }) => {
-        When('I run "architect overview --format json"', async () => {
-          lastResult = await runCli('architect overview --format json');
+      RuleScenario('--base-dir without a value is rejected', ({ When, Then, And }) => {
+        When('I run "architect --base-dir"', async () => {
+          lastResult = await runCli('architect --base-dir');
         });
 
-        Then('the exit code is zero', () => {
-          expect(lastResult?.exitCode).toBe(0);
+        Then('the exit code is non-zero', () => {
+          expect(lastResult?.exitCode).not.toBe(0);
         });
 
-        And('stdout parses as JSON', () => {
-          expect(() => {
-            JSON.parse(lastResult?.stdout ?? '') as unknown;
-          }).not.toThrow();
+        And('stderr mentions "base-dir"', () => {
+          expect((lastResult?.stderr ?? '').toLowerCase()).toContain('base-dir');
+        });
+      });
+
+      RuleScenario('dangling rejects an unknown flag', ({ When, Then, And }) => {
+        When('I run "architect dangling --not-a-flag"', async () => {
+          lastResult = await runCli('architect dangling --not-a-flag');
+        });
+
+        Then('the exit code is non-zero', () => {
+          expect(lastResult?.exitCode).not.toBe(0);
+        });
+
+        And('stderr mentions "not-a-flag"', () => {
+          expect((lastResult?.stderr ?? '').toLowerCase()).toContain('not-a-flag');
         });
       });
     });
   },
-  { excludeTags: ['@skip'] }
+  { excludeTags: ['@skip'] },
 );

@@ -8,19 +8,25 @@
 ## The Core Principle: Design Artifacts Are Ephemeral
 
 Specifications mature through distinct stages. Plan-level specs evolve into design-level
-specs (same file, enriched). But when implementation begins, value transfers to **executable
-specs** — and the design-level spec is **deleted**, just as stubs are deleted when
-implementation code exists.
+specs (same file, enriched). But when implementation begins, value transfers to durable
+carriers and the redundant scaffold is removed — **deletion is cleanup of a copy after its
+value has moved, never loss of information.** Two artifacts move differently: the behavioral
+design-level `.feature` is **deleted** (its invariants now live in the **executable spec**),
+while a **code/contract stub is _promoted_** to its `src/` implementation — its
+`@architect-pattern` identity persists with the code (ADR-003), only the staging copy under
+`architect/stubs/` is removed.
 
-The executable spec is the permanent artifact. The design-level spec was scaffolding.
+The executable spec and the promoted `src/` code are the permanent artifacts. The design-level
+`.feature` was scaffolding; the code/contract stub was the embryo of the shipped pattern, not
+throwaway.
 
 ```
-candidate.feature → plan-level.feature → design-level.feature → (deleted)
+candidate.feature → plan-level.feature → design-level.feature → (deleted; value in executable.feature)
                                               ↓                      ↓
-                                         stubs/*.ts → (deleted)    implementation
-                                                                       ↓
-                                                              executable.feature + step-defs
-                                                              (permanent living tests)
+                              code stubs/*.ts ──promoted──→  src/ implementation
+                              (@architect-pattern identity         ↓
+                               persists, ADR-003; staging      executable.feature + step-defs
+                               copy removed)                   (permanent living tests)
 ```
 
 This is the same principle as construction: you don't keep the blueprints taped to the
@@ -55,7 +61,7 @@ REFINEMENT TRACK                    DELIVERY TRACK
        │                                 │
        │  reject / defer                 ▼
        ▼                            Implementation
-   (archived or                          │  stubs deleted → code exists
+   (archived or                          │  code stubs promoted → identity lives in src/ code
     deleted)                             │  design spec deleted → executable spec exists
                                          │
                                          ▼
@@ -106,26 +112,38 @@ Briefs are NOT processed by the extraction pipeline and are NOT part of the patt
 **Purpose:** Capture a feature idea cheaply — ≤30 lines (warn-only soft budget — there is no minimum) — so creating, splitting,
 combining, and discarding ideas is as low-friction as writing a brief
 
-The idea tier is **not** a separate maturity level — it is the lightest shape of a
-Level 1 Candidate spec, distinguished by the `@architect-maturity:idea` value rather than
-a different status. A spec at idea tier already lives in the pattern graph (visible,
-queryable) but carries minimum viable structure.
+The idea tier is **not** a separate status — both the idea and candidate tiers sit at
+`@architect-status:candidate`. The idea tier authors explicit `@architect-maturity:idea`
+as the guard discriminator; the candidate tier drops that explicit tag and derives
+`idea` from `status:candidate`, so both remain on the consideration track. A spec at
+idea tier already lives in the pattern graph (visible, queryable) but carries minimum
+viable structure.
 
-**Discriminator:** Idea-tier specs have `@architect-status:candidate` plus
-`@architect-maturity:idea`. The maturity value MAY be auto-defaulted by the toolchain
-from `status:candidate` (the reference implementation maps `candidate → idea` via
-`DEFAULT_MATURITY_BY_STATUS`), but explicit authoring is preferred for clarity.
+**Discriminator:** Idea-tier specs have `@architect-status:candidate` plus an
+**explicit** `@architect-maturity:idea`. This explicit tag is the idea-tier
+discriminator: the Process Guard's idea-tier checks key on it, and an
+`architect/specs/ideas/` file that omits it is **not** classified as idea-tier —
+it silently escapes idea-tier validation. `status:candidate` alone is
+insufficient, because the candidate tier shares that status (and legacy specs may
+carry no explicit maturity at all). The
+PatternGraph separately auto-defaults `candidate → idea` via
+`DEFAULT_MATURITY_BY_STATUS`, so the maturity field is always populated for
+queries — but that projection default does **not** substitute for the authored
+discriminator the guard requires. (On promotion to candidate tier the explicit
+`@architect-maturity:idea` is **dropped** — see "Promotion: Idea → Candidate" below —
+which is what carries the spec past idea-tier gating; maturity then derives to `idea`
+from `status:candidate`, and status stays `candidate`.)
 
 **Six-tag minimum:**
 
-| Tag                       | Purpose                                          |
-| ------------------------- | ------------------------------------------------ |
-| `@architect`              | Gate (extraction opt-in)                         |
-| `@architect-pattern`      | PascalCase pattern name                          |
-| `@architect-status`       | `candidate`                                      |
-| `@architect-maturity`     | `idea` (explicit, or auto-defaulted from status) |
-| `@architect-product-area` | Product area grouping                            |
-| `@architect-parent`       | Parent epic — every idea belongs to an epic      |
+| Tag                       | Purpose                                                    |
+| ------------------------- | ---------------------------------------------------------- |
+| `@architect`              | Gate (extraction opt-in)                                   |
+| `@architect-pattern`      | PascalCase pattern name                                    |
+| `@architect-status`       | `candidate`                                                |
+| `@architect-maturity`     | `idea` — authored explicitly (the idea-tier discriminator) |
+| `@architect-product-area` | Product area grouping                                      |
+| `@architect-parent`       | Parent epic — every idea belongs to an epic                |
 
 **Parent carve-out for level variants.** Files carrying `@architect-level:epic` or `@architect-level:slice` MAY omit `@architect-parent` — they are top-of-chain or cross-cutting and have no parent by design. The other five baseline tags remain required.
 
@@ -181,14 +199,15 @@ Feature: <PatternName> - <one-line purpose>
 
 #### Promotion: Idea → Candidate
 
-Promoting an idea-tier spec to a full Level 1 Candidate spec adds:
+Promoting an idea-tier spec to the candidate tier (Level 1) adds:
 
 - An `**Open Questions:**` block listing unresolved questions
 - 1–2 `Scenario:` blocks tagged `@acceptance-criteria @happy-path`
-- Bumps `@architect-maturity:idea` → `@architect-maturity:plan` (status stays `candidate`
-  until the acceptance gate further promotes to `roadmap`)
-- Optionally moves the file from `architect/specs/ideas/` to `architect/specs/candidates/`
-  (or keeps it in place — the maturity tag is the source of truth)
+- Drops the explicit `@architect-maturity:idea`; maturity derives to `idea` from
+  `status:candidate` — still consideration — and status stays `candidate` until the
+  acceptance gate further promotes to `roadmap`
+- Moves the file from `architect/specs/ideas/` to `architect/specs/candidates/`
+  (the explicit idea-tier maturity tag is what the guard keys on)
 
 The same file evolves; the idea-tier spec is the seed of the candidate. From candidate onward,
 the existing acceptance gate (below) governs promotion to plan-level.
@@ -196,8 +215,9 @@ the existing acceptance gate (below) governs promotion to plan-level.
 ### Level 1: Candidate Spec
 
 **Format:** Gherkin `.feature`
-**Location:** `architect/specs/<group>/<feature-name>.feature`
+**Location:** `architect/specs/candidates/<feature-name>.feature`
 **Status:** `@architect-status:candidate`
+**Maturity:** derives to `idea` (consideration) by default — normally no explicit tag; an explicit value still wins (§04, e.g. `:plan` = delivery track)
 **Purpose:** Explore and refine a feature idea in structured Gherkin format
 
 Candidate specs are **proposals under refinement**. They use Gherkin syntax so they're
@@ -206,16 +226,16 @@ accepted plan-level specs.
 
 **What makes a candidate different from a plan-level spec:**
 
-| Aspect               | Candidate                                             | Plan-Level (Accepted)                   |
-| -------------------- | ----------------------------------------------------- | --------------------------------------- |
-| Status               | `candidate`                                           | `roadmap`                               |
-| Required tags        | Gate + pattern + status only                          | Full tag set (§03)                      |
-| Deliverables table   | OPTIONAL                                              | MUST                                    |
-| Rule metadata        | Invariant RECOMMENDED, Rationale/Verified-by OPTIONAL | All three MUST                          |
-| Scenario tags        | OPTIONAL                                              | MUST (`@acceptance-criteria` + subtype) |
-| Quality review       | Not required                                          | MUST pass quality checklist             |
-| In pattern graph     | Yes (visible, queryable)                              | Yes                                     |
-| In delivery pipeline | No                                                    | Yes                                     |
+| Aspect               | Candidate                                                  | Plan-Level (Accepted)                   |
+| -------------------- | ---------------------------------------------------------- | --------------------------------------- |
+| Status               | `candidate`                                                | `roadmap`                               |
+| Required tags        | Baseline five: gate, pattern, status, product-area, parent | Full tag set (§03)                      |
+| Deliverables table   | OPTIONAL                                                   | MUST                                    |
+| Rule metadata        | Invariant RECOMMENDED, Rationale/Verified-by OPTIONAL      | All three MUST                          |
+| Scenario tags        | OPTIONAL                                                   | MUST (`@acceptance-criteria` + subtype) |
+| Quality review       | Not required                                               | MUST pass quality checklist             |
+| In pattern graph     | Yes (visible, queryable)                                   | Yes                                     |
+| In delivery pipeline | No                                                         | Yes                                     |
 
 **Candidate spec example:**
 
@@ -224,7 +244,7 @@ accepted plan-level specs.
 @architect-pattern:DarkModeTheme
 @architect-status:candidate
 @architect-product-area:Desktop
-@architect-bounded-context:desktop
+@architect-parent:DesktopExperience
 Feature: DarkModeTheme - System-aware dark/light theme toggle
 
   **Idea:** Users expect dark mode in desktop apps. Tailwind CSS 4 supports
@@ -359,7 +379,11 @@ For each design-level spec being retired:
 5. **Transfer the Feature description** — if the test file lacks a Problem/Solution
    narrative, prepend the design spec's narrative
 6. **Delete the design spec** from `architect/specs/`
-7. **Delete the stubs** from `architect/stubs/`
+7. **Promote or remove the stubs** — a **code/contract stub** (`architect/stubs/`) is
+   _promoted_: its code and `@architect-pattern` identity now live at `@architect-target` in
+   `src/` (ADR-003), so only the now-redundant staging copy is removed, not the pattern. A
+   **step-definition stub** (`architect/step-stubs/`) is _deleted_ once its wiring lives in the
+   executable feature's step definitions.
 
 ### What Survives the Transfer
 
@@ -421,8 +445,8 @@ no permanent form to transfer to.
 ### File Locations After Transfer
 
 ```
-architect/specs/identity/user-registration.feature     ← DELETED
-architect/stubs/user-registration/                     ← DELETED
+architect/specs/identity/user-registration.feature     ← DELETED (value in executable spec)
+architect/stubs/user-registration/                     ← staging copy removed (promoted to src/; @architect-pattern identity persists, ADR-003)
 tests/features/identity/user-registration.feature      ← PERMANENT (promoted to canonical)
 tests/features/identity/user-registration.steps.ts     ← PERMANENT (step definitions)
 src/identity/registration-service.ts                   ← PERMANENT (implementation)
@@ -440,12 +464,13 @@ src/identity/registration-service.ts                   ← PERMANENT (implementa
 Implementation is a structured transfer of value from ephemeral design artifacts to
 permanent production artifacts:
 
-| Ephemeral Artifact        | Permanent Replacement                | Transfer Mechanism                             |
-| ------------------------- | ------------------------------------ | ---------------------------------------------- |
-| Design-level spec         | Test file promoted to canonical name | Pattern name + phase + deps transferred        |
-| Stubs                     | Implementation source code           | Contracts fulfilled, stubs deleted             |
-| Deliverables table        | Implementation files at paths        | Table dropped — the files ARE the deliverables |
-| Design notes / wireframes | Implementation + executable spec     | Archived or deleted                            |
+| Ephemeral Artifact        | Permanent Replacement                | Transfer Mechanism                                                                                          |
+| ------------------------- | ------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
+| Design-level spec         | Test file promoted to canonical name | Pattern name + phase + deps transferred                                                                     |
+| Code/contract stubs       | Implementation source code           | **Promoted** to `src/` — `@architect-pattern` identity persists (ADR-003); only the staging copy is removed |
+| Step-definition stubs     | Executable feature step definitions  | Wiring lives in `tests/steps/`; the stub is deleted                                                         |
+| Deliverables table        | Implementation files at paths        | Table dropped — the files ARE the deliverables                                                              |
+| Design notes / wireframes | Implementation + executable spec     | Archived or deleted                                                                                         |
 
 **No architectural value is lost.** The pattern graph retains the same canonical names,
 dependency relationships, and phase assignments — but sourced from executable specs
@@ -504,20 +529,20 @@ dependency relationships, and phase assignments — but sourced from executable 
 
 ## Comparison: Plan vs. Design vs. Executable
 
-| Aspect             | Plan (Level 2)                | Design (Level 3)                       | Executable (Level 4)                                              |
-| ------------------ | ----------------------------- | -------------------------------------- | ----------------------------------------------------------------- |
-| Location           | `architect/specs/<group>/`    | `architect/specs/<group>/` (same file) | `tests/features/<group>/`                                         |
-| Status             | `roadmap`                     | `roadmap`                              | `completed`                                                       |
-| Description        | Business Value + How It Works | Problem + Solution                     | Narrative transferred from design                                 |
-| Rules              | 4-6                           | 6-9                                    | 6-9 (from design)                                                 |
-| Scenarios          | 9-15 (intent)                 | 20-40 (behavior)                       | 20-40 (executable)                                                |
-| Deliverables table | 5-column, all `pending`       | 5-column, statuses updated             | **Dropped** (implementation IS the deliverable)                   |
-| Input/Output       | —                             | Present                                | **Dropped** (in implementation code)                              |
-| Surviving tags     | All present                   | All present                            | Pattern, status, uses, implements, product-area, bounded-context, arch-layer, role, level, parent |
-| Stubs              | —                             | Created alongside                      | **Deleted**                                                       |
-| Step definitions   | —                             | —                                      | Present                                                           |
-| N:1 mapping        | —                             | —                                      | Primary gets canonical name; siblings get `@architect-implements` |
-| Permanent?         | Evolves into design           | **Deleted** at implementation          | **Yes**                                                           |
+| Aspect             | Plan (Level 2)                | Design (Level 3)                       | Executable (Level 4)                                                                                                           |
+| ------------------ | ----------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| Location           | `architect/specs/<group>/`    | `architect/specs/<group>/` (same file) | `tests/features/<group>/`                                                                                                      |
+| Status             | `roadmap`                     | `roadmap`                              | `completed`                                                                                                                    |
+| Description        | Business Value + How It Works | Problem + Solution                     | Narrative transferred from design                                                                                              |
+| Rules              | 4-6                           | 6-9                                    | 6-9 (from design)                                                                                                              |
+| Scenarios          | 9-15 (intent)                 | 20-40 (behavior)                       | 20-40 (executable)                                                                                                             |
+| Deliverables table | 5-column, all `pending`       | 5-column, statuses updated             | **Dropped** (implementation IS the deliverable)                                                                                |
+| Input/Output       | —                             | Present                                | **Dropped** (in implementation code)                                                                                           |
+| Surviving tags     | All present                   | All present                            | Pattern, status, uses, implements, product-area, bounded-context, arch-layer, role, level, parent                              |
+| Stubs              | —                             | Created alongside                      | **Promoted** to `src/` (code/contract stub — identity persists, ADR-003; staging copy removed). Step-definition stubs deleted. |
+| Step definitions   | —                             | —                                      | Present                                                                                                                        |
+| N:1 mapping        | —                             | —                                      | Primary gets canonical name; siblings get `@architect-implements`                                                              |
+| Permanent?         | Evolves into design           | **Deleted** at implementation          | **Yes**                                                                                                                        |
 
 ## Folder Organization
 

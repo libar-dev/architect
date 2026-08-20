@@ -2,7 +2,6 @@
 @architect-pattern:BusinessRulesProjectionExecutableTests
 @architect-implements:GovernanceProjectionSupport,BusinessRulesProjection
 @architect-status:completed
-@architect-phase:49
 @architect-product-area:Projection
 @architect-role:projection
 @governance
@@ -12,7 +11,7 @@ Feature: Governance business rule projections
   **Business Value:** Consumers receive business rules as normalized
   `BusinessRule` fragments — with invariant, rationale, and verified-by lifted
   out of the rule description — and grouped `BusinessRuleSet` bundles scoped by
-  feature, phase, or product area, including projection-owned grouping summary
+  feature, package, or product area, including projection-owned grouping summary
   entries that downstream renderers can format without recomputing semantic counts.
 
   **How It Works:** The projection walks `context.graph.patterns`, parses each
@@ -89,25 +88,6 @@ Feature: Governance business rule projections
       When I parse-and-project the business rule set with an invalid grouping option
       Then parsing business-rule-set options should fail loudly
 
-  Rule: Phase grouping requires every grouped rule to expose a phase
-
-    **Invariant:** When `groupedBy: 'phase'` is requested, every collected rule
-    must carry a numeric `phase`; otherwise the projection rejects the grouping
-    request rather than silently dropping unphased rules from child routes and
-    grouping summaries.
-
-    **Rationale:** Projection-owned grouping semantics must remain lossless. A
-    partially grouped root would make navigation-oriented documentation omit
-    valid rules before any renderer has a chance to recover them.
-
-    **Verified by:** Phase grouping rejects unphased rules loudly
-
-    @validation
-    Scenario: Phase grouping rejects unphased rules loudly
-      Given a business rule projection context with at least one unphased rule
-      When I project the business rule set grouped by phase
-      Then grouping business rules by phase should fail loudly
-
   Rule: Package grouping reuses the package axis at runtime
 
     **Invariant:** When `projectBusinessRuleSet` is called with
@@ -129,6 +109,69 @@ Feature: Governance business rule projections
       Then the business rule bundle should expose package child keys
       And the architect-projection child should scope to package "architect-projection"
       And the architect-core child should scope to package "architect-core"
+
+  Rule: Feature scope follows the implementedBy reverse edge
+
+    **Invariant:** `projectBusinessRuleSet({ scope: 'feature', scopeValue: X })`
+    aggregates the rules owned by `X` AND by every feature pattern that realizes
+    `X` via the derived `implementedBy` reverse edge, each fragment carrying the
+    owning feature as `feature`/`pattern` provenance. Querying a feature pattern
+    that owns rules directly still returns exactly its own rules.
+
+    **Rationale:** A reverse-trace question that starts at a TypeScript pattern
+    must surface the rules authored on its implementing `.feature` specs
+    (ADR-002/ADR-003), not return empty just because the focal node owns no
+    inline rules.
+
+    **Verified by:** Feature scope aggregates the implementing features' rules, Feature scope on a rule-owning feature returns its own rules
+
+    @bundle
+    Scenario: Feature scope aggregates the implementing features' rules
+      Given a business rule projection context where a TS pattern is realized by two rule-owning features
+      When I project the business rule set scoped to feature "GraphHandle"
+      Then the projected rules should include the implementing features' rules with owning-feature provenance
+
+    @bundle
+    Scenario: Feature scope on a rule-owning feature returns its own rules
+      Given a business rule projection context where a TS pattern is realized by two rule-owning features
+      When I project the business rule set scoped to feature "GraphRelationshipLookupExecutableTests"
+      Then the projected rules should be exactly that feature's own rules
+
+  Rule: Decision scope aggregates rules across enforcing patterns
+
+    **Invariant:** `projectBusinessRuleSet({ scope: 'decision', scopeValue: ADR })`
+    keeps a rule when its owning pattern authors the ADR in `enforcesDecisions`
+    OR when the pattern IS the decision record (its own `adr` tag), so the
+    decision's own feature rules and every enforcing pattern's rules appear;
+    unrelated rules are excluded. The `scopeValue` is matched through the
+    canonical decision identity, so the human ADR id form (`ADR-009`) and the
+    decision pattern name (`ADR009ProjectionTrustBoundary`) aggregate the same
+    rule set.
+
+    **Rationale:** The ADR → enforcing-rule link is a first-class graph edge, so
+    asking "which rules govern this decision?" must aggregate across the whole
+    enforcement set rather than reading free text.
+
+    **Verified by:** Decision scope aggregates enforcing and own rules, Decision scope accepts the human ADR id form, Decision scope excludes unrelated rules
+
+    @bundle
+    Scenario: Decision scope aggregates enforcing and own rules
+      Given a business rule projection context with a decision record and an enforcing pattern
+      When I project the business rule set scoped to decision "ADR009ProjectionTrustBoundary"
+      Then the projected rules should include both the decision's own rule and the enforcing pattern's rule
+      And the decision-scoped bundle root should round-trip through the Fragment schema
+
+    @bundle
+    Scenario: Decision scope accepts the human ADR id form
+      Given a business rule projection context with a decision record and an enforcing pattern
+      When I project the business rule set scoped to decision "ADR-009"
+      Then the projected rules should include both the decision's own rule and the enforcing pattern's rule
+
+    @filtering
+    Scenario: Decision scope excludes unrelated rules
+      Given a business rule projection context with a decision record and an enforcing pattern
+      When I project the business rule set scoped to decision "ADR009ProjectionTrustBoundary"
+      Then the projected rules should exclude the unrelated pattern's rule
 
   Rule: BusinessRule fragments stay source-agnostic across rule carriers
 

@@ -7,12 +7,18 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Defines the normalized `DependencyEdge` fragment shape for one typed relation between two patterns.
  */
 import { z } from 'zod';
 
 import { DependencyRelationKindSchema } from './supporting.js';
 
+/**
+ * One normalized directed edge between two patterns, tagged with the kind of
+ * relation it represents.
+ *
+ * @architect-shape
+ */
 export const DependencyEdgeSchema = z.strictObject({
   kind: z.literal('DependencyEdge'),
   from: z.string(),

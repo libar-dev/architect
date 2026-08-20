@@ -3,7 +3,7 @@
  * @architect-pattern PatternRelationsProjectionSupport
  * @architect-status completed
  * @architect-role:utility
- * @architect-uses PatternRelationsFragmentContracts
+ * @architect-uses PatternRelationsFragmentContracts, ExtractedPattern, PatternGraph
  * @architect-bounded-context:projection
  *
  * ## Pattern relations projection support
@@ -23,8 +23,10 @@
  * **Invariant:** Pattern lookup is case-insensitive and falls back through
  * exact, canonical-name, and lowercased-key matches; unknown names throw
  * `PATTERN_NOT_FOUND` with a fuzzy suggestion bounded by a minimum similarity
- * score and a maximum Levenshtein distance; relationship normalization falls
- * back to raw pattern arrays when the relationship index is absent; and
+ * score and a maximum Levenshtein distance; relationship normalization throws
+ * `PATTERN_RELATIONSHIP_INVARIANT` when the canonical relationship index is
+ * absent for an existing pattern (mirroring the upstream `pattern-helpers.ts`
+ * canonical resolver — ADR-006: no silent fallback to raw pattern arrays); and
  * `ImplementationRef` objects are always emitted in a stable shape.
  *
  * **Behavior:**
@@ -41,7 +43,8 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Provides shared pattern lookup, summary, relationship, deliverable, and
+ *   rule normalization helpers.
  */
 
 import {
@@ -56,7 +59,7 @@ import type { ProjectionContext } from '../../context/projection-context.js';
 import { ProjectionError } from '../errors.js';
 import type { PatternSummary } from '../../fragments/pattern-relations/pattern-summary.js';
 import type {
-  Deliverable,
+  EmbeddedDeliverable,
   EmbeddedRuleRef,
   ImplementationRef,
   PatternHierarchy,
@@ -93,12 +96,15 @@ export function requirePattern(context: ProjectionContext, name: string): Extrac
 
 export function getRelationships(
   context: ProjectionContext,
-  name: string
+  name: string,
 ): RelationshipEntry | undefined {
   return resolveIndexedEntry(context.graph, context.graph.relationshipIndex, name);
 }
 
-export function createPatternSummaryFragment(pattern: ExtractedPattern): PatternSummary {
+export function createPatternSummaryFragment(
+  pattern: ExtractedPattern,
+  packageId?: string,
+): PatternSummary {
   const summary: PatternSummary = {
     kind: 'PatternSummary',
     patternName: getPatternName(pattern),
@@ -107,32 +113,36 @@ export function createPatternSummaryFragment(pattern: ExtractedPattern): Pattern
     role: pattern.role ?? '',
     file: pattern.source.file,
     source: deriveSource(pattern.source.file),
-    ...(pattern.phase !== undefined ? { phase: pattern.phase } : {}),
+    ...(packageId !== undefined ? { package: packageId } : {}),
   };
 
   return summary;
 }
 
+export function buildFileToPackageMap(
+  byPackage: Readonly<Record<string, readonly ExtractedPattern[]>>,
+): ReadonlyMap<string, string> {
+  const map = new Map<string, string>();
+  for (const [pkgId, pkgPatterns] of Object.entries(byPackage)) {
+    for (const pattern of pkgPatterns) {
+      map.set(pattern.source.file, pkgId);
+    }
+  }
+  return map;
+}
+
 export function normalizePatternRelationships(
   context: ProjectionContext,
-  patternName: string
+  patternName: string,
 ): PatternRelationships {
-  const pattern = requirePattern(context, patternName);
+  requirePattern(context, patternName);
   const relationships = getRelationships(context, patternName);
 
   if (relationships === undefined) {
-    return {
-      dependsOn: [...(pattern.uses ?? [])],
-      enables: [],
-      uses: [...(pattern.uses ?? [])],
-      usedBy: [],
-      implementsPatterns: [...(pattern.implementsPatterns ?? [])],
-      implementedBy: [],
-      ...(pattern.extendsPattern !== undefined ? { extendsPattern: pattern.extendsPattern } : {}),
-      extendedBy: [],
-      seeAlso: [...(pattern.seeAlso ?? [])],
-      apiRef: [...(pattern.apiRef ?? [])],
-    };
+    throw new ProjectionError(
+      'PATTERN_RELATIONSHIP_INVARIANT',
+      `Projection invariant violated: canonical relationship entry missing for pattern "${patternName}". The relationship index must be populated by transformToPatternGraph; falling back to raw pattern.uses arrays would silently return wrong relationship data to AI agents (ADR-006).`,
+    );
   }
 
   return {
@@ -151,7 +161,7 @@ export function normalizePatternRelationships(
   };
 }
 
-export function normalizeDeliverables(pattern: ExtractedPattern): Deliverable[] {
+export function normalizeDeliverables(pattern: ExtractedPattern): EmbeddedDeliverable[] {
   const testRefs = resolveTestRefs(pattern);
 
   return (pattern.deliverables ?? []).map((deliverable) => ({
@@ -160,7 +170,6 @@ export function normalizeDeliverables(pattern: ExtractedPattern): Deliverable[] 
     tests: [...testRefs],
     location: deliverable.location,
     ...(deliverable.finding !== undefined ? { finding: deliverable.finding } : {}),
-    ...(deliverable.release !== undefined ? { release: deliverable.release } : {}),
   }));
 }
 
@@ -211,20 +220,44 @@ export function resolveStubRefs(context: ProjectionContext, patternName: string)
 }
 
 export function extractDescription(text: string): string {
+  return extractDescriptionWithMeta(text).description;
+}
+
+/**
+ * Projects the pattern directive into a compact description head and reports whether
+ * that head dropped design prose. The emitted `description` string is identical to
+ * {@link extractDescription}; `truncated` is the new signal so callers can surface a
+ * boundary marker (the dep-tree `truncated` precedent) instead of silently shipping a
+ * head as if it were the whole directive.
+ */
+export function extractDescriptionWithMeta(text: string): {
+  description: string;
+  truncated: boolean;
+} {
   if (!text) {
-    return '';
+    return { description: '', truncated: false };
   }
 
   const problemMatch = /\*\*Problem:\*\*\s*([\s\S]+?)(?=\*\*Solution:\*\*|$)/.exec(text);
   const solutionMatch = /\*\*Solution:\*\*\s*([\s\S]+?)(?=\n\s*\*\*[A-Z]|\n\n\s*\n|$)/.exec(text);
 
   if (problemMatch?.[1] !== undefined && solutionMatch?.[1] !== undefined) {
-    const problem = extractFirstSentenceRaw(problemMatch[1].trim());
-    const solution = extractFirstSentenceRaw(solutionMatch[1].trim());
-    return `Problem: ${problem} Solution: ${solution}`;
+    const problemRaw = problemMatch[1].trim();
+    const solutionRaw = solutionMatch[1].trim();
+    const problem = extractFirstSentenceRaw(problemRaw);
+    const solution = extractFirstSentenceRaw(solutionRaw);
+    const description = `Problem: ${problem} Solution: ${solution}`;
+    // Truncated when either section carried more than its first sentence, or the
+    // directive holds further sections/prose after the matched Solution block.
+    const truncated =
+      problem.length < problemRaw.length ||
+      solution.length < solutionRaw.length ||
+      solutionMatch.index + solutionMatch[0].length < text.trimEnd().length;
+    return { description, truncated };
   }
 
-  return extractFirstSentenceRaw(text);
+  const description = extractFirstSentenceRaw(text);
+  return { description, truncated: description.length < text.trim().length };
 }
 
 export function extractOpenQuestions(text: string): string[] {
@@ -232,7 +265,11 @@ export function extractOpenQuestions(text: string): string[] {
     return [];
   }
 
-  const match = /\*\*Open Questions:\*\*\s*([\s\S]*?)(?=\n\s*\*\*[A-Za-z][^*]*:\*\*|$)/i.exec(text);
+  // Tolerate a qualifier between "Open Questions" and the colon, e.g.
+  // `**Open Questions (resolved iteratively, per use-case)...:**` on epic headings —
+  // [^*\n]* keeps the match on a single bold heading line.
+  const match =
+    /\*\*Open Questions[^*\n]*:\*\*\s*([\s\S]*?)(?=\n\s*\*\*[A-Za-z][^*]*:\*\*|$)/i.exec(text);
   const rawSection = match?.[1]?.trim();
   if (rawSection === undefined || rawSection.length === 0) {
     return [];
@@ -245,7 +282,7 @@ export function extractOpenQuestions(text: string): string[] {
         .trim()
         .replace(/^[-*]\s+/, '')
         .replace(/^\d+[.)]\s+/, '')
-        .trim()
+        .trim(),
     )
     .filter((line) => line.length > 0);
 }
@@ -287,7 +324,7 @@ function extractFirstSentenceRaw(text: string): string {
 function resolveIndexedEntry<T>(
   graph: PatternGraph,
   index: Readonly<Record<string, T>> | undefined,
-  name: string
+  name: string,
 ): T | undefined {
   if (index === undefined) {
     return undefined;
@@ -327,7 +364,7 @@ function resolveTestRefs(pattern: ExtractedPattern): string[] {
 
   const declaredCount = Math.max(
     ...(pattern.deliverables ?? []).map((deliverable) => deliverable.tests),
-    0
+    0,
   );
   const declaredCountLabel = String(declaredCount);
 
@@ -400,7 +437,7 @@ function parseBusinessRuleAnnotations(description: string): {
 
 function deduplicateScenarioNames(
   scenarioNames: readonly string[],
-  verifiedBy: readonly string[] | undefined
+  verifiedBy: readonly string[] | undefined,
 ): string[] {
   const seen = new Map<string, string>();
 

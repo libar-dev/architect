@@ -2,9 +2,7 @@
  * @architect-bounded-context:execution-context
  */
 /**
- * Private helpers used exclusively by the file-reading-list fragment.
- *
- * Part of the ExecutionContextProjectionSupport utility surface.
+ * Builds the file-reading list that groups primary files, completed dependencies, roadmap dependencies, and architecture neighbors.
  */
 
 import { findPatternByName, isPatternComplete } from '@libar-dev/architect-core';
@@ -34,7 +32,7 @@ export type FileReadingListOptions = z.infer<typeof FileReadingListOptionsSchema
 
 export function buildFileReadingList(
   context: ProjectionContext,
-  options: FileReadingListOptions
+  options: FileReadingListOptions,
 ): FileReadingList | undefined {
   const pattern = findPatternByName(context.graph, options.pattern);
   if (pattern === undefined) {
@@ -61,6 +59,12 @@ export function buildFileReadingList(
   const relationships = getRelationships(context, canonicalName);
 
   if (relationships !== undefined) {
+    // The `.feature` specs that realize this pattern are PRIMARY reading (not
+    // "related"): follow the derived implementedBy reverse edge (ADR-002/ADR-003).
+    for (const implementationRef of relationships.implementedBy) {
+      pushUnique(primary, implementationRef.file);
+    }
+
     for (const dependencyName of relationships.dependsOn) {
       const dependencyPattern = findPatternByName(context.graph, dependencyName);
       if (dependencyPattern === undefined) {
@@ -76,7 +80,7 @@ export function buildFileReadingList(
       if (bucket === completedDeps) {
         const dependencyRelationships = getRelationships(
           context,
-          getPatternName(dependencyPattern)
+          getPatternName(dependencyPattern),
         );
         for (const implementationRef of dependencyRelationships?.implementedBy ?? []) {
           pushUnique(completedDeps, implementationRef.file);
@@ -111,9 +115,9 @@ export function buildFileReadingList(
   };
 }
 
-// Projection-owned legacy parity for `architect_files --related`: source paths sort
-// alphabetically, but design stub paths stay last so generated context keeps the
-// old CLI reading order. See MIGRATION.md Table C, `architect_files`.
+// Projection-owned ordering for the `architect_files` MCP tool with
+// `includeRelated: true`: source paths sort alphabetically, but design stub paths
+// stay last so generated context remains stable. See MIGRATION.md Table C.
 function sortArchitectureNeighborsForLegacyParity(paths: readonly string[]): string[] {
   return [...paths].sort((left, right) => {
     const leftIsStub = left.startsWith('architect/stubs/');

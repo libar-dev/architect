@@ -18,7 +18,7 @@ interface SmokeState {
 }
 
 const feature = await loadFeature(
-  'tests/features/projections/governance/smoke-business-rules.feature'
+  'tests/features/projections/governance/smoke-business-rules.feature',
 );
 
 let state: SmokeState | null = null;
@@ -46,7 +46,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 createPattern('AuthFeature', {
                   status: 'active',
                   role: 'service',
-                  phase: 1,
                   file: 'architect/specs/auth-feature.feature',
                   rules: [
                     createRule({
@@ -61,7 +60,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 createPattern('AuditFeature', {
                   status: 'active',
                   role: 'service',
-                  phase: 1,
                   file: 'architect/specs/audit-feature.feature',
                   rules: [
                     createRule({
@@ -94,11 +92,11 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             expect(state!.bundle!.root.scope).toBe('all');
             expect(state!.bundle!.root.rules).toHaveLength(2);
             expect(state!.bundle!.root.rules.map((rule) => rule.ruleName)).toEqual(
-              expect.arrayContaining(['Session expiry', 'Audit trail immutability'])
+              expect.arrayContaining(['Session expiry', 'Audit trail immutability']),
             );
           });
-        }
+        },
       );
-    }
+    },
   );
 });

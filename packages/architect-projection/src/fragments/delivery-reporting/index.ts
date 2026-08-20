@@ -2,18 +2,16 @@
  * @architect
  * @architect-pattern DeliveryReportingFragmentContracts
  * @architect-role:contract
+ * @architect-bounded-context:delivery-reporting
  * @architect-status active
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Re-exports the delivery-reporting fragment contracts for status
+ *   distribution, roadmap timelines, and traceability matrices.
  */
-export { PhaseProgressSchema } from './phase-progress.js';
-export type { PhaseProgress } from './phase-progress.js';
 export { RoadmapTimelineSchema } from './roadmap-timeline.js';
 export type { RoadmapTimeline } from './roadmap-timeline.js';
-export { ReleaseNotesDigestSchema } from './release-notes-digest.js';
-export type { ReleaseNotesDigest } from './release-notes-digest.js';
 export { StatusDistributionSchema } from './status-distribution.js';
 export type { StatusDistribution } from './status-distribution.js';
 export { TraceabilityMatrixSchema } from './traceability-matrix.js';

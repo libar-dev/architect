@@ -2,9 +2,7 @@
  * @architect-bounded-context:execution-context
  */
 /**
- * Private helpers used exclusively by the handoff fragment.
- *
- * Part of the ExecutionContextProjectionSupport utility surface.
+ * Builds the handoff record, including default checkbox summaries, discovered items, blockers, and next-session text.
  */
 
 import type { ExtractedPattern } from '@libar-dev/architect-core';
@@ -42,21 +40,21 @@ export type HandoffOptions = z.infer<typeof HandoffOptionsSchema>;
 
 export function buildHandoffRecord(
   context: ProjectionContext,
-  options: HandoffOptions
+  options: HandoffOptions,
 ): HandoffRecord {
   const pattern = requirePattern(context, options.pattern);
   const patternName = getPatternName(pattern);
   const deliverables = normalizeExecutionContextDeliverables(pattern);
   const completedDeliverables = deliverables.filter((deliverable) =>
-    isCompletedDeliverableStatus(deliverable.status)
+    isCompletedDeliverableStatus(deliverable.status),
   );
   const inProgressDeliverables = deliverables.filter(
     (deliverable) =>
       !isCompletedDeliverableStatus(deliverable.status) &&
-      !isPendingDeliverableStatus(deliverable.status)
+      !isPendingDeliverableStatus(deliverable.status),
   );
   const remainingDeliverables = deliverables.filter(
-    (deliverable) => !isCompletedDeliverableStatus(deliverable.status)
+    (deliverable) => !isCompletedDeliverableStatus(deliverable.status),
   );
 
   return {
@@ -68,13 +66,13 @@ export function buildHandoffRecord(
       options.completed !== undefined
         ? [...options.completed]
         : completedDeliverables.map(
-            (deliverable) => `[x] ${deliverable.name} (${deliverable.location})`
+            (deliverable) => `[x] ${deliverable.name} (${deliverable.location})`,
           ),
     inProgress:
       options.inProgress !== undefined
         ? [...options.inProgress]
         : inProgressDeliverables.map(
-            (deliverable) => `[ ] ${deliverable.name} (${deliverable.location})`
+            (deliverable) => `[ ] ${deliverable.name} (${deliverable.location})`,
           ),
     filesModified: options.filesModified !== undefined ? [...options.filesModified] : [],
     discovered:

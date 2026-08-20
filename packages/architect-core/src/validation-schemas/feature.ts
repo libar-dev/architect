@@ -1,3 +1,25 @@
+/**
+ * @architect
+ * @architect-pattern GherkinScanResultContract
+ * @architect-status active
+ * @architect-role:contract
+ * @architect-bounded-context:validation-schemas
+ *
+ * ## GherkinScanResultContract - Parsed Executable-Spec Event-Store Contract
+ *
+ * The Gherkin half of the event-store contract: `ScannedGherkinFile` /
+ * `GherkinScanResults` plus the Gherkin AST schema family (feature, rule,
+ * scenario, background, step, examples, data-table, doc-string). Defines what a
+ * "parsed executable spec" means structurally — the typed shape produced when
+ * the Gherkin scanner reads `.feature` source on the way into the PatternGraph
+ * build, the parsed-Gherkin counterpart to the JSDoc-directive contract.
+ *
+ * ### When to Use
+ *
+ * - Validating the structured result of scanning a `.feature` file.
+ * - Defining or consuming the Gherkin AST node shapes (scenario, rule, step).
+ * - Carrying parse errors alongside successfully scanned files in one result.
+ */
 import { z } from 'zod';
 
 export type GherkinDataTableRow = Readonly<Record<string, string>>;
@@ -96,15 +118,3 @@ export type GherkinFeature = z.infer<typeof GherkinFeatureSchema>;
 export type ScannedGherkinFile = z.infer<typeof ScannedGherkinFileSchema>;
 export type GherkinFileError = z.infer<typeof GherkinFileErrorSchema>;
 export type GherkinScanResults = z.infer<typeof GherkinScanResultsSchema>;
-
-export const ParsedStepSchema = GherkinStepSchema;
-export const ParsedScenarioSchema = GherkinScenarioSchema;
-export const ParsedBackgroundSchema = GherkinBackgroundSchema;
-export const ParsedFeatureSchema = GherkinFeatureSchema;
-export const FeatureFileSchema = ScannedGherkinFileSchema;
-
-export type ParsedStep = z.infer<typeof ParsedStepSchema>;
-export type ParsedScenario = z.infer<typeof ParsedScenarioSchema>;
-export type ParsedBackground = z.infer<typeof ParsedBackgroundSchema>;
-export type ParsedFeature = z.infer<typeof ParsedFeatureSchema>;
-export type FeatureFile = z.infer<typeof FeatureFileSchema>;

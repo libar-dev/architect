@@ -23,7 +23,7 @@ interface PatternDetailState {
 }
 
 const feature = await loadFeature(
-  'tests/features/projections/pattern-relations/pattern-detail.feature'
+  'tests/features/projections/pattern-relations/pattern-detail.feature',
 );
 
 let state: PatternDetailState | null = null;
@@ -54,8 +54,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   Rule('Pattern details compose normalized sub-shapes only', ({ RuleScenario }) => {
     RuleScenario('projecting a full pattern detail bundle', ({ Given, When, Then, And }) => {
       Given('a rich pattern detail projection context', () => {
-        const pattern = createPattern('PatternGraphAPI', {
-          file: 'packages/architect-query/src/pattern-graph-api.ts',
+        const pattern = createPattern('WidgetService', {
+          file: 'packages/architect-query/src/graph-handle.ts',
           description:
             '**Problem:** Query consumers need one stable read model.\n\n**Solution:** The PatternGraph API centralizes those reads.',
           executableSpecs: ['tests/features/query/pattern-graph.feature'],
@@ -64,9 +64,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               name: 'PatternGraph API module',
               status: 'in-progress',
               tests: 2,
-              location: 'packages/architect-query/src/pattern-graph-api.ts',
+              location: 'packages/architect-query/src/graph-handle.ts',
               finding: 'Keeps read operations centralized.',
-              release: '2026-Q2',
             },
           ],
           rules: [
@@ -79,15 +78,15 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             },
           ],
         });
-        const stub = createPattern('PatternGraphAPIStub', {
-          file: 'architect/stubs/query/pattern-graph-api.stub.ts',
-          targetPath: 'packages/architect-query/src/pattern-graph-api.ts',
+        const stub = createPattern('WidgetServiceStub', {
+          file: 'architect/stubs/query/graph-handle.stub.ts',
+          targetPath: 'packages/architect-query/src/graph-handle.ts',
         });
 
         state!.context = createProjectionContext({
           patterns: [pattern, stub],
           relationshipIndex: {
-            PatternGraphAPI: createRelationshipEntry({
+            WidgetService: createRelationshipEntry({
               dependsOn: ['PatternGraph'],
               enables: ['ArchitectMcpServer'],
               uses: ['PatternHelpers'],
@@ -95,8 +94,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               implementsPatterns: ['PatternGraphReadModel'],
               implementedBy: [
                 {
-                  name: 'PatternGraphAPIStub',
-                  file: 'architect/stubs/query/pattern-graph-api.stub.ts',
+                  name: 'WidgetServiceStub',
+                  file: 'architect/stubs/query/graph-handle.stub.ts',
                   description: 'Stub for future implementation',
                 },
               ],
@@ -109,8 +108,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         });
       });
 
-      When('I project the pattern detail for "PatternGraphAPI"', () => {
-        state!.bundle = projectPatternDetail(state!.context!, 'PatternGraphAPI');
+      When('I project the pattern detail for "WidgetService"', () => {
+        state!.bundle = projectPatternDetail(state!.context!, 'WidgetService');
       });
 
       And('I render the pattern detail bundle through every renderer', () => {
@@ -129,9 +128,12 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           expect(state!.bundle?.children).toEqual({});
           expect(state!.bundle?.root).toMatchObject({
             kind: 'PatternDetail',
-            patternName: 'PatternGraphAPI',
+            patternName: 'WidgetService',
             description:
               'Problem: Query consumers need one stable read model. Solution: The PatternGraph API centralizes those reads.',
+            // Problem + Solution are each a single sentence with nothing after the
+            // Solution block, so the head is the whole directive — not truncated.
+            descriptionTruncated: false,
             deliverables: [
               {
                 name: 'PatternGraph API module',
@@ -159,18 +161,18 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             ],
             stubs: [
               {
-                stubFile: 'architect/stubs/query/pattern-graph-api.stub.ts',
-                targetPath: 'packages/architect-query/src/pattern-graph-api.ts',
-                name: 'PatternGraphAPIStub',
+                stubFile: 'architect/stubs/query/graph-handle.stub.ts',
+                targetPath: 'packages/architect-query/src/graph-handle.ts',
+                name: 'WidgetServiceStub',
               },
             ],
           });
-        }
+        },
       );
 
       And('the renderer outputs should stay non-empty and type-valid', () => {
         expect(typeof state!.markdown === 'string' || typeof state!.markdown === 'object').toBe(
-          true
+          true,
         );
         expect(state!.compact.length).toBeGreaterThan(0);
         expect(state!.json).toBeTruthy();
@@ -216,7 +218,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             apiRef: ['architect_pattern'],
           });
         });
-      }
+      },
     );
 
     RuleScenario('detail projection keeps empty arrays explicit', ({ Given, When, Then }) => {
@@ -273,6 +275,36 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
     });
 
     RuleScenario(
+      'detail projection flags a truncated description head',
+      ({ Given, When, Then }) => {
+        Given('a pattern detail context with prose beyond the description head', () => {
+          state!.context = createProjectionContext({
+            patterns: [
+              createPattern('TruncatedPattern', {
+                description:
+                  '**User Story:** As an agent I want a compact head. The directive then continues with extensive design prose that the projected head deliberately omits.',
+              }),
+            ],
+            relationshipIndex: {
+              TruncatedPattern: createRelationshipEntry(),
+            },
+          });
+        });
+
+        When('I project the pattern detail for "TruncatedPattern"', () => {
+          state!.bundle = projectPatternDetail(state!.context!, 'TruncatedPattern');
+        });
+
+        Then('the pattern detail head is flagged as truncated', () => {
+          expect(state!.bundle?.root.description).toBe(
+            '**User Story:** As an agent I want a compact head.',
+          );
+          expect(state!.bundle?.root.descriptionTruncated).toBe(true);
+        });
+      },
+    );
+
+    RuleScenario(
       'detail projection extracts open questions from normalized prose',
       ({ Given, When, Then }) => {
         Given('a pattern detail context with open questions prose', () => {
@@ -299,7 +331,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'What is the durable rollout signal?',
           ]);
         });
-      }
+      },
     );
   });
 });

@@ -4,7 +4,7 @@
 @architect-product-area:DataAPI
 @architect-uses:ArchitectBriefDeterministicBundle
 @architect-bounded-context:api
-@architect-see-also:ADR006SingleReadModelArchitecture,ADR005CodecRendererSeparation
+@architect-see-also:ADR006SingleReadModelArchitecture,ADR005CodecBasedMarkdownRendering
 Feature: ModelEnrichedDataAPI
 
   **Problem:**
@@ -32,11 +32,12 @@ Feature: ModelEnrichedDataAPI
 
   **Solution:**
   `ModelEnrichedDataAPI` is a **decoration layer** over the deterministic
-  Data API. The `architect_brief` verb (specified in the sibling
-  `ArchitectBriefDeterministicBundle` candidate) and the existing five
-  verbs (`pattern`, `scope-validate`, `rules`, `dep-tree`, `overview`)
-  keep their deterministic response shapes; this candidate wraps those
-  responses with optional model-generated slices when configured. The
+  Data API. The `architect_brief` MCP tool (specified in the sibling
+  `ArchitectBriefDeterministicBundle` candidate) and the existing typed MCP
+  tools (`architect_pattern`, `architect_scope_validate`, `architect_rules`,
+  `architect_dep_tree`, `architect_overview`) keep their deterministic response
+  shapes; this candidate wraps those responses with optional model-generated
+  slices when configured. The
   Brief's optional `intent: string` parameter is forwarded unchanged at
   the deterministic tier and interpreted here at the LLM tier — biasing
   the narrative slice without altering the deterministic bundle.
@@ -68,21 +69,21 @@ Feature: ModelEnrichedDataAPI
      `model_summary: null`, `model_hints: null`, and a typed
      `model_status`.
 
-  2. **`architect_query <prompt>` (new verb).** Free-form natural-language
-     query routed through Vercel AI SDK tool-calling (`generateText` with
+  2. **`architect_query` typed MCP tool.** It accepts a free-form `prompt`
+     and routes through Vercel AI SDK tool-calling (`generateText` with
      `tools: {...}` and `toolChoice: 'required'`). The model picks exactly
-     one existing typed verb, args validated against Zod input schemas,
-     and the typed verb's deterministic payload (plus its `model_summary`
-     when the verb is itself enriched) is returned with provenance
-     describing which verb was chosen and why. The tool choice IS the
-     provenance. A sibling LLM-tier surface to the brief decoration —
-     the Brief candidate explicitly does not claim NL routing.
+     one existing typed MCP tool, args are validated against its Zod input
+     schema, and that tool's deterministic payload (plus its `model_summary`
+     when enriched) is returned with provenance describing which tool was
+     chosen and why. The tool choice IS the provenance. This is a sibling
+     LLM-tier surface to the brief decoration; the Brief candidate explicitly
+     does not claim NL routing.
 
-  Existing five verbs (`pattern`, `scope-validate`, `rules`, `dep-tree`,
-  `overview`) accept the additive `intent: string` parameter for prompt
-  biasing once they fan out, on the same provenance contract; the
-  fan-out itself is a follow-up wave (see "MVP fan-out boundary"
-  below).
+  The five typed tools (`architect_pattern`, `architect_scope_validate`,
+  `architect_rules`, `architect_dep_tree`, `architect_overview`) accept the
+  additive `intent: string` parameter for prompt biasing once they fan out, on
+  the same provenance contract; the fan-out itself is a follow-up wave (see
+  "MVP fan-out boundary" below).
 
   Every model-enriched response carries a `model_hints` field that
   **advertises** the NL endpoint and any follow-up queries the model
@@ -97,11 +98,12 @@ Feature: ModelEnrichedDataAPI
   session-brief payload) is never withheld. The free CLI and open-source
   MCP package work fully without an API key.
 
-  **MVP fan-out boundary:** The existing five Data API verbs (`pattern`,
-  `scope-validate`, `rules`, `dep-tree`, `overview`) keep their current
-  deterministic-only response shapes for MVP, except that they accept
-  the additive `intent` field for narrative biasing once decorated.
-  Adding `model_summary` to each verb's response is a follow-up wave -
+  **MVP fan-out boundary:** The five existing typed MCP tools
+  (`architect_pattern`, `architect_scope_validate`, `architect_rules`,
+  `architect_dep_tree`, `architect_overview`) keep their current
+  deterministic-only response shapes for MVP, except that they accept the
+  additive `intent` field for narrative biasing once decorated. Adding
+  `model_summary` to each tool's response is a follow-up wave -
   the contract under test is identical and fanning out before the
   brief decoration and NL endpoint are validated dilutes the
   user-research signal.
@@ -117,7 +119,7 @@ Feature: ModelEnrichedDataAPI
   NL endpoint inclusion, and streaming (deferred indefinitely; MCP
   transport limit). What remains open is package ownership shape, BYOK
   vs bundled pricing, slice catalogue beyond `model_summary`, cache
-  key composition, phase ordering, failure-verb sanitization, and
+  key composition, phase ordering, failure-message sanitization, and
   three new questions raised by the MVP refinement (provenance
   placement, NL flavour, advertisement shape).
 
@@ -129,10 +131,10 @@ Feature: ModelEnrichedDataAPI
   separate sidecar MCP namespace per § 7.8 Shape C). This candidate ships
   two LLM-tier surfaces — decorated brief response and NL endpoint —
   each carrying the same provenance envelope, so the contract is exercised
-  from two angles before the semantic namespace lands. Existing-verb
-  fan-out (`model_summary` on `pattern`, `scope-validate`, etc.) is also a
-  follow-up; the contract under test there is identical and fans out
-  trivially once validated on the new surfaces.
+  from two angles before the semantic namespace lands. Existing-tool
+  fan-out (`model_summary` on `architect_pattern`, `architect_scope_validate`,
+  etc.) is also a follow-up; the contract under test there is identical and
+  fans out trivially once validated on the new surfaces.
 
   **Open Questions and Settled Decisions:**
 
@@ -148,24 +150,25 @@ Feature: ModelEnrichedDataAPI
 
   - Q-DEFAULT (settled): Default-on for the two LLM-tier MVP surfaces
     (decorated `architect_brief` response and `architect_query`).
-    Existing five verbs keep deterministic-only response shape until
-    the follow-up wave; they accept `intent` immediately for
+    The five existing typed MCP tools keep deterministic-only response shapes
+    until the follow-up wave; they accept `intent` immediately for
     prompt-construction biasing on the decorated surfaces only.
     Latency at ~1s does not justify gating the surfaces behind a flag.
     The Brief's deterministic bundle is uniform regardless of intent
     (Brief spec Rule 1) — the LLM tier biases narrative phrasing only.
 
   - Q-INTENT (settled): Ship in MVP. Additive optional `intent: string`
-    field on every existing verb input schema, threaded into prompt
+    field on each existing typed MCP input schema, threaded into prompt
     construction for narrative biasing. Distinct from tool-calling: the
     deterministic payload shape is unchanged, only the narrative slice
     is steered. Flag for early user-research feedback whether biasing is
     helpful or noisy.
 
-  - Q-NL-ENDPOINT (settled, reversed from earlier defer): Ship
-    `architect_query <prompt>` in MVP using Vercel AI SDK tool-calling
-    (`generateText` with `tools: {...}` and `toolChoice: 'required'`).
-    The model picks exactly one existing typed verb; args validated
+  - Q-NL-ENDPOINT (settled, reversed from earlier defer): Ship the
+    `architect_query` MCP tool with a required `prompt` field in MVP, using
+    Vercel AI SDK tool-calling (`generateText` with `tools: {...}` and
+    `toolChoice: 'required'`). The model picks exactly one existing typed
+    MCP tool; args are validated
     against Zod input schemas; no free-text output. Earlier deferral
     rationale (different blast radius, different observability) still
     applies but is outweighed by the value of validating three surfaces
@@ -184,7 +187,7 @@ Feature: ModelEnrichedDataAPI
   **Still open (block promotion to plan tier):**
 
   - Q-OWNERSHIP: Which package owns ArchitectModelService? Recommendation
-    refined to a **split**: interface and `ModelEnrichedPatternGraphAPI`
+    refined to a **split**: interface and `ModelEnrichedGraph`
     wrapper in `architect-core` (no LLM dependencies); OpenRouter / Vercel
     AI SDK implementation in a new `@libar-dev/architect-model` package
     (or `architect-ai`); composition roots (`architect-cli`,
@@ -208,7 +211,7 @@ Feature: ModelEnrichedDataAPI
     patterns) in this candidate, or hold them for a follow-up? Recommendation:
     hold; the three MVP surfaces (`session_brief`, `query`, `intent`) carry
     only `model_summary`. Risks and relatedness ship in the follow-up
-    semantic-namespace candidate where they have purpose-built verbs.
+    semantic-namespace candidate where they have purpose-built tools.
 
   - Q-CACHE: The deterministic payload is stable per file-watcher tick. Cache
     `model_summary` keyed on a hash of the deterministic payload plus
@@ -222,12 +225,12 @@ Feature: ModelEnrichedDataAPI
     prompt hash + selected-tool name + tool-args hash (the model's
     tool choice is part of the response identity).
 
-  - Q-PHASE: Tagged `@architect-phase:50` as the natural next slot after the
-    active 49 cluster. Confirm against epic ordering once
-    PerspectiveAwareProjections + ADR007CoordinatedTaxonomyRedesign close out.
-    The 99-104 phase block appears reserved for a different campaign.
+  - Q-ORDER: Where should this candidate sit in edge-derived delivery
+    navigation once its blockers are resolved? Recommendation: keep ordering
+    structural, via `@architect-uses` / `@architect-parent` and status, never
+    via a numeric phase tag.
 
-  - Q-FAILURE-VERB: When `model_status: failed`, do we surface the underlying
+  - Q-FAILURE-DETAIL: When `model_status: failed`, do we surface the underlying
     OpenRouter error message (helpful for debugging) or sanitize it (privacy /
     leak risk against API keys, model identifiers, prompt fragments)?
     Recommendation: include a typed `model_error_code` enum, never raw error
@@ -252,15 +255,15 @@ Feature: ModelEnrichedDataAPI
 
   - Q-NL-FLAVOUR (new): What shape does `architect_query` take?
     (a) Tool-calling router (Vercel AI SDK `tools` + `toolChoice:
-    'required'`) — model picks one typed verb, args validated against
-    Zod input schema, deterministic payload returned. The tool choice
+    'required'`) — model picks one typed MCP tool, args validated against
+    its Zod input schema, deterministic payload returned. The tool choice
     IS the provenance.
     (b) Citations-grounded NL response — model returns prose with
     explicit citations to pattern-IDs, rule-IDs, fragment-keys
     (deepwiki-style).
     (c) Both — tool-calling for "do X" prompts, citations-grounded for
     "explain Y" prompts.
-    Recommendation: (a) for MVP — typed-verb routing has a cleaner
+    Recommendation: (a) for MVP — typed-tool routing has a cleaner
     provenance story and matches the spec's no-free-text-output
     principle. (b) is the long-term shape but needs grounded-citation
     infrastructure that does not exist yet (matrix doc § 7.3
@@ -271,18 +274,18 @@ Feature: ModelEnrichedDataAPI
     (a) free-text "you can also ask architect_query about ..." appended
     to `model_summary`.
     (b) structured `model_hints: { suggested_queries: string[],
-    related_verbs: string[] }`.
+    related_tools: string[] }`.
     (c) per-payload heuristic — only advertise when the deterministic
-    response indicates the user is likely missing context (e.g.,
-    `dep-tree` with unresolved blockers suggests `architect_query "why
-    is X blocked"`).
+    response indicates the user is likely missing context (e.g., an
+    `architect_dep_tree` response with unresolved blockers suggests an
+    `architect_query` call with prompt "why is X blocked").
     Recommendation: (b) for MVP — structured shape is queryable and
     testable; (c) is a later heuristic refinement once usage data shows
     where advertisements actually help.
 
   **Out of Scope (deferred to follow-up candidates):**
 
-  - Semantic-namespace verbs (`architect_semantic_search`,
+  - Semantic-namespace tools (`architect_semantic_search`,
     `architect_semantic_rule_conflicts`, `architect_semantic_type_reuse`,
     `architect_semantic_provenance`) - separate candidate, ships as a sidecar
     MCP server per matrix doc § 7.8 Shape C.
@@ -296,9 +299,10 @@ Feature: ModelEnrichedDataAPI
     SDK + OpenRouter as the first concrete backend.
   - Cost telemetry / billing meter for bundled inference - Q-BYOK resolution
     determines whether this is even needed.
-  - `model_summary` fan-out to existing five verbs (`pattern`,
-    `scope-validate`, `rules`, `dep-tree`, `overview`) - separate
-    follow-up candidate (wave-ordering settled in the sibling
+  - `model_summary` fan-out to the existing typed MCP tools
+    (`architect_pattern`, `architect_scope_validate`, `architect_rules`,
+    `architect_dep_tree`, `architect_overview`) - separate follow-up candidate
+    (wave-ordering settled in the sibling
     `ArchitectBriefDeterministicBundle` spec). Same provenance
     contract as the two MVP surfaces; trivial fan-out once the
     decorated brief and `architect_query` validate the contract in
@@ -313,13 +317,13 @@ Feature: ModelEnrichedDataAPI
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location |
-      | ArchitectModelService interface + ModelEnrichedPatternGraphAPI wrapper (host-agnostic, no LLM deps) | pending | packages/architect-core/src/model-service/ (new) |
+      | ArchitectModelService interface + ModelEnrichedGraph decorator (host-agnostic, no LLM deps) | pending | packages/architect-core/src/model-service/graph-decoration.ts (new) |
       | OpenRouter / Vercel AI SDK implementation of ArchitectModelService (Output.object + Zod schema + AbortSignal timeout, prompt-version registry) | pending | packages/architect-model/ (new package) |
       | architect_brief decoration - wraps the Brief's deterministic response with optional model_summary slice + provenance envelope when configured (intent biases narrative; no deterministic field replaced) | pending | packages/architect-core/src/model-service/brief-decoration.ts (new) |
-      | architect_query verb - Vercel AI SDK tool-calling routes free-form prompts to existing typed verbs with Zod-validated args | pending | packages/architect-core/src/read-api/pattern-graph-api.ts |
-      | Optional intent string field on every existing verb input schema - additive, biases narrative slice prompt construction on enriched surfaces | pending | packages/architect-core/src/read-api/pattern-graph-api.ts |
-      | model_hints advertisement field on every enriched response - structured shape exposing suggested_queries + related_verbs | pending | packages/architect-core/src/read-api/pattern-graph-api.ts |
-      | MCP tool propagation - new verbs registered, existing verb input schemas widened with intent, response schemas widened with model_summary + model_status + model_hints on enriched surfaces | pending | packages/architect-mcp/src/tool-registry.ts |
+      | architect_query tool - Vercel AI SDK tool-calling routes free-form prompts to existing typed MCP tools with Zod-validated args | pending | packages/architect-core/src/model-service/query-router.ts (new) |
+      | Optional intent string field on enriched tool input schemas - additive, biases narrative slice prompt construction on enriched surfaces | pending | packages/architect-core/src/model-service/input-decoration.ts (new) |
+      | model_hints advertisement field on every enriched response - structured shape exposing suggested_queries + related_tools | pending | packages/architect-core/src/model-service/output-decoration.ts (new) |
+      | MCP tool propagation - new tools registered, existing typed-tool input schemas widened with intent, response schemas widened with model_summary + model_status + model_hints on enriched surfaces | pending | packages/architect-mcp/src/tool-registry.ts |
       | OPENROUTER_API_KEY config sourcing + graceful degradation (returns deterministic payload intact with model_summary null and model_hints null when key absent or upstream fails) | pending | packages/architect-core/src/config/ |
       | Provenance contract Zod schema + integration tests covering happy-path, missing-key, timeout, upstream-failure for all three MVP surfaces (session_brief, query, intent-biased) | pending | packages/architect-core/tests/features/model-enriched-data-api.feature |
       | In-memory LRU cache for model_summary keyed on bundled deterministic-input hash + prompt-version (per Q-CACHE) with file-watcher invalidation | pending | packages/architect-core/src/model-service/cache.ts (new) |
@@ -351,7 +355,7 @@ Feature: ModelEnrichedDataAPI
       Given a pattern with rules and dependencies in the graph
       And OPENROUTER_API_KEY is configured
       When the caller invokes architect_brief for that pattern
-      Then the response includes the uniform bundled deterministic payloads (overview + context + dep-tree + files + rules) unchanged
+      Then the response includes the uniform bundled deterministic payloads from architect_overview, architect_context, architect_dep_tree, architect_files, and architect_rules unchanged
       And the response includes a model_summary field
       And model_summary carries source equal to "model"
       And model_summary carries a confidence score between 0 and 1
@@ -362,10 +366,10 @@ Feature: ModelEnrichedDataAPI
   Rule: Deterministic payload is the source of truth; model output is a layer on top
 
     **Invariant:** The model layer never substitutes for a missing deterministic
-    verb. Counts, references, and structural metadata are owned by the wrapping
-    verb, not the model. When a future caller asks "do any rules conflict?"
+    tool. Counts, references, and structural metadata are owned by the wrapping
+    typed tool, not the model. When a future caller asks "do any rules conflict?"
     and only `model_summary` exists (no `architect_semantic_rule_conflicts`
-    verb yet), the answer surface phrases findings as "no conflicts the model
+    tool yet), the answer surface phrases findings as "no conflicts the model
     could find in the rule corpus", never "no conflicts". The model receives
     the deterministic payload as its sole grounded input - it does not perform
     independent file reads, graph traversals, or count derivations.
@@ -374,7 +378,7 @@ Feature: ModelEnrichedDataAPI
     (Gemma E2B, local 26B, hosted Flash Lite) hallucinating structural counts
     at the all-rules size (10/20, 184/330, 150/330 scanned). Structural
     counting is not what LLMs are reliably for. Letting the model "fill in"
-    gaps that belong to deterministic verbs trains consumers to trust narrative
+    gaps that belong to deterministic tools trains consumers to trust narrative
     answers to structural questions, which is exactly what makes downstream
     agent reasoning drift over multi-session work.
 

@@ -1,11 +1,17 @@
+/**
+ * @architect
+ * @architect-pattern TransformDataset
+ * @architect-status active
+ * @architect-role:service
+ * @architect-bounded-context:pipeline
+ * @architect-uses ContextInference, RelationshipResolver, PipelineDatasetContract, PackageResolver, ProjectionError, PatternHelpers, StatusNormalization, StatusValueDomain, ExtractedPattern, PatternGraph, MaturityLevelDomain
+ */
 import type { ExtractedPattern } from '../../validation-schemas/index.js';
-import { ExtractedPatternSchema } from '../../validation-schemas/index.js';
 import { getPatternName } from '../../read-api/pattern-helpers.js';
 import type {
   ExactStatusGroups,
   StatusGroups,
   StatusCounts,
-  PhaseGroup,
   SourceViews,
   RelationshipEntry,
   ArchIndex,
@@ -17,8 +23,9 @@ import {
   buildReverseLookups,
   detectDanglingReferences,
 } from './relationship-resolver.js';
+import type { PackageResolver } from '../../package/package-resolver.js';
+import { ProjectionError } from '../../package/projection-error.js';
 import type {
-  MalformedPattern,
   ValidationSummary,
   TransformResult,
   RuntimePatternGraph,
@@ -33,11 +40,11 @@ function isKnownStatus(status: string | undefined): boolean {
 interface RegistryRoleDefinition {
   readonly tag: string;
   readonly priority: number;
-  readonly aliases?: readonly string[];
+  readonly aliases?: readonly string[] | undefined;
 }
 
 function buildCanonicalRoleLookup(
-  roles: readonly RegistryRoleDefinition[]
+  roles: readonly RegistryRoleDefinition[],
 ): ReadonlyMap<string, string> {
   const canonicalRoleByValue = new Map<string, string>();
   for (const role of roles) {
@@ -50,7 +57,7 @@ function buildCanonicalRoleLookup(
 }
 
 export function sortRoleDefinitionsForOutput(
-  roles: readonly RegistryRoleDefinition[]
+  roles: readonly RegistryRoleDefinition[],
 ): readonly RegistryRoleDefinition[] {
   return [...roles].sort((a, b) => {
     const priorityDiff = a.priority - b.priority;
@@ -60,7 +67,7 @@ export function sortRoleDefinitionsForOutput(
 
 export function populateByRoleView(
   patterns: readonly ExtractedPattern[],
-  roles: readonly RegistryRoleDefinition[]
+  roles: readonly RegistryRoleDefinition[],
 ): Record<string, ExtractedPattern[]> {
   const canonicalRoleByValue = buildCanonicalRoleLookup(roles);
   const groupedByRole = new Map<string, ExtractedPattern[]>();
@@ -85,37 +92,30 @@ export function populateByRoleView(
   return byRole;
 }
 
-export function transformToPatternGraph(raw: RawDataset): RuntimePatternGraph {
-  return transformToPatternGraphWithValidation(raw).dataset;
+export function transformToPatternGraph(
+  raw: RawDataset,
+  packageResolver?: PackageResolver,
+): RuntimePatternGraph {
+  return transformToPatternGraphWithValidation(raw, packageResolver).dataset;
 }
 
-export function transformToPatternGraphWithValidation(raw: RawDataset): TransformResult {
-  const { patterns: rawPatterns, tagRegistry, workflow, contextInferenceRules } = raw;
+export function transformToPatternGraphWithValidation(
+  raw: RawDataset,
+  packageResolver?: PackageResolver,
+): TransformResult {
+  const { patterns: rawPatterns, tagRegistry, contextInferenceRules } = raw;
   const roleDefinitions: readonly RegistryRoleDefinition[] = tagRegistry.roles;
   const canonicalRoleByValue = buildCanonicalRoleLookup(roleDefinitions);
 
-  const malformedPatterns: MalformedPattern[] = [];
   const unknownStatusSet = new Set<string>();
   const patterns: ExtractedPattern[] = [];
   const allPatternNames = new Set<string>();
 
   for (const pattern of rawPatterns) {
-    const parseResult = ExtractedPatternSchema.safeParse(pattern);
-    if (!parseResult.success) {
-      malformedPatterns.push({
-        patternId: getPatternName(pattern),
-        issues: parseResult.error.issues.map(
-          (issue) => `${issue.path.join('.')}: ${issue.message}`
-        ),
-      });
-      continue;
-    }
-
-    const normalizedPattern = parseResult.data;
-    patterns.push(normalizedPattern);
-    allPatternNames.add(getPatternName(normalizedPattern));
-    if (!isKnownStatus(normalizedPattern.status)) {
-      unknownStatusSet.add(normalizedPattern.status);
+    patterns.push(pattern);
+    allPatternNames.add(getPatternName(pattern));
+    if (!isKnownStatus(pattern.status)) {
+      unknownStatusSet.add(pattern.status);
     }
   }
 
@@ -143,8 +143,6 @@ export function transformToPatternGraphWithValidation(raw: RawDataset): Transfor
     design: [],
     executable: [],
   };
-  const byPhaseMap = new Map<number, ExtractedPattern[]>();
-  const byQuarter: Record<string, ExtractedPattern[]> = {};
   const bySourceType: SourceViews = {
     typescript: [],
     gherkin: [],
@@ -158,6 +156,7 @@ export function transformToPatternGraphWithValidation(raw: RawDataset): Transfor
     byContext: {},
     byLayer: {},
     byView: {},
+    byPackage: {},
     all: [],
   };
 
@@ -171,26 +170,13 @@ export function transformToPatternGraphWithValidation(raw: RawDataset): Transfor
       maturityBucket.push(pattern);
     }
 
-    if (pattern.phase !== undefined) {
-      const existing = byPhaseMap.get(pattern.phase) ?? [];
-      existing.push(pattern);
-      byPhaseMap.set(pattern.phase, existing);
-      bySourceType.roadmap.push(pattern);
-    }
-
-    if (pattern.quarter) {
-      const quarterPatterns = byQuarter[pattern.quarter] ?? [];
-      quarterPatterns.push(pattern);
-      byQuarter[pattern.quarter] = quarterPatterns;
-    }
-
     if (pattern.source.file.endsWith('.feature') || pattern.source.file.endsWith('.feature.md')) {
       bySourceType.gherkin.push(pattern);
     } else {
       bySourceType.typescript.push(pattern);
     }
 
-    if (pattern.productArea || pattern.userRole || pattern.businessValue) {
+    if (pattern.productArea) {
       bySourceType.prd.push(pattern);
     }
 
@@ -198,6 +184,23 @@ export function transformToPatternGraphWithValidation(raw: RawDataset): Transfor
       const productAreaPatterns = byProductAreaMap[pattern.productArea] ?? [];
       productAreaPatterns.push(pattern);
       byProductAreaMap[pattern.productArea] = productAreaPatterns;
+    }
+
+    if (packageResolver !== undefined) {
+      try {
+        const pkg = packageResolver(pattern.source.file);
+        const packagePatterns = archIndex.byPackage[pkg.id] ?? [];
+        packagePatterns.push(pattern);
+        archIndex.byPackage[pkg.id] = packagePatterns;
+      } catch (error) {
+        // Skip patterns whose source file is not covered by the package config.
+        // The resolver hard-errors on unmapped files via `ProjectionError` (whose
+        // only code is `UNMAPPED_PACKAGE`); we treat unmapped as "no package
+        // dimension for this pattern" rather than aborting the build.
+        if (!(error instanceof ProjectionError)) {
+          throw error;
+        }
+      }
     }
 
     const patternKey = getPatternName(pattern);
@@ -238,17 +241,6 @@ export function transformToPatternGraphWithValidation(raw: RawDataset): Transfor
   buildReverseLookups(patterns, relationshipIndex);
   const danglingReferences = detectDanglingReferences(patterns, allPatternNames);
 
-  const byPhase: PhaseGroup[] = Array.from(byPhaseMap.entries())
-    .sort(([a], [b]) => a - b)
-    .map(([phaseNumber, phasePatterns]) => ({
-      phaseNumber,
-      phaseName:
-        workflow?.config.phases.find((phase) => phase.order === phaseNumber)?.name ??
-        phasePatterns[0]?.name,
-      patterns: phasePatterns,
-      counts: computeCounts(phasePatterns),
-    }));
-
   const byRole = populateByRoleView(patterns, roleDefinitions);
   const counts: StatusCounts = {
     completed: byNormalizedStatus.completed.length,
@@ -260,17 +252,10 @@ export function transformToPatternGraphWithValidation(raw: RawDataset): Transfor
 
   const validation: ValidationSummary = {
     totalPatterns: patterns.length,
-    malformedPatterns,
     danglingReferences,
     unknownStatuses: [...unknownStatusSet],
-    warningCount: malformedPatterns.length + danglingReferences.length + unknownStatusSet.size,
+    warningCount: danglingReferences.length + unknownStatusSet.size,
   };
-
-  const nameIndex = new Map<string, ExtractedPattern>();
-  for (const pattern of patterns) {
-    const key = getPatternName(pattern).toLowerCase();
-    if (!nameIndex.has(key)) nameIndex.set(key, pattern);
-  }
 
   const dataset: RuntimePatternGraph = {
     patterns,
@@ -278,42 +263,17 @@ export function transformToPatternGraphWithValidation(raw: RawDataset): Transfor
     byStatus,
     byNormalizedStatus,
     byMaturity,
-    byPhase,
-    byQuarter,
     byRole,
     bySourceType,
     byProductArea: byProductAreaMap,
     counts,
-    phaseCount: byPhaseMap.size,
     roleCount: Object.keys(byRole).length,
     relationshipIndex,
-    nameIndex,
     ...(raw.featureParseFailures !== undefined
       ? { featureParseFailures: [...raw.featureParseFailures] }
       : {}),
-    ...(archIndex.all.length > 0 && { archIndex }),
+    ...((archIndex.all.length > 0 || Object.keys(archIndex.byPackage).length > 0) && { archIndex }),
   };
 
-  if (workflow !== undefined) {
-    return { dataset: { ...dataset, workflow }, validation };
-  }
-
   return { dataset, validation };
-}
-
-function computeCounts(patterns: readonly ExtractedPattern[]): StatusCounts {
-  let completed = 0;
-  let active = 0;
-  let planned = 0;
-  let candidate = 0;
-
-  for (const pattern of patterns) {
-    const status = normalizeStatus(pattern.status);
-    if (status === 'completed') completed++;
-    else if (status === 'active') active++;
-    else if (status === 'candidate') candidate++;
-    else planned++;
-  }
-
-  return { completed, active, planned, candidate, total: patterns.length };
 }

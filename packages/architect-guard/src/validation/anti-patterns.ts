@@ -5,7 +5,7 @@
  * @architect-status completed
  * @architect-role:service
  * @architect-bounded-context:validation
- * @architect-uses DoDValidationTypes
+ * @architect-uses AntiPatternValidationTypes, GherkinScanResultContract
  *
  * ## AntiPatternDetector - Documentation Anti-Pattern Detection
  *
@@ -19,6 +19,9 @@
  * |----|----------|-------------|
  * | process-in-code | error | Process metadata in code (should be features-only) |
  * | removed-tag | error | Removed tag still present (silent data loss) |
+ * | ts-missing-architect-marker | error | Pattern JSDoc lacks leading @architect |
+ * | ts-tags-after-prose | error | Architect tags after description prose |
+ * | ts-uses-space-form | error | Space-separated TypeScript @architect-uses |
  * | magic-comments | warning | Generator hints in features |
  * | scenario-bloat | warning | Too many scenarios per feature |
  * | mega-feature | warning | Feature file too large |
@@ -37,8 +40,14 @@ import type { ScannedFile } from '@libar-dev/architect-core';
 import type { AntiPatternViolation, AntiPatternThresholds, WithTagRegistry } from './types.js';
 import { DEFAULT_THRESHOLDS } from './types.js';
 import {
+  detectArchitectTagsAfterProse,
+  detectMissingArchitectMarker,
+  detectTsUsesSpaceForm,
+} from './ts-annotation-integrity.js';
+import {
   ARCHITECT_PACKAGE_FEATURE_ONLY_TAG_SUFFIXES,
   DEFAULT_TAG_PREFIX,
+  extractProcessMetadata,
 } from '@libar-dev/architect-core';
 
 // Re-export types for consumers that import from this module
@@ -48,25 +57,45 @@ export type { AntiPatternViolation, AntiPatternThresholds } from './types.js';
  * Tag suffixes that should only appear in feature files, not TypeScript code.
  * These are process metadata tags that track delivery workflow state.
  *
- * Per ADR-001 Rule 6 (D-3 hybrid model): the canonical minimum is `quarter`
- * and `team`; this package extends with `effort`, `workflow`, `completed`,
- * `effort-actual` for its requirement-doc enrichment. Source of truth lives
- * in `@libar-dev/architect-core`'s taxonomy module.
+ * Per ADR-001 Rule 6 (D-3 hybrid model): the canonical minimum is `team`;
+ * this package extends with `workflow` for its requirement-doc enrichment.
+ * Source of truth lives in
+ * `@libar-dev/architect-core`'s taxonomy module.
  */
 const FEATURE_ONLY_TAG_SUFFIXES = ARCHITECT_PACKAGE_FEATURE_ONLY_TAG_SUFFIXES;
 
 /**
  * Tag suffixes that have been removed from the registry.
  * Using these tags causes silent data loss — the scanner skips unrecognized tags.
+ *
+ * ADR-013 retires the temporal/release/completion-date dimensions and the
+ * unpopulated process-metadata band (`effort`, `effort-actual`, `risk`,
+ * `priority`, `since`, `user-role`, `business-value`). Matching is on the full
+ * `<prefix><suffix>` token (exact or `<prefix><suffix>:`), so `completed` flags
+ * `@architect-completed` but NOT `@architect-status:completed`, and `phase`
+ * flags `@architect-phase` but NOT `@architect-level:phase`.
  */
-const REMOVED_TAG_SUFFIXES = ['brief'] as const;
+const REMOVED_TAG_SUFFIXES = [
+  'brief',
+  'quarter',
+  'phase',
+  'release',
+  'completed',
+  'effort',
+  'effort-actual',
+  'risk',
+  'priority',
+  'since',
+  'user-role',
+  'business-value',
+] as const;
 
 /**
  * Builds feature-only annotation list from the tag prefix.
  * These tags should appear in feature files, not TypeScript code.
  *
  * @param tagPrefix - The tag prefix (e.g., "@architect-" or "@acme-")
- * @returns Array of full annotation strings (e.g., ["@architect-quarter", "@architect-team", ...])
+ * @returns Array of full annotation strings (e.g., ["@architect-team", "@architect-workflow", ...])
  */
 function buildFeatureOnlyAnnotations(tagPrefix: string): readonly string[] {
   return FEATURE_ONLY_TAG_SUFFIXES.map((suffix) => `${tagPrefix}${suffix}`);
@@ -83,6 +112,15 @@ const MAGIC_COMMENT_PATTERNS = [
 ] as const;
 
 /**
+ * Escape regex metacharacters so a literal tag token (which contains `-` and,
+ * for non-default prefixes, possibly other metacharacters) can be embedded in a
+ * dynamically constructed `RegExp` without altering its meaning.
+ */
+function escapeRegExp(literal: string): string {
+  return literal.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/**
  * Configuration options for anti-pattern detection
  */
 export interface AntiPatternDetectionOptions extends WithTagRegistry {
@@ -93,7 +131,7 @@ export interface AntiPatternDetectionOptions extends WithTagRegistry {
 /**
  * Detect process metadata in code anti-pattern
  *
- * Finds process tracking annotations (e.g., @architect-quarter, @architect-team, etc.)
+ * Finds process tracking annotations (e.g., @architect-team, @architect-workflow, etc.)
  * in TypeScript files. Process metadata belongs in feature files.
  *
  * @param scannedFiles - Array of scanned TypeScript files
@@ -102,7 +140,7 @@ export interface AntiPatternDetectionOptions extends WithTagRegistry {
  */
 export function detectProcessInCode(
   scannedFiles: readonly ScannedFile[],
-  registry?: TagRegistry
+  registry?: TagRegistry,
 ): AntiPatternViolation[] {
   const violations: AntiPatternViolation[] = [];
   const tagPrefix = registry?.tagPrefix ?? DEFAULT_TAG_PREFIX;
@@ -147,7 +185,7 @@ export function detectProcessInCode(
  */
 export function detectRemovedTags(
   features: readonly ScannedGherkinFile[],
-  registry?: TagRegistry
+  registry?: TagRegistry,
 ): AntiPatternViolation[] {
   const violations: AntiPatternViolation[] = [];
   const tagPrefix = registry?.tagPrefix ?? DEFAULT_TAG_PREFIX;
@@ -192,6 +230,77 @@ export function detectRemovedTags(
 }
 
 /**
+ * Tags whose Gherkin (single-token) form REQUIRES a colon separator.
+ *
+ * On `.feature` files a tag is one whitespace-delimited token, so identity tags
+ * are written colon-form (`@architect-pattern:Name`, `@architect-implements:Name`).
+ * The space-form authored on TypeScript JSDoc (`@architect-pattern Name`) is a
+ * silent slip on a feature file: the scanner reads only the bare
+ * `@architect-pattern` token and drops the name, so the pattern identity / reverse
+ * edge is lost without any diagnostic. This detector makes that slip loud.
+ */
+const GHERKIN_COLON_FORM_TAG_SUFFIXES = ['pattern', 'implements'] as const;
+
+/**
+ * Detect Gherkin identity tags authored in space-form instead of colon-form.
+ *
+ * On a `.feature` file, `@architect-pattern Name` / `@architect-implements Name`
+ * (whitespace after the suffix) is invalid: Gherkin tags are single tokens, so
+ * the name is silently dropped and the identity / reverse-traceability edge never
+ * materializes in the graph. The correct form is `@architect-pattern:Name`.
+ *
+ * Matching mirrors {@link detectRemovedTags}: it scans raw lines that begin with a
+ * tag, is prefix-aware via the registry, and reports `error` severity (the slip
+ * causes silent data loss, exactly like a removed tag).
+ *
+ * @param features - Array of scanned feature files
+ * @param registry - Optional tag registry for prefix-aware detection (defaults to @architect-)
+ * @returns Array of anti-pattern violations
+ */
+export function detectGherkinTagSpaceForm(
+  features: readonly ScannedGherkinFile[],
+  registry?: TagRegistry,
+): AntiPatternViolation[] {
+  const violations: AntiPatternViolation[] = [];
+  const tagPrefix = registry?.tagPrefix ?? DEFAULT_TAG_PREFIX;
+
+  for (const feature of features) {
+    try {
+      const content = readFileSync(feature.filePath, 'utf-8');
+      const lines = content.split('\n');
+
+      for (let i = 0; i < lines.length; i++) {
+        const rawLine = lines[i];
+        if (!rawLine) continue;
+        const trimmed = rawLine.trim();
+        if (!trimmed.startsWith('@')) continue;
+
+        for (const suffix of GHERKIN_COLON_FORM_TAG_SUFFIXES) {
+          // Space-form = the prefix+suffix token immediately followed by whitespace
+          // (e.g. "@architect-pattern Name"). Colon-form ("@architect-pattern:Name")
+          // and prefixed siblings ("@architect-pattern-foo") must NOT match.
+          const spaceForm = new RegExp(`(^|\\s)${escapeRegExp(`${tagPrefix}${suffix}`)}\\s`, 'i');
+          if (spaceForm.test(`${trimmed} `)) {
+            violations.push({
+              id: 'gherkin-tag-space-form',
+              message: `Tag "${tagPrefix}${suffix}" on a .feature file uses space-form (the name is silently dropped). Gherkin tags are single tokens and must use colon form: ${tagPrefix}${suffix}:Name`,
+              file: feature.filePath,
+              line: i + 1,
+              severity: 'error',
+              fix: `Rewrite as ${tagPrefix}${suffix}:Name (colon, no space). Space-form is only valid on TypeScript JSDoc.`,
+            });
+          }
+        }
+      }
+    } catch {
+      // Ignore read errors - file may have been deleted
+    }
+  }
+
+  return violations;
+}
+
+/**
  * Detect magic comments anti-pattern
  *
  * Finds generator hints like "# GENERATOR:", "# PARSER:" in feature files.
@@ -203,7 +312,7 @@ export function detectRemovedTags(
  */
 export function detectMagicComments(
   features: readonly ScannedGherkinFile[],
-  threshold: number = DEFAULT_THRESHOLDS.magicCommentThreshold
+  threshold: number = DEFAULT_THRESHOLDS.magicCommentThreshold,
 ): AntiPatternViolation[] {
   const violations: AntiPatternViolation[] = [];
 
@@ -254,7 +363,7 @@ export function detectMagicComments(
  */
 export function detectScenarioBloat(
   features: readonly ScannedGherkinFile[],
-  threshold: number = DEFAULT_THRESHOLDS.scenarioBloatThreshold
+  threshold: number = DEFAULT_THRESHOLDS.scenarioBloatThreshold,
 ): AntiPatternViolation[] {
   const violations: AntiPatternViolation[] = [];
 
@@ -286,7 +395,7 @@ export function detectScenarioBloat(
  */
 export function detectMegaFeature(
   features: readonly ScannedGherkinFile[],
-  threshold: number = DEFAULT_THRESHOLDS.megaFeatureLineThreshold
+  threshold: number = DEFAULT_THRESHOLDS.megaFeatureLineThreshold,
 ): AntiPatternViolation[] {
   const violations: AntiPatternViolation[] = [];
 
@@ -337,10 +446,56 @@ export function detectMegaFeature(
  * }
  * ```
  */
+/**
+ * Detect duplicate Gherkin pattern identities — the same feature-level
+ * `@architect-pattern:<Name>` declared across more than one `.feature` file.
+ *
+ * ADR-001 requires exactly one file to own a pattern's identity. When two
+ * features declare the same identity, the dual-source extractor's `featureIndex`
+ * map silently last-write-wins (the second file's rules/scenarios are dropped),
+ * and every downstream gate (`validate:all`, the `architect dangling` graph gate, the process guard)
+ * passes over it because the duplicate has already collapsed to one node.
+ *
+ * This check runs over the RAW scanned feature files — the one place the
+ * collision is still visible — and uses {@link extractProcessMetadata} (the same
+ * feature-level extractor the graph builder uses), so it reads ONLY the top
+ * feature tag block and never false-positives on `@architect-pattern:` tokens
+ * that appear inside scenario docstrings / `"""`-fenced fixtures.
+ */
+export function detectDuplicateFeatureIdentities(
+  features: readonly ScannedGherkinFile[],
+): AntiPatternViolation[] {
+  const filesByIdentity = new Map<string, string[]>();
+  for (const feature of features) {
+    const metadata = extractProcessMetadata(feature);
+    if (!metadata?.pattern) continue;
+    const files = filesByIdentity.get(metadata.pattern) ?? [];
+    files.push(feature.filePath);
+    filesByIdentity.set(metadata.pattern, files);
+  }
+
+  const violations: AntiPatternViolation[] = [];
+  for (const [identity, files] of filesByIdentity) {
+    if (files.length < 2) continue;
+    const sorted = [...files].sort();
+    for (const file of sorted) {
+      violations.push({
+        id: 'duplicate-pattern-identity',
+        message: `Gherkin pattern identity "${identity}" is declared in ${String(sorted.length)} feature files: ${sorted.join(', ')}. ADR-001 requires exactly one file to own a pattern's @architect-pattern identity; the extractor silently drops all but one.`,
+        file,
+        line: 1,
+        severity: 'error',
+        fix: `Give all but one of these features a distinct @architect-pattern identity (add @architect-implements:${identity} if it realizes the same pattern, mirroring the sibling slice features).`,
+      });
+    }
+  }
+  return violations;
+}
+
 export function detectAntiPatterns(
   scannedFiles: readonly ScannedFile[],
   features: readonly ScannedGherkinFile[],
-  options: AntiPatternDetectionOptions = {}
+  options: AntiPatternDetectionOptions = {},
 ): AntiPatternViolation[] {
   const { registry, thresholds = {} } = options;
   const mergedThresholds: AntiPatternThresholds = {
@@ -352,6 +507,11 @@ export function detectAntiPatterns(
     // Error-level (architectural violations)
     ...detectProcessInCode(scannedFiles, registry),
     ...detectRemovedTags(features, registry),
+    ...detectGherkinTagSpaceForm(features, registry),
+    ...detectMissingArchitectMarker(scannedFiles, registry),
+    ...detectArchitectTagsAfterProse(scannedFiles, registry),
+    ...detectTsUsesSpaceForm(scannedFiles, registry),
+    ...detectDuplicateFeatureIdentities(features),
     // Warning-level (hygiene issues)
     ...detectMagicComments(features, mergedThresholds.magicCommentThreshold),
     ...detectScenarioBloat(features, mergedThresholds.scenarioBloatThreshold),
@@ -382,7 +542,7 @@ export function formatAntiPatternReport(violations: AntiPatternViolation[]): str
   const warnings = violations.filter((v) => v.severity === 'warning');
 
   lines.push(
-    `Total: ${String(violations.length)} (${String(errors.length)} errors, ${String(warnings.length)} warnings)`
+    `Total: ${String(violations.length)} (${String(errors.length)} errors, ${String(warnings.length)} warnings)`,
   );
   lines.push('');
 
@@ -415,6 +575,17 @@ export function formatAntiPatternReport(violations: AntiPatternViolation[]): str
   return lines.join('\n');
 }
 
+const TYPESCRIPT_ANTI_PATTERN_IDS = new Set<AntiPatternViolation['id']>([
+  'process-in-code',
+  'ts-missing-architect-marker',
+  'ts-tags-after-prose',
+  'ts-uses-space-form',
+]);
+
+function isTypeScriptAntiPattern(id: AntiPatternViolation['id']): boolean {
+  return TYPESCRIPT_ANTI_PATTERN_IDS.has(id);
+}
+
 /**
  * Convert anti-pattern violations to ValidationIssue format
  *
@@ -430,7 +601,7 @@ export function toValidationIssues(violations: readonly AntiPatternViolation[]):
   return violations.map((v) => ({
     severity: v.severity,
     message: `[${v.id}] ${v.message}`,
-    source: v.id === 'process-in-code' ? ('typescript' as const) : ('gherkin' as const),
+    source: isTypeScriptAntiPattern(v.id) ? ('typescript' as const) : ('gherkin' as const),
     file: v.file,
   }));
 }

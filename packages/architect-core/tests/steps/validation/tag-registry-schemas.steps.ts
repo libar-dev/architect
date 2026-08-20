@@ -83,7 +83,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
           expect(state!.registry!.tagPrefix).toBe('@architect-');
         });
       });
-    }
+    },
   );
 
   Rule('mergeTagRegistries deep-merges registries by tag', ({ RuleScenario }) => {

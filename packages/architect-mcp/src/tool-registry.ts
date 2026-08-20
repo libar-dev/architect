@@ -3,7 +3,7 @@
  * @architect-pattern MCPToolRegistry
  * @architect-status completed
  * @architect-implements MCPToolRegistryIntegrationTests
- * @architect-uses MCPPipelineSession
+ * @architect-uses MCPPipelineSession, CompactTextRenderer, JsonRenderer
  * @architect-role:service
  * @architect-bounded-context:api
  * @architect-product-area:DataAPI
@@ -19,13 +19,15 @@
  */
 
 import {
+  findPatternByName,
   fuzzyMatchPatterns,
   inferHandoffSessionType,
+  paragraph,
   parseAtBoundary,
+  table,
   type SessionType,
 } from '@libar-dev/architect-core';
 import {
-  paragraph,
   projectAnnotationCoverage,
   projectArchitectureNeighborhood,
   projectOverviewDigest,
@@ -34,17 +36,17 @@ import {
   projectStatusDistribution,
   renderCompactText,
   renderJson,
-  table,
+  type ContentRichness,
   type Fragment,
   type PatternSummary,
   type ProjectionBundle,
   type ProjectionContext,
 } from '@libar-dev/architect-projection';
 import {
+  parseAndProjectConfig,
+  parseAndProjectDocumentationBundle,
   projectBusinessRuleSet,
-  projectConfig,
-  projectDependencyTree,
-  projectDocumentationBundle,
+  projectDependencyContext,
   projectFileReadingList,
   projectHandoffRecord,
   projectOpenQuestionList,
@@ -61,6 +63,7 @@ import {
   DocumentTypeShape,
   EmptyInputSchema,
   ListFilterShape,
+  OptionalContentRichnessShape,
   OptionalDocumentationOptionsShape,
   OptionalDepthShape,
   OptionalHandoffSessionShape,
@@ -115,7 +118,7 @@ interface ToolRegistrar {
   registerTool(
     name: string,
     options: { description: string; inputSchema: z.ZodType },
-    handler: (rawInput: unknown) => Promise<TextContentResult>
+    handler: (rawInput: unknown) => Promise<TextContentResult>,
   ): void;
 }
 
@@ -124,7 +127,7 @@ interface ToolHandler {
   readonly handle: (
     input: unknown,
     session: PipelineSession,
-    sessionManager: PipelineSessionManager
+    sessionManager: PipelineSessionManager,
   ) => ToolResult | Promise<ToolResult>;
 }
 
@@ -137,7 +140,7 @@ function defineToolHandler<TSchema extends z.ZodType>(spec: {
   readonly handle: (
     input: z.infer<TSchema>,
     session: PipelineSession,
-    sessionManager: PipelineSessionManager
+    sessionManager: PipelineSessionManager,
   ) => ToolResult | Promise<ToolResult>;
 }): ToolHandler {
   return {
@@ -154,13 +157,17 @@ function formatTextResult(text: string): TextContentResult {
 }
 
 function renderTextToolResult<TFragment extends Fragment>(
-  output: ProjectionBundle<TFragment>
+  output: ProjectionBundle<TFragment>,
+  richness?: ContentRichness,
 ): ToolResult<ProjectionBundle<TFragment>> {
-  return { text: renderCompactText(output), output };
+  return {
+    text: renderCompactText(output, richness !== undefined ? { richness } : undefined),
+    output,
+  };
 }
 
 function renderJsonToolResult<TFragment extends Fragment>(
-  output: ProjectionBundle<TFragment>
+  output: ProjectionBundle<TFragment>,
 ): ToolResult<ProjectionBundle<TFragment>> {
   const rendered = renderJson(output, { pretty: true });
   if (typeof rendered !== 'string') {
@@ -223,7 +230,7 @@ function resolveToolHandler(toolName: string): ToolHandler {
 function parseToolInput<TSchema extends z.ZodType>(
   toolName: RegisteredToolName,
   schema: TSchema,
-  rawInput: unknown
+  rawInput: unknown,
 ): z.infer<TSchema> {
   if (
     rawInput !== undefined &&
@@ -239,7 +246,7 @@ function parseToolInput<TSchema extends z.ZodType>(
 function createSectionedDocument(
   documentType: string,
   title: string,
-  sections: SectionedDocument['sections']
+  sections: SectionedDocument['sections'],
 ): SectionedDocument {
   return {
     kind: 'SectionedDocument',
@@ -252,7 +259,7 @@ function createSectionedDocument(
 function buildSearchResultsDocument(
   query: string,
   matches: readonly ReturnType<typeof fuzzyMatchPatterns>[number][],
-  summariesByPattern: ReadonlyMap<string, PatternSummary>
+  summariesByPattern: ReadonlyMap<string, PatternSummary>,
 ): SectionedDocument {
   const sections: SectionedDocument['sections'] = [
     {
@@ -262,7 +269,7 @@ function buildSearchResultsDocument(
         paragraph(
           matches.length === 0
             ? `No pattern matches were found for query "${query}".`
-            : `${String(matches.length)} ${matches.length === 1 ? 'match' : 'matches'} found for query "${query}".`
+            : `${String(matches.length)} ${matches.length === 1 ? 'match' : 'matches'} found for query "${query}".`,
         ),
       ],
     },
@@ -286,7 +293,7 @@ function buildSearchResultsDocument(
                     summary?.file ?? '',
                   ];
                 }),
-                ['left', 'right', 'left', 'left', 'left', 'left']
+                ['left', 'right', 'left', 'left', 'left', 'left'],
               ),
             ],
     },
@@ -304,7 +311,7 @@ function buildBlockingDocument(blocking: readonly BlockingEntry[]): SectionedDoc
         paragraph(
           blocking.length === 0
             ? 'No patterns are currently blocked by incomplete dependencies.'
-            : `${String(blocking.length)} ${blocking.length === 1 ? 'pattern is' : 'patterns are'} currently blocked by incomplete dependencies.`
+            : `${String(blocking.length)} ${blocking.length === 1 ? 'pattern is' : 'patterns are'} currently blocked by incomplete dependencies.`,
         ),
       ],
     },
@@ -318,7 +325,7 @@ function buildBlockingDocument(blocking: readonly BlockingEntry[]): SectionedDoc
               table(
                 ['Pattern', 'Blocked By'],
                 blocking.map((entry) => [entry.pattern, entry.blockedBy.join(', ')]),
-                ['left', 'left']
+                ['left', 'left'],
               ),
             ],
     },
@@ -332,7 +339,7 @@ function buildHelpDocument(): SectionedDocument {
       title: 'Overview',
       blocks: [
         paragraph(
-          `Registered tools: ${String(ARCHITECT_MCP_TOOLS.length)}. Start with architect_overview, then architect_scope_validate and architect_context; use bounded-context vocabulary for architecture grouping.`
+          `Registered tools: ${String(ARCHITECT_MCP_TOOLS.length)}. Start with architect_overview, then architect_scope_validate and architect_context; use bounded-context vocabulary for architecture grouping.`,
         ),
       ],
     },
@@ -343,7 +350,7 @@ function buildHelpDocument(): SectionedDocument {
         table(
           ['Tool', 'Description'],
           ARCHITECT_MCP_TOOLS.map((tool) => [tool.name, tool.description]),
-          ['left', 'left']
+          ['left', 'left'],
         ),
       ],
     },
@@ -359,9 +366,12 @@ function buildHelpDocument(): SectionedDocument {
  */
 const TOOL_HANDLERS: Record<RegisteredToolName, ToolHandler> = {
   architect_overview: defineToolHandler({
-    inputSchema: EmptyInputSchema,
-    handle: (_input, session) =>
-      renderTextToolResult(projectOverviewDigest(getProjectionContext(session))),
+    inputSchema: createStrictReadonlyObjectSchema({ ...OptionalContentRichnessShape }),
+    handle: ({ disclosure }, session) =>
+      renderTextToolResult(
+        projectOverviewDigest(getProjectionContext(session)),
+        disclosure ?? 'summary',
+      ),
   }),
 
   architect_coverage: defineToolHandler({
@@ -380,7 +390,7 @@ const TOOL_HANDLERS: Record<RegisteredToolName, ToolHandler> = {
         projectSessionContextBundle(getProjectionContext(session), {
           patterns: [name],
           sessionType: getRequestedSessionType(requestedSession),
-        })
+        }),
       ),
   }),
 
@@ -408,11 +418,10 @@ const TOOL_HANDLERS: Record<RegisteredToolName, ToolHandler> = {
     }),
     handle: ({ name, maxDepth }, session) =>
       renderTextToolResult(
-        projectDependencyTree(getProjectionContext(session), {
+        projectDependencyContext(getProjectionContext(session), {
           pattern: name,
           maxDepth: maxDepth ?? 10,
-          includeImplementationDeps: false,
-        })
+        }),
       ),
   }),
 
@@ -428,7 +437,7 @@ const TOOL_HANDLERS: Record<RegisteredToolName, ToolHandler> = {
           pattern: name,
           sessionType: requestedSession,
           strict: strict === true,
-        })
+        }),
       ),
   }),
 
@@ -439,14 +448,14 @@ const TOOL_HANDLERS: Record<RegisteredToolName, ToolHandler> = {
       ...OptionalModifiedFilesShape,
     }),
     handle: ({ name, session: requestedSession, modifiedFiles }, session) => {
-      const pattern = session.api.getPattern(name);
+      const pattern = findPatternByName(session.dataset, name);
       const sessionType = requestedSession ?? inferHandoffSessionType(pattern?.status);
       return renderTextToolResult(
         projectHandoffRecord(getProjectionContext(session), {
           pattern: name,
           sessionType,
           ...(modifiedFiles !== undefined ? { filesModified: modifiedFiles } : {}),
-        })
+        }),
       );
     },
   }),
@@ -475,7 +484,7 @@ const TOOL_HANDLERS: Record<RegisteredToolName, ToolHandler> = {
           ...(mode !== undefined ? { mode } : {}),
           ...(include !== undefined ? { include } : {}),
           estimateTokens: estimateTokens === true,
-        })
+        }),
       ),
   }),
 
@@ -488,7 +497,7 @@ const TOOL_HANDLERS: Record<RegisteredToolName, ToolHandler> = {
           ...(role !== undefined ? { role } : {}),
           namesOnly: namesOnly === true,
           count: count === true,
-        })
+        }),
       ),
   }),
 
@@ -498,7 +507,7 @@ const TOOL_HANDLERS: Record<RegisteredToolName, ToolHandler> = {
       renderJsonToolResult(
         projectOpenQuestionList(getProjectionContext(session), {
           ...(parent !== undefined ? { parent } : {}),
-        })
+        }),
       ),
   }),
 
@@ -507,11 +516,11 @@ const TOOL_HANDLERS: Record<RegisteredToolName, ToolHandler> = {
     handle: ({ query }, session) => {
       const catalog = projectPatternCatalog(getProjectionContext(session)).root;
       const summariesByPattern = new Map(
-        catalog.items.map((summary) => [summary.patternName, summary])
+        catalog.items.map((summary) => [summary.patternName, summary]),
       );
       const matches = fuzzyMatchPatterns(query, catalog.names);
       return renderPlainJsonToolResult(
-        buildSearchResultsDocument(query, matches, summariesByPattern)
+        buildSearchResultsDocument(query, matches, summariesByPattern),
       );
     },
   }),
@@ -542,8 +551,8 @@ const TOOL_HANDLERS: Record<RegisteredToolName, ToolHandler> = {
                   scope: 'all',
                   groupedBy: 'feature',
                   onlyInvariants: onlyInvariants ?? false,
-                }
-        )
+                },
+        ),
       );
     },
   }),
@@ -554,7 +563,7 @@ const TOOL_HANDLERS: Record<RegisteredToolName, ToolHandler> = {
       renderJsonToolResult(
         projectTaxonomyDigest(getProjectionContext(session), {
           ...(exampleOverrides !== undefined ? { exampleOverrides } : {}),
-        })
+        }),
       ),
   }),
 
@@ -577,7 +586,7 @@ const TOOL_HANDLERS: Record<RegisteredToolName, ToolHandler> = {
     handle: async (_input, _session, sessionManager) => {
       const nextSession = await sessionManager.rebuild();
       return renderTextToolResult(
-        projectConfig(getProjectionContext(nextSession), {
+        parseAndProjectConfig(getProjectionContext(nextSession), {
           baseDir: nextSession.baseDir,
           configPath: nextSession.configPath,
           buildTimeMs: nextSession.buildTimeMs,
@@ -585,7 +594,7 @@ const TOOL_HANDLERS: Record<RegisteredToolName, ToolHandler> = {
           ...(nextSession.projectMetadata?.name !== undefined
             ? { projectName: nextSession.projectMetadata.name }
             : {}),
-        })
+        }),
       );
     },
   }),
@@ -594,7 +603,7 @@ const TOOL_HANDLERS: Record<RegisteredToolName, ToolHandler> = {
     inputSchema: EmptyInputSchema,
     handle: (_input, session) =>
       renderJsonToolResult(
-        projectConfig(getProjectionContext(session), {
+        parseAndProjectConfig(getProjectionContext(session), {
           baseDir: session.baseDir,
           configPath: session.configPath,
           buildTimeMs: session.buildTimeMs,
@@ -602,7 +611,7 @@ const TOOL_HANDLERS: Record<RegisteredToolName, ToolHandler> = {
           ...(session.projectMetadata?.name !== undefined
             ? { projectName: session.projectMetadata.name }
             : {}),
-        })
+        }),
       ),
   }),
 
@@ -614,13 +623,13 @@ const TOOL_HANDLERS: Record<RegisteredToolName, ToolHandler> = {
     handle: ({ documentType, disclosure, filter }, session) => {
       const context = getProjectionContext(session);
       return renderJsonToolResult(
-        projectDocumentationBundle(
+        parseAndProjectDocumentationBundle(
           filter === undefined ? context : { ...context, projectionFilter: filter },
           {
             documentType,
             ...(disclosure !== undefined ? { disclosureLevel: disclosure } : {}),
-          }
-        )
+          },
+        ),
       );
     },
   }),
@@ -634,7 +643,7 @@ const TOOL_HANDLERS: Record<RegisteredToolName, ToolHandler> = {
 export async function invokeTool<TOut = unknown>(
   sessionManager: PipelineSessionManager,
   toolName: RegisteredToolName,
-  args: unknown
+  args: unknown,
 ): Promise<ToolResult<TOut>> {
   const entry = resolveToolHandler(toolName);
   const input = parseToolInput(toolName, entry.inputSchema, args);
@@ -645,7 +654,7 @@ export async function invokeTool<TOut = unknown>(
 
 export function registerAllTools(
   server: ToolRegistrar,
-  sessionManager: PipelineSessionManager
+  sessionManager: PipelineSessionManager,
 ): void {
   for (const name of REGISTERED_TOOL_NAMES) {
     const toolHandler = resolveToolHandler(name);
@@ -660,7 +669,7 @@ export function registerAllTools(
         const session = sessionManager.getSession();
         const result = await toolHandler.handle(input, session, sessionManager);
         return formatTextResult(result.text);
-      }
+      },
     );
   }
 }

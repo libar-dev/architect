@@ -12,6 +12,7 @@ import {
   projectRoleProfiles,
   projectSourceInventoryDigest,
   projectTagUsage,
+  renderCompactText,
   renderJson,
   type AnnotationCoverage,
   type OverviewDigest,
@@ -23,6 +24,7 @@ import {
   type TagUsageMatrix,
 } from '../../../../src/index.js';
 import { createTestPackageResolver } from '../../../support/test-package-resolver.js';
+import { SUPPORTED_DOCUMENTATION_TYPE_IDENTITIES } from '../../../../src/projections/documentation-composition/documentation-type-registry.identity.js';
 import {
   createPattern,
   createProjectionContext,
@@ -33,6 +35,7 @@ import {
 interface OperationalInsightsState {
   context: ProjectionContext | null;
   overview: ProjectionBundle<OverviewDigest> | null;
+  overviewRenderings: Record<string, string> | null;
   annotationCoverage: ProjectionBundle<AnnotationCoverage> | null;
   tagUsage: ProjectionBundle<TagUsageMatrix> | null;
   sourceInventory: SourceInventoryEntry[] | null;
@@ -45,7 +48,7 @@ interface OperationalInsightsState {
 }
 
 const feature = await loadFeature(
-  'tests/features/projections/operational-insights/reporting.feature'
+  'tests/features/projections/operational-insights/reporting.feature',
 );
 
 let state: OperationalInsightsState | null = null;
@@ -54,6 +57,7 @@ function createState(): OperationalInsightsState {
   return {
     context: null,
     overview: null,
+    overviewRenderings: null,
     annotationCoverage: null,
     tagUsage: null,
     sourceInventory: null,
@@ -83,162 +87,234 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
     ({ RuleScenario }) => {
       RuleScenario(
         'projecting an overview digest for mixed delivery work',
-        ({ Given, When, Then, And }) => {
-          Given(
-            'a Operational Insights overview context with active phases and blocking dependencies',
-            () => {
-              const phaseOneDependency = createPattern('ProjectionBundleContract', {
-                status: 'roadmap',
-                phase: 7,
-                file: 'architect/specs/projection-bundle-contract.feature',
-              });
-              const phaseOnePattern = createPattern('OperationalInsightsSchemas', {
-                status: 'active',
-                phase: 7,
-                file: 'architect/specs/operational-insights-schemas.feature',
-                dependsOn: ['ProjectionBundleContract'],
-              });
-              const phaseTwoDependency = createPattern('CoverageGraphInput', {
-                status: 'active',
-                phase: 19,
-                file: 'packages/architect-query/src/api/coverage-analyzer.ts',
-              });
-              const phaseTwoPattern = createPattern('OperationalInsightsProjectionBodies', {
-                status: 'roadmap',
-                phase: 19,
-                file: 'packages/architect-projection/src/projections/operational-insights/support.ts',
-                dependsOn: ['OperationalInsightsSchemas', 'CoverageGraphInput'],
-              });
-              const completed = createPattern('ProjectionDeliveryReporting', {
-                status: 'completed',
-                phase: 18,
-              });
-              const unnamedActive = createPattern('OperationalInsightsUnnamedPhase', {
-                status: 'active',
-                phase: 18,
-              });
-              const candidate = createPattern('OperationalInsightsFutureIdeas', {
-                status: 'candidate',
-                phase: 20,
-              });
+        ({ Given, When, Then }) => {
+          Given('a Operational Insights overview context with blocking dependencies', () => {
+            const phaseOneDependency = createPattern('ProjectionBundleContract', {
+              status: 'roadmap',
+              file: 'architect/specs/projection-bundle-contract.feature',
+            });
+            const phaseOnePattern = createPattern('OperationalInsightsSchemas', {
+              status: 'active',
+              file: 'architect/specs/operational-insights-schemas.feature',
+              dependsOn: ['ProjectionBundleContract'],
+            });
+            const phaseTwoDependency = createPattern('CoverageGraphInput', {
+              status: 'active',
+              file: 'packages/architect-query/src/api/coverage-analyzer.ts',
+            });
+            const phaseTwoPattern = createPattern('OperationalInsightsProjectionBodies', {
+              status: 'roadmap',
+              file: 'packages/architect-projection/src/projections/operational-insights/support.ts',
+              dependsOn: ['OperationalInsightsSchemas', 'CoverageGraphInput'],
+            });
+            const completed = createPattern('ProjectionDeliveryReporting', {
+              status: 'completed',
+            });
+            const unnamedActive = createPattern('OperationalInsightsUnnamedPhase', {
+              status: 'active',
+            });
+            const candidate = createPattern('OperationalInsightsFutureIdeas', {
+              status: 'candidate',
+            });
 
-              state!.context = createProjectionContext({
-                patterns: [
-                  phaseOneDependency,
-                  phaseOnePattern,
-                  phaseTwoDependency,
-                  phaseTwoPattern,
-                  completed,
-                  unnamedActive,
-                  candidate,
-                ],
-                phaseNames: {
-                  7: 'Schema Lock',
-                  19: 'Projection Bodies',
-                  20: 'Future Work',
-                },
-                relationshipIndex: {
-                  OperationalInsightsSchemas: createRelationshipEntry({
-                    dependsOn: ['ProjectionBundleContract'],
-                  }),
-                  OperationalInsightsProjectionBodies: createRelationshipEntry({
-                    dependsOn: ['OperationalInsightsSchemas', 'CoverageGraphInput'],
-                  }),
-                },
-              });
-            }
-          );
+            state!.context = createProjectionContext({
+              patterns: [
+                phaseOneDependency,
+                phaseOnePattern,
+                phaseTwoDependency,
+                phaseTwoPattern,
+                completed,
+                unnamedActive,
+                candidate,
+              ],
+              relationshipIndex: {
+                OperationalInsightsSchemas: createRelationshipEntry({
+                  dependsOn: ['ProjectionBundleContract'],
+                }),
+                OperationalInsightsProjectionBodies: createRelationshipEntry({
+                  dependsOn: ['OperationalInsightsSchemas', 'CoverageGraphInput'],
+                }),
+              },
+            });
+          });
 
           When('I project the overview digest', () => {
             state!.overview = projectOverviewDigest(state!.context!);
           });
 
-          Then(
-            'the overview digest should expose delivery progress active phases and blocking entries',
-            () => {
-              expect(state!.overview).toEqual({
-                root: {
-                  kind: 'OverviewDigest',
-                  progress: {
-                    total: 6,
-                    completed: 1,
-                    active: 3,
-                    planned: 2,
-                    candidate: 1,
-                    percentage: 17,
-                  },
-                  activePhases: [
-                    {
-                      phase: 7,
-                      name: 'Schema Lock',
-                      patternCount: 2,
-                      activeCount: 1,
-                    },
-                    {
-                      phase: 18,
-                      name: undefined,
-                      patternCount: 2,
-                      activeCount: 1,
-                    },
-                    {
-                      phase: 19,
-                      name: 'Projection Bodies',
-                      patternCount: 2,
-                      activeCount: 1,
-                    },
-                  ],
-                  blocking: [
-                    {
-                      pattern: 'OperationalInsightsSchemas',
-                      status: 'active',
-                      blockedBy: ['ProjectionBundleContract'],
-                    },
-                    {
-                      pattern: 'OperationalInsightsProjectionBodies',
-                      status: 'roadmap',
-                      blockedBy: ['OperationalInsightsSchemas', 'CoverageGraphInput'],
-                    },
-                  ],
-                  cliHints: [
-                    '=== DATA API — Use Instead of Explore Agents ===',
-                    'pnpm architect:query -- <subcommand>',
-                    '',
-                    '  overview                             Project health (this output)',
-                    '  context <pattern> --session <type>   Curated context bundle (planning/design/implement)',
-                    '  scope-validate <pattern> <session>   Pre-flight check before starting work',
-                    '  dep-tree <pattern>                   Dependency chains',
-                    '  list --status roadmap                Available patterns to work on',
-                    '  context <pattern> --session design   Includes stubs in the curated bundle',
-                    '  files <pattern>                      File paths for a pattern',
-                    '  rules                                Business rules from Gherkin',
-                    '  arch blocking                        Patterns stuck on incomplete deps',
-                    '',
-                    'Full reference: pnpm architect:query -- --help',
-                    'Agent environments: load the `architect-data-api` skill for verb shapes, deterministic gates, and known quirks.',
-                  ],
+          Then('the overview digest should expose delivery progress and blocking entries', () => {
+            // The architecture glimpse derives from a separate component-scope
+            // graph walk; its exact Mermaid is exercised in the disclosure rule
+            // below. The orientation block (registry-derived references + the
+            // graph-derived safe-to-start set), the role distribution, and the
+            // curated cliHints are asserted structurally afterwards (their exact
+            // wording is presentation copy that evolves with the Gap Ledger), so
+            // split them off and assert the stable structural fields exactly.
+            const { architecture, orientation, roleDistribution, cliHints, ...root } =
+              state!.overview!.root;
+            expect({ root, children: state!.overview!.children }).toEqual({
+              root: {
+                kind: 'OverviewDigest',
+                progress: {
+                  total: 6,
+                  completed: 1,
+                  active: 3,
+                  planned: 2,
+                  candidate: 1,
+                  percentage: 17,
                 },
-                children: {},
-              });
-            }
-          );
-
-          And('the overview digest should preserve unnamed active phase parity', () => {
-            expect(state!.overview?.root.activePhases).toContainEqual({
-              phase: 18,
-              name: undefined,
-              patternCount: 2,
-              activeCount: 1,
+                blocking: [
+                  {
+                    pattern: 'OperationalInsightsSchemas',
+                    status: 'active',
+                    blockedBy: ['ProjectionBundleContract'],
+                  },
+                  {
+                    pattern: 'OperationalInsightsProjectionBodies',
+                    status: 'roadmap',
+                    blockedBy: ['OperationalInsightsSchemas', 'CoverageGraphInput'],
+                  },
+                ],
+                // Derived from the canonical registry — same source the overview
+                // projection uses — so this assertion never drifts from the supported set.
+                generatedViews: SUPPORTED_DOCUMENTATION_TYPE_IDENTITIES.map((identity) => ({
+                  docType: identity.key,
+                  verb: `architect_documentation { documentType: "${identity.key}" }`,
+                  summary: identity.description,
+                })),
+              },
+              children: {},
             });
+
+            expect(architecture).toBeDefined();
+            expect(architecture?.packageChart.type).toBe('mermaid');
+            expect(architecture?.contextMap?.type).toBe('mermaid');
+            expect(architecture?.pointer).toContain('not grep');
+
+            // Orientation references are the curated orientation-doc subset,
+            // derived from the registry (typed tool-call hint + title), in declared order.
+            expect(orientation?.references.map((reference) => reference.docType)).toEqual([
+              'decisions',
+              'taxonomy',
+              'validation-rules',
+              'business-rules',
+              'api-reference',
+            ]);
+            expect(orientation?.disclosureHint).toContain('disclosure:');
+            expect(orientation?.disclosureHint).not.toContain('--disclosure');
+            expect(typeof orientation?.startableCount).toBe('number');
+            // Role distribution tallies the canonical @architect-role of every
+            // pattern that declares one; sorted by count descending.
+            expect(Array.isArray(roleDistribution)).toBe(true);
+            // cliHints lead with the ADR-014 graph-handle banner and promote
+            // the eval front door (pnpm architect:q).
+            expect(cliHints?.[0]).toContain('READ SURFACE');
+            expect(cliHints?.[0]).toContain('graph handle');
+            expect(cliHints?.some((hint) => hint.includes('architect:q'))).toBe(true);
 
             const rendered = renderJson(state!.overview!.root);
             expect(typeof rendered).toBe('object');
             expect(rendered).not.toBeNull();
             expect(FragmentSchema.safeParse(rendered).success).toBe(true);
           });
-        }
+        },
       );
-    }
+    },
   );
+
+  Rule('Overview compact rendering honors disclosure richness', ({ RuleScenario }) => {
+    RuleScenario(
+      'rendering the overview digest at each disclosure level',
+      ({ Given, When, Then, And }) => {
+        Given('an Operational Insights overview context with six blocking dependencies', () => {
+          const blockedNames = [
+            'BlockedAlpha',
+            'BlockedBravo',
+            'BlockedCharlie',
+            'BlockedDelta',
+            'BlockedEcho',
+            'BlockedFoxtrot',
+          ];
+          const dependency = createPattern('SharedBlockingDependency', {
+            status: 'roadmap',
+            file: 'architect/specs/shared-blocking-dependency.feature',
+          });
+          const blocked = blockedNames.map((name) =>
+            createPattern(name, {
+              status: 'active',
+              file: `packages/architect-projection/src/projections/${name.toLowerCase()}.ts`,
+              dependsOn: ['SharedBlockingDependency'],
+            }),
+          );
+
+          state!.context = createProjectionContext({
+            patterns: [dependency, ...blocked],
+            relationshipIndex: Object.fromEntries(
+              blockedNames.map((name) => [
+                name,
+                createRelationshipEntry({ dependsOn: ['SharedBlockingDependency'] }),
+              ]),
+            ),
+          });
+        });
+
+        When('I render the overview digest at name-only summary and full', () => {
+          const digest = projectOverviewDigest(state!.context!);
+          state!.overviewRenderings = {
+            'name-only': renderCompactText(digest, { richness: 'name-only' }),
+            summary: renderCompactText(digest, { richness: 'summary' }),
+            full: renderCompactText(digest, { richness: 'full' }),
+          };
+        });
+
+        Then('the name-only rendering contains only the progress section', () => {
+          const output = state!.overviewRenderings!['name-only']!;
+          expect(output).toContain('=== PROGRESS ===');
+          expect(output).not.toContain('=== BLOCKING ===');
+          expect(output).not.toContain('=== GENERATED VIEWS ===');
+          // name-only omits the architecture glimpse too — the bare progress signal.
+          expect(output).not.toContain('=== ARCHITECTURE ===');
+          expect(output).not.toContain('```mermaid');
+        });
+
+        And(
+          'the summary rendering truncates blocking and shows a one-line generated-views index',
+          () => {
+            const output = state!.overviewRenderings!['summary']!;
+            const blockingLines = output.split('\n').filter((line) => line.includes('blocked by:'));
+            expect(blockingLines).toHaveLength(5);
+            expect(output).toContain('... and 1 more — `architect_arch_blocking`');
+            expect(output).toContain('docs via `architect_documentation` / docs-live/:');
+            expect(output).not.toContain(
+              '— `architect_documentation { documentType: "architecture" }`',
+            );
+            // summary shows the coarse package chart (one Mermaid block) + the
+            // live-graph pointer, but NOT the richer bounded-context map.
+            expect(output).toContain('=== ARCHITECTURE ===');
+            expect(output.match(/```mermaid/g) ?? []).toHaveLength(1);
+            expect(output).toContain('Explore via the live graph, not grep');
+          },
+        );
+
+        And(
+          'the full rendering shows every blocking entry and the itemized generated-views index',
+          () => {
+            const output = state!.overviewRenderings!['full']!;
+            const blockingLines = output.split('\n').filter((line) => line.includes('blocked by:'));
+            expect(blockingLines).toHaveLength(6);
+            expect(output).not.toContain('more — `architect_arch_blocking`');
+            expect(output).toContain(
+              '— `architect_documentation { documentType: "architecture" }`',
+            );
+            // full adds the bounded-context map below the package chart — two
+            // Mermaid blocks in the architecture section.
+            expect(output).toContain('=== ARCHITECTURE ===');
+            expect(output.match(/```mermaid/g) ?? []).toHaveLength(2);
+          },
+        );
+      },
+    );
+  });
 
   Rule('Annotation coverage stays numeric and graph-only', ({ RuleScenario }) => {
     RuleScenario(
@@ -318,7 +394,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 ],
               }),
             });
-          }
+          },
         );
 
         When('I project the annotation coverage digest', () => {
@@ -352,9 +428,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               },
               children: {},
             });
-          }
+          },
         );
-      }
+      },
     );
 
     RuleScenario(
@@ -404,7 +480,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 throw new Error('relationshipIndex should not be read for scalar coverage tags');
               },
             });
-          }
+          },
         );
 
         When('I project the annotation coverage digest', () => {
@@ -428,9 +504,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 ],
               },
             });
-          }
+          },
         );
-      }
+      },
     );
   });
 
@@ -446,11 +522,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 role: 'service',
                 archContext: 'projection',
                 archLayer: 'application',
-                phase: 19,
-                quarter: '2026-Q2',
                 team: 'projection',
-                effort: 'm',
-                priority: 'high',
+                workflow: 'implementation',
                 file: 'packages/architect-projection/src/projections/operational-insights/overview.ts',
               }),
               createPattern('ServiceCompleted', {
@@ -458,11 +531,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 role: 'service',
                 archContext: 'projection',
                 archLayer: 'application',
-                phase: 19,
-                quarter: '2026-Q2',
                 team: 'projection',
-                effort: 'm',
-                priority: 'high',
+                workflow: 'implementation',
                 file: 'packages/architect-projection/src/projections/operational-insights/support.ts',
               }),
               createPattern('CliRoadmap', {
@@ -470,10 +540,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 role: 'cli',
                 archContext: 'tooling',
                 archLayer: 'application',
-                phase: 20,
                 team: 'tooling',
-                priority: 'medium',
-                file: 'packages/architect-cli/src/cli/pattern-graph-cli.ts',
+                workflow: 'documentation',
+                file: 'packages/architect-cli/src/cli/graph-cli.ts',
               }),
               createPattern('DecisionRecord', {
                 status: 'completed',
@@ -541,24 +610,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 },
                 {
                   kind: 'TagUsageEntry',
-                  tag: 'phase',
-                  count: 3,
-                  values: [
-                    { value: '19', count: 2 },
-                    { value: '20', count: 1 },
-                  ],
-                },
-                {
-                  kind: 'TagUsageEntry',
-                  tag: 'priority',
-                  count: 3,
-                  values: [
-                    { value: 'high', count: 2 },
-                    { value: 'medium', count: 1 },
-                  ],
-                },
-                {
-                  kind: 'TagUsageEntry',
                   tag: 'team',
                   count: 3,
                   values: [
@@ -568,15 +619,12 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 },
                 {
                   kind: 'TagUsageEntry',
-                  tag: 'effort',
-                  count: 2,
-                  values: [{ value: 'm', count: 2 }],
-                },
-                {
-                  kind: 'TagUsageEntry',
-                  tag: 'quarter',
-                  count: 2,
-                  values: [{ value: '2026-Q2', count: 2 }],
+                  tag: 'workflow',
+                  count: 3,
+                  values: [
+                    { value: 'implementation', count: 2 },
+                    { value: 'documentation', count: 1 },
+                  ],
                 },
               ],
               patternCount: 6,
@@ -593,7 +641,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               count: 3,
               locationPattern: 'packages/**/*.ts',
               files: [
-                'packages/architect-cli/src/cli/pattern-graph-cli.ts',
+                'packages/architect-cli/src/cli/graph-cli.ts',
                 'packages/architect-projection/src/projections/operational-insights/overview.ts',
                 'packages/architect-projection/src/projections/operational-insights/support.ts',
               ],
@@ -624,7 +672,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             },
           ]);
         });
-      }
+      },
     );
   });
 
@@ -640,7 +688,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               state!.context = createProjectionContext({
                 patterns: [
                   createPattern('ContextAssemblerImpl', { role: 'service' }),
-                  createPattern('PatternGraphAPI', { role: 'service' }),
+                  createPattern('WidgetService', { role: 'service' }),
                   createPattern('PatternGraphCli', { role: 'cli' }),
                 ],
                 tagRegistry: createTagRegistry({
@@ -661,7 +709,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   ],
                 }),
               });
-            }
+            },
           );
 
           When('I project the role profile for "APP-SERVICE" and all role profiles', () => {
@@ -677,7 +725,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               priority: 20,
               count: 2,
               description: 'Coordinates use cases and delegates to lower layers.',
-              examples: ['ContextAssemblerImpl', 'PatternGraphAPI'],
+              examples: ['ContextAssemblerImpl', 'WidgetService'],
             });
           });
 
@@ -692,7 +740,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   priority: 20,
                   count: 2,
                   description: 'Coordinates use cases and delegates to lower layers.',
-                  examples: ['ContextAssemblerImpl', 'PatternGraphAPI'],
+                  examples: ['ContextAssemblerImpl', 'WidgetService'],
                 },
                 {
                   kind: 'RoleProfile',
@@ -704,11 +752,11 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   examples: ['PatternGraphCli'],
                 },
               ]);
-            }
+            },
           );
-        }
+        },
       );
-    }
+    },
   );
 
   Rule(
@@ -725,9 +773,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   createPattern('CoverageProjection', {
                     status: 'completed',
                     productArea: 'Projection Platform',
-                    userRole: 'Maintainer',
                     description: 'Expose graph-only annotation coverage as a typed fragment.',
-                    useCases: ['Report numeric coverage in Studio dashboards'],
                     rules: [
                       {
                         name: 'Numeric coverage only',
@@ -755,10 +801,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   }),
                   createPattern('OperatorNeeds', {
                     status: 'active',
-                    userRole: 'Operator',
-                    businessValue: 'Expose requirement digests beyond product-area tags.',
                     description:
-                      'Include PRD patterns that only carry user-role/business-value metadata.',
+                      'Unclassified requirement metadata should not enter product digests.',
                     executableSpecs: ['tests/features/query/context.feature'],
                   }),
                   createPattern('ADRProjectionDecision', {
@@ -769,7 +813,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   }),
                 ],
               });
-            }
+            },
           );
 
           When(
@@ -778,9 +822,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               state!.allRequirements = projectRequirementDigest(state!.context!);
               state!.filteredRequirements = projectRequirementDigest(
                 state!.context!,
-                'Projection Platform'
+                'Projection Platform',
               );
-            }
+            },
           );
 
           Then(
@@ -800,20 +844,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   ],
                   requirements: [
                     {
-                      pattern: 'OperatorNeeds',
-                      ownerRouteId:
-                        'requirements-executable:architect-projection:requirement:operator-needs',
-                      status: 'active',
-                      description: [
-                        { type: 'heading', level: 2, text: 'Requirement' },
-                        {
-                          type: 'paragraph',
-                          text: 'Include PRD patterns that only carry user-role/business-value metadata.',
-                        },
-                      ],
-                      testFiles: ['tests/features/query/context.feature'],
-                    },
-                    {
                       pattern: 'CoverageProjection',
                       ownerRouteId:
                         'requirements-executable:architect-projection:requirement:coverage-projection',
@@ -823,12 +853,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                         {
                           type: 'paragraph',
                           text: 'Expose graph-only annotation coverage as a typed fragment.',
-                        },
-                        { type: 'heading', level: 3, text: 'Use Cases' },
-                        {
-                          type: 'list',
-                          ordered: false,
-                          items: ['Report numeric coverage in Studio dashboards'],
                         },
                         { type: 'heading', level: 3, text: 'Business Rules' },
                         {
@@ -869,16 +893,16 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 },
                 children: {},
               });
-            }
+            },
           );
 
           And(
-            'the all-areas requirement digest should include product-metadata requirements without a product area',
+            'the all-areas requirement digest should exclude requirements without a product area',
             () => {
               expect(
-                state!.allRequirements?.root.requirements.map((requirement) => requirement.pattern)
-              ).toContain('OperatorNeeds');
-            }
+                state!.allRequirements?.root.requirements.map((requirement) => requirement.pattern),
+              ).not.toContain('OperatorNeeds');
+            },
           );
 
           And(
@@ -907,12 +931,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                         {
                           type: 'paragraph',
                           text: 'Expose graph-only annotation coverage as a typed fragment.',
-                        },
-                        { type: 'heading', level: 3, text: 'Use Cases' },
-                        {
-                          type: 'list',
-                          ordered: false,
-                          items: ['Report numeric coverage in Studio dashboards'],
                         },
                         { type: 'heading', level: 3, text: 'Business Rules' },
                         {
@@ -943,9 +961,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 },
                 children: {},
               });
-            }
+            },
           );
-        }
+        },
       );
 
       RuleScenario(
@@ -959,7 +977,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   createPattern('SharedRequirementRef', {
                     status: 'active',
                     productArea: 'Alpha',
-                    phase: 12,
                     file: 'packages/architect-core/src/shared-requirement-ref.ts',
                     description: 'First package owns one rule for the shared requirement.',
                     behaviorFile: 'tests/features/query/context.feature',
@@ -976,7 +993,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                     patternName: 'SharedRequirementRef',
                     status: 'completed',
                     productArea: 'Beta',
-                    phase: 18,
                     file: 'packages/architect-projection/src/shared-requirement-ref.ts',
                     description:
                       'Second package contributes another rule to the same feature name.',
@@ -994,7 +1010,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   }),
                 ],
               });
-            }
+            },
           );
 
           When('I project the requirement digest for all areas', () => {
@@ -1018,7 +1034,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   ownerRouteId: 'business-rules:architect-projection',
                 },
               ]);
-            }
+            },
           );
 
           And(
@@ -1068,9 +1084,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   ],
                 },
               ]);
-            }
+            },
           );
-        }
+        },
       );
 
       RuleScenario(
@@ -1084,7 +1100,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   createPattern('SharedRequirementRef', {
                     status: 'active',
                     productArea: 'Alpha',
-                    phase: 12,
                     file: 'packages/architect-core/src/shared-requirement-ref.ts',
                     description: 'First package owns one rule for the shared requirement.',
                     behaviorFile: 'tests/features/query/context.feature',
@@ -1101,7 +1116,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                     patternName: 'SharedRequirementRef',
                     status: 'completed',
                     productArea: 'Beta',
-                    phase: 18,
                     file: 'packages/architect-projection/src/shared-requirement-ref.ts',
                     description:
                       'Second package contributes another rule to the same feature name.',
@@ -1119,7 +1133,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   }),
                 ],
               });
-            }
+            },
           );
 
           When('I project the requirements-executable digest', () => {
@@ -1143,7 +1157,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   ownerRouteId: 'business-rules:architect-projection',
                 },
               ]);
-            }
+            },
           );
 
           And(
@@ -1193,26 +1207,26 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   ],
                 },
               ]);
-            }
+            },
           );
 
           And(
             'the executable requirement root should preserve all-areas sort order for duplicate-feature entries',
             () => {
               expect(
-                state!.executableRequirements?.root.requirements.map((entry) => entry.ownerRouteId)
+                state!.executableRequirements?.root.requirements.map((entry) => entry.ownerRouteId),
               ).toEqual([
                 'requirements-executable:architect-core:requirement:shared-requirement-ref',
                 'requirements-executable:architect-projection:requirement:shared-requirement-ref',
               ]);
-            }
+            },
           );
 
           And(
             'the executable requirement package and detail children should keep only local business-rule references',
             () => {
               expect(
-                state!.executableRequirements?.children['requirements-executable:architect-core']
+                state!.executableRequirements?.children['requirements-executable:architect-core'],
               ).toEqual({
                 kind: 'RequirementDigest',
                 productArea: 'architect-core',
@@ -1251,7 +1265,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               expect(
                 state!.executableRequirements?.children[
                   'requirements-executable:architect-projection:requirement:shared-requirement-ref'
-                ]
+                ],
               ).toEqual({
                 kind: 'RequirementDigest',
                 productArea: 'SharedRequirementRef',
@@ -1288,9 +1302,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   },
                 ],
               });
-            }
+            },
           );
-        }
+        },
       );
 
       RuleScenario(
@@ -1321,7 +1335,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 ],
                 packageResolver: createTestPackageResolver(),
               });
-            }
+            },
           );
 
           When('I project the requirements-executable digest', () => {
@@ -1355,34 +1369,35 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               ]);
 
               expect(state!.executableRequirements?.children).toHaveProperty(
-                'requirements-executable:architect-dev'
+                'requirements-executable:architect-dev',
               );
               expect(state!.executableRequirements?.children).toHaveProperty(
-                'requirements-executable:architect-dev:requirement:harness-requirement'
+                'requirements-executable:architect-dev:requirement:harness-requirement',
               );
-            }
+            },
           );
-        }
+        },
       );
 
       RuleScenario(
-        'package scoped architect releases stay out of requirement digests',
+        'nested architect decisions stay out of requirement digests',
         ({ Given, When, Then }) => {
           Given(
-            'a Operational Insights requirement context with a nested architect release pattern',
+            'a Operational Insights requirement context with a nested architect decision pattern',
             () => {
               state!.context = createProjectionContext({
                 patterns: [
-                  createPattern('NestedArchitectRelease', {
+                  createPattern('NestedArchitectDecision', {
                     status: 'completed',
                     productArea: 'Projection Platform',
-                    file: 'architect/releases/2026-q2-release.feature',
-                    description: 'Release notes must not appear in requirement digests.',
+                    file: 'architect/decisions/adr-099-decision.feature',
+                    adr: '099',
+                    description: 'Decision records must not appear in requirement digests.',
                     rules: [
                       {
-                        name: 'Release rule',
-                        description: '**Invariant:** Release notes stay excluded.',
-                        scenarioNames: ['nested architect release exclusion'],
+                        name: 'Decision rule',
+                        description: '**Invariant:** Decision records stay excluded.',
+                        scenarioNames: ['nested architect decision exclusion'],
                         scenarioCount: 1,
                       },
                     ],
@@ -1397,7 +1412,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   }),
                 ],
               });
-            }
+            },
           );
 
           When('I project the requirement digest for all areas', () => {
@@ -1405,7 +1420,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           });
 
           Then(
-            'the nested architect release pattern should be excluded from the all-areas requirement digest',
+            'the nested architect decision pattern should be excluded from the all-areas requirement digest',
             () => {
               expect(state!.allRequirements?.root.requirements).toEqual([
                 {
@@ -1422,9 +1437,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   ],
                 },
               ]);
-            }
+            },
           );
-        }
+        },
       );
 
       RuleScenario(
@@ -1466,7 +1481,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   }),
                 ],
               });
-            }
+            },
           );
 
           When('I project the requirements-specs digest', () => {
@@ -1504,22 +1519,22 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   testFiles: [],
                 },
               ]);
-            }
+            },
           );
 
           And(
             'the requirements-specs child routes should stay package-stable for duplicate planned feature names',
             () => {
               expect(state!.specRequirements?.children).toHaveProperty(
-                'requirements-specs:architect-core:requirement:shared-planned-requirement'
+                'requirements-specs:architect-core:requirement:shared-planned-requirement',
               );
               expect(state!.specRequirements?.children).toHaveProperty(
-                'requirements-specs:architect-projection:requirement:shared-planned-requirement'
+                'requirements-specs:architect-projection:requirement:shared-planned-requirement',
               );
-            }
+            },
           );
-        }
+        },
       );
-    }
+    },
   );
 });

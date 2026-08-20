@@ -45,6 +45,16 @@ must already be canonical relative `.md` paths. Traversal, absolute paths,
 schemes, duplicate route-id aliases, and unresolved internal child references do
 not become emitted files or clickable links.
 
+Both boundaries are now ESLint-enforced for renderer code. The repo-root
+`eslint.config.mjs` ships four boundary rules scoped to `src/renderers/**/*.ts`
+(documentation-composition import ban, route-construction ban, cross-layer
+`.internal.js` ban, and a five-selector `TRUSTED_MARKDOWN` firewall). Each
+violation carries a stable `[arch-boundary:*]` or `[trust-boundary:*]` tag in
+its error message — grep the tag to land in `packages/architect-projection/README.md`
+"Architecture invariants → Enforced at lint time". v1→v2 consumers porting
+renderer-shaped code should expect these rules to surface latent boundary
+violations; no `eslint-disable` escape is provided.
+
 ---
 
 ## Performance gate
@@ -63,38 +73,38 @@ The following codecs were deleted in commit `58c0f85` ("Implement ddd projection
 for doc generation") from `packages/architect-presentation/src/renderable/codecs/`.
 Each row maps the original codec to its replacement projection and renderer.
 
-| Original Codec             | Original Output                  | New Projection                                                                              | New Renderer                                                        |
-| -------------------------- | -------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `adr.ts`                   | ADR Markdown docs                | `governance/decision-records.ts` -> `projectDecisionCatalog`                                | `renderMarkdown` (DecisionCatalog + DecisionRecord)                 |
-| `architecture.ts`          | Architecture diagram Markdown    | `documentation-composition/architecture-diagram.ts` -> `parseAndProjectArchitectureDiagram` | `renderMarkdown` (ArchitectureDiagram)                              |
-| `business-rules.ts`        | Business rules Markdown          | `governance/business-rules.ts` -> `parseAndProjectBusinessRuleSet`                          | `renderMarkdown` (BusinessRuleSet)                                  |
-| `codec-registry.ts`        | Registry of all codecs           | Eliminated; projections are imported directly                                               | N/A                                                                 |
-| `composite.ts`             | Multi-codec document composition | Bundle routing in `renderMarkdown` / `renderJson` handles composition                       | N/A                                                                 |
-| `convention-extractor.ts`  | Convention extraction doc        | `governance/taxonomy-digest.ts` -> `projectTaxonomyDigest`                                  | `renderMarkdown` (TaxonomyDigest)                                   |
-| `decision-doc.ts`          | Decision document Markdown       | `governance/decision-records.ts` -> `projectDecisionRecord`                                 | `renderMarkdown` (DecisionRecord)                                   |
-| `design-review.ts`         | Design review Markdown           | Deleted — lifecycle-management projection + fragment both removed in Action 5.              | N/A (not shipping in the current surface)                           |
-| `diagram-utils.ts`         | Mermaid diagram helpers          | Inlined into `renderMarkdown` via `mermaid()` block builder                                 | N/A                                                                 |
-| `helpers.ts`               | Shared codec helpers             | Split across renderers and `blocks/schema.ts` (paragraph, table, etc.)                      | N/A                                                                 |
-| `index-codec.ts`           | Index/table-of-contents doc      | `documentation-composition/documentation-bundle.ts` -> `parseAndProjectDocumentationBundle` | `renderMarkdown` (domain `ProjectionBundle`, documentType=`index`)  |
-| `index.ts`                 | Barrel re-exports                | `projections/index.ts` barrel                                                               | N/A                                                                 |
-| `patterns.ts`              | Pattern catalog Markdown         | `pattern-relations/pattern-catalog.ts` -> `projectPatternCatalog`                           | `renderMarkdown` (PatternCatalog bundle, documentType=`patterns`)   |
-| `planning.ts`              | Roadmap/planning Markdown        | `delivery-reporting/delivery-reporting-shared.internal.ts` -> `projectRoadmapTimeline`      | `renderMarkdown` (RoadmapTimeline)                                  |
-| `pr-changes.ts`            | PR change review doc             | `documentation-composition/pr-change-review.ts` -> `parseAndProjectPrChangeReview`          | `renderMarkdown` (PrChangeReview)                                   |
-| `product-area-metadata.ts` | Product area metadata doc        | `operational-insights/index.ts` -> `projectRequirementDigest`                               | `renderMarkdown` (RequirementDigest)                                |
-| `reference-builders.ts`    | Reference doc section builders   | Absorbed into `renderMarkdown` normalizers                                                  | N/A                                                                 |
-| `reference-diagrams.ts`    | Reference architecture diagrams  | `documentation-composition/architecture-diagram.ts` -> `parseAndProjectArchitectureDiagram` | `renderMarkdown` (ArchitectureDiagram)                              |
-| `reference-types.ts`       | Shared reference types           | Fragment Zod schemas in `fragments/`                                                        | N/A                                                                 |
-| `reference.ts`             | Reference documentation          | `documentation-composition/documentation-bundle.ts` -> `parseAndProjectDocumentationBundle` | `renderMarkdown` (domain `ProjectionBundle`)                        |
-| `reporting.ts`             | Status/progress reporting        | `delivery-reporting/delivery-reporting-shared.internal.ts`                                  | `renderJson` (StatusDistribution), `renderMarkdown` (PhaseProgress) |
-| `requirements.ts`          | Product requirements doc         | `operational-insights/index.ts` -> `projectRequirementDigest`                               | `renderMarkdown` (RequirementDigest)                                |
-| `session.ts`               | Session context rendering        | `execution-context/session-context.ts` -> `parseAndProjectSessionContext`                   | `renderCompactText` (SessionContextBundle)                          |
-| `shape-matcher.ts`         | Shape-matching utilities         | Replaced by Zod schema validation in `renderJson`                                           | N/A                                                                 |
-| `shared-schema.ts`         | Shared schema definitions        | `fragments/base.ts` + per-fragment Zod schemas                                              | N/A                                                                 |
-| `taxonomy.ts`              | Taxonomy reference doc           | `governance/taxonomy-digest.ts` -> `parseAndProjectTaxonomyDigest`                          | `renderMarkdown` (TaxonomyDigest)                                   |
-| `timeline.ts`              | Timeline/roadmap Markdown        | `delivery-reporting/delivery-reporting-shared.internal.ts`                                  | `renderMarkdown` (RoadmapTimeline, ReleaseNotesDigest)              |
-| `types/base.ts`            | Base codec types                 | `renderers/types.ts` (RenderMarkdown, RenderJson, etc.)                                     | N/A                                                                 |
-| `types/index.ts`           | Type barrel                      | `renderers/types.ts`                                                                        | N/A                                                                 |
-| `validation-rules.ts`      | Validation rules doc             | `governance/validation-rule-digest.ts` -> `projectValidationRuleDigest`                     | `renderMarkdown` (ValidationRuleDigest)                             |
+| Original Codec             | Original Output                  | New Projection                                                                              | New Renderer                                                                                                  |
+| -------------------------- | -------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `adr.ts`                   | ADR Markdown docs                | `governance/decision-records.ts` -> `projectDecisionCatalog`                                | `renderMarkdown` (DecisionCatalog + DecisionRecord)                                                           |
+| `architecture.ts`          | Architecture diagram Markdown    | `documentation-composition/architecture-diagram.ts` -> `parseAndProjectArchitectureDiagram` | `renderMarkdown` (ArchitectureDiagram)                                                                        |
+| `business-rules.ts`        | Business rules Markdown          | `governance/business-rules.ts` -> `parseAndProjectBusinessRuleSet`                          | `renderMarkdown` (BusinessRuleSet)                                                                            |
+| `codec-registry.ts`        | Registry of all codecs           | Eliminated; projections are imported directly                                               | N/A                                                                                                           |
+| `composite.ts`             | Multi-codec document composition | Bundle routing in `renderMarkdown` / `renderJson` handles composition                       | N/A                                                                                                           |
+| `convention-extractor.ts`  | Convention extraction doc        | `governance/taxonomy-digest.ts` -> `projectTaxonomyDigest`                                  | `renderMarkdown` (TaxonomyDigest)                                                                             |
+| `decision-doc.ts`          | Decision document Markdown       | `governance/decision-records.ts` -> `projectDecisionRecord`                                 | `renderMarkdown` (DecisionRecord)                                                                             |
+| `design-review.ts`         | Design review Markdown           | Deleted — lifecycle-management projection + fragment both removed in Action 5.              | N/A (not shipping in the current surface)                                                                     |
+| `diagram-utils.ts`         | Mermaid diagram helpers          | Inlined into `renderMarkdown` via `mermaid()` block builder                                 | N/A                                                                                                           |
+| `helpers.ts`               | Shared codec helpers             | Split across renderers and `blocks/schema.ts` (paragraph, table, etc.)                      | N/A                                                                                                           |
+| `index-codec.ts`           | Index/table-of-contents doc      | `documentation-composition/documentation-bundle.ts` -> `parseAndProjectDocumentationBundle` | `renderMarkdown` (domain `ProjectionBundle`, documentType=`index`)                                            |
+| `index.ts`                 | Barrel re-exports                | `projections/index.ts` barrel                                                               | N/A                                                                                                           |
+| `patterns.ts`              | Pattern catalog Markdown         | `pattern-relations/pattern-catalog.ts` -> `projectPatternCatalog`                           | `renderMarkdown` (PatternCatalog bundle, documentType=`patterns`)                                             |
+| `planning.ts`              | Roadmap/planning Markdown        | `delivery-reporting/delivery-reporting-shared.internal.ts` -> `projectRoadmapTimeline`      | `renderMarkdown` (RoadmapTimeline)                                                                            |
+| `pr-changes.ts`            | PR change review doc             | `documentation-composition/pr-change-review.ts` -> `parseAndProjectPrChangeReview`          | `renderMarkdown` (PrChangeReview)                                                                             |
+| `product-area-metadata.ts` | Product area metadata doc        | `operational-insights/index.ts` -> `projectRequirementDigest`                               | `renderMarkdown` (RequirementDigest)                                                                          |
+| `reference-builders.ts`    | Reference doc section builders   | Absorbed into `renderMarkdown` normalizers                                                  | N/A                                                                                                           |
+| `reference-diagrams.ts`    | Reference architecture diagrams  | `documentation-composition/architecture-diagram.ts` -> `parseAndProjectArchitectureDiagram` | `renderMarkdown` (ArchitectureDiagram)                                                                        |
+| `reference-types.ts`       | Shared reference types           | Fragment Zod schemas in `fragments/`                                                        | N/A                                                                                                           |
+| `reference.ts`             | Reference documentation          | `documentation-composition/documentation-bundle.ts` -> `parseAndProjectDocumentationBundle` | `renderMarkdown` (domain `ProjectionBundle`)                                                                  |
+| `reporting.ts`             | Status/progress reporting        | `delivery-reporting/delivery-reporting-shared.internal.ts`                                  | `renderJson` (StatusDistribution); historical `PhaseProgress` output was retired during ADR-013 cleanup       |
+| `requirements.ts`          | Product requirements doc         | `operational-insights/index.ts` -> `projectRequirementDigest`                               | `renderMarkdown` (RequirementDigest)                                                                          |
+| `session.ts`               | Session context rendering        | `execution-context/session-context.ts` -> `parseAndProjectSessionContext`                   | `renderCompactText` (SessionContextBundle)                                                                    |
+| `shape-matcher.ts`         | Shape-matching utilities         | Replaced by Zod schema validation in `renderJson`                                           | N/A                                                                                                           |
+| `shared-schema.ts`         | Shared schema definitions        | `fragments/base.ts` + per-fragment Zod schemas                                              | N/A                                                                                                           |
+| `taxonomy.ts`              | Taxonomy reference doc           | `governance/taxonomy-digest.ts` -> `parseAndProjectTaxonomyDigest`                          | `renderMarkdown` (TaxonomyDigest)                                                                             |
+| `timeline.ts`              | Timeline/roadmap Markdown        | `delivery-reporting/delivery-reporting-shared.internal.ts`                                  | `renderMarkdown` (RoadmapTimeline); historical `ReleaseNotesDigest` output was retired during ADR-013 cleanup |
+| `types/base.ts`            | Base codec types                 | `renderers/types.ts` (RenderMarkdown, RenderJson, etc.)                                     | N/A                                                                                                           |
+| `types/index.ts`           | Type barrel                      | `renderers/types.ts`                                                                        | N/A                                                                                                           |
+| `validation-rules.ts`      | Validation rules doc             | `governance/validation-rule-digest.ts` -> `projectValidationRuleDigest`                     | `renderMarkdown` (ValidationRuleDigest)                                                                       |
 
 ---
 
@@ -139,7 +149,7 @@ Every tool registered in `packages/architect-mcp/src/tool-registry.ts`:
 | `architect_arch_blocking`     | `projectOverviewDigest` (reads `.blocking`) + inline `SectionedDocument`            | `renderJson`        | No parameters                                                                                          |
 | `architect_rebuild`           | validated config projection (after rebuild)                                         | `renderCompactText` | Triggers session rebuild                                                                               |
 | `architect_config`            | validated config projection                                                         | `renderJson`        | No parameters                                                                                          |
-| `architect_documentation`     | `projectDocumentationBundle`                                                        | `renderJson`        | `documentType` required; text includes bundle `children` and logical `routing` metadata                |
+| `architect_documentation`     | `parseAndProjectDocumentationBundle`                                                | `renderJson`        | `documentType` required; text includes bundle `children` and logical `routing` metadata                |
 | `architect_help`              | None (inline `SectionedDocument`)                                                   | `renderJson`        | Static help text                                                                                       |
 
 ---

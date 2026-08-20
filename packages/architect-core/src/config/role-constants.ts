@@ -1,15 +1,8 @@
-import type { DiagramShapeValue } from '../taxonomy/diagram-shape-values.js';
+import type { RoleDefinition } from '../validation-schemas/tag-registry.js';
 
-export interface RoleDefinition {
-  readonly tag: string;
-  readonly domain: string;
-  readonly priority: number;
-  readonly description?: string;
-  readonly aliases?: readonly string[];
-  readonly diagramShape?: DiagramShapeValue;
-}
+export type { RoleDefinition } from '../validation-schemas/tag-registry.js';
 
-const LOCKED_WAVE_ONE_ROLES = [
+export const BUILTIN_ROLES = [
   {
     tag: 'projection',
     domain: 'Projection',
@@ -62,7 +55,3 @@ const LOCKED_WAVE_ONE_ROLES = [
     description: 'Shared helpers and narrowly focused utilities',
   },
 ] as const satisfies readonly RoleDefinition[];
-
-export const DEFAULT_ROLES = LOCKED_WAVE_ONE_ROLES;
-
-export const DDD_ES_CQRS_ROLES = LOCKED_WAVE_ONE_ROLES;

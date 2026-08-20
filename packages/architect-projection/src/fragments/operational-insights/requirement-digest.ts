@@ -5,15 +5,20 @@
  * @architect-role:contract
  * @architect-bounded-context:operational-insights
  *
- * ### When to Use
- *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * Defines the `RequirementDigest` fragment shape for product requirements, resolved test files, and linked governance rules.
  */
 import { z } from 'zod';
 
 import { BusinessRuleReferenceSchema } from '../governance/business-rule-reference.js';
 import { RequirementEntrySchema } from './supporting.js';
 
+/**
+ * Fragment shape grouping product requirements for one product area — the area
+ * label, its requirement entries, and the business-rule references that govern
+ * them.
+ *
+ * @architect-shape
+ */
 export const RequirementDigestSchema = z.strictObject({
   kind: z.literal('RequirementDigest'),
   productArea: z.string(),
@@ -23,6 +28,24 @@ export const RequirementDigestSchema = z.strictObject({
 
 export type RequirementDigest = z.infer<typeof RequirementDigestSchema>;
 
+/**
+ * Display label for the aggregate area covering every product area.
+ *
+ * @architect-shape
+ */
 export const REQUIREMENTS_ALL_AREAS_LABEL = 'All Product Areas';
+
+/**
+ * Display label for requirements whose value transfer is complete (backed by
+ * executable specs).
+ *
+ * @architect-shape
+ */
 export const REQUIREMENTS_EXECUTABLE_AREA_LABEL = 'Implemented (Value Transfer Complete)';
+
+/**
+ * Display label for requirements still pending implementation (spec-only).
+ *
+ * @architect-shape
+ */
 export const REQUIREMENTS_SPECS_AREA_LABEL = 'Specs (Pending Implementation)';

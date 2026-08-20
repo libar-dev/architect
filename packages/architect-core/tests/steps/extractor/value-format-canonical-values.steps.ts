@@ -1,7 +1,10 @@
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';
 
-import { extractPatternTags } from '../../../src/scanner/gherkin-ast-parser.js';
+import {
+  extractPatternTags,
+  type FeatureTagMetadata,
+} from '../../../src/scanner/gherkin-ast-parser.js';
 import { extractPatternsFromGherkin } from '../../../src/extractor/gherkin-extractor.js';
 import { createDefaultTagRegistry } from '../../../src/validation-schemas/tag-registry.js';
 import type {
@@ -17,7 +20,7 @@ const feature = await loadFeature('tests/features/extractor/value-format-canonic
 
 interface State {
   registry: TagRegistry | null;
-  metadata: Record<string, unknown> | null;
+  metadata: FeatureTagMetadata | null;
   diagnostics: readonly { code: string; message: string; suggestion?: string }[];
 }
 
@@ -50,7 +53,7 @@ function makeScannedFile(tags: readonly string[]): ScannedGherkinFile {
   };
 }
 
-function runExtraction(testAreaValue: string): void {
+async function runExtraction(testAreaValue: string): Promise<void> {
   const registry = state.registry!;
   const tags = [
     'architect',
@@ -59,9 +62,9 @@ function runExtraction(testAreaValue: string): void {
     `architect-test-area:${testAreaValue}`,
   ];
 
-  state.metadata = extractPatternTags(tags, registry) as Record<string, unknown>;
+  state.metadata = extractPatternTags(tags, registry);
 
-  const result = extractPatternsFromGherkin([makeScannedFile(tags)], {
+  const result = await extractPatternsFromGherkin([makeScannedFile(tags)], {
     baseDir: '/test',
     tagRegistry: registry,
   });
@@ -90,11 +93,11 @@ describeFeature(feature, ({ Background, Rule }) => {
               repeatable: false,
               values: ['Alpha', 'Beta'],
             });
-          }
+          },
         );
 
-        When('I extract a feature using "@architect-test-area:Gamma"', () => {
-          runExtraction('Gamma');
+        When('I extract a feature using "@architect-test-area:Gamma"', async () => {
+          await runExtraction('Gamma');
         });
 
         Then(
@@ -103,17 +106,17 @@ describeFeature(feature, ({ Background, Rule }) => {
             const match = state.diagnostics.find(
               (d) =>
                 d.code === 'invalid-enum-value' &&
-                d.message.includes("Unrecognized value 'Gamma' for @architect-test-area")
+                d.message.includes("Unrecognized value 'Gamma' for @architect-test-area"),
             );
             expect(match).toBeDefined();
-          }
+          },
         );
 
         And('the diagnostic lists valid values "Alpha, Beta"', () => {
           const match = state.diagnostics.find((d) => d.code === 'invalid-enum-value');
           expect(match?.suggestion).toContain('Alpha, Beta');
         });
-      }
+      },
     );
 
     RuleScenario(
@@ -130,24 +133,24 @@ describeFeature(feature, ({ Background, Rule }) => {
               repeatable: false,
               values: ['Alpha', 'Beta'],
             });
-          }
+          },
         );
 
-        When('I extract a feature using "@architect-test-area:Alpha"', () => {
-          runExtraction('Alpha');
+        When('I extract a feature using "@architect-test-area:Alpha"', async () => {
+          await runExtraction('Alpha');
         });
 
         Then('no "invalid-enum-value" diagnostic is emitted', () => {
           const match = state.diagnostics.find(
-            (d) => d.code === 'invalid-enum-value' && d.message.includes('@architect-test-area')
+            (d) => d.code === 'invalid-enum-value' && d.message.includes('@architect-test-area'),
           );
           expect(match).toBeUndefined();
         });
 
         And('the metadata records test-area as "Alpha"', () => {
-          expect(state.metadata?.['testArea']).toBe('Alpha');
+          expect(state.metadata?.customMetadata?.['testArea']).toBe('Alpha');
         });
-      }
+      },
     );
   });
 });

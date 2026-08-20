@@ -40,13 +40,13 @@ and the `@libar-dev/architect-*` package family (currently 260 delivery patterns
 candidates / 347 rules / 9 ADRs+PDRs as of this draft):
 
 | Metric                   | Without Spec Format | With Spec Format (reported peak across the two codebases) |
-| ------------------------ | ------------------- | ---------------------------------------------------------- |
-| Daily velocity           | ~1,900 LOC/day      | ~10,100 LOC/day                                            |
-| Specification coverage   | 50 files            | 530 files                                                  |
-| Architecture decisions   | Ad hoc              | 33 formal ADRs (studio)                                    |
-| Patterns tracked         | None                | 386 (258 completed) (studio peak)                          |
-| Business rules extracted | None                | 929 machine-extractable rules (studio peak)                |
-| Major rewrites           | Multiple            | Zero                                                       |
+| ------------------------ | ------------------- | --------------------------------------------------------- |
+| Daily velocity           | ~1,900 LOC/day      | ~10,100 LOC/day                                           |
+| Specification coverage   | 50 files            | 530 files                                                 |
+| Architecture decisions   | Ad hoc              | 33 formal ADRs (studio)                                   |
+| Patterns tracked         | None                | 386 (258 completed) (studio peak)                         |
+| Business rules extracted | None                | 929 machine-extractable rules (studio peak)               |
+| Major rewrites           | Multiple            | Zero                                                      |
 
 > _Informative:_ The current `@libar-dev/architect` reference repo runs a much smaller
 > dogfood instance — its purpose is to govern the toolchain itself, not to be a
@@ -74,41 +74,41 @@ Start at Level 1. Graduate when you need more.
 
 ## Reading Guide
 
-| Document                                                    | What It Covers                            | Read When                            |
-| ----------------------------------------------------------- | ----------------------------------------- | ------------------------------------ |
-| [00 — Overview](00-overview.md)                             | Core concepts, component map, quick start | First. Always.                       |
-| [01 — Conformance](01-conformance.md)                       | 3 levels, versioning, RFC 2119            | Understanding what's required        |
-| [02 — Artifact Types](02-artifact-types.md)                 | 4 artifact types, directories, naming     | Setting up a project                 |
-| [03 — Tag System](03-tag-system.md)                         | Tag mechanics, format types, ordering     | Writing your first spec              |
-| [04 — Tag Registry](04-tag-registry.md)                     | Complete tag reference (50+ tags)         | Looking up a specific tag            |
-| [05 — Feature Spec Format](05-feature-spec-format.md)       | Gherkin structure conventions             | Writing feature specs                |
-| [06 — ADR Format](06-adr-format.md)                         | Architecture Decision Records             | Writing ADRs                         |
-| [07 — Stub Format](07-stub-format.md)                       | TypeScript design stubs                   | Creating design stubs                |
-| [08 — Spec Evolution](08-spec-evolution.md)                 | Plan → design → executable model          | Understanding the maturity lifecycle |
-| [09 — Delivery Lifecycle](09-delivery-lifecycle.md)         | FSM, ProcessGuard, sessions               | Enforcing delivery process           |
-| [10 — Pattern Graph](10-pattern-graph.md)                   | Data model specification                  | Building tooling                     |
-| [11 — Project Configuration](11-project-configuration.md)   | Config format and role sets               | Configuring a project                |
-| [12 — Live Documentation API](12-live-documentation-api.md) | Structured document serving via Data API  | Building live document views         |
-| [Appendix A — Examples](appendix-a-examples.md)             | 6 complete annotated examples             | Learning by example                  |
+| Document                                                    | What It Covers                                 | Read When                            |
+| ----------------------------------------------------------- | ---------------------------------------------- | ------------------------------------ |
+| [00 — Overview](00-overview.md)                             | Core concepts, component map, quick start      | First. Always.                       |
+| [01 — Conformance](01-conformance.md)                       | 3 levels, versioning, RFC 2119                 | Understanding what's required        |
+| [02 — Artifact Types](02-artifact-types.md)                 | 3 authored artifact types, directories, naming | Setting up a project                 |
+| [03 — Tag System](03-tag-system.md)                         | Tag mechanics, format types, ordering          | Writing your first spec              |
+| [04 — Tag Registry](04-tag-registry.md)                     | Complete tag reference (50+ tags)              | Looking up a specific tag            |
+| [05 — Feature Spec Format](05-feature-spec-format.md)       | Gherkin structure conventions                  | Writing feature specs                |
+| [06 — ADR Format](06-adr-format.md)                         | Architecture Decision Records                  | Writing ADRs                         |
+| [07 — Stub Format](07-stub-format.md)                       | TypeScript design stubs                        | Creating design stubs                |
+| [08 — Spec Evolution](08-spec-evolution.md)                 | Plan → design → executable model               | Understanding the maturity lifecycle |
+| [09 — Delivery Lifecycle](09-delivery-lifecycle.md)         | FSM, ProcessGuard, sessions                    | Enforcing delivery process           |
+| [10 — Pattern Graph](10-pattern-graph.md)                   | Data model specification                       | Building tooling                     |
+| [11 — Project Configuration](11-project-configuration.md)   | Config format and role sets                    | Configuring a project                |
+| [12 — Live Documentation API](12-live-documentation-api.md) | Structured document serving via Data API       | Building live document views         |
+| [Appendix A — Examples](appendix-a-examples.md)             | 6 complete annotated examples                  | Learning by example                  |
 
 ## Relationship to @libar-dev/architect
 
 The `@libar-dev/architect-*` package family is the **reference implementation** of this spec. As of v2.0 the implementation is split into five publishable packages plus a bin-only meta:
 
-| Package | Role |
-| --- | --- |
-| `@libar-dev/architect-core` | Canonical model, ingestion, graph build, scanner/extractor, taxonomy, config, read API (`PatternGraphAPI`). |
-| `@libar-dev/architect-projection` | Fragment-based projection pipeline (Zod-validated `RenderableDocument` blocks, renderers). |
-| `@libar-dev/architect-guard` | Policy, validation, ProcessGuard, step-lint, anti-pattern detection. |
-| `@libar-dev/architect-cli` | Composition root and 7 bins (`architect`, `architect-generate`, `architect-guard`, `architect-validate`, `architect-lint-steps`, `architect-lint-patterns`, `architect-mcp`). |
-| `@libar-dev/architect-mcp` | MCP server, tool registry, file watcher, pipeline session. |
-| `@libar-dev/architect` (meta) | Bin-only re-export of the 7 bins. No JS API — JS consumers must import from the split that owns each symbol. |
+| Package                           | Role                                                                                                                                                                |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@libar-dev/architect-core`       | Canonical model, ingestion, graph build, scanner/extractor, taxonomy, config, frozen `./graph` contract, and pure read kernels.                                     |
+| `@libar-dev/architect-projection` | Fragment-based projection pipeline (Zod-validated `RenderableDocument` blocks, renderers).                                                                          |
+| `@libar-dev/architect-guard`      | Policy, validation, ProcessGuard, step-lint, anti-pattern detection.                                                                                                |
+| `@libar-dev/architect-cli`        | CLI composition root and 6 bins: `architect`, `architect-generate`, `architect-guard`, `architect-validate`, `architect-lint-steps`, and `architect-lint-patterns`. |
+| `@libar-dev/architect-mcp`        | MCP composition root and the separately owned `architect-mcp` bin, plus the tool registry, file watcher, and pipeline session.                                      |
+| `@libar-dev/architect` (meta)     | Bin-only re-export of the 7 bins. No JS API — JS consumers must import from the split that owns each symbol.                                                        |
 
 Together they provide:
 
 - A scanner/extractor pipeline that parses annotated TypeScript and Gherkin
-- `buildPatternGraph()` / `createPatternGraphAPI()` from `architect-core` producing and querying the pattern-graph data model described in §10
-- A CLI with 22 user-facing subcommands (`overview`, `context`, `dep-tree`, `scope-validate`, `arch`, `rules`, …) for querying the graph
+- `buildPatternGraph()` plus `Graph` / `createGraph()` from `@libar-dev/architect-core/graph`, with named pure read kernels from the package root, producing and querying the pattern-graph data model described in §10
+- A scriptable graph CLI (`architect q '<js>'`) with named demos and the frozen `dangling` integrity gate
 - An MCP server with 21 tools (`architect_overview`, `architect_context`, `architect_documentation`, …) for AI context delivery
 - Projection-based documentation generation from the graph
 - ProcessGuard for FSM enforcement described in §09
@@ -117,11 +117,11 @@ This spec defines the format. The toolchain implements it.
 
 ## Publication Trajectory
 
-| Phase       | Location                                                | Status               |
-| ----------- | ------------------------------------------------------- | -------------------- |
-| **Phase 1** | `formal-spec/` folder in libar-dev/architect repo       | Current (v0.2 draft) |
-| **Phase 2** | Standalone npm package (`@libar-dev/architect-spec`)    | Planned              |
-| **Phase 3** | Published HTML specification at `spec.libar.dev`        | Future               |
+| Phase       | Location                                             | Status               |
+| ----------- | ---------------------------------------------------- | -------------------- |
+| **Phase 1** | `formal-spec/` folder in libar-dev/architect repo    | Current (v0.2 draft) |
+| **Phase 2** | Standalone npm package (`@libar-dev/architect-spec`) | Planned              |
+| **Phase 3** | Published HTML specification at `spec.libar.dev`     | Future               |
 
 ## CHANGELOG
 
@@ -144,8 +144,8 @@ This spec defines the format. The toolchain implements it.
 - Added Idea Tier subsection in §08 (Spec Evolution) describing the lightest pre-candidate
   spec shape: `@architect-status:candidate` + `@architect-maturity:idea`, ≤30 lines (warn-only), six-tag
   minimum, no `Background:` block, no `Scenario:` blocks, rules-with-`**Invariant:**` only.
-  Idea tier is not a new maturity level — it is the lightest shape of Level 1 Candidate,
-  expressed via the existing `@architect-maturity` enum value `idea`.
+  Idea tier is not a new status — the idea and candidate tiers both sit at
+  `@architect-status:candidate`, distinguished by `@architect-maturity` (`idea` vs `plan`).
 - No new tags introduced for "track" or "consideration". The existing `@architect-maturity`
   enum (`idea` / `plan` / `design` / `executable`) is the lifecycle discriminator.
 

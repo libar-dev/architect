@@ -3,7 +3,7 @@
  * @architect-pattern PatternDetailProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses PatternRelationsProjectionSupport, PatternRelationsFragmentContracts
+ * @architect-uses PatternRelationsProjectionSupport, PatternRelationsFragmentContracts, PatternDetail
  * @architect-bounded-context:projection
  *
  * ## Pattern detail projection
@@ -33,16 +33,17 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects the expanded detail bundle for one pattern, normalizing summary, deliverables, relationships, rules, stubs, and manifest.
  */
 
 import type { ProjectionContext } from '../../context/projection-context.js';
 import { projectSingle, type ProjectionBundle } from '../../fragments/base.js';
 import type { PatternDetail } from '../../fragments/pattern-relations/index.js';
 import {
+  buildFileToPackageMap,
   buildPatternHierarchy,
   createPatternSummaryFragment,
-  extractDescription,
+  extractDescriptionWithMeta,
   extractOpenQuestions,
   normalizeDeliverables,
   normalizePatternRelationships,
@@ -53,18 +54,26 @@ import {
 
 export function projectPatternDetail(
   context: ProjectionContext,
-  name: string
+  name: string,
 ): ProjectionBundle<PatternDetail> {
   const pattern = requirePattern(context, name);
-  const summary = createPatternSummaryFragment(pattern);
+  const byPackage = context.graph.archIndex?.byPackage;
+  const fileToPackage: ReadonlyMap<string, string> =
+    byPackage !== undefined ? buildFileToPackageMap(byPackage) : new Map();
+  const summary = createPatternSummaryFragment(pattern, fileToPackage.get(pattern.source.file));
   const deliverables = normalizeDeliverables(pattern);
-  const description = extractDescription(pattern.directive.description);
+  const { description, truncated: descriptionTruncated } = extractDescriptionWithMeta(
+    pattern.directive.description,
+  );
   const openQuestions = extractOpenQuestions(pattern.directive.description);
   const hierarchy = buildPatternHierarchy(pattern);
   const detail: PatternDetail = {
     ...summary,
     kind: 'PatternDetail',
-    ...(description !== '' ? { description } : {}),
+    ...(pattern.boundedContext !== undefined ? { boundedContext: pattern.boundedContext } : {}),
+    ...(pattern.productArea !== undefined ? { productArea: pattern.productArea } : {}),
+    ...(pattern.level !== undefined ? { level: pattern.level } : {}),
+    ...(description !== '' ? { description, descriptionTruncated } : {}),
     ...(openQuestions.length > 0 ? { openQuestions } : {}),
     deliverables,
     relationships: normalizePatternRelationships(context, summary.patternName),

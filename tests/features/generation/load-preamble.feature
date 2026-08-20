@@ -1,21 +1,22 @@
 @architect
 @architect-pattern:LoadPreambleParser
 @architect-status:active
+@architect-implements:MarkdownBlockParser
 @architect-product-area:Generation
 @behavior @load-preamble
-Feature: Markdown-to-SectionBlock Parser
+Feature: Markdown-to-Block Parser
 
   The parseMarkdownToBlocks function converts raw markdown content into
-  a readonly SectionBlock[] array using a 5-state line-by-line state machine.
+  a readonly Block[] array using a 5-state line-by-line state machine.
   This enables preamble content to be authored as markdown files instead of
   verbose inline TypeScript object literals.
 
   **Problem:**
-  Preamble content authored as inline TypeScript SectionBlock[] literals is
+  Preamble content authored as inline TypeScript Block[] literals is
   verbose (540+ lines per codec config) and hard to review.
 
   **Solution:**
-  A shared parser reads markdown and produces the same SectionBlock[] shape
+  A shared parser reads markdown and produces the same Block[] shape
   that codecs expect, enabling markdown authoring with TypeScript type safety.
 
   Background:
@@ -129,6 +130,24 @@ Feature: Markdown-to-SectionBlock Parser
       When parsing the markdown to blocks
       Then block 1 is a code block with empty content
 
+  Rule: Code-fence language is a single identifier-shaped token
+
+    **Invariant:** The language emitted for a fenced code block is the first whitespace-delimited token of the info string, kept only when it is identifier-shaped (1-64 characters of letters, digits, underscore, plus, hyphen, or dot); a non-conforming or absent token yields a code block with no language.
+    **Rationale:** The canonical CodeBlockSchema constrains `language` to that identifier shape, and CommonMark treats the first word of a code-fence info string as the language. Normalizing at parse time keeps every emitted code block valid against the one shared block vocabulary.
+    **Verified by:** Info string with a trailing attribute keeps only the language token, Non-identifier info string yields no language
+
+    @edge-case @code
+    Scenario: Info string with a trailing attribute keeps only the language token
+      Given markdown with a code fence info string carrying extra tokens
+      When parsing the markdown to blocks
+      Then block 1 is a code block with language "ts"
+
+    @edge-case @code
+    Scenario: Non-identifier info string yields no language
+      Given markdown with a non-identifier code fence info string
+      When parsing the markdown to blocks
+      Then block 1 is a code block with no language
+
   Rule: Mermaid blocks are parsed into MermaidBlock
 
     **Invariant:** Code fences with the info string "mermaid" produce MermaidBlock instead of CodeBlock.
@@ -164,3 +183,15 @@ Feature: Markdown-to-SectionBlock Parser
       Given markdown with bold and code span formatting
       When parsing the markdown to blocks
       Then block 1 is a paragraph preserving inline formatting
+
+  Rule: Parser output validates against the canonical block schema
+
+    **Invariant:** Every block parseMarkdownToBlocks emits validates against the canonical BlockSchema from architect-core; the parser shares one block vocabulary with the projection renderers rather than a divergent shape.
+    **Rationale:** The two former block vocabularies (architect-core SectionBlock, architect-projection BlockSchema) were reconciled to one canonical BlockSchema in architect-core (No-BC). Validating parser output against that schema at the test boundary makes producer/schema drift impossible.
+    **Verified by:** A mixed markdown document's blocks all validate against the canonical schema
+
+    @happy-path @schema
+    Scenario: A mixed markdown document's blocks all validate against the canonical schema
+      Given markdown with heading, paragraph, table, code, and list
+      When parsing the markdown to blocks
+      Then every produced block validates against the canonical block schema

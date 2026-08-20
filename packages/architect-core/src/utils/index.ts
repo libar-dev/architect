@@ -9,7 +9,18 @@ export { groupBy } from './collection-utils.js';
 export { generatePatternId } from './id-utils.js';
 export { parseMarkdownToBlocks } from './markdown-parser.js';
 export { parseMarkdownTableRows } from './parse-markdown-table-rows.js';
-export { formatZodError, parseOrThrow } from './errors.js';
+export {
+  exitWithErrorMessage,
+  exitWithProcessError,
+  formatZodError,
+  parseOrThrow,
+} from './errors.js';
+export {
+  readPackageMetadata,
+  resolveInvocationDir,
+  runBuiltPackageEntrypoint,
+  type PackageMetadata,
+} from './runtime-helpers.js';
 export {
   assertHasValue,
   assertNoNullBytes,
@@ -20,8 +31,4 @@ export {
 export type { FuzzyMatch } from './fuzzy-match.js';
 export { fuzzyMatchPatterns, findBestMatch, levenshteinDistance } from './fuzzy-match.js';
 export type { HandoffSessionType, SessionType } from './session-helpers.js';
-export {
-  extractFirstSentenceRaw,
-  formatUserZodError,
-  inferHandoffSessionType,
-} from './session-helpers.js';
+export { extractFirstSentenceRaw, inferHandoffSessionType } from './session-helpers.js';

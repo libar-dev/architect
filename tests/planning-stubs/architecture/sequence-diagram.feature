@@ -2,7 +2,6 @@
 @architect-pattern:SequenceDiagramGeneration
 @architect-status:roadmap
 @architect-implements:ArchitectureDiagramGeneration
-@architect-phase:23
 @architect-product-area:Process
 @architecture
 @future

@@ -1,3 +1,22 @@
+/**
+ * @architect
+ * @architect-pattern:ConfigValidationSchemas
+ * @architect-status:completed
+ * @architect-role:contract
+ * @architect-bounded-context:validation-schemas
+ * @architect-uses BrandedIdentifiers
+ *
+ * ## ConfigValidationSchemas — Config Path & Glob Safety Contract
+ *
+ * The Zod contract that validates architect config inputs: glob patterns, base
+ * directory, and output directory — rejecting parent-directory traversal (`..`)
+ * and out-of-base output paths via realpath comparison. A security-relevant
+ * trust boundary: untrusted config-supplied paths are constrained here.
+ *
+ * **When to Use:** when validating config-supplied filesystem paths or globs —
+ * never resolve a config path without passing it through these schemas first.
+ */
+
 import * as fs from 'fs';
 import * as path from 'path';
 import { z } from 'zod';
@@ -39,7 +58,7 @@ function createOutputDirSchema(baseDir: string): z.ZodType<string> {
         }
         return resolvedDir.startsWith(resolvedBase) || !path.isAbsolute(dir);
       },
-      { message: 'Output directory must be within project (no parent traversal)' }
+      { message: 'Output directory must be within project (no parent traversal)' },
     );
 }
 
@@ -81,7 +100,7 @@ export function isScannerConfig(value: unknown): value is ScannerConfig {
 
 export function isGeneratorConfig(
   value: unknown,
-  baseDir = process.cwd()
+  baseDir = process.cwd(),
 ): value is GeneratorConfig {
   return createGeneratorConfigSchema(baseDir).safeParse(value).success;
 }

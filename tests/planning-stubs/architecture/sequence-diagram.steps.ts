@@ -42,14 +42,14 @@ describeFeature(feature, ({ Background, Rule }) => {
         'a decider pattern {string} used by {string}',
         (_ctx: unknown, _decider: string, _handler: string) => {
           throw new Error('Not yet implemented: decider pattern relationship');
-        }
+        },
       );
 
       Given(
         'an event pattern {string} produced by {string}',
         (_ctx: unknown, _event: string, _decider: string) => {
           throw new Error('Not yet implemented: event pattern relationship');
-        }
+        },
       );
 
       When('the sequence diagram is generated for {string}', (_ctx: unknown, _name: string) => {
@@ -88,7 +88,7 @@ describeFeature(feature, ({ Background, Rule }) => {
         'compensation for {string} is {string}',
         (_ctx: unknown, _step: string, _compensation: string) => {
           throw new Error('Not yet implemented: compensation mapping');
-        }
+        },
       );
 
       When('the sequence diagram is generated for {string}', (_ctx: unknown, _name: string) => {

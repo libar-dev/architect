@@ -12,7 +12,6 @@ interface PatternFixtureOptions {
   readonly status?: ExtractedPattern['status'];
   readonly maturity?: PatternMaturity;
   readonly role?: ExtractedPattern['role'];
-  readonly phase?: ExtractedPattern['phase'];
   readonly file?: string;
   readonly description?: string;
   readonly deliverables?: ExtractedPattern['deliverables'];
@@ -44,7 +43,6 @@ let _nextPatternId = 1;
 export function createPattern(name: string, options: PatternFixtureOptions = {}): ExtractedPattern {
   const pattern = buildPatternStub(name, {
     role: options.role ?? 'service',
-    phase: options.phase ?? 49,
     file: options.file ?? `packages/architect-projection/fixtures/${name}.ts`,
     ...(options.patternName !== undefined ? { patternName: options.patternName } : {}),
     ...(options.status !== undefined ? { status: options.status } : {}),
@@ -80,7 +78,7 @@ export function createPattern(name: string, options: PatternFixtureOptions = {})
 }
 
 export function createRelationshipEntry(
-  overrides: Partial<RelationshipEntry> = {}
+  overrides: Partial<RelationshipEntry> = {},
 ): RelationshipEntry {
   return {
     uses: overrides.uses ?? [],
@@ -93,6 +91,8 @@ export function createRelationshipEntry(
     extendedBy: overrides.extendedBy ?? [],
     seeAlso: overrides.seeAlso ?? [],
     apiRef: overrides.apiRef ?? [],
+    enforcesDecisions: overrides.enforcesDecisions ?? [],
+    enforcedBy: overrides.enforcedBy ?? [],
   };
 }
 

@@ -2,9 +2,7 @@ import { describeFeature, loadFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';
 
 import {
-  projectPhaseProgress,
   projectStatusDistribution,
-  type PhaseProgress,
   type ProjectionContext,
   type StatusDistribution,
 } from '../../../../src/index.js';
@@ -12,12 +10,11 @@ import { createPattern, createProjectionContext } from './support.js';
 
 interface ProgressProjectionState {
   context: ProjectionContext | null;
-  phaseProgress: PhaseProgress | undefined;
   statusDistribution: StatusDistribution | null;
 }
 
 const feature = await loadFeature(
-  'tests/features/projections/delivery-reporting/phase-progress-status.feature'
+  'tests/features/projections/delivery-reporting/phase-progress-status.feature',
 );
 
 let state: ProgressProjectionState | null = null;
@@ -25,7 +22,6 @@ let state: ProgressProjectionState | null = null;
 function createState(): ProgressProjectionState {
   return {
     context: null,
-    phaseProgress: undefined,
     statusDistribution: null,
   };
 }
@@ -41,99 +37,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
     });
     And('the following deliverables:', () => void 0);
   });
-
-  Rule(
-    'Phase progress reflects delivery counts without artificial completion',
-    ({ RuleScenario }) => {
-      RuleScenario('projecting progress for a named phase', ({ Given, When, Then }) => {
-        Given('a progress projection context for phase 16 named "Timeline Bodies"', () => {
-          state!.context = createProjectionContext({
-            patterns: [
-              createPattern('RoadmapBody', { status: 'roadmap', phase: 16 }),
-              createPattern('ActiveBundle', { status: 'active', phase: 16 }),
-              createPattern('CompletedBundle', { status: 'completed', phase: 16 }),
-              createPattern('CandidateBundle', { status: 'candidate', phase: 16 }),
-            ],
-            phaseNames: {
-              16: 'Timeline Bodies',
-            },
-          });
-        });
-
-        When('I project phase progress for phase 16', () => {
-          state!.phaseProgress = projectPhaseProgress(state!.context!, 16)?.root;
-        });
-
-        Then('the phase progress fragment should expose the named phase counts', () => {
-          expect(state!.phaseProgress).toEqual({
-            kind: 'PhaseProgress',
-            phaseNumber: 16,
-            phaseName: 'Timeline Bodies',
-            completed: 1,
-            active: 1,
-            planned: 1,
-            candidate: 1,
-            total: 4,
-            completionPercentage: 33,
-          });
-        });
-      });
-
-      RuleScenario('missing phases return no fragment', ({ Given, When, Then }) => {
-        Given('a progress projection context for phase 16 named "Timeline Bodies"', () => {
-          state!.context = createProjectionContext({
-            patterns: [createPattern('RoadmapBody', { status: 'roadmap', phase: 16 })],
-            phaseNames: {
-              16: 'Timeline Bodies',
-            },
-          });
-        });
-
-        When('I project phase progress for the missing phase 99', () => {
-          state!.phaseProgress = projectPhaseProgress(state!.context!, 99)?.root;
-        });
-
-        Then('the phase progress result should be undefined', () => {
-          expect(state!.phaseProgress).toBeUndefined();
-        });
-      });
-
-      RuleScenario('projection filters scope phase progress counts', ({ Given, When, Then }) => {
-        Given('a filtered progress projection context for phase 16 named "Timeline Bodies"', () => {
-          state!.context = createProjectionContext({
-            patterns: [
-              createPattern('RoadmapBody', { status: 'roadmap', phase: 16 }),
-              createPattern('ActiveBundle', { status: 'active', phase: 16 }),
-              createPattern('CompletedBundle', { status: 'completed', phase: 16 }),
-              createPattern('CandidateBundle', { status: 'candidate', phase: 16 }),
-            ],
-            phaseNames: {
-              16: 'Timeline Bodies',
-            },
-            projectionFilter: {
-              status: ['active', 'completed'],
-            },
-          });
-        });
-
-        When('I project phase progress for phase 16', () => {
-          state!.phaseProgress = projectPhaseProgress(state!.context!, 16)?.root;
-        });
-
-        Then('the phase progress fragment should include only filtered phase patterns', () => {
-          expect(state!.phaseProgress).toMatchObject({
-            kind: 'PhaseProgress',
-            completed: 1,
-            active: 1,
-            planned: 0,
-            candidate: 0,
-            total: 2,
-            completionPercentage: 50,
-          });
-        });
-      });
-    }
-  );
 
   Rule('Status distribution keeps zero-delivery percentages honest', ({ RuleScenario }) => {
     RuleScenario(
@@ -151,7 +54,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 createPattern('CandidateOne', { status: 'candidate' }),
               ],
             });
-          }
+          },
         );
 
         When('I project the status distribution', () => {
@@ -176,7 +79,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             },
           });
         });
-      }
+      },
     );
 
     RuleScenario('zero-delivery projects report zero percentages', ({ Given, When, Then }) => {
@@ -219,7 +122,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               status: ['active', 'completed'],
             },
           });
-        }
+        },
       );
 
       When('I project the status distribution', () => {

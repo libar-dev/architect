@@ -1,9 +1,18 @@
+/**
+ * @architect
+ * @architect-pattern RelationshipResolver
+ * @architect-status active
+ * @architect-role:service
+ * @architect-bounded-context:pipeline
+ * @architect-uses PipelineDatasetContract, DecisionResolution, ExtractedPattern, PatternReferenceContract, PatternGraph
+ */
 import type { ExtractedPattern } from '../../validation-schemas/index.js';
 import { parsePatternReference } from '../../validation-schemas/index.js';
 import type {
   ImplementationRef,
   RelationshipEntry,
 } from '../../validation-schemas/pattern-graph.js';
+import { resolveDecisionPattern } from '../../read-api/decision-resolution.js';
 import type { DanglingReference } from './transform-types.js';
 
 function getPatternName(pattern: ExtractedPattern): string {
@@ -35,7 +44,7 @@ function isSourceDeclaration(sourceFile: string): boolean {
 }
 
 export function buildDeclaredPatternIndex(
-  patterns: readonly ExtractedPattern[]
+  patterns: readonly ExtractedPattern[],
 ): ReadonlyMap<string, readonly DeclaredPatternTarget[]> {
   const index = new Map<string, DeclaredPatternTarget[]>();
 
@@ -58,7 +67,7 @@ export function buildDeclaredPatternIndex(
 export function resolveUsesTarget(
   sourcePattern: ExtractedPattern,
   reference: string,
-  declaredTargetsByName: ReadonlyMap<string, readonly DeclaredPatternTarget[]>
+  declaredTargetsByName: ReadonlyMap<string, readonly DeclaredPatternTarget[]>,
 ): string | undefined {
   const parsed = parsePatternReference(reference);
   if (parsed === undefined) return undefined;
@@ -70,21 +79,21 @@ export function resolveUsesTarget(
 
   if (parsed.packageId !== undefined) {
     const prefixedMatches = candidates.filter(
-      (candidate) => candidate.packageId === parsed.packageId
+      (candidate) => candidate.packageId === parsed.packageId,
     );
     const [prefixedMatch] = prefixedMatches;
     return prefixedMatches.length === 1 && prefixedMatch ? prefixedMatch.canonicalName : undefined;
   }
 
   const samePackageMatches = candidates.filter(
-    (candidate) => candidate.packageId === sourcePackageId
+    (candidate) => candidate.packageId === sourcePackageId,
   );
   const [samePackageMatch] = samePackageMatches;
   if (samePackageMatches.length === 1 && samePackageMatch) return samePackageMatch.canonicalName;
   if (samePackageMatches.length > 1) return undefined;
 
   const externalSourceMatches = candidates.filter(
-    (candidate) => candidate.packageId !== sourcePackageId && candidate.isSourceDeclaration
+    (candidate) => candidate.packageId !== sourcePackageId && candidate.isSourceDeclaration,
   );
   const [externalSourceMatch] = externalSourceMatches;
   if (externalSourceMatches.length === 1 && externalSourceMatch)
@@ -105,11 +114,13 @@ export function createRelationshipEntry(pattern: ExtractedPattern): Relationship
     extendedBy: [],
     seeAlso: [...(pattern.seeAlso ?? [])],
     apiRef: [...(pattern.apiRef ?? [])],
+    enforcesDecisions: [...(pattern.enforcesDecisions ?? [])],
+    enforcedBy: [],
   };
 }
 
 export function buildCanonicalRelationshipIndex(
-  patterns: readonly ExtractedPattern[]
+  patterns: readonly ExtractedPattern[],
 ): Record<string, RelationshipEntry> {
   const relationshipIndex: Record<string, RelationshipEntry> = {};
 
@@ -123,7 +134,7 @@ export function buildCanonicalRelationshipIndex(
 
 export function buildReverseLookups(
   patterns: readonly ExtractedPattern[],
-  relationshipIndex: Record<string, RelationshipEntry>
+  relationshipIndex: Record<string, RelationshipEntry>,
 ): void {
   const declaredTargetsByName = buildDeclaredPatternIndex(patterns);
 
@@ -136,7 +147,7 @@ export function buildReverseLookups(
       const target = relationshipIndex[implemented];
       if (target) {
         const alreadyAdded = target.implementedBy.some(
-          (impl: ImplementationRef) => impl.name === patternKey
+          (impl: ImplementationRef) => impl.name === patternKey,
         );
         if (!alreadyAdded) {
           const desc = pattern.directive.description;
@@ -181,21 +192,32 @@ export function buildReverseLookups(
         target.usedBy.push(patternKey);
       }
     }
+
+    for (const decision of entry.enforcesDecisions) {
+      const decisionPattern = resolveDecisionPattern(patterns, decision);
+      const decisionKey =
+        decisionPattern !== undefined ? getPatternName(decisionPattern) : decision;
+      const target = relationshipIndex[decisionKey];
+      if (target && !target.enforcedBy.includes(patternKey)) {
+        target.enforcedBy.push(patternKey);
+      }
+    }
   }
 
   for (const entry of Object.values(relationshipIndex)) {
     entry.implementedBy.sort((a: ImplementationRef, b: ImplementationRef) =>
-      a.file.localeCompare(b.file)
+      a.file.localeCompare(b.file),
     );
     entry.extendedBy.sort((a, b) => a.localeCompare(b));
     entry.enables.sort((a, b) => a.localeCompare(b));
     entry.usedBy.sort((a, b) => a.localeCompare(b));
+    entry.enforcedBy.sort((a, b) => a.localeCompare(b));
   }
 }
 
 export function detectDanglingReferences(
   patterns: readonly ExtractedPattern[],
-  allPatternNames: ReadonlySet<string>
+  allPatternNames: ReadonlySet<string>,
 ): DanglingReference[] {
   const danglingReferences: DanglingReference[] = [];
   const declaredTargetsByName = buildDeclaredPatternIndex(patterns);

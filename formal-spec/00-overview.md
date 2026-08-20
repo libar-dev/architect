@@ -83,14 +83,14 @@ Candidate (Gherkin)  →  Plan-level (Gherkin)  →  Design-level (Gherkin)  →
 
 ### 4. Delivery Process
 
-The FSM-enforced lifecycle that governs how patterns move from idea to completion.
+The FSM-governed lifecycle that governs how patterns move from idea to completion.
 
-The delivery process is machine-enforced infrastructure, not a wiki page. Five status
+The delivery process is machine-checked infrastructure, not a wiki page. Five status
 values across two tracks — `candidate` (refinement) and `roadmap → active → completed`
-with `deferred` as an escape hatch (delivery) — three protection levels (none,
-scope-locked, hard-locked), and six ProcessGuard rules prevent the most expensive
-mistakes in software development: scope creep on active work and modification of
-completed artifacts.
+with `deferred` as an escape hatch (delivery) — and ProcessGuard rules keep
+consequential changes visible without forcing status lies. Active-scope expansion warns,
+completed work can reopen to `roadmap` or `active`, and `@architect-unlock-reason`
+records intent and suppresses the advisory warning rather than acting as a hard gate.
 
 ### 5. Projection
 

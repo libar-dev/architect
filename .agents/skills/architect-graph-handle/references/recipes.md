@@ -1,0 +1,347 @@
+# Recipes. Script the rest
+
+The published Graph (`@libar-dev/architect-core/graph`) freezes only the irreducible
+joins: the grep→graph entry adapters (`findByConcept`/`byFile`/`bySymbol`), the
+spec-bridge (`invariantsOf`/`specsReverifying`), and the firehose (`blastRadius`).
+Everything else is a script you write. Freezing one-consumer traversals is how
+the handle would quietly become the verb wall ADR-014 deleted.
+
+Every recipe below is a runnable `q` body. Save one to `playground/scratch/<name>.ts`
+and pipe it through `q` (the script bakes in `--conditions=source`):
+
+```bash
+pnpm architect:q < playground/scratch/<name>.ts
+# …or inline:  echo 'return g.patterns.length;' | pnpm architect:q
+```
+
+`q` injects `g` (the live handle), `inspect`, `execFileSync`, and `REPO_ROOT`, and runs
+your script with cwd at the repo root. No imports, no `loadGraph()` boilerplate, and
+`git`/path shell-outs are stable wherever you invoke it. Two rules, because the body is
+compiled as a function body: (1) no `import`/`export` and no TS-only syntax
+(type annotations, `<generics>`, `!`). It's plain JS at eval time. (2) End with
+`return <value>` (inspect-printed) and/or `console.log`.
+
+Script over `g.patterns` (decoded `PatternNode[]`), `g.pattern(name)`,
+`g.invariantsOf(x)`, `g.specsReverifying(x)`, `g.blastRadius(files)`, the entry adapters,
+the complete frozen `g.graph`, the deterministic `g.fsm`, and the raw escape
+hatches `g.mech` / `g.authored`. Read `packages/architect-core/src/graph/schema.ts` +
+`graph.ts` for the shapes.
+
+> Import `Graph`, `createGraph`, schemas, types, and trusted pure views from
+> `@libar-dev/architect-core/graph`. Named pure kernels such as
+> `getDependencyContext` and `getRulesForPattern` come from `@libar-dev/architect-core`.
+> Callers supply already-built graph values. Source/config/git IO belongs to their
+> composition root. For ad-hoc live repository reads, the piped `q` form is still
+> the entry point.
+
+---
+
+## STATE. What is the state of X
+
+Pattern-state questions are direct reads. No verb needed:
+
+```js
+// one pattern's decoded state (need-shaped)
+return g.pattern('ProjectionBundle');
+// the full canonical record and direct deterministic reads:
+//   g.graph.patterns.find((p) => p.name === 'X') · g.graph.counts
+//   g.patterns.filter((p) => p.status === 'active')
+//   g.fsm.isValidTransition('roadmap', 'active')  ← the FSM gate, one call
+```
+
+```js
+// status distribution (the old `status` verb)
+const byStatus = {};
+for (const p of g.patterns) byStatus[p.status] = (byStatus[p.status] ?? 0) + 1;
+return byStatus;
+```
+
+```js
+// workable: roadmap patterns whose deps are all completed (the old `arch workable`)
+return g.patterns
+  .filter((p) => p.status === 'roadmap')
+  .filter((p) => p.uses.every((u) => g.pattern(u)?.status === 'completed'))
+  .map((p) => p.name);
+```
+
+---
+
+## I1. If I change this pattern, what breaks?
+
+A thin transitive walk over the curated `usedBy` edges. For the exhaustive answer that
+reaches dark files, use `g.blastRadius(files)`, the firehose. This is the curated-edge
+version: the architecture's own answer, no mechanical graph.
+
+```js
+function downstream(name) {
+  const seen = new Set(),
+    q = [name];
+  while (q.length)
+    for (const u of g.pattern(q.shift())?.usedBy ?? [])
+      if (!seen.has(u)) {
+        seen.add(u);
+        q.push(u);
+      }
+  return [...seen];
+}
+return downstream('ProjectionFragmentContracts').length; // → N patterns downstream (curated edges)
+```
+
+Leave it a script. One consumer, one already-structured field (`usedBy`). A short walk an
+agent won't get wrong. Freezing it would add a verb that hides a for-loop.
+
+---
+
+## MEMBERS. What is in this epic, and at what maturity?
+
+Epic→member membership (`@architect-parent`) is a first-class decoded field: `p.parent`
+and its inverse `p.children`. An epic's member set is a direct read, the usual cut for a
+design review of capability X. Group the members by maturity to see what is proven
+(`executable`), still design, or still idea-tier.
+
+```js
+const epic = g.pattern('DocumentationProjection');
+const order = { executable: 0, design: 1, plan: 2, idea: 3 };
+return epic.children
+  .map((n) => g.pattern(n))
+  .sort((a, b) => order[a.maturity] - order[b.maturity] || a.name.localeCompare(b.name))
+  .map(
+    (m) =>
+      `[${m.maturity.padEnd(10)}] ${m.name}  (${m.status}${m.implementedBy.length ? ', live test' : ''})`,
+  )
+  .join('\n');
+```
+
+`children` is an exposed field. Members by maturity is a `sort`/`map` over it, the
+freeze-vs-script bar, not a method.
+
+---
+
+## A1. How is this kind of thing done here?
+
+Filter by `role`, rank by `maturity` so the strongest precedent (an `executable`-proven
+pattern) sorts first, and pull a sample invariant as the "what it guarantees" hint.
+
+```js
+const order = { executable: 0, design: 1, plan: 2, idea: 3 };
+const precedents = g.patterns
+  .filter((p) => p.role === 'projection')
+  .sort((a, b) => order[a.maturity] - order[b.maturity] || a.name.localeCompare(b.name))
+  .slice(0, 4);
+for (const p of precedents) {
+  const inv = g.invariantsOf(p.name)[0];
+  console.log(`[${p.maturity}] ${p.name}  ${p.sourceFile ?? ''}`);
+  if (inv) console.log(`    e.g. invariant: ${inv.text.slice(0, 80)}…`);
+}
+```
+
+Precedent is the agent's to choose: by role, by context, or a fuzzy `findByConcept` first.
+A verb would freeze one definition. The script lets the agent pick. `role` is populated but
+coarse. Combine with `g.findByConcept(intent)` or a `boundedContext` filter to narrow.
+
+---
+
+## A2. What context or seam am I extending?
+
+Group by the seam axis. `boundedContext` is the doctrine-correct seam and the denser field.
+Use it. `productArea` is the coarser org axis. Fall back to it only where `boundedContext`
+is absent.
+
+```js
+const bySeam = new Map();
+for (const p of g.patterns)
+  if (p.boundedContext)
+    (bySeam.get(p.boundedContext) ?? bySeam.set(p.boundedContext, []).get(p.boundedContext)).push(
+      p.name,
+    );
+for (const [ctx, members] of [...bySeam].sort((a, b) => b[1].length - a[1].length))
+  console.log(`${ctx.padEnd(26)} ${members.length} members`);
+```
+
+A one-line `groupBy` over an exposed field stays a recipe, never a method.
+
+---
+
+## GUARANTEE. What does X guarantee?
+
+`g.invariantsOf(x)` returns `[]` for ~40% of patterns: the code-originated contracts
+(`role:contract`/`codec`, a `.ts` source) whose guarantee is their TypeScript type, not a
+Gherkin Rule block. Don't read that `[]` as "guarantees nothing." The follow-up below splits
+the cases `[]` collapses:
+
+```js
+function guaranteeOf(x) {
+  const inv = g.invariantsOf(x);
+  if (inv.length)
+    return { kind: 'invariants', count: inv.length, sample: inv[0].text.slice(0, 60) };
+  const node = g.pattern(x) ?? g.pattern(g.fileToPattern(x) ?? '');
+  if (!node) return { kind: 'unresolved', x }; // not a pattern, not a mapped .ts file
+  if (node.sourceFile?.endsWith('.ts'))
+    // code-originated contract → read the TYPE
+    return { kind: 'structural', role: node.role, typeAt: node.sourceFile };
+  return { kind: 'none-yet', pattern: node.name }; // real .feature pattern, no Rule blocks yet
+}
+return [
+  guaranteeOf('ProjectionBundle'),
+  guaranteeOf('ApiReferenceProjection'),
+  guaranteeOf('NoSuchPattern'),
+];
+```
+
+> `structural` is not "a contract never has invariants." It only means no Gherkin Rule reaches
+> it. A code-originated contract realized by a live test returns real `executable`
+> invariants, so the recipe calls `invariantsOf` first and never infers emptiness from
+> `role`. Don't shortcut "it's a contract, so `[]`". Ask the graph.
+
+Leave it a script, not a handle method. It's a thin field-check over already-exposed fields,
+not an irreducible cross-source join. Whether this earns a frozen `g.guarantee()` is an
+ADR-010 second-real-caller question. The `invariants` CLI command is the first. If a second
+programmatic caller appears, promote it. Until then, script it.
+
+---
+
+## TRIAGE. Which annotations are noise, which need edges
+
+An annotated pattern carrying zero architectural-significance signal is one of two things.
+Mechanical fan-in is the discriminator. Near-zero importers means true noise (REMOVE). Many
+importers means load-bearing but under-annotated (ADD edges). Significance is any of: a
+curated edge, a rule/scenario, a realization (`implements` OR `implementedBy`), a decision
+enforced, `children` (it's a parent/epic), or a structural role. Those are all first-class
+node fields, so the filter needs no escape hatch.
+
+```js
+const STRUCTURAL = new Set(['contract', 'codec', 'decider', 'read-model']);
+const fanIn = new Map();
+for (const e of g.mech.edges)
+  if (e.fromFile !== e.toFile)
+    (fanIn.get(e.toFile) ?? fanIn.set(e.toFile, new Set()).get(e.toFile)).add(e.fromFile);
+return g.patterns
+  .filter(
+    (p) =>
+      !p.uses.length &&
+      !p.usedBy.length &&
+      !p.ruleCount &&
+      !p.scenarioCount &&
+      !p.implements.length &&
+      !p.implementedBy.length &&
+      !p.enforcesDecisions.length &&
+      !p.children.length &&
+      !STRUCTURAL.has(p.role ?? '') &&
+      p.sourceFile?.endsWith('.ts'),
+  )
+  .map((p) => ({ name: p.name, role: p.role ?? '—', fanIn: fanIn.get(p.sourceFile)?.size ?? 0 }))
+  .sort((a, b) => a.fanIn - b.fanIn)
+  .map(
+    (t) =>
+      `${String(t.fanIn).padStart(3)} imp  ${t.name} [${t.role}]  → ${t.fanIn <= 1 ? 'REMOVE? (noise)' : 'ADD edges? (load-bearing)'}`,
+  )
+  .join('\n');
+```
+
+Significance is the curator's definition to tune. A verb would freeze one policy. Mechanical
+imports are evidence, not authored architecture. Dark imports default to no action. The ADD
+side (an intentional dependency that merits a curated `uses` edge) is
+`g.graphDiff().aspirational` / `pnpm architect:graph fan-in`, but each candidate still needs
+the significance rubric and a human-readable architectural reason. This recipe is the REMOVE
+side plus the load-bearing-but-edge-dark cross-check.
+
+---
+
+## IMPACT. File-level impact is `blastRadius`, not `specsReverifying`
+
+A demand-map trap worth knowing: `g.specsReverifying([implFile])` can return `0` for a
+real realizing impl file. That file's tests live on the cluster spec it implements, not on
+a feature of its own, and `specsReverifying` walks a pattern's own plus
+reverse-`implementedBy` scenarios, not the forward `implements` edge. For "I changed this
+file, what re-verifies?", reach for `g.blastRadius([file]).atRiskSpecs` (exhaustive,
+reaches the cluster via the mechanical graph) or seed `specsReverifying` with the pattern
+name of what the file implements.
+
+```js
+// file → at-risk specs (the reliable file-level form)
+return g.blastRadius([
+  'packages/architect-projection/src/projections/documentation-composition/taxonomy-embedded.ts',
+]).atRiskSpecs.length;
+```
+
+---
+
+## DRIFT. What ran ahead of its design?
+
+A unit backed by a live test whose own design status still lags. The handle does not
+fabricate this as a maturity label. Executable provenance is clamped to `executable`
+maturity. A live verifier is the realization rung. The signal lives here instead, as a
+deliberate query, where it is informative rather than contradictory.
+
+```js
+// patterns realized by a live test (tests/features) but whose status is not yet `completed`
+const realized = new Set();
+for (const p of g.patterns)
+  for (const i of g.authored.relationshipIndex[p.name]?.implementedBy ?? [])
+    if (i.file && i.file.includes('tests/features')) realized.add(p.name);
+const drift = [...realized]
+  .map((n) => g.pattern(n))
+  .filter((p) => p && p.status !== 'completed')
+  .map((p) => `${p.name} [${p.status}]`)
+  .sort();
+return `${drift.length} drift (live test ∧ status<completed):\n` + drift.join('\n');
+```
+
+A filter over two already-exposed fields (`status`, `implementedBy`). One consumer, no
+irreducible join. It stays a recipe.
+
+---
+
+## COMPOSE. A question that is not a method
+
+Chain frozen primitives into a cut no single verb produces: of everything at risk from this
+diff, which patterns rest on authored-only invariants no live test proves?
+(`blastRadius` → `invariantsOf` → provenance filter).
+
+```js
+const changed = execFileSync('git', ['diff', '--name-only', 'HEAD~20', '--'], {
+  encoding: 'utf8',
+  cwd: REPO_ROOT,
+})
+  .split('\n')
+  .filter(Boolean);
+const exposed = g
+  .blastRadius(changed)
+  .mechPatterns.map((p) => ({ p, inv: g.invariantsOf(p) }))
+  .filter(({ inv }) => inv.length && inv.every((i) => i.provenance === 'authored'));
+return `${exposed.length} at-risk patterns rest only on authored (unproven) invariants`;
+```
+
+`execFileSync` and `REPO_ROOT` are injected. The explicit `cwd: REPO_ROOT` keeps it correct
+even if you later lift it into a standalone file. Three primitives compose into a fourth
+question, in-process, no envelope, ~⅕ the context of a verb round-trip.
+
+---
+
+## ESCAPE HATCH. Raw shapes when no view fits
+
+Drop to `g.mech` / `g.authored` for anything the views don't cover. The mechanical graph is
+right there.
+
+```js
+const typeOnly = g.mech.edges.filter((e) => e.typeOnly).length;
+return `${typeOnly}/${g.mech.edges.length} import edges are type-only`;
+```
+
+This is the whole bet: the agent is not limited to the view library. Views are a starting
+toolkit. Raw authored and mechanical shapes are always one property away.
+
+---
+
+## When does a recipe graduate to a handle method?
+
+Only when it clears both axes of the bar (ADR-014 §3):
+
+1. Many consumers (ADR-010's second-caller). Several other recipes need it first.
+2. Irreducible join. It hides a sharp cross-source join an agent would hand-roll wrong
+   (the 2-hop `pattern→implementedBy→featureFile→rules` is the canonical example; a `groupBy`
+   over an exposed field is not).
+
+Reached often but still a thin traversal? Stays a recipe. Document it here. Hard join, one
+consumer? Stays a recipe. Script it inline. Both at once and it's earned the handle. Nothing
+else gets frozen.

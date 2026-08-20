@@ -20,7 +20,7 @@ interface PatternSummaryState {
 }
 
 const feature = await loadFeature(
-  'tests/features/projections/pattern-relations/pattern-summary.feature'
+  'tests/features/projections/pattern-relations/pattern-summary.feature',
 );
 
 let state: PatternSummaryState | null = null;
@@ -40,22 +40,18 @@ function createMixedCatalogContext(): ProjectionContext {
       createPattern('ActiveService', {
         status: 'active',
         role: 'service',
-        phase: 49,
       }),
       createPattern('CompletedService', {
         status: 'completed',
         role: 'service',
-        phase: 49,
       }),
       createPattern('ActiveInfraPhase50', {
         status: 'active',
         role: 'infra',
-        phase: 50,
       }),
       createPattern('RoadmapUiPhase50', {
         status: 'roadmap',
         role: 'ui',
-        phase: 50,
       }),
     ],
   });
@@ -79,71 +75,69 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
   Rule('Pattern summaries keep the stable fragment contract', ({ RuleScenario }) => {
     RuleScenario('projecting a canonical pattern summary', ({ Given, When, Then }) => {
-      Given('a summary projection context with a pattern named "PatternGraphAPI"', () => {
+      Given('a summary projection context with a pattern named "WidgetService"', () => {
         state!.context = createProjectionContext({
           patterns: [
-            createPattern('PatternGraphAPI', {
+            createPattern('WidgetService', {
               role: 'service',
-              phase: 49,
-              file: 'packages/architect-query/src/pattern-graph-api.ts',
+              file: 'packages/architect-query/src/graph-handle.ts',
             }),
           ],
         });
       });
 
-      When('I project the summary for "PatternGraphAPI"', () => {
-        state!.summary = projectPatternSummary(state!.context!, 'PatternGraphAPI').root;
+      When('I project the summary for "WidgetService"', () => {
+        state!.summary = projectPatternSummary(state!.context!, 'WidgetService').root;
       });
 
       Then('the projected summary should expose the canonical fragment fields', () => {
         expect(state!.summary).toEqual({
           kind: 'PatternSummary',
-          patternName: 'PatternGraphAPI',
+          patternName: 'WidgetService',
           status: 'active',
           maturity: 'design',
           role: 'service',
-          phase: 49,
-          file: 'packages/architect-query/src/pattern-graph-api.ts',
+          file: 'packages/architect-query/src/graph-handle.ts',
           source: 'typescript',
         });
       });
     });
 
     RuleScenario('pattern lookup is case-insensitive', ({ Given, When, Then }) => {
-      Given('a summary projection context with a pattern named "PatternGraphAPI"', () => {
+      Given('a summary projection context with a pattern named "WidgetService"', () => {
         state!.context = createProjectionContext({
-          patterns: [createPattern('PatternGraphAPI')],
+          patterns: [createPattern('WidgetService')],
         });
       });
 
-      When('I project the summary for "patterngraphapi"', () => {
-        state!.summary = projectPatternSummary(state!.context!, 'patterngraphapi').root;
+      When('I project the summary for "widgetservice"', () => {
+        state!.summary = projectPatternSummary(state!.context!, 'widgetservice').root;
       });
 
-      Then('the projected summary should still target "PatternGraphAPI"', () => {
-        expect(state!.summary?.patternName).toBe('PatternGraphAPI');
+      Then('the projected summary should still target "WidgetService"', () => {
+        expect(state!.summary?.patternName).toBe('WidgetService');
       });
     });
 
     RuleScenario('missing patterns return a suggested match', ({ Given, When, Then }) => {
-      Given('a summary projection context with a pattern named "PatternGraphAPI"', () => {
+      Given('a summary projection context with a pattern named "WidgetService"', () => {
         state!.context = createProjectionContext({
-          patterns: [createPattern('PatternGraphAPI')],
+          patterns: [createPattern('WidgetService')],
         });
       });
 
-      When('I project the summary for the missing pattern "PatternGraphAp"', () => {
+      When('I project the summary for the missing pattern "WidgetServic"', () => {
         try {
-          projectPatternSummary(state!.context!, 'PatternGraphAp');
+          projectPatternSummary(state!.context!, 'WidgetServic');
         } catch (error) {
           state!.error = error;
         }
       });
 
-      Then('the summary projection should fail with a suggestion for "PatternGraphAPI"', () => {
+      Then('the summary projection should fail with a suggestion for "WidgetService"', () => {
         expect(state!.error).toBeInstanceOf(ProjectionError);
-        expect((state!.error as Error).message).toContain('Pattern not found: "PatternGraphAp"');
-        expect((state!.error as Error).message).toContain('Did you mean: PatternGraphAPI?');
+        expect((state!.error as Error).message).toContain('Pattern not found: "WidgetServic"');
+        expect((state!.error as Error).message).toContain('Did you mean: WidgetService?');
       });
     });
   });
@@ -159,7 +153,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             }),
             createPattern('ServicePattern', {
               role: 'service',
-              file: 'packages/architect-query/src/pattern-graph-api.ts',
+              file: 'packages/architect-query/src/graph-handle.ts',
             }),
           ],
         });
@@ -192,7 +186,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
     });
 
     RuleScenario('status filter selects matching patterns', ({ Given, When, Then }) => {
-      Given('a catalog projection context with mixed status phase and role variants', () => {
+      Given('a catalog projection context with mixed status and role variants', () => {
         state!.context = createMixedCatalogContext();
       });
 
@@ -207,36 +201,19 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       });
     });
 
-    RuleScenario('phase filter selects matching patterns', ({ Given, When, Then }) => {
-      Given('a catalog projection context with mixed status phase and role variants', () => {
-        state!.context = createMixedCatalogContext();
-      });
-
-      When('I project the pattern catalog with phase {int}', (_ctx: unknown, phase: number) => {
-        state!.catalog = parseAndProjectPatternCatalog(state!.context!, {
-          phase,
-        }).root;
-      });
-
-      Then('the projected catalog names should be {string}', (_ctx: unknown, names: string) => {
-        expectCatalogNames(names);
-      });
-    });
-
-    RuleScenario('status phase and role filters combine', ({ Given, When, Then, And }) => {
-      Given('a catalog projection context with mixed status phase and role variants', () => {
+    RuleScenario('status and role filters combine', ({ Given, When, Then, And }) => {
+      Given('a catalog projection context with mixed status and role variants', () => {
         state!.context = createMixedCatalogContext();
       });
 
       When(
-        'I project the pattern catalog with status {string} phase {int} and role alias {string}',
-        (_ctx: unknown, status: AcceptedStatusValue, phase: number, role: string) => {
+        'I project the pattern catalog with status {string} and role alias {string}',
+        (_ctx: unknown, status: AcceptedStatusValue, role: string) => {
           state!.catalog = parseAndProjectPatternCatalog(state!.context!, {
             status,
-            phase,
             role,
           }).root;
-        }
+        },
       );
 
       Then('the projected catalog should resolve the canonical role filter', () => {
@@ -249,7 +226,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
     });
 
     RuleScenario('count flag returns only the matching count', ({ Given, When, Then, And }) => {
-      Given('a catalog projection context with mixed status phase and role variants', () => {
+      Given('a catalog projection context with mixed status and role variants', () => {
         state!.context = createMixedCatalogContext();
       });
 
@@ -272,7 +249,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
     RuleScenario(
       'namesOnly flag returns names without item details',
       ({ Given, When, Then, And }) => {
-        Given('a catalog projection context with mixed status phase and role variants', () => {
+        Given('a catalog projection context with mixed status and role variants', () => {
           state!.context = createMixedCatalogContext();
         });
 
@@ -289,7 +266,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         And('the projected catalog should omit item details', () => {
           expect(state!.catalog?.items).toEqual([]);
         });
-      }
+      },
     );
   });
 });

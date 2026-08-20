@@ -11,7 +11,7 @@ import { createPackageResolver, type ExtractedPattern } from '@libar-dev/archite
 
 import {
   type FileReadingList,
-  parseAndProjectDependencyTree,
+  parseAndProjectDependencyContext,
   parseAndProjectFileReadingList,
   parseAndProjectSessionContext,
   projectOverviewDigest,
@@ -25,7 +25,7 @@ import {
 import { createTestPattern } from '../../../fixtures/pattern-factories.js';
 
 const feature = await loadFeature(
-  'tests/features/api/context-assembly/compact-text-renderer.feature'
+  'tests/features/api/context-assembly/compact-text-renderer.feature',
 );
 
 interface TestState {
@@ -51,7 +51,7 @@ function createProjectionContext(graph: ProjectionContext['graph']): ProjectionC
 
 function renderSessionContext(
   patterns: ExtractedPattern[],
-  sessionType: 'design' | 'implement'
+  sessionType: 'design' | 'implement',
 ): string {
   const dataset = createTestPatternGraph({ patterns });
   const focalPattern = patterns.find((pattern) => pattern.implementsPatterns === undefined);
@@ -63,18 +63,17 @@ function renderSessionContext(
     parseAndProjectSessionContext(createProjectionContext(dataset), {
       patterns: [focalPattern.patternName ?? focalPattern.name],
       sessionType,
-    })
+    }),
   );
 }
 
-function renderDependencyTreeFor(patterns: ExtractedPattern[], pattern: string): string {
+function renderDependencyContextFor(patterns: ExtractedPattern[], pattern: string): string {
   const dataset = createTestPatternGraph({ patterns });
   return renderCompactText(
-    parseAndProjectDependencyTree(createProjectionContext(dataset), {
+    parseAndProjectDependencyContext(createProjectionContext(dataset), {
       pattern,
       maxDepth: 5,
-      includeImplementationDeps: true,
-    })
+    }),
   );
 }
 
@@ -117,7 +116,6 @@ describeFeature(feature, ({ Rule }) => {
             createTestPattern({
               name: 'OrderSaga',
               status: 'roadmap',
-              phase: 22,
               role: 'agent',
               filePath: 'architect/specs/order-saga.feature',
               description: 'Orchestrates order lifecycle.',
@@ -145,7 +143,7 @@ describeFeature(feature, ({ Rule }) => {
               targetPath: 'src/domain/order-saga.ts',
             }),
           ],
-          'design'
+          'design',
         );
       });
 
@@ -155,7 +153,7 @@ describeFeature(feature, ({ Rule }) => {
           for (const row of table) {
             expect(state!.output).toContain(row.section.trim());
           }
-        }
+        },
       );
     });
 
@@ -170,7 +168,6 @@ describeFeature(feature, ({ Rule }) => {
             createTestPattern({
               name: 'ProcessGuard',
               status: 'active',
-              phase: 14,
               role: 'validation',
               filePath: 'architect/specs/process-guard.feature',
               description: 'Validates delivery workflow.',
@@ -185,7 +182,7 @@ describeFeature(feature, ({ Rule }) => {
               ],
             }),
           ],
-          'implement'
+          'implement',
         );
       });
 
@@ -195,7 +192,7 @@ describeFeature(feature, ({ Rule }) => {
           for (const row of table) {
             expect(state!.output).toContain(row.section.trim());
           }
-        }
+        },
       );
 
       And('the output contains checkbox markers', () => {
@@ -204,32 +201,35 @@ describeFeature(feature, ({ Rule }) => {
     });
   });
 
-  Rule('formatDepTree renders indented tree', ({ RuleScenario }) => {
-    RuleScenario('Tree renders with arrows and focal marker', ({ Given, When, Then }) => {
-      Given('a dep-tree with root, middle, and focal leaf', () => {
-        state = initState();
-      });
+  Rule('formatDependencyContext renders a bidirectional focal view', ({ RuleScenario }) => {
+    RuleScenario(
+      'Context renders the focal summary and bidirectional trees',
+      ({ Given, When, Then }) => {
+        Given('a dependency context with root, middle, and focal leaf', () => {
+          state = initState();
+        });
 
-      When('I format the tree', () => {
-        state!.output = renderDependencyTreeFor(
-          [
-            createTestPattern({ name: 'Root', status: 'completed' }),
-            createTestPattern({ name: 'Middle', status: 'active', dependsOn: ['Root'] }),
-            createTestPattern({ name: 'Leaf', status: 'roadmap', dependsOn: ['Middle'] }),
-          ],
-          'Leaf'
+        When('I format the dependency context', () => {
+          state!.output = renderDependencyContextFor(
+            [
+              createTestPattern({ name: 'Root', status: 'completed' }),
+              createTestPattern({ name: 'Middle', status: 'active', dependsOn: ['Root'] }),
+              createTestPattern({ name: 'Leaf', status: 'roadmap', dependsOn: ['Middle'] }),
+            ],
+            'Leaf',
+          );
+        });
+
+        Then(
+          'the output contains all expected sections',
+          (_ctx: unknown, table: Array<{ section: string }>) => {
+            for (const row of table) {
+              expect(state!.output).toContain(row.section.trim());
+            }
+          },
         );
-      });
-
-      Then(
-        'the output contains all expected sections',
-        (_ctx: unknown, table: Array<{ section: string }>) => {
-          for (const row of table) {
-            expect(state!.output).toContain(row.section.trim());
-          }
-        }
-      );
-    });
+      },
+    );
   });
 
   Rule('formatOverview renders progress summary', ({ RuleScenario }) => {
@@ -239,7 +239,7 @@ describeFeature(feature, ({ Rule }) => {
         (_ctx: unknown, total: number, percent: number) => {
           state = initState();
           state.output = renderOverview(total, percent);
-        }
+        },
       );
 
       When('I format the overview', () => {});
@@ -250,17 +250,17 @@ describeFeature(feature, ({ Rule }) => {
           for (const row of table) {
             expect(state!.output).toContain(row.section.trim());
           }
-        }
+        },
       );
     });
 
-    RuleScenario('Overview renders architect query guidance', ({ Given, When, Then, And }) => {
+    RuleScenario('Overview renders read-surface guidance', ({ Given, When, Then, And }) => {
       Given(
         'an overview with {int} total patterns at {int} percent',
         (_ctx: unknown, total: number, percentage: number) => {
           state = initState();
           state.output = renderOverview(total, percentage);
-        }
+        },
       );
 
       When('I format the overview', () => {});
@@ -317,7 +317,7 @@ describeFeature(feature, ({ Rule }) => {
                 implementsPatterns: ['OrderSaga'],
               }),
             ],
-            'OrderSaga'
+            'OrderSaga',
           );
         });
 
@@ -328,7 +328,7 @@ describeFeature(feature, ({ Rule }) => {
         And('the output contains {string}', (_ctx: unknown, text: string) => {
           expect(state!.output).toContain(text);
         });
-      }
+      },
     );
 
     RuleScenario('Empty file reading list renders minimal output', ({ Given, When, Then }) => {

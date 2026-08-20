@@ -3,7 +3,7 @@
  * @architect-pattern TaxonomyDigestProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses GovernanceProjectionSupport, ProjectionFragmentContracts
+ * @architect-uses GovernanceProjectionSupport, ProjectionFragmentContracts, TaxonomyDigest, GovernanceSupporting
  * @architect-bounded-context:projection
  *
  * **Value:** Produces a `TaxonomyDigest` fragment that describes the
@@ -29,12 +29,15 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects the governance taxonomy digest and merges per-call example overrides without mutating the default examples.
  */
 
 import type { ProjectionContext } from '../../context/projection-context.js';
 import { projectSingle, type ProjectionBundle } from '../../fragments/base.js';
-import type { TaxonomyDigest } from '../../fragments/governance/index.js';
+import type {
+  TaxonomyDigest,
+  TaxonomyDigestCountSummary,
+} from '../../fragments/governance/index.js';
 import {
   TaxonomyDigestOptionsSchema,
   buildTaxonomyDigest,
@@ -43,11 +46,24 @@ import {
 import { parseAndProject } from '../_shared/parse-and-project.internal.js';
 
 export { TaxonomyDigestOptionsSchema } from './taxonomy-digest.internal.js';
-export { summarizeTaxonomyDigest } from '../../fragments/governance/index.js';
+
+export function summarizeTaxonomyDigest(digest: TaxonomyDigest): TaxonomyDigestCountSummary {
+  const allEntries = digest.tags.flatMap((group) => group.entries);
+  const roles = allEntries.filter((entry) => entry.kind === 'role').length;
+  const metadata = allEntries.filter((entry) => entry.kind === 'metadata').length;
+  const aggregation = allEntries.filter((entry) => entry.kind === 'aggregation').length;
+
+  return {
+    roles,
+    metadata,
+    aggregation,
+    total: roles + metadata + aggregation,
+  };
+}
 
 export function projectTaxonomyDigest(
   context: ProjectionContext,
-  options: TaxonomyDigestOptions = {}
+  options: TaxonomyDigestOptions = {},
 ): ProjectionBundle<TaxonomyDigest> {
   const exampleOverrides = {
     ...(context.tagExampleOverrides ?? {}),
@@ -58,7 +74,7 @@ export function projectTaxonomyDigest(
     buildTaxonomyDigest(context, {
       ...options,
       ...(Object.keys(exampleOverrides).length > 0 ? { exampleOverrides } : {}),
-    })
+    }),
   );
 }
 
@@ -66,5 +82,5 @@ export const parseAndProjectTaxonomyDigest = parseAndProject(
   TaxonomyDigestOptionsSchema,
   projectTaxonomyDigest,
   'parseAndProjectTaxonomyDigest',
-  {}
+  {},
 );

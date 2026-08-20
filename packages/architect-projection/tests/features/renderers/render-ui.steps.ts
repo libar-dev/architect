@@ -41,7 +41,6 @@ function createPatternDetailFixture(patternName = 'RenderUiProjection'): Pattern
     patternName,
     status: 'active',
     role: 'projection',
-    phase: 14,
     file: 'packages/architect-projection/src/renderers/render-ui.ts',
     source: 'typescript',
     description: 'Render UI data in a stable order for Studio consumers.',
@@ -58,7 +57,7 @@ function createPatternDetailFixture(patternName = 'RenderUiProjection'): Pattern
       enables: ['StudioProjectionConsumption'],
       uses: ['BlockSchema'],
       usedBy: ['StudioProjectionConsumption'],
-      implementsPatterns: ['PerspectiveAwareProjections'],
+      implementsPatterns: ['SessionContextProjection'],
       implementedBy: [
         {
           name: 'renderUi',
@@ -174,7 +173,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'stubs',
           ]);
         });
-      }
+      },
     );
   });
 
@@ -196,13 +195,13 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'pattern-detail-copy',
           ]);
           expect(state!.rendered?.children?.['documentation-child']?.heading).toBe(
-            'DocumentationChild'
+            'DocumentationChild',
           );
           expect(state!.rendered?.children?.['pattern-detail-copy']?.heading).toBe(
-            'RenderUiProjectionChild'
+            'RenderUiProjectionChild',
           );
         });
-      }
+      },
     );
   });
 });

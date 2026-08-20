@@ -199,12 +199,19 @@ should derive them from the stub's public exports instead of relying on a separa
    └── Implementation created at @architect-target path
    └── Implementation MUST fulfill stub interfaces
 
-4. IMPLEMENTATION complete
+4. IMPLEMENTATION complete — the stub is PROMOTED, not discarded
    └── Tests pass against the stub-defined contracts
-   └── Stub directory deleted from architect/stubs/
-   └── Pattern status transitions to active or completed
+   └── @architect-pattern identity persists at the @architect-target src/ file (ADR-003)
+   └── Pattern @architect-status advances roadmap → active → completed
+   └── Staging copy removed from architect/stubs/ (the src/ file IS the realized stub)
 ```
 
-**Critical rule:** Stubs are ephemeral design artifacts. They MUST be deleted when
-implementation is complete. The implementation IS the realized stub — keeping both
-creates confusing duplication.
+**Critical rule:** A stub's _staging copy_ in `architect/stubs/` is ephemeral and MUST be removed
+once implementation is complete — the implementation at `@architect-target` IS the realized stub,
+so keeping both creates confusing duplication. But "removed" is **promotion, not loss of
+identity**: the stub's `@architect-pattern` identity (and its role, decisions, and use-cases)
+**travels with the code into `src/`** and persists there as a code-originated pattern (ADR-003 —
+"identity travels with code from stub through production"). Only the staging duplicate is deleted;
+the pattern lives on, its `@architect-status` advancing `roadmap → active → completed`. (This is
+distinct from a _step-definition_ stub or a _behavioral design `.feature`_, which carry no durable
+code identity and are deleted outright once their value has transferred to the executable feature.)

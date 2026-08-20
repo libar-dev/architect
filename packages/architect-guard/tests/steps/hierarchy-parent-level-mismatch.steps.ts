@@ -57,7 +57,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
             state.directive as DocDirective,
             'fixture.feature',
             1,
-            ctx
+            ctx,
           );
         });
 
@@ -85,7 +85,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
             state.directive as DocDirective,
             'fixture.feature',
             1,
-            ctx
+            ctx,
           );
         });
 
@@ -97,6 +97,6 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
           expect(violations[0]?.rule).toBe('hierarchy-parent-level-mismatch');
         });
       });
-    }
+    },
   );
 });

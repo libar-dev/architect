@@ -1,5 +1,6 @@
 @architect
 @architect-pattern:CodecUtilsValidation
+@architect-implements:CodecUtils
 @architect-status:active
 @architect-product-area:Validation
 @validation

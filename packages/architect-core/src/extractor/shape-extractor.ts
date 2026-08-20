@@ -4,10 +4,6 @@
  * @architect-status active
  * @architect-role:service
  * @architect-bounded-context:extractor
- *
- * ### When to Use
- *
- * - As a typed contract / data shape consumed by projection or render layers.
  */
 import { AST_NODE_TYPES, AST_TOKEN_TYPES, parse } from '@typescript-eslint/typescript-estree';
 import type { TSESTree } from '@typescript-eslint/typescript-estree';
@@ -50,13 +46,13 @@ function parseSource(sourceCode: string, jsx: boolean): TSESTree.Program {
 export function extractShapes(
   sourceCode: string,
   shapeNames: string[],
-  options: ShapeExtractionOptionsInput = {}
+  options: ShapeExtractionOptionsInput = {},
 ): Result<ShapeExtractionResult> {
   if (sourceCode.length > MAX_SOURCE_SIZE_BYTES) {
     return Result.err(
       new Error(
-        `Source code size (${String(sourceCode.length)} bytes) exceeds maximum allowed (${String(MAX_SOURCE_SIZE_BYTES)} bytes)`
-      )
+        `Source code size (${String(sourceCode.length)} bytes) exceeds maximum allowed (${String(MAX_SOURCE_SIZE_BYTES)} bytes)`,
+      ),
     );
   }
 
@@ -72,7 +68,7 @@ export function extractShapes(
     ast = parseSource(sourceCode, options.jsx ?? false);
   } catch (error) {
     return Result.err(
-      error instanceof Error ? error : new Error(`Failed to parse source code: ${String(error)}`)
+      error instanceof Error ? error : new Error(`Failed to parse source code: ${String(error)}`),
     );
   }
 
@@ -87,7 +83,7 @@ export function extractShapes(
         extractShape(sourceCode, declaration, ast.comments ?? [], {
           includeJsDoc,
           preserveFormatting,
-        })
+        }),
       );
       continue;
     }
@@ -142,7 +138,7 @@ function findDeclarations(ast: TSESTree.Program): Map<string, FoundDeclaration[]
         const existing = declarations.get(declaration.name);
         if (existing !== undefined) {
           const hasExportedSameKind = existing.some(
-            (entry) => entry.exported && entry.kind === declaration.kind
+            (entry) => entry.exported && entry.kind === declaration.kind,
           );
           if (!hasExportedSameKind) existing.push(declaration);
         } else {
@@ -261,7 +257,7 @@ function extractShape(
   sourceCode: string,
   declaration: FoundDeclaration,
   comments: TSESTree.Comment[],
-  options: { includeJsDoc: boolean; preserveFormatting: boolean }
+  options: { includeJsDoc: boolean; preserveFormatting: boolean },
 ): ExtractedShape {
   const { node, kind, name, exported } = declaration;
   let sourceText = sourceCode.slice(node.range[0], node.range[1]);
@@ -304,7 +300,7 @@ function extractShape(
     const params = node.typeParameters;
     if (params?.params) {
       typeParameters = params.params.map((param) =>
-        sourceCode.slice(param.range[0], param.range[1])
+        sourceCode.slice(param.range[0], param.range[1]),
       );
     }
   }
@@ -329,7 +325,7 @@ function extractShape(
           sourceCode,
           member,
           sortedComments,
-          interfaceBodyStartLine
+          interfaceBodyStartLine,
         );
         if (propJsDoc) {
           const cleanedJsDoc = extractJsDocText(propJsDoc);
@@ -390,7 +386,7 @@ function stripArchitectTags(jsDoc: string): string | undefined {
 function extractPrecedingJsDoc(
   sourceCode: string,
   node: TSESTree.Node,
-  comments: TSESTree.Comment[]
+  comments: TSESTree.Comment[],
 ): string | undefined {
   const nodeStart = node.range[0];
   const nodeLine = node.loc.start.line;
@@ -435,7 +431,7 @@ function prepareJsDocComments(comments: readonly TSESTree.Comment[]): JsDocComme
 
 function findCommentEndingAtLine(
   sortedComments: readonly JsDocCommentWithLine[],
-  targetLine: number
+  targetLine: number,
 ): number {
   if (sortedComments.length === 0) return -1;
 
@@ -465,7 +461,7 @@ function findStrictlyAdjacentPropertyJsDoc(
   sourceCode: string,
   member: TSESTree.Node,
   sortedComments: readonly JsDocCommentWithLine[],
-  interfaceBodyStartLine: number
+  interfaceBodyStartLine: number,
 ): string | undefined {
   const memberStartLine = member.loc.start.line;
   const memberStart = member.range[0];
@@ -607,15 +603,30 @@ export interface ProcessExtractShapesResult {
   warnings: string[];
 }
 
+/**
+ * Block-tag patterns anchored to a JSDoc tag line. The leading `^[ \t]*\*?[ \t]*`
+ * consumes a line's indentation and optional `*` comment marker, so the tag is only
+ * recognised when it *begins* a line — a prose mention mid-sentence (e.g. "see
+ * `@architect-shape` for details") can never false-tag the declaration. The literal
+ * `@` marker is **required**: leniency at this trust boundary is the bug, not a
+ * feature — a line-start prose mention without the `@` (e.g. a wrapped sentence
+ * beginning "architect-shape contracts …") must NOT opt a declaration into the API
+ * surface. `[ \t]` (never `\s`) keeps every part of the match within one physical
+ * line, so the optional group/value cannot bleed onto a following line. `m` makes
+ * `^`/`$` match per line within the multi-line JSDoc block.
+ */
+const SHAPE_TAG_PATTERN = /^[ \t]*\*?[ \t]*@architect-shape(?!-)(?:[ \t]+([^\s*/]+))?[ \t]*$/m;
+const INCLUDE_TAG_PATTERN = /^[ \t]*\*?[ \t]*@architect-include(?!-)(?:[ \t]+([^\n@*]+?))?[ \t]*$/m;
+
 function extractShapeTag(jsDocText: string): { tagged: boolean; group?: string } {
-  const match = /architect-shape(?!-)(?:\s+([^\s*/]+))?/.exec(jsDocText);
+  const match = SHAPE_TAG_PATTERN.exec(jsDocText);
   if (!match) return { tagged: false };
   const group = match[1];
   return group !== undefined ? { tagged: true, group } : { tagged: true };
 }
 
 function extractIncludeTag(jsDocText: string): readonly string[] | undefined {
-  const match = /architect-include(?!-)(?:\s+([^\n@*]+))?/.exec(jsDocText);
+  const match = INCLUDE_TAG_PATTERN.exec(jsDocText);
   if (!match) return undefined;
   const raw = match[1];
   if (raw === undefined) return undefined;
@@ -628,13 +639,13 @@ function extractIncludeTag(jsDocText: string): readonly string[] | undefined {
 
 export function discoverTaggedShapes(
   sourceCode: string,
-  options?: { readonly jsx?: boolean }
+  options?: { readonly jsx?: boolean },
 ): Result<ProcessExtractShapesResult> {
   if (sourceCode.length > MAX_SOURCE_SIZE_BYTES) {
     return Result.err(
       new Error(
-        `Source code size (${String(sourceCode.length)} bytes) exceeds maximum allowed (${String(MAX_SOURCE_SIZE_BYTES)} bytes)`
-      )
+        `Source code size (${String(sourceCode.length)} bytes) exceeds maximum allowed (${String(MAX_SOURCE_SIZE_BYTES)} bytes)`,
+      ),
     );
   }
 
@@ -643,7 +654,7 @@ export function discoverTaggedShapes(
     ast = parseSource(sourceCode, options?.jsx ?? false);
   } catch (error) {
     return Result.err(
-      error instanceof Error ? error : new Error(`Failed to parse source code: ${String(error)}`)
+      error instanceof Error ? error : new Error(`Failed to parse source code: ${String(error)}`),
     );
   }
 

@@ -7,10 +7,16 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Defines the `ArchitectureComparison` fragment shape for side-by-side bounded-context comparisons, including shared/unique dependencies and integration points.
  */
 import { z } from 'zod';
 
+/**
+ * A compact summary of one bounded context — its name, pattern count, member
+ * patterns, and the full set of dependencies it draws on.
+ *
+ * @architect-shape
+ */
 export const BoundedContextSummarySchema = z.strictObject({
   name: z.string(),
   patternCount: z.number().int().nonnegative(),
@@ -18,8 +24,19 @@ export const BoundedContextSummarySchema = z.strictObject({
   allDependencies: z.array(z.string()),
 });
 
+/**
+ * The kind of relationship that links two patterns across bounded contexts.
+ *
+ * @architect-shape
+ */
 export const IntegrationRelationshipSchema = z.enum(['uses', 'dependsOn']);
 
+/**
+ * One cross-context integration point — the source and target patterns, their
+ * respective contexts, and the relationship that connects them.
+ *
+ * @architect-shape
+ */
 export const ArchitectureIntegrationPointSchema = z.strictObject({
   from: z.string(),
   fromContext: z.string(),
@@ -28,6 +45,13 @@ export const ArchitectureIntegrationPointSchema = z.strictObject({
   relationship: IntegrationRelationshipSchema,
 });
 
+/**
+ * A side-by-side comparison of two bounded contexts — their summaries, the
+ * dependencies they share or hold uniquely, and the integration points between
+ * them.
+ *
+ * @architect-shape
+ */
 export const ArchitectureComparisonSchema = z.strictObject({
   kind: z.literal('ArchitectureComparison'),
   context1: BoundedContextSummarySchema,

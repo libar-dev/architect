@@ -14,7 +14,12 @@ import {
   type ProjectionBundle,
   type ProjectionContext,
 } from '../../../../src/index.js';
-import { createPattern, createProjectionContext, createRule } from './support.js';
+import {
+  createPattern,
+  createProjectionContext,
+  createRelationshipEntry,
+  createRule,
+} from './support.js';
 
 interface BusinessRuleProjectionState {
   context: ProjectionContext | null;
@@ -41,7 +46,6 @@ function createBusinessRuleContext(): ProjectionContext {
     patterns: [
       createPattern('ProjectionMigration', {
         patternName: 'ProjectionMigration',
-        phase: 49,
         productArea: 'Delivery Process',
         rules: [
           createRule({
@@ -64,7 +68,6 @@ function createBusinessRuleContext(): ProjectionContext {
       }),
       createPattern('RulesQueryAPI', {
         patternName: 'RulesQueryAPI',
-        phase: 49,
         productArea: 'Data API',
         rules: [
           createRule({
@@ -80,7 +83,7 @@ function createBusinessRuleContext(): ProjectionContext {
 }
 
 function createFilteredBusinessRuleContext(
-  projectionFilter?: ProjectionContext['projectionFilter']
+  projectionFilter?: ProjectionContext['projectionFilter'],
 ): ProjectionContext {
   return createProjectionContext({
     patterns: [
@@ -132,7 +135,7 @@ function createFilteredBusinessRuleContext(
 }
 
 function createExcludedMaturityOverrideContext(
-  projectionFilter?: ProjectionContext['projectionFilter']
+  projectionFilter?: ProjectionContext['projectionFilter'],
 ): ProjectionContext {
   return createProjectionContext({
     patterns: [
@@ -238,36 +241,6 @@ function createPackageGroupedBusinessRuleContext(): ProjectionContext {
   });
 }
 
-function createPhaseGroupedBusinessRuleContextWithUnphasedRule(): ProjectionContext {
-  return createProjectionContext({
-    patterns: [
-      createPattern('PhasedRules', {
-        phase: 49,
-        productArea: 'Projection',
-        rules: [
-          createRule({
-            name: 'Phased rule',
-            description: '**Invariant:** Phase grouping keeps phased rules visible.',
-            scenarioNames: ['Phase grouping rejects unphased rules loudly'],
-            scenarioCount: 1,
-          }),
-        ],
-      }),
-      createPattern('UnphasedRules', {
-        productArea: 'Projection',
-        rules: [
-          createRule({
-            name: 'Unphased rule',
-            description: '**Invariant:** Unphased rules must not disappear during grouping.',
-            scenarioNames: ['Phase grouping rejects unphased rules loudly'],
-            scenarioCount: 1,
-          }),
-        ],
-      }),
-    ],
-  });
-}
-
 function createSourceAgnosticBusinessRuleContext(): ProjectionContext {
   const context = createProjectionContext({
     patterns: [
@@ -319,6 +292,98 @@ function createSourceAgnosticBusinessRuleContext(): ProjectionContext {
   };
 }
 
+function createImplementedByBusinessRuleContext(): ProjectionContext {
+  const reverseLookupFile = 'packages/architect-core/tests/features/read-api/graph-handle.feature';
+  const consistencyFile =
+    'packages/architect-core/tests/features/read-api/graph-handle-consistency.feature';
+
+  return createProjectionContext({
+    patterns: [
+      createPattern('GraphHandle', {
+        file: 'packages/architect-core/src/read-api/graph-handle.ts',
+        productArea: 'Data API',
+      }),
+      createPattern('GraphRelationshipLookupExecutableTests', {
+        file: reverseLookupFile,
+        productArea: 'Data API',
+        implementsPatterns: ['GraphHandle'],
+        rules: [
+          createRule({
+            name: 'Reverse lookup resolves implementers',
+            description: '**Invariant:** Reverse lookup follows implementedBy.',
+            scenarioNames: ['reverse lookup resolves implementers'],
+            scenarioCount: 1,
+          }),
+        ],
+      }),
+      createPattern('GraphFieldConsistencyExecutableTests', {
+        file: consistencyFile,
+        productArea: 'Data API',
+        implementsPatterns: ['GraphHandle'],
+        rules: [
+          createRule({
+            name: 'Status partition is exact',
+            description: '**Invariant:** Status buckets partition the graph.',
+            scenarioNames: ['status partition is exact'],
+            scenarioCount: 1,
+          }),
+        ],
+      }),
+    ],
+    relationshipIndex: {
+      GraphHandle: createRelationshipEntry({
+        implementedBy: [
+          { name: 'GraphRelationshipLookupExecutableTests', file: reverseLookupFile },
+          { name: 'GraphFieldConsistencyExecutableTests', file: consistencyFile },
+        ],
+      }),
+    },
+  });
+}
+
+function createDecisionScopeBusinessRuleContext(): ProjectionContext {
+  return createProjectionContext({
+    patterns: [
+      createPattern('ADR009ProjectionTrustBoundary', {
+        adr: '009',
+        productArea: 'Projection',
+        rules: [
+          createRule({
+            name: 'Parse once at external projection boundaries',
+            description: '**Invariant:** External projection input is parsed exactly once.',
+            scenarioNames: ['parse once at external projection boundaries'],
+            scenarioCount: 1,
+          }),
+        ],
+      }),
+      createPattern('ApiReferenceProjectionExecutableTests', {
+        file: 'packages/architect-projection/tests/features/projections/documentation-composition/api-reference.feature',
+        productArea: 'Projection',
+        enforcesDecisions: ['ADR009ProjectionTrustBoundary'],
+        rules: [
+          createRule({
+            name: 'Sourced shape text is escaped and code fences are guarded',
+            description: '**Invariant:** ADR-009 treats sourced text as untrusted.',
+            scenarioNames: ['sourced shape text is escaped'],
+            scenarioCount: 1,
+          }),
+        ],
+      }),
+      createPattern('UnrelatedRules', {
+        productArea: 'Projection',
+        rules: [
+          createRule({
+            name: 'Unrelated rule',
+            description: '**Invariant:** Unrelated work is not governed by ADR-009.',
+            scenarioNames: ['unrelated'],
+            scenarioCount: 1,
+          }),
+        ],
+      }),
+    ],
+  });
+}
+
 describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   AfterEachScenario(() => {
     state = null;
@@ -341,7 +406,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         'I project the business rule {string} from feature {string}',
         (_ctx: unknown, ruleName: string, featureName: string) => {
           state!.rule = projectBusinessRule(state!.context!, featureName, ruleName)?.root ?? null;
-        }
+        },
       );
 
       Then(
@@ -360,10 +425,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             ],
             scenarioCount: 2,
             pattern: 'ProjectionMigration',
-            phase: 49,
             productArea: 'Delivery Process',
           });
-        }
+        },
       );
     });
 
@@ -382,13 +446,13 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           'I project the business rule {string} from feature {string}',
           (_ctx: unknown, ruleName: string, featureName: string) => {
             state!.rule = projectBusinessRule(state!.context!, featureName, ruleName)?.root ?? null;
-          }
+          },
         );
 
         Then('no business rule bundle should be returned', () => {
           expect(state!.rule).toBeNull();
         });
-      }
+      },
     );
   });
 
@@ -405,7 +469,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             scope: 'all',
             groupedBy: 'product-area',
           });
-        }
+        },
       );
 
       Then('the business rule bundle root should normalize to an all-rules grouping root', () => {
@@ -448,7 +512,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           scopeValue: area,
         });
         expect((state!.bundle?.children['delivery-process'] as BusinessRuleSet).rules).toHaveLength(
-          2
+          2,
         );
       });
 
@@ -481,11 +545,11 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
         Then('parsing business-rule-set options should fail loudly', () => {
           expect(state!.invalidOptionsError).toContain(
-            'Invalid options for parseAndProjectBusinessRuleSet:'
+            'Invalid options for parseAndProjectBusinessRuleSet:',
           );
           expect(state!.invalidOptionsError).toContain('groupedBy');
         });
-      }
+      },
     );
   });
 
@@ -499,7 +563,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'a business rule projection context with active and candidate rule patterns',
             () => {
               state!.context = createFilteredBusinessRuleContext();
-            }
+            },
           );
 
           Then(
@@ -514,20 +578,20 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               expect(filterPattern(committed!, { status: ['active'] })).toBe(true);
               expect(filterPattern(candidate!, { status: ['active'] })).toBe(false);
               expect(filterPattern(committed!, { maturity: ['design'], status: ['active'] })).toBe(
-                true
+                true,
               );
               expect(
-                filterPattern(committed!, { maturity: ['design'], status: ['candidate'] })
+                filterPattern(committed!, { maturity: ['design'], status: ['candidate'] }),
               ).toBe(false);
               expect(
                 filterPatterns(state!.context!.graph.patterns, {
                   maturity: ['idea'],
                   status: ['candidate'],
-                }).map((pattern) => pattern.patternName)
+                }).map((pattern) => pattern.patternName),
               ).toEqual(['CandidateRules']);
-            }
+            },
           );
-        }
+        },
       );
 
       RuleScenario(
@@ -545,7 +609,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 ...context,
                 projectionFilter,
               };
-            }
+            },
           );
 
           When('I project the default business rule set', () => {
@@ -559,9 +623,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 'ActiveIdeaRules',
                 'CommittedRules',
               ]);
-            }
+            },
           );
-        }
+        },
       );
 
       RuleScenario(
@@ -574,7 +638,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 maturity: ['idea'],
                 status: ['candidate'],
               });
-            }
+            },
           );
 
           When('I project the default business rule set', () => {
@@ -586,7 +650,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               'CandidateRules',
             ]);
           });
-        }
+        },
       );
 
       RuleScenario(
@@ -612,9 +676,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'the projected business rule set should include no rules when only the maturity axis is narrowed to idea',
             () => {
               expect(state!.bundle?.root.rules.map((rule) => rule.pattern) ?? []).toEqual([]);
-            }
+            },
           );
-        }
+        },
       );
 
       RuleScenario('explicit override on initially-excluded maturity', ({ Given, When, Then }) => {
@@ -634,7 +698,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           'I project the business rule set with a runtime maturity override for {string}',
           () => {
             state!.bundle = parseAndProjectBusinessRuleSet(state!.context!);
-          }
+          },
         );
 
         Then(
@@ -647,10 +711,10 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             expect(patterns).not.toContain('ExecutableRulesOne');
             expect(patterns).not.toContain('ExecutableRulesTwo');
             expect(patterns).not.toContain('ExecutableRulesThree');
-          }
+          },
         );
       });
-    }
+    },
   );
 
   Rule('Package grouping reuses the package axis at runtime', ({ RuleScenario }) => {
@@ -659,7 +723,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         'a business rule projection context with rules from multiple workspace packages',
         () => {
           state!.context = createPackageGroupedBusinessRuleContext();
-        }
+        },
       );
 
       When('I project the business rule set scoped to all rules and grouped by package', () => {
@@ -703,7 +767,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             scope: 'package',
             scopeValue: pkg,
           });
-        }
+        },
       );
 
       And(
@@ -714,33 +778,188 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             scope: 'package',
             scopeValue: pkg,
           });
-        }
+        },
       );
     });
   });
 
-  Rule('Phase grouping requires every grouped rule to expose a phase', ({ RuleScenario }) => {
-    RuleScenario('Phase grouping rejects unphased rules loudly', ({ Given, When, Then }) => {
-      Given('a business rule projection context with at least one unphased rule', () => {
-        state!.context = createPhaseGroupedBusinessRuleContextWithUnphasedRule();
-      });
-
-      When('I project the business rule set grouped by phase', () => {
-        try {
-          state!.bundle = parseAndProjectBusinessRuleSet(state!.context!, {
-            scope: 'all',
-            groupedBy: 'phase',
-          });
-          state!.invalidOptionsError = null;
-        } catch (error) {
-          state!.invalidOptionsError = error instanceof Error ? error.message : String(error);
-        }
-      });
-
-      Then('grouping business rules by phase should fail loudly', () => {
-        expect(state!.invalidOptionsError).toBe(
-          'Cannot group business rules by phase when one or more projected rules have no phase.'
+  Rule('Feature scope follows the implementedBy reverse edge', ({ RuleScenario }) => {
+    RuleScenario(
+      "Feature scope aggregates the implementing features' rules",
+      ({ Given, When, Then }) => {
+        Given(
+          'a business rule projection context where a TS pattern is realized by two rule-owning features',
+          () => {
+            state!.context = createImplementedByBusinessRuleContext();
+          },
         );
+
+        When(
+          'I project the business rule set scoped to feature {string}',
+          (_ctx: unknown, scopeValue: string) => {
+            state!.bundle = parseAndProjectBusinessRuleSet(state!.context!, {
+              scope: 'feature',
+              scopeValue,
+            });
+          },
+        );
+
+        Then(
+          "the projected rules should include the implementing features' rules with owning-feature provenance",
+          () => {
+            const rules = state!.bundle?.root.rules ?? [];
+            const byFeature = rules.map((rule) => ({
+              feature: rule.feature,
+              ruleName: rule.ruleName,
+            }));
+            expect(byFeature).toEqual(
+              expect.arrayContaining([
+                {
+                  feature: 'GraphRelationshipLookupExecutableTests',
+                  ruleName: 'Reverse lookup resolves implementers',
+                },
+                {
+                  feature: 'GraphFieldConsistencyExecutableTests',
+                  ruleName: 'Status partition is exact',
+                },
+              ]),
+            );
+            expect(rules).toHaveLength(2);
+          },
+        );
+      },
+    );
+
+    RuleScenario(
+      'Feature scope on a rule-owning feature returns its own rules',
+      ({ Given, When, Then }) => {
+        Given(
+          'a business rule projection context where a TS pattern is realized by two rule-owning features',
+          () => {
+            state!.context = createImplementedByBusinessRuleContext();
+          },
+        );
+
+        When(
+          'I project the business rule set scoped to feature {string}',
+          (_ctx: unknown, scopeValue: string) => {
+            state!.bundle = parseAndProjectBusinessRuleSet(state!.context!, {
+              scope: 'feature',
+              scopeValue,
+            });
+          },
+        );
+
+        Then("the projected rules should be exactly that feature's own rules", () => {
+          const rules = state!.bundle?.root.rules ?? [];
+          expect(rules.map((rule) => ({ feature: rule.feature, ruleName: rule.ruleName }))).toEqual(
+            [
+              {
+                feature: 'GraphRelationshipLookupExecutableTests',
+                ruleName: 'Reverse lookup resolves implementers',
+              },
+            ],
+          );
+        });
+      },
+    );
+  });
+
+  Rule('Decision scope aggregates rules across enforcing patterns', ({ RuleScenario }) => {
+    RuleScenario(
+      'Decision scope aggregates enforcing and own rules',
+      ({ Given, When, Then, And }) => {
+        Given(
+          'a business rule projection context with a decision record and an enforcing pattern',
+          () => {
+            state!.context = createDecisionScopeBusinessRuleContext();
+          },
+        );
+
+        When(
+          'I project the business rule set scoped to decision {string}',
+          (_ctx: unknown, scopeValue: string) => {
+            state!.bundle = parseAndProjectBusinessRuleSet(state!.context!, {
+              scope: 'decision',
+              scopeValue,
+            });
+          },
+        );
+
+        Then(
+          "the projected rules should include both the decision's own rule and the enforcing pattern's rule",
+          () => {
+            const ruleNames = (state!.bundle?.root.rules ?? []).map((rule) => rule.ruleName);
+            expect(ruleNames).toEqual(
+              expect.arrayContaining([
+                'Parse once at external projection boundaries',
+                'Sourced shape text is escaped and code fences are guarded',
+              ]),
+            );
+          },
+        );
+
+        And('the decision-scoped bundle root should round-trip through the Fragment schema', () => {
+          expect(state!.bundle?.root.scope).toBe('decision');
+          const rendered = renderJson(state!.bundle!.root);
+          expect(FragmentSchema.safeParse(rendered).success).toBe(true);
+        });
+      },
+    );
+
+    RuleScenario('Decision scope accepts the human ADR id form', ({ Given, When, Then }) => {
+      Given(
+        'a business rule projection context with a decision record and an enforcing pattern',
+        () => {
+          state!.context = createDecisionScopeBusinessRuleContext();
+        },
+      );
+
+      When(
+        'I project the business rule set scoped to decision {string}',
+        (_ctx: unknown, scopeValue: string) => {
+          state!.bundle = parseAndProjectBusinessRuleSet(state!.context!, {
+            scope: 'decision',
+            scopeValue,
+          });
+        },
+      );
+
+      Then(
+        "the projected rules should include both the decision's own rule and the enforcing pattern's rule",
+        () => {
+          const ruleNames = (state!.bundle?.root.rules ?? []).map((rule) => rule.ruleName);
+          expect(ruleNames).toEqual(
+            expect.arrayContaining([
+              'Parse once at external projection boundaries',
+              'Sourced shape text is escaped and code fences are guarded',
+            ]),
+          );
+        },
+      );
+    });
+
+    RuleScenario('Decision scope excludes unrelated rules', ({ Given, When, Then }) => {
+      Given(
+        'a business rule projection context with a decision record and an enforcing pattern',
+        () => {
+          state!.context = createDecisionScopeBusinessRuleContext();
+        },
+      );
+
+      When(
+        'I project the business rule set scoped to decision {string}',
+        (_ctx: unknown, scopeValue: string) => {
+          state!.bundle = parseAndProjectBusinessRuleSet(state!.context!, {
+            scope: 'decision',
+            scopeValue,
+          });
+        },
+      );
+
+      Then("the projected rules should exclude the unrelated pattern's rule", () => {
+        const ruleNames = (state!.bundle?.root.rules ?? []).map((rule) => rule.ruleName);
+        expect(ruleNames).not.toContain('Unrelated rule');
       });
     });
   });
@@ -753,7 +972,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           'a business rule projection context with decision spec and executable rule carriers',
           () => {
             state!.context = createSourceAgnosticBusinessRuleContext();
-          }
+          },
         );
 
         When('I project the default business rule set', () => {
@@ -764,12 +983,12 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           'the projected business rules should stay source-agnostic after identity fields are removed',
           () => {
             const normalized = state!.bundle!.root.rules.map(
-              ({ feature: _feature, pattern: _pattern, ruleName: _ruleName, ...rule }) => rule
+              ({ feature: _feature, pattern: _pattern, ruleName: _ruleName, ...rule }) => rule,
             );
             expect(normalized).toEqual([normalized[0], normalized[0], normalized[0]]);
-          }
+          },
         );
-      }
+      },
     );
   });
 });

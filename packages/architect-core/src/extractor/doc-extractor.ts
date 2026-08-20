@@ -4,6 +4,7 @@
  * @architect-status active
  * @architect-role:service
  * @architect-bounded-context:extractor
+ * @architect-uses ShapeExtractor, ExportInfoContract
  *
  * ## DocExtractor - JSDoc Directive Extraction
  *
@@ -30,10 +31,11 @@ import type {
 import { Result } from '../types/index.js';
 import { asPatternId, asSourceFilePath, createPatternValidationError } from '../types/index.js';
 import {
-  ExtractedPatternSchema,
+  ExtractedPatternDraftSchema,
   createDefaultTagRegistry,
-  type TagRegistry,
 } from '../validation-schemas/index.js';
+import { BoundaryParseError, parseAtBoundary } from '../validation/boundary.js';
+import { resolveCanonicalRole, type TagRegistry } from '../validation-schemas/tag-registry.js';
 import { generatePatternId } from '../utils/index.js';
 import { inferMaturity } from '../taxonomy/index.js';
 import {
@@ -50,35 +52,7 @@ export interface ExtractionResults {
   readonly diagnostics: readonly ExtractionDiagnostic[];
 }
 
-interface RoleLike {
-  readonly tag: string;
-  readonly aliases?: readonly string[];
-}
-
-function buildRoleLookup(roles: readonly RoleLike[]): {
-  readonly canonical: ReadonlyMap<string, string>;
-  readonly aliases: ReadonlyMap<string, string>;
-} {
-  const canonical = new Map<string, string>();
-  const aliases = new Map<string, string>();
-  for (const role of roles) {
-    canonical.set(role.tag, role.tag);
-    for (const alias of role.aliases ?? []) aliases.set(alias, role.tag);
-  }
-  return { canonical, aliases };
-}
-
-function resolveCanonicalRole(
-  rawValue: string | undefined,
-  roles: readonly RoleLike[]
-): string | undefined {
-  if (rawValue === undefined) return undefined;
-  const lookup = buildRoleLookup(roles);
-  if (lookup.canonical.has(rawValue)) return rawValue;
-  return lookup.aliases.get(rawValue);
-}
-
-function createRoleValuesSuggestion(roles: readonly RoleLike[]): string {
+function createRoleValuesSuggestion(roles: TagRegistry['roles']): string {
   return roles
     .map((role) => role.tag)
     .filter((value, index, values) => values.indexOf(value) === index)
@@ -89,14 +63,14 @@ function collectRoleDiagnostics(
   directive: DocDirective,
   patternRole: string | undefined,
   registry: TagRegistry,
-  filePath: string
+  filePath: string,
 ): ExtractionDiagnostic[] {
   const diagnostics: ExtractionDiagnostic[] = [];
   const validRoleValues = createRoleValuesSuggestion(registry.roles);
   const canonicalRoleTagPrefix = `${registry.tagPrefix}role`;
 
   const canonicalRoleTags = directive.tags.filter(
-    (tag) => tag === canonicalRoleTagPrefix || tag.startsWith(`${canonicalRoleTagPrefix}:`)
+    (tag) => tag === canonicalRoleTagPrefix || tag.startsWith(`${canonicalRoleTagPrefix}:`),
   );
   if (canonicalRoleTags.length > 1) {
     diagnostics.push(
@@ -104,8 +78,8 @@ function collectRoleDiagnostics(
         filePath,
         'invalid-enum-value',
         `Multiple @architect-role tags found; using the first value and ignoring ${String(canonicalRoleTags.length - 1)} duplicate tag(s)`,
-        'Keep exactly one @architect-role tag'
-      )
+        'Keep exactly one @architect-role tag',
+      ),
     );
   }
 
@@ -115,8 +89,8 @@ function collectRoleDiagnostics(
         filePath,
         'invalid-enum-value',
         `Unrecognized value '${directive.role}' for @architect-role`,
-        `Valid values: ${validRoleValues}`
-      )
+        `Valid values: ${validRoleValues}`,
+      ),
     );
   }
 
@@ -127,9 +101,9 @@ function collectRoleDiagnostics(
 
     if (normalized.startsWith('arch-role:')) {
       const value = normalized.substring('arch-role:'.length);
-      const canonicalRole = resolveCanonicalRole(value, registry.roles) ?? value;
+      const canonicalRole = resolveCanonicalRole(registry, value) ?? value;
       diagnostics.push(
-        createDeprecatedTagDiagnostic(filePath, deprecatedTag, `@architect-role:${canonicalRole}`)
+        createDeprecatedTagDiagnostic(filePath, deprecatedTag, `@architect-role:${canonicalRole}`),
       );
       continue;
     }
@@ -140,8 +114,8 @@ function collectRoleDiagnostics(
         createDeprecatedTagDiagnostic(
           filePath,
           deprecatedTag,
-          `@architect-bounded-context:${value}`
-        )
+          `@architect-bounded-context:${value}`,
+        ),
       );
       continue;
     }
@@ -151,10 +125,10 @@ function collectRoleDiagnostics(
       continue;
     }
 
-    const canonicalRole = resolveCanonicalRole(normalized, registry.roles);
+    const canonicalRole = resolveCanonicalRole(registry, normalized);
     if (canonicalRole !== undefined) {
       diagnostics.push(
-        createDeprecatedTagDiagnostic(filePath, deprecatedTag, `@architect-role:${canonicalRole}`)
+        createDeprecatedTagDiagnostic(filePath, deprecatedTag, `@architect-role:${canonicalRole}`),
       );
     }
   }
@@ -165,7 +139,7 @@ function collectRoleDiagnostics(
 export function extractPatterns(
   scannedFiles: readonly ScannedFile[],
   baseDir: string,
-  registry?: TagRegistry
+  registry?: TagRegistry,
 ): ExtractionResults {
   const patterns: ExtractedPattern[] = [];
   const errors: PatternValidationError[] = [];
@@ -180,7 +154,7 @@ export function extractPatterns(
         item.exports,
         scannedFile.filePath,
         baseDir,
-        effectiveRegistry
+        effectiveRegistry,
       );
 
       if (Result.isOk(result)) {
@@ -190,16 +164,16 @@ export function extractPatterns(
             item.directive,
             result.value.role,
             effectiveRegistry,
-            path.relative(baseDir, scannedFile.filePath)
-          )
+            path.relative(baseDir, scannedFile.filePath),
+          ),
         );
       } else {
         errors.push(result.error);
         diagnostics.push(
           ...createPatternContractDiagnostics(
             path.relative(baseDir, scannedFile.filePath),
-            result.error.validationErrors ?? []
-          )
+            result.error.validationErrors ?? [],
+          ),
         );
       }
     }
@@ -214,12 +188,12 @@ export function buildPattern(
   exports: readonly ExportInfo[],
   filePath: string,
   baseDir: string,
-  registry: TagRegistry
+  registry: TagRegistry,
 ): Result<ExtractedPattern, PatternValidationError> {
   const relativePath = path.relative(baseDir, filePath);
   const id = asPatternId(generatePatternId(relativePath, directive.position.startLine));
   const name = inferPatternName(directive, exports, registry);
-  const role = resolveCanonicalRole(directive.role, registry.roles);
+  const role = resolveCanonicalRole(registry, directive.role);
 
   let extractedShapes: ExtractedPattern['extractedShapes'];
   const extractionWarnings: string[] = [];
@@ -231,7 +205,7 @@ export function buildPattern(
       sourceContent = fs.readFileSync(filePath, 'utf-8');
     } catch (error) {
       extractionWarnings.push(
-        `[shape-extraction] Failed to read file: ${filePath} - ${error instanceof Error ? error.message : String(error)}`
+        `[shape-extraction] Failed to read file: ${filePath} - ${error instanceof Error ? error.message : String(error)}`,
       );
     }
 
@@ -267,11 +241,8 @@ export function buildPattern(
     ...(directive.unlockReason !== undefined && { unlockReason: directive.unlockReason }),
     status,
     ...(directive.boundedContext !== undefined && { boundedContext: directive.boundedContext }),
-    ...(directive.useCases !== undefined &&
-      directive.useCases.length > 0 && { useCases: directive.useCases }),
     ...(directive.whenToUse !== undefined && { whenToUse: directive.whenToUse }),
     ...(directive.uses !== undefined && directive.uses.length > 0 && { uses: directive.uses }),
-    ...(directive.phase !== undefined && { phase: directive.phase }),
     ...(directive.level !== undefined && { level: directive.level }),
     ...(directive.parent !== undefined && { parent: directive.parent }),
     ...(directive.implements !== undefined &&
@@ -279,10 +250,11 @@ export function buildPattern(
     ...(directive.extends !== undefined && { extendsPattern: directive.extends }),
     ...(directive.seeAlso !== undefined &&
       directive.seeAlso.length > 0 && { seeAlso: directive.seeAlso }),
+    ...(directive.enforcesDecisions !== undefined &&
+      directive.enforcesDecisions.length > 0 && { enforcesDecisions: directive.enforcesDecisions }),
     ...(directive.apiRef !== undefined &&
       directive.apiRef.length > 0 && { apiRef: directive.apiRef }),
     ...(directive.target !== undefined && { targetPath: directive.target }),
-    ...(directive.since !== undefined && { since: directive.since }),
     ...(directive.executableSpecs !== undefined &&
       directive.executableSpecs.length > 0 && { executableSpecs: directive.executableSpecs }),
     ...(directive.include !== undefined &&
@@ -293,25 +265,36 @@ export function buildPattern(
       directive.convention.length > 0 && { convention: directive.convention }),
   };
 
-  const validation = ExtractedPatternSchema.safeParse(pattern);
-  if (!validation.success) {
+  try {
+    const validatedPattern = parseAtBoundary(
+      ExtractedPatternDraftSchema,
+      pattern,
+      `ExtractedPatternDraft validation failed for ${relativePath}`,
+    );
+    return Result.ok(validatedPattern);
+  } catch (error: unknown) {
+    if (!(error instanceof BoundaryParseError)) {
+      throw error;
+    }
+
     return Result.err(
       createPatternValidationError(
         asSourceFilePath(relativePath),
         name,
         'Pattern validation failed',
-        validation.error.issues.map((issue) => `${issue.path.join('.')}: ${issue.message}`)
-      )
+        error.details.map((detail) => {
+          const pathLabel = detail.path.length > 0 ? detail.path.join('.') : 'pattern';
+          return `${pathLabel}: expected ${detail.expected}, received ${detail.received}`;
+        }),
+      ),
     );
   }
-
-  return Result.ok(validation.data);
 }
 
 export function inferPatternName(
   directive: DocDirective,
   exports: readonly ExportInfo[],
-  registry: TagRegistry
+  registry: TagRegistry,
 ): string {
   if (directive.patternName) return directive.patternName;
 
@@ -332,7 +315,7 @@ export function inferPatternName(
 export function hasAggregationTag(
   tags: readonly string[],
   aggregationTagName: string,
-  registry: TagRegistry
+  registry: TagRegistry,
 ): boolean {
   const aggregationTag = registry.aggregationTags.find((tag) => tag.tag === aggregationTagName);
   if (!aggregationTag) return false;
@@ -348,7 +331,7 @@ export interface AggregationTags {
 
 export function getAggregationTags(
   tags: readonly string[],
-  registry: TagRegistry
+  registry: TagRegistry,
 ): AggregationTags {
   return {
     overview: hasAggregationTag(tags, 'overview', registry),

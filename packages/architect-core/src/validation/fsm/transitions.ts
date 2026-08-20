@@ -5,14 +5,10 @@
  * @architect-status active
  * @architect-role:read-model
  * @architect-bounded-context:validation
- *
- * ### When to Use
- *
- * - As a typed contract / data shape consumed by projection or render layers.
  */
 
 import type { ProcessStatusValue } from '../../taxonomy/index.js';
-import type { TagRegistry } from '../../config/tag-registry-contract.js';
+import type { TagRegistry } from '../../validation-schemas/tag-registry.js';
 import { DEFAULT_TAG_PREFIX } from '../../config/defaults.js';
 
 export interface TransitionMessageOptions {
@@ -24,7 +20,7 @@ export const VALID_TRANSITIONS: Readonly<
 > = {
   roadmap: ['active', 'deferred'],
   active: ['completed', 'roadmap'],
-  completed: [],
+  completed: ['active', 'roadmap'],
   deferred: ['roadmap'],
 } as const;
 
@@ -39,12 +35,15 @@ export function getValidTransitionsFrom(status: ProcessStatusValue): readonly Pr
 export function getTransitionErrorMessage(
   from: ProcessStatusValue,
   to: ProcessStatusValue,
-  options?: TransitionMessageOptions
+  options?: TransitionMessageOptions,
 ): string {
   const tagPrefix = options?.registry?.tagPrefix ?? DEFAULT_TAG_PREFIX;
 
+  // completed → active / completed → roadmap are valid reopen transitions (PDR-006),
+  // so this branch only fires for targets that remain invalid from completed
+  // (e.g. completed → completed, completed → deferred).
   if (from === 'completed') {
-    return `Cannot transition from 'completed' (terminal state). Use ${tagPrefix}unlock-reason to modify.`;
+    return `Cannot transition from 'completed' to '${to}'. Reopen to 'active' or 'roadmap'; use ${tagPrefix}unlock-reason to record intent.`;
   }
 
   if (from === 'roadmap' && to === 'completed') {

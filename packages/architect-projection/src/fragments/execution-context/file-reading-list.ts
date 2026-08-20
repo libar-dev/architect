@@ -5,12 +5,17 @@
  * @architect-role:contract
  * @architect-bounded-context:execution-context
  *
- * ### When to Use
- *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * Defines the `FileReadingList` fragment shape for the primary, dependency, and neighbor files used to read a pattern.
  */
 import { z } from 'zod';
 
+/**
+ * Fragment shape for the files an agent should read to understand a pattern —
+ * the pattern's own primary files plus its completed dependencies, roadmap
+ * dependencies, and architecture neighbors.
+ *
+ * @architect-shape
+ */
 export const FileReadingListSchema = z.strictObject({
   kind: z.literal('FileReadingList'),
   pattern: z.string(),

@@ -108,7 +108,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
           And('the error message should contain {string}', () => {
             expect(state!.error!.message).toContain(expected_text);
           });
-        }
+        },
       );
 
       RuleScenario(
@@ -120,9 +120,9 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
               state!.error = createFileSystemError(
                 file,
                 reason as FileSystemError['reason'],
-                new Error(originalErrorMsg)
+                new Error(originalErrorMsg),
               );
-            }
+            },
           );
 
           Then('the error should have originalError', () => {
@@ -134,9 +134,9 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
             (_ctx: unknown, text: string) => {
               const originalError = (state!.error as FileSystemError).originalError as Error;
               expect(originalError.message).toContain(text);
-            }
+            },
           );
-        }
+        },
       );
 
       RuleScenario(
@@ -146,15 +146,15 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
             'I create a FileSystemError for {string} with reason {string}',
             (_ctx: unknown, file: string, reason: string) => {
               state!.error = createFileSystemError(file, reason as FileSystemError['reason']);
-            }
+            },
           );
 
           Then('the error should not have originalError property', () => {
             expect(Object.prototype.hasOwnProperty.call(state!.error, 'originalError')).toBe(false);
           });
-        }
+        },
       );
-    }
+    },
   );
 
   // ===========================================================================
@@ -171,7 +171,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
             'I create a DirectiveValidationError for {string} at line {int} with reason {string}',
             (_ctx: unknown, file: string, line: number, reason: string) => {
               state!.error = createDirectiveValidationError(file, line, reason);
-            }
+            },
           );
 
           Then('the error type should be {string}', (_ctx: unknown, expectedType: string) => {
@@ -193,7 +193,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
           And('the error message should contain {string}', (_ctx: unknown, text: string) => {
             expect(state!.error!.message).toContain(text);
           });
-        }
+        },
       );
 
       RuleScenario(
@@ -203,13 +203,13 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
             'I create a DirectiveValidationError with directive {string}',
             (_ctx: unknown, directive: string) => {
               state!.error = createDirectiveValidationError('test.ts', 1, 'Invalid', directive);
-            }
+            },
           );
 
           Then('the error should have directive {string}', (_ctx: unknown, directive: string) => {
             expect((state!.error as DirectiveValidationError).directive).toBe(directive);
           });
-        }
+        },
       );
 
       RuleScenario(
@@ -222,9 +222,9 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
           Then('the error should not have directive property', () => {
             expect(Object.prototype.hasOwnProperty.call(state!.error, 'directive')).toBe(false);
           });
-        }
+        },
       );
-    }
+    },
   );
 
   // ===========================================================================
@@ -243,9 +243,9 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
               state!.error = createPatternValidationError(
                 asSourceFilePath(file),
                 patternName,
-                reason
+                reason,
               );
-            }
+            },
           );
 
           Then('the error type should be {string}', (_ctx: unknown, expectedType: string) => {
@@ -262,9 +262,9 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
               for (const row of table) {
                 expect(state!.error!.message).toContain(row['text']!);
               }
-            }
+            },
           );
-        }
+        },
       );
 
       RuleScenario(
@@ -278,26 +278,26 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
                 asSourceFilePath('test.ts'),
                 'TestPattern',
                 'Invalid',
-                errors
+                errors,
               );
-            }
+            },
           );
 
           Then(
             'the error validationErrors should have {int} items',
             (_ctx: unknown, count: number) => {
               expect((state!.error as PatternValidationError).validationErrors).toHaveLength(count);
-            }
+            },
           );
 
           And('validationErrors should contain all:', (_ctx: unknown, table: DataTableRow[]) => {
             for (const row of table) {
               expect((state!.error as PatternValidationError).validationErrors).toContain(
-                row['error']!
+                row['error']!,
               );
             }
           });
-        }
+        },
       );
 
       RuleScenario(
@@ -307,18 +307,18 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
             state!.error = createPatternValidationError(
               asSourceFilePath('test.ts'),
               'TestPattern',
-              'Invalid'
+              'Invalid',
             );
           });
 
           Then('the error should not have validationErrors property', () => {
             expect(Object.prototype.hasOwnProperty.call(state!.error, 'validationErrors')).toBe(
-              false
+              false,
             );
           });
-        }
+        },
       );
-    }
+    },
   );
 
   // ===========================================================================
@@ -335,7 +335,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
             'I create a ProcessMetadataValidationError for {string} with reason {string}',
             (_ctx: unknown, file: string, reason: string) => {
               state!.error = createProcessMetadataValidationError(file, reason);
-            }
+            },
           );
 
           Then('the error type should be {string}', (_ctx: unknown, expectedType: string) => {
@@ -353,7 +353,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
           And('the error message should contain {string}', (_ctx: unknown, text: string) => {
             expect(state!.error!.message).toContain(text);
           });
-        }
+        },
       );
 
       RuleScenario(
@@ -366,28 +366,28 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
               state!.error = createProcessMetadataValidationError(
                 'test.feature',
                 'Invalid',
-                errors
+                errors,
               );
-            }
+            },
           );
 
           Then(
             'the error validationErrors should have {int} items',
             (_ctx: unknown, count: number) => {
               expect(
-                (state!.error as ProcessMetadataValidationError).validationErrors
+                (state!.error as ProcessMetadataValidationError).validationErrors,
               ).toHaveLength(count);
-            }
+            },
           );
 
           And('validationErrors should contain {string}', (_ctx: unknown, error: string) => {
             expect((state!.error as ProcessMetadataValidationError).validationErrors).toContain(
-              error
+              error,
             );
           });
-        }
+        },
       );
-    }
+    },
   );
 
   // ===========================================================================
@@ -404,7 +404,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
             'I create a DeliverableValidationError for {string} with reason {string}',
             (_ctx: unknown, file: string, reason: string) => {
               state!.error = createDeliverableValidationError(file, reason);
-            }
+            },
           );
 
           Then('the error type should be {string}', (_ctx: unknown, expectedType: string) => {
@@ -418,7 +418,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
           And('the error reason should be {string}', (_ctx: unknown, reason: string) => {
             expect((state!.error as DeliverableValidationError).reason).toBe(reason);
           });
-        }
+        },
       );
 
       RuleScenario(
@@ -428,7 +428,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
             'I create a DeliverableValidationError for deliverable {string}',
             (_ctx: unknown, name: string) => {
               state!.error = createDeliverableValidationError('test.feature', 'Invalid', name);
-            }
+            },
           );
 
           Then('the error deliverableName should be {string}', (_ctx: unknown, name: string) => {
@@ -438,7 +438,7 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
           And('the error message should contain {string}', (_ctx: unknown, text: string) => {
             expect(state!.error!.message).toContain(text);
           });
-        }
+        },
       );
 
       RuleScenario(
@@ -450,10 +450,10 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
 
           Then('the error should not have deliverableName property', () => {
             expect(Object.prototype.hasOwnProperty.call(state!.error, 'deliverableName')).toBe(
-              false
+              false,
             );
           });
-        }
+        },
       );
 
       RuleScenario(
@@ -467,21 +467,21 @@ describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
                 'test.feature',
                 'Invalid',
                 undefined,
-                errors
+                errors,
               );
-            }
+            },
           );
 
           Then(
             'the error validationErrors should have {int} items',
             (_ctx: unknown, count: number) => {
               expect((state!.error as DeliverableValidationError).validationErrors).toHaveLength(
-                count
+                count,
               );
-            }
+            },
           );
-        }
+        },
       );
-    }
+    },
   );
 });

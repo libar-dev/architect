@@ -15,7 +15,7 @@ interface SmokeState {
 }
 
 const feature = await loadFeature(
-  'tests/features/projections/delivery-reporting/smoke-status-distribution.feature'
+  'tests/features/projections/delivery-reporting/smoke-status-distribution.feature',
 );
 
 let state: SmokeState | null = null;
@@ -42,12 +42,12 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             () => {
               state!.context = createProjectionContext({
                 patterns: [
-                  createPattern('ActiveService', { status: 'active', phase: 1 }),
-                  createPattern('CompletedService', { status: 'completed', phase: 1 }),
-                  createPattern('PlannedService', { status: 'roadmap', phase: 2 }),
+                  createPattern('ActiveService', { status: 'active' }),
+                  createPattern('CompletedService', { status: 'completed' }),
+                  createPattern('PlannedService', { status: 'roadmap' }),
                 ],
               });
-            }
+            },
           );
 
           When('I project the status distribution', () => {
@@ -64,8 +64,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             expect(state!.result!.counts.planned).toBe(1);
             expect(state!.result!.counts.total).toBe(3);
           });
-        }
+        },
       );
-    }
+    },
   );
 });

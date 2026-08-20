@@ -79,7 +79,7 @@ The MCP server:
 
 1. **Loads the pipeline once** — config detection, scanning, extraction, transformation (~1-2s)
 2. **Keeps PatternGraph in memory** — all subsequent queries are O(1) lookups
-3. **Exposes 18 focused tools** — the current core workflow surface, not the historical full monolith
+3. **Exposes 21 focused tools** — the current split-runtime workflow surface, not the historical 25-tool monolith
 4. **Optionally watches files** — auto-rebuilds on source changes (500ms debounce)
 
 ## Available Tools
@@ -95,9 +95,12 @@ The MCP server:
 | `architect_handoff`           | Session-end state for continuity                   |
 | `architect_status`            | Status counts and completion percentage            |
 | `architect_pattern`           | Full pattern metadata                              |
+| `architect_bundle`            | Composite bundle for a pattern and its members     |
 | `architect_list`              | List patterns with filters (status, role)          |
+| `architect_open_questions`    | Patterns with extracted open questions             |
 | `architect_search`            | Fuzzy search patterns by name                      |
 | `architect_rules`             | Business rules and invariants                      |
+| `architect_taxonomy`          | Current taxonomy digest and tag metadata           |
 | `architect_arch_neighborhood` | Pattern neighborhood, declared uses, and peers     |
 | `architect_arch_blocking`     | Patterns blocked by dependencies                   |
 | `architect_rebuild`           | Force dataset rebuild                              |
@@ -105,10 +108,10 @@ The MCP server:
 | `architect_documentation`     | Structured documentation view for a supported type |
 | `architect_help`              | List all tools                                     |
 
-The split runtime intentionally keeps the tool surface small and workflow-first.
+The split runtime intentionally keeps the tool surface workflow-first.
 If you need a lower-level or package-specific detail that is not in this list,
-use the CLI subcommands instead of assuming the older 25-tool surface still
-exists.
+use the CLI subcommands instead of assuming the historical 25-tool monolith
+surface still exists.
 
 ## CLI Options
 

@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { performance } from 'node:perf_hooks';
 
@@ -23,6 +23,7 @@ import {
   parseAndProjectScopeReadinessReport,
   parseAndProjectSessionContext,
   renderJson,
+  renderMarkdown,
   type ProjectionContext,
 } from '../../../src/index.js';
 import { createTestPackageResolver } from '../../support/test-package-resolver.js';
@@ -51,14 +52,8 @@ const BOUNDED_CONTEXTS = [
 
 const ARCH_LAYERS = ['domain', 'application', 'interface', 'infrastructure'] as const;
 const STATUSES = ['active', 'completed', 'roadmap'] as const;
-const PRIORITIES = ['P0', 'P1', 'P2'] as const;
-const QUARTERS = ['2026-Q1', '2026-Q2', '2026-Q3', '2026-Q4'] as const;
 const TEAMS = ['core-platform', 'projection-runtime', 'docs-foundation'] as const;
-const EFFORTS = ['small', 'medium', 'large'] as const;
-const EFFORT_ACTUALS = ['small', 'medium', 'large'] as const;
-const USER_ROLES = ['maintainer', 'operator', 'reviewer'] as const;
 const WORKFLOWS = ['implementation', 'verification', 'handoff'] as const;
-const RISKS = ['low', 'medium', 'high'] as const;
 
 const COVERAGE_REQUIRED_TAGS: TagRegistry['metadataTags'] = [
   {
@@ -82,39 +77,9 @@ const COVERAGE_REQUIRED_TAGS: TagRegistry['metadataTags'] = [
     values: [...ARCH_LAYERS],
   },
   {
-    tag: 'phase',
-    format: 'number',
-    purpose: 'Tracks phase coverage.',
-    required: true,
-  },
-  {
-    tag: 'priority',
-    format: 'value',
-    purpose: 'Records priority coverage.',
-    required: true,
-  },
-  {
-    tag: 'quarter',
-    format: 'value',
-    purpose: 'Records roadmap quarter coverage.',
-    required: true,
-  },
-  {
     tag: 'team',
     format: 'value',
     purpose: 'Records owning team coverage.',
-    required: true,
-  },
-  {
-    tag: 'effort',
-    format: 'value',
-    purpose: 'Records estimated effort coverage.',
-    required: true,
-  },
-  {
-    tag: 'effort-actual',
-    format: 'value',
-    purpose: 'Records actual effort coverage.',
     required: true,
   },
   {
@@ -124,52 +89,15 @@ const COVERAGE_REQUIRED_TAGS: TagRegistry['metadataTags'] = [
     required: true,
   },
   {
-    tag: 'user-role',
-    format: 'value',
-    purpose: 'Records user-role coverage.',
-    required: true,
-  },
-  {
-    tag: 'business-value',
-    format: 'quoted-value',
-    purpose: 'Records business-value coverage.',
-    required: true,
-  },
-  {
     tag: 'workflow',
     format: 'value',
     purpose: 'Records workflow coverage.',
     required: true,
   },
   {
-    tag: 'risk',
-    format: 'enum',
-    purpose: 'Records risk coverage.',
-    required: true,
-    values: [...RISKS],
-  },
-  {
-    tag: 'release',
-    format: 'value',
-    purpose: 'Records release coverage.',
-    required: true,
-  },
-  {
-    tag: 'completed',
-    format: 'value',
-    purpose: 'Records completion timestamp coverage.',
-    required: true,
-  },
-  {
     tag: 'target-path',
     format: 'value',
     purpose: 'Records implementation target-path coverage.',
-    required: true,
-  },
-  {
-    tag: 'since',
-    format: 'value',
-    purpose: 'Records introduction-version coverage.',
     required: true,
   },
   {
@@ -260,39 +188,38 @@ interface BusinessRuleSetPerfFixture {
 
 interface PerfPatternOptions {
   readonly patternName: string;
+  readonly title?: string;
   readonly status: ExtractedPattern['status'];
   readonly role: ExtractedPattern['role'];
-  readonly phase: ExtractedPattern['phase'];
   readonly file: string;
   readonly productArea: ExtractedPattern['productArea'];
   readonly boundedContext: ExtractedPattern['boundedContext'];
   readonly adrLayer: ExtractedPattern['adrLayer'];
-  readonly quarter: ExtractedPattern['quarter'];
-  readonly release: ExtractedPattern['release'];
-  readonly completed: ExtractedPattern['completed'];
-  readonly userRole: ExtractedPattern['userRole'];
-  readonly businessValue: ExtractedPattern['businessValue'];
   readonly team: ExtractedPattern['team'];
-  readonly effort: ExtractedPattern['effort'];
-  readonly effortActual: ExtractedPattern['effortActual'];
-  readonly priority: ExtractedPattern['priority'];
   readonly targetPath: ExtractedPattern['targetPath'];
   readonly uses: ExtractedPattern['uses'];
   readonly dependsOn: readonly string[];
   readonly usedBy: readonly string[];
   readonly enables: readonly string[];
   readonly implementsPatterns: ExtractedPattern['implementsPatterns'];
-  readonly useCases: readonly string[];
   readonly seeAlso: ExtractedPattern['seeAlso'];
   readonly apiRef: ExtractedPattern['apiRef'];
   readonly workflow: string;
-  readonly risk: string;
-  readonly since: string;
   readonly rules: readonly ReturnType<typeof createRule>[];
+  readonly adr?: string;
+  readonly adrStatus?: ExtractedPattern['adrStatus'];
+  readonly adrCategory?: ExtractedPattern['adrCategory'];
 }
 
 type ProjectionMeasure = (context: ProjectionContext) => unknown;
 type AsyncMeasure = () => Promise<unknown>;
+
+const RENDER_MARKDOWN_DOCUMENT_TYPES = [
+  'patterns',
+  'decisions',
+  'requirements-executable',
+] as const;
+type RenderMarkdownDocumentType = (typeof RENDER_MARKDOWN_DOCUMENT_TYPES)[number];
 
 let state: PerfReportState = {
   reportPath: null,
@@ -301,51 +228,45 @@ let state: PerfReportState = {
 function createBusinessRuleSetPerfContext(): BusinessRuleSetPerfFixture {
   const patternNames = Array.from(
     { length: 36 },
-    (_, patternIndex) => `BusinessRulePerfPattern${String(patternIndex + 1).padStart(2, '0')}`
+    (_, patternIndex) => `BusinessRulePerfPattern${String(patternIndex + 1).padStart(2, '0')}`,
   );
   const tagRegistry = createProjectionPerfTagRegistry();
   const patterns = patternNames.map((patternName, patternIndex) => {
     const productArea = PRODUCT_AREAS[patternIndex % PRODUCT_AREAS.length]!;
     const boundedContext = BOUNDED_CONTEXTS[patternIndex % BOUNDED_CONTEXTS.length]!;
     const adrLayer = ARCH_LAYERS[patternIndex % ARCH_LAYERS.length]!;
-    const quarter = QUARTERS[patternIndex % QUARTERS.length]!;
     const relatedPattern = patternNames[(patternIndex + 1) % patternNames.length]!;
     const dependencyPattern =
       patternNames[(patternIndex + patternNames.length - 1) % patternNames.length]!;
 
+    const adrNumber = patternIndex % 6 === 0 ? String(Math.floor(patternIndex / 6) + 1) : undefined;
+
     return createPerfPattern(patternName, {
       patternName,
+      ...(adrNumber !== undefined
+        ? {
+            title: `${productArea} projection decision ${adrNumber}`,
+            adr: adrNumber,
+            adrStatus: 'accepted',
+            adrCategory: 'architecture',
+          }
+        : {}),
       status: STATUSES[patternIndex % STATUSES.length]!,
-      role: patternIndex % 2 === 0 ? 'projection' : 'service',
-      phase: 49 + (patternIndex % 4),
+      role: patternIndex % 2 === 0 ? 'projection' : 'service' + (patternIndex % 4),
       file: `packages/architect-projection/fixtures/perf/${patternName}.feature`,
       productArea,
       boundedContext,
       adrLayer,
-      quarter,
-      release: `2026.${String((patternIndex % 6) + 1).padStart(2, '0')}`,
-      completed: `2026-04-${String((patternIndex % 28) + 1).padStart(2, '0')}`,
-      userRole: USER_ROLES[patternIndex % USER_ROLES.length]!,
-      businessValue: `Keep ${boundedContext} perf coverage deterministic for ${patternName}.`,
       team: TEAMS[patternIndex % TEAMS.length]!,
-      effort: EFFORTS[patternIndex % EFFORTS.length]!,
-      effortActual: EFFORT_ACTUALS[patternIndex % EFFORT_ACTUALS.length]!,
-      priority: PRIORITIES[patternIndex % PRIORITIES.length]!,
       targetPath: `packages/architect-projection/src/perf/${patternName}.ts`,
       uses: [relatedPattern],
       dependsOn: [dependencyPattern],
       usedBy: [relatedPattern],
       enables: [relatedPattern],
       implementsPatterns: [`${boundedContext}-contract`],
-      useCases: [
-        `${boundedContext}-throughput`,
-        `${productArea.toLowerCase().replace(/\s+/g, '-')}-budget`,
-      ],
       seeAlso: [`ADR-${String((patternIndex % 4) + 1).padStart(3, '0')}`],
       apiRef: [`https://example.test/${patternName.toLowerCase()}`],
       workflow: WORKFLOWS[patternIndex % WORKFLOWS.length]!,
-      risk: RISKS[patternIndex % RISKS.length]!,
-      since: `2026-Q${String((patternIndex % 4) + 1)}`,
       rules: Array.from({ length: 3 }, (_, ruleIndex) => {
         const ruleNumber = ruleIndex + 1;
         const ruleLabel = String(ruleNumber);
@@ -355,7 +276,7 @@ function createBusinessRuleSetPerfContext(): BusinessRuleSetPerfFixture {
           name: `${productArea} rule ${ruleLabel} for ${patternName}`,
           description: [
             `**Invariant:** ${patternName} keeps rule ${ruleLabel} stable across grouped JSON output.`,
-            `**Rationale:** The rules command must keep ${productArea} semantics visible to renderer consumers.`,
+            `**Rationale:** The rules projection must keep ${productArea} semantics visible to renderer consumers.`,
             `**Verified by:** ${scenarioName}, ${patternName} rule ${ruleLabel} keeps pretty JSON parseable`,
           ].join('\n'),
           scenarioNames: [
@@ -414,39 +335,31 @@ function createProjectionPerfTagRegistry(): TagRegistry {
 function createPerfPattern(name: string, options: PerfPatternOptions): ExtractedPattern {
   const pattern = buildPatternStub(name, {
     patternName: options.patternName,
+    ...(options.title !== undefined ? { title: options.title } : {}),
     status: options.status,
     role: options.role,
-    phase: options.phase,
     file: options.file,
     productArea: options.productArea,
     boundedContext: options.boundedContext,
     adrLayer: options.adrLayer,
-    quarter: options.quarter,
-    release: options.release,
-    completed: options.completed,
-    userRole: options.userRole,
-    businessValue: options.businessValue,
     team: options.team,
-    effort: options.effort,
-    effortActual: options.effortActual,
-    priority: options.priority,
     targetPath: options.targetPath,
     uses: options.uses,
     dependsOn: options.dependsOn,
     usedBy: options.usedBy,
     enables: options.enables,
     implementsPatterns: options.implementsPatterns,
-    useCases: options.useCases,
     seeAlso: options.seeAlso,
     apiRef: options.apiRef,
     rules: options.rules,
+    ...(options.adr !== undefined ? { adr: options.adr } : {}),
+    ...(options.adrStatus !== undefined ? { adrStatus: options.adrStatus } : {}),
+    ...(options.adrCategory !== undefined ? { adrCategory: options.adrCategory } : {}),
   });
 
   return {
     ...pattern,
     workflow: options.workflow,
-    risk: options.risk,
-    since: options.since,
   };
 }
 
@@ -469,7 +382,7 @@ function measureProjection(
   context: ProjectionContext,
   project: ProjectionMeasure,
   iterations: number,
-  warmupIterations = 5
+  warmupIterations = 5,
 ): PerfSummary {
   const values: number[] = [];
 
@@ -487,9 +400,29 @@ function measureProjection(
   return summarize(values, iterations);
 }
 
+function measureRenderMarkdownBundles(
+  context: ProjectionContext,
+  iterations: number,
+): Record<RenderMarkdownDocumentType, PerfSummary> {
+  const result = {} as Record<RenderMarkdownDocumentType, PerfSummary>;
+
+  for (const documentType of RENDER_MARKDOWN_DOCUMENT_TYPES) {
+    result[documentType] = measureProjection(
+      context,
+      (projectionContext) => {
+        const bundle = parseAndProjectDocumentationBundle(projectionContext, { documentType });
+        return renderMarkdown(bundle);
+      },
+      iterations,
+    );
+  }
+
+  return result;
+}
+
 async function measureAsyncOperation(
   measure: AsyncMeasure,
-  iterations: number
+  iterations: number,
 ): Promise<PerfSummary> {
   const values: number[] = [];
 
@@ -530,7 +463,12 @@ async function generateBusinessRuleSetPerfReport(): Promise<string> {
   const samples: PerfSample[] = [];
   const warmupIterations = 5;
   const iterations = 40;
-  const hotPathIterations = 30;
+  // Sub-millisecond hot paths: a single GC/scheduler pause inflates the mean,
+  // and the baseline gate's 1.5x relative budget cannot absorb that on a tiny
+  // sample. Average many iterations so one pause is diluted (~250 samples keeps
+  // run-to-run drift comfortably under 1.5x); the ops are microsecond-scale so
+  // the extra iterations cost only a few hundred ms.
+  const hotPathIterations = 250;
   const graphBuildIterations = 10;
   const repoRoot = path.resolve(import.meta.dirname, '../../../../..');
 
@@ -595,15 +533,15 @@ async function generateBusinessRuleSetPerfReport(): Promise<string> {
         },
         project: summarize(
           samples.map((sample) => sample.projectMs),
-          iterations
+          iterations,
         ),
         renderObject: summarize(
           samples.map((sample) => sample.renderObjectMs),
-          iterations
+          iterations,
         ),
         renderPretty: summarize(
           samples.map((sample) => sample.renderPrettyMs),
-          iterations
+          iterations,
         ),
         projectionHotPaths: {
           sessionContextBundle: measureProjection(
@@ -613,7 +551,7 @@ async function generateBusinessRuleSetPerfReport(): Promise<string> {
                 patterns: ['BusinessRulePerfPattern01'],
                 sessionType: 'implement',
               }),
-            hotPathIterations
+            hotPathIterations,
           ),
           scopeReadinessReport: measureProjection(
             context,
@@ -623,7 +561,7 @@ async function generateBusinessRuleSetPerfReport(): Promise<string> {
                 sessionType: 'implement',
                 strict: true,
               }),
-            hotPathIterations
+            hotPathIterations,
           ),
           documentationView: measureProjection(
             context,
@@ -631,39 +569,40 @@ async function generateBusinessRuleSetPerfReport(): Promise<string> {
               parseAndProjectDocumentationBundle(projectionContext, {
                 documentType: 'patterns',
               }),
-            hotPathIterations
+            hotPathIterations,
           ),
           requirementDigestAllAreas: measureProjection(
             context,
             (projectionContext) => projectRequirementDigest(projectionContext),
             hotPathIterations,
-            20
+            20,
           ),
           requirementDigestExecutable: measureProjection(
             context,
             (projectionContext) => projectRequirementExecutableDigest(projectionContext),
             hotPathIterations,
-            20
+            20,
           ),
           patternSatisfiesTag: measureProjection(
             context,
             (projectionContext) => projectAnnotationCoverage(projectionContext),
-            hotPathIterations
+            hotPathIterations,
           ),
           buildBoundedContext: measureProjection(
             context,
             (projectionContext) => projectBoundedContext(projectionContext),
-            hotPathIterations
+            hotPathIterations,
           ),
           graphBuild: await measureGraphBuild(repoRoot, graphBuildIterations),
         },
+        renderMarkdownBundles: measureRenderMarkdownBundles(context, hotPathIterations),
         isBundleP50Micros: p50(samples.map((sample) => sample.isBundleMicros)),
         samples,
       },
       null,
-      2
+      2,
     ) + '\n',
-    'utf8'
+    'utf8',
   );
 
   return reportPath;
@@ -677,14 +616,46 @@ describeFeature(feature, ({ BeforeEachScenario, Rule }) => {
   });
 
   Rule('Projection hot paths stay under committed budgets', ({ RuleScenario }): void => {
-    RuleScenario('Write a budgetable BusinessRuleSet perf report', ({ When, Then }): void => {
-      When('I generate the BusinessRuleSet perf report', async () => {
-        state.reportPath = await generateBusinessRuleSetPerfReport();
-      });
+    RuleScenario(
+      'Write a budgetable projection perf report for representative documentation bundles',
+      ({ When, Then, And }): void => {
+        When('I generate the BusinessRuleSet perf report', async () => {
+          state.reportPath = await generateBusinessRuleSetPerfReport();
+        });
 
-      Then('the perf report evidence file should be written', () => {
-        expect(state.reportPath).toContain('task-3-business-rule-set-perf-report.json');
-      });
-    });
+        Then('the perf report evidence file should be written', () => {
+          expect(state.reportPath).toContain('task-3-business-rule-set-perf-report.json');
+        });
+
+        And(
+          'the perf report should include renderMarkdown metrics for representative documentation bundles',
+          async () => {
+            const reportPath = state.reportPath;
+            expect(reportPath).not.toBeNull();
+            if (reportPath === null || reportPath === undefined) {
+              throw new Error('reportPath missing');
+            }
+            const report = JSON.parse(await readFile(reportPath, 'utf8')) as {
+              readonly renderMarkdownBundles?: Record<string, PerfSummary>;
+            };
+
+            expect(Object.keys(report.renderMarkdownBundles ?? {}).sort()).toEqual(
+              [...RENDER_MARKDOWN_DOCUMENT_TYPES].sort(),
+            );
+
+            for (const documentType of RENDER_MARKDOWN_DOCUMENT_TYPES) {
+              const summary = report.renderMarkdownBundles?.[documentType];
+              expect(summary).toBeDefined();
+              if (summary === undefined) {
+                throw new Error(`Missing renderMarkdownBundles summary for ${documentType}`);
+              }
+              expect(Number.isFinite(summary.avgMs)).toBe(true);
+              expect(Number.isFinite(summary.p50Ms)).toBe(true);
+              expect(summary.iterations).toBeGreaterThan(0);
+            }
+          },
+        );
+      },
+    );
   });
 });

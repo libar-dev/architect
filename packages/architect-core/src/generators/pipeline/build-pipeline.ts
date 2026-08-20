@@ -4,7 +4,7 @@
  * @architect-status completed
  * @architect-role:service
  * @architect-bounded-context:pipeline
- * @architect-uses PatternScanner, GherkinScanner, DocExtractor, GherkinExtractor, PatternGraph, ExtractionDiagnostics
+ * @architect-uses PatternScanner, GherkinScanner, DocExtractor, GherkinExtractor, PatternGraph, ExtractionDiagnostics, AstParser
  * @architect-decision core-deps
  *
  * ## Shared Pipeline Factory Responsibilities
@@ -24,10 +24,6 @@
  * runtime validation for configs, registries, and graph inputs. Those runtime
  * dependencies belong here because every higher package relies on the same
  * foundational scan → parse → validate → merge pipeline.
- *
- * ### When to Use
- *
- * - As a typed contract / data shape consumed by projection or render layers.
  */
 
 import * as path from 'path';
@@ -40,7 +36,7 @@ import {
   computeHierarchyChildren,
 } from '../../extractor/gherkin-extractor.js';
 import { mergePatterns } from './merge-patterns.js';
-import { loadConfig, formatConfigError } from '../../config/config-loader.js';
+import { loadProjectConfig, formatConfigError } from '../../config/config-loader.js';
 import { DEFAULT_CONTEXT_INFERENCE_RULES } from '../../config/defaults.js';
 import { loadDefaultWorkflow, loadWorkflowFromPath } from '../../config/workflow-loader.js';
 import type { LoadedWorkflow } from '../../config/workflow-loader.js';
@@ -48,14 +44,19 @@ import {
   transformToPatternGraph,
   transformToPatternGraphWithValidation,
 } from './transform-dataset.js';
+import { createPackageResolver } from '../../package/package-resolver.js';
+import type { PackageResolver } from '../../package/package-resolver.js';
+import type { PackageConfig } from '../../package/package-config.js';
 import { Result } from '../../types/result.js';
 import type { ExtractionDiagnostic } from '../../extractor/extraction-diagnostics.js';
 import type { ExtractedPattern } from '../../validation-schemas/index.js';
+import { PatternGraphSchema } from '../../validation-schemas/pattern-graph.js';
 import { createFeatureParseError } from '../../types/errors.js';
-import type { TagRegistry } from '../../config/tag-registry-contract.js';
+import type { TagRegistry } from '../../validation-schemas/tag-registry.js';
 import type { PatternParseFailure } from '../../validation-schemas/pattern-graph.js';
 import type { RuntimePatternGraph, ValidationSummary } from './transform-types.js';
 import type { ContextInferenceRule } from './context-inference.js';
+import { BoundaryParseError, parseAtBoundary } from '../../validation/boundary.js';
 
 export interface PipelineOptions {
   readonly input: readonly string[];
@@ -68,6 +69,7 @@ export interface PipelineOptions {
   readonly includeValidation?: boolean;
   readonly failOnScanErrors?: boolean;
   readonly tagRegistry?: TagRegistry;
+  readonly packages?: readonly PackageConfig[];
 }
 
 export interface PipelineError {
@@ -104,6 +106,22 @@ export interface BuildResult {
   readonly diagnostics: readonly ExtractionDiagnostic[];
 }
 
+function validatePatternGraphDataset(
+  graph: RuntimePatternGraph,
+): Result<RuntimePatternGraph, PipelineError> {
+  try {
+    return Result.ok(parseAtBoundary(PatternGraphSchema, graph, 'PatternGraph validation failed'));
+  } catch (error: unknown) {
+    if (error instanceof BoundaryParseError) {
+      return Result.err({ step: 'transform', message: error.message });
+    }
+    return Result.err({
+      step: 'transform',
+      message: error instanceof Error ? error.message : String(error),
+    });
+  }
+}
+
 function normalizeFeaturePath(baseDir: string, filePath: string): string {
   return path.relative(baseDir, filePath).split(path.sep).join('/');
 }
@@ -122,17 +140,24 @@ function formatGherkinParseReason(error: {
 }
 
 export async function buildPatternGraph(
-  options: PipelineOptions
+  options: PipelineOptions,
 ): Promise<Result<BuildResult, PipelineError>> {
   const baseDir = path.resolve(options.baseDir);
   const warnings: PipelineWarning[] = [];
   const allDiagnostics: ExtractionDiagnostic[] = [];
 
   let registry: TagRegistry;
+  let packageResolver: PackageResolver | undefined;
+
+  // Build package resolver from explicitly-provided packages (caller already has the config).
+  if (options.packages !== undefined && options.packages.length > 0) {
+    packageResolver = createPackageResolver(options.packages);
+  }
+
   if (options.tagRegistry !== undefined) {
     registry = options.tagRegistry;
   } else {
-    const configResult = await loadConfig(baseDir);
+    const configResult = await loadProjectConfig(baseDir);
     if (!configResult.ok) {
       return Result.err({
         step: 'config',
@@ -140,6 +165,13 @@ export async function buildPatternGraph(
       });
     }
     registry = configResult.value.instance.registry;
+    // If packages weren't provided by the caller, derive them from the loaded config.
+    if (packageResolver === undefined) {
+      const configPackages = configResult.value.project.packages;
+      if (configPackages.length > 0) {
+        packageResolver = createPackageResolver(configPackages);
+      }
+    }
   }
 
   const scanResult = await scanPatterns(
@@ -148,7 +180,7 @@ export async function buildPatternGraph(
       baseDir,
       ...(options.exclude !== undefined ? { exclude: options.exclude } : {}),
     },
-    registry
+    registry,
   );
   if (!scanResult.ok) {
     return Result.err({
@@ -234,7 +266,7 @@ export async function buildPatternGraph(
         });
       }
 
-      const gherkinResult = extractPatternsFromGherkin(gherkinFiles, {
+      const gherkinResult = await extractPatternsFromGherkin(gherkinFiles, {
         baseDir,
         tagRegistry: registry,
         scenariosAsUseCases: true,
@@ -312,12 +344,16 @@ export async function buildPatternGraph(
   };
 
   if (options.includeValidation === false) {
-    const dataset = transformToPatternGraph(rawDataset);
+    const datasetResult = validatePatternGraphDataset(
+      transformToPatternGraph(rawDataset, packageResolver),
+    );
+    if (!datasetResult.ok) {
+      return datasetResult;
+    }
     return Result.ok({
-      graph: dataset,
+      graph: datasetResult.value,
       validation: {
         totalPatterns: allPatterns.length,
-        malformedPatterns: [],
         danglingReferences: [],
         unknownStatuses: [],
         warningCount: 0,
@@ -328,9 +364,17 @@ export async function buildPatternGraph(
     });
   }
 
-  const { dataset, validation } = transformToPatternGraphWithValidation(rawDataset);
+  const { dataset, validation } = transformToPatternGraphWithValidation(
+    rawDataset,
+    packageResolver,
+  );
+  const datasetResult = validatePatternGraphDataset(dataset);
+  if (!datasetResult.ok) {
+    return datasetResult;
+  }
+
   return Result.ok({
-    graph: dataset,
+    graph: datasetResult.value,
     validation,
     warnings,
     scanMetadata,

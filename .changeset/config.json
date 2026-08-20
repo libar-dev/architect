@@ -16,5 +16,5 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["@libar-dev/architect-spec", "architect-self-host-example"]
+  "ignore": ["@libar-dev/architect-spec"]
 }

@@ -4,6 +4,7 @@
  * @architect-status completed
  * @architect-role:codec
  * @architect-bounded-context:rendering
+ * @architect-uses FragmentRendererDispatch, ProjectionFragmentSchema, BlockSchema
  *
  * Renders fragments into GitHub-flavored Markdown documents for generated docs.
  * Normalizers map fragment contracts to block sections, then handle frontmatter,
@@ -11,7 +12,10 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - When generating documentation output such as docs-live pages, package README
+ *   content, or the `architect documentation` CLI surface, especially when the
+ *   output needs frontmatter, h2 splitting, routed child files, or relative
+ *   child-link rewriting.
  */
 import { humanizeKey, isPrimitive, stableStringify } from '../_internal/format-utils.js';
 import {
@@ -29,34 +33,42 @@ import {
   type ListBlock,
   type ListItem,
   type TableBlock,
-} from '../blocks/schema.js';
+} from '@libar-dev/architect-core';
+import { slugForFilename } from '../_internal/slug.js';
+import { summarizeTaxonomyDigest } from '../projections/governance/taxonomy-digest.js';
+import {
+  taxonomyGroupSource,
+  TAXONOMY_FUNCTION_GROUPS,
+  TAXONOMY_ROLE_ENUM_SOURCE,
+  TAXONOMY_TAG_COUNT_SOURCE,
+} from '../projections/documentation-composition/taxonomy-embedded.js';
 import {
   isBundle,
-  summarizeTaxonomyDigest,
+  type ApiReferenceDigest,
+  type ApiShape,
   type ArchitectureDiagram,
   type BusinessRule,
   type BusinessRuleSet,
   type DecisionCatalog,
   type DecisionRecord,
   type Fragment,
+  type MarkdownFileRoute,
   type ProjectionBundle,
-  type ReleaseNotesDigest,
   type RequirementDigest,
   type RoadmapTimeline,
   type TaxonomyDigest,
   type TraceabilityMatrix,
   type ValidationRuleDigest,
 } from '../fragments/index.js';
-import { getDocumentationTypeMetadata } from '../projections/documentation-composition/documentation-types.js';
 import { defaultMarkdownRouteProfile } from './markdown-paths.js';
-import type { DisclosureSpec } from '../projections/documentation-composition/disclosure-spec.js';
+import type { DisclosureSpec } from '../disclosure/spec.js';
 import {
   REQUIREMENTS_ALL_AREAS_LABEL,
   REQUIREMENTS_EXECUTABLE_AREA_LABEL,
   REQUIREMENTS_SPECS_AREA_LABEL,
 } from '../fragments/operational-insights/requirement-digest.js';
 
-import { dispatchByKind, type KindTable } from './_shared/dispatch.js';
+import { dispatchByKind, type StrictKindTable } from './_shared/dispatch.js';
 import type { ProjectionInput, RenderMarkdownOptions } from './types.js';
 
 interface MarkdownDocument {
@@ -72,8 +84,14 @@ interface H2Group {
 }
 
 interface SplitResult {
-  readonly parent: MarkdownDocument;
-  readonly subFiles: Record<string, MarkdownDocument>;
+  readonly parent: RenderedMarkdownDocument;
+  readonly subFiles: Record<string, RenderedMarkdownDocument>;
+}
+
+interface RenderedMarkdownDocument {
+  readonly document: MarkdownDocument;
+  readonly markdown: string;
+  readonly lineCount: number;
 }
 
 interface MarkdownMetadata {
@@ -82,6 +100,12 @@ interface MarkdownMetadata {
   readonly detailLevel?: string;
 }
 
+/**
+ * Module-private bypass marker for renderer-authored Markdown. Helpers below
+ * mint trusted values when the renderer intentionally emits raw Markdown and
+ * bypasses escaping.
+ */
+// @invariant: module-private trusted-markdown bypass marker; do not export or widen
 const TRUSTED_MARKDOWN = Symbol('trustedMarkdown');
 
 interface TrustedMarkdownText {
@@ -158,6 +182,18 @@ interface RoutedChildOutputMaps {
   readonly childRouteIdPathMap: Record<string, string>;
 }
 
+type MarkdownNormalizerKind =
+  | 'ApiReferenceDigest'
+  | 'ArchitectureDiagram'
+  | 'BusinessRuleSet'
+  | 'DecisionCatalog'
+  | 'DecisionRecord'
+  | 'RoadmapTimeline'
+  | 'RequirementDigest'
+  | 'TaxonomyDigest'
+  | 'TraceabilityMatrix'
+  | 'ValidationRuleDigest';
+
 const DEFAULT_OPTIONS: {
   includeChildren: boolean;
   includeFrontmatter: boolean;
@@ -178,22 +214,22 @@ const DEFAULT_NORMALIZE_OPTIONS: NormalizeMarkdownOptions = {
   childRefAliases: new Set<string>(),
 };
 
-const MARKDOWN_NORMALIZERS: KindTable<MarkdownDocument, NormalizeMarkdownOptions> = {
+const MARKDOWN_NORMALIZERS = {
+  ApiReferenceDigest: normalizeApiReference,
   ArchitectureDiagram: normalizeArchitectureDiagram,
   BusinessRuleSet: normalizeBusinessRuleSet,
   DecisionCatalog: normalizeDecisionCatalog,
   DecisionRecord: normalizeDecisionRecord,
   RoadmapTimeline: normalizeRoadmapTimeline,
-  ReleaseNotesDigest: normalizeReleaseNotesDigest,
   RequirementDigest: (fragment, options) => normalizeRequirementDigest(fragment, options),
   TaxonomyDigest: normalizeTaxonomyDigest,
   TraceabilityMatrix: normalizeTraceabilityMatrix,
   ValidationRuleDigest: normalizeValidationRuleDigest,
-};
+} satisfies StrictKindTable<MarkdownDocument, NormalizeMarkdownOptions, MarkdownNormalizerKind>;
 
 export const renderMarkdown = (
   input: ProjectionInput,
-  options?: RenderMarkdownOptions
+  options?: RenderMarkdownOptions,
 ): string | Record<string, string> => {
   const resolvedOptions = resolveOptions(options);
 
@@ -206,7 +242,7 @@ export const renderMarkdown = (
 
 function renderBundle(
   bundle: ProjectionBundle<Fragment>,
-  options: ResolvedMarkdownOptions
+  options: ResolvedMarkdownOptions,
 ): string | Record<string, string> {
   const childKeys = Object.keys(bundle.children);
 
@@ -222,7 +258,7 @@ function renderBundle(
       [],
       new Set<string>(),
       false,
-      disclosureSpec
+      disclosureSpec,
     );
     return renderDocument(rootDocument, options);
   }
@@ -232,10 +268,11 @@ function renderBundle(
   }
 
   const routing = bundle.routing;
+  const markdownRoute = bundleMarkdownRoute(bundle);
   const entries = new Map<string, string>();
   const rootPath = normalizeRequiredRoutedOutputPath(
-    options.routeProfile.mapPath(routing.rootRouteId, bundle.root.kind),
-    routing.rootRouteId
+    options.routeProfile.mapPath(routing.rootRouteId, bundle.root.kind, undefined, markdownRoute),
+    routing.rootRouteId,
   );
   const sortedKeys = [...childKeys].sort((left, right) => left.localeCompare(right));
 
@@ -243,7 +280,7 @@ function renderBundle(
     bundle,
     sortedKeys,
     rootPath,
-    options
+    options,
   );
   const childRefAliases = new Set<string>([
     ...sortedKeys,
@@ -263,7 +300,7 @@ function renderBundle(
     childRoutes,
     childRefAliases,
     true,
-    disclosureSpec
+    disclosureSpec,
   );
 
   addRoutedDocument(entries, rootPath, rootDocument, options);
@@ -283,19 +320,19 @@ function renderBundle(
       childRoutes,
       childRefAliases,
       false,
-      disclosureSpec
+      disclosureSpec,
     );
     const childDocument = appendBundleBackLink(
       normalizedChild,
       rootDocument.title,
       childPath,
-      rootPath
+      rootPath,
     );
     addRoutedDocument(entries, childPath, childDocument, options);
   }
 
   return Object.fromEntries(
-    Array.from(entries.entries()).sort(([left], [right]) => left.localeCompare(right))
+    Array.from(entries.entries()).sort(([left], [right]) => left.localeCompare(right)),
   );
 }
 
@@ -303,25 +340,42 @@ function addRoutedDocument(
   entries: Map<string, string>,
   basePath: string,
   document: MarkdownDocument,
-  options: ResolvedMarkdownOptions
+  options: ResolvedMarkdownOptions,
 ): void {
-  const sizeBudget = options.sizeBudget;
-  const splitResult = shouldSplit(document, basePath, options)
-    ? splitOversizedDocument(document, sizeBudget ?? 0, basePath, (doc) =>
-        renderDocument(doc, options)
-      )
-    : null;
+  const parentRendered = renderMarkdownDocument(document, options, basePath, 'measure');
 
-  if (!splitResult) {
-    addUniqueEntry(entries, basePath, renderDocument(document, options));
+  if (!shouldSplitFromLineCount(parentRendered.lineCount, basePath, options)) {
+    // Non-split path: reuse the rendered output. Saves one render per doc.
+    addUniqueEntry(entries, basePath, parentRendered.markdown);
     return;
   }
 
-  addUniqueEntry(entries, basePath, renderDocument(splitResult.parent, options));
+  const splitResult = splitOversizedDocument(
+    document,
+    options.sizeBudget ?? 0,
+    basePath,
+    options,
+    parentRendered,
+  );
+
+  addUniqueEntry(entries, basePath, splitResult.parent.markdown);
 
   for (const [path, childDocument] of Object.entries(splitResult.subFiles)) {
-    addUniqueEntry(entries, path, renderDocument(childDocument, options));
+    addUniqueEntry(entries, path, childDocument.markdown);
   }
+}
+
+function renderMarkdownDocument(
+  document: MarkdownDocument,
+  options: ResolvedMarkdownOptions,
+  path: string,
+  phase: 'measure' | 'emit',
+  renderKey = path,
+): RenderedMarkdownDocument {
+  const markdown = renderDocument(document, options);
+  const lineCount = countLines(markdown);
+  options.onRenderDocument?.({ renderKey, path, title: document.title, phase, lineCount });
+  return { document, markdown, lineCount };
 }
 
 function addUniqueEntry(entries: Map<string, string>, path: string, content: string): void {
@@ -336,7 +390,7 @@ function resolveChildOutputPaths(
   bundle: ProjectionBundle<Fragment>,
   sortedKeys: readonly string[],
   rootPath: string,
-  options: ResolvedMarkdownOptions
+  options: ResolvedMarkdownOptions,
 ): RoutedChildOutputMaps {
   const routing = bundle.routing;
   if (!routing) {
@@ -386,7 +440,7 @@ function resolveChildRoutePath(
   bundle: ProjectionBundle<Fragment>,
   key: string,
   child: Fragment,
-  options: ResolvedMarkdownOptions
+  options: ResolvedMarkdownOptions,
 ): string {
   const routeId = bundle.routing?.childRouteIds[key];
 
@@ -394,29 +448,23 @@ function resolveChildRoutePath(
     throw new Error(`renderMarkdown missing child route ID for bundle child key: ${key}`);
   }
 
-  return options.routeProfile.mapPath(routeId, child.kind, key);
+  return options.routeProfile.mapPath(routeId, child.kind, key, bundleMarkdownRoute(bundle));
+}
+
+/**
+ * The markdown-file route a `whole-artifact` emission descriptor carries, or
+ * `undefined` for a sink-agnostic bundle (no descriptor) or an `embedded-region`
+ * descriptor (which routes into host regions, not whole-file output paths).
+ */
+function bundleMarkdownRoute(bundle: ProjectionBundle<Fragment>): MarkdownFileRoute | undefined {
+  return bundle.emission?.mode === 'whole-artifact' ? bundle.emission.markdownFileRoute : undefined;
 }
 
 function resolveBundleDisclosureSpec(
   bundle: ProjectionBundle<Fragment>,
-  options: ResolvedMarkdownOptions
+  _options: ResolvedMarkdownOptions,
 ): DisclosureSpec | undefined {
-  if (options.disclosureSpec !== undefined) {
-    return options.disclosureSpec;
-  }
-
-  const documentType = bundle.routing?.rootRouteId.split(':')[0];
-  if (documentType === undefined) {
-    return undefined;
-  }
-
-  const metadata = getDocumentationTypeMetadata(documentType);
-  if (metadata?.status !== 'supported') {
-    return undefined;
-  }
-
-  const level = options.disclosureLevel ?? metadata.defaultDisclosureLevel;
-  return metadata.disclosureMatrix[level];
+  return bundle.routing?.disclosureSpec;
 }
 
 function createUniqueRoutedPath(path: string, stableId: string, usedPaths: Set<string>): string {
@@ -425,7 +473,7 @@ function createUniqueRoutedPath(path: string, stableId: string, usedPaths: Set<s
     return path;
   }
 
-  const suffix = toKebabCase(stableId) || 'route';
+  const suffix = slugForFilename(stableId) || 'route';
   const directory = extractDirectory(path);
   const fileName = extractFileName(path);
   const extensionStart = fileName.lastIndexOf('.');
@@ -444,10 +492,10 @@ function createUniqueRoutedPath(path: string, stableId: string, usedPaths: Set<s
   return candidate;
 }
 
-function shouldSplit(
-  document: MarkdownDocument,
+function shouldSplitFromLineCount(
+  lineCount: number,
   basePath: string,
-  options: ResolvedMarkdownOptions
+  options: ResolvedMarkdownOptions,
 ): boolean {
   if (
     options.splitStrategy !== 'h2-boundary' ||
@@ -461,8 +509,18 @@ function shouldSplit(
     return false;
   }
 
-  const rendered = renderDocument(document, options);
-  return rendered.split('\n').length > options.sizeBudget;
+  return lineCount > options.sizeBudget;
+}
+
+function countLines(s: string): number {
+  // Equivalent to s.split('\n').length but without allocating the intermediate
+  // array. Char code 10 is '\n'. An empty string still counts as 1 line, matching
+  // split('\n').length semantics.
+  let count = 1;
+  for (let i = 0; i < s.length; i++) {
+    if (s.charCodeAt(i) === 10) count++;
+  }
+  return count;
 }
 
 function resolveOptions(options: RenderMarkdownOptions | undefined): ResolvedMarkdownOptions {
@@ -474,6 +532,9 @@ function resolveOptions(options: RenderMarkdownOptions | undefined): ResolvedMar
     routeProfile: options?.routeProfile ?? DEFAULT_OPTIONS.routeProfile,
     splitStrategy: options?.splitStrategy ?? DEFAULT_OPTIONS.splitStrategy,
     ...(options?.sizeBudget !== undefined ? { sizeBudget: options.sizeBudget } : {}),
+    ...(options?.onRenderDocument !== undefined
+      ? { onRenderDocument: options.onRenderDocument }
+      : {}),
   };
 }
 
@@ -483,6 +544,7 @@ type ResolvedMarkdownOptions = Required<
   Required<Pick<RenderMarkdownOptions, 'splitStrategy'>> & {
     disclosureLevel?: NonNullable<RenderMarkdownOptions['disclosureLevel']>;
     disclosureSpec?: DisclosureSpec;
+    onRenderDocument?: NonNullable<RenderMarkdownOptions['onRenderDocument']>;
     sizeBudget?: number;
   };
 
@@ -494,7 +556,7 @@ function normalizeFragment(
   childRoutes: readonly ChildRouteRef[] = [],
   childRefAliases: ReadonlySet<string> = new Set<string>(),
   isRootDocument = false,
-  disclosureSpec?: DisclosureSpec
+  disclosureSpec?: DisclosureSpec,
 ): MarkdownDocument {
   const normalizeOptions =
     currentPath === undefined &&
@@ -518,37 +580,262 @@ function normalizeFragment(
   return dispatchByKind(fragment, MARKDOWN_NORMALIZERS, normalizeGenericFragment, normalizeOptions);
 }
 
-function normalizeArchitectureDiagram(fragment: ArchitectureDiagram): MarkdownDocument {
+function normalizeArchitectureDiagram(
+  fragment: ArchitectureDiagram,
+  options: NormalizeMarkdownOptions,
+): MarkdownDocument {
   const metadata = resolveFragmentMetadata(fragment);
   const scopeLabel = humanizeKey(fragment.scope);
+  // A `presentation` override means this fragment renders under its own heading (the
+  // `design-review` view), so the body noun must not hard-code "architecture". The
+  // production `architecture` view carries no presentation, so its Overview text — and
+  // the docs:check byte-identity it is gated by — is unchanged.
+  const viewNoun = fragment.presentation !== undefined ? 'view.' : 'architecture view.';
   const scopeDescription =
     fragment.scopeValue !== undefined
       ? `${scopeLabel} scoped to ${fragment.scopeValue}.`
-      : `${scopeLabel} architecture view.`;
+      : `${scopeLabel} ${viewNoun}`;
 
-  const sections: MarkdownRenderableBlock[] = [
+  const diagramCount = fragment.sections.length;
+  const blocks: MarkdownRenderableBlock[] = [
     heading(2, 'Overview'),
     paragraph(
-      `This diagram captures ${String(fragment.patterns.length)} ${fragment.patterns.length === 1 ? 'pattern' : 'patterns'} in the ${scopeDescription}`
+      `This view captures ${String(fragment.patterns.length)} ${fragment.patterns.length === 1 ? 'pattern' : 'patterns'} across ${String(diagramCount)} ${diagramCount === 1 ? 'diagram' : 'diagrams'} in the ${scopeDescription}`,
     ),
-    heading(2, 'Diagram'),
-    fragment.diagram,
   ];
 
+  // Link the bundle's child lenses (package-seam, layered) ONLY from the root doc. The root
+  // sits at the docs root, so each child route path is already the correct relative link; a
+  // child lens doc lives inside architecture/ and would mis-resolve those docs-root-relative
+  // paths, so children omit this section and rely on their back-link to the root instead.
+  if (options.isRootDocument) {
+    const relatedViewLinks = options.childRoutes
+      .map((route) => {
+        const link = toSafeRoutedMarkdownLink(
+          humanizeKey(route.key.split(':').slice(1).join('-')),
+          route.path,
+        );
+        return link === null ? null : trustedMarkdown(link);
+      })
+      .filter((entry): entry is TrustedMarkdownText => entry !== null);
+    if (relatedViewLinks.length > 0) {
+      blocks.push(heading(2, 'Related views'), {
+        type: 'list',
+        ordered: false,
+        items: relatedViewLinks,
+      });
+    }
+  }
+
+  blocks.push(heading(2, 'Diagrams'));
+
+  for (const section of fragment.sections) {
+    // section.title is SOURCED group/scope data (bounded-context / package / role / layer
+    // name) → escape it; ADR-009 forbids trusting sourced text as raw markdown. Only the
+    // pattern-count suffix is renderer-authored, so its parens stay live. (Mirrors the
+    // DecisionCatalog rule: trust the structure, escape the sourced text.)
+    // section.description is a renderer-authored literal (code spans) → trusted.
+    const patternCount = section.patterns.length;
+    if (patternCount > 0) {
+      const suffix = ` (${String(patternCount)} ${patternCount === 1 ? 'pattern' : 'patterns'})`;
+      blocks.push(trustedMarkdownHeading(3, `${escapePlainMarkdownText(section.title)}${suffix}`));
+    } else {
+      blocks.push(heading(3, section.title));
+    }
+    if (section.description !== undefined) {
+      blocks.push(trustedMarkdownParagraph(section.description));
+    }
+    blocks.push(section.diagram);
+  }
+
+  if (fragment.fanIn !== undefined && fragment.fanIn.length > 0) {
+    // Pattern / consumer names are SOURCED → the plain `table` block escapes every cell.
+    blocks.push(
+      heading(2, 'Fan-in'),
+      paragraph('Most-depended-on patterns in this view, ranked by in-view dependant count.'),
+      table(
+        ['Pattern', 'Dependants', 'Top dependants'],
+        fragment.fanIn.map((entry) => [
+          entry.pattern,
+          String(entry.usedByCount),
+          entry.topConsumers.join(', '),
+        ]),
+      ),
+    );
+  }
+
+  if (fragment.crossPackageContexts !== undefined && fragment.crossPackageContexts.length > 0) {
+    // Context / package names are SOURCED → the plain `table` block escapes every cell.
+    blocks.push(
+      heading(2, 'Cross-package bounded contexts'),
+      paragraph('Bounded contexts whose patterns span more than one workspace package.'),
+      table(
+        ['Bounded context', 'Packages', 'Patterns'],
+        fragment.crossPackageContexts.map((entry) => [
+          entry.context,
+          entry.packages.join(', '),
+          String(entry.patternCount),
+        ]),
+      ),
+    );
+  }
+
   if (fragment.legend !== undefined && fragment.legend.length > 0) {
-    sections.push(heading(2, 'Legend'), ...fragment.legend);
+    blocks.push(heading(2, 'Legend'), ...fragment.legend.map(trustAuthoredBlock));
   }
 
   if (fragment.patterns.length > 0) {
-    sections.push(heading(2, 'Patterns'), list(fragment.patterns));
+    blocks.push(heading(2, 'Patterns'), list(fragment.patterns));
   }
 
-  return createMarkdownDocument(metadata, sections);
+  return createMarkdownDocument(metadata, blocks);
+}
+
+function normalizeApiReference(
+  fragment: ApiReferenceDigest,
+  options: NormalizeMarkdownOptions,
+): MarkdownDocument {
+  const metadata = resolveFragmentMetadata(fragment);
+  if (fragment.scope === 'all') {
+    return normalizeApiReferenceIndex(fragment, options, metadata);
+  }
+  return normalizeApiReferencePackage(fragment, metadata);
+}
+
+function normalizeApiReferenceIndex(
+  fragment: Extract<ApiReferenceDigest, { scope: 'all' }>,
+  options: NormalizeMarkdownOptions,
+  metadata: MarkdownMetadata,
+): MarkdownDocument {
+  const groupingEntries = fragment.groupingEntries ?? [];
+  const shapeCount = fragment.shapes.length;
+  const packageCount = groupingEntries.length;
+
+  const blocks: MarkdownRenderableBlock[] = [
+    heading(2, 'Overview'),
+    paragraph(
+      `This API reference covers ${String(shapeCount)} ${shapeCount === 1 ? 'shape' : 'shapes'} across ${String(packageCount)} ${packageCount === 1 ? 'package' : 'packages'}, sourced from \`@architect-shape\` annotations.`,
+    ),
+  ];
+
+  if (groupingEntries.length > 0) {
+    // Package labels are SOURCED → the plain `table` block escapes every cell.
+    blocks.push(
+      heading(2, 'Packages'),
+      table(
+        ['Package', 'Patterns', 'Shapes'],
+        groupingEntries.map((entry) => [
+          entry.label,
+          String(entry.patternCount),
+          String(entry.shapeCount),
+        ]),
+        ['left', 'left', 'left'],
+      ),
+    );
+
+    const links = buildChildRouteLinks(groupingEntries, options.childRoutes);
+    if (links.length > 0) {
+      blocks.push(heading(2, 'Packages — detail'), {
+        type: 'list',
+        ordered: false,
+        items: links,
+      });
+    }
+  }
+
+  return createMarkdownDocument(metadata, blocks);
+}
+
+function normalizeApiReferencePackage(
+  fragment: Extract<ApiReferenceDigest, { scope: 'package' }>,
+  metadata: MarkdownMetadata,
+): MarkdownDocument {
+  const patternCount = new Set(fragment.shapes.map((shape) => shape.pattern)).size;
+  const shapeCount = fragment.shapes.length;
+
+  const blocks: MarkdownRenderableBlock[] = [
+    heading(2, 'Overview'),
+    paragraph(
+      `${String(shapeCount)} ${shapeCount === 1 ? 'shape' : 'shapes'} across ${String(patternCount)} ${patternCount === 1 ? 'pattern' : 'patterns'} in ${fragment.scopeValue}.`,
+    ),
+  ];
+
+  // Shapes arrive pre-sorted by (pattern, name); group consecutive runs by owning pattern.
+  let currentPattern: string | undefined;
+  for (const shape of fragment.shapes) {
+    if (shape.pattern !== currentPattern) {
+      currentPattern = shape.pattern;
+      // Pattern name is SOURCED → the plain `heading` block escapes it.
+      blocks.push(heading(2, currentPattern));
+    }
+    blocks.push(...renderApiShape(shape));
+  }
+
+  return createMarkdownDocument(metadata, blocks);
+}
+
+function renderApiShape(shape: ApiShape): MarkdownRenderableBlock[] {
+  // Shape name is SOURCED → the plain `heading` block escapes it.
+  const blocks: MarkdownRenderableBlock[] = [heading(3, shape.name)];
+
+  if (shape.description !== undefined) {
+    blocks.push(paragraph(shape.description));
+  }
+
+  // sourceText is SOURCED, but a code fence is a sanctioned raw surface (ADR-009);
+  // `code` routes through pickFence so embedded backtick runs cannot break out.
+  blocks.push(code(shape.sourceText, 'ts'));
+
+  if (shape.properties !== undefined && shape.properties.length > 0) {
+    blocks.push(
+      heading(4, 'Properties'),
+      table(
+        ['Property', 'Description'],
+        shape.properties.map((property) => [property.name, property.description]),
+        ['left', 'left'],
+      ),
+    );
+  }
+
+  if (shape.params !== undefined && shape.params.length > 0) {
+    blocks.push(
+      heading(4, 'Parameters'),
+      table(
+        ['Parameter', 'Type', 'Description'],
+        shape.params.map((param) => [param.name, param.type ?? '', param.description]),
+        ['left', 'left', 'left'],
+      ),
+    );
+  }
+
+  if (shape.returns !== undefined) {
+    blocks.push(
+      heading(4, 'Returns'),
+      paragraph(
+        shape.returns.type !== undefined
+          ? `${shape.returns.type} — ${shape.returns.description}`
+          : shape.returns.description,
+      ),
+    );
+  }
+
+  if (shape.throws !== undefined && shape.throws.length > 0) {
+    blocks.push(
+      heading(4, 'Throws'),
+      list(
+        shape.throws.map((entry) =>
+          entry.type !== undefined ? `${entry.type} — ${entry.description}` : entry.description,
+        ),
+      ),
+    );
+  }
+
+  return blocks;
 }
 
 function normalizeBusinessRuleSet(
   fragment: BusinessRuleSet,
-  options: NormalizeMarkdownOptions
+  options: NormalizeMarkdownOptions,
 ): MarkdownDocument {
   const metadata = resolveFragmentMetadata(fragment);
   const rules = [...fragment.rules].sort((left, right) => {
@@ -561,7 +848,7 @@ function normalizeBusinessRuleSet(
   const sections: MarkdownRenderableBlock[] = [
     heading(2, 'Overview'),
     paragraph(
-      `Structured business-rule catalog with ${String(rules.length)} ${rules.length === 1 ? 'rule' : 'rules'}${fragment.groupedBy !== undefined ? ` grouped by ${humanizeKey(fragment.groupedBy).toLowerCase()}` : ''}.`
+      `Structured business-rule catalog with ${String(rules.length)} ${rules.length === 1 ? 'rule' : 'rules'}${fragment.groupedBy !== undefined ? ` grouped by ${humanizeKey(fragment.groupedBy).toLowerCase()}` : ''}.`,
     ),
   ];
 
@@ -574,7 +861,7 @@ function normalizeBusinessRuleSet(
     const groupingLinks = buildBusinessRuleGroupingLinks(
       fragment.groupedBy,
       fragment.groupingEntries,
-      options.childRoutes
+      options.childRoutes,
     );
     if (groupingLinks !== null) {
       sections.push(heading(2, groupingLinks.heading), groupingLinks.links);
@@ -595,13 +882,13 @@ function normalizeBusinessRuleSet(
 
 function createBusinessRuleTable(
   rules: readonly BusinessRule[],
-  richness: DisclosureSpec['richness']
+  richness: DisclosureSpec['richness'],
 ): TableBlock {
   if (richness === 'name-only') {
     return table(
       ['Feature', 'Rule Name'],
       rules.map((rule) => [rule.feature, rule.ruleName]),
-      ['left', 'left']
+      ['left', 'left'],
     );
   }
 
@@ -609,7 +896,7 @@ function createBusinessRuleTable(
     return table(
       ['Feature', 'Rule Name', 'Invariant'],
       rules.map((rule) => [rule.feature, rule.ruleName, rule.invariant ?? '']),
-      ['left', 'left', 'left']
+      ['left', 'left', 'left'],
     );
   }
 
@@ -623,7 +910,7 @@ function createBusinessRuleTable(
         rule.verifiedBy.join(', '),
         String(rule.scenarioCount),
       ]),
-      ['left', 'left', 'left', 'left', 'left']
+      ['left', 'left', 'left', 'left', 'left'],
     );
   }
 
@@ -636,7 +923,6 @@ function createBusinessRuleTable(
       'Verified By',
       'Scenarios',
       'Pattern',
-      'Phase',
       'Product Area',
     ],
     rules.map((rule): string[] => [
@@ -647,10 +933,9 @@ function createBusinessRuleTable(
       rule.verifiedBy.join(', '),
       String(rule.scenarioCount),
       rule.pattern ?? '',
-      rule.phase === undefined ? '' : String(rule.phase),
       rule.productArea ?? '',
     ]),
-    ['left', 'left', 'left', 'left', 'left', 'left', 'left', 'left', 'left']
+    ['left', 'left', 'left', 'left', 'left', 'left', 'left', 'left'],
   );
 }
 
@@ -674,18 +959,23 @@ function normalizeDecisionCatalog(fragment: DecisionCatalog): MarkdownDocument {
         ['Deprecated', String(counts.get('deprecated') ?? 0)],
         ['Superseded', String(counts.get('superseded') ?? 0)],
       ],
-      ['left', 'left']
+      ['left', 'left'],
     ),
     heading(2, 'ADR Index'),
-    table(
+    markdownTable(
       ['ADR', 'Title', 'Status', 'Type'],
-      decisions.map((decision) => [
-        toMarkdownLink(decision.id, `decisions/${toKebabCase(decision.id)}.md`) ?? decision.id,
-        decision.title,
-        decision.status,
-        decision.type,
-      ]),
-      ['left', 'left', 'left', 'left']
+      decisions.map((decision) => {
+        // The link is renderer-authored markdown; the link TEXT (decision.id) is
+        // already escaped inside toMarkdownLink. title/status/type stay sourced → escaped.
+        const link = toMarkdownLink(decision.id, `decisions/${slugForFilename(decision.id)}.md`);
+        return [
+          link === null ? decision.id : trustedMarkdown(link),
+          decision.title,
+          decision.status,
+          decision.type,
+        ];
+      }),
+      ['left', 'left', 'left', 'left'],
     ),
   ]);
 }
@@ -702,7 +992,7 @@ function normalizeDecisionRecord(fragment: DecisionRecord): MarkdownDocument {
         ['Status', fragment.status],
         ['Type', fragment.type],
       ],
-      ['left', 'left']
+      ['left', 'left'],
     ),
     heading(2, 'Context'),
     ...fragment.context,
@@ -737,93 +1027,53 @@ function normalizeRoadmapTimeline(fragment: RoadmapTimeline): MarkdownDocument {
   const sections: MarkdownRenderableBlock[] = [
     heading(2, 'Overview'),
     paragraph(
-      `Quarter-grouped ${viewLabel} timeline covering ${String(fragment.quarters.length)} ${fragment.quarters.length === 1 ? 'quarter' : 'quarters'}.`
+      `${capitalize(viewLabel)} timeline covering ${String(fragment.patterns.length)} ${fragment.patterns.length === 1 ? 'pattern' : 'patterns'}.`,
     ),
   ];
 
-  if (fragment.quarters.length === 0) {
-    sections.push(paragraph('No quarter entries were recorded.'));
+  if (fragment.patterns.length === 0) {
+    sections.push(paragraph('No patterns were recorded.'));
     return createMarkdownDocument(metadata, sections);
   }
 
-  for (const entry of fragment.quarters) {
-    sections.push(
-      heading(2, entry.quarter),
-      table(
-        ['Metric', 'Value'],
-        [
-          ['Patterns', String(entry.patterns.length)],
-          ['Completed', String(entry.counts.completed)],
-          ['Active', String(entry.counts.active)],
-          ['Planned', String(entry.counts.planned)],
-          ['Candidate', String(entry.counts.candidate)],
-        ],
-        ['left', 'left']
-      ),
-      table(
-        ['Pattern', 'Status', 'Role', 'Phase', 'Source File'],
-        entry.patterns.map((pattern) => [
-          pattern.patternName,
-          pattern.status ?? '',
-          pattern.role,
-          pattern.phase === undefined ? '' : String(pattern.phase),
-          pattern.file,
-        ]),
-        ['left', 'left', 'left', 'left', 'left']
-      )
-    );
-  }
+  sections.push(
+    table(
+      ['Metric', 'Value'],
+      [
+        ['Patterns', String(fragment.patterns.length)],
+        ['Completed', String(fragment.counts.completed)],
+        ['Active', String(fragment.counts.active)],
+        ['Planned', String(fragment.counts.planned)],
+        ['Candidate', String(fragment.counts.candidate)],
+      ],
+      ['left', 'left'],
+    ),
+    table(
+      ['Pattern', 'Status', 'Role', 'Source File'],
+      fragment.patterns.map((pattern) => [
+        pattern.patternName,
+        pattern.status ?? '',
+        pattern.role,
+        pattern.file,
+      ]),
+      ['left', 'left', 'left', 'left'],
+    ),
+  );
 
   return createMarkdownDocument(metadata, sections);
 }
 
-function normalizeReleaseNotesDigest(fragment: ReleaseNotesDigest): MarkdownDocument {
-  const metadata = resolveFragmentMetadata(fragment);
-  const sections: MarkdownRenderableBlock[] = [
-    paragraph('All notable changes to this project will be documented in this file.'),
-    trustedMarkdownParagraph(
-      'The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).'
-    ),
-  ];
-
-  for (const release of fragment.releases) {
-    const addedEntries = dedupeStrings([
-      ...release.deliverables.map(
-        (deliverable) =>
-          `**${escapePlainMarkdownText(deliverable.name)}**${deliverable.location.length > 0 ? `: ${escapePlainMarkdownText(deliverable.location)}` : ''}`
-      ),
-      ...release.patterns.map((pattern) => escapePlainMarkdownText(pattern.patternName)),
-    ]);
-
-    sections.push(
-      trustedMarkdownHeading(
-        2,
-        `[${escapePlainMarkdownText(release.release)}]${release.date !== undefined ? ` - ${escapePlainMarkdownText(release.date)}` : ''}`
-      )
-    );
-
-    if (release.notes !== undefined && release.notes.trim().length > 0) {
-      sections.push(paragraph(release.notes));
-    }
-
-    sections.push(
-      heading(3, 'Added'),
-      ...(addedEntries.length > 0
-        ? [trustedMarkdownList(addedEntries)]
-        : [paragraph('No release additions were recorded.')])
-    );
-  }
-
-  return createMarkdownDocument(metadata, sections);
+function capitalize(value: string): string {
+  return value.length === 0 ? value : value.charAt(0).toUpperCase() + value.slice(1);
 }
 
 function normalizeRequirementDigest(
   fragment: RequirementDigest,
-  options: NormalizeMarkdownOptions
+  options: NormalizeMarkdownOptions,
 ): MarkdownDocument {
   const metadata = resolveFragmentMetadata(fragment);
   const requirements = [...fragment.requirements].sort((left, right) =>
-    left.pattern.localeCompare(right.pattern)
+    left.pattern.localeCompare(right.pattern),
   );
 
   // Per-pattern detail file (single-entry digest where the productArea label
@@ -841,7 +1091,7 @@ function normalizeRequirementDigest(
     const sections: MarkdownRenderableBlock[] = [];
     if (requirement.status !== undefined) {
       sections.push(
-        trustedMarkdownParagraph(`**Status:** ${escapePlainMarkdownText(requirement.status)}`)
+        trustedMarkdownParagraph(`**Status:** ${escapePlainMarkdownText(requirement.status)}`),
       );
     }
     sections.push(...requirement.description);
@@ -863,14 +1113,14 @@ function normalizeRequirementDigest(
         requirement.status ?? '',
         requirement.testFiles.join(', '),
       ]),
-      ['left', 'left', 'left']
+      ['left', 'left', 'left'],
     ),
   ]);
 }
 
 function renderRequirementPatternCell(
   patternName: string,
-  options: NormalizeMarkdownOptions
+  options: NormalizeMarkdownOptions,
 ): MarkdownText {
   const detailRoute = options.childRoutes.find((route) => {
     const child = route.fragment;
@@ -902,12 +1152,12 @@ function normalizeTaxonomyDigest(fragment: TaxonomyDigest): MarkdownDocument {
   const roleGroups = fragment.tags.filter((group) => group.entries[0]?.kind === 'role');
   const metadataGroups = fragment.tags.filter((group) => group.entries[0]?.kind === 'metadata');
   const aggregationGroups = fragment.tags.filter(
-    (group) => group.entries[0]?.kind === 'aggregation'
+    (group) => group.entries[0]?.kind === 'aggregation',
   );
-  const sections: Block[] = [
+  const sections: MarkdownRenderableBlock[] = [
     heading(2, 'Overview'),
-    paragraph(
-      `**${String(counts.roles)} roles** | **${String(counts.metadata)} metadata tags** | **${String(counts.aggregation)} aggregation tags** | **${String(counts.total)} total**`
+    trustedMarkdownParagraph(
+      `**${String(counts.roles)} roles** | **${String(counts.metadata)} metadata tags** | **${String(counts.aggregation)} aggregation tags** | **${String(counts.total)} total**`,
     ),
     table(
       ['Component', 'Count'],
@@ -917,7 +1167,7 @@ function normalizeTaxonomyDigest(fragment: TaxonomyDigest): MarkdownDocument {
         ['Aggregation Tags', String(counts.aggregation)],
         ['Total', String(counts.total)],
       ],
-      ['left', 'left']
+      ['left', 'left'],
     ),
   ];
 
@@ -948,8 +1198,8 @@ function normalizeTaxonomyDigest(fragment: TaxonomyDigest): MarkdownDocument {
         formatType.description,
         formatType.example,
       ]),
-      ['left', 'left', 'left']
-    )
+      ['left', 'left', 'left'],
+    ),
   );
 
   if (
@@ -963,8 +1213,8 @@ function normalizeTaxonomyDigest(fragment: TaxonomyDigest): MarkdownDocument {
         Object.entries(fragment.exampleOverrides)
           .sort(([left], [right]) => left.localeCompare(right))
           .map(([format, example]) => [format, example]),
-        ['left', 'left']
-      )
+        ['left', 'left'],
+      ),
     );
   }
 
@@ -977,7 +1227,7 @@ function normalizeTraceabilityMatrix(fragment: TraceabilityMatrix): MarkdownDocu
   return createMarkdownDocument(metadata, [
     heading(2, 'Summary'),
     paragraph(
-      `Traceability matrix covering ${String(fragment.rows.length)} ${fragment.rows.length === 1 ? 'pattern row' : 'pattern rows'}.`
+      `Traceability matrix covering ${String(fragment.rows.length)} ${fragment.rows.length === 1 ? 'pattern row' : 'pattern rows'}.`,
     ),
     heading(2, 'Rows'),
     table(
@@ -989,7 +1239,7 @@ function normalizeTraceabilityMatrix(fragment: TraceabilityMatrix): MarkdownDocu
         row.specs.join(', '),
         row.deliverables.join(', '),
       ]),
-      ['left', 'left', 'left', 'left', 'left']
+      ['left', 'left', 'left', 'left', 'left'],
     ),
   ]);
 }
@@ -1001,47 +1251,47 @@ function normalizeValidationRuleDigest(fragment: ValidationRuleDigest): Markdown
       status,
       level.level,
       level.canAddDeliverables ? 'Yes' : 'No',
-      level.needsUnlock ? 'Yes' : 'No',
+      level.unlockSuppressesWarning ? 'Yes' : 'No',
       level.meaning ?? '',
-    ])
+    ]),
   );
 
   return createMarkdownDocument(metadata, [
     heading(2, 'Overview'),
     paragraph(
-      `Process Guard validates delivery workflow changes at commit time using a Decider pattern. It enforces the ${String(fragment.fsm.states.length)}-state FSM and prevents common workflow violations.`
+      `Process Guard validates delivery workflow changes at commit time using a Decider pattern. It enforces the ${String(fragment.fsm.states.length)}-state FSM and prevents common workflow violations.`,
     ),
-    paragraph(
-      `**${String(fragment.rules.length)} validation rules** | **${String(fragment.fsm.states.length)} FSM states** | **${String(fragment.protectionLevels.length)} protection levels**`
+    trustedMarkdownParagraph(
+      `**${String(fragment.rules.length)} validation rules** | **${String(fragment.fsm.states.length)} FSM states** | **${String(fragment.protectionLevels.length)} protection levels**`,
     ),
     heading(2, 'Validation Rules'),
-    table(
+    markdownTable(
       ['Rule ID', 'Severity', 'Description', 'Applies To Roles'],
       fragment.rules.map((rule) => [
-        `\`${rule.id}\``,
+        // Rule id renders as inline code; `inlineCode` trusts the backtick fence only
+        // when the sourced id cannot break out of it. severity/description stay sourced → escaped.
+        inlineCode(rule.id),
         rule.severity,
         rule.description,
         rule.appliesToRoles?.join(', ') ?? '',
       ]),
-      ['left', 'left', 'left', 'left']
+      ['left', 'left', 'left', 'left'],
     ),
     heading(2, 'FSM State Diagram'),
     paragraph('Valid transitions for the delivery workflow FSM:'),
     mermaid(buildFsmStateDiagram(fragment)),
     heading(2, 'Protection Levels'),
-    table(['Status', 'Protection', 'Can Add Deliverables', 'Needs Unlock', 'Meaning'], rows, [
-      'left',
-      'left',
-      'left',
-      'left',
-      'left',
-    ]),
+    table(
+      ['Status', 'Protection', 'Can Add Deliverables', 'Unlock Suppresses Warning', 'Meaning'],
+      rows,
+      ['left', 'left', 'left', 'left', 'left'],
+    ),
   ]);
 }
 
 function normalizeGenericFragment(
   fragment: Fragment,
-  options: NormalizeMarkdownOptions
+  options: NormalizeMarkdownOptions,
 ): MarkdownDocument {
   const fields = Object.entries(fragment).filter(([key]) => key !== 'kind');
   const metadataRows: string[][] = [];
@@ -1050,7 +1300,7 @@ function normalizeGenericFragment(
   const title = metadata.title;
   const embeddedSections = renderEmbeddedSections(
     (fragment as Record<string, unknown>)['sections'],
-    options
+    options,
   );
 
   if (embeddedSections.length > 0) {
@@ -1159,7 +1409,7 @@ function renderEmbeddedSections(value: unknown, options: NormalizeMarkdownOption
         options.childPathMap,
         options.childRouteIdPathMap,
         options.childRefAliases,
-        options.currentPath
+        options.currentPath,
       ),
     ];
   });
@@ -1167,7 +1417,7 @@ function renderEmbeddedSections(value: unknown, options: NormalizeMarkdownOption
 
 function createMarkdownDocument(
   metadata: MarkdownMetadata,
-  sections: MarkdownRenderableBlock[]
+  sections: MarkdownRenderableBlock[],
 ): MarkdownDocument {
   return {
     title: metadata.title,
@@ -1181,11 +1431,37 @@ function createMarkdownDocument(
 // metadata from instance values rather than kind alone.
 function resolveFragmentMetadata(fragment: Fragment): MarkdownMetadata {
   switch (fragment.kind) {
+    case 'ApiReferenceDigest': {
+      switch (fragment.scope) {
+        case 'all':
+          return {
+            title: 'API Reference',
+            purpose: 'Type and API surface extracted from @architect-shape annotations',
+            detailLevel: 'Package index with links to per-package field tables',
+          };
+        case 'package':
+          return {
+            title: `${fragment.scopeValue} API Reference`,
+            purpose: 'Type and API surface for a single workspace package',
+          };
+        default:
+          throw new Error('Unsupported api-reference scope');
+      }
+    }
     case 'ArchitectureDiagram':
+      if (fragment.presentation !== undefined) {
+        return {
+          title: fragment.presentation.title,
+          purpose: fragment.presentation.purpose,
+          ...(fragment.presentation.detailLevel !== undefined
+            ? { detailLevel: fragment.presentation.detailLevel }
+            : {}),
+        };
+      }
       return {
         title: 'Architecture',
-        purpose: 'Auto-generated architecture diagram from source annotations',
-        detailLevel: 'Component diagram with bounded context subgraphs',
+        purpose: 'Auto-generated architecture diagrams from source annotations',
+        detailLevel: 'Context map plus per-group component diagrams',
       };
     case 'BusinessRuleSet': {
       switch (fragment.scope) {
@@ -1195,8 +1471,6 @@ function resolveFragmentMetadata(fragment: Fragment): MarkdownMetadata {
             purpose: 'Domain constraints and invariants extracted from feature files',
             detailLevel: 'Overview with links to detailed business rules by package',
           };
-        case 'phase':
-          return { title: `Phase ${String(fragment.scopeValue)} Business Rules` };
         case 'package':
         case 'product-area':
         case 'feature':
@@ -1212,15 +1486,18 @@ function resolveFragmentMetadata(fragment: Fragment): MarkdownMetadata {
         detailLevel: 'Summary with links to category details',
       };
     case 'RoadmapTimeline':
-      return {
-        title: getRoadmapViewTitle(fragment.view),
-        purpose: `Quarter-grouped ${getRoadmapViewTitle(fragment.view).toLowerCase()} timeline.`,
-      };
-    case 'ReleaseNotesDigest':
-      return {
-        title: 'Changelog',
-        purpose: 'Project changelog in Keep a Changelog format',
-      };
+      // The `milestones` view is the release-free changelog (ADR-013): the set of
+      // completed patterns in completion (name) order, with no release or date
+      // grouping. It renders to CHANGELOG.md, so its H1 is the changelog title.
+      return fragment.view === 'milestones'
+        ? {
+            title: 'Changelog',
+            purpose: 'Completed patterns in completion order.',
+          }
+        : {
+            title: getRoadmapViewTitle(fragment.view),
+            purpose: `${getRoadmapViewTitle(fragment.view)} timeline.`,
+          };
     case 'RequirementDigest': {
       const knownTitles: Record<string, string> = {
         [REQUIREMENTS_ALL_AREAS_LABEL]: 'Product Requirements',
@@ -1302,7 +1579,7 @@ function formatPrimitiveLike(value: PrimitiveLike): string {
 }
 
 function buildBusinessRuleGroupingSummary(
-  fragment: BusinessRuleSet
+  fragment: BusinessRuleSet,
 ): { heading: string; table: TableBlock } | null {
   const groupedBy = fragment.groupedBy;
   if (groupedBy === undefined) {
@@ -1325,7 +1602,7 @@ function buildBusinessRuleGroupingSummary(
           String(entry.ruleCount),
           String(entry.invariantCount),
         ]),
-        ['left', 'left', 'left', 'left']
+        ['left', 'left', 'left', 'left'],
       ),
     };
   }
@@ -1341,38 +1618,22 @@ function buildBusinessRuleGroupingSummary(
           String(entry.ruleCount),
           String(entry.invariantCount),
         ]),
-        ['left', 'left', 'left', 'left']
-      ),
-    };
-  }
-
-  if (groupedBy === 'package') {
-    return {
-      heading: 'Packages',
-      table: table(
-        ['Package', 'Features', 'Rules', 'With Invariants'],
-        groupingEntries.map((entry) => [
-          entry.label,
-          String(entry.featureCount),
-          String(entry.ruleCount),
-          String(entry.invariantCount),
-        ]),
-        ['left', 'left', 'left', 'left']
+        ['left', 'left', 'left', 'left'],
       ),
     };
   }
 
   return {
-    heading: 'Phases',
+    heading: 'Packages',
     table: table(
-      ['Phase', 'Features', 'Rules', 'With Invariants'],
+      ['Package', 'Features', 'Rules', 'With Invariants'],
       groupingEntries.map((entry) => [
         entry.label,
         String(entry.featureCount),
         String(entry.ruleCount),
         String(entry.invariantCount),
       ]),
-      ['left', 'left', 'left', 'left']
+      ['left', 'left', 'left', 'left'],
     ),
   };
 }
@@ -1380,24 +1641,13 @@ function buildBusinessRuleGroupingSummary(
 function buildBusinessRuleGroupingLinks(
   groupedBy: BusinessRuleSet['groupedBy'],
   groupingEntries: BusinessRuleSet['groupingEntries'],
-  childRoutes: readonly ChildRouteRef[]
+  childRoutes: readonly ChildRouteRef[],
 ): { heading: string; links: TrustedListBlock } | null {
   if (groupedBy === undefined || groupingEntries === undefined || groupingEntries.length === 0) {
     return null;
   }
 
-  const routes = new Map(childRoutes.map((route) => [route.key, route.path]));
-  const links = groupingEntries
-    .map((entry) => {
-      const path = routes.get(entry.childKey);
-      if (path === undefined) {
-        return null;
-      }
-
-      const link = toSafeRoutedMarkdownLink(entry.label, path);
-      return link === null ? entry.label : trustedMarkdown(link);
-    })
-    .filter((entry): entry is string | TrustedMarkdownText => entry !== null);
+  const links = buildChildRouteLinks(groupingEntries, childRoutes);
 
   if (links.length === 0) {
     return null;
@@ -1408,9 +1658,7 @@ function buildBusinessRuleGroupingLinks(
       ? 'Product Area Detail'
       : groupedBy === 'feature'
         ? 'Feature Detail'
-        : groupedBy === 'package'
-          ? 'Package Detail'
-          : 'Phase Detail';
+        : 'Package Detail';
 
   return {
     heading,
@@ -1422,35 +1670,43 @@ function buildBusinessRuleGroupingLinks(
   };
 }
 
-function buildTaxonomyGroupTable(group: TaxonomyDigest['tags'][number]): TableBlock {
+function buildTaxonomyGroupTable(group: TaxonomyDigest['tags'][number]): TrustedTableBlock {
   const kind = group.entries[0]?.kind;
 
+  // The `Tag` column renders as an inline code span. The tag VALUE is sourced, so
+  // `inlineCode` only trusts the backtick fence when the value cannot break out of
+  // it (no embedded backtick) and otherwise degrades to escaped plain text. Every
+  // other column is sourced text and stays a plain string → escaped by
+  // `escapeTableCell`.
+  const tagCell = (entry: TaxonomyDigest['tags'][number]['entries'][number]): MarkdownText =>
+    inlineCode(entry.tag);
+
   if (kind === 'role') {
-    return table(
+    return markdownTable(
       ['Tag', 'Domain', 'Priority', 'Description', 'Aliases'],
       group.entries.map((entry) => [
-        `\`${entry.tag}\``,
+        tagCell(entry),
         entry.domain ?? '',
         entry.priority === undefined ? '' : String(entry.priority),
         entry.description ?? '',
         entry.aliases?.join(', ') ?? '',
       ]),
-      ['left', 'left', 'left', 'left', 'left']
+      ['left', 'left', 'left', 'left', 'left'],
     );
   }
 
   if (kind === 'aggregation') {
-    return table(
+    return markdownTable(
       ['Tag', 'Target Document', 'Purpose'],
-      group.entries.map((entry) => [`\`${entry.tag}\``, entry.targetDoc ?? '', entry.purpose]),
-      ['left', 'left', 'left']
+      group.entries.map((entry) => [tagCell(entry), entry.targetDoc ?? '', entry.purpose]),
+      ['left', 'left', 'left'],
     );
   }
 
-  return table(
+  return markdownTable(
     ['Tag', 'Format', 'Purpose', 'Required', 'Repeatable', 'Values', 'Default Value', 'Example'],
     group.entries.map((entry) => [
-      `\`${entry.tag}\``,
+      tagCell(entry),
       entry.format ?? '',
       entry.purpose,
       entry.required === undefined ? '' : entry.required ? 'Yes' : 'No',
@@ -1459,8 +1715,95 @@ function buildTaxonomyGroupTable(group: TaxonomyDigest['tags'][number]): TableBl
       entry.defaultValue ?? '',
       entry.example ?? '',
     ]),
-    ['left', 'left', 'left', 'left', 'left', 'left', 'left', 'left']
+    ['left', 'left', 'left', 'left', 'left', 'left', 'left', 'left'],
   );
+}
+
+/**
+ * Render the markdown body for one taxonomy embedded-region `source` (cluster
+ * `TaxonomyDocumentationCluster`): the canonical role-value enum, the live
+ * registry counts, or one digest tag-group's enumeration table. The body carries
+ * NO document chrome (no `# title`, no frontmatter) and no trailing newline — the
+ * managed-region engine owns the in-region blank-line/EOL normalization. The
+ * group tables reuse `buildTaxonomyGroupTable`, so an embedded region is
+ * byte-consistent with the corresponding `docs-live/TAXONOMY.md` table.
+ *
+ * Throws when `source` matches no role-enum / tag-count / digest-group selection
+ * (an unknown routing key), so a stale descriptor fails loud rather than emitting
+ * an empty region.
+ */
+export function renderTaxonomyManagedRegion(digest: TaxonomyDigest, source: string): string {
+  const blocks = buildTaxonomyRegionBlocks(digest, source);
+  const lines: string[] = [];
+  for (const block of blocks) {
+    lines.push(...renderBlock(block));
+  }
+  return lines.join('\n').trimEnd();
+}
+
+function buildTaxonomyRegionBlocks(
+  digest: TaxonomyDigest,
+  source: string,
+): MarkdownRenderableBlock[] {
+  if (source === TAXONOMY_ROLE_ENUM_SOURCE) {
+    const roleGroup = digest.tags.find((group) => group.entries[0]?.kind === 'role');
+    const roleTags = roleGroup?.entries.map((entry) => entry.tag) ?? [];
+    return [code(roleTags.join(' · '))];
+  }
+
+  if (source === TAXONOMY_TAG_COUNT_SOURCE) {
+    const counts = summarizeTaxonomyDigest(digest);
+    return [
+      trustedMarkdownParagraph(
+        `The validation registry currently defines **${String(counts.roles)} roles**, ` +
+          `**${String(counts.metadata)} metadata tags**, and ` +
+          `**${String(counts.aggregation)} aggregation tags** (**${String(counts.total)} total**).`,
+      ),
+    ];
+  }
+
+  // Function-group selection (audience-shaped View read): the RFC groups tags by
+  // FUNCTION, gathering them across the digest's DOMAIN buckets into one canonical
+  // enumeration table. Resolved before the single-bucket fallback below.
+  const functionGroupTags = TAXONOMY_FUNCTION_GROUPS[source];
+  if (functionGroupTags !== undefined) {
+    return [buildTaxonomyFunctionGroupTable(digest, source, functionGroupTags)];
+  }
+
+  const group = digest.tags.find(
+    (candidate) => taxonomyGroupSource(candidate.groupName) === source,
+  );
+  if (group === undefined) {
+    throw new Error(`Unknown taxonomy managed-region source: ${source}`);
+  }
+  return [buildTaxonomyGroupTable(group)];
+}
+
+/**
+ * Gather a function group's tags from across the digest's domain buckets into one
+ * synthetic group and render it with {@link buildTaxonomyGroupTable}, so a
+ * function-group region is byte-consistent with the same tags' rows in
+ * `docs-live/TAXONOMY.md`. The `Required` column comes from each entry's projected
+ * `required` flag — a source fact, not hand-authored modality (cluster spec).
+ * Throws when a referenced tag is absent from the digest (a stale function-group
+ * definition), so the region fails loud rather than silently dropping a row.
+ */
+function buildTaxonomyFunctionGroupTable(
+  digest: TaxonomyDigest,
+  source: string,
+  tags: readonly string[],
+): TrustedTableBlock {
+  const allEntries = digest.tags.flatMap((group) => group.entries);
+  const entries = tags.map((tag) => {
+    const entry = allEntries.find((candidate) => candidate.tag === tag);
+    if (entry === undefined) {
+      throw new Error(
+        `Taxonomy function group "${source}" references tag "${tag}" absent from the digest`,
+      );
+    }
+    return entry;
+  });
+  return buildTaxonomyGroupTable({ groupName: source, entries });
 }
 
 function buildFsmStateDiagram(fragment: ValidationRuleDigest): string {
@@ -1484,7 +1827,7 @@ function rewriteDocumentationLinks(
   childPathMap: Readonly<Record<string, string>>,
   childRouteIdPathMap: Readonly<Record<string, string>>,
   childRefAliases: ReadonlySet<string>,
-  currentPath: string | undefined
+  currentPath: string | undefined,
 ): Block[] {
   return blocks.map((block) => {
     if (block.type === 'link-out') {
@@ -1518,7 +1861,7 @@ function rewriteDocumentationLinks(
           childPathMap,
           childRouteIdPathMap,
           childRefAliases,
-          currentPath
+          currentPath,
         ),
       };
     }
@@ -1554,23 +1897,6 @@ function splitPathSegments(filePath: string): string[] {
 
 function hasText(value: string | undefined): value is string {
   return value !== undefined && value.trim().length > 0;
-}
-
-function dedupeStrings(values: readonly string[]): string[] {
-  const seen = new Set<string>();
-  const unique: string[] = [];
-
-  for (const value of values) {
-    const normalized = value.trim();
-    if (normalized.length === 0 || seen.has(normalized)) {
-      continue;
-    }
-
-    seen.add(normalized);
-    unique.push(normalized);
-  }
-
-  return unique;
 }
 
 function isBlockArray(value: unknown): value is Block[] {
@@ -1638,9 +1964,9 @@ function renderRecordArrayTable(rows: TabularRow[]): TableBlock {
       columns.map((column) => {
         const value = row[column];
         return value === undefined || !isPrimitiveLike(value) ? '' : formatPrimitiveLike(value);
-      })
+      }),
     ),
-    columns.map(() => 'left')
+    columns.map(() => 'left'),
   );
 }
 
@@ -1648,7 +1974,7 @@ function appendBundleBackLink(
   document: MarkdownDocument,
   rootTitle: string,
   currentPath: string,
-  rootPath: string
+  rootPath: string,
 ): MarkdownDocument {
   return {
     ...document,
@@ -1697,11 +2023,13 @@ function renderBlock(block: MarkdownRenderableBlock): string[] {
     case 'list':
       return renderList(block);
     case 'code': {
-      const fence = block.content.includes('```') ? '````' : '```';
+      const fence = pickFence(block.content);
       return [`${fence}${block.language ?? ''}`, block.content, fence, ''];
     }
-    case 'mermaid':
-      return ['```mermaid', block.content, '```', ''];
+    case 'mermaid': {
+      const fence = pickFence(block.content);
+      return [`${fence}mermaid`, block.content, fence, ''];
+    }
     case 'collapsible':
       return renderCollapsible(block);
     case 'link-out':
@@ -1710,6 +2038,14 @@ function renderBlock(block: MarkdownRenderableBlock): string[] {
       return [`<!-- Unknown block type: ${JSON.stringify(block)} -->`, ''];
     }
   }
+}
+
+function pickFence(content: string): string {
+  const longestRun = (content.match(/`{3,}/g) ?? []).reduce(
+    (max, run) => Math.max(max, run.length),
+    0,
+  );
+  return '`'.repeat(Math.max(3, longestRun + 1));
 }
 
 function renderTable(block: TableBlock | TrustedTableBlock): string[] {
@@ -1766,10 +2102,10 @@ function renderTable(block: TableBlock | TrustedTableBlock): string[] {
 
   const lines: string[] = [];
   lines.push(
-    `| ${escapedColumns.map((cell, index) => padCell(cell, widths[index] ?? 0)).join(' | ')} |`
+    `| ${escapedColumns.map((cell, index) => padCell(cell, widths[index] ?? 0)).join(' | ')} |`,
   );
   lines.push(
-    `| ${separators.map((cell, index) => padSeparator(cell, widths[index] ?? 0, index)).join(' | ')} |`
+    `| ${separators.map((cell, index) => padSeparator(cell, widths[index] ?? 0, index)).join(' | ')} |`,
   );
 
   for (const row of escapedRows) {
@@ -1797,7 +2133,7 @@ function renderList(block: ListBlock | TrustedListBlock): string[] {
 function renderListItem(
   item: ListItem | MarkdownListItem,
   prefix: string,
-  indent: number
+  indent: number,
 ): string[] {
   const lines: string[] = [];
   const indentation = '  '.repeat(indent);
@@ -1852,6 +2188,21 @@ function renderMarkdownLinkText(text: string): string {
   return escapePlainMarkdownText(text);
 }
 
+/**
+ * Renders a sourced value as an inline code span WITHOUT trusting it raw. The
+ * backtick fence makes any markup inside inert, but the one character that can
+ * close the span early — a backtick — would let the remainder of a hostile value
+ * inject live markdown. So the trusted code span is emitted only when the value
+ * contains no backtick; otherwise the value falls back to a plain string that the
+ * caller's escaping path renders literally (never as markup). `|`/newline stay the
+ * table layer's concern (`escapeTableCell`). This is the ONLY sanctioned way to
+ * code-span sourced text — never hand-wrap sourced values in `trustedMarkdown`
+ * backticks, which trusts them and re-opens the injection this guards against.
+ */
+function inlineCode(value: string): MarkdownText {
+  return value.includes('`') ? value : trustedMarkdown(`\`${value}\``);
+}
+
 function trustedMarkdown(text: string): TrustedMarkdownText {
   return { text, [TRUSTED_MARKDOWN]: true };
 }
@@ -1864,20 +2215,34 @@ function trustedMarkdownHeading(level: 1 | 2 | 3 | 4 | 5 | 6, text: string): Tru
   return { type: 'heading', level, text: trustedMarkdown(text) };
 }
 
-function trustedMarkdownList(items: readonly string[], ordered = false): TrustedListBlock {
-  return {
-    type: 'list',
-    ordered,
-    items: items.map((item) => trustedMarkdown(item)),
-  };
-}
-
 function markdownTable(
   columns: MarkdownText[],
   rows: MarkdownText[][],
-  alignment?: ('left' | 'center' | 'right')[]
+  alignment?: ('left' | 'center' | 'right')[],
 ): TrustedTableBlock {
   return { type: 'table', columns, rows, ...(alignment !== undefined ? { alignment } : {}) };
+}
+
+/**
+ * Re-emit a renderer/projection-authored Block as its trusted-markdown variant so
+ * intentional inline markdown (code spans, parens) renders instead of being escaped.
+ */
+// @invariant: apply ONLY to renderer/projection-authored blocks, never to sourced fragment text
+function trustAuthoredBlock(block: Block): MarkdownRenderableBlock {
+  switch (block.type) {
+    case 'heading':
+      return trustedMarkdownHeading(block.level, block.text);
+    case 'paragraph':
+      return trustedMarkdownParagraph(block.text);
+    case 'list':
+      return {
+        type: 'list',
+        ordered: block.ordered,
+        items: block.items.map((item) => (typeof item === 'string' ? trustedMarkdown(item) : item)),
+      };
+    default:
+      return block;
+  }
 }
 
 function isTrustedMarkdown(value: MarkdownText): value is TrustedMarkdownText {
@@ -1885,7 +2250,7 @@ function isTrustedMarkdown(value: MarkdownText): value is TrustedMarkdownText {
 }
 
 function isTrustedListItemObject(
-  value: ListItem | MarkdownListItem
+  value: ListItem | MarkdownListItem,
 ): value is TrustedListItemObject | Exclude<ListItem, string> {
   return typeof value === 'object' && !(TRUSTED_MARKDOWN in value);
 }
@@ -1907,12 +2272,51 @@ function toSafeRoutedMarkdownLink(text: string, path: string): string | null {
   return toMarkdownLink(text, path);
 }
 
+/**
+ * Resolves grouping entries to routed child links — the navigation list shared
+ * by every routed-bundle index (api-reference packages, business-rule groups,
+ * …). Each entry's `childKey` is matched against `childRoutes`; the link TEXT
+ * (a sourced label) is escaped inside `toSafeRoutedMarkdownLink`, and entries
+ * whose route is missing (or whose path is unsafe) fall back to the plain
+ * escaped label. Entries with no resolvable route are dropped.
+ */
+function buildChildRouteLinks(
+  entries: readonly { readonly childKey: string; readonly label: string }[],
+  childRoutes: readonly ChildRouteRef[],
+): (string | TrustedMarkdownText)[] {
+  const routes = new Map(childRoutes.map((route) => [route.key, route.path]));
+  return entries
+    .map((entry) => {
+      const path = routes.get(entry.childKey);
+      if (path === undefined) {
+        return null;
+      }
+      const link = toSafeRoutedMarkdownLink(entry.label, path);
+      return link === null ? entry.label : trustedMarkdown(link);
+    })
+    .filter((entry): entry is string | TrustedMarkdownText => entry !== null);
+}
+
 function escapePlainMarkdownText(text: string): string {
   return escapeHtml(text).split('\n').map(escapePlainMarkdownLine).join('\n');
 }
 
 function escapePlainMarkdownLine(line: string): string {
-  const escapedInline = line.replace(/([\\`*_\[\]()!])/g, '\\$1');
+  // Escape only the inline constructs that could actually start markup, so the
+  // text renders literally without gratuitous backslashes. Deliberately NOT
+  // escaped: `(` `)` are never markup standalone (a link needs a preceding `]`,
+  // which IS escaped here, so the `](…)` form can never close); `!` only matters
+  // as `![` (the `[` is escaped); and intra-word `_` never emphasizes in
+  // CommonMark, so `snake_case` / `MARKDOWN_NORMALIZERS` stay literal. `*`, by
+  // contrast, emphasizes mid-word and is always escaped.
+  const escapedInline = line
+    .replace(/[\\`*\[\]]/g, '\\$&')
+    .replace(/_/g, (underscore: string, offset: number, source: string) => {
+      const left = source[offset - 1] ?? '';
+      const right = source[offset + 1] ?? '';
+      const intraWord = /[\p{L}\p{N}]/u.test(left) && /[\p{L}\p{N}]/u.test(right);
+      return intraWord ? underscore : `\\${underscore}`;
+    });
 
   if (/^\s*$/.test(escapedInline)) {
     return escapedInline;
@@ -1935,6 +2339,11 @@ function escapeTableCell(cell: MarkdownText): string {
   return rendered.replace(/\|/g, '\\|').replace(/\n/g, '<br>');
 }
 
+/**
+ * Single chokepoint for markdown-link href values: decode HTML entities before
+ * classification, reject control characters and protocol-relative URLs, and
+ * enforce the scheme allowlist accepted by link rendering.
+ */
 function sanitizeMarkdownLinkTarget(value: string): string | null {
   const trimmed = value.trim();
   if (trimmed.length === 0) {
@@ -2055,35 +2464,51 @@ function splitOversizedDocument(
   document: MarkdownDocument,
   budget: number,
   basePath: string,
-  renderFn: (document: MarkdownDocument) => string
+  options: ResolvedMarkdownOptions,
+  renderedDocument: RenderedMarkdownDocument,
 ): SplitResult {
   const groups = groupByH2(document.sections);
 
   if (groups.length <= 1) {
-    return { parent: document, subFiles: {} };
+    return { parent: renderedDocument, subFiles: {} };
   }
 
-  const subFiles: Record<string, MarkdownDocument> = {};
+  const subFiles: Record<string, RenderedMarkdownDocument> = {};
   const parentSections: MarkdownRenderableBlock[] = [];
   const directory = extractDirectory(basePath);
   const parentFileName = extractFileName(basePath);
 
-  for (const group of groups) {
+  for (const [groupIndex, group] of groups.entries()) {
     if (group.heading === '_preamble') {
       parentSections.push(...group.sections);
       continue;
     }
 
     const subDocument: MarkdownDocument = { title: group.heading, sections: group.sections };
-    const subLineCount = renderFn(subDocument).split('\n').length;
+    const subFileName = `${slugForFilename(group.heading)}.md`;
+    const subPath = directory ? `${directory}/${subFileName}` : subFileName;
+    const renderKey = `${basePath}#${String(groupIndex)}:${slugForFilename(group.heading)}`;
+    const renderedSubDocument = renderMarkdownDocument(
+      subDocument,
+      options,
+      subPath,
+      'measure',
+      renderKey,
+    );
 
-    if (subLineCount <= budget) {
-      const subFileName = `${toKebabCase(group.heading)}.md`;
-      const subPath = directory ? `${directory}/${subFileName}` : subFileName;
-      subFiles[subPath] = {
+    if (renderedSubDocument.lineCount <= budget) {
+      const splitChildDocument: MarkdownDocument = {
         title: group.heading,
         sections: [linkOut(`← Back to ${document.title}`, parentFileName), ...group.sections],
       };
+      // Re-renders splitChildDocument (not subDocument) because linkOut is prepended after the measure pass, so the emitted output is genuinely different.
+      subFiles[subPath] = renderMarkdownDocument(
+        splitChildDocument,
+        options,
+        subPath,
+        'emit',
+        renderKey,
+      );
       parentSections.push(heading(2, group.heading), linkOut(`See ${group.heading}`, subFileName));
       continue;
     }
@@ -2092,12 +2517,17 @@ function splitOversizedDocument(
   }
 
   return {
-    parent: {
-      title: document.title,
-      ...(document.purpose !== undefined ? { purpose: document.purpose } : {}),
-      ...(document.detailLevel !== undefined ? { detailLevel: document.detailLevel } : {}),
-      sections: parentSections,
-    },
+    parent: renderMarkdownDocument(
+      {
+        title: document.title,
+        ...(document.purpose !== undefined ? { purpose: document.purpose } : {}),
+        ...(document.detailLevel !== undefined ? { detailLevel: document.detailLevel } : {}),
+        sections: parentSections,
+      },
+      options,
+      basePath,
+      'emit',
+    ),
     subFiles,
   };
 }
@@ -2130,15 +2560,6 @@ function groupByH2(sections: readonly MarkdownRenderableBlock[]): H2Group[] {
   }
 
   return groups;
-}
-
-function toKebabCase(text: string): string {
-  return text
-    .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
-    .replace(/([A-Z]+)([A-Z][a-z])/g, '$1-$2')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '');
 }
 
 function extractDirectory(filePath: string): string {

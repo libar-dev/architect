@@ -4,15 +4,23 @@
  * @architect-status active
  * @architect-role:contract
  * @architect-bounded-context:documentation-composition
+ * @architect-uses BlockSchema
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Defines the PrChangeReview fragment shape for branch changes and reviewer
+ *   recommendations.
  */
 import { z } from 'zod';
 
-import { BlockSchema } from '../../blocks/schema.js';
+import { BlockSchema } from '@libar-dev/architect-core';
 
+/**
+ * A PR change-review fragment — the branch, its changed files, the patterns
+ * those changes affect, and reviewer recommendation blocks.
+ *
+ * @architect-shape
+ */
 export const PrChangeReviewSchema = z.strictObject({
   kind: z.literal('PrChangeReview'),
   branch: z.string(),

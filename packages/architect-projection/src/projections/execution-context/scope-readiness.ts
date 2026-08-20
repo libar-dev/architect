@@ -3,7 +3,7 @@
  * @architect-pattern ScopeReadinessProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses ExecutionContextProjectionSupport, ProjectionFragmentContracts
+ * @architect-uses ExecutionContextProjectionSupport, ProjectionFragmentContracts, ScopeReadinessReport, ScopeReadinessCheck
  * @architect-bounded-context:projection
  *
  * **Value:** Projects a `ScopeReadinessReport` per pattern + session type so
@@ -28,7 +28,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects scope-readiness checks and verdicts for design and implement sessions.
  */
 
 import type { ProjectionContext } from '../../context/projection-context.js';
@@ -47,7 +47,7 @@ export type { ScopeReadinessOptions } from './scope-readiness.internal.js';
 
 export function projectScopeReadinessReport(
   context: ProjectionContext,
-  options: ScopeReadinessOptions
+  options: ScopeReadinessOptions,
 ): ProjectionBundle<ScopeReadinessReport> {
   return projectSingle(buildScopeReadinessReport(context, options));
 }
@@ -55,5 +55,5 @@ export function projectScopeReadinessReport(
 export const parseAndProjectScopeReadinessReport = parseAndProject(
   ScopeReadinessOptionsSchema,
   projectScopeReadinessReport,
-  'parseAndProjectScopeReadinessReport'
+  'parseAndProjectScopeReadinessReport',
 );

@@ -2,7 +2,6 @@
 @architect-pattern:ExecutionContextProjectionExecutableTests
 @architect-implements:ExecutionContextProjectionSupport,ScopeReadinessProjection,SessionContextProjection,FileReadingListProjection,DeliverableProjection,HandoffProjection
 @architect-status:completed
-@architect-phase:49
 @architect-product-area:Projection
 @architect-role:projection
 @execution-context
@@ -75,7 +74,7 @@ Feature: Execution Context context and session projections
     type needs, and invalid session options must fail at the parse boundary
     instead of producing an ambiguous bundle.
 
-    **Verified by:** planning design and implement sessions expose different shapes, parseAndProjectSessionContext rejects invalid session options
+    **Verified by:** planning design and implement sessions expose different shapes, parseAndProjectSessionContext rejects invalid session options, parseAndProjectSessionContext rejects extra option properties
 
     Scenario: planning design and implement sessions expose different shapes
       Given a Execution Context session projection context with metadata stubs neighbors and tests
@@ -90,6 +89,11 @@ Feature: Execution Context context and session projections
       When I parse-and-project session context with an invalid session type
       Then parsing session context options should fail loudly
 
+    Scenario: parseAndProjectSessionContext rejects extra option properties
+      Given a Execution Context session projection context with metadata stubs neighbors and tests
+      When I parse-and-project session context with an extra option property
+      Then parsing session context options should reject the extra property
+
   Rule: Reading lists and deliverables stay deterministic
 
     Scenario: reading-list and deliverable lookups normalize the same graph data
@@ -103,6 +107,32 @@ Feature: Execution Context context and session projections
       Given a Execution Context reading-list projection context with completed and roadmap dependencies
       When I project the file reading list for "ProjectionBody" without related files
       Then the file reading list should keep only primary files
+
+  Rule: Reverse-trace surfaces the realizing features as specs primary and tests
+
+    **Invariant:** When the focal pattern is a TypeScript pattern realized by a
+    `.feature` spec via the derived `implementedBy` reverse edge, design and
+    implement session context push the implementing `.feature` paths into
+    `specFiles`, implement context also pushes them into `testFiles`, and the
+    file reading list lists those `.feature` paths in `primary` (not gated by
+    the typed `includeRelated` option).
+
+    **Rationale:** The only link from a TS pattern to its behavioral spec is
+    `implementedBy` (ADR-002/ADR-003); a reverse-trace question must follow it
+    rather than returning an empty spec/test set for the TS focal node.
+
+    **Verified by:** session context follows implementedBy for specs and tests, file reading list lists realizing features as primary
+
+    Scenario: session context follows implementedBy for specs and tests
+      Given a Execution Context session projection context where a TS pattern is realized by a feature spec
+      When I project session context for the design and implement sessions
+      Then the design session context specFiles should include the realizing feature
+      And the implement session context testFiles should include the realizing feature
+
+    Scenario: file reading list lists realizing features as primary
+      Given a Execution Context session projection context where a TS pattern is realized by a feature spec
+      When I project the file reading list for "ReverseTraceBody" without related files
+      Then the file reading list primary should include the realizing feature
 
   Rule: Handoff stays flattened and separate from scope/context bundles
 

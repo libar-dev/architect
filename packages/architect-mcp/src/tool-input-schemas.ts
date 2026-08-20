@@ -11,20 +11,24 @@ import {
   ScopeTypeSchema,
   SafeStringSchema,
   SessionTypeSchema,
+  StatusFilterSchema,
 } from '@libar-dev/architect-core';
 import {
   PatternBundleOptionsSchema,
   OpenQuestionListOptionsSchema,
   ProjectDocumentationBundleOptionsSchema,
-  ProgressiveDisclosureLevelSchema,
   TaxonomyDigestOptionsSchema,
 } from '@libar-dev/architect-projection/projections';
+import {
+  ContentRichnessSchema,
+  ProgressiveDisclosureLevelSchema,
+} from '@libar-dev/architect-projection/disclosure';
 import { z } from 'zod';
 
 export const MAX_HANDOFF_MODIFIED_FILES = 200;
 
 function createStrictReadonlyObjectSchema<TShape extends z.ZodRawShape>(
-  shape: TShape
+  shape: TShape,
 ): z.ZodReadonly<z.ZodObject<TShape>> {
   return z.strictObject(shape).readonly();
 }
@@ -71,6 +75,10 @@ export const DocumentationFilterSchema = z
   })
   .readonly();
 
+export const OptionalContentRichnessShape = {
+  disclosure: ContentRichnessSchema.optional(),
+} satisfies z.ZodRawShape;
+
 export const OptionalDocumentationOptionsShape = {
   disclosure: ProgressiveDisclosureLevelSchema.optional(),
   filter: DocumentationFilterSchema.optional(),
@@ -81,7 +89,7 @@ export const SearchQueryShape = {
 } satisfies z.ZodRawShape;
 
 export const ListFilterShape = {
-  status: AcceptedStatusSchema.optional(),
+  status: StatusFilterSchema.optional(),
   role: SafeStringSchema.optional(),
   namesOnly: z.boolean().optional(),
   count: z.boolean().optional(),

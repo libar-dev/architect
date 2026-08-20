@@ -3,7 +3,7 @@
  * @architect-pattern BusinessRulesProjection
  * @architect-status completed
  * @architect-role:projection
- * @architect-uses GovernanceProjectionSupport, ProjectionFragmentContracts
+ * @architect-uses GovernanceProjectionSupport, ProjectionFragmentContracts, BusinessRule, BusinessRuleSet, GovernanceSupporting
  * @architect-bounded-context:projection
  *
  * **Value:** Exposes normalized `BusinessRule` and `BusinessRuleSet`
@@ -21,7 +21,7 @@
  *   a single-bundle projection of the normalized `BusinessRule`, unless the
  *   current `ProjectionFilter` excludes the owning pattern.
  * - `projectBusinessRuleSet` filters, groups, and sorts rules by product
- *   area, package, phase, or feature; defaults to scope `all` when no option
+ *   area, package, or feature; defaults to scope `all` when no option
  *   is given.
  * - Re-exports `BusinessRuleSetOptionsSchema` for callers that validate
  *   options independently, and exposes `parseAndProjectBusinessRuleSet` as a
@@ -29,7 +29,7 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Projects normalized business rules and grouped rule sets into schema-validated fragments for render consumers.
  */
 
 import type { ProjectionContext } from '../../context/projection-context.js';
@@ -44,11 +44,12 @@ import {
 import { parseAndProject } from '../_shared/parse-and-project.internal.js';
 
 export { BusinessRuleSetOptionsSchema } from './business-rules.internal.js';
+export { collectBusinessRuleProductAreas } from './business-rules.internal.js';
 
 export function projectBusinessRule(
   context: ProjectionContext,
   feature: string,
-  ruleName: string
+  ruleName: string,
 ): ProjectionBundle<BusinessRule> | undefined {
   const businessRule = buildBusinessRule(context, feature, ruleName);
   return businessRule === undefined ? undefined : projectSingle(businessRule);
@@ -56,7 +57,7 @@ export function projectBusinessRule(
 
 export function projectBusinessRuleSet(
   context: ProjectionContext,
-  options: BusinessRuleSetOptions = { scope: 'all' }
+  options: BusinessRuleSetOptions = { scope: 'all' },
 ): ProjectionBundle<BusinessRuleSet> {
   return buildBusinessRuleSet(context, options);
 }
@@ -65,7 +66,7 @@ export const parseAndProjectBusinessRuleSet = parseAndProject(
   BusinessRuleSetOptionsSchema,
   projectBusinessRuleSet,
   'parseAndProjectBusinessRuleSet',
-  { scope: 'all' }
+  { scope: 'all' },
 );
 
 export type { BusinessRuleSetOptions } from './business-rules.internal.js';

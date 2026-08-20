@@ -3,14 +3,14 @@
  * @architect-pattern MCPPipelineSession
  * @architect-status completed
  * @architect-implements MCPToolRegistryIntegrationTests
- * @architect-uses MCPToolRegistry, MCPFileWatcher
+ * @architect-uses MCPToolRegistry, MCPFileWatcher, BuildPipeline
  * @architect-role:service
  * @architect-bounded-context:api
  * @architect-product-area:DataAPI
  *
  * ## PipelineSessionManager — In-Memory PatternGraph Lifecycle
  *
- * Owns the long-lived PatternGraph/API pair for the split MCP runtime, including
+ * Owns the long-lived PatternGraph for the split MCP runtime, including
  * config auto-detection, fallback source planning, and coalesced rebuild behavior.
  *
  * **When to Use:** Use for any MCP flow that needs a stable in-process dataset
@@ -33,8 +33,6 @@ import {
   type RuntimePatternGraph,
   type TagRegistry,
   WORKSPACE_TAG_REGISTRY,
-  createPatternGraphAPI,
-  type PatternGraphAPI,
 } from '@libar-dev/architect-core';
 import { normalizeSessionBaseDir } from './runtime-helpers.js';
 
@@ -47,7 +45,6 @@ export interface SessionOptions {
 
 export interface PipelineSession {
   readonly dataset: RuntimePatternGraph;
-  readonly api: PatternGraphAPI;
   readonly registry: TagRegistry;
   readonly tagRegistryOverride?: TagRegistry | undefined;
   readonly baseDir: string;
@@ -87,9 +84,7 @@ export class PipelineSessionManager {
     }
 
     if (input.length === 0 || features.length === 0) {
-      const applied = await this.withWorkingDirectory(baseDir, () =>
-        applyProjectSourceDefaults({ baseDir, input, features })
-      );
+      const applied = await applyProjectSourceDefaults({ baseDir, input, features });
       if (!applied) {
         this.applyFallbackDefaults({ baseDir, input, features });
       }
@@ -97,13 +92,11 @@ export class PipelineSessionManager {
 
     if (input.length === 0) {
       throw new Error(
-        'No TypeScript source globs found. Provide --input or create architect.config.ts'
+        'No TypeScript source globs found. Provide --input or create architect.config.ts',
       );
     }
 
-    const session = await this.withWorkingDirectory(baseDir, () =>
-      this.buildSession(baseDir, input, features, tagRegistryOverride)
-    );
+    const session = await this.buildSession(baseDir, input, features, tagRegistryOverride);
     this.session = session;
     return session;
   }
@@ -146,13 +139,11 @@ export class PipelineSessionManager {
     let latestSession = this.session;
 
     for (;;) {
-      const newSession = await this.withWorkingDirectory(latestSession.baseDir, () =>
-        this.buildSession(
-          latestSession.baseDir,
-          [...latestSession.sourceGlobs.input],
-          [...latestSession.sourceGlobs.features],
-          latestSession.tagRegistryOverride
-        )
+      const newSession = await this.buildSession(
+        latestSession.baseDir,
+        [...latestSession.sourceGlobs.input],
+        [...latestSession.sourceGlobs.features],
+        latestSession.tagRegistryOverride,
       );
       this.session = newSession;
       latestSession = newSession;
@@ -173,7 +164,7 @@ export class PipelineSessionManager {
     baseDir: string,
     input: readonly string[],
     features: readonly string[],
-    tagRegistryOverride?: TagRegistry
+    tagRegistryOverride?: TagRegistry,
   ): Promise<PipelineSession> {
     const startMs = Date.now();
     const discoveredConfigPath = await findConfigFile(baseDir);
@@ -200,12 +191,10 @@ export class PipelineSessionManager {
 
     const pipelineResult: BuildResult = result.value;
     const dataset = pipelineResult.graph;
-    const api = createPatternGraphAPI(dataset);
     const buildTimeMs = Date.now() - startMs;
 
     return {
       dataset,
-      api,
       registry: dataset.tagRegistry,
       ...(tagRegistryOverride !== undefined ? { tagRegistryOverride } : {}),
       baseDir,
@@ -249,24 +238,6 @@ export class PipelineSessionManager {
       if (fs.existsSync(specsDir)) {
         config.features.push('architect/specs/*.feature');
       }
-      const releasesDir = path.join(config.baseDir, 'architect', 'releases');
-      if (fs.existsSync(releasesDir)) {
-        config.features.push('architect/releases/*.feature');
-      }
-    }
-  }
-
-  private async withWorkingDirectory<T>(baseDir: string, operation: () => Promise<T>): Promise<T> {
-    const previousCwd = process.cwd();
-    if (previousCwd === baseDir) {
-      return operation();
-    }
-
-    process.chdir(baseDir);
-    try {
-      return await operation();
-    } finally {
-      process.chdir(previousCwd);
     }
   }
 }

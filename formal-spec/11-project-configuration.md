@@ -22,11 +22,7 @@ export default defineConfig({
   sources: {
     typescript: ['src/**/*.ts'],
     stubs: ['architect/stubs/**/*.ts'],
-    features: [
-      'architect/specs/*.feature',
-      'architect/decisions/*.feature',
-      'architect/releases/*.feature',
-    ],
+    features: ['architect/specs/*.feature', 'architect/decisions/*.feature'],
   },
   output: {
     directory: 'docs-live',
@@ -62,7 +58,7 @@ sources: {
   // Design stubs (not compiled/linted)
   stubs: string[];         // e.g., ['architect/stubs/**/*.ts']
 
-  // Gherkin feature files (specs, ADRs, releases)
+  // Gherkin feature files (specs, ADRs, executable features if projected)
   features: string[];      // e.g., ['architect/specs/*.feature']
 
   // Files to exclude from processing
@@ -137,8 +133,8 @@ export default defineConfig({
 
 A project MAY additionally maintain an informative `architect/tag-taxonomy.md`
 document describing its role taxonomy, but the configuration above is the source of
-truth. The reference implementation surfaces the taxonomy via
-`architect:query taxonomy` rather than a static file.
+truth. The reference implementation exposes the live registry through
+`pnpm architect:q 'g.graph.tagRegistry'` rather than a static file.
 
 ## Canonical Project Layout
 
@@ -156,8 +152,6 @@ project-root/
     stubs/                  # Design stubs (.ts, ephemeral)
       <pattern-name>/
         module.ts
-    releases/               # Release manifests (.feature)
-      vNEXT.feature
     briefs/                 # Optional: pre-candidate briefs (.md)
       pattern-name.md
     design-reviews/         # Optional: design review artifacts
@@ -196,7 +190,6 @@ project-root/
 | `architect/specs/`     | MUST     | Feature specifications (grouped into subdirectories) |
 | `architect/decisions/` | SHOULD   | ADRs (if decisions are tracked)                      |
 | `architect/stubs/`     | SHOULD   | Design stubs (if design-level specs exist)           |
-| `architect/releases/`  | MAY      | Release manifests                                    |
 | `tests/features/`      | SHOULD   | Executable specs (if implementation exists)          |
 
 ### Optional Directories

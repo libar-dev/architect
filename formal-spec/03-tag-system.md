@@ -92,14 +92,14 @@ In TypeScript files, tags appear within JSDoc blocks with a space separator for 
 
 Each tag has a defined format type that determines how its value is parsed:
 
-| Format Type    | Description                        | Syntax (Gherkin)  | Syntax (JSDoc)    | Example                             |
-| -------------- | ---------------------------------- | ----------------- | ----------------- | ----------------------------------- |
-| `value`        | Free-form string                   | `@tag:MyValue`    | `@tag MyValue`    | `@architect-pattern:UserService`    |
-| `enum`         | One of a fixed set of values       | `@tag:active`     | `@tag active`     | `@architect-status:active`          |
-| `csv`          | Comma-separated list of values     | `@tag:A,B,C`      | `@tag A, B, C`    | `@architect-uses:Auth,Tokens`       |
-| `number`       | Numeric value                      | `@tag:3`          | `@tag 3`          | `@architect-phase:2`                |
-| `quoted-value` | String value (may contain spaces)  | `@tag:"My Value"` | `@tag "My Value"` | (rare, used internally)             |
-| `flag`         | Boolean presence (no value needed) | `@tag`            | `@tag`            | `@architect` (the gate tag)         |
+| Format Type    | Description                        | Syntax (Gherkin)  | Syntax (JSDoc)    | Example                          |
+| -------------- | ---------------------------------- | ----------------- | ----------------- | -------------------------------- |
+| `value`        | Free-form string                   | `@tag:MyValue`    | `@tag MyValue`    | `@architect-pattern:UserService` |
+| `enum`         | One of a fixed set of values       | `@tag:active`     | `@tag active`     | `@architect-status:active`       |
+| `csv`          | Comma-separated list of values     | `@tag:A,B,C`      | `@tag A, B, C`    | `@architect-uses:Auth,Tokens`    |
+| `number`       | Numeric value                      | `@tag:3`          | `@tag 3`          | `@tag:2`                         |
+| `quoted-value` | String value (may contain spaces)  | `@tag:"My Value"` | `@tag "My Value"` | (rare, used internally)          |
+| `flag`         | Boolean presence (no value needed) | `@tag`            | `@tag`            | `@architect` (the gate tag)      |
 
 **Validation rules:**
 
@@ -153,38 +153,39 @@ tags in any order, consistent ordering improves readability and review.
 
 ### Level 1 (Minimal) — All Artifact Types
 
-| Tag                  | Required | Notes                    |
-| -------------------- | -------- | ------------------------ |
-| `@architect`         | MUST     | Gate tag                 |
-| `@architect-pattern` | MUST     | Except release manifests |
-| `@architect-status`  | MUST     | FSM state                |
+| Tag                  | Required | Notes            |
+| -------------------- | -------- | ---------------- |
+| `@architect`         | MUST     | Gate tag         |
+| `@architect-pattern` | MUST     | Pattern identity |
+| `@architect-status`  | MUST     | FSM state        |
 
 ### Candidate Specs (Pre-Acceptance)
 
-Candidate specs (`@architect-status:candidate`) have reduced tag requirements:
+Candidate specs (`@architect-status:candidate`) carry the full idea/candidate **baseline** but omit the _plan-level_ tags (role, bounded-context, relationships) until acceptance:
 
-| Tag                          | Required | Notes                             |
-| ---------------------------- | -------- | --------------------------------- |
-| `@architect`                 | MUST     | Gate tag                          |
-| `@architect-pattern`         | MUST     | PascalCase pattern name           |
-| `@architect-status`          | MUST     | Must be `candidate`               |
-| `@architect-product-area`    | SHOULD   | Product area                      |
-| `@architect-bounded-context` | SHOULD   | Architecture grouping             |
-| All other tags               | MAY      | Added during acceptance promotion |
+| Tag                       | Required | Notes                                                                                                                                                                                                                               |
+| ------------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@architect`              | MUST     | Gate tag                                                                                                                                                                                                                            |
+| `@architect-pattern`      | MUST     | PascalCase pattern name                                                                                                                                                                                                             |
+| `@architect-status`       | MUST     | `candidate`                                                                                                                                                                                                                         |
+| `@architect-product-area` | MUST     | Product area                                                                                                                                                                                                                        |
+| `@architect-parent`       | MUST     | Parent epic (unless `@architect-level:epic` / `:slice`)                                                                                                                                                                             |
+| `@architect-maturity`     | OPTIONAL | Derives to `idea` (consideration) from `status:candidate`; the refinement tier normally carries none. Do not author `:idea` here (it re-triggers idea-tier gating); an explicit value still wins per §04 (`:plan` = delivery track) |
+| Plan-level tags           | MAY      | role, bounded-context, relationships — added at acceptance promotion                                                                                                                                                                |
 
 ### Level 2 (Standard) — Accepted Feature Specs
 
 Accepted specs (`@architect-status:roadmap` or later) require the full tag set:
 
-| Tag                          | Required | Notes                     |
-| ---------------------------- | -------- | ------------------------- |
-| `@architect-product-area`    | MUST     | Product area              |
-| `@architect-bounded-context` | MUST     | Architecture grouping     |
-| `@architect-arch-layer`      | MUST     | Architecture layer        |
-| `@architect-role`            | MUST     | Canonical role            |
-| `@architect-uses`            | SHOULD   | If dependencies exist     |
-| `@architect-see-also`        | SHOULD   | If related patterns exist |
-| `@architect-level`           | SHOULD   | Hierarchy level (when meaningful) |
+| Tag                          | Required | Notes                              |
+| ---------------------------- | -------- | ---------------------------------- |
+| `@architect-product-area`    | MUST     | Product area                       |
+| `@architect-bounded-context` | MUST     | Architecture grouping              |
+| `@architect-arch-layer`      | MUST     | Architecture layer                 |
+| `@architect-role`            | MUST     | Canonical role                     |
+| `@architect-uses`            | SHOULD   | If dependencies exist              |
+| `@architect-see-also`        | SHOULD   | If related patterns exist          |
+| `@architect-level`           | SHOULD   | Hierarchy level (when meaningful)  |
 | `@architect-parent`          | SHOULD   | Hierarchy parent (when applicable) |
 
 ### Level 2 (Standard) — ADRs
@@ -206,20 +207,6 @@ Accepted specs (`@architect-status:roadmap` or later) require the full tag set:
 | `@architect-bounded-context` | SHOULD   | Architecture grouping      |
 | `@architect-arch-layer`      | SHOULD   | Architecture layer         |
 | `@architect-uses`            | SHOULD   | Patterns this stub uses    |
-
-### Level 2 (Standard) — Release Manifests
-
-| Tag                       | Required | Notes              |
-| ------------------------- | -------- | ------------------ |
-| `@architect-product-area` | MUST     | Product area       |
-
-> _Informative:_ Earlier drafts of this spec listed `@architect-release` as the version
-> identifier on release manifests. That tag is not part of the v0.2.0 canonical taxonomy;
-> release manifests today use the file name (`vNEXT.feature`, `vX.Y.Z.feature`) as the
-> version identifier and may carry only the core gate + status + product-area tags.
-
-> _Informative:_ Release manifests do not require `@architect-pattern` because
-> they represent temporal groupings, not architectural patterns.
 
 ## Tag Validation Rules
 
@@ -245,7 +232,7 @@ values. The taxonomy defines:
 
 A project's tag taxonomy is conveyed by its `architect.config.ts` (§11) — specifically
 the `roles`, `productAreas`, and any custom-tag entries — and SHOULD be queryable via
-the project's data API (`architect:query taxonomy` in the reference implementation).
+the project's live graph handle (`pnpm architect:q 'g.graph.tagRegistry'` in the reference implementation).
 Projects MAY additionally maintain an informative `architect/tag-taxonomy.md` document,
 but it is not required and the configuration is the source of truth. The tag taxonomy
 separates the **tag system** (how tags work — this document) from the **tag registry**

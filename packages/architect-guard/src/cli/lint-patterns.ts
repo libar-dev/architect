@@ -7,7 +7,7 @@
  * @architect-status completed
  * @architect-role:service
  * @architect-bounded-context:cli
- * @architect-uses LintEngine, LintRules, PatternScanner
+ * @architect-uses LintEngine, LintRules, PatternScanner, LintViolationContract
  *
  * ## LintPatternsCLI - Pattern Annotation Quality Checker
  *
@@ -26,11 +26,16 @@
 // See src/cli/error-handler.ts for the unified handler.
 // ────────────────────────────────────────────────────────────────────────
 
-import { printVersionAndExit, handleCliError, isDirectCliEntrypoint } from './shared.js';
-import { scanPatterns } from '@libar-dev/architect-core';
-import { ScannerConfigSchema } from '@libar-dev/architect-core';
-import { loadConfig, formatConfigError } from '@libar-dev/architect-core';
-import type { DocDirective, LintViolation } from '@libar-dev/architect-core';
+import {
+  exitWithProcessError,
+  formatConfigError,
+  loadConfig,
+  ScannerConfigSchema,
+  scanPatterns,
+  type DocDirective,
+  type LintViolation,
+} from '@libar-dev/architect-core';
+import { printVersionAndExit, isDirectCliEntrypoint } from './shared.js';
 import {
   defaultRules,
   filterRulesBySeverity,
@@ -196,24 +201,24 @@ Examples:
  * Main CLI function
  */
 async function main(): Promise<void> {
-  const config = parseArgs();
-
-  if (config.version) {
-    printVersionAndExit('architect-lint-patterns');
-  }
-
-  if (config.help) {
-    printHelp();
-    process.exit(0);
-  }
-
-  if (config.input.length === 0) {
-    console.error('Error: No input patterns specified. Use --input <pattern>');
-    printHelp();
-    process.exit(1);
-  }
-
   try {
+    const config = parseArgs();
+
+    if (config.version) {
+      printVersionAndExit('architect-lint-patterns');
+    }
+
+    if (config.help) {
+      printHelp();
+      process.exit(0);
+    }
+
+    if (config.input.length === 0) {
+      console.error('Error: No input patterns specified. Use --input <pattern>');
+      printHelp();
+      process.exit(1);
+    }
+
     // Load configuration (discovers architect.config.ts)
     const configResult = await loadConfig(config.baseDir);
     if (!configResult.ok) {
@@ -260,7 +265,7 @@ async function main(): Promise<void> {
     // Report skipped directives (these are already validation failures)
     if (skippedDirectives.length > 0 && config.format === 'pretty') {
       process.stdout.write(
-        `Warning: ${String(skippedDirectives.length)} directives skipped due to validation:\n`
+        `Warning: ${String(skippedDirectives.length)} directives skipped due to validation:\n`,
       );
       for (const { file, error } of skippedDirectives) {
         process.stdout.write(`  - ${file}:${String(error.line)}: ${error.reason}\n`);
@@ -299,7 +304,7 @@ async function main(): Promise<void> {
     }
 
     const validationViolations = skippedDirectives.flatMap(({ file, error }) =>
-      createValidationViolations(file, error.line, error.reason)
+      createValidationViolations(file, error.line, error.reason),
     );
 
     // Run lint
@@ -316,7 +321,7 @@ async function main(): Promise<void> {
     if (config.format === 'json') {
       const jsonResult = formatJson(summary);
       if (!jsonResult.ok) {
-        handleCliError(jsonResult.error, 1);
+        exitWithProcessError(jsonResult.error, 1);
       }
       process.stdout.write(`${jsonResult.value}\n`);
     } else {
@@ -327,7 +332,7 @@ async function main(): Promise<void> {
     // Determine exit code
     process.exit(hasFailures(summary, config.strict) ? 1 : 0);
   } catch (error) {
-    handleCliError(error, 1);
+    exitWithProcessError(error, 1);
   }
 }
 
@@ -356,7 +361,7 @@ function mergeLintSummary(summary: LintSummary, violations: readonly LintViolati
 function createValidationViolations(
   file: string,
   line: number,
-  reason: string
+  reason: string,
 ): readonly LintViolation[] {
   if (reason.includes('patternName:')) {
     return [

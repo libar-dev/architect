@@ -33,23 +33,17 @@ export interface PatternStubOptions {
   readonly status?: ExtractedPattern['status'];
   readonly maturity?: PatternMaturity;
   readonly role?: ExtractedPattern['role'];
-  readonly phase?: ExtractedPattern['phase'];
-  readonly quarter?: ExtractedPattern['quarter'];
-  readonly release?: ExtractedPattern['release'];
-  readonly completed?: ExtractedPattern['completed'];
   readonly file?: string;
   readonly description?: string;
   readonly boundedContext?: ExtractedPattern['boundedContext'];
   readonly adrLayer?: ExtractedPattern['adrLayer'];
+  readonly adrTheme?: ExtractedPattern['adrTheme'];
   readonly archContext?: string;
   readonly archLayer?: string;
+  readonly archTheme?: string;
   readonly productArea?: ExtractedPattern['productArea'];
-  readonly userRole?: ExtractedPattern['userRole'];
-  readonly businessValue?: ExtractedPattern['businessValue'];
   readonly team?: ExtractedPattern['team'];
-  readonly effort?: ExtractedPattern['effort'];
-  readonly effortActual?: ExtractedPattern['effortActual'];
-  readonly priority?: ExtractedPattern['priority'];
+  readonly workflow?: ExtractedPattern['workflow'];
   readonly deliverables?: ExtractedPattern['deliverables'];
   readonly executableSpecs?: ExtractedPattern['executableSpecs'];
   readonly behaviorFile?: ExtractedPattern['behaviorFile'];
@@ -59,7 +53,7 @@ export interface PatternStubOptions {
   readonly usedBy?: readonly string[];
   readonly enables?: readonly string[];
   readonly implementsPatterns?: ExtractedPattern['implementsPatterns'];
-  readonly useCases?: readonly string[];
+  readonly enforcesDecisions?: ExtractedPattern['enforcesDecisions'];
   readonly rules?: readonly BusinessRuleStubOptions[];
   readonly adr?: ExtractedPattern['adr'];
   readonly adrStatus?: ExtractedPattern['adrStatus'];
@@ -72,12 +66,12 @@ export interface PatternStubOptions {
   readonly level?: ExtractedPattern['level'];
   readonly parent?: ExtractedPattern['parent'];
   readonly children?: ExtractedPattern['children'];
+  readonly extractedShapes?: ExtractedPattern['extractedShapes'];
 }
 
 export interface GraphBuilderOptions {
   readonly patterns: readonly ExtractedPattern[];
   readonly tagRegistry: TagRegistry;
-  readonly phaseNames?: Record<number, string> | undefined;
   readonly relationshipIndex?: Record<string, RelationshipEntry> | undefined;
   readonly includeArchIndex?: boolean;
 }
@@ -114,23 +108,18 @@ export function buildPatternStub(name: string, options: PatternStubOptions = {})
     exports: [],
     extractedAt: '2026-04-19T00:00:00.000Z',
     status: options.status ?? 'active',
-    ...(options.phase !== undefined ? { phase: options.phase } : {}),
-    ...(options.quarter !== undefined ? { quarter: options.quarter } : {}),
-    ...(options.release !== undefined ? { release: options.release } : {}),
-    ...(options.completed !== undefined ? { completed: options.completed } : {}),
     ...(options.boundedContext !== undefined || options.archContext !== undefined
       ? { boundedContext: options.boundedContext ?? options.archContext }
       : {}),
     ...(options.adrLayer !== undefined || options.archLayer !== undefined
       ? { adrLayer: options.adrLayer ?? options.archLayer }
       : {}),
+    ...(options.adrTheme !== undefined || options.archTheme !== undefined
+      ? { adrTheme: options.adrTheme ?? options.archTheme }
+      : {}),
     ...(options.productArea !== undefined ? { productArea: options.productArea } : {}),
-    ...(options.userRole !== undefined ? { userRole: options.userRole } : {}),
-    ...(options.businessValue !== undefined ? { businessValue: options.businessValue } : {}),
     ...(options.team !== undefined ? { team: options.team } : {}),
-    ...(options.effort !== undefined ? { effort: options.effort } : {}),
-    ...(options.effortActual !== undefined ? { effortActual: options.effortActual } : {}),
-    ...(options.priority !== undefined ? { priority: options.priority } : {}),
+    ...(options.workflow !== undefined ? { workflow: options.workflow } : {}),
     ...(options.deliverables !== undefined ? { deliverables: options.deliverables } : {}),
     ...(options.executableSpecs !== undefined ? { executableSpecs: options.executableSpecs } : {}),
     ...(options.behaviorFile !== undefined ? { behaviorFile: options.behaviorFile } : {}),
@@ -139,7 +128,9 @@ export function buildPatternStub(name: string, options: PatternStubOptions = {})
     ...(options.implementsPatterns !== undefined
       ? { implementsPatterns: options.implementsPatterns }
       : {}),
-    ...(options.useCases !== undefined ? { useCases: [...options.useCases] } : {}),
+    ...(options.enforcesDecisions !== undefined
+      ? { enforcesDecisions: options.enforcesDecisions }
+      : {}),
     ...(options.rules !== undefined
       ? {
           rules: options.rules.map((rule) => ({
@@ -161,6 +152,7 @@ export function buildPatternStub(name: string, options: PatternStubOptions = {})
     ...(options.level !== undefined ? { level: options.level } : {}),
     ...(options.parent !== undefined ? { parent: options.parent } : {}),
     ...(options.children !== undefined ? { children: options.children } : {}),
+    ...(options.extractedShapes !== undefined ? { extractedShapes: options.extractedShapes } : {}),
     ...(options.maturity !== undefined ? { maturity: options.maturity } : {}),
     ...(options.dependsOn !== undefined ? { dependsOn: options.dependsOn } : {}),
     ...(options.usedBy !== undefined ? { usedBy: options.usedBy } : {}),
@@ -169,21 +161,12 @@ export function buildPatternStub(name: string, options: PatternStubOptions = {})
 }
 
 export function buildGraphFromPatterns(options: GraphBuilderOptions): PatternGraph {
-  const {
-    patterns,
-    tagRegistry,
-    phaseNames = {},
-    relationshipIndex,
-    includeArchIndex = false,
-  } = options;
+  const { patterns, tagRegistry, relationshipIndex, includeArchIndex = false } = options;
   const completed = patterns.filter((pattern) => pattern.status === 'completed');
   const active = patterns.filter((pattern) => pattern.status === 'active');
   const roadmap = patterns.filter((pattern) => pattern.status === 'roadmap');
   const deferred = patterns.filter((pattern) => pattern.status === 'deferred');
   const candidate = patterns.filter((pattern) => pattern.status === 'candidate');
-  const phases = patterns
-    .map((pattern) => pattern.phase)
-    .filter((phase): phase is number => phase !== undefined);
   const roles = patterns
     .map((pattern) => pattern.role)
     .filter((role): role is string => role !== undefined && role.length > 0);
@@ -208,19 +191,13 @@ export function buildGraphFromPatterns(options: GraphBuilderOptions): PatternGra
       candidate: [...candidate],
     },
     byMaturity,
-    byPhase: buildPhaseGroups(patterns, phaseNames),
-    byQuarter: buildQuarterGroups(patterns),
     byRole: buildRoleGroups(patterns),
     bySourceType: {
       typescript: patterns.filter((pattern) => !pattern.source.file.endsWith('.feature')),
       gherkin: patterns.filter((pattern) => pattern.source.file.endsWith('.feature')),
       roadmap: [],
       prd: patterns.filter(
-        (pattern) =>
-          pattern.adr === undefined &&
-          (pattern.productArea !== undefined ||
-            pattern.userRole !== undefined ||
-            pattern.businessValue !== undefined)
+        (pattern) => pattern.adr === undefined && pattern.productArea !== undefined,
       ),
     },
     byProductArea: buildProductAreaIndex(patterns),
@@ -231,7 +208,6 @@ export function buildGraphFromPatterns(options: GraphBuilderOptions): PatternGra
       candidate: patterns.filter((pattern) => pattern.status === 'candidate').length,
       total: patterns.length,
     },
-    phaseCount: new Set(phases).size,
     roleCount: new Set(roles).size,
     relationshipIndex: derivedRelationshipIndex,
     ...(includeArchIndex ? { archIndex: createArchIndex(patterns) } : {}),
@@ -254,55 +230,6 @@ function buildMaturityGroups(patterns: readonly ExtractedPattern[]): PatternGrap
   return groups;
 }
 
-function buildPhaseGroups(
-  patterns: readonly ExtractedPattern[],
-  phaseNames: Record<number, string>
-): PatternGraph['byPhase'] {
-  const grouped = new Map<number, ExtractedPattern[]>();
-
-  for (const pattern of patterns) {
-    if (pattern.phase === undefined) {
-      continue;
-    }
-
-    const bucket = grouped.get(pattern.phase) ?? [];
-    bucket.push(pattern);
-    grouped.set(pattern.phase, bucket);
-  }
-
-  return [...grouped.entries()]
-    .sort(([left], [right]) => left - right)
-    .map(([phaseNumber, phasePatterns]) => ({
-      phaseNumber,
-      phaseName: phaseNames[phaseNumber],
-      patterns: [...phasePatterns],
-      counts: {
-        completed: phasePatterns.filter((pattern) => isPatternComplete(pattern.status)).length,
-        active: phasePatterns.filter((pattern) => isPatternActive(pattern.status)).length,
-        planned: phasePatterns.filter((pattern) => isPatternPlanned(pattern.status)).length,
-        candidate: phasePatterns.filter((pattern) => pattern.status === 'candidate').length,
-        total: phasePatterns.length,
-      },
-    })) as PatternGraph['byPhase'];
-}
-
-function buildQuarterGroups(patterns: readonly ExtractedPattern[]): PatternGraph['byQuarter'] {
-  const grouped: Record<string, ExtractedPattern[]> = {};
-
-  for (const pattern of patterns) {
-    const quarter = pattern.quarter?.trim();
-    if (!quarter) {
-      continue;
-    }
-
-    const bucket = grouped[quarter] ?? [];
-    bucket.push(pattern);
-    grouped[quarter] = bucket;
-  }
-
-  return grouped;
-}
-
 function buildRoleGroups(patterns: readonly ExtractedPattern[]): PatternGraph['byRole'] {
   const grouped: Record<string, ExtractedPattern[]> = {};
 
@@ -322,7 +249,7 @@ function buildRoleGroups(patterns: readonly ExtractedPattern[]): PatternGraph['b
 
 function buildRelationshipIndex(
   patterns: readonly ExtractedPattern[],
-  overrides: Record<string, RelationshipEntry> | undefined
+  overrides: Record<string, RelationshipEntry> | undefined,
 ): Record<string, RelationshipEntry> {
   const index: Record<string, RelationshipEntry> = {};
 
@@ -343,6 +270,8 @@ function buildRelationshipIndex(
       extendedBy: override?.extendedBy ?? [],
       seeAlso: override?.seeAlso ?? [...(pattern.seeAlso ?? [])],
       apiRef: override?.apiRef ?? [...(pattern.apiRef ?? [])],
+      enforcesDecisions: override?.enforcesDecisions ?? [...(pattern.enforcesDecisions ?? [])],
+      enforcedBy: override?.enforcedBy ?? [],
     };
   }
 
@@ -379,6 +308,7 @@ function createArchIndex(patterns: readonly ExtractedPattern[]): PatternGraph['a
     byContext,
     byLayer,
     byView: {},
+    byPackage: {},
     all: [...patterns],
   };
 }
@@ -392,7 +322,7 @@ function getPatternName(pattern: ExtractedPattern): string {
 }
 
 function buildProductAreaIndex(
-  patterns: readonly ExtractedPattern[]
+  patterns: readonly ExtractedPattern[],
 ): PatternGraph['byProductArea'] {
   const grouped: Record<string, ExtractedPattern[]> = {};
 

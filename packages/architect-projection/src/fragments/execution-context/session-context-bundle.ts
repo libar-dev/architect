@@ -3,11 +3,10 @@
  * @architect-pattern SessionContextBundle
  * @architect-status active
  * @architect-role:contract
+ * @architect-uses ExecutionContextSupporting
  * @architect-bounded-context:execution-context
  *
- * ### When to Use
- *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * Defines the `SessionContextBundle` fragment shape for the session-opening context across patterns, dependencies, stubs, deliverables, and FSM data.
  */
 import { z } from 'zod';
 
@@ -22,6 +21,14 @@ import {
   StubRefSchema,
 } from './supporting.js';
 
+/**
+ * Fragment shape bundling everything needed to open a session — the in-scope
+ * patterns and session type, per-pattern metadata, spec files, stubs,
+ * dependencies (own, shared, and consumers), architecture neighbors,
+ * deliverables, test files, and FSM context.
+ *
+ * @architect-shape
+ */
 export const SessionContextBundleSchema = z.strictObject({
   kind: z.literal('SessionContextBundle'),
   patterns: z.array(z.string()),

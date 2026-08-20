@@ -4,10 +4,7 @@
  * @architect-status active
  * @architect-role:service
  * @architect-bounded-context:scanner
- *
- * ### When to Use
- *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * @architect-uses ExportInfoContract
  */
 import {
   AST_NODE_TYPES,
@@ -60,7 +57,7 @@ export interface ParseDirectivesResult {
 
 function extractSingleValue(commentText: string, fullTag: string): string | undefined {
   const regex = getCachedRegex(
-    `(?:^|\\n)\\s*\\*?\\s*${escapeRegex(fullTag)}(?:\\s*:\\s*|\\s+)(.+?)(?=\\s+@[A-Za-z][\\w-]*|\\n|\\*|$)`
+    `(?:^|\\n)\\s*\\*?\\s*${escapeRegex(fullTag)}(?:\\s*:\\s*|\\s+)(.+?)(?=\\s+@[A-Za-z][\\w-]*|\\n|\\*|$)`,
   );
   return regex.exec(commentText)?.[1]?.trim();
 }
@@ -68,7 +65,7 @@ function extractSingleValue(commentText: string, fullTag: string): string | unde
 function extractEnumValue(
   commentText: string,
   fullTag: string,
-  validValues: string[]
+  validValues: string[],
 ): string | undefined {
   const valuesPattern = validValues.join('|');
   const regex = getCachedRegex(`${escapeRegex(fullTag)}(?:\\s*:\\s*|\\s+)(${valuesPattern})`);
@@ -78,7 +75,7 @@ function extractEnumValue(
 function extractQuotedValue(commentText: string, fullTag: string): string[] {
   const regex = getCachedRegex(
     `${escapeRegex(fullTag)}(?:\\s*:\\s*|\\s+)(?:"([^"]+)"|([^\\n*]+?)(?=\\s+@[A-Za-z][\\w-]*|\\n|\\*|$))`,
-    'g'
+    'g',
   );
   const values: string[] = [];
   for (let match = regex.exec(commentText); match !== null; match = regex.exec(commentText)) {
@@ -147,7 +144,7 @@ function buildValueTakingTagsPattern(registry: TagRegistry): string {
 function extractMetadataTag(
   commentText: string,
   tagDef: MetadataTagDefinition,
-  prefix: string
+  prefix: string,
 ): unknown {
   const fullTag = `${prefix}${tagDef.tag}`;
   switch (tagDef.format) {
@@ -170,10 +167,35 @@ function extractMetadataTag(
   }
 }
 
+function readStringMetadata(
+  metadataResults: ReadonlyMap<string, unknown>,
+  key: string,
+): string | undefined {
+  const value = metadataResults.get(key);
+  return typeof value === 'string' ? value : undefined;
+}
+
+function readStringArrayMetadata(
+  metadataResults: ReadonlyMap<string, unknown>,
+  key: string,
+): string[] | undefined {
+  const value = metadataResults.get(key);
+  if (!Array.isArray(value)) {
+    return undefined;
+  }
+
+  const stringValues = value.filter((entry): entry is string => typeof entry === 'string');
+  if (stringValues.length !== value.length) {
+    return undefined;
+  }
+
+  return stringValues;
+}
+
 export function parseFileDirectives(
   content: string,
   filePath: string,
-  registry?: TagRegistry
+  registry?: TagRegistry,
 ): Result<ParseDirectivesResult, FileParseError> {
   const effectiveRegistry = registry ?? createDefaultTagRegistry();
   let ast: TSESTree.Program;
@@ -186,7 +208,7 @@ export function parseFileDirectives(
         ? { line: tsError.lineNumber, column: tsError.column }
         : undefined;
     return Result.err(
-      createFileParseError(filePath, tsError.message || 'Unknown parse error', location, error)
+      createFileParseError(filePath, tsError.message || 'Unknown parse error', location, error),
     );
   }
 
@@ -226,7 +248,7 @@ function parseDirective(
   commentText: string,
   loc: TSESTree.SourceLocation,
   filePath: string,
-  registry: TagRegistry
+  registry: TagRegistry,
 ): Result<DocDirective, DirectiveValidationError> {
   const lines = commentText.split('\n').map((line) => line.trim().replace(/^\*\s?/, ''));
   const patterns = buildDirectivePatterns(registry);
@@ -276,25 +298,23 @@ function parseDirective(
     if (result !== undefined) metadataResults.set(tagDef.tag, result);
   }
 
-  const patternName = metadataResults.get('pattern') as string | undefined;
-  const status = metadataResults.get('status') as AcceptedStatusValue | undefined;
-  const boundedContext = metadataResults.get('bounded-context') as string | undefined;
-  const useCases = metadataResults.get('usecase') as string[] | undefined;
-  const uses = metadataResults.get('uses') as string[] | undefined;
-  const phase = metadataResults.get('phase') as number | undefined;
-  const level = metadataResults.get('level') as DocDirective['level'];
-  const parent = metadataResults.get('parent') as string | undefined;
-  const implementsPatterns = metadataResults.get('implements') as string[] | undefined;
-  const extendsPattern = metadataResults.get('extends') as string | undefined;
-  const seeAlso = metadataResults.get('see-also') as string[] | undefined;
-  const apiRef = metadataResults.get('api-ref') as string[] | undefined;
-  const role = metadataResults.get('role') as string | undefined;
-  const unlockReason = metadataResults.get('unlock-reason') as string | undefined;
-  const target = metadataResults.get('target') as string | undefined;
-  const since = metadataResults.get('since') as string | undefined;
-  const executableSpecs = metadataResults.get('executable-specs') as string[] | undefined;
-  const productArea = metadataResults.get('product-area') as string | undefined;
-  const convention = metadataResults.get('convention') as string[] | undefined;
+  const patternName = readStringMetadata(metadataResults, 'pattern');
+  const status = readStringMetadata(metadataResults, 'status') as AcceptedStatusValue | undefined;
+  const boundedContext = readStringMetadata(metadataResults, 'bounded-context');
+  const uses = readStringArrayMetadata(metadataResults, 'uses');
+  const level = readStringMetadata(metadataResults, 'level') as DocDirective['level'];
+  const parent = readStringMetadata(metadataResults, 'parent');
+  const implementsPatterns = readStringArrayMetadata(metadataResults, 'implements');
+  const extendsPattern = readStringMetadata(metadataResults, 'extends');
+  const seeAlso = readStringArrayMetadata(metadataResults, 'see-also');
+  const enforcesDecisions = readStringArrayMetadata(metadataResults, 'enforces-decision');
+  const apiRef = readStringArrayMetadata(metadataResults, 'api-ref');
+  const role = readStringMetadata(metadataResults, 'role');
+  const unlockReason = readStringMetadata(metadataResults, 'unlock-reason');
+  const target = readStringMetadata(metadataResults, 'target');
+  const executableSpecs = readStringArrayMetadata(metadataResults, 'executable-specs');
+  const productArea = readStringMetadata(metadataResults, 'product-area');
+  const convention = readStringArrayMetadata(metadataResults, 'convention');
 
   const deprecatedTags: string[] = [];
   const deprecatedFlagTags = new Set<string>();
@@ -307,14 +327,6 @@ function parseDirective(
   for (const tag of tags) {
     if (deprecatedFlagTags.has(tag)) deprecatedTags.push(tag);
   }
-
-  const legacyArchRole = extractSingleValue(commentText, `${registry.tagPrefix}arch-role`);
-  const legacyArchContext = extractSingleValue(commentText, `${registry.tagPrefix}arch-context`);
-  const legacyArchLayer = extractSingleValue(commentText, `${registry.tagPrefix}arch-layer`);
-  if (legacyArchRole) deprecatedTags.push(`${registry.tagPrefix}arch-role:${legacyArchRole}`);
-  if (legacyArchContext)
-    deprecatedTags.push(`${registry.tagPrefix}arch-context:${legacyArchContext}`);
-  if (legacyArchLayer) deprecatedTags.push(`${registry.tagPrefix}arch-layer:${legacyArchLayer}`);
 
   const whenToUse = extractWhenToUse(commentText, registry.fileOptInTag);
 
@@ -361,18 +373,16 @@ function parseDirective(
     ...(patternName && { patternName }),
     ...(status && { status }),
     ...(boundedContext && { boundedContext }),
-    ...(useCases && useCases.length > 0 && { useCases }),
     ...(whenToUse && { whenToUse }),
     ...(uses && uses.length > 0 && { uses }),
-    ...(phase !== undefined && { phase }),
     ...(level !== undefined && { level }),
     ...(parent && { parent }),
     ...(implementsPatterns && implementsPatterns.length > 0 && { implements: implementsPatterns }),
     ...(extendsPattern && { extends: extendsPattern }),
     ...(seeAlso && seeAlso.length > 0 && { seeAlso }),
+    ...(enforcesDecisions && enforcesDecisions.length > 0 && { enforcesDecisions }),
     ...(apiRef && apiRef.length > 0 && { apiRef }),
     ...(target && { target }),
-    ...(since && { since }),
     ...(executableSpecs && executableSpecs.length > 0 && { executableSpecs }),
     ...(role && { role }),
     ...(unlockReason && { unlockReason }),
@@ -394,8 +404,8 @@ function parseDirective(
         filePath,
         loc.start.line,
         `Invalid directive structure: ${reason}`,
-        commentText.substring(0, 100)
-      )
+        commentText.substring(0, 100),
+      ),
     );
   }
 
@@ -405,7 +415,7 @@ function parseDirective(
 function extractCodeBlockAfterComment(
   content: string,
   ast: TSESTree.Program,
-  comment: TSESTree.Comment
+  comment: TSESTree.Comment,
 ): { code: string; startLine: number; endLine: number } | null {
   const nextNode = findNextNodeAfterPosition(ast, comment.range[1]);
   if (!nextNode) return null;
@@ -431,7 +441,7 @@ function findNextNodeAfterPosition(ast: TSESTree.Program, position: number): TSE
 function extractExportsFromBlock(
   ast: TSESTree.Program,
   block: { code: string; startLine: number; endLine: number },
-  sourceCode: string
+  sourceCode: string,
 ): readonly ExportInfo[] {
   const exports: ExportInfo[] = [];
 
@@ -460,7 +470,7 @@ function extractExportsFromBlock(
 
 function buildFunctionSignature(
   declaration: TSESTree.FunctionDeclaration,
-  sourceCode: string
+  sourceCode: string,
 ): string {
   const beforeBody = sourceCode.slice(declaration.range[0], declaration.body.range[0]);
   const withoutExport = beforeBody.startsWith('export ')
@@ -521,35 +531,53 @@ function getExportType(declaration: TSESTree.Node): ExportInfo['type'] {
 
 function extractWhenToUse(
   commentText: string,
-  fileOptInTag: string
+  fileOptInTag: string,
 ): readonly string[] | undefined {
-  const cleanedLines = commentText.split('\n').map((line) =>
-    line
+  const cleanedLines = commentText.split('\n').map((line) => {
+    return line
       .trim()
       .replace(/^\*\s?/, '')
-      .trim()
-  );
+      .trim();
+  });
   const cleanedText = cleanedLines.join('\n');
 
   const headingMatch = /###\s*When to Use\s*\n/i.exec(cleanedText);
   if (headingMatch) {
     const afterHeading = cleanedText.slice(headingMatch.index + headingMatch[0].length);
     const bullets: string[] = [];
+
     for (const line of afterHeading.split('\n')) {
       const trimmed = line.trim();
-      if (trimmed === '' || trimmed.startsWith('#') || trimmed.startsWith('|')) break;
-      if (trimmed.startsWith('@') && !trimmed.startsWith(fileOptInTag)) break;
+
+      if (trimmed === '' || trimmed.startsWith('#') || trimmed.startsWith('|')) {
+        break;
+      }
+
+      if (trimmed.startsWith('@') && !trimmed.startsWith(fileOptInTag)) {
+        break;
+      }
+
       const bulletMatch = /^[-*]\s+(.+)$/.exec(trimmed);
-      if (bulletMatch?.[1]) bullets.push(bulletMatch[1].trim());
-      else break;
+
+      if (bulletMatch?.[1]) {
+        bullets.push(bulletMatch[1].trim());
+        continue;
+      }
+
+      break;
     }
-    if (bullets.length > 0) return bullets;
+
+    if (bullets.length > 0) {
+      return bullets;
+    }
   }
 
   const inlineMatch = /\*\*When to use:\*\*\s*([^\n]+)/i.exec(cleanedText);
   if (inlineMatch?.[1]) {
     const description = inlineMatch[1].trim();
-    if (description) return [description];
+    if (description) {
+      return [description];
+    }
   }
 
   return undefined;

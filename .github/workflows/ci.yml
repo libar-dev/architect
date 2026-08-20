@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.4.1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+      # Shared correctness gate (build, format:check, lint, typecheck[:dogfood],
+      # test[:dogfood], validate:all, guard:no-suppressions, check:skills, arch
+      # dangling --strict, umbrella bin smoke via `pnpm test`, audit:subtractive).
+      # The pre-push hook and publish.yml call the same composite — single source
+      # of truth so the gates never drift apart.
+      - run: pnpm ci:verify
+      - run: pnpm docs:all
+      # docs-live/ is committed; docs:all must regenerate it byte-identically.
+      - run: git diff --exit-code docs-live
+      - run: pnpm --filter @libar-dev/architect-projection test:perf:baseline

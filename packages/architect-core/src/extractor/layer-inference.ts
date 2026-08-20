@@ -4,10 +4,6 @@
  * @architect-status active
  * @architect-role:service
  * @architect-bounded-context:extractor
- *
- * ### When to Use
- *
- * - As a typed contract / data shape consumed by projection or render layers.
  */
 export type FeatureLayer = 'timeline' | 'domain' | 'integration' | 'e2e' | 'component' | 'unknown';
 

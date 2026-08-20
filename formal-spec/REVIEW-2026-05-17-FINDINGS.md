@@ -194,7 +194,7 @@ descriptions (it is markdown prose, not a tag). No fix needed.
 ### O-10. Stub example uses `@architect-pattern`
 
 The current spec and dogfood stubs both carry `@architect-pattern` in stub JSDoc.
-The `_shared/annotation-ownership.md` doctrine in `.agents/skills/` says **production
+The `architect-base/references/annotation-ownership.md` doctrine in `.agents/skills/` says **production
 code** must not use `@architect-pattern` — but stubs are not production code,
 they're staging artifacts, so this is consistent. Verified, no fix needed.
 

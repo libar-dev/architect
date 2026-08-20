@@ -6,15 +6,15 @@
 @architect-adr-theme:projections
 @architect-pattern:ADR009ProjectionTrustBoundary
 @architect-status:completed
+@architect-unlock-reason:Consolidate-durable-facts-remove-W7-framing-and-deliverables-table
 @architect-see-also:ADR005CodecBasedMarkdownRendering,ADR006SingleReadModelArchitecture
-Feature: ADR-009 - Projection Trust Boundary and W7 Naming
+Feature: ADR-009 - Projection Trust Boundary
 
   **Context:**
-  The W7 simplification wave replaced the deleted presentation codec stack and
-  dissolved query package with a Fragment / Projection / Renderer pipeline.
-  The wave also renamed public projection entrypoints so exported names match
-  fragment kinds and external callers use validated `parseAndProject*`
-  boundaries.
+  A simplification effort replaced the earlier presentation codec stack and
+  dissolved the query package with a Fragment / Projection / Renderer pipeline,
+  and renamed public projection entrypoints so exported names match fragment
+  kinds and external callers use validated `parseAndProject*` boundaries.
 
   **Decision:**
   `parseAndProject*` functions are the raw-input trust boundary for external
@@ -33,9 +33,8 @@ Feature: ADR-009 - Projection Trust Boundary and W7 Naming
   be canonical relative `.md` outputs; rejected or ambiguous internal child
   references fall back to plain text instead of links.
 
-  Public names follow fragment-kind vocabulary. Current projection mappings are
-  maintained in `packages/architect-projection/docs/MIGRATION.md`; public
-  contract tests pin only canonical package surfaces.
+  Public names follow fragment-kind vocabulary; public contract tests pin only
+  canonical package surfaces.
 
   **Consequences:**
   | Type | Impact |
@@ -43,11 +42,6 @@ Feature: ADR-009 - Projection Trust Boundary and W7 Naming
   | Positive | Runtime hot paths avoid duplicate Zod walks after boundary validation |
   | Positive | Contract-freeze tests protect canonical public entrypoints |
   | Negative | Breaking package-surface changes require coordinated downstream updates |
-
-  Background: Deliverables
-    Given the following deliverables:
-      | Deliverable | Status | Location |
-      | Decision spec | complete | architect/decisions/adr-009-projection-trust-boundary.feature |
 
   Rule: Parse once at external projection boundaries
 

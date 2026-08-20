@@ -9,7 +9,7 @@ import type {
   ScannerConfig,
 } from '../types/index.js';
 import { Result as R, createFileParseError } from '../types/index.js';
-import type { TagRegistry } from '../config/tag-registry-contract.js';
+import type { TagRegistry } from '../validation-schemas/tag-registry.js';
 import { parseFileDirectives } from './ast-parser.js';
 import { findFilesToScan, hasDocDirectives, hasFileOptIn } from './pattern-scanner.js';
 
@@ -40,7 +40,7 @@ export interface ScanResults {
 
 export async function scanPatterns(
   config: ScannerConfig,
-  registry?: TagRegistry
+  registry?: TagRegistry,
 ): Promise<Result<ScanResults, never>> {
   const files = await findFilesToScan(config);
 
@@ -75,7 +75,7 @@ export async function scanPatterns(
           filePath,
           error instanceof Error ? error.message : String(error),
           undefined,
-          error
+          error,
         ),
       });
     }

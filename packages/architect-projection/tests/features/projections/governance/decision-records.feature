@@ -2,7 +2,6 @@
 @architect-pattern:DecisionCatalogProjectionExecutableTests
 @architect-implements:DecisionCatalogProjection
 @architect-status:completed
-@architect-phase:49
 @architect-product-area:Projection
 @architect-role:projection
 @governance
@@ -35,11 +34,18 @@ Feature: Governance decision projections
     `consequences`, optional `alternatives`, `relatedDecisions`,
     `affectedPatterns`) derived from the decision pattern, and throws a
     `DECISION_NOT_FOUND` error that lists the available ids when the lookup
-    does not resolve.
+    does not resolve. `relatedDecisions` is the governance chain — the
+    decision's see-also cross-links that are themselves decisions, resolved to
+    their ids (never a supersession "replaces" edge; that history lives in git).
+    `affectedPatterns` includes the computed `enforcedBy` reverse edge, so a
+    decision is navigable to every rule that authored `@architect-enforces-decision`
+    against it.
 
     **Rationale:** Decision consumers must see a strict, schema-validated shape
-    regardless of how the ADR was authored, and unresolved lookups must guide
-    callers to the correct id rather than failing silently.
+    regardless of how the ADR was authored; unresolved lookups must guide
+    callers to the correct id rather than failing silently; and the read model
+    carries only live navigable state, so the decision↔rule and decision↔decision
+    edges are derived from current links, not from historical supersession.
 
     **Verified by:** Projecting a decision record from a decision spec, Missing decisions surface the available ids
 

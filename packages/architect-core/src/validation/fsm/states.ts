@@ -5,10 +5,6 @@
  * @architect-status active
  * @architect-role:read-model
  * @architect-bounded-context:validation
- *
- * ### When to Use
- *
- * - As a typed contract / data shape consumed by projection or render layers.
  */
 
 import { PROCESS_STATUS_VALUES, type ProcessStatusValue } from '../../taxonomy/index.js';
@@ -38,4 +34,5 @@ export function isScopeLocked(status: ProcessStatusValue): boolean {
   return PROTECTION_LEVELS[status] === 'scope';
 }
 
+export { StatusValueSchema } from '../../domain-enums.js';
 export { PROCESS_STATUS_VALUES, type ProcessStatusValue };

@@ -2,11 +2,12 @@
  * @architect
  * @architect-pattern PatternRelationsFragmentContracts
  * @architect-role:contract
+ * @architect-bounded-context:pattern-relations
  * @architect-status active
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Re-exports the pattern-relations fragment contracts for catalog, detail, bundle, dependency, neighborhood, and context projections.
  */
 export { ArchitectureComparisonSchema } from './architecture-comparison.js';
 export type { ArchitectureComparison } from './architecture-comparison.js';
@@ -18,8 +19,8 @@ export { DependencyEdgeSchema } from './dependency-edge.js';
 export type { DependencyEdge } from './dependency-edge.js';
 export { DependencyEdgeSetSchema } from './dependency-edge-set.js';
 export type { DependencyEdgeSet } from './dependency-edge-set.js';
-export { DependencyTreeSchema } from './dependency-tree.js';
-export type { DependencyTree } from './dependency-tree.js';
+export { DependencyContextSchema } from './dependency-context.js';
+export type { DependencyContext } from './dependency-context.js';
 export { OrphanPatternListSchema } from './orphan-pattern-list.js';
 export type { OrphanPatternList } from './orphan-pattern-list.js';
 export { OpenQuestionListSchema } from './open-question-list.js';

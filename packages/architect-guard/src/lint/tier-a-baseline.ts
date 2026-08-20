@@ -30,58 +30,10 @@ export const TIER_A_LINT_BASELINE: readonly TierABaselineEntry[] = [
     message: "Relationship target 'DocError' not found in known patterns",
   },
   {
-    path: 'packages/architect-cli/src/cli/pattern-graph-cli.ts',
-    rule: 'missing-relationship-target',
-    line: 3,
-    message: "Relationship target 'ContextFormatterImpl' not found in known patterns",
-  },
-  {
-    path: 'packages/architect-cli/src/cli/pattern-graph-cli.ts',
-    rule: 'missing-relationship-target',
-    line: 3,
-    message: "Relationship target 'ScopeValidatorImpl' not found in known patterns",
-  },
-  {
-    path: 'packages/architect-cli/src/cli/pattern-graph-cli.ts',
-    rule: 'missing-relationship-target',
-    line: 3,
-    message: "Relationship target 'CoverageAnalyzerImpl' not found in known patterns",
-  },
-  {
-    path: 'packages/architect-cli/src/cli/pattern-graph-cli.ts',
-    rule: 'missing-relationship-target',
-    line: 3,
-    message: "Relationship target 'HandoffGeneratorImpl' not found in known patterns",
-  },
-  {
-    path: 'packages/architect-cli/src/cli/pattern-graph-cli.ts',
-    rule: 'missing-relationship-target',
-    line: 3,
-    message: "Relationship target 'CLIVersionHelper' not found in known patterns",
-  },
-  {
-    path: 'packages/architect-cli/src/cli/pattern-graph-cli.ts',
-    rule: 'missing-relationship-target',
-    line: 3,
-    message: "Implementation target 'PatternGraphAPICLI' not found in known patterns",
-  },
-  {
-    path: 'packages/architect-cli/src/cli/pattern-graph-cli.ts',
-    rule: 'missing-relationship-target',
-    line: 3,
-    message: "Implementation target 'DataAPICLIErgonomics' not found in known patterns",
-  },
-  {
     path: 'packages/architect-cli/src/cli/version.ts',
     rule: 'missing-pattern-name',
     line: 1,
     message: 'Pattern missing explicit name. Add @architect-pattern YourPatternName',
-  },
-  {
-    path: 'packages/architect-core/src/config/cli-schema.ts',
-    rule: 'missing-relationship-target',
-    line: 1,
-    message: "Implementation target 'CliReferenceGeneration' not found in known patterns",
   },
   {
     path: 'packages/architect-core/src/generators/pipeline/build-pipeline.ts',
@@ -300,36 +252,6 @@ export const TIER_A_LINT_BASELINE: readonly TierABaselineEntry[] = [
     message: "Implementation target 'PatternRelationshipModel' not found in known patterns",
   },
   {
-    path: 'packages/architect-guard/src/validation/anti-patterns.ts',
-    rule: 'missing-relationship-target',
-    line: 1,
-    message: "Relationship target 'DoDValidationTypes' not found in known patterns",
-  },
-  {
-    path: 'packages/architect-guard/src/validation/anti-patterns.ts',
-    rule: 'missing-relationship-target',
-    line: 1,
-    message: "Relationship target 'GherkinTypes' not found in known patterns",
-  },
-  {
-    path: 'packages/architect-guard/src/validation/dod-validator.ts',
-    rule: 'missing-relationship-target',
-    line: 1,
-    message: "Relationship target 'DoDValidationTypes' not found in known patterns",
-  },
-  {
-    path: 'packages/architect-guard/src/validation/dod-validator.ts',
-    rule: 'missing-relationship-target',
-    line: 1,
-    message: "Relationship target 'GherkinTypes' not found in known patterns",
-  },
-  {
-    path: 'packages/architect-guard/src/validation/dod-validator.ts',
-    rule: 'missing-relationship-target',
-    line: 1,
-    message: "Relationship target 'PatternGraph' not found in known patterns",
-  },
-  {
     path: 'packages/architect-guard/src/validation/index.ts',
     rule: 'missing-pattern-name',
     line: 1,
@@ -406,102 +328,6 @@ export const TIER_A_LINT_BASELINE: readonly TierABaselineEntry[] = [
     rule: 'missing-relationship-target',
     line: 1,
     message: "Relationship target 'ArchitectureNeighborhood' not found in known patterns",
-  },
-  {
-    path: 'packages/architect-projection/src/projections/delivery-reporting/index.ts',
-    rule: 'missing-relationship-target',
-    line: 1,
-    message: "Relationship target 'ProjectionContext' not found in known patterns",
-  },
-  {
-    path: 'packages/architect-projection/src/projections/delivery-reporting/index.ts',
-    rule: 'missing-relationship-target',
-    line: 1,
-    message: "Relationship target 'PhaseProgress' not found in known patterns",
-  },
-  {
-    path: 'packages/architect-projection/src/projections/delivery-reporting/index.ts',
-    rule: 'missing-relationship-target',
-    line: 1,
-    message: "Relationship target 'StatusDistribution' not found in known patterns",
-  },
-  {
-    path: 'packages/architect-projection/src/projections/delivery-reporting/index.ts',
-    rule: 'missing-relationship-target',
-    line: 1,
-    message: "Relationship target 'RoadmapTimeline' not found in known patterns",
-  },
-  {
-    path: 'packages/architect-projection/src/projections/delivery-reporting/index.ts',
-    rule: 'missing-relationship-target',
-    line: 1,
-    message: "Relationship target 'ReleaseNotesDigest' not found in known patterns",
-  },
-  {
-    path: 'packages/architect-projection/src/projections/delivery-reporting/index.ts',
-    rule: 'missing-relationship-target',
-    line: 1,
-    message: "Relationship target 'TraceabilityMatrix' not found in known patterns",
-  },
-  {
-    path: 'packages/architect-projection/src/projections/delivery-reporting/index.ts',
-    rule: 'missing-relationship-target',
-    line: 546,
-    message: "Relationship target 'PhaseProgressSchema' not found in known patterns",
-  },
-  {
-    path: 'packages/architect-projection/src/projections/delivery-reporting/index.ts',
-    rule: 'missing-relationship-target',
-    line: 546,
-    message: "Relationship target 'ProjectionContext' not found in known patterns",
-  },
-  {
-    path: 'packages/architect-projection/src/projections/delivery-reporting/index.ts',
-    rule: 'missing-relationship-target',
-    line: 582,
-    message: "Relationship target 'StatusDistributionSchema' not found in known patterns",
-  },
-  {
-    path: 'packages/architect-projection/src/projections/delivery-reporting/index.ts',
-    rule: 'missing-relationship-target',
-    line: 582,
-    message: "Relationship target 'ProjectionContext' not found in known patterns",
-  },
-  {
-    path: 'packages/architect-projection/src/projections/delivery-reporting/index.ts',
-    rule: 'missing-relationship-target',
-    line: 618,
-    message: "Relationship target 'RoadmapTimelineSchema' not found in known patterns",
-  },
-  {
-    path: 'packages/architect-projection/src/projections/delivery-reporting/index.ts',
-    rule: 'missing-relationship-target',
-    line: 618,
-    message: "Relationship target 'ProjectionContext' not found in known patterns",
-  },
-  {
-    path: 'packages/architect-projection/src/projections/delivery-reporting/index.ts',
-    rule: 'missing-relationship-target',
-    line: 666,
-    message: "Relationship target 'ReleaseNotesDigestSchema' not found in known patterns",
-  },
-  {
-    path: 'packages/architect-projection/src/projections/delivery-reporting/index.ts',
-    rule: 'missing-relationship-target',
-    line: 666,
-    message: "Relationship target 'ProjectionContext' not found in known patterns",
-  },
-  {
-    path: 'packages/architect-projection/src/projections/delivery-reporting/index.ts',
-    rule: 'missing-relationship-target',
-    line: 703,
-    message: "Relationship target 'TraceabilityMatrixSchema' not found in known patterns",
-  },
-  {
-    path: 'packages/architect-projection/src/projections/delivery-reporting/index.ts',
-    rule: 'missing-relationship-target',
-    line: 703,
-    message: "Relationship target 'ProjectionContext' not found in known patterns",
   },
   {
     path: 'packages/architect-projection/src/projections/documentation-composition/architecture-diagram.ts',
@@ -1041,7 +867,7 @@ export const TIER_A_LINT_BASELINE: readonly TierABaselineEntry[] = [
 
 export function applyTierABaseline(
   summary: LintSummary,
-  options: TierABaselineFilterOptions
+  options: TierABaselineFilterOptions,
 ): LintSummary {
   if (TIER_A_LINT_BASELINE.length === 0) {
     return summary;
@@ -1050,8 +876,8 @@ export function applyTierABaseline(
   const repoRoot = findRepoRoot(options.baseDir);
   const baselineKeys = new Set(
     TIER_A_LINT_BASELINE.map((entry) =>
-      createBaselineKey(entry.path, entry.rule, entry.line, entry.message)
-    )
+      createBaselineKey(entry.path, entry.rule, entry.line, entry.message),
+    ),
   );
   const results = summary.results
     .map((result) => {
@@ -1059,8 +885,8 @@ export function applyTierABaseline(
       const violations = result.violations.filter(
         (violation) =>
           !baselineKeys.has(
-            createBaselineKey(relativePath, violation.rule, violation.line, violation.message)
-          )
+            createBaselineKey(relativePath, violation.rule, violation.line, violation.message),
+          ),
       );
       return { file: result.file, violations };
     })
@@ -1072,7 +898,7 @@ export function applyTierABaseline(
 export function summarizeLintResults(
   results: readonly { readonly file: string; readonly violations: readonly LintViolation[] }[],
   filesScanned: number,
-  directivesChecked: number
+  directivesChecked: number,
 ): LintSummary {
   let errorCount = 0;
   let warningCount = 0;
@@ -1111,7 +937,7 @@ function createBaselineKey(filePath: string, rule: string, line: number, message
 function normalizeViolationPath(
   filePath: string,
   baseDir: string,
-  repoRoot: string | undefined
+  repoRoot: string | undefined,
 ): string {
   const absolutePath = path.resolve(filePath);
   const root = repoRoot ?? path.resolve(baseDir);

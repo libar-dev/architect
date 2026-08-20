@@ -166,7 +166,7 @@ function mergeOptions(session: SessionOptions, options: McpServerOptions): Sessi
 
 function createWatcher(
   session: Awaited<ReturnType<PipelineSessionManager['initialize']>>,
-  manager: PipelineSessionManager
+  manager: PipelineSessionManager,
 ): McpFileWatcher {
   const globs = [
     ...session.sourceGlobs.input,
@@ -185,7 +185,7 @@ function createWatcher(
 
 export async function startMcpServer(
   argv: readonly string[] = process.argv.slice(2),
-  options: McpServerOptions = {}
+  options: McpServerOptions = {},
 ): Promise<void> {
   const parsed = parseCliArgs(argv);
   const pkg = readMcpPackageMetadata();
@@ -216,7 +216,7 @@ export async function startMcpServer(
     {
       capabilities: { logging: {} },
       instructions: MCP_SERVER_INSTRUCTIONS,
-    }
+    },
   );
 
   registerAllTools(server, sessionManager);
@@ -230,7 +230,7 @@ export async function startMcpServer(
   await server.connect(transport);
 
   log(
-    `Server ready for ${session.baseDir} with ${String(session.dataset.counts.total)} patterns and ${String(REGISTERED_TOOL_NAMES.length)} registered tools.`
+    `Server ready for ${session.baseDir} with ${String(session.dataset.counts.total)} patterns and ${String(REGISTERED_TOOL_NAMES.length)} registered tools.`,
   );
 
   let shuttingDown = false;

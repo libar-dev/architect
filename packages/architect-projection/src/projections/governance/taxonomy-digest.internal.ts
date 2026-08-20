@@ -2,9 +2,7 @@
  * @architect-bounded-context:governance
  */
 /**
- * Private helpers used exclusively by the taxonomy-digest fragment.
- *
- * Part of the GovernanceProjectionSupport utility surface.
+ * Builds the governance taxonomy digest from the graph's tag registry and optional example overrides.
  */
 
 import type {
@@ -51,7 +49,7 @@ const HIDDEN_TAXONOMY_TAGS = new Set(['title', 'target', 'unlock-reason']);
 
 export function buildTaxonomyDigest(
   context: ProjectionContext,
-  options: TaxonomyDigestOptions = {}
+  options: TaxonomyDigestOptions = {},
 ): TaxonomyDigest {
   const overrides = cloneExampleOverrides(options.exampleOverrides);
   const tags = buildTaxonomyGroups(context.graph.tagRegistry);
@@ -78,7 +76,7 @@ function buildTaxonomyGroups(registry: TagRegistry): TagGroupEntry[] {
   });
 
   const metadataGroups = groupMetadataTagsByDomain(
-    registry.metadataTags.filter((tag) => !HIDDEN_TAXONOMY_TAGS.has(tag.tag))
+    registry.metadataTags.filter((tag) => !HIDDEN_TAXONOMY_TAGS.has(tag.tag)),
   );
   for (const [groupName, tags] of metadataGroups) {
     groups.push({
@@ -135,7 +133,7 @@ function createAggregationTagEntry(tag: AggregationTagDefinition): TagEntry {
 }
 
 function buildFormatTypeEntries(
-  overrides: TagExampleOverrides | undefined
+  overrides: TagExampleOverrides | undefined,
 ): TaxonomyDigest['formatTypes'] {
   const defaults: Record<FormatType, { description: string; example: string }> = {
     value: { description: 'Simple string value', example: '@architect-pattern MyPattern' },
@@ -145,7 +143,7 @@ function buildFormatTypeEntries(
     },
     'quoted-value': {
       description: 'String in quotes (preserves spaces)',
-      example: '@architect-usecase "When X happens"',
+      example: '@architect-unlock-reason "Correct post-completion drift"',
     },
     csv: { description: 'Comma-separated values', example: '@architect-uses A, B, C' },
     number: { description: 'Numeric value', example: '@architect-adr 2' },
@@ -165,7 +163,7 @@ function buildFormatTypeEntries(
 }
 
 function toExampleOverrideRecord(
-  overrides: TagExampleOverrides | undefined
+  overrides: TagExampleOverrides | undefined,
 ): Record<string, string> {
   if (overrides === undefined) {
     return {};
@@ -173,13 +171,13 @@ function toExampleOverrideRecord(
 
   return Object.fromEntries(
     Object.entries(overrides).flatMap(([format, override]) =>
-      override.example !== undefined ? [[format, override.example] as const] : []
-    )
+      override.example !== undefined ? [[format, override.example] as const] : [],
+    ),
   );
 }
 
 function cloneExampleOverrides(
-  overrides: TaxonomyDigestOptions['exampleOverrides']
+  overrides: TaxonomyDigestOptions['exampleOverrides'],
 ): TagExampleOverrides | undefined {
   if (overrides === undefined) {
     return undefined;
@@ -187,9 +185,9 @@ function cloneExampleOverrides(
 
   return Object.fromEntries(
     Object.entries(overrides).flatMap(([format, override]) =>
-      override === undefined ? [] : [[format, { ...override }] as const]
-    )
-  ) as TagExampleOverrides;
+      override === undefined ? [] : [[format, { ...override }] as const],
+    ),
+  );
 }
 
 type GroupKey = keyof typeof METADATA_TAGS_BY_GROUP;
@@ -213,10 +211,10 @@ const OTHER_GROUP = 'Other Tags';
 
 const DISPLAY_ORDER: readonly string[] = [
   ...(['core', 'relationship', 'architecture', 'process', 'prd', 'adr'] as const).map(
-    (key) => GROUP_DISPLAY_NAMES[key]
+    (key) => GROUP_DISPLAY_NAMES[key],
   ),
   ...(['hierarchy', 'traceability', 'discovery', 'extraction', 'stub', 'convention'] as const).map(
-    (key) => GROUP_DISPLAY_NAMES[key]
+    (key) => GROUP_DISPLAY_NAMES[key],
   ),
   OTHER_GROUP,
 ];
@@ -236,7 +234,7 @@ const TAG_TO_GROUP_DISPLAY: ReadonlyMap<string, string> = (() => {
 })();
 
 function groupMetadataTagsByDomain(
-  tags: MetadataTagDefinition[]
+  tags: MetadataTagDefinition[],
 ): [string, MetadataTagDefinition[]][] {
   const groups = new Map<string, MetadataTagDefinition[]>();
 

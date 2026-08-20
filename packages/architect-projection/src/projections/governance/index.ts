@@ -2,6 +2,7 @@
  * @architect-bounded-context:governance
  */
 export {
+  collectBusinessRuleProductAreas,
   parseAndProjectBusinessRuleSet,
   projectBusinessRule,
   projectBusinessRuleSet,

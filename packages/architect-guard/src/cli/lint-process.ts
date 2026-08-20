@@ -27,9 +27,13 @@
 // See src/cli/error-handler.ts for the unified handler.
 // ────────────────────────────────────────────────────────────────────────
 
-import { printVersionAndExit, handleCliError, isDirectCliEntrypoint } from './shared.js';
-import { formatConfigError, loadProjectConfig } from '@libar-dev/architect-core';
-import { buildPatternGraph } from '@libar-dev/architect-core';
+import {
+  buildPatternGraph,
+  exitWithProcessError,
+  formatConfigError,
+  loadProjectConfig,
+} from '@libar-dev/architect-core';
+import { printVersionAndExit, isDirectCliEntrypoint } from './shared.js';
 import {
   deriveProcessState,
   detectStagedChanges,
@@ -166,12 +170,12 @@ Exit Codes:
   1  Errors found (or warnings with --strict)
 
 Rules Checked:
-  error    completed-protection       Cannot modify completed specs without unlock-reason
-  error    invalid-status-transition  Status transition must follow PDR-005 FSM
-  error    scope-creep                Cannot add deliverables to active specs
+  warning  completed-protection       Modifying a completed spec (advisory; unlock-reason suppresses)
+  error    invalid-status-transition  Status transition must follow the FSM
+  warning  scope-creep                Adding pending scope to an active spec (advisory; unlock-reason suppresses)
   error    session-excluded           Cannot modify files excluded from session
   warning  session-scope              File not in active session scope
-  warning  deliverable-removed        Deliverable was removed (informational)
+  warning  deliverable-removed        Deliverable was removed (advisory; unlock-reason suppresses)
 
 Examples:
   # Pre-commit hook (default)
@@ -238,7 +242,7 @@ function formatJson(output: ReturnType<typeof validateChanges>): string {
       events,
     },
     null,
-    2
+    2,
   );
 }
 
@@ -246,18 +250,18 @@ function formatJson(output: ReturnType<typeof validateChanges>): string {
  * Main CLI function
  */
 async function main(): Promise<void> {
-  const config = parseArgs();
-
-  if (config.version) {
-    printVersionAndExit('architect-guard');
-  }
-
-  if (config.help) {
-    printHelp();
-    process.exit(0);
-  }
-
   try {
+    const config = parseArgs();
+
+    if (config.version) {
+      printVersionAndExit('architect-guard');
+    }
+
+    if (config.help) {
+      printHelp();
+      process.exit(0);
+    }
+
     process.stdout.write(`Process Guard: validating ${config.mode} changes...\n`);
     process.stdout.write(`  Base directory: ${config.baseDir}\n`);
 
@@ -278,7 +282,7 @@ async function main(): Promise<void> {
     });
     if (!pipelineResult.ok) {
       throw new Error(
-        `Pipeline error [${pipelineResult.error.step}]: ${pipelineResult.error.message}`
+        `Pipeline error [${pipelineResult.error.step}]: ${pipelineResult.error.message}`,
       );
     }
 
@@ -301,7 +305,7 @@ async function main(): Promise<void> {
       for (const [path, fileState] of state.files) {
         process.stdout.write(`  ${path}\n`);
         process.stdout.write(
-          `    Status: ${fileState.status} (${fileState.protection} protection)\n`
+          `    Status: ${fileState.status} (${fileState.protection} protection)\n`,
         );
         if (fileState.deliverables.length > 0) {
           process.stdout.write(`    Deliverables: ${String(fileState.deliverables.length)}\n`);
@@ -383,7 +387,7 @@ async function main(): Promise<void> {
 
     process.exit(failed ? 1 : 0);
   } catch (error) {
-    handleCliError(error, 1);
+    exitWithProcessError(error, 1);
   }
 }
 

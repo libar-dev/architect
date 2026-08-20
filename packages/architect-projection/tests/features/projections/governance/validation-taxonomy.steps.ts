@@ -19,7 +19,7 @@ interface ValidationTaxonomyState {
 }
 
 const feature = await loadFeature(
-  'tests/features/projections/governance/validation-taxonomy.feature'
+  'tests/features/projections/governance/validation-taxonomy.feature',
 );
 
 let state: ValidationTaxonomyState | null = null;
@@ -62,7 +62,7 @@ function createTaxonomyContext(): ProjectionContext {
           format: 'csv',
           purpose: 'Links one pattern to another.',
           repeatable: false,
-          example: '@architect-uses PatternGraphAPI, ProjectionBundle',
+          example: '@architect-uses WidgetService, ProjectionBundle',
         },
         {
           tag: 'title',
@@ -127,8 +127,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             expect(state!.validation?.kind).toBe('ValidationRuleDigest');
             expect(state!.validation?.rules).toContainEqual({
               id: 'completed-protection',
-              description: 'Completed specs require unlock-reason tag to modify',
-              severity: 'error',
+              description:
+                'Modifying a completed spec warns; unlock-reason is optional and suppresses it',
+              severity: 'warning',
             });
             expect(state!.validation?.rules).toContainEqual({
               id: 'session-scope',
@@ -148,6 +149,16 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 },
                 { from: 'active', to: 'completed', description: 'Finish implementation work' },
                 { from: 'active', to: 'roadmap', description: 'Move active work back to planning' },
+                {
+                  from: 'completed',
+                  to: 'active',
+                  description: 'Reopen completed work for changes',
+                },
+                {
+                  from: 'completed',
+                  to: 'roadmap',
+                  description: 'Reopen completed work back to planning',
+                },
                 { from: 'deferred', to: 'roadmap', description: 'Reactivate deferred work' },
               ],
             });
@@ -157,28 +168,29 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 statuses: ['roadmap', 'deferred'],
                 meaning: 'Planning statuses remain editable.',
                 canAddDeliverables: true,
-                needsUnlock: false,
+                unlockSuppressesWarning: false,
               },
               {
                 level: 'scope',
                 statuses: ['active'],
-                meaning: 'Active work is scope-locked against deliverable expansion.',
+                meaning:
+                  'Active work is scope-locked; adding pending deliverables warns (advisory).',
                 canAddDeliverables: false,
-                needsUnlock: false,
+                unlockSuppressesWarning: true,
               },
               {
                 level: 'hard',
                 statuses: ['completed'],
                 meaning:
-                  'Completed work is hard-locked until an explicit unlock reason is provided.',
+                  'Completed work is hard-locked; editing or reopening warns, unlock reason is optional (advisory).',
                 canAddDeliverables: false,
-                needsUnlock: true,
+                unlockSuppressesWarning: true,
               },
             ]);
-          }
+          },
         );
       });
-    }
+    },
   );
 
   Rule('Taxonomy overrides are explicit and per-call only', ({ RuleScenario }) => {
@@ -197,7 +209,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 example: '@architect-status active',
               },
               csv: {
-                example: '@architect-uses PatternGraphAPI, ProjectionBundle, RulesQueryAPI',
+                example: '@architect-uses WidgetService, ProjectionBundle, RulesQueryAPI',
               },
             },
           }).root;
@@ -218,13 +230,13 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             expect(state!.firstDigest?.formatTypes).toContainEqual({
               format: 'csv',
               description: 'Comma-separated values',
-              example: '@architect-uses PatternGraphAPI, ProjectionBundle, RulesQueryAPI',
+              example: '@architect-uses WidgetService, ProjectionBundle, RulesQueryAPI',
             });
             expect(state!.firstDigest?.exampleOverrides).toEqual({
               enum: '@architect-status active',
-              csv: '@architect-uses PatternGraphAPI, ProjectionBundle, RulesQueryAPI',
+              csv: '@architect-uses WidgetService, ProjectionBundle, RulesQueryAPI',
             });
-          }
+          },
         );
 
         And(
@@ -241,9 +253,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               example: '@architect-uses A, B, C',
             });
             expect(state!.secondDigest?.exampleOverrides).toBeUndefined();
-          }
+          },
         );
-      }
+      },
     );
   });
 
@@ -265,7 +277,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             const metadataTags =
               state!.firstDigest?.tags
                 .flatMap((group) =>
-                  group.entries.flatMap((entry) => (entry.kind === 'metadata' ? [entry.tag] : []))
+                  group.entries.flatMap((entry) => (entry.kind === 'metadata' ? [entry.tag] : [])),
                 )
                 .sort() ?? [];
 
@@ -275,9 +287,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             expect(metadataTags).not.toContain('shape');
             expect(metadataTags).not.toContain('target');
             expect(metadataTags).not.toContain('unlock-reason');
-          }
+          },
         );
-      }
+      },
     );
   });
 
@@ -300,5 +312,41 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         });
       });
     });
+
+    RuleScenario(
+      "the count summary is a self-consistent function of the digest's own entries",
+      ({ Given, When, Then, And }) => {
+        Given('a taxonomy projection context with roles metadata tags and aggregation tags', () => {
+          state!.context = createTaxonomyContext();
+        });
+
+        When('I project the taxonomy digest', () => {
+          state!.firstDigest = parseAndProjectTaxonomyDigest(state!.context!).root;
+        });
+
+        Then(
+          'the count summary equals the role, metadata, and aggregation entries enumerated from the digest itself',
+          () => {
+            const entries = state!.firstDigest!.tags.flatMap((group) => group.entries);
+            const summary = summarizeTaxonomyDigest(state!.firstDigest!);
+            expect(summary.roles).toBe(entries.filter((entry) => entry.kind === 'role').length);
+            expect(summary.metadata).toBe(
+              entries.filter((entry) => entry.kind === 'metadata').length,
+            );
+            expect(summary.aggregation).toBe(
+              entries.filter((entry) => entry.kind === 'aggregation').length,
+            );
+          },
+        );
+
+        And(
+          'the total equals the sum of those three counts, so the count surface cannot diverge from the enumerated surface',
+          () => {
+            const summary = summarizeTaxonomyDigest(state!.firstDigest!);
+            expect(summary.total).toBe(summary.roles + summary.metadata + summary.aggregation);
+          },
+        );
+      },
+    );
   });
 });

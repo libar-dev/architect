@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-08T15:24:38.282Z",
+  "generatedAt": "2026-05-29T04:15:34.472Z",
   "fixture": {
     "name": "BusinessRuleSet grouped-by-product-area bundle",
     "patterns": 36,
@@ -11,61 +11,360 @@
     "warmupIterations": 5
   },
   "project": {
-    "avgMs": 1.1706323000000054,
-    "p50Ms": 0.5370419999999285,
+    "avgMs": 0.5962738750000028,
+    "p50Ms": 0.5401249999999891,
     "iterations": 40
   },
   "renderObject": {
-    "avgMs": 0.4403969249999989,
-    "p50Ms": 0.39545799999996234,
+    "avgMs": 0.37305319999999254,
+    "p50Ms": 0.371167000000014,
     "iterations": 40
   },
   "renderPretty": {
-    "avgMs": 0.7603312500000016,
-    "p50Ms": 0.5768330000000788,
+    "avgMs": 0.5416459499999917,
+    "p50Ms": 0.5236669999999322,
     "iterations": 40
   },
   "projectionHotPaths": {
     "sessionContextBundle": {
-      "avgMs": 0.013877766666693485,
-      "p50Ms": 0.009500000000116415,
-      "iterations": 30
+      "avgMs": 0.006313667999994323,
+      "p50Ms": 0.0054169999998521234,
+      "iterations": 250
     },
     "scopeReadinessReport": {
-      "avgMs": 0.011734699999995732,
-      "p50Ms": 0.008333999999877051,
-      "iterations": 30
+      "avgMs": 0.00623716400000103,
+      "p50Ms": 0.005374999999958163,
+      "iterations": 250
     },
     "documentationView": {
-      "avgMs": 0.019727866666645846,
-      "p50Ms": 0.01683299999990595,
-      "iterations": 30
+      "avgMs": 0.009942147999992813,
+      "p50Ms": 0.008125000000063665,
+      "iterations": 250
     },
     "requirementDigestAllAreas": {
-      "avgMs": 0.15573196666667474,
-      "p50Ms": 0.15658300000018244,
-      "iterations": 30
+      "avgMs": 0.0966245200000003,
+      "p50Ms": 0.09429099999988466,
+      "iterations": 250
     },
     "requirementDigestExecutable": {
-      "avgMs": 0.22038616666667016,
-      "p50Ms": 0.21408400000018446,
-      "iterations": 30
+      "avgMs": 0.14814464799999041,
+      "p50Ms": 0.14483400000017355,
+      "iterations": 250
     },
     "patternSatisfiesTag": {
-      "avgMs": 0.07620699999999185,
-      "p50Ms": 0.08029099999998834,
-      "iterations": 30
+      "avgMs": 0.04117066000000705,
+      "p50Ms": 0.0359169999999267,
+      "iterations": 250
     },
     "buildBoundedContext": {
-      "avgMs": 0.03054456666666283,
-      "p50Ms": 0.027166999999963082,
-      "iterations": 30
+      "avgMs": 0.016804299999999786,
+      "p50Ms": 0.014833000000180618,
+      "iterations": 250
     },
     "graphBuild": {
-      "avgMs": 290.94890829999997,
-      "p50Ms": 283.45437500000025,
+      "avgMs": 376.2606917999998,
+      "p50Ms": 371.7694589999992,
       "iterations": 10
     }
   },
-  "isBundleP50Micros": 2.6250000000800355
+  "renderMarkdownBundles": {
+    "patterns": {
+      "avgMs": 0.23772281200000725,
+      "p50Ms": 0.21970799999962765,
+      "iterations": 250
+    },
+    "decisions": {
+      "avgMs": 0.25274582399998324,
+      "p50Ms": 0.24049999999988358,
+      "iterations": 250
+    },
+    "requirements-executable": {
+      "avgMs": 0.19015747599999305,
+      "p50Ms": 0.1800839999996242,
+      "iterations": 250
+    }
+  },
+  "isBundleP50Micros": 4.583000000138782,
+  "samples": [
+    {
+      "iteration": 1,
+      "projectMs": 0.5788330000000315,
+      "renderObjectMs": 0.4869170000001759,
+      "renderPrettyMs": 0.6763750000000073,
+      "isBundleMicros": 4.790999999841006
+    },
+    {
+      "iteration": 2,
+      "projectMs": 0.6522500000000946,
+      "renderObjectMs": 0.4344579999999496,
+      "renderPrettyMs": 0.5983750000000327,
+      "isBundleMicros": 4.707999999936874
+    },
+    {
+      "iteration": 3,
+      "projectMs": 0.6102500000001783,
+      "renderObjectMs": 0.4152080000001206,
+      "renderPrettyMs": 0.5824170000000777,
+      "isBundleMicros": 4.58400000002257
+    },
+    {
+      "iteration": 4,
+      "projectMs": 0.5974169999999503,
+      "renderObjectMs": 0.4043749999998454,
+      "renderPrettyMs": 0.5897499999998672,
+      "isBundleMicros": 4.666000000042914
+    },
+    {
+      "iteration": 5,
+      "projectMs": 3.1422079999999823,
+      "renderObjectMs": 0.3427910000000338,
+      "renderPrettyMs": 0.5236669999999322,
+      "isBundleMicros": 5.625000000009095
+    },
+    {
+      "iteration": 6,
+      "projectMs": 0.6212080000000242,
+      "renderObjectMs": 0.42325000000005275,
+      "renderPrettyMs": 0.6050000000000182,
+      "isBundleMicros": 8.95900000000438
+    },
+    {
+      "iteration": 7,
+      "projectMs": 0.6265830000002097,
+      "renderObjectMs": 0.4001670000000104,
+      "renderPrettyMs": 0.5470840000000408,
+      "isBundleMicros": 4.249999999956344
+    },
+    {
+      "iteration": 8,
+      "projectMs": 0.5467499999999745,
+      "renderObjectMs": 0.3861669999998867,
+      "renderPrettyMs": 0.5418340000001081,
+      "isBundleMicros": 3.9580000000114524
+    },
+    {
+      "iteration": 9,
+      "projectMs": 0.5632080000000315,
+      "renderObjectMs": 0.3968330000000151,
+      "renderPrettyMs": 0.5638330000001588,
+      "isBundleMicros": 4.20799999983501
+    },
+    {
+      "iteration": 10,
+      "projectMs": 0.5791250000002037,
+      "renderObjectMs": 0.3897500000000491,
+      "renderPrettyMs": 0.6433329999999842,
+      "isBundleMicros": 10.33400000005713
+    },
+    {
+      "iteration": 11,
+      "projectMs": 0.572458000000097,
+      "renderObjectMs": 0.4042500000000473,
+      "renderPrettyMs": 0.566332999999986,
+      "isBundleMicros": 4.83299999996234
+    },
+    {
+      "iteration": 12,
+      "projectMs": 0.5401249999999891,
+      "renderObjectMs": 0.39370800000006057,
+      "renderPrettyMs": 0.5560420000001614,
+      "isBundleMicros": 4.833000000189713
+    },
+    {
+      "iteration": 13,
+      "projectMs": 0.6339590000000044,
+      "renderObjectMs": 0.487041999999974,
+      "renderPrettyMs": 0.6120409999998628,
+      "isBundleMicros": 5.417000000079497
+    },
+    {
+      "iteration": 14,
+      "projectMs": 0.553957999999966,
+      "renderObjectMs": 0.43233299999997143,
+      "renderPrettyMs": 0.6383749999999964,
+      "isBundleMicros": 29.16700000014316
+    },
+    {
+      "iteration": 15,
+      "projectMs": 0.5789159999999356,
+      "renderObjectMs": 0.4511249999998199,
+      "renderPrettyMs": 0.6417089999999916,
+      "isBundleMicros": 6.0829999999896245
+    },
+    {
+      "iteration": 16,
+      "projectMs": 0.622916000000032,
+      "renderObjectMs": 0.4627499999999145,
+      "renderPrettyMs": 0.6935839999998734,
+      "isBundleMicros": 7.2920000000067375
+    },
+    {
+      "iteration": 17,
+      "projectMs": 0.6215829999998732,
+      "renderObjectMs": 0.43716700000004494,
+      "renderPrettyMs": 0.5997079999999642,
+      "isBundleMicros": 6.333999999924345
+    },
+    {
+      "iteration": 18,
+      "projectMs": 0.5726669999999103,
+      "renderObjectMs": 0.42325000000005275,
+      "renderPrettyMs": 0.5977089999998952,
+      "isBundleMicros": 17.20799999998235
+    },
+    {
+      "iteration": 19,
+      "projectMs": 0.5305829999999787,
+      "renderObjectMs": 0.3343750000001364,
+      "renderPrettyMs": 0.483208999999988,
+      "isBundleMicros": 4.583000000138782
+    },
+    {
+      "iteration": 20,
+      "projectMs": 0.46612500000014734,
+      "renderObjectMs": 0.3254589999999098,
+      "renderPrettyMs": 0.4749580000000151,
+      "isBundleMicros": 4.083999999920707
+    },
+    {
+      "iteration": 21,
+      "projectMs": 0.46091599999999744,
+      "renderObjectMs": 0.31083300000000236,
+      "renderPrettyMs": 0.47891600000002654,
+      "isBundleMicros": 4.000000000132786
+    },
+    {
+      "iteration": 22,
+      "projectMs": 0.4720420000001013,
+      "renderObjectMs": 0.3137090000000171,
+      "renderPrettyMs": 0.4705420000000231,
+      "isBundleMicros": 4.415999999991982
+    },
+    {
+      "iteration": 23,
+      "projectMs": 0.4644590000000335,
+      "renderObjectMs": 0.31237499999997453,
+      "renderPrettyMs": 0.5097919999998339,
+      "isBundleMicros": 4.8750000000836735
+    },
+    {
+      "iteration": 24,
+      "projectMs": 0.5452080000000024,
+      "renderObjectMs": 0.3479589999999462,
+      "renderPrettyMs": 0.5336250000000291,
+      "isBundleMicros": 5.791999999928521
+    },
+    {
+      "iteration": 25,
+      "projectMs": 0.5418329999999969,
+      "renderObjectMs": 0.37179199999991397,
+      "renderPrettyMs": 0.4988749999999982,
+      "isBundleMicros": 3.6250000000563887
+    },
+    {
+      "iteration": 26,
+      "projectMs": 0.48054099999990285,
+      "renderObjectMs": 0.315541999999823,
+      "renderPrettyMs": 0.47345900000004804,
+      "isBundleMicros": 2.958000000035099
+    },
+    {
+      "iteration": 27,
+      "projectMs": 0.4846669999999449,
+      "renderObjectMs": 0.371167000000014,
+      "renderPrettyMs": 0.46937500000012733,
+      "isBundleMicros": 5.000000000109139
+    },
+    {
+      "iteration": 28,
+      "projectMs": 0.4574579999998605,
+      "renderObjectMs": 0.37962500000003274,
+      "renderPrettyMs": 0.48433399999998983,
+      "isBundleMicros": 3.292000000101325
+    },
+    {
+      "iteration": 29,
+      "projectMs": 0.45537500000000364,
+      "renderObjectMs": 0.35874999999987267,
+      "renderPrettyMs": 0.49966699999981756,
+      "isBundleMicros": 8.666999999832115
+    },
+    {
+      "iteration": 30,
+      "projectMs": 0.4595839999999498,
+      "renderObjectMs": 0.3423750000001746,
+      "renderPrettyMs": 0.5145410000000084,
+      "isBundleMicros": 2.958000000035099
+    },
+    {
+      "iteration": 31,
+      "projectMs": 0.45566699999994853,
+      "renderObjectMs": 0.31904199999985394,
+      "renderPrettyMs": 0.5048749999998563,
+      "isBundleMicros": 2.7919999999994616
+    },
+    {
+      "iteration": 32,
+      "projectMs": 0.4547909999998865,
+      "renderObjectMs": 0.31500000000005457,
+      "renderPrettyMs": 0.5202919999999267,
+      "isBundleMicros": 2.9170000000249274
+    },
+    {
+      "iteration": 33,
+      "projectMs": 0.48745800000006057,
+      "renderObjectMs": 0.3213749999999891,
+      "renderPrettyMs": 0.55987499999992,
+      "isBundleMicros": 6.374999999934516
+    },
+    {
+      "iteration": 34,
+      "projectMs": 0.5102500000000418,
+      "renderObjectMs": 0.3493340000002263,
+      "renderPrettyMs": 0.5046250000000327,
+      "isBundleMicros": 3.9999999999054126
+    },
+    {
+      "iteration": 35,
+      "projectMs": 0.4591249999998581,
+      "renderObjectMs": 0.3097499999998945,
+      "renderPrettyMs": 0.4698750000000018,
+      "isBundleMicros": 2.7500000001055014
+    },
+    {
+      "iteration": 36,
+      "projectMs": 0.4632080000001224,
+      "renderObjectMs": 0.31654200000002675,
+      "renderPrettyMs": 0.47070899999994253,
+      "isBundleMicros": 2.8750000001309672
+    },
+    {
+      "iteration": 37,
+      "projectMs": 0.4883749999999054,
+      "renderObjectMs": 0.3182919999999285,
+      "renderPrettyMs": 0.4840409999999338,
+      "isBundleMicros": 2.958000000035099
+    },
+    {
+      "iteration": 38,
+      "projectMs": 0.46916699999997036,
+      "renderObjectMs": 0.32024999999998727,
+      "renderPrettyMs": 0.5315840000000662,
+      "isBundleMicros": 4.208000000062384
+    },
+    {
+      "iteration": 39,
+      "projectMs": 0.4754169999998794,
+      "renderObjectMs": 0.37687499999992724,
+      "renderPrettyMs": 0.4812500000000455,
+      "isBundleMicros": 3.165999999964697
+    },
+    {
+      "iteration": 40,
+      "projectMs": 0.5542920000000322,
+      "renderObjectMs": 0.320165999999972,
+      "renderPrettyMs": 0.4702500000000782,
+      "isBundleMicros": 2.8340000001207954
+    }
+  ]
 }

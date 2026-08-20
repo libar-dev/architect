@@ -15,24 +15,28 @@
  *
  * - `ARCHITECT_PACKAGE_FEATURE_ONLY_TAG_SUFFIXES` — this package's choice of
  *   how to extend the canonical minimum, enriching its requirement-doc
- *   vocabulary (`workflow`, `completed`). Other
+ *   vocabulary (`workflow`). Other
  *   projects may declare their own extension list; they MUST include the
  *   canonical minimum but may add to it freely. The package's extension is
  *   NOT sync-tested against the ADR — extensions are per-project and may
  *   legitimately drift from any single ADR's table.
  *
+ * The `quarter` tag was retired per ADR-013 (no calendar temporal axis), and
+ * the `completed` completion-date field was retired by the same decision
+ * (no temporal state in the read model; completion order lives in git), so the
+ * canonical minimum is `team` alone and the package extension is `workflow`.
+ *
  * Source-ownership *violation detection* (flagging `@architect-uses` in
  * `.feature` files, or `@architect-depends-on` in TS JSDoc) is graph-health
- * work tracked under `DataAPIRelationshipGraph`, not the guard pipeline. See
- * the ADR-001 Rule 6 narrative for the rationale.
+ * work for the graph handle's drift views (ADR-014), not the guard pipeline.
+ * See the ADR-001 Rule 6 narrative for the rationale.
  */
 
-export const CANONICAL_FEATURE_ONLY_TAG_SUFFIXES = ['quarter', 'team'] as const;
+export const CANONICAL_FEATURE_ONLY_TAG_SUFFIXES = ['team'] as const;
 
 export const ARCHITECT_PACKAGE_FEATURE_ONLY_TAG_SUFFIXES = [
   ...CANONICAL_FEATURE_ONLY_TAG_SUFFIXES,
   'workflow',
-  'completed',
 ] as const;
 
 export type CanonicalFeatureOnlyTag = (typeof CANONICAL_FEATURE_ONLY_TAG_SUFFIXES)[number];

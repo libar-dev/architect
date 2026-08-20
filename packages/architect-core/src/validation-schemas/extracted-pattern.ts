@@ -1,6 +1,27 @@
+/**
+ * @architect
+ * @architect-pattern ExtractedPattern
+ * @architect-status active
+ * @architect-role:contract
+ * @architect-bounded-context:validation-schemas
+ * @architect-uses ExportInfoContract
+ *
+ * ## ExtractedPattern - Canonical Per-Pattern Record Contract
+ *
+ * Zod schema for the ~60-field canonical record the PatternGraph read model
+ * is built from. One `ExtractedPattern` per architectural pattern, carrying
+ * identity, status, source provenance, relationships, deliverables, rules,
+ * and shapes. The PatternGraph (the read model per ADR-006) composes these
+ * records into status-grouped views and a relationship index.
+ *
+ * ### When to Use
+ *
+ * - As the per-pattern record contract when constructing or consuming the graph
+ * - Tests: validate that extractor output conforms to the schema
+ */
 import { z } from 'zod';
 
-import { ADR_CATEGORY_VALUES, ADR_STATUS_VALUES, QUARTER_PATTERN } from '../taxonomy/index.js';
+import { ADR_CATEGORY_VALUES, ADR_STATUS_VALUES } from '../taxonomy/index.js';
 import { asPatternId, asSourceFilePath } from '../types/branded.js';
 import { slugify } from '../utils/string-utils.js';
 import { DocDirectiveSchema, PatternStatusSchema } from './doc-directive.js';
@@ -10,7 +31,13 @@ import { ExtractedShapeSchema } from './extracted-shape.js';
 import { PatternIdentifierSchema, PatternReferenceSchema } from './pattern-contract.js';
 import { ScenarioRefSchema } from './scenario-ref.js';
 
-export const BusinessRuleSchema = z.object({
+/**
+ * A business rule extracted from a pattern's scenarios — its name, description,
+ * the count and names of scenarios that exercise it, and any tags.
+ *
+ * @architect-shape
+ */
+export const BusinessRuleSchema = z.strictObject({
   name: z.string(),
   description: z.string(),
   scenarioCount: z.number().int().nonnegative(),
@@ -41,10 +68,16 @@ const SourceFilePathSchema = z
     {
       message:
         'Source file must be a TypeScript file (.ts) or Gherkin feature file (.feature or .feature.md)',
-    }
+    },
   )
   .transform((path) => asSourceFilePath(path));
 
+/**
+ * Source provenance for a pattern — the file it was extracted from and the
+ * 1-based inclusive `[start, end]` line span of its declaration.
+ *
+ * @architect-shape
+ */
 export const SourceInfoSchema = z.strictObject({
   file: SourceFilePathSchema,
   lines: z
@@ -75,32 +108,21 @@ const ExtractedPatternBaseSchema = z.strictObject({
   patternName: PatternIdentifierSchema.optional(),
   status: PatternStatusSchema,
   boundedContext: z.string().optional(),
-  useCases: z.array(z.string()).readonly().optional(),
   whenToUse: z.array(z.string()).readonly().optional(),
   uses: z.array(PatternReferenceSchema).readonly().optional(),
   scenarios: z.array(ScenarioRefSchema).readonly().optional(),
-  phase: z.number().int().positive().optional(),
-  release: z.string().optional(),
   implementsPatterns: z.array(z.string()).readonly().optional(),
   extendsPattern: z.string().optional(),
   targetPath: z.string().optional(),
-  since: z.string().optional(),
   executableSpecs: z.array(z.string()).readonly().optional(),
   convention: z.array(z.string()).readonly().optional(),
   seeAlso: z.array(z.string()).readonly().optional(),
+  enforcesDecisions: z.array(z.string()).readonly().optional(),
   apiRef: z.array(z.string()).readonly().optional(),
-  quarter: z.string().regex(QUARTER_PATTERN).optional(),
-  completed: z.string().optional(),
-  effort: z.string().optional(),
-  effortActual: z.string().optional(),
   team: z.string().optional(),
   productArea: z.string().optional(),
-  userRole: z.string().optional(),
-  businessValue: z.string().optional(),
   deliverables: z.array(DeliverableSchema).readonly().optional(),
   workflow: z.string().optional(),
-  risk: z.string().optional(),
-  priority: z.string().optional(),
   level: HierarchyLevelSchema.optional(),
   parent: z.string().optional(),
   children: z.array(z.string()).readonly().optional(),
@@ -124,10 +146,37 @@ const ExtractedPatternBaseSchema = z.strictObject({
   extractedShapes: z.array(ExtractedShapeSchema).readonly().optional(),
 });
 
+/**
+ * The canonical per-pattern record contract — the ~60-field strict-object
+ * schema every extracted pattern must satisfy.
+ *
+ * @architect-shape
+ */
 export const ExtractedPatternSchema = ExtractedPatternBaseSchema;
 
-export type ExtractedPattern = z.output<typeof ExtractedPatternBaseSchema>;
+/**
+ * Draft variant of {@link ExtractedPatternSchema} that additionally permits a
+ * `_diagnostics` array, carrying extraction warnings before the record is
+ * finalized.
+ *
+ * @architect-shape
+ */
+export const ExtractedPatternDraftSchema = z.strictObject({
+  ...ExtractedPatternBaseSchema.shape,
+  _diagnostics: z.array(z.string().min(1)).readonly().optional(),
+});
 
+export type ExtractedPattern = z.output<typeof ExtractedPatternBaseSchema>;
+export type ExtractedPatternDraft = z.output<typeof ExtractedPatternDraftSchema>;
+
+/**
+ * Type guard narrowing an unknown value to {@link ExtractedPattern} by parsing
+ * it against {@link ExtractedPatternSchema}.
+ *
+ * @architect-shape
+ * @param value - The unknown value to test against the ExtractedPattern contract.
+ * @returns `true` when `value` is a valid ExtractedPattern (narrowing its type), else `false`.
+ */
 export function isExtractedPattern(value: unknown): value is ExtractedPattern {
   return ExtractedPatternSchema.safeParse(value).success;
 }

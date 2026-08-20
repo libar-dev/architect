@@ -4,10 +4,7 @@
  * @architect-status active
  * @architect-role:utility
  * @architect-bounded-context:read-api
- *
- * ### When to Use
- *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * @architect-uses ExtractedPattern, PatternGraph, PatternHelpers
  */
 import type { ExtractedPattern } from '../validation-schemas/extracted-pattern.js';
 import type { ArchIndex, PatternGraph } from '../validation-schemas/pattern-graph.js';
@@ -19,8 +16,8 @@ import {
   getRelationshipsForPattern,
 } from './pattern-helpers.js';
 
-function resolveNeighborEntry(patterns: readonly ExtractedPattern[], name: string): NeighborEntry {
-  const pattern = findPatternByName(patterns, name);
+function resolveNeighborEntry(dataset: PatternGraph, name: string): NeighborEntry {
+  const pattern = findPatternByName(dataset, name);
   return {
     name,
     status: pattern?.status,
@@ -40,6 +37,8 @@ export interface NeighborhoodResult {
   readonly dependsOn: readonly NeighborEntry[];
   readonly enables: readonly NeighborEntry[];
   readonly sameContext: readonly NeighborEntry[];
+  readonly seeAlso: readonly NeighborEntry[];
+  readonly enforcedBy: readonly NeighborEntry[];
   readonly implements: readonly string[];
   readonly implementedBy: readonly string[];
 }
@@ -70,7 +69,7 @@ export interface ContextComparison {
 
 export function computeNeighborhood(
   name: string,
-  dataset: PatternGraph
+  dataset: PatternGraph,
 ): NeighborhoodResult | undefined {
   const pattern = findPatternByName(dataset.patterns, name);
   if (pattern === undefined) {
@@ -80,17 +79,19 @@ export function computeNeighborhood(
   const patternName = getPatternName(pattern);
   const relationships = getRelationships(dataset, patternName);
 
-  const uses = (relationships?.uses ?? []).map((entry) =>
-    resolveNeighborEntry(dataset.patterns, entry)
-  );
-  const usedBy = (relationships?.usedBy ?? []).map((entry) =>
-    resolveNeighborEntry(dataset.patterns, entry)
-  );
+  const uses = (relationships?.uses ?? []).map((entry) => resolveNeighborEntry(dataset, entry));
+  const usedBy = (relationships?.usedBy ?? []).map((entry) => resolveNeighborEntry(dataset, entry));
   const dependsOn = (relationships?.dependsOn ?? []).map((entry) =>
-    resolveNeighborEntry(dataset.patterns, entry)
+    resolveNeighborEntry(dataset, entry),
   );
   const enables = (relationships?.enables ?? []).map((entry) =>
-    resolveNeighborEntry(dataset.patterns, entry)
+    resolveNeighborEntry(dataset, entry),
+  );
+  const seeAlso = (relationships?.seeAlso ?? []).map((entry) =>
+    resolveNeighborEntry(dataset, entry),
+  );
+  const enforcedBy = (relationships?.enforcedBy ?? []).map((entry) =>
+    resolveNeighborEntry(dataset, entry),
   );
 
   const sameContext: NeighborEntry[] = [];
@@ -99,7 +100,7 @@ export function computeNeighborhood(
     if (contextPatterns !== undefined) {
       for (const sibling of contextPatterns) {
         if (getPatternName(sibling) !== patternName) {
-          sameContext.push(resolveNeighborEntry(dataset.patterns, getPatternName(sibling)));
+          sameContext.push(resolveNeighborEntry(dataset, getPatternName(sibling)));
         }
       }
     }
@@ -115,6 +116,8 @@ export function computeNeighborhood(
     dependsOn,
     enables,
     sameContext,
+    seeAlso,
+    enforcedBy,
     implements: relationships?.implementsPatterns ?? [],
     implementedBy: (relationships?.implementedBy ?? []).map((entry) => entry.name),
   };
@@ -122,7 +125,7 @@ export function computeNeighborhood(
 
 function aggregateContextDependencies(
   patterns: readonly ExtractedPattern[],
-  dataset: PatternGraph
+  dataset: PatternGraph,
 ): Set<string> {
   const dependencies = new Set<string>();
 
@@ -146,7 +149,7 @@ function findIntegrationPoints(
   fromContext: string,
   targetPatternNames: ReadonlySet<string>,
   toContext: string,
-  dataset: PatternGraph
+  dataset: PatternGraph,
 ): IntegrationPoint[] {
   const points: IntegrationPoint[] = [];
 
@@ -185,7 +188,7 @@ function findIntegrationPoints(
 export function compareContexts(
   leftContext: string,
   rightContext: string,
-  dataset: PatternGraph
+  dataset: PatternGraph,
 ): ContextComparison | undefined {
   const archIndex: ArchIndex | undefined = dataset.archIndex;
   if (archIndex === undefined) {

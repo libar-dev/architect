@@ -7,20 +7,33 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Defines the `PatternCatalog` fragment shape for filtered pattern-summary catalogs, including counts, names-only mode, and filters.
  */
 import { z } from 'zod';
 
 import { PatternSummarySchema } from './pattern-summary.js';
 
+/**
+ * The filter criteria applied to a pattern catalog — status, role, parent, and
+ * package narrowing plus the names-only and count-only output modes.
+ *
+ * @architect-shape
+ */
 export const PatternCatalogFilterSchema = z.strictObject({
   status: z.string().optional(),
-  phase: z.number().int().optional(),
   role: z.string().optional(),
+  parent: z.string().optional(),
+  package: z.string().optional(),
   namesOnly: z.boolean(),
   count: z.boolean(),
 });
 
+/**
+ * A filtered catalog of pattern summaries — the applied filters, the total
+ * count, the names-only list, and the full summary items.
+ *
+ * @architect-shape
+ */
 export const PatternCatalogSchema = z.strictObject({
   kind: z.literal('PatternCatalog'),
   filters: PatternCatalogFilterSchema,

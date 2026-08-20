@@ -1,19 +1,25 @@
 @architect
-@architect-adr:004
+@architect-adr:001
 @architect-adr-status:accepted
 @architect-adr-category:process
+@architect-adr-layer:refinement
+@architect-adr-theme:commands
 @architect-pattern:PDR001SessionWorkflowCommands
-@architect-status:roadmap
+@architect-status:completed
+@architect-unlock-reason:Correct-accepted-decision-status-from-roadmap-to-completed
 @architect-product-area:DataAPI
 Feature: PDR-001 - Session Workflow Commands Design Decisions
 
   **Context:**
-  DataAPIDesignSessionSupport adds `scope-validate` (pre-flight session
-  readiness check) and `handoff` (session-end state summary) CLI subcommands.
-  Seven design decisions affect how these commands behave.
+  DataAPIDesignSessionSupport adds scope validation (pre-flight session
+  readiness check) and handoff (session-end state summary). Since ADR-014
+  the carriers are the `projectScopeReadinessReport` / `projectHandoffRecord`
+  projections and their `architect_scope_validate` / `architect_handoff` MCP
+  tools (the CLI-subcommand form was retired with the verb CLI).
 
   **Decision:**
-  Seven design decisions (DD-1 through DD-7) captured as Rules below.
+  Design decisions DD-1 through DD-7 captured as Rules below (DD-6, which
+  governed the retired CLI argument forms, was retired with the verb CLI).
 
   # ===========================================================================
   # DECISION CONTEXT
@@ -36,22 +42,22 @@ Feature: PDR-001 - Session Workflow Commands Design Decisions
     **Rationale:** Inconsistent output formats force consumers to detect and branch on format type, breaking the dual output path contract.
     **Verified by:** scope-validate outputs structured text
 
-    Both scope-validate and handoff return string from the router, using
-    === SECTION === markers. Follows the dual output path where text
-    commands bypass JSON.stringify.
+    Both scope-validate and handoff render plain text with === SECTION ===
+    markers (today: the MCP tools' rendered-text channel alongside the typed
+    projection bundle).
 
   # ===========================================================================
   # RULE 2: DD-2 - Git Integration Is Opt-In
   # ===========================================================================
 
-  Rule: DD-2 - Git integration is opt-in via --git flag
+  Rule: DD-2 - Git integration is opt-in
 
     **Invariant:** Domain logic must never invoke shell commands or depend on git directly.
     **Rationale:** Shell dependencies in domain logic make functions untestable without git fixtures and break deterministic behavior.
-    **Verified by:** N/A — no-shell constraint verified by code review (no exec/spawn calls in domain logic)
+    **Verified by:** Verified by code review (no executable scenario)
 
-    The handoff command accepts an optional --git flag. The CLI handler
-    calls git diff and passes file list to the pure generator function.
+    The handoff surface accepts an opt-in git input. The tool handler
+    calls git diff and passes the file list to the pure generator function.
     No shell dependency in domain logic.
 
   # ===========================================================================
@@ -60,12 +66,12 @@ Feature: PDR-001 - Session Workflow Commands Design Decisions
 
   Rule: DD-3 - Session type inferred from status
 
-    **Invariant:** Every accepted status value must map to exactly one default session type, overridable by an explicit --session flag.
-    **Rationale:** Ambiguous or missing inference forces users to always specify --session manually, defeating the ergonomic benefit of status-based defaults.
-    **Verified by:** N/A — full mapping table (5 statuses) verified by code review; active→implement example in "Active pattern infers implement session"
+    **Invariant:** Every accepted status value must map to exactly one default session type, overridable by an explicit session input.
+    **Rationale:** Ambiguous or missing inference forces callers to always specify the session type manually, defeating the ergonomic benefit of status-based defaults.
+    **Verified by:** Active pattern infers implement session
 
     Handoff infers session type from pattern's current status.
-    An explicit --session flag overrides inference.
+    An explicit session input overrides inference.
 
     | Status | Inferred Session |
     | candidate | planning |
@@ -82,7 +88,7 @@ Feature: PDR-001 - Session Workflow Commands Design Decisions
 
     **Invariant:** Scope validation must use exactly three severity levels (PASS, BLOCKED, WARN) consistent with Process Guard.
     **Rationale:** Divergent severity models cause confusion when the same violation appears in both systems with different severity classifications.
-    **Verified by:** N/A — three severity levels defined as type-system enum; verified by code review
+    **Verified by:** Verified by code review (no executable scenario)
 
     Scope validation uses three severity levels:
 
@@ -91,7 +97,7 @@ Feature: PDR-001 - Session Workflow Commands Design Decisions
     | BLOCKED | Hard prerequisite missing |
     | WARN | Recommendation not met |
 
-    The --strict flag promotes WARN to BLOCKED.
+    The strict option promotes WARN to BLOCKED.
 
   # ===========================================================================
   # RULE 5: DD-5 - Current Date Only For Handoff
@@ -101,22 +107,9 @@ Feature: PDR-001 - Session Workflow Commands Design Decisions
 
     **Invariant:** Handoff must always use the current system date with no override mechanism.
     **Rationale:** A --date flag enables backdating handoff timestamps, which breaks audit trail integrity for multi-session work.
-    **Verified by:** N/A — no --date flag by design; verified by code review and CLI arg inventory
+    **Verified by:** Verified by code review (no executable scenario)
 
     Handoff always uses the current date. No --date flag.
-
-  # ===========================================================================
-  # RULE 6: DD-6 - Both Positional And Flag Forms
-  # ===========================================================================
-
-  Rule: DD-6 - Both positional and flag forms for scope type
-
-    **Invariant:** scope-validate must accept scope type as both a positional argument and a --type flag.
-    **Rationale:** Supporting only one form creates inconsistency with CLI conventions and forces users to remember which form each subcommand uses.
-    **Verified by:** N/A — dual-form acceptance verified by code review (both positional and --type flag parsed in CLI handler)
-
-    scope-validate accepts scope type as both positional argument
-    and --type flag.
 
   # ===========================================================================
   # RULE 7: DD-7 - Co-Located Formatter Functions
@@ -126,7 +119,7 @@ Feature: PDR-001 - Session Workflow Commands Design Decisions
 
     **Invariant:** Each module must export both its data builder and text formatter as co-located functions.
     **Rationale:** Splitting builder and formatter across files increases coupling surface and makes it harder to trace data flow through the module.
-    **Verified by:** N/A — co-location is a module structure decision; verified by code review of scope-validator.ts and handoff-generator.ts exports
+    **Verified by:** Verified by code review (no executable scenario)
 
     Each module (scope-validator.ts, handoff-generator.ts) exports
     both the data builder and the text formatter. Simpler than the
@@ -138,12 +131,12 @@ Feature: PDR-001 - Session Workflow Commands Design Decisions
 
   @acceptance-criteria @happy-path
   Scenario: scope-validate outputs structured text
-    Given the CLI receives "scope-validate MyPattern --type implement"
+    Given the architect_scope_validate tool receives pattern "MyPattern" and scope type "implement"
     When the handler returns a formatted string
-    Then main() outputs the string directly to stdout
+    Then the rendered-text channel carries the string with === SECTION === markers
 
   @acceptance-criteria @happy-path
   Scenario: Active pattern infers implement session
     Given a pattern with status "active"
-    When running "pattern-graph-cli handoff --pattern MyPattern"
+    When the architect_handoff tool runs for pattern "MyPattern"
     Then the session summary shows session type "implement"

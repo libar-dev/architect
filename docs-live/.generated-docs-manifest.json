@@ -1,0 +1,431 @@
+{
+  "version": 1,
+  "generators": {
+    "patterns": {
+      "generatorName": "patterns",
+      "kind": "projection",
+      "rootPath": "PATTERNS.md",
+      "entries": [
+        {
+          "path": "PATTERNS.md",
+          "role": "root",
+          "audience": "published",
+          "tracking": "commit"
+        }
+      ],
+      "documentType": "patterns"
+    },
+    "architecture": {
+      "generatorName": "architecture",
+      "kind": "projection",
+      "rootPath": "ARCHITECTURE.md",
+      "entries": [
+        {
+          "path": "ARCHITECTURE.md",
+          "role": "root",
+          "audience": "published",
+          "tracking": "commit"
+        },
+        {
+          "path": "architecture/by-theme.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "ARCHITECTURE.md"
+        },
+        {
+          "path": "architecture/layered.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "ARCHITECTURE.md"
+        },
+        {
+          "path": "architecture/package-seam.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "ARCHITECTURE.md"
+        }
+      ],
+      "documentType": "architecture"
+    },
+    "roadmap": {
+      "generatorName": "roadmap",
+      "kind": "projection",
+      "rootPath": "ROADMAP.md",
+      "entries": [
+        {
+          "path": "ROADMAP.md",
+          "role": "root",
+          "audience": "published",
+          "tracking": "commit"
+        }
+      ],
+      "documentType": "roadmap"
+    },
+    "changelog": {
+      "generatorName": "changelog",
+      "kind": "projection",
+      "rootPath": "CHANGELOG.md",
+      "entries": [
+        {
+          "path": "CHANGELOG.md",
+          "role": "root",
+          "audience": "published",
+          "tracking": "commit"
+        }
+      ],
+      "documentType": "changelog"
+    },
+    "requirements-executable": {
+      "generatorName": "requirements-executable",
+      "kind": "projection",
+      "rootPath": "REQUIREMENTS-EXECUTABLE.md",
+      "entries": [
+        {
+          "path": "REQUIREMENTS-EXECUTABLE.md",
+          "role": "root",
+          "audience": "published",
+          "tracking": "commit"
+        }
+      ],
+      "documentType": "requirements-executable"
+    },
+    "requirements-specs": {
+      "generatorName": "requirements-specs",
+      "kind": "projection",
+      "rootPath": "REQUIREMENTS-SPECS.md",
+      "entries": [
+        {
+          "path": "REQUIREMENTS-SPECS.md",
+          "role": "root",
+          "audience": "published",
+          "tracking": "commit"
+        }
+      ],
+      "documentType": "requirements-specs"
+    },
+    "decisions": {
+      "generatorName": "decisions",
+      "kind": "projection",
+      "rootPath": "DECISIONS.md",
+      "entries": [
+        {
+          "path": "DECISIONS.md",
+          "role": "root",
+          "audience": "published",
+          "tracking": "commit"
+        },
+        {
+          "path": "decisions/adr-001.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "DECISIONS.md"
+        },
+        {
+          "path": "decisions/adr-002.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "DECISIONS.md"
+        },
+        {
+          "path": "decisions/adr-003.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "DECISIONS.md"
+        },
+        {
+          "path": "decisions/adr-005.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "DECISIONS.md"
+        },
+        {
+          "path": "decisions/adr-006.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "DECISIONS.md"
+        },
+        {
+          "path": "decisions/adr-007.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "DECISIONS.md"
+        },
+        {
+          "path": "decisions/adr-008.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "DECISIONS.md"
+        },
+        {
+          "path": "decisions/adr-009.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "DECISIONS.md"
+        },
+        {
+          "path": "decisions/adr-010.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "DECISIONS.md"
+        },
+        {
+          "path": "decisions/adr-012.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "DECISIONS.md"
+        },
+        {
+          "path": "decisions/adr-013.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "DECISIONS.md"
+        },
+        {
+          "path": "decisions/adr-014.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "DECISIONS.md"
+        },
+        {
+          "path": "decisions/pdr-001.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "DECISIONS.md"
+        },
+        {
+          "path": "decisions/pdr-005.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "DECISIONS.md"
+        },
+        {
+          "path": "decisions/pdr-006.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "DECISIONS.md"
+        }
+      ],
+      "documentType": "decisions"
+    },
+    "taxonomy": {
+      "generatorName": "taxonomy",
+      "kind": "projection",
+      "rootPath": "TAXONOMY.md",
+      "entries": [
+        {
+          "path": "TAXONOMY.md",
+          "role": "root",
+          "audience": "published",
+          "tracking": "commit"
+        }
+      ],
+      "documentType": "taxonomy"
+    },
+    "business-rules": {
+      "generatorName": "business-rules",
+      "kind": "projection",
+      "rootPath": "BUSINESS-RULES.md",
+      "entries": [
+        {
+          "path": "BUSINESS-RULES.md",
+          "role": "root",
+          "audience": "published",
+          "tracking": "commit"
+        },
+        {
+          "path": "business-rules/architect-cli.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "BUSINESS-RULES.md"
+        },
+        {
+          "path": "business-rules/architect-core.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "BUSINESS-RULES.md"
+        },
+        {
+          "path": "business-rules/architect-dev.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "BUSINESS-RULES.md"
+        },
+        {
+          "path": "business-rules/architect-guard.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "BUSINESS-RULES.md"
+        },
+        {
+          "path": "business-rules/architect-mcp.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "BUSINESS-RULES.md"
+        },
+        {
+          "path": "business-rules/architect-pkg-content.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "BUSINESS-RULES.md"
+        },
+        {
+          "path": "business-rules/architect-projection.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "BUSINESS-RULES.md"
+        }
+      ],
+      "documentType": "business-rules"
+    },
+    "current-work": {
+      "generatorName": "current-work",
+      "kind": "projection",
+      "rootPath": "CURRENT-WORK.md",
+      "entries": [
+        {
+          "path": "CURRENT-WORK.md",
+          "role": "root",
+          "audience": "published",
+          "tracking": "commit"
+        }
+      ],
+      "documentType": "current-work"
+    },
+    "validation-rules": {
+      "generatorName": "validation-rules",
+      "kind": "projection",
+      "rootPath": "VALIDATION-RULES.md",
+      "entries": [
+        {
+          "path": "VALIDATION-RULES.md",
+          "role": "root",
+          "audience": "published",
+          "tracking": "commit"
+        }
+      ],
+      "documentType": "validation-rules"
+    },
+    "traceability": {
+      "generatorName": "traceability",
+      "kind": "projection",
+      "rootPath": "TRACEABILITY.md",
+      "entries": [
+        {
+          "path": "TRACEABILITY.md",
+          "role": "root",
+          "audience": "published",
+          "tracking": "commit"
+        }
+      ],
+      "documentType": "traceability"
+    },
+    "index": {
+      "generatorName": "index",
+      "kind": "index",
+      "rootPath": "INDEX.md",
+      "entries": [
+        {
+          "path": "INDEX.md",
+          "role": "root",
+          "audience": "published",
+          "tracking": "commit"
+        }
+      ]
+    },
+    "api-reference": {
+      "generatorName": "api-reference",
+      "kind": "projection",
+      "rootPath": "API-REFERENCE.md",
+      "entries": [
+        {
+          "path": "API-REFERENCE.md",
+          "role": "root",
+          "audience": "published",
+          "tracking": "commit"
+        },
+        {
+          "path": "api-reference/architect-core.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "API-REFERENCE.md"
+        },
+        {
+          "path": "api-reference/architect-guard.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "API-REFERENCE.md"
+        },
+        {
+          "path": "api-reference/architect-projection.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "API-REFERENCE.md"
+        }
+      ],
+      "documentType": "api-reference"
+    },
+    "design-review": {
+      "generatorName": "design-review",
+      "kind": "projection",
+      "rootPath": "DESIGN-REVIEW.md",
+      "entries": [
+        {
+          "path": "DESIGN-REVIEW.md",
+          "role": "root",
+          "audience": "published",
+          "tracking": "commit"
+        },
+        {
+          "path": "design-review/by-layer.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "DESIGN-REVIEW.md"
+        },
+        {
+          "path": "design-review/by-package.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "DESIGN-REVIEW.md"
+        },
+        {
+          "path": "design-review/by-theme.md",
+          "role": "progressive-child",
+          "audience": "published",
+          "tracking": "commit",
+          "parentPath": "DESIGN-REVIEW.md"
+        }
+      ],
+      "documentType": "design-review"
+    }
+  }
+}

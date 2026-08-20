@@ -7,12 +7,18 @@
  *
  * ### When to Use
  *
- * - As a typed contract / data shape consumed by projection or render layers.
+ * - Defines the TraceabilityMatrix fragment shape for pattern-to-test trace
+ *   rows.
  */
 import { z } from 'zod';
 
 import { TraceRowSchema } from './supporting.js';
 
+/**
+ * A pattern-to-test traceability matrix carrying one trace row per pattern.
+ *
+ * @architect-shape
+ */
 export const TraceabilityMatrixSchema = z.strictObject({
   kind: z.literal('TraceabilityMatrix'),
   rows: z.array(TraceRowSchema),

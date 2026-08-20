@@ -1,5 +1,6 @@
 @architect
-@architect-pattern:ResultMonad
+@architect-pattern:ResultMonadTypesExecutableTests
+@architect-implements:ResultMonadTypes
 @architect-status:completed
 @architect-unlock-reason:Retroactive-completion-during-rebrand
 @architect-product-area:CoreTypes

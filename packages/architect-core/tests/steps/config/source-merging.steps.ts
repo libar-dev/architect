@@ -63,7 +63,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         state!.mergedSources = mergeSourcesForGenerator(
           state!.baseSources!,
           'patterns',
-          state!.overrides
+          state!.overrides,
         );
       });
 
@@ -93,7 +93,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         state!.mergedSources = mergeSourcesForGenerator(
           state!.baseSources!,
           'changelog',
-          state!.overrides
+          state!.overrides,
         );
       });
 
@@ -125,14 +125,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           state!.mergedSources = mergeSourcesForGenerator(
             state!.baseSources!,
             'changelog',
-            state!.overrides
+            state!.overrides,
           );
         });
 
         Then('merged features should have 1 entry from the override', () => {
           expect(state!.mergedSources!.features).toEqual([REPLACE_FEATURES]);
         });
-      }
+      },
     );
 
     RuleScenario('Empty replaceFeatures does NOT replace', ({ Given, When, Then, And }) => {
@@ -157,7 +157,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         state!.mergedSources = mergeSourcesForGenerator(
           state!.baseSources!,
           'changelog',
-          state!.overrides
+          state!.overrides,
         );
       });
 
@@ -189,7 +189,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         state!.mergedSources = mergeSourcesForGenerator(
           state!.baseSources!,
           'patterns',
-          state!.overrides
+          state!.overrides,
         );
       });
 
@@ -226,7 +226,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           state!.mergedSources = mergeSourcesForGenerator(
             state!.baseSources!,
             'changelog',
-            state!.overrides
+            state!.overrides,
           );
         });
 
@@ -241,7 +241,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           expect(state!.mergedSources!.typescript).toContain(BASE_TS);
           expect(state!.mergedSources!.typescript).toContain(EXTRA_INPUT);
         });
-      }
+      },
     );
   });
 
@@ -265,7 +265,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         state!.mergedSources = mergeSourcesForGenerator(
           state!.baseSources!,
           'patterns',
-          state!.overrides
+          state!.overrides,
         );
       });
 

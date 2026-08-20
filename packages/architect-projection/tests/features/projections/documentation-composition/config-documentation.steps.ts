@@ -11,6 +11,7 @@ import {
   ProjectionError,
   SupportedDocumentationTypeRegistryEntrySchema,
   SUPPORTED_DOCUMENTATION_TYPE_REGISTRY,
+  parseAndProjectArchitectureDiagram,
   parseAndProjectConfig,
   parseAndProjectDocumentationBundle,
   parseAndProjectPrChangeReview,
@@ -23,7 +24,6 @@ import {
   type ProjectionContext,
   type SupportedDocumentationType,
 } from '../../../../src/index.js';
-import { projectArchitectureDiagram } from '../../../../src/projections/documentation-composition/index.js';
 import { createPattern, createProjectionContext, createRelationshipEntry } from './support.js';
 
 interface DocumentationCompositionState {
@@ -48,7 +48,7 @@ interface OptionsSchemaBarrelAuditSummary {
 }
 
 const feature = await loadFeature(
-  'tests/features/projections/documentation-composition/config-documentation.feature'
+  'tests/features/projections/documentation-composition/config-documentation.feature',
 );
 
 let state: DocumentationCompositionState | null = null;
@@ -87,18 +87,13 @@ const disclosureRichnessLevels = [
   'full',
 ] as const;
 
-const droppedDocumentTypes = [
-  'reference',
-  'product-areas',
-  'design-review',
-  'product-requirements',
-] as const;
+const droppedDocumentTypes = ['reference', 'product-areas', 'product-requirements'] as const;
 
 function assertRequirementDocumentationLinksResolve(
   requirementsView: ProjectionBundle<Fragment> | undefined,
   rootFile: string,
   documentType: 'requirements-executable' | 'requirements-specs',
-  expectedTarget: string
+  expectedTarget: string,
 ): void {
   expect(requirementsView).toBeDefined();
 
@@ -152,17 +147,15 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 patterns: [
                   createPattern('ProjectionDocs', {
                     status: 'active',
-                    phase: 20,
                     role: 'projection',
                   }),
                   createPattern('ProjectionCli', {
                     status: 'roadmap',
-                    phase: 21,
                     role: 'service',
                   }),
                 ],
               });
-            }
+            },
           );
 
           When('I project the config snapshot', () => {
@@ -191,7 +184,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               ],
               buildTimeMs: 184,
               patternCount: 2,
-              phaseCount: 2,
               roleCount: 2,
               projectName: 'Architect Studio',
             });
@@ -203,7 +195,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             expect(rendered).not.toBeNull();
             expect(FragmentSchema.safeParse(rendered).success).toBe(true);
           });
-        }
+        },
       );
 
       RuleScenario(
@@ -214,9 +206,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             () => {
               state!.context = createProjectionContext({
                 projectMetadata,
-                patterns: [createPattern('ProjectionDocs', { status: 'active', phase: 20 })],
+                patterns: [createPattern('ProjectionDocs', { status: 'active' })],
               });
-            }
+            },
           );
 
           When('I parse-and-project a config snapshot with malformed source glob groups', () => {
@@ -238,13 +230,13 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
           Then('parsing config projection options should fail loudly', () => {
             expect(state!.invalidOptionsError).toContain(
-              'Invalid options for parseAndProjectConfig:'
+              'Invalid options for parseAndProjectConfig:',
             );
             expect(state!.invalidOptionsError).toContain('sourceGlobs');
           });
-        }
+        },
       );
-    }
+    },
   );
 
   Rule(
@@ -257,14 +249,25 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'a Documentation Composition documentation context with delivery architecture requirements and decisions data',
             () => {
               state!.context = createDocumentationContext();
-            }
+            },
           );
 
           When('I project every supported documentation bundle', () => {
             for (const documentType of supportedDocumentTypes) {
+              // Project requirements bundles at 'useful' disclosure so the
+              // bundle.routing.disclosureSpec carries emitChildren=true;
+              // the requirement-documentation-link assertions below depend on
+              // fan-out child routes resolved at projection time.
+              const projectionOptions: {
+                documentType: typeof documentType;
+                disclosureLevel?: 'useful';
+              } =
+                documentType === 'requirements-executable' || documentType === 'requirements-specs'
+                  ? { documentType, disclosureLevel: 'useful' }
+                  : { documentType };
               state!.documentationViews[documentType] = parseAndProjectDocumentationBundle(
                 state!.context!,
-                { documentType }
+                projectionOptions,
               );
             }
           });
@@ -277,32 +280,31 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 expect(result).toBeDefined();
                 expect(FragmentSchema.safeParse(result?.root).success).toBe(true);
                 expect(result?.routing?.rootRouteId ?? `${documentType}:index`).toBe(
-                  `${documentType}:index`
+                  `${documentType}:index`,
                 );
               }
-            }
+            },
           );
 
           And(
             'the supported documentation registry should expose metadata for every live surface',
             () => {
               expect(SUPPORTED_DOCUMENTATION_TYPE_REGISTRY.map((entry) => entry.key)).toEqual(
-                supportedDocumentTypes
+                supportedDocumentTypes,
               );
               for (const metadata of SUPPORTED_DOCUMENTATION_TYPE_REGISTRY) {
-                expect(metadata.status).toBe('supported');
                 expect(metadata.displayTitle.length).toBeGreaterThan(0);
                 expect(metadata.rootRouteId).toBe(`${metadata.key}:index`);
                 expect(metadata.markdownRootTarget).toMatch(/\.md$/);
                 expect(metadata.defaultDisclosureLevel).toMatch(
-                  /^(essential|important|useful|advanced)$/
+                  /^(essential|important|useful|advanced)$/,
                 );
                 expect(metadata.generatorName.length).toBeGreaterThan(0);
                 expect(
-                  SupportedDocumentationTypeRegistryEntrySchema.safeParse(metadata).success
+                  SupportedDocumentationTypeRegistryEntrySchema.safeParse(metadata).success,
                 ).toBe(true);
               }
-            }
+            },
           );
 
           And(
@@ -310,7 +312,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             () => {
               for (const metadata of SUPPORTED_DOCUMENTATION_TYPE_REGISTRY) {
                 expect(Object.keys(metadata.disclosureMatrix).sort()).toEqual(
-                  [...PROGRESSIVE_DISCLOSURE_LEVELS].sort()
+                  [...PROGRESSIVE_DISCLOSURE_LEVELS].sort(),
                 );
 
                 for (const level of PROGRESSIVE_DISCLOSURE_LEVELS) {
@@ -322,7 +324,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   expect(typeof disclosureSpec.committed).toBe('boolean');
                 }
               }
-            }
+            },
           );
 
           And(
@@ -342,6 +344,17 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               };
 
               for (const metadata of SUPPORTED_DOCUMENTATION_TYPE_REGISTRY) {
+                // Design review carries NO status/maturity filter at any level: it
+                // deliberately includes not-yet-implemented patterns, so it must not
+                // inherit the committed-only defaults the other types do.
+                if (metadata.key === 'design-review') {
+                  expect(metadata.disclosureMatrix.essential.filter).toBeUndefined();
+                  expect(metadata.disclosureMatrix.important.filter).toBeUndefined();
+                  expect(metadata.disclosureMatrix.useful.filter).toBeUndefined();
+                  expect(metadata.disclosureMatrix.advanced.filter).toBeUndefined();
+                  continue;
+                }
+
                 const expectedCommittedFilter =
                   metadata.key === 'roadmap' ? plannedFilter : committedFilter;
                 const expectedUsefulFilter =
@@ -352,7 +365,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 expect(metadata.disclosureMatrix.useful.filter).toEqual(expectedUsefulFilter);
                 expect(metadata.disclosureMatrix.advanced.filter).toBeUndefined();
               }
-            }
+            },
           );
 
           And(
@@ -361,13 +374,20 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               for (const metadata of SUPPORTED_DOCUMENTATION_TYPE_REGISTRY) {
                 expect(metadata.disclosureMatrix[metadata.defaultDisclosureLevel]).toBeDefined();
               }
-            }
+            },
           );
 
           And(
             'committed false disclosure levels should only appear on opt-in detail surfaces',
             () => {
               const optInDetailLevels = new Set([
+                // Design review is non-committed-inclusive at every level by design —
+                // it deliberately surfaces not-yet-implemented specs (its D-16/D-18
+                // differentiator from the production architecture view).
+                'design-review:essential',
+                'design-review:important',
+                'design-review:useful',
+                'design-review:advanced',
                 'business-rules:useful',
                 'business-rules:advanced',
                 'patterns:useful',
@@ -388,7 +408,31 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               }
 
               expect(actualOptInDetailLevels).toEqual(optInDetailLevels);
-            }
+            },
+          );
+
+          And(
+            'flat-catalog documentation types should declare emitChildren false at every level',
+            () => {
+              // `patterns` and `taxonomy` project a single flat fragment
+              // (`projectSingle`) with no bundle children, so their disclosure
+              // matrices must not advertise a child fan-out the projection never
+              // produces. Types that legitimately emit children (api-reference,
+              // architecture, requirements, decisions) are excluded.
+              const flatCatalogTypes = ['patterns', 'taxonomy'] as const;
+              for (const documentType of flatCatalogTypes) {
+                const metadata = SUPPORTED_DOCUMENTATION_TYPE_REGISTRY.find(
+                  (entry) => entry.key === documentType,
+                );
+                expect(metadata).toBeDefined();
+                expect(
+                  Object.keys(state!.documentationViews[documentType]?.children ?? {}).length,
+                ).toBe(0);
+                for (const level of PROGRESSIVE_DISCLOSURE_LEVELS) {
+                  expect(metadata!.disclosureMatrix[level].emitChildren).toBe(false);
+                }
+              }
+            },
           );
 
           And(
@@ -397,7 +441,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               const patternsBundle = state!.documentationViews['patterns'];
               expect(patternsBundle?.root.kind).toBe('PatternCatalog');
               expect(JSON.stringify(patternsBundle)).toContain('ProjectionAPI');
-            }
+            },
           );
 
           And(
@@ -407,9 +451,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 state!.documentationViews['requirements-executable'],
                 'REQUIREMENTS-EXECUTABLE.md',
                 'requirements-executable',
-                'requirements-executable/architect-projection/projection-api.md'
+                'requirements-executable/architect-projection/projection-api.md',
               );
-            }
+            },
           );
 
           And(
@@ -421,12 +465,12 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               expect(Object.keys(requirementsView!.children)).toEqual([
                 'requirements-specs:idea-active-rules',
               ]);
-            }
+            },
           );
 
           And('the roadmap documentation should include roadmap work by default', () => {
             expect(JSON.stringify(state!.documentationViews['roadmap'])).toContain(
-              'ProjectionDocs'
+              'ProjectionDocs',
             );
           });
 
@@ -449,7 +493,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               runtimeOverrideContext,
               {
                 documentType: 'business-rules',
-              }
+              },
             );
             const rendered = JSON.stringify(runtimeFilteredBusinessRules);
 
@@ -460,7 +504,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             expect(rendered).not.toContain('Idea active documentation rule');
             expect(rendered).not.toContain('Candidate documentation rule');
           });
-        }
+        },
       );
 
       RuleScenario(
@@ -470,14 +514,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'a Documentation Composition documentation context with delivery architecture requirements and decisions data',
             () => {
               state!.context = createDocumentationContext();
-            }
+            },
           );
 
           When('I project every supported documentation bundle', () => {
             for (const documentType of supportedDocumentTypes) {
               state!.documentationViews[documentType] = parseAndProjectDocumentationBundle(
                 state!.context!,
-                { documentType }
+                { documentType },
               );
             }
           });
@@ -491,7 +535,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               const childKeys = Object.keys(requirementsView!.children);
               const businessRuleKeys = childKeys.filter((key) => key.includes(':business-rule:'));
               expect(businessRuleKeys).toEqual([]);
-            }
+            },
           );
 
           And(
@@ -509,7 +553,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               ] as Fragment | undefined;
               expect(ruleMatrixDetail).toBeDefined();
               expect(JSON.stringify(ruleMatrixDetail)).not.toContain(':business-rule:');
-            }
+            },
           );
 
           And(
@@ -526,25 +570,25 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 emittedBusinessRuleRouteIds.add(rootRouteId);
               }
               for (const routeId of Object.values(
-                businessRulesView!.routing?.childRouteIds ?? {}
+                businessRulesView!.routing?.childRouteIds ?? {},
               )) {
                 emittedBusinessRuleRouteIds.add(routeId);
               }
               const referencedOwnerRouteIds = new Set(
                 Object.values(requirementsView!.children)
                   .flatMap((child) =>
-                    child.kind === 'RequirementDigest' ? child.businessRuleReferences : []
+                    child.kind === 'RequirementDigest' ? child.businessRuleReferences : [],
                   )
-                  .map((reference) => reference.ownerRouteId)
+                  .map((reference) => reference.ownerRouteId),
               );
               expect(referencedOwnerRouteIds).toContain('business-rules:architect-projection');
 
               for (const routeId of referencedOwnerRouteIds) {
                 expect(emittedBusinessRuleRouteIds.has(routeId)).toBe(true);
               }
-            }
+            },
           );
-        }
+        },
       );
 
       RuleScenario(
@@ -554,7 +598,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'a Documentation Composition documentation context with delivery architecture requirements and decisions data',
             () => {
               state!.context = createDocumentationContext();
-            }
+            },
           );
 
           When('I project dropped and unknown documentation bundle types', () => {
@@ -575,10 +619,18 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               expect((rejection as ProjectionError).code).toBe('UNKNOWN_DOCUMENT_TYPE');
             }
 
-            const [rootBarrel, projectionsBarrel] = await Promise.all([
-              readFile(new URL('../../../../src/index.ts', import.meta.url), 'utf8'),
-              readFile(new URL('../../../../src/projections/index.ts', import.meta.url), 'utf8'),
-            ]);
+            const [rootBarrel, projectionsBarrel, documentationCompositionBarrel] =
+              await Promise.all([
+                readFile(new URL('../../../../src/index.ts', import.meta.url), 'utf8'),
+                readFile(new URL('../../../../src/projections/index.ts', import.meta.url), 'utf8'),
+                readFile(
+                  new URL(
+                    '../../../../src/projections/documentation-composition/index.ts',
+                    import.meta.url,
+                  ),
+                  'utf8',
+                ),
+              ]);
 
             for (const barrel of [rootBarrel, projectionsBarrel]) {
               expect(barrel).not.toMatch(/\bDROPPED_DOCUMENTATION_TYPES\b/u);
@@ -591,10 +643,25 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               expect(barrel).not.toMatch(/\bDocumentationTypeStatus\b/u);
               expect(barrel).not.toMatch(/\bisDroppedDocumentationType\b/u);
             }
+
+            for (const barrel of [rootBarrel, projectionsBarrel, documentationCompositionBarrel]) {
+              expect(barrel).not.toMatch(/\bprojectArchitectureDiagram\b/u);
+              expect(barrel).not.toMatch(/\bprojectConfig\b/u);
+              expect(barrel).not.toMatch(/\bprojectDocumentationBundle\b/u);
+              expect(barrel).not.toMatch(/\bprojectPrChangeReview\b/u);
+            }
+
+            expect(rootBarrel).toContain("export * from './projections/index.js';");
+            for (const barrel of [projectionsBarrel, documentationCompositionBarrel]) {
+              expect(barrel).toMatch(/\bparseAndProjectArchitectureDiagram\b/u);
+              expect(barrel).toMatch(/\bparseAndProjectConfig\b/u);
+              expect(barrel).toMatch(/\bparseAndProjectDocumentationBundle\b/u);
+              expect(barrel).toMatch(/\bparseAndProjectPrChangeReview\b/u);
+            }
           });
-        }
+        },
       );
-    }
+    },
   );
 
   Rule(
@@ -607,29 +674,35 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'a Documentation Composition architecture context with bounded contexts layers and product areas',
             () => {
               state!.context = createBoundedContextScopeContext();
-            }
+            },
           );
 
           When('I project architecture diagrams for each supported scope', () => {
-            state!.architectureDiagrams['component'] = projectArchitectureDiagram(state!.context!, {
-              scope: 'component',
-            });
-            state!.architectureDiagrams['layered'] = projectArchitectureDiagram(state!.context!, {
-              scope: 'layered',
-            });
-            state!.architectureDiagrams['bounded-context'] = projectArchitectureDiagram(
+            state!.architectureDiagrams['component'] = parseAndProjectArchitectureDiagram(
+              state!.context!,
+              {
+                scope: 'component',
+              },
+            );
+            state!.architectureDiagrams['layered'] = parseAndProjectArchitectureDiagram(
+              state!.context!,
+              {
+                scope: 'layered',
+              },
+            );
+            state!.architectureDiagrams['bounded-context'] = parseAndProjectArchitectureDiagram(
               state!.context!,
               {
                 scope: 'bounded-context',
                 scopeValue: 'projection',
-              }
+              },
             );
-            state!.architectureDiagrams['product-area'] = projectArchitectureDiagram(
+            state!.architectureDiagrams['product-area'] = parseAndProjectArchitectureDiagram(
               state!.context!,
               {
                 scope: 'product-area',
                 scopeValue: 'Studio UI',
-              }
+              },
             );
           });
 
@@ -661,7 +734,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   scope: 'bounded-context',
                   scopeValue: 'projection',
                   patterns: ['ProjectionAPI', 'ProjectionDocs'],
-                })
+                }),
               );
 
               expect(productAreaDiagram?.root).toEqual(
@@ -669,14 +742,519 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   scope: 'product-area',
                   scopeValue: 'Studio UI',
                   patterns: ['ProjectionDocs', 'StudioSettings'],
-                })
+                }),
               );
-            }
+            },
           );
-        }
+        },
       );
-    }
+    },
   );
+
+  Rule(
+    'The architecture view splits into a context map plus per-group detail diagrams',
+    ({ RuleScenario }) => {
+      RuleScenario(
+        'the component view splits into a context map and per-group detail diagrams',
+        ({ Given, When, Then, And }) => {
+          Given(
+            'a Documentation Composition architecture context with bounded contexts layers and product areas',
+            () => {
+              state!.context = createBoundedContextScopeContext();
+            },
+          );
+
+          When('I project the component architecture diagram', () => {
+            state!.architectureDiagrams['component'] = parseAndProjectArchitectureDiagram(
+              state!.context!,
+              { scope: 'component' },
+            );
+          });
+
+          Then('the component diagram should lead with a context map section', () => {
+            const diagram = state!.architectureDiagrams['component'];
+            expect(diagram).toBeDefined();
+            const sections = diagram!.root.sections;
+            expect(sections.length).toBeGreaterThanOrEqual(2);
+            const first = sections[0];
+            expect(first?.title).toMatch(/^Context Map/u);
+            expect(first?.diagram.content.startsWith('graph LR')).toBe(true);
+          });
+
+          And(
+            'the remaining sections should partition the patterns into per-group detail diagrams',
+            () => {
+              const root = state!.architectureDiagrams['component']!.root;
+              const detailSections = root.sections.slice(1);
+
+              for (const section of detailSections) {
+                expect(section.diagram.content.startsWith('graph TD')).toBe(true);
+                // No single detail diagram holds every pattern.
+                expect(section.patterns.length).toBeLessThan(root.patterns.length);
+              }
+
+              const seen = detailSections.flatMap((section) => section.patterns);
+              // Disjoint: each pattern lands in exactly one detail diagram.
+              expect(new Set(seen).size).toBe(seen.length);
+              // Complete: the detail diagrams cover the whole pattern set.
+              expect([...seen].sort()).toEqual([...root.patterns].sort());
+            },
+          );
+        },
+      );
+    },
+  );
+
+  Rule(
+    'The context map aggregates only forward dependency edges between groups',
+    ({ RuleScenario }) => {
+      RuleScenario(
+        'the context map keeps forward dependencies and omits derived reverse edges',
+        ({ Given, When, Then, And }) => {
+          Given(
+            'a Documentation Composition architecture context with opposing cross-group dependency and enablement edges',
+            () => {
+              state!.context = createCrossGroupEdgeContext();
+            },
+          );
+
+          When('I project the component architecture diagram for the cross-group context', () => {
+            state!.architectureDiagrams['component'] = parseAndProjectArchitectureDiagram(
+              state!.context!,
+              { scope: 'component' },
+            );
+          });
+
+          Then('the context map should contain the forward cross-group dependency arrow', () => {
+            const map = state!.architectureDiagrams['component']!.root.sections[0];
+            expect(map?.title).toMatch(/^Context Map/u);
+            expect(map?.diagram.content).toContain('context_a --> context_b');
+          });
+
+          And('the context map should omit the derived reverse enablement arrow', () => {
+            const map = state!.architectureDiagrams['component']!.root.sections[0];
+            expect(map?.diagram.content).not.toContain('context_b --> context_a');
+          });
+        },
+      );
+    },
+  );
+
+  Rule(
+    'Architecture diagrams encode sourced labels destined for Mermaid nodes',
+    ({ RuleScenario }) => {
+      RuleScenario(
+        'a hostile bounded-context name is encoded inside the context-map node label',
+        ({ Given, When, Then, And }) => {
+          Given(
+            'an architecture context with a bounded-context name carrying Mermaid-breaking characters',
+            () => {
+              state!.context = createProjectionContext({
+                patterns: [
+                  createPattern('AlphaNode', {
+                    status: 'active',
+                    role: 'service',
+                    archContext: 'Aut"h]<x>',
+                    file: 'packages/architect-projection/src/projections/documentation-composition/support.ts',
+                  }),
+                  createPattern('BetaNode', {
+                    status: 'active',
+                    role: 'service',
+                    archContext: 'safe',
+                    file: 'apps/desktop/src/views/Settings.tsx',
+                  }),
+                ],
+              });
+            },
+          );
+
+          When('I project the component architecture diagram', () => {
+            state!.architectureDiagrams['component'] = parseAndProjectArchitectureDiagram(
+              state!.context!,
+              { scope: 'component' },
+            );
+          });
+
+          Then('the context-map node label should encode the Mermaid-breaking characters', () => {
+            const map = state!.architectureDiagrams['component']!.root.sections[0];
+            expect(map?.title).toMatch(/^Context Map/u);
+            expect(map?.diagram.content).toContain('Aut#34;h#93;#60;x#62;');
+          });
+
+          And('the context-map diagram should not contain the raw sourced label', () => {
+            const map = state!.architectureDiagrams['component']!.root.sections[0];
+            expect(map?.diagram.content).not.toContain('Aut"h]');
+          });
+        },
+      );
+    },
+  );
+
+  Rule(
+    'The architecture view surfaces fan-in for the most-depended-on patterns',
+    ({ RuleScenario }) => {
+      RuleScenario(
+        'fan-in ranks in-view hub patterns by in-view dependant count',
+        ({ Given, When, Then, And }) => {
+          Given(
+            'an architecture context with a hub pattern depended on by several in-view peers',
+            () => {
+              state!.context = createProjectionContext({
+                patterns: [
+                  createPattern('HubPattern', {
+                    status: 'active',
+                    role: 'service',
+                    archContext: 'core',
+                    file: 'packages/architect-core/src/hub.ts',
+                  }),
+                  createPattern('AlphaConsumer', {
+                    status: 'active',
+                    role: 'service',
+                    archContext: 'core',
+                    file: 'packages/architect-core/src/alpha.ts',
+                  }),
+                  createPattern('BetaConsumer', {
+                    status: 'active',
+                    role: 'service',
+                    archContext: 'cli',
+                    file: 'packages/architect-cli/src/beta.ts',
+                  }),
+                  createPattern('GammaConsumer', {
+                    status: 'active',
+                    role: 'service',
+                    archContext: 'cli',
+                    file: 'packages/architect-cli/src/gamma.ts',
+                  }),
+                ],
+                relationshipIndex: {
+                  HubPattern: createRelationshipEntry({
+                    usedBy: ['GammaConsumer', 'AlphaConsumer', 'BetaConsumer'],
+                  }),
+                },
+              });
+            },
+          );
+
+          When('I project the component architecture diagram', () => {
+            state!.architectureDiagrams['component'] = parseAndProjectArchitectureDiagram(
+              state!.context!,
+              { scope: 'component' },
+            );
+          });
+
+          Then(
+            'the fan-in list should rank the hub pattern first with its in-view dependant count',
+            () => {
+              const fanIn = state!.architectureDiagrams['component']!.root.fanIn;
+              expect(fanIn?.[0]).toEqual({
+                pattern: 'HubPattern',
+                usedByCount: 3,
+                topConsumers: ['AlphaConsumer', 'BetaConsumer', 'GammaConsumer'],
+              });
+            },
+          );
+
+          And('patterns with no in-view dependants are omitted from fan-in', () => {
+            const fanIn = state!.architectureDiagrams['component']!.root.fanIn ?? [];
+            expect(fanIn.map((entry) => entry.pattern)).not.toContain('AlphaConsumer');
+          });
+        },
+      );
+    },
+  );
+
+  Rule(
+    'The architecture view flags bounded contexts that span multiple packages',
+    ({ RuleScenario }) => {
+      RuleScenario(
+        'cross-package contexts list the packages a context spans',
+        ({ Given, When, Then, And }) => {
+          Given(
+            'an architecture context with one bounded context split across two packages',
+            () => {
+              state!.context = createProjectionContext({
+                patterns: [
+                  createPattern('SharedOne', {
+                    status: 'active',
+                    role: 'service',
+                    archContext: 'shared',
+                    file: 'packages/architect-core/src/shared-one.ts',
+                  }),
+                  createPattern('SharedTwo', {
+                    status: 'active',
+                    role: 'service',
+                    archContext: 'shared',
+                    file: 'packages/architect-cli/src/shared-two.ts',
+                  }),
+                  createPattern('SoloOne', {
+                    status: 'active',
+                    role: 'service',
+                    archContext: 'solo',
+                    file: 'packages/architect-core/src/solo-one.ts',
+                  }),
+                ],
+              });
+            },
+          );
+
+          When('I project the component architecture diagram', () => {
+            state!.architectureDiagrams['component'] = parseAndProjectArchitectureDiagram(
+              state!.context!,
+              { scope: 'component' },
+            );
+          });
+
+          Then(
+            'the cross-package list should include the spanning context with its packages',
+            () => {
+              const crossPackage =
+                state!.architectureDiagrams['component']!.root.crossPackageContexts;
+              expect(crossPackage).toContainEqual({
+                context: 'shared',
+                packages: ['architect-cli', 'architect-core'],
+                patternCount: 2,
+              });
+            },
+          );
+
+          And('a context confined to a single package is not flagged', () => {
+            const crossPackage =
+              state!.architectureDiagrams['component']!.root.crossPackageContexts ?? [];
+            expect(crossPackage.map((entry) => entry.context)).not.toContain('solo');
+          });
+        },
+      );
+    },
+  );
+
+  Rule(
+    'The architecture documentation projects a routed tree of lens views',
+    ({ RuleScenario }) => {
+      RuleScenario(
+        'the architecture bundle emits a component root and lens children',
+        ({ Given, When, Then, And }) => {
+          Given(
+            'a documentation context with patterns spanning packages, layers, and themes',
+            () => {
+              state!.context = createProjectionContext({
+                patterns: [
+                  createPattern('CoreThing', {
+                    status: 'active',
+                    role: 'service',
+                    archContext: 'core',
+                    adrLayer: 'domain',
+                    adrTheme: 'taxonomy',
+                    file: 'packages/architect-core/src/core-thing.ts',
+                  }),
+                  createPattern('CliThing', {
+                    status: 'active',
+                    role: 'service',
+                    archContext: 'cli',
+                    file: 'packages/architect-cli/src/cli-thing.ts',
+                  }),
+                ],
+              });
+            },
+          );
+
+          When('I project the architecture documentation bundle', () => {
+            state!.documentationViews['architecture'] = parseAndProjectDocumentationBundle(
+              state!.context!,
+              { documentType: 'architecture' },
+            );
+          });
+
+          Then('the architecture root should be the component view', () => {
+            const bundle = state!.documentationViews['architecture'];
+            expect(bundle?.root.kind).toBe('ArchitectureDiagram');
+            expect((bundle?.root as ArchitectureDiagram | undefined)?.scope).toBe('component');
+          });
+
+          And(
+            'the architecture bundle should route the package-seam, layered, and by-theme lens docs',
+            () => {
+              const bundle = state!.documentationViews['architecture'];
+              expect(Object.keys(bundle?.children ?? {}).sort()).toEqual([
+                'architecture:by-theme',
+                'architecture:layered',
+                'architecture:package-seam',
+              ]);
+              const emission = bundle?.emission;
+              expect(emission?.mode).toBe('whole-artifact');
+              expect(
+                emission?.mode === 'whole-artifact'
+                  ? emission.markdownFileRoute.childDirectory
+                  : undefined,
+              ).toBe('architecture');
+            },
+          );
+
+          And('only the root links the lens docs — children carry no related-view links', () => {
+            const rendered = renderMarkdown(state!.documentationViews['architecture']!, {
+              includeChildren: true,
+              includeFrontmatter: true,
+              splitStrategy: 'never',
+            });
+            if (typeof rendered === 'string') {
+              throw new Error('Expected the architecture bundle to render as routed files.');
+            }
+            expect(rendered['ARCHITECTURE.md']).toContain('Related views');
+            expect(rendered['ARCHITECTURE.md']).toContain('architecture/package-seam.md');
+            // Child lens docs sit inside architecture/ — they must NOT emit the doc-root-relative
+            // related-view links (those would mis-resolve to architecture/architecture/...).
+            expect(rendered['architecture/package-seam.md']).toBeDefined();
+            expect(rendered['architecture/package-seam.md']).not.toContain('Related views');
+            expect(rendered['architecture/package-seam.md']).not.toContain('](architecture/');
+          });
+        },
+      );
+    },
+  );
+
+  Rule('Per-group detail diagrams draw only forward dependency edges', ({ RuleScenario }) => {
+    RuleScenario(
+      'a detail diagram collapses co-directional edges and drops the reverse enablement',
+      ({ Given, When, Then, And }) => {
+        Given(
+          'a Documentation Composition architecture context with same-group dependency and enablement edges',
+          () => {
+            state!.context = createIntraGroupEdgeContext();
+          },
+        );
+
+        When('I project the component architecture diagram for the intra-group context', () => {
+          state!.architectureDiagrams['component'] = parseAndProjectArchitectureDiagram(
+            state!.context!,
+            { scope: 'component' },
+          );
+        });
+
+        // A single group yields no context map, so the lone detail diagram is section[0].
+        Then(
+          'the detail diagram should contain one forward dependency arrow between the pair',
+          () => {
+            const detail = state!.architectureDiagrams['component']!.root.sections[0];
+            const content = detail!.diagram.content;
+            const matches = content.match(/intradependant -->\|depends-on\| intradependency/gu);
+            expect(matches).toHaveLength(1);
+          },
+        );
+
+        And('the detail diagram should omit the dotted usage arrow', () => {
+          const detail = state!.architectureDiagrams['component']!.root.sections[0];
+          expect(detail!.diagram.content).not.toContain('-.->');
+        });
+
+        And('the detail diagram should omit the bold enablement arrow', () => {
+          const detail = state!.architectureDiagrams['component']!.root.sections[0];
+          expect(detail!.diagram.content).not.toContain('==>');
+        });
+
+        And('the detail diagram should omit the reverse arrow', () => {
+          const detail = state!.architectureDiagrams['component']!.root.sections[0];
+          expect(detail!.diagram.content).not.toContain('intradependency -->');
+        });
+      },
+    );
+  });
+
+  Rule(
+    'The component view shows production components, not test-feature patterns',
+    ({ RuleScenario }) => {
+      RuleScenario(
+        'the component view omits patterns defined by test feature files',
+        ({ Given, When, Then, And }) => {
+          Given(
+            'a Documentation Composition architecture context mixing a production pattern and a test-feature pattern',
+            () => {
+              state!.context = createMixedProductionAndTestFeatureContext();
+            },
+          );
+
+          When('I project the component architecture diagram for the mixed context', () => {
+            state!.architectureDiagrams['component'] = parseAndProjectArchitectureDiagram(
+              state!.context!,
+              { scope: 'component' },
+            );
+          });
+
+          Then('the component diagram should include the production pattern', () => {
+            const root = state!.architectureDiagrams['component']!.root;
+            expect(root.patterns).toContain('RenderMarkdownComponent');
+          });
+
+          And('the component diagram should omit the test-feature pattern', () => {
+            const root = state!.architectureDiagrams['component']!.root;
+            expect(root.patterns).not.toContain('RenderMarkdownComponentExecutableTests');
+            for (const section of root.sections) {
+              expect(section.patterns).not.toContain('RenderMarkdownComponentExecutableTests');
+            }
+          });
+        },
+      );
+    },
+  );
+
+  Rule('The component view omits decision-record patterns', ({ RuleScenario }) => {
+    RuleScenario(
+      'the component view omits patterns defined by decision-record files',
+      ({ Given, When, Then, And }) => {
+        Given(
+          'a Documentation Composition architecture context mixing a production pattern and a decision-record pattern',
+          () => {
+            state!.context = createMixedProductionAndDecisionRecordContext();
+          },
+        );
+
+        When('I project the component architecture diagram for the decision-mixed context', () => {
+          state!.architectureDiagrams['component'] = parseAndProjectArchitectureDiagram(
+            state!.context!,
+            { scope: 'component' },
+          );
+        });
+
+        Then('the component diagram should include the production pattern', () => {
+          const root = state!.architectureDiagrams['component']!.root;
+          expect(root.patterns).toContain('RenderMarkdownComponent');
+        });
+
+        And('the component diagram should omit the decision-record pattern', () => {
+          const root = state!.architectureDiagrams['component']!.root;
+          expect(root.patterns).not.toContain('ADR006SingleReadModelArchitecture');
+          for (const section of root.sections) {
+            expect(section.patterns).not.toContain('ADR006SingleReadModelArchitecture');
+          }
+        });
+      },
+    );
+
+    RuleScenario(
+      'the component view is empty when every pattern is a decision record',
+      ({ Given, When, Then }) => {
+        Given(
+          'a Documentation Composition architecture context of only decision-record patterns',
+          () => {
+            state!.context = createDecisionOnlyContext();
+          },
+        );
+
+        When('I project the component architecture diagram for the decision-only context', () => {
+          state!.architectureDiagrams['component'] = parseAndProjectArchitectureDiagram(
+            state!.context!,
+            { scope: 'component' },
+          );
+        });
+
+        Then('the component diagram should contain no patterns', () => {
+          const root = state!.architectureDiagrams['component']!.root;
+          expect(root.patterns).toHaveLength(0);
+          for (const section of root.sections) {
+            expect(section.patterns).toHaveLength(0);
+          }
+        });
+      },
+    );
+  });
 
   Rule(
     'PR change review projections derive affected patterns from explicit options',
@@ -688,7 +1266,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'a Documentation Composition PR review context with changed deliverable and feature files',
             () => {
               state!.context = createDocumentationContext();
-            }
+            },
           );
 
           When('I project the PR change review for branch "feat/documentation-composition"', () => {
@@ -711,7 +1289,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   'apps/desktop/src/views/Settings.tsx',
                 ],
                 affectedPatterns: ['ProjectionAPI', 'StudioSettings'],
-              })
+              }),
             );
           });
 
@@ -719,11 +1297,11 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'the PR change review should list affected patterns matched from the changed file options',
             () => {
               expect(state!.prChangeReview?.root.recommendations.length).toBeGreaterThan(0);
-            }
+            },
           );
-        }
+        },
       );
-    }
+    },
   );
 
   Rule(
@@ -758,21 +1336,20 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'the audit should confirm the public subtree export set matches the projections barrel export set',
             () => {
               expect(state!.barrelAudit?.publicOptionsSchemaExports).toEqual(
-                state!.barrelAudit?.rootOptionsSchemaExports
+                state!.barrelAudit?.rootOptionsSchemaExports,
               );
               expect(state!.barrelAudit?.publicOptionsSchemaExports.length).toBeGreaterThan(0);
-            }
+            },
           );
-        }
+        },
       );
-    }
+    },
   );
 });
 
 function createDocumentationContext(): ProjectionContext {
   const projectionApi = createPattern('ProjectionAPI', {
     status: 'active',
-    phase: 20,
     role: 'projection',
     file: 'packages/architect-projection/src/projections/documentation-composition/support.ts',
     description:
@@ -780,9 +1357,6 @@ function createDocumentationContext(): ProjectionContext {
     archContext: 'projection',
     archLayer: 'application',
     productArea: 'Projection Platform',
-    userRole: 'AI engineer',
-    businessValue: 'Deterministic projections for Studio and MCP consumers.',
-    quarter: '2026-Q2',
     deliverables: [
       {
         name: 'Documentation Composition projection support',
@@ -790,7 +1364,6 @@ function createDocumentationContext(): ProjectionContext {
         tests: 2,
         location:
           'packages/architect-projection/src/projections/documentation-composition/support.ts',
-        release: 'v0.5.0',
       },
     ],
     executableSpecs: [
@@ -813,7 +1386,6 @@ function createDocumentationContext(): ProjectionContext {
   });
   const projectionDocs = createPattern('ProjectionDocs', {
     status: 'roadmap',
-    phase: 21,
     role: 'projection',
     file: 'apps/desktop/src/views/Documentation.tsx',
     description:
@@ -821,16 +1393,12 @@ function createDocumentationContext(): ProjectionContext {
     archContext: 'projection',
     archLayer: 'infrastructure',
     productArea: 'Studio UI',
-    userRole: 'Architect reviewer',
-    businessValue: 'Structured documentation rendering inside Studio.',
-    quarter: '2026-Q3',
     deliverables: [
       {
         name: 'Documentation view wiring',
         status: 'pending',
         tests: 1,
         location: 'apps/desktop/src/views/Documentation.tsx',
-        release: 'v0.6.0',
       },
     ],
     executableSpecs: ['apps/desktop/tests/features/documentation-view.feature'],
@@ -846,7 +1414,6 @@ function createDocumentationContext(): ProjectionContext {
   });
   const studioSettings = createPattern('StudioSettings', {
     status: 'completed',
-    phase: 19,
     role: 'service',
     file: 'apps/desktop/src/views/Settings.tsx',
     description:
@@ -854,31 +1421,24 @@ function createDocumentationContext(): ProjectionContext {
     archContext: 'studio',
     archLayer: 'application',
     productArea: 'Studio UI',
-    userRole: 'Architect reviewer',
-    businessValue: 'Project diagnostics stay readable in the Studio shell.',
-    quarter: '2026-Q2',
     deliverables: [
       {
         name: 'Settings config card',
         status: 'complete',
         tests: 1,
         location: 'apps/desktop/src/views/Settings.tsx',
-        release: 'v0.4.0',
       },
     ],
     executableSpecs: ['apps/desktop/tests/features/settings.feature'],
   });
   const ruleMatrix = createPattern('RuleMatrix', {
     status: 'completed',
-    phase: 20,
     role: 'projection',
     file: 'packages/architect-projection/src/projections/documentation-composition/rule-matrix.ts',
     description: 'Requirement details link to bounded business-rule detail documents.',
     archContext: 'projection',
     archLayer: 'application',
     productArea: 'Projection Platform',
-    userRole: 'AI engineer',
-    businessValue: 'Requirement readers drill into rule details only when needed.',
     executableSpecs: [
       'packages/architect-projection/tests/features/projections/documentation-composition/config-documentation.feature',
     ],
@@ -908,7 +1468,6 @@ function createDocumentationContext(): ProjectionContext {
   });
   const decision = createPattern('ADR006SingleReadModel', {
     status: 'completed',
-    phase: 10,
     role: 'service',
     file: 'architect/decisions/adr-006-single-read-model.feature',
     description:
@@ -918,7 +1477,6 @@ function createDocumentationContext(): ProjectionContext {
   const ideaActiveRules = createPattern('IdeaActiveRules', {
     status: 'active',
     maturity: 'idea',
-    phase: 22,
     role: 'projection',
     file: 'architect/specs/idea-active-rules.feature',
     productArea: 'Projection Platform',
@@ -936,7 +1494,6 @@ function createDocumentationContext(): ProjectionContext {
   const candidateRules = createPattern('CandidateRules', {
     status: 'candidate',
     maturity: 'idea',
-    phase: 22,
     role: 'projection',
     file: 'architect/specs/candidate-rules.feature',
     productArea: 'Projection Platform',
@@ -961,12 +1518,6 @@ function createDocumentationContext(): ProjectionContext {
       ideaActiveRules,
       candidateRules,
     ],
-    phaseNames: {
-      10: 'Architecture Decisions',
-      19: 'Studio Integration',
-      20: 'Projection Bodies',
-      21: 'Documentation Cutover',
-    },
     relationshipIndex: {
       ProjectionAPI: createRelationshipEntry({
         dependsOn: ['ADR006SingleReadModel'],
@@ -983,13 +1534,133 @@ function createDocumentationContext(): ProjectionContext {
   });
 }
 
+function createCrossGroupEdgeContext(): ProjectionContext {
+  return createProjectionContext({
+    patterns: [
+      createPattern('CrossGroupDependant', {
+        status: 'active',
+        role: 'service',
+        archContext: 'context-a',
+        file: 'packages/architect-projection/src/projections/cross-group/a.ts',
+      }),
+      createPattern('CrossGroupDependency', {
+        status: 'active',
+        role: 'service',
+        archContext: 'context-b',
+        file: 'packages/architect-projection/src/projections/cross-group/b.ts',
+      }),
+    ],
+    relationshipIndex: {
+      // Forward dependency (context-a → context-b) and the derived reverse
+      // enablement (context-b → context-a). The map must keep the former and
+      // drop the latter.
+      CrossGroupDependant: createRelationshipEntry({ uses: ['CrossGroupDependency'] }),
+      CrossGroupDependency: createRelationshipEntry({ enables: ['CrossGroupDependant'] }),
+    },
+  });
+}
+
+function createIntraGroupEdgeContext(): ProjectionContext {
+  return createProjectionContext({
+    patterns: [
+      createPattern('IntraDependant', {
+        status: 'active',
+        role: 'service',
+        archContext: 'intra',
+        file: 'packages/architect-projection/src/projections/intra/a.ts',
+      }),
+      createPattern('IntraDependency', {
+        status: 'active',
+        role: 'service',
+        archContext: 'intra',
+        file: 'packages/architect-projection/src/projections/intra/b.ts',
+      }),
+    ],
+    relationshipIndex: {
+      // Same group (context `intra`). The dependant both depends-on and uses the
+      // dependency (co-directional forward edges from one `@architect-uses`), and
+      // the dependency enables the dependant (derived reverse). The detail
+      // diagram must collapse the forward pair to ONE solid arrow and drop the
+      // reverse enablement.
+      IntraDependant: createRelationshipEntry({
+        dependsOn: ['IntraDependency'],
+        uses: ['IntraDependency'],
+      }),
+      IntraDependency: createRelationshipEntry({ enables: ['IntraDependant'] }),
+    },
+  });
+}
+
+function createMixedProductionAndTestFeatureContext(): ProjectionContext {
+  return createProjectionContext({
+    patterns: [
+      createPattern('RenderMarkdownComponent', {
+        status: 'active',
+        role: 'codec',
+        archContext: 'rendering',
+        file: 'packages/architect-projection/src/renderers/render-markdown.ts',
+      }),
+      // A test/executable-spec pattern: identity is a feature under
+      // tests/features/, realizing the production component. The component view
+      // must omit it even though it carries a role + archContext.
+      createPattern('RenderMarkdownComponentExecutableTests', {
+        status: 'active',
+        role: 'projection',
+        archContext: 'rendering',
+        implementsPatterns: ['RenderMarkdownComponent'],
+        file: 'packages/architect-projection/tests/features/renderers/render-markdown.feature',
+      }),
+    ],
+  });
+}
+
+function createMixedProductionAndDecisionRecordContext(): ProjectionContext {
+  return createProjectionContext({
+    patterns: [
+      createPattern('RenderMarkdownComponent', {
+        status: 'active',
+        role: 'codec',
+        archContext: 'rendering',
+        file: 'packages/architect-projection/src/renderers/render-markdown.ts',
+      }),
+      // A decision-record pattern: identity is an ADR feature under
+      // architect/decisions/. The component view must omit it — it is a durable
+      // decision, not a production component, and is projected by the decisions
+      // doc. It carries a product-area but no role/bounded-context, exactly the
+      // shape that previously fell into the package-fallback bucket. See D-16.
+      createPattern('ADR006SingleReadModelArchitecture', {
+        status: 'completed',
+        productArea: 'Generation',
+        file: 'architect/decisions/adr-006-single-read-model-architecture.feature',
+      }),
+    ],
+  });
+}
+
+function createDecisionOnlyContext(): ProjectionContext {
+  // Every pattern is a decision record. The component view must render empty —
+  // it must NOT fall back to re-including the excluded decision records. See D-16.
+  return createProjectionContext({
+    patterns: [
+      createPattern('ADR006SingleReadModelArchitecture', {
+        status: 'completed',
+        productArea: 'Generation',
+        file: 'architect/decisions/adr-006-single-read-model-architecture.feature',
+      }),
+      createPattern('ADR005CodecBasedMarkdownRendering', {
+        status: 'completed',
+        file: 'architect/decisions/adr-005-codec-based-markdown-rendering.feature',
+      }),
+    ],
+  });
+}
+
 function createBoundedContextScopeContext(): ProjectionContext {
   return createProjectionContext({
     patterns: [
       createPattern('ProjectionAPI', {
         status: 'active',
         role: 'projection',
-        phase: 20,
         archContext: 'projection',
         archLayer: 'application',
         productArea: 'Projection Platform',
@@ -998,7 +1669,6 @@ function createBoundedContextScopeContext(): ProjectionContext {
       createPattern('ProjectionDocs', {
         status: 'roadmap',
         role: 'projection',
-        phase: 21,
         archContext: 'projection',
         archLayer: 'infrastructure',
         productArea: 'Studio UI',
@@ -1007,7 +1677,6 @@ function createBoundedContextScopeContext(): ProjectionContext {
       createPattern('StudioSettings', {
         status: 'completed',
         role: 'service',
-        phase: 19,
         archContext: 'studio',
         archLayer: 'application',
         productArea: 'Studio UI',
