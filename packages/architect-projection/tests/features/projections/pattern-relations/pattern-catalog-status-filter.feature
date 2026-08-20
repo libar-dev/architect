@@ -6,12 +6,12 @@
 @architect-role:projection
 @pattern-relations
 Feature: Pattern catalog status filter speaks both FSM and normalized words
-  The pattern catalog `--status` filter accepts every word a cold-start agent
-  reads in `overview`/`getStatusDistribution`. The normalized bucket word
-  `planned` matches the roadmap ∪ deferred union; the FSM-authored values
-  (candidate/roadmap/active/completed/deferred) match exactly. This removes the
-  third-word trap where the agent reads `planned` but `list --status planned`
-  rejects it.
+  The pattern catalog's typed `status` filter accepts every word exposed by
+  `g.graph.counts` and the `StatusDistribution` projection. The normalized
+  bucket word `planned` matches the roadmap ∪ deferred union; the FSM-authored
+  values (candidate/roadmap/active/completed/deferred) match exactly. This keeps
+  the `architect_list` MCP filter aligned with the status vocabulary consumers
+  read from the graph.
 
   Background:
     Given a pattern catalog spanning every authored status

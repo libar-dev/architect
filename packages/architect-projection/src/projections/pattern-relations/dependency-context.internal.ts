@@ -7,8 +7,8 @@
  */
 
 import {
-  createPatternGraphAPI,
   findPatternByName,
+  getDependencyContext,
   type DependencyContext as KernelDependencyContext,
   type DependencyContextNode as KernelDependencyContextNode,
   type ExtractedPattern,
@@ -129,8 +129,9 @@ export function buildDependencyContext(
   const focalPattern = requirePattern(context, options.pattern);
   const focalName = getPatternName(focalPattern);
 
-  const api = createPatternGraphAPI(context.graph);
-  const kernelContext = api.getDependencyContext(focalName, { maxDepth: options.maxDepth });
+  const kernelContext = getDependencyContext(context.graph, focalName, {
+    maxDepth: options.maxDepth,
+  });
 
   if (kernelContext === undefined) {
     return {
@@ -152,8 +153,9 @@ export function buildDependencyContext(
 
   // Decision patterns express their structured relations only as see-also
   // cross-links, which the kernel context (rightly) ignores. Graft the see-also
-  // governance chain into the upstream forest so `dep-tree <ADR>` surfaces the
-  // decision lineage instead of an isolated node. Scoped to adr→adr edges.
+  // governance chain into the upstream forest so `getDependencyContext` and the
+  // `architect_dep_tree` MCP tool surface decision lineage instead of an isolated
+  // node. Scoped to adr→adr edges.
   if (isDecisionPattern(focalPattern)) {
     const existingUpstream = new Set(upstream.map((node) => node.name));
     const governance = walkGovernanceChain(

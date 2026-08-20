@@ -8,8 +8,9 @@
  *
  * ## Pattern catalog projection
  *
- * **Value:** Gives list and search consumers (CLI list, MCP search, UI
- * pickers) a stable filtered catalog of `PatternSummary` items, with
+ * **Value:** Gives typed-tool and UI consumers (`architect_list`,
+ * `architect_search`, UI pickers) a stable filtered catalog of
+ * `PatternSummary` items, with
  * role-alias resolution, combined status/role filtering, and compact
  * `namesOnly` / `count` response modes.
  *

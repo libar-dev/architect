@@ -15,14 +15,16 @@ pnpm architect:q '<js>'
 Evaluates a JS expression (or statement body ending in `return`) with `g` — the live PatternGraph handle, built fresh from the working tree — in scope. Accessors return plain composable data, no envelopes.
 
 ```bash
-pnpm architect:q 'g.api.getStatusCounts()'                            # status distribution
-pnpm architect:q 'g.pattern("PatternGraphApi")'                       # one node: status, deps, files
+pnpm architect:q 'g.graph.counts'                                     # status distribution
+pnpm architect:q 'g.pattern("GraphHandle")'                            # one node: status, deps, files
 pnpm architect:q 'g.findByConcept("taxonomy")'                        # concept → ranked patterns
 pnpm architect:q 'g.byFile("packages/architect-core/src/index.ts")'   # file → owner + neighborhood
-pnpm architect:q 'g.api.isValidTransition("roadmap","active")'        # deterministic FSM gate
+pnpm architect:q 'g.fsm.isValidTransition("roadmap","active")'        # deterministic FSM gate
 ```
 
-The surface: `g.patterns`, `g.pattern(name)`, `g.fileToPattern(file)`, `g.findByConcept(q)`, `g.byFile(f)`, `g.bySymbol(s)`, `g.invariantsOf(x)`, `g.specsReverifying(xs)`, `g.blastRadius(files)`, `g.fanInCandidates()`, `g.graphDiff()`, `g.census()`, `g.driftFlags(fn)`, plus `g.api` (the canonical `PatternGraphAPI`: `getPattern`, `getStatusCounts`, `getCurrentWork`, `getDependencyContext`, `getRulesForPattern`, `isValidTransition`, `checkTransition`, `getPatternParseFailure`, …) and the raw shapes `g.authored` / `g.mech`.
+The handle exposes `g.graph`, the complete deeply frozen PatternGraph; `g.fsm`, the four deterministic transition operations; need-shaped accessors (`g.patterns`, `g.pattern(name)`, `g.fileToPattern(file)`); trusted joins (`g.findByConcept`, `g.byFile`, `g.bySymbol`, `g.invariantsOf`, `g.specsReverifying`, `g.blastRadius`); curation helpers; and the raw `g.authored` / `g.mech` shapes. Accessors return plain data, not query envelopes.
+
+Programmatic consumers import the frozen `Graph`, `createGraph`, schemas, types, and trusted pure views from `@libar-dev/architect-core/graph`. Named algorithms that operate on a caller-supplied PatternGraph, including `getDependencyContext` and `getRulesForPattern`, remain pure exports from `@libar-dev/architect-core`. Source, config, filesystem, and git IO remain composition-root concerns.
 
 ## Named commands
 

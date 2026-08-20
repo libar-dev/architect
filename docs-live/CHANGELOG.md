@@ -6,12 +6,12 @@
 
 ## Overview
 
-Completed milestones timeline covering 139 patterns.
+Completed milestones timeline covering 143 patterns.
 
 | Metric    | Value |
 | --------- | ----- |
-| Patterns  | 139   |
-| Completed | 139   |
+| Patterns  | 143   |
+| Completed | 143   |
 | Active    | 0     |
 | Planned   | 0     |
 | Candidate | 0     |
@@ -37,6 +37,7 @@ Completed milestones timeline covering 139 patterns.
 | ArchitectureDiagramProjection                         | completed | projection | packages/architect-projection/src/projections/documentation-composition/architecture-diagram.ts                      |
 | ArchitectureNavigationProjectionExecutableTests       | completed | projection | packages/architect-projection/tests/features/projections/pattern-relations/architecture-neighborhood.feature         |
 | ArchitectureNeighborhoodProjection                    | completed | projection | packages/architect-projection/src/projections/pattern-relations/architecture-neighborhood.ts                         |
+| ArchitectWorkspaceSources                             | completed | contract   | packages/architect-core/src/config/self-hosting.ts                                                                   |
 | ArgvHygiene                                           | completed | utility    | packages/architect-core/src/utils/argv-hygiene.ts                                                                    |
 | AuthoredCoreBuilder                                   | completed | service    | packages/architect-cli/src/handle/authored.ts                                                                        |
 | BoundedContextProjection                              | completed | projection | packages/architect-projection/src/projections/pattern-relations/architecture-context.ts                              |
@@ -47,6 +48,7 @@ Completed milestones timeline covering 139 patterns.
 | ChangelogProjection                                   | completed | projection | packages/architect-projection/src/projections/delivery-reporting/index.ts                                            |
 | ChangelogProjectionExecutableTests                    | completed | projection | packages/architect-projection/tests/features/projections/delivery-reporting/changelog.feature                        |
 | CliCommandResolutionExecutableTests                   | completed |            | packages/architect-cli/tests/features/cli-command-resolution.feature                                                 |
+| CLIContextBuilder                                     | completed | service    | packages/architect-cli/src/cli/cli-runtime.ts                                                                        |
 | CLIContextTypes                                       | completed | contract   | packages/architect-cli/src/cli/cli-types.ts                                                                          |
 | CLIErrorHandler                                       | completed | utility    | packages/architect-cli/src/cli/error-handler.ts                                                                      |
 | CliFlagParsingExecutableTests                         | completed |            | packages/architect-cli/tests/features/cli-flag-parsing.feature                                                       |
@@ -56,6 +58,8 @@ Completed milestones timeline covering 139 patterns.
 | ConfigResolution                                      | completed |            | packages/architect-core/tests/features/config/config-resolution.feature                                              |
 | ConfigurationAPI                                      | completed |            | packages/architect-core/tests/features/config/configuration-api.feature                                              |
 | ConfigValidationSchemas                               | completed | contract   | packages/architect-core/src/validation-schemas/config.ts                                                             |
+| CoreGraphExecutableTests                              | completed |            | packages/architect-core/tests/features/graph/graph.feature                                                           |
+| DanglingBaseline                                      | completed | service    | packages/architect-guard/src/lint/dangling-baseline.ts                                                               |
 | DataAPIOutputShaping                                  | completed |            | tests/features/api/output-shaping/output-pipeline.feature                                                            |
 | DecisionCatalogProjection                             | completed | projection | packages/architect-projection/src/projections/governance/decision-records.ts                                         |
 | DecisionCatalogProjectionExecutableTests              | completed | projection | packages/architect-projection/tests/features/projections/governance/decision-records.feature                         |
@@ -91,8 +95,6 @@ Completed milestones timeline covering 139 patterns.
 | GraphHandle                                           | completed | service    | packages/architect-cli/src/handle/graph.ts                                                                           |
 | GraphHandleCli                                        | completed | service    | packages/architect-cli/src/cli/graph-cli.ts                                                                          |
 | GraphHandleCliExecutableTests                         | completed |            | tests/features/cli/graph-handle.feature                                                                              |
-| GraphHandleShapes                                     | completed | contract   | packages/architect-cli/src/handle/schema.ts                                                                          |
-| GraphHandleViews                                      | completed | service    | packages/architect-cli/src/handle/views.ts                                                                           |
 | HandoffProjection                                     | completed | projection | packages/architect-projection/src/projections/execution-context/handoff.ts                                           |
 | HierarchyLevelDomain                                  | completed | contract   | packages/architect-core/src/taxonomy/hierarchy-levels.ts                                                             |
 | JsonRenderer                                          | completed | codec      | packages/architect-projection/src/renderers/render-json.ts                                                           |
@@ -145,6 +147,7 @@ Completed milestones timeline covering 139 patterns.
 | SourceInventoryProjection                             | completed | projection | packages/architect-projection/src/projections/operational-insights/index.ts                                          |
 | SourceMerging                                         | completed |            | packages/architect-core/tests/features/config/source-merging.feature                                                 |
 | StatusDistributionProjection                          | completed | projection | packages/architect-projection/src/projections/delivery-reporting/index.ts                                            |
+| StepLintContract                                      | completed | contract   | packages/architect-guard/src/lint/steps/types.ts                                                                     |
 | TagDirectiveRegexBuilders                             | completed | utility    | packages/architect-core/src/config/regex-builders.ts                                                                 |
 | TagUsageProjection                                    | completed | projection | packages/architect-projection/src/projections/operational-insights/index.ts                                          |
 | TaxonomyDigestProjection                              | completed | projection | packages/architect-projection/src/projections/governance/taxonomy-digest.ts                                          |
@@ -155,5 +158,6 @@ Completed milestones timeline covering 139 patterns.
 | UiRenderer                                            | completed | codec      | packages/architect-projection/src/renderers/render-ui.ts                                                             |
 | ValidatePatternsCLI                                   | completed | service    | packages/architect-guard/src/cli/validate-patterns.ts                                                                |
 | ValidationModule                                      | completed | barrel     | packages/architect-guard/src/validation/index.ts                                                                     |
+| ValidationOutputSchemas                               | completed | contract   | packages/architect-core/src/validation-schemas/output-schemas.ts                                                     |
 | ValidationRuleDigestProjection                        | completed | projection | packages/architect-projection/src/projections/governance/validation-rule-digest.ts                                   |
 | ValidatorReadModelConsolidation                       | completed |            | tests/features/cli/validate-patterns.feature                                                                         |

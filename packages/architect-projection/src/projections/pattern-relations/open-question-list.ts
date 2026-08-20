@@ -3,7 +3,7 @@
  * @architect-pattern OpenQuestionListProjection
  * @architect-status active
  * @architect-role:projection
- * @architect-uses PatternRelationsProjectionSupport, PatternRelationsFragmentContracts
+ * @architect-uses PatternRelationsProjectionSupport, PatternRelationsFragmentContracts, OpenQuestionList
  * @architect-bounded-context:projection
  *
  * ### When to Use

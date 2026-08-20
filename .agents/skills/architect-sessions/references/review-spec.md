@@ -19,9 +19,9 @@ Know what "complete" means for _this_ spec before scanning for gaps:
 Run the pre-flight from [`../../architect-graph-handle/SKILL.md`](../../architect-graph-handle/SKILL.md) — the read surface (ADR-014):
 
 ```bash
-pnpm architect:q 'return {counts: g.api.getStatusCounts(), active: g.api.getCurrentWork().map(p => p.patternName ?? p.name)}'
+pnpm architect:q 'return {counts: g.graph.counts, active: g.patterns.filter(p => p.status === "active").map(p => p.name)}'
 pnpm architect:q 'const p = g.pattern("<pattern>"); return {p, invariants: g.invariantsOf("<pattern>"), reverifies: g.specsReverifying(["<pattern>"]).length}'
-pnpm architect:q 'g.api.getDependencyContext("<pattern>")'
+pnpm architect:q 'g.graph.relationshipIndex["<pattern>"]'
 pnpm architect:q 'g.patterns.filter(p => p.status === "roadmap" && p.uses.some(u => g.pattern(u)?.status !== "completed")).map(p => p.name)'
 pnpm architect:q 'const p = g.pattern("<pattern>"); return {file: p?.sourceFile, realizing: p?.implementedBy}'
 ```
@@ -45,7 +45,7 @@ Scope readiness is the `architect_scope_validate` MCP tool; its verdict (PASS / 
 1. **Normative source coverage.** Read the ADR/redesign/brief. Are all its types, constants, and constraints represented in the spec's deliverables? Grep for them in the referenced files.
 2. **Deliverable path correctness.** Each `Background:` path must exist (or be one the spec explicitly creates). Check with `pnpm architect:q 'const p = g.pattern("<pattern>"); return {file: p?.sourceFile, realizing: p?.implementedBy}'` + direct existence. A typo ships a broken implementation.
 3. **Type reuse.** If a Zod schema / interface already exists in `packages/`, the spec should reference and reuse it, not redefine it.
-4. **Dependency chain.** `pnpm architect:q 'g.api.getDependencyContext("<pattern>")'` — anything blocking? The global view: `pnpm architect:q 'g.patterns.filter(p => p.status === "roadmap" && p.uses.some(u => g.pattern(u)?.status !== "completed")).map(p => p.name)'`. A dependency that is `roadmap` and unimplemented means not-ready.
+4. **Dependency chain.** `pnpm architect:q 'g.graph.relationshipIndex["<pattern>"]'` — anything blocking? The global view: `pnpm architect:q 'g.patterns.filter(p => p.status === "roadmap" && p.uses.some(u => g.pattern(u)?.status !== "completed")).map(p => p.name)'`. A dependency that is `roadmap` and unimplemented means not-ready.
 5. **Scope-validate state** (the `architect_scope_validate` MCP tool). PASS = ready; WARN = recoverable miss; BLOCKED = upstream dependency or invariant violation.
 6. **Implied file modifications.** Does the source imply changes the `Background:` table omits? Common miss: a new type in a shared package needing a barrel re-export.
 7. **Edge cases vs scenarios.** For each Rule, is there both a happy-path and at least one error/boundary scenario?
@@ -71,7 +71,7 @@ Found nothing? Say so in one sentence. Do not produce an elaborate "looks good" 
 - **Rewriting the spec** — surface the gap; let the design author fix it.
 - **Generating wrapper / enriched-prompt documents** — the spec is the prompt.
 - **Implementing what's missing** — this is review; an unclear deliverable is the gap "deliverable unclear," not "I'll write it."
-- **Reading source via Read/Glob/Grep before the graph-handle pre-flight** — `g.pattern(...)` / `g.api.getDependencyContext(...)` first.
+- **Reading source via Read/Glob/Grep before the graph-handle pre-flight** — `g.pattern(...)` / `g.graph.relationshipIndex[...]` first.
 
 ## Do not
 

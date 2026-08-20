@@ -3,7 +3,7 @@
  * @architect-lint
  * @architect-pattern LintEngine
  * @architect-status completed
- * @architect-uses LintRules, CodecUtils
+ * @architect-uses LintRules, CodecUtils, LintViolationContract
  * @architect-role:service
  * @architect-bounded-context:lint
  *

@@ -65,7 +65,7 @@ Found nothing wrong? State it in one sentence — no elaborate restatement.
 ```bash
 git rm <designSpecPath1> <designSpecPath2> …
 git rm -r <stubDir1> <stubDir2> …
-pnpm architect:q 'return {counts: g.api.getStatusCounts(), active: g.api.getCurrentWork().map(p => p.patternName ?? p.name)}'   # confirm patterns show completed without lingering specs
+pnpm architect:q 'return {counts: g.graph.counts, active: g.patterns.filter(p => p.status === "active").map(p => p.name)}'   # confirm patterns show completed without lingering specs
 pnpm docs:all                     # regenerate docs
 ```
 

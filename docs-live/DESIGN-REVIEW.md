@@ -7,7 +7,7 @@
 
 ## Overview
 
-This view captures 268 patterns across 25 diagrams in the Component view.
+This view captures 270 patterns across 24 diagrams in the Component view.
 
 ## Related views
 
@@ -25,41 +25,38 @@ Each node is a group; each arrow is a cross-group dependency (`depends-on` / `us
 graph LR
   shared["_shared (4)"]
   api["api (7)"]
-  cli["cli (12)"]
-  configuration["configuration (11)"]
+  cli["cli (11)"]
+  configuration["configuration (12)"]
   delivery_reporting["delivery-reporting (5)"]
   documentation_composition["documentation-composition (13)"]
-  domain["domain (9)"]
+  domain["domain (11)"]
   execution_context["execution-context (8)"]
   extractor["extractor (7)"]
   generator["generator (4)"]
   governance["governance (10)"]
-  lint["lint (4)"]
+  lint["lint (5)"]
   operational_insights["operational-insights (10)"]
   pattern_relations["pattern-relations (16)"]
   pipeline["pipeline (6)"]
   process_guard["process-guard (6)"]
   projection["projection (49)"]
-  read_api["read-api (8)"]
+  read_api["read-api (7)"]
   rendering["rendering (16)"]
   scanner["scanner (4)"]
-  validation["validation (9)"]
-  validation_schemas["validation-schemas (11)"]
-  role_contract["role: contract (2)"]
+  validation["validation (10)"]
+  validation_schemas["validation-schemas (12)"]
   pkg_architect_package_content["Architect Package Content (37)"]
   shared --> projection
   shared --> validation_schemas
   api --> cli
   api --> pipeline
   api --> projection
-  api --> read_api
   api --> rendering
   cli --> api
   cli --> configuration
+  cli --> domain
   cli --> lint
   cli --> pipeline
-  cli --> read_api
-  cli --> role_contract
   cli --> scanner
   cli --> validation_schemas
   configuration --> domain
@@ -78,6 +75,7 @@ graph LR
   governance --> read_api
   governance --> rendering
   governance --> validation_schemas
+  lint --> domain
   lint --> process_guard
   lint --> validation
   lint --> validation_schemas
@@ -93,7 +91,6 @@ graph LR
   pipeline --> extractor
   pipeline --> projection
   pipeline --> read_api
-  pipeline --> role_contract
   pipeline --> scanner
   pipeline --> validation_schemas
   pkg_architect_package_content --> configuration
@@ -103,6 +100,8 @@ graph LR
   process_guard --> lint
   process_guard --> scanner
   process_guard --> validation
+  process_guard --> validation_schemas
+  projection --> shared
   projection --> api
   projection --> cli
   projection --> delivery_reporting
@@ -117,10 +116,14 @@ graph LR
   read_api --> validation_schemas
   rendering --> shared
   rendering --> documentation_composition
+  scanner --> domain
+  scanner --> validation_schemas
   validation --> extractor
+  validation --> pipeline
   validation --> scanner
   validation --> validation_schemas
   validation_schemas --> domain
+  validation_schemas --> extractor
 ```
 
 ### Bounded context: \_shared (4 patterns)
@@ -156,43 +159,38 @@ graph TD
   modelenricheddataapi -->|depends-on| architectbriefdeterministicbundle
 ```
 
-### Bounded context: cli (12 patterns)
+### Bounded context: cli (11 patterns)
 
 ```mermaid
 graph TD
   argvhygiene["ArgvHygiene<br/>(utility · completed)"]
   authoredcorebuilder["AuthoredCoreBuilder<br/>(service · completed)"]
+  clicontextbuilder["CLIContextBuilder<br/>(service · completed)"]
   clicontexttypes["CLIContextTypes<br/>(contract · completed)"]
   clierrorhandler["CLIErrorHandler<br/>(utility · completed)"]
   cliruntimepaths["CLIRuntimePaths<br/>(utility · completed)"]
   graphhandle["GraphHandle<br/>(service · completed)"]
   graphhandlecli["GraphHandleCli<br/>(service · completed)"]
-  graphhandleshapes["GraphHandleShapes<br/>(contract · completed)"]
-  graphhandleviews["GraphHandleViews<br/>(service · completed)"]
   lintpatternscli["LintPatternsCLI<br/>(service · completed)"]
   mcpserverbin["MCPServerBin<br/>(utility · completed)"]
   mechanicalsubstrateextractor["MechanicalSubstrateExtractor<br/>(service · completed)"]
   authoredcorebuilder -->|depends-on| clicontexttypes
-  authoredcorebuilder -->|depends-on| graphhandleshapes
+  clicontextbuilder -->|depends-on| clicontexttypes
   graphhandle -->|depends-on| authoredcorebuilder
-  graphhandle -->|depends-on| graphhandleshapes
-  graphhandle -->|depends-on| graphhandleviews
   graphhandle -->|depends-on| mechanicalsubstrateextractor
   graphhandlecli -->|depends-on| authoredcorebuilder
   graphhandlecli -->|depends-on| clicontexttypes
   graphhandlecli -->|depends-on| cliruntimepaths
   graphhandlecli -->|depends-on| graphhandle
-  graphhandlecli -->|depends-on| graphhandleviews
   graphhandlecli -->|depends-on| mechanicalsubstrateextractor
-  graphhandleviews -->|depends-on| graphhandleshapes
-  mechanicalsubstrateextractor -->|depends-on| graphhandleshapes
 ```
 
-### Bounded context: configuration (11 patterns)
+### Bounded context: configuration (12 patterns)
 
 ```mermaid
 graph TD
   architectconfigcontract["ArchitectConfigContract<br/>(contract · active)"]
+  architectworkspacesources["ArchitectWorkspaceSources<br/>(contract · completed)"]
   configdefaults["ConfigDefaults<br/>(contract · active)"]
   configloader["ConfigLoader<br/>(service · active)"]
   defineconfig["DefineConfig<br/>(utility · active)"]
@@ -246,17 +244,19 @@ graph TD
   taxonomyembeddedshapesprojection -->|depends-on| emissiondescriptor
 ```
 
-### Bounded context: domain (9 patterns)
+### Bounded context: domain (11 patterns)
 
 ```mermaid
 graph TD
   brandedidentifiers["BrandedIdentifiers<br/>(contract · active)"]
   deliverablestatusdomain["DeliverableStatusDomain<br/>(contract · active)"]
   domainenumschemas["DomainEnumSchemas<br/>(contract · active)"]
+  errorfactorytypes["ErrorFactoryTypes<br/>(contract · completed)"]
   formattypedomain["FormatTypeDomain<br/>(contract · active)"]
   hierarchyleveldomain["HierarchyLevelDomain<br/>(contract · completed)"]
   maturityleveldomain["MaturityLevelDomain<br/>(contract · active)"]
   packageresolver["PackageResolver<br/>(utility · active)"]
+  resultmonadtypes["ResultMonadTypes<br/>(contract · completed)"]
   statusnormalization["StatusNormalization<br/>(service · active)"]
   statusvaluedomain["StatusValueDomain<br/>(contract · active)"]
   maturityleveldomain -->|depends-on| statusvaluedomain
@@ -327,7 +327,7 @@ graph TD
   businessrulesetassembly -->|depends-on| governancesupporting
 ```
 
-### Bounded context: lint (4 patterns)
+### Bounded context: lint (5 patterns)
 
 ```mermaid
 graph TD
@@ -335,6 +335,7 @@ graph TD
   lintmodule["LintModule<br/>(barrel · completed)"]
   lintrules["LintRules<br/>(service · completed)"]
   processguarddecider["ProcessGuardDecider<br/>(decider · active)"]
+  steplintcontract["StepLintContract<br/>(contract · completed)"]
   lintengine -->|depends-on| lintrules
   lintmodule -->|depends-on| lintengine
   lintmodule -->|depends-on| lintrules
@@ -473,6 +474,7 @@ graph TD
   annotationcoverageprojection -->|depends-on| operationalinsightsprojectionsupport
   architecturecomparisonprojection -->|depends-on| patternrelationsprojectionsupport
   architecturediagramprojection -->|depends-on| documentationcompositionprojectionsupport
+  architecturegraphprojection -->|depends-on| projectioncontext
   architectureneighborhoodprojection -->|depends-on| patternrelationsprojectionsupport
   boundedcontextprojection -->|depends-on| patternrelationsprojectionsupport
   businessrulesprojection -->|depends-on| governanceprojectionsupport
@@ -509,7 +511,7 @@ graph TD
   validationruledigestprojection -->|depends-on| governanceprojectionsupport
 ```
 
-### Bounded context: read-api (8 patterns)
+### Bounded context: read-api (7 patterns)
 
 ```mermaid
 graph TD
@@ -517,14 +519,12 @@ graph TD
   decisionresolution["DecisionResolution<br/>(utility · active)"]
   graphinventory["GraphInventory<br/>(utility · active)"]
   patternclassification["PatternClassification<br/>(utility · active)"]
-  patterngraphapi["PatternGraphApi<br/>(utility · active)"]
   patternhelpers["PatternHelpers<br/>(utility · active)"]
   readapiresultcontract["ReadApiResultContract<br/>(contract · active)"]
   ruleaggregation["RuleAggregation<br/>(utility · active)"]
   architectureinspection -->|depends-on| patternhelpers
   decisionresolution -->|depends-on| patternhelpers
   graphinventory -->|depends-on| patternhelpers
-  patterngraphapi -->|depends-on| patternhelpers
   ruleaggregation -->|depends-on| patternhelpers
 ```
 
@@ -572,12 +572,13 @@ graph TD
   patternscanner["PatternScanner<br/>(service · active)"]
 ```
 
-### Bounded context: validation (9 patterns)
+### Bounded context: validation (10 patterns)
 
 ```mermaid
 graph TD
   antipatterndetector["AntiPatternDetector<br/>(service · completed)"]
   antipatternvalidationtypes["AntiPatternValidationTypes<br/>(contract · completed)"]
+  danglingbaseline["DanglingBaseline<br/>(service · completed)"]
   fsmstates["FSMStates<br/>(read-model · active)"]
   fsmtransitions["FSMTransitions<br/>(read-model · active)"]
   fsmvalidator["FSMValidator<br/>(decider · active)"]
@@ -593,7 +594,7 @@ graph TD
   zoderrorboundary -->|depends-on| trustboundaryparser
 ```
 
-### Bounded context: validation-schemas (11 patterns)
+### Bounded context: validation-schemas (12 patterns)
 
 ```mermaid
 graph TD
@@ -608,16 +609,11 @@ graph TD
   patterngraph["PatternGraph<br/>(contract · active)"]
   patternreferencecontract["PatternReferenceContract<br/>(contract · active)"]
   tagregistryschemas["TagRegistrySchemas<br/>(contract · active)"]
+  validationoutputschemas["ValidationOutputSchemas<br/>(contract · completed)"]
   docdirectivecontract -->|depends-on| tagregistryschemas
+  extractedpattern -->|depends-on| exportinfocontract
   patterngraph -->|depends-on| extractedpattern
-```
-
-### Uncontextualized · role: contract (2 patterns)
-
-```mermaid
-graph TD
-  errorfactorytypes["ErrorFactoryTypes<br/>(contract · completed)"]
-  resultmonadtypes["ResultMonadTypes<br/>(contract · completed)"]
+  validationoutputschemas -->|depends-on| lintviolationcontract
 ```
 
 ### Unclassified · Architect Package Content (37 patterns)
@@ -703,12 +699,12 @@ Most-depended-on patterns in this view, ranked by in-view dependant count.
 
 | Pattern                              | Dependants | Top dependants                                                                                                                                          |
 | ------------------------------------ | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ExtractedPattern                     | 21         | ArchitectureGraphSupport, ArchitectureInspection, BusinessRuleSetAssembly, DecisionResolution, DeliveryReportingProjectionSupport                       |
+| ExtractedPattern                     | 20         | ArchitectureGraphSupport, ArchitectureInspection, BusinessRuleSetAssembly, DecisionResolution, DeliveryReportingProjectionSupport                       |
 | ProjectionFragmentContracts          | 17         | ArchitectureDiagramProjection, BusinessRulesProjection, DecisionCatalogProjection, DeliverableProjection, DocumentationBundle                           |
-| PatternGraph                         | 15         | ArchitectureInspection, BuildPipeline, DecisionResolution, GraphInventory, PatternClassification                                                        |
+| PatternGraph                         | 14         | ArchitectureInspection, BuildPipeline, DecisionResolution, GraphInventory, PatternClassification                                                        |
 | PatternRelationsProjectionSupport    | 13         | ArchitectureComparisonProjection, ArchitectureNeighborhoodProjection, BoundedContextProjection, DependencyContextProjection, DependencyEdgeProjection   |
-| PatternHelpers                       | 11         | ArchitectureInspection, BusinessRuleSetAssembly, DecisionResolution, DualSourceExtractor, GraphInventory                                                |
 | PatternRelationsFragmentContracts    | 11         | ArchitectureComparisonProjection, ArchitectureNeighborhoodProjection, DependencyContextProjection, DependencyEdgeProjection, OpenQuestionListProjection |
+| PatternHelpers                       | 10         | ArchitectureInspection, BusinessRuleSetAssembly, DecisionResolution, DualSourceExtractor, GraphInventory                                                |
 | OperationalInsightsProjectionSupport | 8          | AnnotationCoverageProjection, OverviewProjection, RequirementDigestProjection, RequirementExecutableDigestProjection, RequirementSpecsDigestProjection  |
 | BlockSchema                          | 7          | ArchitectureDiagram, DecisionRecord, DocumentationCompositionSupporting, MarkdownRenderer, OperationalInsightsSupporting                                |
 | ProjectionFragmentSchema             | 7          | ApiReferenceProjection, CompactTextRenderer, FragmentRendererDispatch, JsonRenderer, MarkdownRenderer                                                   |
@@ -720,13 +716,13 @@ Bounded contexts whose patterns span more than one workspace package.
 
 | Bounded context | Packages                                                      | Patterns |
 | --------------- | ------------------------------------------------------------- | -------- |
-| cli             | Architect CLI, Architect Core, Architect Guard, Architect MCP | 12       |
+| cli             | Architect CLI, Architect Core, Architect Guard, Architect MCP | 11       |
 | api             | Architect MCP, Architect Package Content                      | 7        |
 | extractor       | Architect Core, Architect Package Content                     | 7        |
 | governance      | Architect Package Content, Architect Projection               | 10       |
 | projection      | Architect Package Content, Architect Projection               | 49       |
 | rendering       | Architect Core, Architect Projection                          | 16       |
-| validation      | Architect Core, Architect Guard                               | 9        |
+| validation      | Architect Core, Architect Guard                               | 10       |
 
 ## Legend
 
@@ -768,6 +764,7 @@ Bounded contexts whose patterns span more than one workspace package.
 - ArchitectureInspection
 - ArchitectureNeighborhood
 - ArchitectureNeighborhoodProjection
+- ArchitectWorkspaceSources
 - ArgvHygiene
 - AssistiveCodeIntelligence
 - AstParser
@@ -783,6 +780,7 @@ Bounded contexts whose patterns span more than one workspace package.
 - BusinessRuleSetAssembly
 - BusinessRulesProjection
 - ChangelogProjection
+- CLIContextBuilder
 - CLIContextTypes
 - CLIErrorHandler
 - CLIRuntimePaths
@@ -793,6 +791,7 @@ Bounded contexts whose patterns span more than one workspace package.
 - ConfigLoader
 - ConfigValidationSchemas
 - ContextInference
+- DanglingBaseline
 - DecisionCatalog
 - DecisionCatalogProjection
 - DecisionRecord
@@ -858,8 +857,6 @@ Bounded contexts whose patterns span more than one workspace package.
 - GovernanceSupporting
 - GraphHandle
 - GraphHandleCli
-- GraphHandleShapes
-- GraphHandleViews
 - GraphInventory
 - GroupedRoutedBundleSupport
 - HandoffProjection
@@ -910,7 +907,6 @@ Bounded contexts whose patterns span more than one workspace package.
 - PatternDetail
 - PatternDetailProjection
 - PatternGraph
-- PatternGraphApi
 - PatternHelpers
 - PatternReferenceContract
 - PatternRelationsFragmentContracts
@@ -982,6 +978,7 @@ Bounded contexts whose patterns span more than one workspace package.
 - StatusNormalization
 - StatusValueDomain
 - StepDefinitionCompletion
+- StepLintContract
 - StreamingGitDiff
 - TagDirectiveRegexBuilders
 - TagRegistrySchemas
@@ -1001,6 +998,7 @@ Bounded contexts whose patterns span more than one workspace package.
 - UiRenderer
 - ValidatePatternsCLI
 - ValidationModule
+- ValidationOutputSchemas
 - ValidationRuleDigest
 - ValidationRuleDigestProjection
 - ValueTransferState

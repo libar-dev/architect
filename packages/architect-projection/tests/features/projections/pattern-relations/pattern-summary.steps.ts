@@ -75,69 +75,69 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
   Rule('Pattern summaries keep the stable fragment contract', ({ RuleScenario }) => {
     RuleScenario('projecting a canonical pattern summary', ({ Given, When, Then }) => {
-      Given('a summary projection context with a pattern named "PatternGraphAPI"', () => {
+      Given('a summary projection context with a pattern named "WidgetService"', () => {
         state!.context = createProjectionContext({
           patterns: [
-            createPattern('PatternGraphAPI', {
+            createPattern('WidgetService', {
               role: 'service',
-              file: 'packages/architect-query/src/pattern-graph-api.ts',
+              file: 'packages/architect-query/src/graph-handle.ts',
             }),
           ],
         });
       });
 
-      When('I project the summary for "PatternGraphAPI"', () => {
-        state!.summary = projectPatternSummary(state!.context!, 'PatternGraphAPI').root;
+      When('I project the summary for "WidgetService"', () => {
+        state!.summary = projectPatternSummary(state!.context!, 'WidgetService').root;
       });
 
       Then('the projected summary should expose the canonical fragment fields', () => {
         expect(state!.summary).toEqual({
           kind: 'PatternSummary',
-          patternName: 'PatternGraphAPI',
+          patternName: 'WidgetService',
           status: 'active',
           maturity: 'design',
           role: 'service',
-          file: 'packages/architect-query/src/pattern-graph-api.ts',
+          file: 'packages/architect-query/src/graph-handle.ts',
           source: 'typescript',
         });
       });
     });
 
     RuleScenario('pattern lookup is case-insensitive', ({ Given, When, Then }) => {
-      Given('a summary projection context with a pattern named "PatternGraphAPI"', () => {
+      Given('a summary projection context with a pattern named "WidgetService"', () => {
         state!.context = createProjectionContext({
-          patterns: [createPattern('PatternGraphAPI')],
+          patterns: [createPattern('WidgetService')],
         });
       });
 
-      When('I project the summary for "patterngraphapi"', () => {
-        state!.summary = projectPatternSummary(state!.context!, 'patterngraphapi').root;
+      When('I project the summary for "widgetservice"', () => {
+        state!.summary = projectPatternSummary(state!.context!, 'widgetservice').root;
       });
 
-      Then('the projected summary should still target "PatternGraphAPI"', () => {
-        expect(state!.summary?.patternName).toBe('PatternGraphAPI');
+      Then('the projected summary should still target "WidgetService"', () => {
+        expect(state!.summary?.patternName).toBe('WidgetService');
       });
     });
 
     RuleScenario('missing patterns return a suggested match', ({ Given, When, Then }) => {
-      Given('a summary projection context with a pattern named "PatternGraphAPI"', () => {
+      Given('a summary projection context with a pattern named "WidgetService"', () => {
         state!.context = createProjectionContext({
-          patterns: [createPattern('PatternGraphAPI')],
+          patterns: [createPattern('WidgetService')],
         });
       });
 
-      When('I project the summary for the missing pattern "PatternGraphAp"', () => {
+      When('I project the summary for the missing pattern "WidgetServic"', () => {
         try {
-          projectPatternSummary(state!.context!, 'PatternGraphAp');
+          projectPatternSummary(state!.context!, 'WidgetServic');
         } catch (error) {
           state!.error = error;
         }
       });
 
-      Then('the summary projection should fail with a suggestion for "PatternGraphAPI"', () => {
+      Then('the summary projection should fail with a suggestion for "WidgetService"', () => {
         expect(state!.error).toBeInstanceOf(ProjectionError);
-        expect((state!.error as Error).message).toContain('Pattern not found: "PatternGraphAp"');
-        expect((state!.error as Error).message).toContain('Did you mean: PatternGraphAPI?');
+        expect((state!.error as Error).message).toContain('Pattern not found: "WidgetServic"');
+        expect((state!.error as Error).message).toContain('Did you mean: WidgetService?');
       });
     });
   });
@@ -153,7 +153,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             }),
             createPattern('ServicePattern', {
               role: 'service',
-              file: 'packages/architect-query/src/pattern-graph-api.ts',
+              file: 'packages/architect-query/src/graph-handle.ts',
             }),
           ],
         });

@@ -4,13 +4,14 @@
 
 ## Purpose
 
-`architect-core` is the **canonical runtime read model** and the only acyclic-root package in the family (it depends on no intra-repo package; every other package depends on it). It owns the full **scan → parse → extract → validate → merge → transform** pipeline that turns annotated TypeScript and executable Gherkin into the `PatternGraph`, plus the Zod-first contracts, the FSM transition rules, the tag/status taxonomy, config loading/resolution, and the read API (`createPatternGraphAPI()`) that every consumer queries. If a value domain or graph shape crosses a package boundary, its source of truth lives here.
+`architect-core` is the **canonical runtime read model** and the only acyclic-root package in the family (it depends on no intra-repo package; every other package depends on it). It owns the full **scan → parse → extract → validate → merge → transform** pipeline that turns annotated TypeScript and executable Gherkin into the `PatternGraph`, plus the Zod-first contracts, the FSM transition rules, the tag/status taxonomy, config loading/resolution, the frozen `@libar-dev/architect-core/graph` contract, and named pure read kernels. If a value domain or graph shape crosses a package boundary, its source of truth lives here.
 
 ## Public interface
 
 The boundary surface is wide (root `index.ts` re-exports ~12 sub-barrels). Grouped by responsibility:
 
-- **Read API (the headline contract)** — `createPatternGraphAPI()` → `PatternGraphAPI` (status, role, dependency, relationship, documentation, and FSM transition queries, plus inventory and inspection helpers); `QueryResult<T>` / `QuerySuccess` / `QueryError` envelope + `createSuccess` / `createError` / `QueryApiError`; pattern helpers (`findPatternByName`, `getRelationships`, `suggestPattern`, `resolveCanonicalRole`, …); inspection (`computeNeighborhood`, `compareContexts`); inventory (`aggregateTagUsage`, `buildSourceInventory`, `findOrphanPatterns`).
+- **Frozen Graph contract (the headline query contract)** — `@libar-dev/architect-core/graph` exports `Graph`, `createGraph`, the canonical Graph schemas/types, trusted pure entry/spec/impact views, and a deeply frozen object with the complete PatternGraph at `.graph`, the FSM kernel at `.fsm`, need-shaped nodes, curated state, and the mechanical import graph. Accessors return plain values, never query envelopes.
+- **Pure read kernels** — the package root exports named functions over caller-supplied PatternGraph values: dependency context (`getDependencyContext`), rule aggregation (`getRulesForPattern` / `resolveImplementingFeatures`), decision resolution, pattern helpers, architecture inspection, and inventory.
 - **Read model contracts (Zod)** — `PatternGraphSchema` / `PatternGraph`, `ExtractedPatternSchema` / `ExtractedPattern` (the canonical per-pattern record), `StatusCounts`, `RelationshipEntry`, `ImplementationRef`, plus the whole `validation-schemas/` family (feature/Gherkin, dual-source, lint, output-schemas, tag-registry, codec-utils).
 - **Graph-build pipeline** — `buildPatternGraph()` (single graph-construction entrypoint), `transformToPatternGraph[WithValidation]`, `mergePatterns`; `BuildResult` / `TransformResult` / `RawDataset` / `RuntimePatternGraph` / `PipelineOptions` / `DanglingReference`.
 - **Scanner / extractor** — `scanPatterns`, `parseFileDirectives`, `parseFeatureFile`, `scanGherkinFiles`; `extractPatterns`, `extractPatternsFromGherkin`, extraction diagnostics.
@@ -20,7 +21,7 @@ The boundary surface is wide (root `index.ts` re-exports ~12 sub-barrels). Group
 - **Package resolution** — `createPackageResolver` / `PackageResolver`, `PackageConfigSchema`, `ProjectionError`.
 - **Branded types, Result, errors, utils** — `asPatternId` etc., `Result`, typed error constructors, `fuzzyMatchPatterns`, `groupBy`, string/id/markdown helpers.
 
-`package.json` exports: `.` (full barrel) and `./config`. No bin (library only). External runtime deps are deliberately concentrated here.
+`package.json` exports: `.` (full barrel), `./config`, the frozen pure `./graph` subpath, and `./package.json`. No bin (library only). External runtime deps are deliberately concentrated here.
 
 ## Enumerated functionality
 
@@ -29,7 +30,7 @@ The boundary surface is wide (root `index.ts` re-exports ~12 sub-barrels). Group
 - Extract patterns, deliverables, process metadata, and shapes from both sources.
 - Merge dual-source records and resolve relationships / cross-package edges / dangling references.
 - Transform into the immutable `PatternGraph` read model (status groups, relationship index, hierarchy/navigation edges, and pre-computed views).
-- Serve deterministic structured queries over the graph via `PatternGraphAPI`.
+- Serve deterministic graph reads through the frozen `Graph`, direct canonical fields, `g.fsm`, and named pure kernels.
 - Enforce the FSM lifecycle: legal status transitions + protection levels.
 - Define the canonical tag/status/role/maturity taxonomy and the Zod schemas for every cross-package contract.
 - Load, validate, resolve, and merge project + workflow config.
@@ -55,7 +56,8 @@ Direction is one-way (everything points at core):
 
 ### Load-bearing (core to the single responsibility)
 
-- `src/read-api/pattern-graph-api.ts` + `read-api/index.ts` — the headline query contract every consumer uses.
+- `src/graph/` + the published `./graph` export — the frozen Graph contract, schemas, trusted joins, and analysis views.
+- `src/read-api/` pure kernels — dependency context, rule aggregation, decision resolution, pattern helpers, architecture inspection, and graph inventory.
 - `src/validation-schemas/pattern-graph.ts` + `extracted-pattern.ts` — the read model and its record contract (ADR-006).
 - `src/generators/pipeline/` (`build-pipeline`, `transform-dataset`, `merge-patterns`, `relationship-resolver`) — the one graph-construction path.
 - `src/scanner/` + `src/extractor/` (doc + gherkin) — the ingestion front end.
@@ -78,4 +80,4 @@ Direction is one-way (everything points at core):
 - **~106 `.ts` files, ~12,500 LOC** in `src/` (excluding tests/dist).
 - Largest areas by LOC: `extractor/` (~2.2k), `validation-schemas/` (~1.8k), `scanner/` (~1.7k), `config/` (~1.4k), `read-api/` (~1.2k), `generators/pipeline/` (~1.1k).
 - **36 distinct `@architect-pattern` names** across 31 annotated files (annotation-derived, treat as approximate).
-- Root barrel re-exports **~200 symbols** across 12 sub-barrels + 2 `package.json` export entries (`.`, `./config`).
+- Root barrel re-exports **~200 symbols** across 12 sub-barrels. `package.json` has 4 export entries: `.`, `./config`, `./graph`, and `./package.json`.

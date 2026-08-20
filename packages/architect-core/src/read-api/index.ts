@@ -1,25 +1,18 @@
 export type {
-  QuerySuccess,
-  QueryError,
   QueryErrorCode,
-  QueryResult,
   QueryMetadataExtra,
   RoleInfo,
   StatusDistribution,
   PatternDependencies,
   PatternRelationships,
-  DependencyContext,
-  DependencyContextNode,
   BusinessRuleRef,
   TransitionCheck,
   ProtectionInfo,
   NeighborEntry,
 } from './types.js';
 
-export { createSuccess, createError, QueryApiError } from './types.js';
-
-export type { PatternGraphAPI } from './pattern-graph-api.js';
-export { createPatternGraphAPI } from './pattern-graph-api.js';
+export { getDependencyContext } from './dependency-context.js';
+export type { DependencyContext, DependencyContextNode } from './dependency-context.js';
 
 export {
   resolveImplementingFeatures,

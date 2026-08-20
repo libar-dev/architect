@@ -5,42 +5,86 @@
  */
 
 import { describeFeature, loadFeature } from '@amiceli/vitest-cucumber';
-import {
-  buildPatternGraph,
-  createPatternGraphAPI,
-  createSuccess,
-  RenderFormatSchema,
-  ScopeTypeSchema,
-  SessionTypeSchema,
-  WORKSPACE_TAG_REGISTRY,
-  type QuerySuccess,
-} from '@libar-dev/architect-core';
 import * as architectProjection from '@libar-dev/architect-projection';
-import { expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
+
+const [architectCore, architectGraph] = await Promise.all([
+  import('@libar-dev/architect-core'),
+  import('@libar-dev/architect-core/graph'),
+]);
 
 const feature = await loadFeature('tests/features/cli/public-contract.feature');
+
+const RETAINED_CORE_EXPORTS = [
+  'buildPatternGraph',
+  'getDependencyContext',
+  'getRulesForPattern',
+  'isValidTransition',
+  'validateTransition',
+  'getValidTransitionsFrom',
+  'getProtectionSummary',
+  'resolveDecisionPattern',
+  'listDecisionPatterns',
+  'canonicalDecisionKey',
+  'createPackageResolver',
+  'WORKSPACE_TAG_REGISTRY',
+  'RenderFormatSchema',
+  'SessionTypeSchema',
+  'ScopeTypeSchema',
+] as const;
+
+const RETAINED_GRAPH_EXPORTS = ['Graph', 'createGraph', 'PatternGraphSchema'] as const;
+
+const LEGACY_CORE_EXPORTS = [
+  'createPatternGraphAPI',
+  'PatternGraphAPI',
+  'QueryResult',
+  'QuerySuccess',
+  'QueryError',
+  'QueryApiError',
+  'createSuccess',
+  'createError',
+] as const;
+
+function findLegacyCoreExports(moduleExports: object): readonly string[] {
+  return LEGACY_CORE_EXPORTS.filter((exportName) => exportName in moduleExports);
+}
+
+describe('legacy facade export absence guard', () => {
+  for (const exportName of ['createPatternGraphAPI', 'PatternGraphAPI'] as const) {
+    it(`detects a restored ${exportName} runtime export`, () => {
+      // Given a package namespace with one real facade key restored
+      const restoredExports = { [exportName]: Symbol(exportName) };
+
+      // When the public-contract absence guard inspects it
+      const detected = findLegacyCoreExports(restoredExports);
+
+      // Then the restored key is reported and the package-level empty assertion would fail
+      expect(detected).toEqual([exportName]);
+    });
+  }
+});
 
 describeFeature(feature, ({ Rule }) => {
   Rule(
     'architect-core and architect-projection keep canonical exports importable',
     ({ RuleScenario }) => {
-      RuleScenario('architect-core query contract exports remain available', ({ Then }) => {
-        Then('architect-core query contract exports remain available', () => {
-          const envelope: QuerySuccess<{ ok: boolean }> = createSuccess({ ok: true }, 3);
-
-          expect(typeof buildPatternGraph).toBe('function');
-          expect(typeof createPatternGraphAPI).toBe('function');
-          expect(WORKSPACE_TAG_REGISTRY).toBeDefined();
-          expect(RenderFormatSchema.safeParse('json').success).toBe(true);
-          expect(SessionTypeSchema.safeParse('implement').success).toBe(true);
-          expect(ScopeTypeSchema.safeParse('design').success).toBe(true);
-
-          expect(envelope.success).toBe(true);
-          expect(envelope.data).toEqual({ ok: true });
-          expect(envelope.metadata.patternCount).toBe(3);
-          expect(Number.isNaN(Date.parse(envelope.metadata.timestamp))).toBe(false);
-        });
-      });
+      RuleScenario(
+        'architect-core graph and pure-kernel exports replace the legacy facade',
+        ({ Then, And }) => {
+          Then('architect-core graph and pure-kernel exports are available', () => {
+            for (const exportName of RETAINED_CORE_EXPORTS) {
+              expect(exportName in architectCore).toBe(true);
+            }
+            for (const exportName of RETAINED_GRAPH_EXPORTS) {
+              expect(exportName in architectGraph).toBe(true);
+            }
+          });
+          And('architect-core legacy facade exports are absent', () => {
+            expect(findLegacyCoreExports(architectCore)).toEqual([]);
+          });
+        },
+      );
 
       RuleScenario(
         'architect-projection canonical projection entrypoints remain public',

@@ -1,69 +1,112 @@
 import { describeFeature, loadFeature } from '@amiceli/vitest-cucumber';
+import { Graph as CoreGraph } from '@libar-dev/architect-core/graph';
 import { expect } from 'vitest';
 
+import { loadGraph } from '../../../packages/architect-cli/src/handle/graph.js';
 import { runCLI, type CLIResult } from '../../support/helpers/cli-runner.js';
+import {
+  EXPECTED_STRICT_DANGLING,
+  GRAPH_HANDLE_BATTERY_SCRIPT,
+  parseBattery,
+  parseMigratedHandle,
+  parseStrictDangling,
+} from '../../support/helpers/graph-handle-contract.js';
 
 const feature = await loadFeature('tests/features/cli/graph-handle.feature');
 
 const GRAPH_CLI = 'graph-cli';
 const BASE = ['--base-dir', '.'];
-// One script, one graph build, four independently-asserted invariants.
-const BATTERY_SCRIPT = `
-const dangling = g.driftFlags(() => true).dangling.length;
-const specs = g.specsReverifying(g.patterns.map((p) => p.name));
-const incoherent =
-  specs.filter((s) => s.provenance === 'executable' && s.maturity !== 'executable').length +
-  specs.filter((s) => s.provenance === 'authored' && s.maturity === 'executable').length;
-const adapters =
-  g.bySymbol('ProjectionBundle').definedIn.length > 0 && g.findByConcept('taxonomy').length > 0;
-const specBridge = g.patterns
-  .filter((p) => p.implementedBy.length > 0)
-  .slice(0, 50)
-  .some((p) => g.invariantsOf(p.name).length > 0);
-return JSON.stringify({ dangling, incoherent, adapters, specBridge });
-`;
-
 let lastResult: CLIResult | null = null;
-const battery = (): {
-  dangling: number;
-  incoherent: number;
-  adapters: boolean;
-  specBridge: boolean;
-} =>
-  JSON.parse((lastResult?.stdout ?? '').trim()) as {
-    dangling: number;
-    incoherent: number;
-    adapters: boolean;
-    specBridge: boolean;
-  };
+let composedGraph: CoreGraph | null = null;
+let mutationResult: CLIResult | null = null;
+let freshResult: CLIResult | null = null;
+const battery = () => parseBattery((lastResult?.stdout ?? '').trim());
 
 describeFeature(feature, ({ AfterEachScenario, Rule }) => {
   AfterEachScenario(() => {
     lastResult = null;
+    composedGraph = null;
+    mutationResult = null;
+    freshResult = null;
   });
 
   Rule('The q front door evaluates agent scripts against the live graph', ({ RuleScenario }) => {
     RuleScenario('argv expression round-trips against the live graph', ({ When, Then, And }) => {
-      When('I run the graph CLI with q expression "g.patterns.length"', async () => {
-        lastResult = await runCLI(GRAPH_CLI, [...BASE, 'q', 'g.patterns.length'], {
+      When('I run the graph CLI with q expression "g.pattern(\'GraphHandle\')?.name"', async () => {
+        lastResult = await runCLI(GRAPH_CLI, [...BASE, 'q', "g.pattern('GraphHandle')?.name"], {
           timeout: 120000,
         });
       });
       Then('the exit code is zero', () => {
         expect(lastResult?.exitCode).toBe(0);
       });
-      And('stdout is a number greater than 300', () => {
-        expect(Number((lastResult?.stdout ?? '').trim())).toBeGreaterThan(300);
+      And('stdout is "GraphHandle"', () => {
+        expect((lastResult?.stdout ?? '').trim()).toBe('GraphHandle');
       });
     });
 
+    RuleScenario('the CLI composes the public core Graph', ({ When, Then, And }) => {
+      When('I load the CLI graph composition', async () => {
+        composedGraph = await loadGraph(process.cwd());
+      });
+      Then('the handle is the public core Graph', () => {
+        expect(composedGraph).toBeInstanceOf(CoreGraph);
+      });
+      And('the handle has no api field', () => {
+        expect(composedGraph === null ? undefined : 'api' in composedGraph).toBe(false);
+      });
+      And('the canonical graph and FSM are frozen', () => {
+        expect(Object.isFrozen(composedGraph?.graph)).toBe(true);
+        expect(Object.isFrozen(composedGraph?.fsm)).toBe(true);
+      });
+      And('deferred patterns have plan maturity', () => {
+        expect(
+          composedGraph?.patterns
+            .filter((pattern) => pattern.status === 'deferred')
+            .every((pattern) => pattern.maturity === 'plan'),
+        ).toBe(true);
+      });
+    });
+
+    RuleScenario(
+      'the migrated handle exposes canonical graph and FSM values',
+      ({ When, Then, And }) => {
+        When('I run the migrated handle characterization', async () => {
+          const script = `return JSON.stringify({
+  hasApi: 'api' in g,
+  hasFsm: typeof g.fsm?.isValidTransition,
+  frozen: Object.isFrozen(g.graph),
+  deferred: g.patterns
+    .filter((p) => p.status === 'deferred')
+    .every((p) => p.maturity === 'plan'),
+})`;
+          lastResult = await runCLI(GRAPH_CLI, [...BASE, 'q', script], { timeout: 120000 });
+        });
+        Then('the exit code is zero', () => {
+          expect(lastResult?.exitCode).toBe(0);
+        });
+        And('the characterization reports api is absent', () => {
+          expect(parseMigratedHandle(lastResult?.stdout ?? '{}').hasApi).toBe(false);
+        });
+        And('the characterization reports FSM is available', () => {
+          expect(parseMigratedHandle(lastResult?.stdout ?? '{}').hasFsm).toBe('function');
+        });
+        And('the characterization reports canonical graph is frozen', () => {
+          expect(parseMigratedHandle(lastResult?.stdout ?? '{}').frozen).toBe(true);
+        });
+        And('the characterization reports deferred maturity is plan', () => {
+          expect(parseMigratedHandle(lastResult?.stdout ?? '{}').deferred).toBe(true);
+        });
+      },
+    );
+
     RuleScenario('argv multi-statement body round-trips', ({ When, Then, And }) => {
       When(
-        'I run the graph CLI with q expression "const n = g.patterns.length; return n > 0"',
+        'I run the graph CLI with q expression "const p = g.pattern(\'GraphHandle\'); return p?.name"',
         async () => {
           lastResult = await runCLI(
             GRAPH_CLI,
-            [...BASE, 'q', 'const n = g.patterns.length; return n > 0'],
+            [...BASE, 'q', "const p = g.pattern('GraphHandle'); return p?.name"],
             { timeout: 120000 },
           );
         },
@@ -71,23 +114,62 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
       Then('the exit code is zero', () => {
         expect(lastResult?.exitCode).toBe(0);
       });
-      And('stdout is "true"', () => {
-        expect((lastResult?.stdout ?? '').trim()).toBe('true');
+      And('stdout is "GraphHandle"', () => {
+        expect((lastResult?.stdout ?? '').trim()).toBe('GraphHandle');
       });
     });
 
     RuleScenario('stdin script round-trips', ({ When, Then, And }) => {
-      When('I pipe a script returning the pattern count into the graph CLI', async () => {
+      When('I pipe a script returning the GraphHandle sentinel into the graph CLI', async () => {
         lastResult = await runCLI(GRAPH_CLI, [...BASE, 'q'], {
           timeout: 120000,
-          stdin: 'const n = g.patterns.length;\nreturn n;\n',
+          stdin: "return g.pattern('GraphHandle')?.name;\n",
         });
       });
       Then('the exit code is zero', () => {
         expect(lastResult?.exitCode).toBe(0);
       });
-      And('stdout is a number greater than 300', () => {
-        expect(Number((lastResult?.stdout ?? '').trim())).toBeGreaterThan(300);
+      And('stdout is "GraphHandle"', () => {
+        expect((lastResult?.stdout ?? '').trim()).toBe('GraphHandle');
+      });
+    });
+
+    RuleScenario('the removed api field fails loud', ({ When, Then, And }) => {
+      When('I run the graph CLI with q expression "return g.api.getStatusCounts()"', async () => {
+        lastResult = await runCLI(GRAPH_CLI, [...BASE, 'q', 'return g.api.getStatusCounts()'], {
+          timeout: 120000,
+        });
+      });
+      Then('the exit code is non-zero', () => {
+        expect(lastResult?.exitCode).not.toBe(0);
+      });
+      And('stderr mentions "getStatusCounts"', () => {
+        expect(lastResult?.stderr ?? '').toContain('getStatusCounts');
+      });
+    });
+
+    RuleScenario('canonical graph mutation cannot corrupt a fresh read', ({ When, Then, And }) => {
+      When('I attempt canonical graph mutation through q', async () => {
+        mutationResult = await runCLI(
+          GRAPH_CLI,
+          [
+            ...BASE,
+            'q',
+            'g.graph.patterns[0].name="Mutated"; return g.pattern("GraphHandle")?.name',
+          ],
+          { timeout: 120000 },
+        );
+        freshResult = await runCLI(GRAPH_CLI, [...BASE, 'q', 'g.pattern("GraphHandle")?.name'], {
+          timeout: 120000,
+        });
+      });
+      Then('mutation throws or the GraphHandle sentinel remains unchanged', () => {
+        expect(
+          mutationResult?.exitCode !== 0 || mutationResult.stdout.trim() === 'GraphHandle',
+        ).toBe(true);
+      });
+      And('a fresh q invocation returns the GraphHandle sentinel', () => {
+        expect(freshResult).toEqual({ exitCode: 0, stdout: 'GraphHandle\n', stderr: '' });
       });
     });
 
@@ -114,7 +196,7 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
       When('I pipe the invariant battery script into the graph CLI', async () => {
         lastResult = await runCLI(GRAPH_CLI, [...BASE, 'q'], {
           timeout: 120000,
-          stdin: BATTERY_SCRIPT,
+          stdin: GRAPH_HANDLE_BATTERY_SCRIPT,
         });
       });
       Then('the exit code is zero', () => {
@@ -153,9 +235,9 @@ describeFeature(feature, ({ AfterEachScenario, Rule }) => {
       Then('the exit code is zero', () => {
         expect(lastResult?.exitCode).toBe(0);
       });
-      And('stdout parses as JSON with "drift" false', () => {
-        const doc = JSON.parse((lastResult?.stdout ?? '').trim()) as { drift?: unknown };
-        expect(doc.drift).toBe(false);
+      And('stdout matches the exact strict dangling JSON shape', () => {
+        const doc = parseStrictDangling((lastResult?.stdout ?? '').trim());
+        expect(doc).toEqual(EXPECTED_STRICT_DANGLING);
       });
     });
   });

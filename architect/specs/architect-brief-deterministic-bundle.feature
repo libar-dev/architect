@@ -30,18 +30,18 @@ Feature: ArchitectBriefDeterministicBundle
   1. The `SessionContextBundle` fragment already bundles 12 fields
      (patterns, metadata, specFiles, stubs, dependencies,
      sharedDependencies, consumers, architectureNeighbors, deliverables,
-     fsm, fsmByPattern, testFiles) but its shape varies by `--session`
-     filter -- planning returns minimal, design adds stubs, implement
+     fsm, fsmByPattern, testFiles) but its shape varies by the typed `session`
+     option -- planning returns minimal, design adds stubs, implement
      adds tests. Token-budget pressure (the original reason for
      filtering) has lapsed: Gemini Flash Lite handles 31.7k tokens at
      ~1s per `.plans/spec-review-data-api-matrix.md` § 7.9. The filter
      is now overhead, not value.
 
-  2. The `ScopeReadinessReport`, `BusinessRuleSet`, `OverviewDigest`,
-     and the (sibling-candidate) `ValueTransferState` fragments are
-     each their own MCP tool today. Composing them into one bundle is
-     mechanical -- pure projection composition over fragments that
-     already exist.
+  2. `ScopeReadinessReport`, `BusinessRuleSet`, and `OverviewDigest`
+     already exist and are exposed through typed MCP tools. The sibling
+     `ValueTransferState` candidate is a planned dependency: its fragment,
+     projection, and `architect_value_transfer` tool are all still pending.
+     Once it lands, composing the four is mechanical projection composition.
 
   3. Agent sessions already collapse to one graph-handle script
      (ADR-014), so the agent-side stitching problem is dissolved. The
@@ -51,15 +51,16 @@ Feature: ArchitectBriefDeterministicBundle
 
   **Solution:**
   Add a new `ArchitectBrief` fragment in the `execution-context`
-  subdomain that composes existing fragments via projection
-  composition. A single new MCP tool returns the full bundle:
+  subdomain that composes shipped fragments with the planned
+  `ValueTransferState` projection once that sibling candidate lands. A single
+  new MCP tool returns the full bundle:
 
   - `sessionContext: SessionContextBundle` -- existing fragment, **no
     longer filtered by session-type**; uniform shape for every caller
   - `scopeReadiness: ScopeReadinessReport` -- existing fragment, folded
-    in (replaces the standalone `scope-validate` call)
+    in (replaces a separate `architect_scope_validate` tool call)
   - `businessRules: BusinessRuleSet` -- existing fragment, folded in
-    (replaces the standalone `rules --pattern <P>` call)
+    (replaces a separate `architect_rules` tool call)
   - `valueTransfer: ValueTransferState` -- the sibling candidate's
     fragment, folded in so every brief surfaces anti-patterns
   - `taxonomySlice: TaxonomySlice` -- new pruned slice; tags the
@@ -67,8 +68,8 @@ Feature: ArchitectBriefDeterministicBundle
     full taxonomy read. Keeps token budget tight while making the
     tag choice surface visible at every brief.
   - `transitiveBlockers: BlockingEntry[]` -- graph traversal beyond
-    direct `blockedBy` (today's `arch blocking` is one-hop). Cycle-
-    safe; bounded depth.
+    the direct `blockedBy` entries exposed by `architect_arch_blocking`.
+    Cycle-safe; bounded depth.
   - `nextActions: NextActionHint[]` -- deterministic lookup over
     current bundle state. Each entry is a follow-up read suggestion plus a
     triggering condition observable in the bundle (e.g., "deletionReady
@@ -76,14 +77,13 @@ Feature: ArchitectBriefDeterministicBundle
     byte-for-byte across runs given identical graph state.
 
   Surfaces:
-  1. an `architect_brief` MCP tool (the typed machine sink) plus a `brief`
-     handle read — a named `architect` command only if a second machine
-     consumer requires the frozen contract (ADR-014).
-  2. `architect_brief` MCP tool with the same input shape.
-  3. Slash commands collapse from multi-call bash blocks to a single
-     `<cli-prefix> brief <pattern>` line. The skill bodies stop
-     enumerating "run these reads and stitch them" prose and start
-     interpreting the bundle.
+  1. `projectArchitectBrief` and `parseAndProjectArchitectBrief` as pure
+     projection entry points over the single read model.
+  2. An `architect_brief` MCP tool as the typed machine sink, with the
+     same validated input and deterministic output shape.
+  3. Graph-handle callers continue to use one `architect q` script over
+     `g.graph` and trusted pure kernels; this candidate adds no named CLI
+     command and does not widen the frozen ADR-014 handle contract.
 
   The tool accepts an optional `intent: string` parameter that is
   carried through unmodified to downstream consumers. The
@@ -93,12 +93,12 @@ Feature: ArchitectBriefDeterministicBundle
 
   **Business Value:**
   | Benefit | Impact |
-  | Single round-trip session-open | Slash commands collapse from 5 calls to 1; agent context shrinks proportionally |
+  | Single round-trip session-open | Typed machine consumers collapse from 5 tool calls to 1; caller context shrinks proportionally |
   | LLM enrichment lands on richer payload | Wave 1 `model_summary` summarises a bundled, anti-pattern-aware payload, not 5 raw fragments |
   | Anti-patterns visible at every session-open | `valueTransfer.antipatterns` is one structured field away from every plan/design/implement/review session |
   | Convention parity | Deterministic-first, LLM-second mirrors the existing "deterministic CLI / optional MCP enrichment" split elsewhere in the codebase |
   | ADR-006 conformant | No fragment data is re-derived; the bundle is composition over the Single Read Model |
-  | Reduced drift surface | One tool to maintain instead of 5 stitching points across 5 slash commands |
+  | Reduced drift surface | One typed bundle tool instead of repeated stitching across machine consumers |
 
   **Relationship to ModelEnrichedDataAPI:**
   This candidate carves out the **deterministic-bundling slice** of
@@ -110,12 +110,12 @@ Feature: ArchitectBriefDeterministicBundle
   | Owned by ArchitectBriefDeterministicBundle (this spec) | Owned by ModelEnrichedDataAPI (sibling spec) |
   | `architect_brief` tool proposal | `model_summary` LLM narrative slice |
   | Multi-endpoint deterministic composition | Provenance envelope (source/confidence/prompt-version/latency_ms) |
-  | Removal of `--session` type filtering | `intent` interpretation for prompt biasing |
+  | Removal of session-type filtering | `intent` interpretation for prompt biasing |
   | `taxonomySlice`, `transitiveBlockers`, deterministic `nextActions` | BYOK + Vercel AI SDK + OpenRouter wiring |
   | Single bundling round-trip | `architect_query` NL endpoint with tool-calling |
-  | Slash-command consolidation | LLM-advertised `model_hints` (deterministic `nextActions` is the deterministic counterpart) |
+  | Typed-tool consolidation | LLM-advertised `model_hints` (deterministic `nextActions` is the deterministic counterpart) |
   | Composition with `ValueTransferState` | Graceful degradation when `OPENROUTER_API_KEY` absent |
-  | `ArchitectBrief` fragment in `execution-context` subdomain | `ArchitectModelService` host-agnostic wrapper, `ModelEnrichedPatternGraphAPI` decorator, `architect-model` package |
+  | `ArchitectBrief` fragment in `execution-context` subdomain | `ArchitectModelService` host-agnostic wrapper, `ModelEnrichedGraph` decorator, `architect-model` package |
 
   Wave ordering becomes explicit: this candidate ships first
   (deterministic floor), then `ModelEnrichedDataAPI` MVP wraps it
@@ -147,17 +147,10 @@ Feature: ArchitectBriefDeterministicBundle
       | execution-context fragment barrel export | pending | packages/architect-projection/src/fragments/execution-context/index.ts | Yes | typecheck |
       | execution-context projection barrel export | pending | packages/architect-projection/src/projections/execution-context/index.ts | Yes | typecheck |
       | top-level fragments barrel export | pending | packages/architect-projection/src/fragments/index.ts | Yes | typecheck |
-      | brief MCP tool / handle read | pending | packages/architect-mcp/src/tool-registry.ts | Yes | integration |
       | architect_brief MCP tool definition | pending | packages/architect-mcp/src/tool-registry.ts | Yes | integration |
       | architect_brief MCP input shape | pending | packages/architect-mcp/src/tool-input-schemas.ts | Yes | integration |
       | architect_brief MCP handler | pending | packages/architect-mcp/src/tool-registry.ts | Yes | integration |
       | architect_brief metadata entry | pending | packages/architect-mcp/src/tool-metadata.ts | Yes | integration |
-      | Slash-command consolidation: plan.md | pending | packages/architect-claude-plugin/commands/plan.md | No | manual |
-      | Slash-command consolidation: design.md | pending | packages/architect-claude-plugin/commands/design.md | No | manual |
-      | Slash-command consolidation: implement.md | pending | packages/architect-claude-plugin/commands/implement.md | No | manual |
-      | Slash-command consolidation: review.md | pending | packages/architect-claude-plugin/commands/review.md | No | manual |
-      | Slash-command consolidation: handoff.md | pending | packages/architect-claude-plugin/commands/handoff.md | No | manual |
-      | brief read scenarios | pending | tests/features/cli/graph-handle.feature | Yes | integration |
       | MCP architect_brief scenarios | pending | packages/architect-mcp/tests/features/architect-mcp-integration.feature.steps.ts | Yes | integration |
 
   # ============================================================================
@@ -174,7 +167,7 @@ Feature: ArchitectBriefDeterministicBundle
     are composed, which fields are populated, or how data is shaped.
 
     **Rationale:** Token-budget pressure (the original reason for
-    `--session <T>` filtering) lapsed when hosted Gemini Flash Lite
+    session-type filtering) lapsed when hosted Gemini Flash Lite
     demonstrated ~1s response across the full Studio rule corpus
     (31.7k tokens). Caller intent steers narrative, not evidence. A
     reviewer needs the same facts as an implementer; the reviewer just
@@ -203,44 +196,40 @@ Feature: ArchitectBriefDeterministicBundle
       Then the response carries the intent string unchanged in a top-level field
 
   # ============================================================================
-  # RULE 2: Single Round-Trip Replaces Multi-Verb Stitching
+  # RULE 2: Single Typed Call Replaces Multi-Tool Stitching
   # ============================================================================
 
   Rule: One brief call returns sufficient state for any session type to proceed
 
-    **Invariant:** A single `architect_brief <pattern>` call returns
-    every field a plan, design, implement, review, or handoff session
-    needs to begin work without invoking other deterministic reads. The
-    bundle is the union (not a subset) of what `overview` (relevant
-    parts), `context --session <any>`, `scope-validate`, `dep-tree`,
-    `files [--related]`, `rules --pattern <P>`, and `arch blocking`
-    return for the focal pattern, plus the value-transfer state and
-    taxonomy slice. Any additional verb call after the brief is by
-    choice (drill-down), not by necessity.
+    **Invariant:** A single `architect_brief` MCP call returns every field a
+    plan, design, implement, review, or handoff consumer needs to begin work
+    without invoking other deterministic tools. The bundle is the union (not a
+    subset) of the relevant payloads from `architect_overview`,
+    `architect_context`, `architect_scope_validate`, `architect_dep_tree`,
+    `architect_files`, `architect_rules`, and `architect_arch_blocking`, plus
+    the value-transfer state and taxonomy slice. Any additional typed tool call
+    after the brief is optional drill-down, not a prerequisite.
 
-    **Rationale:** This is the load-bearing property that justifies
-    the candidate's existence. If the bundle is missing fields that
-    common sessions need, slash commands keep stitching and the
-    consolidation never lands. The exhaustiveness criterion is
-    enforced at test time by exercising every slash-command bootstrap
-    sequence against the brief response and asserting no other CLI
-    call would have added information.
+    **Rationale:** This is the load-bearing property that justifies the
+    candidate's existence. If the bundle is missing fields common sessions
+    need, machine consumers keep stitching and the consolidation never lands.
+    Exhaustiveness tests compare the composed brief with the existing typed
+    projection and MCP outputs rather than relying on a command dispatcher.
 
-    **Verified by:** Bundle exhaustiveness tests covering each slash-
-    command bootstrap, Slash command markdown updated to single
-    `<cli-prefix> brief <pattern>` line per command
+    **Verified by:** Bundle exhaustiveness tests cover every constituent
+    projection, architect_brief integration returns the full typed bundle
 
     @acceptance-criteria @happy-path
-    Scenario: Bundle covers the union of slash-command bootstraps
+    Scenario: Bundle covers the union of typed session reads
       Given a pattern Foo
       When I project ArchitectBrief for Foo
-      Then the response contains every field that overview, scope-validate, context, dep-tree, files, and rules would have returned for Foo
+      Then the response contains every relevant field from architect_overview, architect_context, architect_scope_validate, architect_dep_tree, architect_files, architect_rules, and architect_arch_blocking for Foo
 
     @acceptance-criteria @happy-path
-    Scenario: Slash command consolidation collapses to one verb
-      Given the plan / design / implement / review / handoff slash command markdown files
-      When the consolidation deliverable is complete
-      Then each command's bootstrap block contains exactly one Data API call: `<cli-prefix> brief <pattern>`
+    Scenario: Typed machine consumer opens a session in one call
+      Given the architect_brief MCP tool is registered
+      When a caller invokes architect_brief for "Foo"
+      Then the caller receives the complete ArchitectBrief projection without another tool call
 
   # ============================================================================
   # RULE 3: Bundling Is Composition, Not Re-Derivation
@@ -248,11 +237,12 @@ Feature: ArchitectBriefDeterministicBundle
 
   Rule: ArchitectBrief is composed from existing fragments via projection composition
 
-    **Invariant:** Every field in `ArchitectBrief` is sourced from an
-    existing projection function (`projectSessionContextBundle`,
-    `projectScopeReadinessReport`, `projectBusinessRuleSet`,
-    `projectValueTransferState`, `projectTaxonomySlice`) or from a
-    deterministic helper (`computeTransitiveBlockers`,
+    **Invariant:** Every field in `ArchitectBrief` is sourced from a
+    shipped projection function (`projectSessionContextBundle`,
+    `projectScopeReadinessReport`, `projectBusinessRuleSet`), from this
+    candidate's planned `projectTaxonomySlice`, from the sibling candidate's
+    planned `projectValueTransferState`, or from a deterministic helper
+    (`computeTransitiveBlockers`,
     `deriveNextActions`) that itself reads only from the
     `PatternGraph`. No field is computed by re-walking the scanner
     output, re-deriving relationships, or constructing a parallel
@@ -295,8 +285,8 @@ Feature: ArchitectBriefDeterministicBundle
     proposes `model_hints` as LLM-advertised follow-ups. The
     deterministic counterpart of "what should I do next?" is a
     pure function over current state. Studio Dashboard, future
-    GitHub Action, and the slash commands all benefit from this
-    structured output without paying the LLM round-trip. When the
+    GitHub Action, and typed MCP consumers all benefit from this structured
+    output without paying the LLM round-trip. When the
     LLM `model_hints` ships in wave 2, it has the deterministic
     `nextActions` as a known floor it cannot regress past.
 
@@ -314,13 +304,13 @@ Feature: ArchitectBriefDeterministicBundle
     Scenario: Zombie spec triggers deletion suggestion
       Given a pattern Bar with valueTransfer.antipatterns containing "zombie-design-spec" and deletionReady true
       When I project ArchitectBrief for Bar
-      Then nextActions contains an entry whose verb is `git rm <designSpecPath>`
+      Then nextActions contains an entry whose action is `git rm <designSpecPath>`
 
     @acceptance-criteria @happy-path
     Scenario: Blocked pattern triggers blocker drill-down
       Given a pattern Baz with non-empty transitiveBlockers
       When I project ArchitectBrief for Baz
-      Then nextActions contains an entry whose verb begins with `<cli-prefix> dep-tree`
+      Then nextActions contains an entry suggesting the `architect_dep_tree` tool for Baz
 
   # ============================================================================
   # RULE 5: TaxonomySlice Is Pruned, With Pointer to Full Taxonomy
@@ -374,13 +364,11 @@ Feature: ArchitectBriefDeterministicBundle
   # under budget). Confirm with empirical measurement once the bundle
   # is wired.
   #
-  # Q-BRIEF-VS-CONTEXT: Keep `context --session <T>` verb alongside
-  # `brief` (different audiences -- e.g., scripts that want only the
-  # session context), or deprecate `context`? Brief is a strict superset
-  # of context. Deprecation conflicts with the no-BC rule for the CLI
-  # surface (`COMMAND_NAMES` is a Zod enum). Recommendation: both verbs
-  # coexist permanently; document `context` as a narrower projection
-  # for callers who don't need the full bundle.
+  # Q-BRIEF-VS-CONTEXT: Keep the typed `architect_context` MCP tool
+  # alongside `architect_brief` for consumers that want only session context?
+  # Brief is a strict superset, but the two tools expose different frozen typed
+  # contracts. Recommendation: both tools coexist; document
+  # `architect_context` as the narrower projection.
   #
   # Q-NEXT-ACTIONS-CAP: Cap `nextActions` length? E.g., top-3 most
   # relevant by predicate priority. Avoids overwhelming smaller agents.
@@ -389,7 +377,7 @@ Feature: ArchitectBriefDeterministicBundle
   #
   # Q-MCP-TOOL-NAME-RECONCILIATION: The `model-enriched-data-api.feature`
   # spec already proposes `architect_brief` as an MCP tool name. After
-  # this candidate lands, that name belongs to the deterministic verb
+  # this candidate lands, that name belongs to the deterministic MCP tool
   # specified here; the LLM enrichment in `ModelEnrichedDataAPI` decorates
   # it (returning the same shape plus `model_summary` / `model_hints`
   # when configured). Confirm the cleanup sweep removes the deterministic-
@@ -402,19 +390,21 @@ Feature: ArchitectBriefDeterministicBundle
   # are added later. Recommendation: top-level for MVP, with the option
   # of moving to an envelope if `architect_query` shares the shape.
   #
-  # Q-BRIEF-WITHOUT-FOCAL-PATTERN: Should the verb support a no-pattern
-  # form returning a graph-wide brief (overview + arch-blocking + every
+  # Q-BRIEF-WITHOUT-FOCAL-PATTERN: Should the tool support a no-pattern
+  # form returning a graph-wide brief (overview + blocking + every
   # pattern's value-transfer rollup)? Out of scope for this candidate;
   # may motivate a separate `architect_dashboard_brief` candidate paired
   # with the `ValueTransferRollup` Q from the sibling spec.
   #
-  # Q-TOKEN-BUDGET-SIGNAL: Should the brief (and the sibling read verbs
-  # bundle / pattern / arch) emit a deterministic token-budget signal --
-  # an estimated payload size plus an over/under-budget flag -- so a
-  # caller can tell whether the response fits its context window before
-  # reading, and self-route to a narrower verb when it does not? The
-  # estimate is heuristic (chars/4, already shipped behind `bundle
-  # --estimate-tokens`); generalising it as a structured field with an
+  # Q-TOKEN-BUDGET-SIGNAL: Should the brief (and sibling typed MCP tools)
+  # emit a deterministic token-budget signal -- an estimated payload size
+  # plus an over/under-budget flag -- so a caller can tell whether the
+  # response fits its context window before reading, and self-route to a
+  # narrower projection when it does not? The
+  # estimate is heuristic (chars/4, already shipped through the typed
+  # `architect_bundle` input `{ estimateTokens: true }` and the equivalent
+  # pure `PatternBundle` projection option); generalising it as a structured
+  # field with an
   # overflow/underflow flag is the open part. Keep it deterministic (no
   # model call); defer until the brief payload shape settles so the
   # estimate measures the real bundle.

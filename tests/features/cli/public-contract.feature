@@ -4,19 +4,22 @@
 @architect-product-area:DataAPI
 @cli @contracts
 Feature: Architect public contract exports
-  Freeze the canonical public exports that refactors must preserve.
+  Freeze the canonical public exports that refactors must preserve and reject
+  removed facade compatibility paths.
 
   Rule: architect-core and architect-projection keep canonical exports importable
 
-    **Invariant:** Key `@libar-dev/architect-core` query exports and canonical
-    `@libar-dev/architect-projection` entrypoints remain publicly importable.
-    **Rationale:** CLI, MCP, and downstream consumers rely on the current package
-    surface while internals continue to evolve.
-    **Verified by:** architect-core query contract exports remain available, architect-projection canonical projection entrypoints remain public, architect-projection barrel exposes only the validated architecture entrypoint
+    **Invariant:** `@libar-dev/architect-core/graph`, graph construction, FSM,
+    dependency, rule, decision, and package kernels remain public while every
+    legacy facade and result-envelope export is absent at runtime.
+    **Rationale:** Callers should use the frozen Graph and named pure kernels,
+    with no parallel compatibility API that can drift from the canonical graph.
+    **Verified by:** architect-core graph and pure-kernel exports replace the legacy facade, architect-projection canonical projection entrypoints remain public, architect-projection barrel exposes only the validated architecture entrypoint
 
     @contract
-    Scenario: architect-core query contract exports remain available
-      Then architect-core query contract exports remain available
+    Scenario: architect-core graph and pure-kernel exports replace the legacy facade
+      Then architect-core graph and pure-kernel exports are available
+      And architect-core legacy facade exports are absent
 
     @contract
     Scenario: architect-projection canonical projection entrypoints remain public

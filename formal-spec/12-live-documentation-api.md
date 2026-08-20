@@ -83,9 +83,14 @@ CONFIG → SCANNER → EXTRACTOR → PATTERN GRAPH → PROJECTION → ┐
 
 ### Tool: `architect_documentation`
 
-A single parameterized MCP tool that invokes any registered documentation projection and
-returns a `RenderableDocument`. The CLI counterpart is
-`pnpm architect:query documentation <document-type> [--disclosure <level>] [--filter <status=csv>]…`.
+A single parameterized MCP tool invokes any registered documentation projection and
+returns a `RenderableDocument`. The CLI does not duplicate this typed tool. Use the graph
+handle for live graph cuts and the documentation generator for static projection output:
+
+```bash
+pnpm architect:q 'g.graph.counts'
+pnpm exec architect-generate --base-dir . -g patterns --check
+```
 
 | Parameter      | Type   | Required | Description                                                                                        |
 | -------------- | ------ | -------- | -------------------------------------------------------------------------------------------------- |

@@ -232,7 +232,7 @@ values. The taxonomy defines:
 
 A project's tag taxonomy is conveyed by its `architect.config.ts` (§11) — specifically
 the `roles`, `productAreas`, and any custom-tag entries — and SHOULD be queryable via
-the project's data API (`architect:query taxonomy` in the reference implementation).
+the project's live graph handle (`pnpm architect:q 'g.graph.tagRegistry'` in the reference implementation).
 Projects MAY additionally maintain an informative `architect/tag-taxonomy.md` document,
 but it is not required and the configuration is the source of truth. The tag taxonomy
 separates the **tag system** (how tags work — this document) from the **tag registry**

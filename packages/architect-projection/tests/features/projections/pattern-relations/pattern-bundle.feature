@@ -43,8 +43,9 @@ Feature: Pattern bundle projection
     derived `implementedBy` reverse edge.
 
     **Rationale:** The bundle sources rules through the feature-scoped rule set;
-    reverse-trace through `implementedBy` means `bundle <TsPattern> --mode review`
-    is no longer empty just because the focal node owns no rules (ADR-002).
+    reverse-trace through `implementedBy` means a review-mode projection (including
+    the `architect_bundle` MCP tool with `mode: "review"`) is no longer empty just
+    because the focal node owns no rules (ADR-002).
 
     **Verified by:** review bundle for a TS pattern surfaces the realizing feature rules
 

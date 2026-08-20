@@ -197,7 +197,7 @@ candidate ──┴──► roadmap ──► active ──► completed
 Verify any transition before flipping:
 
 ```bash
-pnpm architect:q 'g.api.isValidTransition("<from>", "<to>")'   # deterministic boolean
+pnpm architect:q 'g.fsm.isValidTransition("<from>", "<to>")'   # deterministic boolean
 # scope-readiness (PASS/WARN/BLOCKED) remains available as the `architect_scope_validate` MCP tool
 ```
 
@@ -252,19 +252,19 @@ conclusion back. The full surface, recipes, and quirks live in the dedicated
 
 ```bash
 # Health / inventory / orientation
-pnpm architect:q 'g.api.getStatusCounts()'                        # status distribution
-pnpm architect:q 'g.api.getCurrentWork()'                         # active work
+pnpm architect:q 'g.graph.counts'                                 # status distribution
+pnpm architect:q 'g.patterns.filter(p => p.status === "active")'  # active work
 pnpm architect:graph census                                       # annotation coverage per package
 pnpm architect:q 'g.findByConcept("taxonomy").slice(0,5)'         # fuzzy concept → patterns
 
 # Per-pattern detail
 pnpm architect:q 'g.pattern("<Name>")'                            # need-shaped node (status, edges, maturity)
-pnpm architect:q 'g.api.getPattern("<Name>")'                     # full canonical record
+pnpm architect:q 'g.graph.patterns.find(p => p.name === "<Name>")' # full canonical record
 pnpm architect:q 'g.invariantsOf("<Name>")'                       # what it guarantees, exec vs authored
 pnpm architect:q 'g.specsReverifying(["<Name>"])'                 # what re-verifies if it changes
 
 # Gates (deterministic)
-pnpm architect:q 'g.api.isValidTransition("<from>","<to>")'       # FSM boolean
+pnpm architect:q 'g.fsm.isValidTransition("<from>","<to>")'       # FSM boolean
 pnpm architect:graph dangling --baseline <path> --strict          # non-zero exit on drift (the CI gate)
 
 # Impact / architecture cuts
@@ -291,14 +291,14 @@ trusting a count cached here.
 - `g.invariantsOf(x) === []` does NOT mean "guarantees nothing" — code-originated contracts
   carry their guarantee as a TS type, not a Gherkin Rule (the GUARANTEE recipe disambiguates).
 - `g.pattern("<Name>") === undefined` can mean parse failure OR doesn't exist — cross-check
-  with `g.findByConcept` and `g.api.getPatternParseFailure("<Name>")`.
+  with `g.findByConcept` and `g.graph.featureParseFailures?.find(f => f.patternName === "<Name>")`.
 
 ## 15. Bootstrap discipline (every session)
 
 Orient from the live graph, not from file scanning. A cheap first read:
 
 ```bash
-pnpm architect:q 'return {counts: g.api.getStatusCounts(), active: g.api.getCurrentWork().map(p => p.patternName ?? p.name)}'
+pnpm architect:q 'return {counts: g.graph.counts, active: g.patterns.filter(p => p.status === "active").map(p => p.name)}'
 ```
 
 If a pattern name is in scope:

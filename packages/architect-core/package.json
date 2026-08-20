@@ -33,6 +33,11 @@
       "types": "./dist/config/index.d.ts",
       "import": "./dist/config/index.js"
     },
+    "./graph": {
+      "source": "./src/graph/index.ts",
+      "types": "./dist/graph/index.d.ts",
+      "import": "./dist/graph/index.js"
+    },
     "./package.json": "./package.json"
   },
   "scripts": {

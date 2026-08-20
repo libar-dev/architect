@@ -1,6 +1,6 @@
 ---
 name: architect-graph-handle
-description: THE agent read surface over the live PatternGraph for this Architect repo (ADR-014 — the verb CLI is retired). Load whenever you need graph state — a pattern's status/deps/rules, an architectural slice, neighborhoods, blast radius of a diff, what a pattern guarantees, which specs re-verify a change — or when you would otherwise grep/Read across files to learn the architecture. One command (`pnpm architect:q '<js>'`) builds the graph live in-process and hands you `g`, a typed object whose methods return plain composable data; you script the cut in plain JS instead of calling pre-baked verbs. `g.api` carries the canonical PatternGraphAPI, so every deterministic read (including `isValidTransition`) is one script away. Ordinary grep over annotated source remains the complement for content-level search; MCP `architect_*` tools remain for burst-mode/Studio use.
+description: THE agent read surface over the live PatternGraph for this Architect repo (ADR-014 — the verb CLI is retired). Load whenever you need graph state — a pattern's status/deps/rules, an architectural slice, neighborhoods, blast radius of a diff, what a pattern guarantees, which specs re-verify a change — or when you would otherwise grep/Read across files to learn the architecture. One command (`pnpm architect:q '<js>'`) builds the graph live in-process and hands you `g`, a typed object whose methods return plain composable data; you script the cut in plain JS instead of calling pre-baked verbs. The complete frozen read model is `g.graph`, deterministic transition operations are `g.fsm`, and reusable read algorithms stay pure core functions. Ordinary grep over annotated source remains the complement for content-level search; MCP `architect_*` tools remain for burst-mode/Studio use.
 allowed-tools:
   - Bash
   - Read
@@ -53,9 +53,13 @@ g.patterns              // PatternNode[] — {name, status, maturity, role, boun
                         //   implements[], enforcesDecisions[], ruleCount, scenarioCount}
 g.pattern(name)         // one PatternNode | undefined
 g.fileToPattern(file)   // repo-rel .ts → owning pattern name | undefined
-g.api                   // the canonical PatternGraphAPI (ADR-006 read side) over the same build:
-                        //   g.api.getPattern(n) · g.api.getStatusCounts() · g.api.getCurrentWork()
-                        //   g.api.isValidTransition(from, to)  ← the deterministic FSM gate
+g.graph                 // complete, deeply frozen PatternGraph (ADR-006 read side):
+                        //   .patterns · .counts · .byStatus · .byNormalizedStatus
+                        //   .relationshipIndex · .tagRegistry · .archIndex
+
+g.fsm                   // four deterministic transition operations:
+                        //   .isValidTransition · .validateTransition
+                        //   .getValidTransitionsFrom · .getProtectionSummary
 
 // entry adapters — the grep→graph bridge (you start from a string / file / symbol, not a name):
 g.findByConcept('rate limiter')   // fuzzy concept → ranked curated patterns (+ why each matched)
@@ -69,6 +73,8 @@ g.blastRadius(changedFiles)       // exhaustive impact over the substrate (+ .at
 
 // curation-assist:
 g.fanInCandidates() · g.graphDiff() · g.census() · g.driftFlags(existsFn)
+
+`g.mech` imports are diagnostic context, not authored architecture. Dark imports default to no action; only add a curated edge when the significance rubric shows an intentional architectural dependency.
 
 // escape hatches — the raw shapes, never hidden:
 g.authored              // {patterns, relationshipIndex}  (the curated core)
@@ -87,18 +93,19 @@ bySymbol →  { symbol, definedIn[{file,kind,pkg,pattern?}], importedByFiles[], 
 `provenance` is `'executable'` (a live test proves it) or `'authored'` (a working-spec).
 `cohort` is present only when the realizing feature covers >1 pattern (the result isn't
 specific to your one query). Full field shapes live in
-`packages/architect-cli/src/handle/schema.ts` + `graph.ts`.
+`packages/architect-core/src/graph/schema.ts` + `graph.ts`. The published pure contract is
+`@libar-dev/architect-core/graph`; source/config/git IO remains in `architect-cli`.
 
 ## Where to reach — the decision guide
 
 | You're starting from…                    | want…                               | reach for                                                      |
 | ---------------------------------------- | ----------------------------------- | -------------------------------------------------------------- |
-| a pattern **name**                       | its state / deps / rules            | `g.pattern` / `g.api.getPattern` / `g.invariantsOf`            |
+| a pattern **name**                       | its state / deps / rules            | `g.pattern` / `g.graph.relationshipIndex` / `g.invariantsOf`   |
 | a **concept string**                     | which patterns relate               | `g.findByConcept`                                              |
 | a **file**                               | owner + neighborhood (even if dark) | `g.byFile`                                                     |
 | a **symbol**                             | architectural usage                 | `g.bySymbol`                                                   |
 | a **diff / changeset**                   | impact + which specs re-verify      | `g.blastRadius` / `g.specsReverifying`                         |
-| an **FSM transition**                    | is it legal?                        | `g.api.isValidTransition(from, to)`                            |
+| an **FSM transition**                    | is it legal?                        | `g.fsm.isValidTransition(from, to)`                            |
 | a **custom cross-cut**                   | a slice no method pre-bakes         | script it (see [references/recipes.md](references/recipes.md)) |
 | **file contents** (strings, code idioms) | textual matches                     | plain grep — the graph doesn't index bodies                    |
 | a **burst** of ≥5 typed reads, or Studio | stable typed tools                  | the `architect_*` MCP surface                                  |
@@ -122,8 +129,8 @@ pnpm architect:q 'g.findByConcept("taxonomy").slice(0,5).map(h => [h.name, h.sco
 
 ```bash
 pnpm architect:q 'g.pattern("GraphHandle")'                          # detail (need-shaped)
-pnpm architect:q 'g.api.getStatusCounts()'                           # status distribution
-pnpm architect:q 'g.api.isValidTransition("roadmap","active")'       # deterministic FSM gate
+pnpm architect:q 'g.graph.counts'                                    # status distribution
+pnpm architect:q 'g.fsm.isValidTransition("roadmap","active")'       # deterministic FSM gate
 pnpm architect:q 'g.patterns.filter(p => p.status === "active").map(p => p.name)'
 ```
 
@@ -131,7 +138,7 @@ pnpm architect:q 'g.patterns.filter(p => p.status === "active").map(p => p.name)
 
 ```bash
 # invariants of a pattern, each labeled live-test (executable) vs authored working-spec
-pnpm architect:q 'g.invariantsOf("PatternGraphApi").map(i => ({rule:i.rule, maturity:i.maturity, provenance:i.provenance}))'
+pnpm architect:q 'g.invariantsOf("GraphHandle").map(i => ({rule:i.rule, maturity:i.maturity, provenance:i.provenance}))'
 ```
 
 > **Honest nuance:** `invariantsOf` covers **Gherkin** invariants (Rule blocks). A
@@ -144,7 +151,7 @@ pnpm architect:q 'g.invariantsOf("PatternGraphApi").map(i => ({rule:i.rule, matu
 `playground/scratch/headline.ts` (no `import`; end with `return`), pipe it in:
 
 ```js
-const changed = ['packages/architect-core/src/read-api/pattern-graph-api.ts']; // or a git diff list
+const changed = ['packages/architect-core/src/graph/graph.ts']; // or a git diff list
 const b = g.blastRadius(changed);
 const specs = g.specsReverifying(changed);
 return {
@@ -177,7 +184,7 @@ pnpm architect:q 'const t = g.mech.edges.filter(e => e.typeOnly).length; return 
 ## Named commands (`pnpm architect:graph <cmd>`)
 
 ```bash
-pnpm architect:graph census       # node/edge annotation coverage
+pnpm architect:graph census       # curation candidates, then diagnostic node/edge coverage per package
 pnpm architect:graph diff         # mechanical ⋈ authored: shared / dark / aspirational
 pnpm architect:graph blast HEAD~8 # impact: downstream + at-risk specs of a diff
 pnpm architect:graph fan-in       # curation assist: load-bearing, uncurated modules
@@ -211,8 +218,8 @@ view fits, drop to `g.mech` / `g.authored` and script against the raw shapes.
 - [references/recipes.md](references/recipes.md) — the "script the rest" recipe set
   (STATE · I1 · MEMBERS · A1 · A2 · GUARANTEE · TRIAGE · IMPACT · DRIFT · COMPOSE · escape
   hatch) + the freeze-vs-script graduation bar.
-- `packages/architect-cli/src/handle/schema.ts` + `graph.ts` — the actual `g.*` methods +
-  field shapes (the type IS the discovery surface).
+- `packages/architect-core/src/graph/schema.ts` + `graph.ts` — the published Graph methods +
+  field shapes; `packages/architect-cli/src/handle/graph.ts` owns only live IO composition.
 - `architect/decisions/adr-014-agent-read-surface.feature` — the decision record (why the
   verb CLI is gone, what stayed frozen, the trust posture).
 - `playground/CONTEXT.md` — the experiment findings that proved this direction (two-surface

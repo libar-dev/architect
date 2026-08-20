@@ -4,7 +4,7 @@
 
 | Field | Value |
 | ----- | ----- |
-| Count | 317   |
+| Count | 321   |
 
 ## Filters
 
@@ -48,6 +48,7 @@
 - ArchitectureNavigationProjectionExecutableTests
 - ArchitectureNeighborhood
 - ArchitectureNeighborhoodProjection
+- ArchitectWorkspaceSources
 - ArgvHygiene
 - AstParser
 - AuthoredCoreBuilder
@@ -67,6 +68,7 @@
 - ChangelogProjection
 - ChangelogProjectionExecutableTests
 - CliCommandResolutionExecutableTests
+- CLIContextBuilder
 - CLIContextTypes
 - CLIErrorHandler
 - CliFlagParsingExecutableTests
@@ -82,7 +84,9 @@
 - ConfigurationAPI
 - ConfigValidationSchemas
 - ContextInference
+- CoreGraphExecutableTests
 - CrossPackageEdgeClassification
+- DanglingBaseline
 - DataAPIOutputShaping
 - DecisionCatalog
 - DecisionCatalogProjection
@@ -167,8 +171,6 @@
 - GraphHandle
 - GraphHandleCli
 - GraphHandleCliExecutableTests
-- GraphHandleShapes
-- GraphHandleViews
 - GraphInventory
 - GroupedRoutedBundleSupport
 - HandoffProjection
@@ -195,6 +197,7 @@
 - MaturityLevelDomain
 - MCPFileWatcher
 - MCPPipelineSession
+- MCPPipelineSessionDatasetLookupExecutableTests
 - MCPRuntimeHardeningExecutableTests
 - MCPServer
 - MCPServerBin
@@ -230,9 +233,7 @@
 - PatternDetailProjection
 - PatternDetailProjectionExecutableTests
 - PatternGraph
-- PatternGraphApi
-- PatternGraphApiConsistencyExecutableTests
-- PatternGraphApiReverseLookup
+- PatternGraphConsistencyExecutableTests
 - PatternHelpers
 - PatternReferenceContract
 - PatternReferenceValidation
@@ -271,6 +272,7 @@
 - ProjectionKernelRelationshipContractExecutableTests
 - ProjectionTrustBoundary
 - ReadApiResultContract
+- ReadKernelExecutableTests
 - RegistryBuilder
 - RelationshipResolver
 - RendererDispatchSmokeExecutableTests
@@ -306,6 +308,7 @@
 - StatusDistributionProjection
 - StatusNormalization
 - StatusValueDomain
+- StepLintContract
 - StubTaxonomyTagTests
 - TagDirectiveRegexBuilders
 - TagRegistrySchemas
@@ -328,6 +331,7 @@
 - UiRendererExecutableTests
 - ValidatePatternsCLI
 - ValidationModule
+- ValidationOutputSchemas
 - ValidationRuleDigest
 - ValidationRuleDigestProjection
 - ValidatorReadModelConsolidation
@@ -370,6 +374,7 @@
 | packages/architect-projection/tests/features/projections/pattern-relations/architecture-neighborhood.feature              | executable | ArchitectureNavigationProjectionExecutableTests       | projection | gherkin    | completed |
 | packages/architect-projection/src/fragments/pattern-relations/architecture-neighborhood.ts                                | design     | ArchitectureNeighborhood                              | contract   | typescript | active    |
 | packages/architect-projection/src/projections/pattern-relations/architecture-neighborhood.ts                              | executable | ArchitectureNeighborhoodProjection                    | projection | typescript | completed |
+| packages/architect-core/src/config/self-hosting.ts                                                                        | executable | ArchitectWorkspaceSources                             | contract   | typescript | completed |
 | packages/architect-core/src/utils/argv-hygiene.ts                                                                         | executable | ArgvHygiene                                           | utility    | typescript | completed |
 | packages/architect-core/src/scanner/ast-parser.ts                                                                         | design     | AstParser                                             | service    | typescript | active    |
 | packages/architect-cli/src/handle/authored.ts                                                                             | executable | AuthoredCoreBuilder                                   | service    | typescript | completed |
@@ -389,6 +394,7 @@
 | packages/architect-projection/src/projections/delivery-reporting/index.ts                                                 | executable | ChangelogProjection                                   | projection | typescript | completed |
 | packages/architect-projection/tests/features/projections/delivery-reporting/changelog.feature                             | executable | ChangelogProjectionExecutableTests                    | projection | gherkin    | completed |
 | packages/architect-cli/tests/features/cli-command-resolution.feature                                                      | executable | CliCommandResolutionExecutableTests                   |            | gherkin    | completed |
+| packages/architect-cli/src/cli/cli-runtime.ts                                                                             | executable | CLIContextBuilder                                     | service    | typescript | completed |
 | packages/architect-cli/src/cli/cli-types.ts                                                                               | executable | CLIContextTypes                                       | contract   | typescript | completed |
 | packages/architect-cli/src/cli/error-handler.ts                                                                           | executable | CLIErrorHandler                                       | utility    | typescript | completed |
 | packages/architect-cli/tests/features/cli-flag-parsing.feature                                                            | executable | CliFlagParsingExecutableTests                         |            | gherkin    | completed |
@@ -404,7 +410,9 @@
 | packages/architect-core/tests/features/config/configuration-api.feature                                                   | executable | ConfigurationAPI                                      |            | gherkin    | completed |
 | packages/architect-core/src/validation-schemas/config.ts                                                                  | executable | ConfigValidationSchemas                               | contract   | typescript | completed |
 | packages/architect-core/src/generators/pipeline/context-inference.ts                                                      | design     | ContextInference                                      | service    | typescript | active    |
+| packages/architect-core/tests/features/graph/graph.feature                                                                | executable | CoreGraphExecutableTests                              |            | gherkin    | completed |
 | packages/architect-core/tests/features/extractor/edge-classification.feature                                              | design     | CrossPackageEdgeClassification                        |            | gherkin    | active    |
+| packages/architect-guard/src/lint/dangling-baseline.ts                                                                    | executable | DanglingBaseline                                      | service    | typescript | completed |
 | tests/features/api/output-shaping/output-pipeline.feature                                                                 | executable | DataAPIOutputShaping                                  |            | gherkin    | completed |
 | packages/architect-projection/src/fragments/governance/decision-catalog.ts                                                | design     | DecisionCatalog                                       | contract   | typescript | active    |
 | packages/architect-projection/src/projections/governance/decision-records.ts                                              | executable | DecisionCatalogProjection                             | projection | typescript | completed |
@@ -489,8 +497,6 @@
 | packages/architect-cli/src/handle/graph.ts                                                                                | executable | GraphHandle                                           | service    | typescript | completed |
 | packages/architect-cli/src/cli/graph-cli.ts                                                                               | executable | GraphHandleCli                                        | service    | typescript | completed |
 | tests/features/cli/graph-handle.feature                                                                                   | executable | GraphHandleCliExecutableTests                         |            | gherkin    | completed |
-| packages/architect-cli/src/handle/schema.ts                                                                               | executable | GraphHandleShapes                                     | contract   | typescript | completed |
-| packages/architect-cli/src/handle/views.ts                                                                                | executable | GraphHandleViews                                      | service    | typescript | completed |
 | packages/architect-core/src/read-api/graph-inventory.ts                                                                   | design     | GraphInventory                                        | utility    | typescript | active    |
 | packages/architect-projection/src/projections/\_shared/grouped-routed-bundle.internal.ts                                  | design     | GroupedRoutedBundleSupport                            | service    | typescript | active    |
 | packages/architect-projection/src/projections/execution-context/handoff.ts                                                | executable | HandoffProjection                                     | projection | typescript | completed |
@@ -517,6 +523,7 @@
 | packages/architect-core/src/taxonomy/maturity-values.ts                                                                   | design     | MaturityLevelDomain                                   | contract   | typescript | active    |
 | packages/architect-mcp/src/file-watcher.ts                                                                                | executable | MCPFileWatcher                                        | utility    | typescript | completed |
 | packages/architect-mcp/src/pipeline-session.ts                                                                            | executable | MCPPipelineSession                                    | service    | typescript | completed |
+| packages/architect-mcp/tests/features/mcp-pipeline-session-no-facade.feature                                              | design     | MCPPipelineSessionDatasetLookupExecutableTests        |            | gherkin    | active    |
 | packages/architect-mcp/tests/features/mcp-runtime-hardening.feature                                                       | design     | MCPRuntimeHardeningExecutableTests                    |            | gherkin    | active    |
 | packages/architect-mcp/src/server.ts                                                                                      | executable | MCPServer                                             | service    | typescript | completed |
 | packages/architect-mcp/src/cli/mcp-server.ts                                                                              | executable | MCPServerBin                                          | utility    | typescript | completed |
@@ -552,9 +559,7 @@
 | packages/architect-projection/src/projections/pattern-relations/pattern-detail.ts                                         | executable | PatternDetailProjection                               | projection | typescript | completed |
 | packages/architect-projection/tests/features/projections/pattern-relations/pattern-detail.feature                         | executable | PatternDetailProjectionExecutableTests                | projection | gherkin    | completed |
 | packages/architect-core/src/validation-schemas/pattern-graph.ts                                                           | design     | PatternGraph                                          | contract   | typescript | active    |
-| packages/architect-core/src/read-api/pattern-graph-api.ts                                                                 | design     | PatternGraphApi                                       | utility    | typescript | active    |
-| packages/architect-core/tests/features/read-api/pattern-graph-api-consistency.feature                                     | design     | PatternGraphApiConsistencyExecutableTests             | utility    | gherkin    | active    |
-| packages/architect-core/tests/features/read-api/pattern-graph-api.feature                                                 | design     | PatternGraphApiReverseLookup                          |            | gherkin    | active    |
+| packages/architect-core/tests/features/graph/pattern-graph-consistency.feature                                            | design     | PatternGraphConsistencyExecutableTests                |            | gherkin    | active    |
 | packages/architect-core/src/read-api/pattern-helpers.ts                                                                   | design     | PatternHelpers                                        | utility    | typescript | active    |
 | packages/architect-core/src/validation-schemas/pattern-contract.ts                                                        | design     | PatternReferenceContract                              | contract   | typescript | active    |
 | packages/architect-core/tests/features/extractor/pattern-reference-validation.feature                                     | design     | PatternReferenceValidation                            |            | gherkin    | active    |
@@ -593,6 +598,7 @@
 | packages/architect-projection/tests/features/projections/pattern-relations/kernel-relationship-contract.feature           | design     | ProjectionKernelRelationshipContractExecutableTests   | projection | gherkin    | active    |
 | packages/architect-projection/src/projections/\_shared/parse-and-project.internal.ts                                      | design     | ProjectionTrustBoundary                               | service    | typescript | active    |
 | packages/architect-core/src/read-api/types.ts                                                                             | design     | ReadApiResultContract                                 | contract   | typescript | active    |
+| packages/architect-core/tests/features/read-api/read-kernels.feature                                                      | design     | ReadKernelExecutableTests                             |            | gherkin    | active    |
 | packages/architect-core/src/taxonomy/registry-builder.ts                                                                  | design     | RegistryBuilder                                       | utility    | typescript | active    |
 | packages/architect-core/src/generators/pipeline/relationship-resolver.ts                                                  | design     | RelationshipResolver                                  | service    | typescript | active    |
 | packages/architect-projection/tests/features/renderers/renderer-smoke.feature                                             | design     | RendererDispatchSmokeExecutableTests                  | projection | gherkin    | active    |
@@ -628,6 +634,7 @@
 | packages/architect-projection/src/projections/delivery-reporting/index.ts                                                 | executable | StatusDistributionProjection                          | projection | typescript | completed |
 | packages/architect-core/src/taxonomy/normalized-status.ts                                                                 | design     | StatusNormalization                                   | service    | typescript | active    |
 | packages/architect-core/src/taxonomy/status-values.ts                                                                     | design     | StatusValueDomain                                     | contract   | typescript | active    |
+| packages/architect-guard/src/lint/steps/types.ts                                                                          | executable | StepLintContract                                      | contract   | typescript | completed |
 | tests/features/api/stub-integration/taxonomy-tags.feature                                                                 | design     | StubTaxonomyTagTests                                  |            | gherkin    | active    |
 | packages/architect-core/src/config/regex-builders.ts                                                                      | executable | TagDirectiveRegexBuilders                             | utility    | typescript | completed |
 | packages/architect-core/src/validation-schemas/tag-registry.ts                                                            | design     | TagRegistrySchemas                                    | contract   | typescript | active    |
@@ -650,6 +657,7 @@
 | packages/architect-projection/tests/features/renderers/render-ui.feature                                                  | design     | UiRendererExecutableTests                             | projection | gherkin    | active    |
 | packages/architect-guard/src/cli/validate-patterns.ts                                                                     | executable | ValidatePatternsCLI                                   | service    | typescript | completed |
 | packages/architect-guard/src/validation/index.ts                                                                          | executable | ValidationModule                                      | barrel     | typescript | completed |
+| packages/architect-core/src/validation-schemas/output-schemas.ts                                                          | executable | ValidationOutputSchemas                               | contract   | typescript | completed |
 | packages/architect-projection/src/fragments/governance/validation-rule-digest.ts                                          | design     | ValidationRuleDigest                                  | contract   | typescript | active    |
 | packages/architect-projection/src/projections/governance/validation-rule-digest.ts                                        | executable | ValidationRuleDigestProjection                        | projection | typescript | completed |
 | tests/features/cli/validate-patterns.feature                                                                              | executable | ValidatorReadModelConsolidation                       |            | gherkin    | completed |

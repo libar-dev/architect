@@ -44,9 +44,11 @@ Feature: ValueTransferState
     to host
 
   Surfaces:
-  1. a `value-transfer <pattern>` read on the graph handle — a named `architect:graph` command only if a second machine consumer requires the frozen contract, else a recipe (ADR-014); governance sibling
-     of `rules` and `taxonomy`).
-  2. `architect_value_transfer` MCP tool with the same input shape.
+  1. `projectValueTransferState` and `parseAndProjectValueTransferState` as
+     pure projection entry points over the single read model.
+  2. `architect_value_transfer` MCP tool with the same validated input shape.
+     No named CLI command, graph-handle method, or q-import surface is added;
+     plain-JS q bodies cannot import this planned projection (ADR-014).
   3. The fragment is consumed by `ArchitectBriefDeterministicBundle`
      (sibling candidate) so every brief response surfaces the
      value-transfer state of the focal pattern, making the load-bearing
@@ -81,12 +83,11 @@ Feature: ValueTransferState
       | governance fragment barrel export | pending | packages/architect-projection/src/fragments/governance/index.ts | Yes | typecheck |
       | governance projection barrel export | pending | packages/architect-projection/src/projections/governance/index.ts | Yes | typecheck |
       | top-level fragments barrel export | pending | packages/architect-projection/src/fragments/index.ts | Yes | typecheck |
-      | value-transfer handle read | pending | packages/architect-cli/src/handle/graph.ts | Yes | integration |
       | architect_value_transfer MCP tool definition | pending | packages/architect-mcp/src/tool-registry.ts | Yes | integration |
       | architect_value_transfer MCP input shape | pending | packages/architect-mcp/src/tool-input-schemas.ts | Yes | integration |
       | architect_value_transfer MCP handler | pending | packages/architect-mcp/src/tool-registry.ts | Yes | integration |
       | architect_value_transfer metadata entry | pending | packages/architect-mcp/src/tool-metadata.ts | Yes | integration |
-      | handle value-transfer scenarios | pending | tests/features/cli/graph-handle.feature | Yes | integration |
+      | pure value-transfer projection scenarios | pending | packages/architect-projection/tests/features/projections/governance/value-transfer-state.feature | Yes | unit |
       | MCP architect_value_transfer scenarios | pending | packages/architect-mcp/tests/features/architect-mcp-integration.feature.steps.ts | Yes | integration |
 
   # ============================================================================
@@ -214,29 +215,29 @@ Feature: ValueTransferState
   # RULE 4: Output Behaviour Matches Governance-Subdomain Conventions
   # ============================================================================
 
-  Rule: the value-transfer read and architect_value_transfer tool follow rules / taxonomy conventions
+  Rule: the pure projection and architect_value_transfer tool follow governance conventions
 
-    **Invariant:** The handle read returns the plain `ValueTransferState`
-    fragment (no envelope — ADR-014). The MCP tool
-    returns the fragment via `renderJsonToolResult`, mirroring
-    `architect_rules` and `architect_taxonomy`. The MCP input shape is
-    composed via `createStrictReadonlyObjectSchema` referencing
-    `ValueTransferStateOptionsSchema.shape` -- single source of truth
-    for the option contract.
+    **Invariant:** `projectValueTransferState` returns a projection bundle whose
+    root is the plain `ValueTransferState` fragment. The MCP tool renders that
+    bundle through `renderJsonToolResult`, mirroring `architect_rules` and
+    `architect_taxonomy`. Its strict input schema is composed from
+    `ValueTransferStateOptionsSchema.shape`, keeping the planned projection and
+    typed-tool option contract single-sourced. No graph-handle operation is part
+    of this contract.
 
     **Rationale:** Sibling projections in the same DDD subdomain
-    (governance) expose identical surface conventions. Convention
-    parity > novelty.
+    (governance) expose identical projection and typed-MCP conventions.
+    Convention parity > novelty.
 
-    **Verified by:** handle value-transfer scenario, MCP
+    **Verified by:** pure value-transfer projection scenario, MCP
     architect_value_transfer scenario, MCP input schema is the
     spread of ValueTransferStateOptionsSchema.shape
 
     @acceptance-criteria @happy-path
-    Scenario: the handle read returns the plain fragment
-      When evaluating the value-transfer read for "<pattern>" on the graph handle
-      Then the result is the plain ValueTransferState fragment
-      And the result has "kind": "ValueTransferState"
+    Scenario: the pure projection returns the plain fragment at its root
+      When projecting ValueTransferState for "<pattern>" through projectValueTransferState
+      Then the projection root is the plain ValueTransferState fragment
+      And the projection root has "kind": "ValueTransferState"
 
     @acceptance-criteria @happy-path
     Scenario: MCP tool returns valid JSON via renderJsonToolResult

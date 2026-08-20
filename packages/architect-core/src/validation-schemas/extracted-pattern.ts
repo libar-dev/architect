@@ -4,6 +4,7 @@
  * @architect-status active
  * @architect-role:contract
  * @architect-bounded-context:validation-schemas
+ * @architect-uses ExportInfoContract
  *
  * ## ExtractedPattern - Canonical Per-Pattern Record Contract
  *

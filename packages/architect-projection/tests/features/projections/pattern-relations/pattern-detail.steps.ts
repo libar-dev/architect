@@ -54,8 +54,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   Rule('Pattern details compose normalized sub-shapes only', ({ RuleScenario }) => {
     RuleScenario('projecting a full pattern detail bundle', ({ Given, When, Then, And }) => {
       Given('a rich pattern detail projection context', () => {
-        const pattern = createPattern('PatternGraphAPI', {
-          file: 'packages/architect-query/src/pattern-graph-api.ts',
+        const pattern = createPattern('WidgetService', {
+          file: 'packages/architect-query/src/graph-handle.ts',
           description:
             '**Problem:** Query consumers need one stable read model.\n\n**Solution:** The PatternGraph API centralizes those reads.',
           executableSpecs: ['tests/features/query/pattern-graph.feature'],
@@ -64,7 +64,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               name: 'PatternGraph API module',
               status: 'in-progress',
               tests: 2,
-              location: 'packages/architect-query/src/pattern-graph-api.ts',
+              location: 'packages/architect-query/src/graph-handle.ts',
               finding: 'Keeps read operations centralized.',
             },
           ],
@@ -78,15 +78,15 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             },
           ],
         });
-        const stub = createPattern('PatternGraphAPIStub', {
-          file: 'architect/stubs/query/pattern-graph-api.stub.ts',
-          targetPath: 'packages/architect-query/src/pattern-graph-api.ts',
+        const stub = createPattern('WidgetServiceStub', {
+          file: 'architect/stubs/query/graph-handle.stub.ts',
+          targetPath: 'packages/architect-query/src/graph-handle.ts',
         });
 
         state!.context = createProjectionContext({
           patterns: [pattern, stub],
           relationshipIndex: {
-            PatternGraphAPI: createRelationshipEntry({
+            WidgetService: createRelationshipEntry({
               dependsOn: ['PatternGraph'],
               enables: ['ArchitectMcpServer'],
               uses: ['PatternHelpers'],
@@ -94,8 +94,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               implementsPatterns: ['PatternGraphReadModel'],
               implementedBy: [
                 {
-                  name: 'PatternGraphAPIStub',
-                  file: 'architect/stubs/query/pattern-graph-api.stub.ts',
+                  name: 'WidgetServiceStub',
+                  file: 'architect/stubs/query/graph-handle.stub.ts',
                   description: 'Stub for future implementation',
                 },
               ],
@@ -108,8 +108,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         });
       });
 
-      When('I project the pattern detail for "PatternGraphAPI"', () => {
-        state!.bundle = projectPatternDetail(state!.context!, 'PatternGraphAPI');
+      When('I project the pattern detail for "WidgetService"', () => {
+        state!.bundle = projectPatternDetail(state!.context!, 'WidgetService');
       });
 
       And('I render the pattern detail bundle through every renderer', () => {
@@ -128,7 +128,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           expect(state!.bundle?.children).toEqual({});
           expect(state!.bundle?.root).toMatchObject({
             kind: 'PatternDetail',
-            patternName: 'PatternGraphAPI',
+            patternName: 'WidgetService',
             description:
               'Problem: Query consumers need one stable read model. Solution: The PatternGraph API centralizes those reads.',
             // Problem + Solution are each a single sentence with nothing after the
@@ -161,9 +161,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             ],
             stubs: [
               {
-                stubFile: 'architect/stubs/query/pattern-graph-api.stub.ts',
-                targetPath: 'packages/architect-query/src/pattern-graph-api.ts',
-                name: 'PatternGraphAPIStub',
+                stubFile: 'architect/stubs/query/graph-handle.stub.ts',
+                targetPath: 'packages/architect-query/src/graph-handle.ts',
+                name: 'WidgetServiceStub',
               },
             ],
           });

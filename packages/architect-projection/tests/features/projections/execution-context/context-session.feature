@@ -115,7 +115,7 @@ Feature: Execution Context context and session projections
     implement session context push the implementing `.feature` paths into
     `specFiles`, implement context also pushes them into `testFiles`, and the
     file reading list lists those `.feature` paths in `primary` (not gated by
-    `--related`).
+    the typed `includeRelated` option).
 
     **Rationale:** The only link from a TS pattern to its behavioral spec is
     `implementedBy` (ADR-002/ADR-003); a reverse-trace question must follow it

@@ -4,7 +4,7 @@
  * @architect-status active
  * @architect-role:service
  * @architect-bounded-context:extractor
- * @architect-uses ShapeExtractor
+ * @architect-uses ShapeExtractor, ExportInfoContract
  *
  * ## DocExtractor - JSDoc Directive Extraction
  *

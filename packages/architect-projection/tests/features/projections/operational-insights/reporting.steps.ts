@@ -179,7 +179,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 // projection uses — so this assertion never drifts from the supported set.
                 generatedViews: SUPPORTED_DOCUMENTATION_TYPE_IDENTITIES.map((identity) => ({
                   docType: identity.key,
-                  verb: `architect_documentation ${identity.key}`,
+                  verb: `architect_documentation { documentType: "${identity.key}" }`,
                   summary: identity.description,
                 })),
               },
@@ -192,7 +192,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             expect(architecture?.pointer).toContain('not grep');
 
             // Orientation references are the curated orientation-doc subset,
-            // derived from the registry (verb + title), in declared order.
+            // derived from the registry (typed tool-call hint + title), in declared order.
             expect(orientation?.references.map((reference) => reference.docType)).toEqual([
               'decisions',
               'taxonomy',
@@ -200,7 +200,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               'business-rules',
               'api-reference',
             ]);
-            expect(orientation?.disclosureHint).toContain('--disclosure');
+            expect(orientation?.disclosureHint).toContain('disclosure:');
+            expect(orientation?.disclosureHint).not.toContain('--disclosure');
             expect(typeof orientation?.startableCount).toBe('number');
             // Role distribution tallies the canonical @architect-role of every
             // pattern that declares one; sorted by count descending.
@@ -284,7 +285,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             expect(blockingLines).toHaveLength(5);
             expect(output).toContain('... and 1 more — `architect_arch_blocking`');
             expect(output).toContain('docs via `architect_documentation` / docs-live/:');
-            expect(output).not.toContain('— `architect_documentation architecture`');
+            expect(output).not.toContain(
+              '— `architect_documentation { documentType: "architecture" }`',
+            );
             // summary shows the coarse package chart (one Mermaid block) + the
             // live-graph pointer, but NOT the richer bounded-context map.
             expect(output).toContain('=== ARCHITECTURE ===');
@@ -300,7 +303,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             const blockingLines = output.split('\n').filter((line) => line.includes('blocked by:'));
             expect(blockingLines).toHaveLength(6);
             expect(output).not.toContain('more — `architect_arch_blocking`');
-            expect(output).toContain('— `architect_documentation architecture`');
+            expect(output).toContain(
+              '— `architect_documentation { documentType: "architecture" }`',
+            );
             // full adds the bounded-context map below the package chart — two
             // Mermaid blocks in the architecture section.
             expect(output).toContain('=== ARCHITECTURE ===');
@@ -683,7 +688,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               state!.context = createProjectionContext({
                 patterns: [
                   createPattern('ContextAssemblerImpl', { role: 'service' }),
-                  createPattern('PatternGraphAPI', { role: 'service' }),
+                  createPattern('WidgetService', { role: 'service' }),
                   createPattern('PatternGraphCli', { role: 'cli' }),
                 ],
                 tagRegistry: createTagRegistry({
@@ -720,7 +725,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               priority: 20,
               count: 2,
               description: 'Coordinates use cases and delegates to lower layers.',
-              examples: ['ContextAssemblerImpl', 'PatternGraphAPI'],
+              examples: ['ContextAssemblerImpl', 'WidgetService'],
             });
           });
 
@@ -735,7 +740,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   priority: 20,
                   count: 2,
                   description: 'Coordinates use cases and delegates to lower layers.',
-                  examples: ['ContextAssemblerImpl', 'PatternGraphAPI'],
+                  examples: ['ContextAssemblerImpl', 'WidgetService'],
                 },
                 {
                   kind: 'RoleProfile',

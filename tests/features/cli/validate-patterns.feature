@@ -16,7 +16,7 @@ Feature: Validator Read Model Consolidation — validate-patterns CLI
   **Solution:**
   Refactored `validate-patterns.ts` to consume the PatternGraph as its
   data source for cross-source validation. The validator became a feature
-  consumer like codecs and the PatternGraphAPI — querying pre-computed
+  consumer like codecs and projections, querying pre-computed
   views and the relationship index instead of building its own maps.
 
   Command-line interface for cross-validating TypeScript patterns vs Gherkin feature files.

@@ -133,8 +133,8 @@ export default defineConfig({
 
 A project MAY additionally maintain an informative `architect/tag-taxonomy.md`
 document describing its role taxonomy, but the configuration above is the source of
-truth. The reference implementation surfaces the taxonomy via
-`architect:query taxonomy` rather than a static file.
+truth. The reference implementation exposes the live registry through
+`pnpm architect:q 'g.graph.tagRegistry'` rather than a static file.
 
 ## Canonical Project Layout
 

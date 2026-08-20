@@ -8,7 +8,7 @@ set -euo pipefail
 #
 #   ci:pre-push = ci:verify (build, format:check, lint, typecheck[:dogfood],
 #                 test[:dogfood], validate:all, guard:no-suppressions,
-#                 check:skills, arch dangling --strict, umbrella bin smoke,
+#                 check:skills, architect:graph dangling --strict, umbrella bin smoke,
 #                 audit:subtractive) && docs:check (projection determinism,
 #                 in-place / writes nothing — the mid-changeset-safe variant of
 #                 the CI `docs:all && git diff` gate).

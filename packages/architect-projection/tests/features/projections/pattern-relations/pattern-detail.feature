@@ -45,7 +45,7 @@ Feature: Pattern detail projection
     @acceptance-criteria
     Scenario: projecting a full pattern detail bundle
       Given a rich pattern detail projection context
-      When I project the pattern detail for "PatternGraphAPI"
+      When I project the pattern detail for "WidgetService"
       And I render the pattern detail bundle through every renderer
       Then the pattern detail bundle should include normalized relationships, deliverables, rules, and stubs
       And the renderer outputs should stay non-empty and type-valid

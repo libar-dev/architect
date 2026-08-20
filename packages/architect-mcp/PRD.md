@@ -30,7 +30,7 @@
 ## Enumerated functionality
 
 - **21 MCP tools**, each defined once in `TOOL_HANDLERS` (`tool-registry.ts`) and registered for both the MCP server (`registerAllTools`) and programmatic use (`invokeTool`). Input validated by per-tool Zod schemas composed from shared shapes in `tool-input-schemas.ts`; parse-once at the tool boundary via `parseToolInput`.
-- **Pipeline session lifecycle** (`pipeline-session.ts`): `initialize()` resolves sources (explicit globs → workspace sources → `applyProjectSourceDefaults` → hardcoded fallback defaults), builds the graph via `buildPatternGraph`, wraps it with `createPatternGraphAPI`; `rebuild()` coalesces concurrent rebuilds (single in-flight promise + `pendingRebuild` flag) and atomically swaps the session on success; `getSession()` / `isRebuilding()` accessors.
+- **Pipeline session lifecycle** (`pipeline-session.ts`): `initialize()` resolves sources (explicit globs → workspace sources → `applyProjectSourceDefaults` → hardcoded fallback defaults), builds the graph via `buildPatternGraph`; `rebuild()` coalesces concurrent rebuilds (single in-flight promise + `pendingRebuild` flag) and atomically swaps the session on success; `getSession()` / `isRebuilding()` accessors.
 - **File-watch / live rebuild** (`file-watcher.ts`): chokidar watch over input + feature globs + `architect.config.{ts,js}`, 500 ms debounce, filters to `.ts`/`.feature`/config files, delegates to `sessionManager.rebuild()`; on rebuild failure logs and keeps the previous dataset live. Only active with `--watch`.
 - **Server bootstrap** (`server.ts`): CLI arg parse (Zod-validated `ParsedCliArgs`), help/version short-circuits, `McpServer` construction with `instructions`, **redirects `console.log` → `console.error`** to keep stdout stdio-protocol-clean, registers tools, optionally starts the watcher, connects stdio transport, wires SIGINT/SIGTERM graceful shutdown.
 - **Tool metadata** (`tool-metadata.ts`): the 21-tool name+description table, `REGISTERED_TOOL_NAMES`, `MCP_SERVER_INSTRUCTIONS`, and help-text builders. The `RegisteredToolName` union is derived from this array.
@@ -40,7 +40,7 @@
 
 **Intra-repo (runtime, all one-directional — this package is a leaf consumer):**
 
-- `@libar-dev/architect-core` → graph build (`buildPatternGraph`), `createPatternGraphAPI`, config loading/source resolution, package resolver, Zod boundary primitives, runtime/bin helpers.
+- `@libar-dev/architect-core` → graph build (`buildPatternGraph`), canonical pattern helpers, config loading/source resolution, package resolver, Zod boundary primitives, runtime/bin helpers.
 - `@libar-dev/architect-projection` (incl. `/projections`, `/disclosure` subpaths) → every projection function the tools emit, plus the compact-text / JSON renderers and the option schemas reused as MCP input shapes.
 
 **External:** `@modelcontextprotocol/sdk` (server + stdio transport), `chokidar` (watch), `zod` (input contracts).

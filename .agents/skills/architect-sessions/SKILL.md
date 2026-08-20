@@ -35,7 +35,7 @@ What the graph handle returns is determined by the pattern's **state on disk**, 
 
 In practice:
 
-- The same handful of graph reads covers every shape above: status counts (`g.api.getStatusCounts()`), the pattern node (`g.pattern("<P>")`), dependency context (`g.api.getDependencyContext("<P>")`), realizing files (`p?.sourceFile` / `p?.implementedBy`), invariants (`g.invariantsOf("<P>")`), plus the `architect_scope_validate` MCP gate. The default pre-flight is one handle call: `pnpm architect:q 'const p = g.pattern("<P>"); return {p, invariants: g.invariantsOf("<P>"), reverifies: g.specsReverifying(["<P>"]).length}'`.
+- The same handful of graph reads covers every shape above: status counts (`g.graph.counts`), the pattern node (`g.pattern("<P>")`), direct dependency context (`g.graph.relationshipIndex["<P>"]`), realizing files (`p?.sourceFile` / `p?.implementedBy`), invariants (`g.invariantsOf("<P>")`), plus the `architect_scope_validate` MCP gate. The default pre-flight is one handle call: `pnpm architect:q 'const p = g.pattern("<P>"); return {p, invariants: g.invariantsOf("<P>"), reverifies: g.specsReverifying(["<P>"]).length}'`.
 - The work shape tells you which reference to read and which gate to honor — not a different command set.
 - Typed context bundles remain as the `architect_bundle` / `architect_context` MCP tools; their mode/session inputs nudge which blocks are included by default, but defaults are good and the returned data is dominated by what the pattern actually _is_. Do not over-rely on intent flags; they are receding over time.
 

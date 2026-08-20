@@ -8,7 +8,7 @@ A one-page map of what the six packages _are now_ — recorded from code, not fr
 architect-core            ← no intra-repo deps — the read model
   ├─ architect-projection  ← core                          fragments / projections / renderers
   ├─ architect-guard       ← core                          FSM gates / linters
-  ├─ architect-cli         ← core, projection, guard       verbs + bins
+  ├─ architect-cli         ← core, projection, guard       graph front door + 6 bins
   └─ architect-mcp         ← core, projection              MCP tools + watcher
 architect (meta)          ← install-deps all; re-exposes 7 bins (6 → cli, 1 → mcp)
 ```
@@ -20,24 +20,24 @@ architect (meta)          ← install-deps all; re-exposes 7 bins (6 → cli, 1 
 | **core**       | ~106  | ~12.5k | ~36      | ~200-symbol barrel; read-api, Zod schemas, FSM rules, taxonomy, scan→extract→merge→graph pipeline | small — `config/presentation-contracts.ts` stranded in the read-model root + a dead `markdown-parser` cluster (~240 LOC) |
 | **projection** | 153   | ~18k   | 121      | 44 fragments · 51 `projectX` · 14 `parseAndProjectX` · 13-docType star · 4 renderers              | **~55–60%** — the documentType star (~2k LOC) + `render-markdown.ts` (2,544 LOC) special-casing                          |
 | **guard**      | 38    | ~9.2k  | 21       | process guard, DoD, dangling-baseline, git helpers, FSM (imported from core), lints               | ~2k — idea-tier soft lint (447, warning-only), step-lint (~1.4k), anti-patterns                                          |
-| **cli**        | thin  | small  | 8        | 6 bins (4 are 1-line guard re-exports); 24 verbs → ~38 surfaces                                   | **29 of 33** read/slice verbs — derivable from one naked emission                                                        |
+| **cli**        | thin  | small  | 11       | 6 bins; `architect q` graph front door; named demos; frozen `dangling` gate                       | named demos remain runnable documentation, not machine contracts                                                         |
 | **mcp**        | 7     | ~1.6k  | 9        | 21 tools, pipeline session, chokidar live-rebuild                                                 | **18 of 21** read tools — same naked-emission logic; + `SectionedDocument` builders leaked into the transport            |
 | **meta/shell** | —     | —      | —        | 7 bin shims, root scripts, `architect.config.ts`, shared tsconfig base                            | 5 per-docType `docs:*` scripts (subsumed by `docs:all`)                                                                  |
 
 ## What survives — the irreducible core (same for the MVP loop _and_ the greenfield)
 
-- **core** read model: scan→extract→merge→`PatternGraph`, schemas, FSM, taxonomy, `createPatternGraphAPI()`.
+- **core** read model: scan→extract→merge→`PatternGraph`, schemas, FSM, taxonomy, the frozen `@libar-dev/architect-core/graph` contract, and pure read kernels.
 - **projection**: the ADR-010 helpers (`projectSingle` / `buildGroupedRoutedBundle`), the read-model→fragment skeleton, and the **UI / JSON renderers** (what Studio renders today / what a typed live-HTML emission needs tomorrow).
 - **guard**: the deterministic gates only — FSM transition validation, DoD, dangling-reference.
-- the **thin cli/mcp composition** + ~4 gate surfaces: `scope-validate`, `query isValidTransition`, `arch dangling`, `handoff`.
-- **one naked typed emission** — and `arch graph` is already approximately that.
+- the **thin CLI/MCP composition**: `architect q` exposes `g.graph`, `g.fsm`, and trusted joins; `architect dangling` is the frozen CLI machine gate; MCP keeps stable typed tools such as `architect_scope_validate` and `architect_handoff`.
+- the published `@libar-dev/architect-core/graph` contract and named pure core kernels for programmatic graph consumers.
 
 ## The headline
 
 Two cuts dominate, and they converge on the same answer:
 
 1. **The docgen documentType star + the markdown renderer** (~10k LOC; the heaviest 55–60% of the heaviest package). Markdown is the minor sink; the agent emission and Studio / live-HTML are the real ones.
-2. **The verb/tool layer** (CLI 29/33, MCP 18/21) — collapses to one naked typed emission + a handful of gates.
+2. **The verb/tool layer.** The CLI verb wall has already collapsed to the q front door, runnable named demos, and the dangling gate. MCP retains its 21 stable typed tools for Studio and burst-mode callers.
 
 Remove those (plus the non-gating lints and the stranded core/shell bits) and roughly a **third of the family's LOC and the majority of its API surface** goes — while the surviving core is exactly what both the loop-closing MVP and the types-primary/live-HTML greenfield need. The direction can stay undecided; the keep-set does not.
 

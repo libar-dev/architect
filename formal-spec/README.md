@@ -95,20 +95,20 @@ Start at Level 1. Graduate when you need more.
 
 The `@libar-dev/architect-*` package family is the **reference implementation** of this spec. As of v2.0 the implementation is split into five publishable packages plus a bin-only meta:
 
-| Package                           | Role                                                                                                                                                                          |
-| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `@libar-dev/architect-core`       | Canonical model, ingestion, graph build, scanner/extractor, taxonomy, config, read API (`PatternGraphAPI`).                                                                   |
-| `@libar-dev/architect-projection` | Fragment-based projection pipeline (Zod-validated `RenderableDocument` blocks, renderers).                                                                                    |
-| `@libar-dev/architect-guard`      | Policy, validation, ProcessGuard, step-lint, anti-pattern detection.                                                                                                          |
-| `@libar-dev/architect-cli`        | Composition root and 7 bins (`architect`, `architect-generate`, `architect-guard`, `architect-validate`, `architect-lint-steps`, `architect-lint-patterns`, `architect-mcp`). |
-| `@libar-dev/architect-mcp`        | MCP server, tool registry, file watcher, pipeline session.                                                                                                                    |
-| `@libar-dev/architect` (meta)     | Bin-only re-export of the 7 bins. No JS API — JS consumers must import from the split that owns each symbol.                                                                  |
+| Package                           | Role                                                                                                                                                                |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@libar-dev/architect-core`       | Canonical model, ingestion, graph build, scanner/extractor, taxonomy, config, frozen `./graph` contract, and pure read kernels.                                     |
+| `@libar-dev/architect-projection` | Fragment-based projection pipeline (Zod-validated `RenderableDocument` blocks, renderers).                                                                          |
+| `@libar-dev/architect-guard`      | Policy, validation, ProcessGuard, step-lint, anti-pattern detection.                                                                                                |
+| `@libar-dev/architect-cli`        | CLI composition root and 6 bins: `architect`, `architect-generate`, `architect-guard`, `architect-validate`, `architect-lint-steps`, and `architect-lint-patterns`. |
+| `@libar-dev/architect-mcp`        | MCP composition root and the separately owned `architect-mcp` bin, plus the tool registry, file watcher, and pipeline session.                                      |
+| `@libar-dev/architect` (meta)     | Bin-only re-export of the 7 bins. No JS API — JS consumers must import from the split that owns each symbol.                                                        |
 
 Together they provide:
 
 - A scanner/extractor pipeline that parses annotated TypeScript and Gherkin
-- `buildPatternGraph()` / `createPatternGraphAPI()` from `architect-core` producing and querying the pattern-graph data model described in §10
-- A CLI with 22 user-facing subcommands (`overview`, `context`, `dep-tree`, `scope-validate`, `arch`, `rules`, …) for querying the graph
+- `buildPatternGraph()` plus `Graph` / `createGraph()` from `@libar-dev/architect-core/graph`, with named pure read kernels from the package root, producing and querying the pattern-graph data model described in §10
+- A scriptable graph CLI (`architect q '<js>'`) with named demos and the frozen `dangling` integrity gate
 - An MCP server with 21 tools (`architect_overview`, `architect_context`, `architect_documentation`, …) for AI context delivery
 - Projection-based documentation generation from the graph
 - ProcessGuard for FSM enforcement described in §09

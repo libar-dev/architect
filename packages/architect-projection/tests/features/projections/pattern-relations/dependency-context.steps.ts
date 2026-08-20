@@ -47,6 +47,40 @@ function buildChainContext(): ProjectionContext {
   });
 }
 
+/** Exact chain plus decision graft: LeafConsumer -> MiddleService -> RootLib
+ * and ADR009 --dependsOn--> MiddleService plus ADR009 --see-also--> ADR006
+ * --see-also--> ADR005. Non-decision see-also must stay unfollowed. */
+function buildChainAndGovernanceContext(): ProjectionContext {
+  return createProjectionContext({
+    patterns: [
+      createPattern('RootLib'),
+      createPattern('MiddleService'),
+      createPattern('LeafConsumer'),
+      createPattern('ADR009ProjectionTrustBoundary', { adr: '009' }),
+      createPattern('ADR006SingleReadModelArchitecture', { adr: '006' }),
+      createPattern('ADR005CodecBasedMarkdownRendering', { adr: '005' }),
+      createPattern('McpOutputSchemaValidation'),
+    ],
+    relationshipIndex: {
+      RootLib: createRelationshipEntry({ usedBy: ['MiddleService'] }),
+      MiddleService: createRelationshipEntry({
+        dependsOn: ['RootLib'],
+        usedBy: ['LeafConsumer', 'ADR009ProjectionTrustBoundary'],
+      }),
+      LeafConsumer: createRelationshipEntry({ dependsOn: ['MiddleService'] }),
+      ADR009ProjectionTrustBoundary: createRelationshipEntry({
+        dependsOn: ['MiddleService'],
+        seeAlso: ['ADR006SingleReadModelArchitecture', 'McpOutputSchemaValidation'],
+      }),
+      ADR006SingleReadModelArchitecture: createRelationshipEntry({
+        seeAlso: ['ADR005CodecBasedMarkdownRendering'],
+      }),
+      ADR005CodecBasedMarkdownRendering: createRelationshipEntry({}),
+      McpOutputSchemaValidation: createRelationshipEntry({}),
+    },
+  });
+}
+
 /** ADR009 --see-also--> ADR006 --see-also--> ADR005, with a non-decision
  * see-also link (McpOutputSchemaValidation) that must not be followed. */
 function buildGovernanceChainContext(): ProjectionContext {
@@ -335,6 +369,51 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             expect(flattenNames(state!.bundle!.root.upstream)).not.toContain(
               'McpOutputSchemaValidation',
             );
+          },
+        );
+      },
+    );
+
+    RuleScenario(
+      'a decision focal with a dependency chain also grafts its see-also lineage',
+      ({ Given, When, Then, And }) => {
+        Given(
+          'a dependency context with a three-level chain and a three-decision governance chain',
+          () => {
+            state!.context = buildChainAndGovernanceContext();
+          },
+        );
+
+        When(
+          'I project the dependency context for "ADR009ProjectionTrustBoundary" with max depth 10',
+          () => {
+            state!.bundle = parseAndProjectDependencyContext(state!.context!, {
+              pattern: 'ADR009ProjectionTrustBoundary',
+              maxDepth: 10,
+            });
+          },
+        );
+
+        Then(
+          'the dependency context upstream should expand the chain "MiddleService" then "RootLib" and the graft "ADR006SingleReadModelArchitecture" then "ADR005CodecBasedMarkdownRendering"',
+          () => {
+            const upstream = state!.bundle!.root.upstream;
+            expect(upstream.map((node) => node.name)).toEqual([
+              'MiddleService',
+              'ADR006SingleReadModelArchitecture',
+            ]);
+            expect(upstream[0]?.children.map((node) => node.name)).toEqual(['RootLib']);
+            expect(upstream[1]?.children.map((node) => node.name)).toEqual([
+              'ADR005CodecBasedMarkdownRendering',
+            ]);
+          },
+        );
+
+        And(
+          'the dependency context summary should report 2 direct and 4 transitive upstream',
+          () => {
+            expect(state!.bundle!.root.summary.upstreamDirect).toBe(2);
+            expect(state!.bundle!.root.summary.upstreamTransitive).toBe(4);
           },
         );
       },

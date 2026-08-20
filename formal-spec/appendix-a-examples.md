@@ -113,7 +113,7 @@ Feature: ProjectConnection - Connect the desktop app to a project directory
 
   **How It Works:** The user selects a project directory via file dialog, drag-and-drop,
   or the recents list. The app looks for `architect.config.ts` at the project root. If
-  found, it reads the config, initializes the PatternGraphAPI, and transitions to the
+  found, it reads the config, initializes the frozen Graph, and transitions to the
   connected state. If not found, it offers guided setup. Recent projects persist across
   sessions via Electron's app data storage.
 
@@ -258,11 +258,11 @@ replaced by an executable spec in `tests/features/`.
 ```gherkin
   Rule: Step 1, MCP bridge starts when a project is connected
 
-    **Invariant:** Exactly one PatternGraphAPI instance exists per connected project.
+    **Invariant:** Exactly one frozen Graph instance exists per connected project.
     **Rationale:** Multiple instances would cause cache inconsistency and doubled memory.
     The API must be a singleton scoped to the project connection lifecycle.
     **Input:** ProjectConfig -- configPath: string, sources: SourceConfig, roles: RoleDefinition[]
-    **Output:** McpState -- status: 'connected', api: PatternGraphAPI, watcher: FileWatcher
+    **Output:** McpState -- status: 'connected', graph: Graph, watcher: FileWatcher
     **Verified by:** Successful initialization, duplicate prevention, config error handling.
 
     @acceptance-criteria @happy-path
@@ -271,13 +271,13 @@ replaced by an executable spec in `tests/features/`.
       And the project has architect.config.ts with typescript and features sources
       When the Electron main process calls initializePatternGraph(configPath)
       Then buildPatternGraph() is called with the resolved config
-      And a PatternGraphAPI instance is created from the graph
+      And a frozen Graph instance is created from the canonical graph
       And a file watcher is started on all source glob patterns
       And the McpState transitions to "connected"
 
     @acceptance-criteria @edge-case
     Scenario: Duplicate prevention
-      Given a PatternGraphAPI instance already exists for the current project
+      Given a frozen Graph instance already exists for the current project
       When initializePatternGraph is called again for the same project
       Then the existing instance is returned without rebuilding
       And no duplicate file watchers are created
@@ -287,7 +287,7 @@ replaced by an executable spec in `tests/features/`.
       Given a project with an architect.config.ts that fails Zod validation
       When initializePatternGraph attempts to load the config
       Then a ConfigValidationError is returned with field-level details
-      And no PatternGraphAPI instance is created
+      And no Graph instance is created
       And the renderer is notified with the structured error
 ```
 
@@ -322,14 +322,14 @@ Feature: ADR-005 - Electron + React Technology Stack
 
   **Decision:** Pivot from Tauri to Electron + React. The entire Studio codebase
   becomes TypeScript — fully trackable by @architect annotations. The MCP server /
-  PatternGraphAPI runs in Electron's main process (no sidecar needed), eliminating
+  the frozen Graph runs in Electron's main process (no sidecar needed), eliminating
   SidecarLifecycle as a separate concern and dramatically simplifying IPCBridge.
 
   **Consequences:**
   | Type     | Impact                                                                 |
   | Positive | Full dogfooding — every Studio component is a trackable pattern        |
   | Positive | Architecture simplification — 1 process instead of 3                   |
-  | Positive | PatternGraphAPI runs in-process — no sidecar spawning or stdio         |
+  | Positive | Graph reads run in-process — no sidecar spawning or stdio              |
   | Positive | Mature ecosystem — Electron tooling, debugging, and community support  |
   | Negative | Larger binary size (~150MB vs ~10MB with Tauri)                        |
   | Negative | Higher memory usage (Chromium per-window overhead)                     |
@@ -356,16 +356,16 @@ Feature: ADR-005 - Electron + React Technology Stack
       Then every source directory is eligible for @architect annotations
       And no source files are in a language invisible to the extraction pipeline
 
-  Rule: Decision: PatternGraphAPI runs in Electron main process
+  Rule: Decision: The frozen Graph runs in Electron main process
 
     **Invariant:** No separate sidecar process is needed for architecture queries.
     **Rationale:** Electron's main process is Node.js — the same runtime as
-    PatternGraphAPI. Direct function calls replace stdio JSON-RPC transport.
+    the Graph and pure read kernels. Direct function calls replace stdio JSON-RPC transport.
     **Verified by:** In-process query latency, no sidecar process detection.
 
     @acceptance-criteria @happy-path
     Scenario: In-process query latency
-      Given the PatternGraphAPI is initialized in the Electron main process
+      Given the frozen Graph is initialized in the Electron main process
       When a query is dispatched from the renderer via IPC
       Then the response time is under 5ms for cached queries
       And no child process is spawned for the query
@@ -398,10 +398,10 @@ A complete design stub with JSDoc annotations and interface definitions.
  * @architect-product-area Infrastructure
  * @architect-uses ProjectConnection, McpIntegration
  *
- * ## IPCBridge -- Typed Electron IPC for PatternGraphAPI
+ * ## IPCBridge -- Typed Electron IPC for Graph reads
  *
  * Provides a type-safe bridge between Electron's renderer process (React UI)
- * and the main process (PatternGraphAPI). All architecture queries flow through
+ * and the main process (Graph fields, FSM operations, and pure kernels). All architecture queries flow through
  * this bridge via contextBridge and ipcRenderer.
  *
  * ### Design Decisions
@@ -410,7 +410,7 @@ A complete design stub with JSDoc annotations and interface definitions.
  * DD-3: Error propagation -- main process errors are forwarded as typed errors
  *
  * ### When to Use
- * - Any React component that needs PatternGraphAPI data
+ * - Any React component that needs Graph data
  * - Custom hooks that wrap architecture queries
  *
  * See: feature-inventory.md F-03 IPCBridge
@@ -420,7 +420,7 @@ A complete design stub with JSDoc annotations and interface definitions.
 // Configuration Types
 // ---------------------------------------------------------------------------
 
-/** Bridge configuration for connecting to the PatternGraphAPI. */
+/** Bridge configuration for connecting to the Graph read service. */
 export interface ArchitectBridgeConfig {
   /** Path to the project's architect.config.ts */
   readonly configPath: string;
@@ -453,10 +453,10 @@ export interface BridgeError {
 // Bridge Service
 // ---------------------------------------------------------------------------
 
-/** Type-safe IPC bridge to PatternGraphAPI in the Electron main process. */
+/** Type-safe IPC bridge to Graph reads in the Electron main process. */
 export class ArchitectBridge {
   /**
-   * Initialize the bridge and connect to the PatternGraphAPI.
+   * Initialize the bridge and connect to the Graph read service.
    * @param config - Bridge configuration
    * @returns Connection result with API readiness status
    */
@@ -465,7 +465,7 @@ export class ArchitectBridge {
   }
 
   /**
-   * Execute a typed query against the PatternGraphAPI.
+   * Execute a typed Graph or pure-kernel query.
    * @param tool - MCP tool name (e.g., 'architect_overview')
    * @param params - Tool-specific parameters
    * @returns Query result with typed data
@@ -474,7 +474,7 @@ export class ArchitectBridge {
     throw new Error('IPCBridge not yet implemented -- roadmap pattern');
   }
 
-  /** Disconnect from the PatternGraphAPI and clean up resources. */
+  /** Disconnect from the Graph read service and clean up resources. */
   async disconnect(): Promise<void> {
     throw new Error('IPCBridge not yet implemented -- roadmap pattern');
   }

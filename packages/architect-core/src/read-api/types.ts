@@ -6,22 +6,16 @@
  * @architect-bounded-context:read-api
  * @architect-uses PatternGraph
  *
- * ## ReadApiResultContract - The Structured-Answer Envelope (ADR-006)
+ * ## ReadApiResultContract - Named read payloads
  *
- * The shared result vocabulary every structured read-API response is shaped
- * by. Defines the `QueryResult<T>` discriminated union (`QuerySuccess<T>` /
- * `QueryError`) with its metadata envelope, plus the read-side payload shapes a
- * verb returns: `DependencyContext` (the focal-rooted, bidirectional blast-radius
- * forest), `PatternRelationships`, `StatusDistribution`, `NeighborEntry`,
- * `TransitionCheck`, `ProtectionInfo`, `BusinessRuleRef`, and the
- * `createSuccess` / `createError` factories. A read-side contract that sits over
- * the {@link PatternGraph} and never re-derives state.
+ * Shared payload shapes used by pure read kernels and graph consumers:
+ * `PatternRelationships`, `StatusDistribution`, `NeighborEntry`,
+ * `TransitionCheck`, `ProtectionInfo`, and `BusinessRuleRef`. These contracts
+ * sit over the {@link PatternGraph} and never re-derive canonical state.
  *
  * ### When to Use
  *
- * - Authoring or consuming a Data API verb that returns a `QueryResult<T>`.
- * - Shaping a blast-radius / dependency-context or relationship response.
- * - Constructing success / error envelopes via the result factories.
+ * - Shaping a named relationship, transition, protection, or inventory result.
  */
 import type { ImplementationRef, StatusCounts } from '../validation-schemas/pattern-graph.js';
 import type { ProcessStatusValue } from '../taxonomy/index.js';
@@ -47,15 +41,6 @@ export interface RoleInfo {
   readonly description?: string;
 }
 
-export interface QuerySuccess<T> {
-  success: true;
-  data: T;
-  metadata: {
-    timestamp: string;
-    patternCount: number;
-  } & QueryMetadataExtra;
-}
-
 export type QueryErrorCode =
   | 'INVALID_ARGUMENT'
   | 'INVALID_STATUS'
@@ -68,14 +53,6 @@ export type QueryErrorCode =
   | 'PDR_NOT_FOUND'
   | 'CONTEXT_ASSEMBLY_ERROR'
   | 'UNKNOWN_METHOD';
-
-export interface QueryError {
-  success: false;
-  error: string;
-  code: QueryErrorCode;
-}
-
-export type QueryResult<T> = QuerySuccess<T> | QueryError;
 
 export type { StatusCounts } from '../validation-schemas/pattern-graph.js';
 
@@ -120,43 +97,6 @@ export interface PatternRelationships {
 }
 
 /**
- * One node in a {@link DependencyContext} forest. The focal pattern is the root
- * of both forests (named by {@link DependencyContext.focal}) and is never
- * represented as a node, so there is no per-node focal flag. `truncated` is set
- * when the node has further edges in its direction that were not expanded
- * because the depth cap was reached.
- */
-export interface DependencyContextNode {
-  name: string;
-  status?: string;
-  truncated: boolean;
-  children: readonly DependencyContextNode[];
-}
-
-/**
- * Focal-rooted, bidirectional transitive dependency context for a single
- * pattern. `upstream` is the cycle-safe closure over `dependsOn`∪`uses` (the
- * prerequisites / what the focal needs); `downstream` is the closure over
- * `usedBy`∪`enables` (the blast radius / what needs the focal). The focal
- * pattern is the root of both forests. `summary` precomputes the direct and
- * transitive counts so a consumer can size blast radius without re-walking.
- */
-export interface DependencyContext {
-  focal: string;
-  upstream: readonly DependencyContextNode[];
-  downstream: readonly DependencyContextNode[];
-  summary: {
-    upstreamDirect: number;
-    upstreamTransitive: number;
-    downstreamDirect: number;
-    downstreamTransitive: number;
-  };
-  options: {
-    maxDepth: number;
-  };
-}
-
-/**
  * A lightweight reference to a business rule that enforces a decision — the
  * owning pattern, the rule name, and an optional invariant string. Returned by
  * the decision-scoped rule aggregation so the CLI/projection can resolve full
@@ -196,30 +136,4 @@ export interface NeighborEntry {
   role: string | undefined;
   archContext: string | undefined;
   file: string | undefined;
-}
-
-export class QueryApiError extends Error {
-  constructor(
-    readonly code: QueryErrorCode,
-    message: string,
-    readonly details?: unknown,
-  ) {
-    super(message);
-    this.name = 'QueryApiError';
-  }
-}
-
-export function createSuccess<T>(data: T, patternCount: number): QuerySuccess<T> {
-  return {
-    success: true,
-    data,
-    metadata: {
-      timestamp: new Date().toISOString(),
-      patternCount,
-    },
-  };
-}
-
-export function createError(code: QueryErrorCode, error: string): QueryError {
-  return { success: false, code, error };
 }

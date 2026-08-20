@@ -9,7 +9,7 @@ Doctrine depth: valid FSM transitions + `@architect-unlock-reason:` + what `arch
 Run the handoff pre-flight from [`../../architect-graph-handle/SKILL.md`](../../architect-graph-handle/SKILL.md) — the read surface (ADR-014) — for forward-looking signal:
 
 ```bash
-pnpm architect:q 'return {counts: g.api.getStatusCounts(), active: g.api.getCurrentWork().map(p => p.patternName ?? p.name)}'
+pnpm architect:q 'return {counts: g.graph.counts, active: g.patterns.filter(p => p.status === "active").map(p => p.name)}'
 pnpm architect:q 'const p = g.pattern("<pattern>"); return {p, invariants: g.invariantsOf("<pattern>"), reverifies: g.specsReverifying(["<pattern>"]).length}'
 pnpm architect:q 'g.patterns.filter(p => p.status === "roadmap" && p.uses.some(u => g.pattern(u)?.status !== "completed")).map(p => p.name)'
 grep -rn -A4 'Open Questions' architect/specs/
@@ -28,7 +28,7 @@ For each pattern touched:
 | Current FSM state          | `pnpm architect:q 'g.pattern("<pattern>")?.status'`                                                 |
 | Transitions made           | Your edit history                                                                                   |
 | Files modified             | Pass as the modified-files input to `architect_handoff`                                             |
-| Open dependencies          | `pnpm architect:q 'g.api.getDependencyContext("<pattern>")'` minus the satisfied ones               |
+| Open dependencies          | `pnpm architect:q 'g.graph.relationshipIndex["<pattern>"]'` minus the satisfied ones                |
 | Open blockers              | `pnpm architect:q 'g.pattern("<pattern>")?.uses.filter(u => g.pattern(u)?.status !== "completed")'` |
 | Outstanding open questions | `grep -rn -A4 'Open Questions' architect/specs/` scoped to this pattern's specs                     |
 | Outstanding work           | What you didn't finish, one-line "why" each                                                         |

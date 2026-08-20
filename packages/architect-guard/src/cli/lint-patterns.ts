@@ -7,7 +7,7 @@
  * @architect-status completed
  * @architect-role:service
  * @architect-bounded-context:cli
- * @architect-uses LintEngine, LintRules, PatternScanner
+ * @architect-uses LintEngine, LintRules, PatternScanner, LintViolationContract
  *
  * ## LintPatternsCLI - Pattern Annotation Quality Checker
  *

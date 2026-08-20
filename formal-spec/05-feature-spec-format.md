@@ -130,8 +130,8 @@ Design-level specs use `**Problem:**` and `**Solution:**`:
 ```gherkin
 Feature: McpServerIntegration - MCP server lifecycle and tool dispatch
 
-  **Problem:** The desktop app needs to query the PatternGraphAPI for live
-  architecture data, but the API runs as a Node.js module that must be
+  **Problem:** The desktop app needs to query the frozen Graph for live
+  architecture data, but the Graph runs as a Node.js module that must be
   initialized with project configuration, watched for file changes, and
   gracefully shut down.
 
@@ -139,7 +139,7 @@ Feature: McpServerIntegration - MCP server lifecycle and tool dispatch
   1. **Initialization** — On project connection, the main process loads
      `architect.config.ts` and calls `buildPatternGraph()`.
   2. **Query dispatch** — Renderer process sends typed IPC requests that
-     the main process routes to PatternGraphAPI methods.
+     the main process routes to Graph fields, FSM operations, and pure kernels.
   3. **File watching** — A file watcher triggers automatic rebuilds when
      annotated files change.
   4. **Shutdown** — On app close, the watcher is disposed and resources freed.

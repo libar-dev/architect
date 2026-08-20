@@ -1,3 +1,19 @@
+/**
+ * @architect
+ * @architect-pattern ArchitectWorkspaceSources
+ * @architect-status completed
+ * @architect-role:contract
+ * @architect-bounded-context:configuration
+ * @architect-uses TagRegistrySchemas
+ *
+ * ## ArchitectWorkspaceSources - Self-hosting source contract
+ *
+ * Defines the package family's canonical TypeScript, stub, and feature inputs
+ * used when Architect builds its own graph from the repository root.
+ *
+ * **When to Use:** Use when resolving the self-hosting workspace inputs or
+ * constructing the workspace tag registry for package-family graph builds.
+ */
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 

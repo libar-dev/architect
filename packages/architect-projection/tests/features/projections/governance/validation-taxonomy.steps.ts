@@ -62,7 +62,7 @@ function createTaxonomyContext(): ProjectionContext {
           format: 'csv',
           purpose: 'Links one pattern to another.',
           repeatable: false,
-          example: '@architect-uses PatternGraphAPI, ProjectionBundle',
+          example: '@architect-uses WidgetService, ProjectionBundle',
         },
         {
           tag: 'title',
@@ -209,7 +209,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 example: '@architect-status active',
               },
               csv: {
-                example: '@architect-uses PatternGraphAPI, ProjectionBundle, RulesQueryAPI',
+                example: '@architect-uses WidgetService, ProjectionBundle, RulesQueryAPI',
               },
             },
           }).root;
@@ -230,11 +230,11 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             expect(state!.firstDigest?.formatTypes).toContainEqual({
               format: 'csv',
               description: 'Comma-separated values',
-              example: '@architect-uses PatternGraphAPI, ProjectionBundle, RulesQueryAPI',
+              example: '@architect-uses WidgetService, ProjectionBundle, RulesQueryAPI',
             });
             expect(state!.firstDigest?.exampleOverrides).toEqual({
               enum: '@architect-status active',
-              csv: '@architect-uses PatternGraphAPI, ProjectionBundle, RulesQueryAPI',
+              csv: '@architect-uses WidgetService, ProjectionBundle, RulesQueryAPI',
             });
           },
         );

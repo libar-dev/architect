@@ -148,7 +148,7 @@ const validArchitectureDiagramFixture: Fragment = {
         type: 'mermaid',
         content: 'graph TD; A[PatternGraph] --> B[ProjectionContext]; B --> C[ArchitectureDiagram]',
       },
-      patterns: ['PatternGraphAPI', 'ProjectionContext', 'ArchitectureDiagramProjection'],
+      patterns: ['WidgetService', 'ProjectionContext', 'ArchitectureDiagramProjection'],
     },
   ],
   legend: [
@@ -163,7 +163,7 @@ const validArchitectureDiagramFixture: Fragment = {
       ordered: false,
     },
   ],
-  patterns: ['PatternGraphAPI', 'ProjectionContext', 'ArchitectureDiagramProjection'],
+  patterns: ['WidgetService', 'ProjectionContext', 'ArchitectureDiagramProjection'],
 };
 
 export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
@@ -578,7 +578,7 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
     ],
     exampleOverrides: {
       enum: '@architect-status active',
-      csv: '@architect-uses PatternGraphAPI, ProjectionBundle',
+      csv: '@architect-uses WidgetService, ProjectionBundle',
     },
   },
   OverviewDigest: {
@@ -673,7 +673,7 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
     priority: 20,
     count: 5,
     description: 'Coordinates use cases and delegates to lower layers.',
-    examples: ['PatternGraphAPI', 'ContextAssemblerImpl'],
+    examples: ['WidgetService', 'ContextAssemblerImpl'],
   },
   RoleProfileCollection: {
     kind: 'RoleProfileCollection',
@@ -685,7 +685,7 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
         priority: 20,
         count: 5,
         description: 'Coordinates use cases and delegates to lower layers.',
-        examples: ['PatternGraphAPI', 'ContextAssemblerImpl'],
+        examples: ['WidgetService', 'ContextAssemblerImpl'],
       },
     ],
   },
@@ -744,14 +744,14 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
       count: false,
     },
     count: 1,
-    names: ['PatternGraphAPI'],
+    names: ['WidgetService'],
     items: [
       {
         kind: 'PatternSummary',
-        patternName: 'PatternGraphAPI',
+        patternName: 'WidgetService',
         status: 'active',
         role: 'infra',
-        file: 'packages/architect-query/src/pattern-graph-api.ts',
+        file: 'packages/architect-query/src/graph-handle.ts',
         source: 'typescript',
       },
     ],
@@ -762,7 +762,7 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
       {
         name: 'api',
         patternCount: 2,
-        patterns: ['ContextAssemblerImpl', 'PatternGraphAPI'],
+        patterns: ['ContextAssemblerImpl', 'WidgetService'],
         layers: ['application'],
         roles: ['service'],
       },
@@ -797,18 +797,18 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
   },
   PatternSummary: {
     kind: 'PatternSummary',
-    patternName: 'PatternGraphAPI',
+    patternName: 'WidgetService',
     status: 'active',
     role: 'service',
-    file: 'packages/architect-query/src/pattern-graph-api.ts',
+    file: 'packages/architect-query/src/graph-handle.ts',
     source: 'typescript',
   },
   PatternDetail: {
     kind: 'PatternDetail',
-    patternName: 'PatternGraphAPI',
+    patternName: 'WidgetService',
     status: 'active',
     role: 'service',
-    file: 'packages/architect-query/src/pattern-graph-api.ts',
+    file: 'packages/architect-query/src/graph-handle.ts',
     source: 'typescript',
     description: 'Primary query facade over the PatternGraph read model.',
     deliverables: [
@@ -816,7 +816,7 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
         name: 'PatternGraph API module',
         status: 'active',
         tests: ['tests/features/query/pattern-graph.feature'],
-        location: 'packages/architect-query/src/pattern-graph-api.ts',
+        location: 'packages/architect-query/src/graph-handle.ts',
         finding: 'Keeps read operations centralized.',
       },
     ],
@@ -828,8 +828,8 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
       implementsPatterns: ['PatternGraphReadModel'],
       implementedBy: [
         {
-          name: 'PatternGraphAPIImpl',
-          file: 'packages/architect-query/src/pattern-graph-api.ts',
+          name: 'WidgetServiceImpl',
+          file: 'packages/architect-query/src/graph-handle.ts',
           description: 'Concrete API adapter',
         },
       ],
@@ -849,19 +849,19 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
     ],
     stubs: [
       {
-        stubFile: 'architect/stubs/query/pattern-graph-api.stub.ts',
-        targetPath: 'packages/architect-query/src/pattern-graph-api.ts',
-        name: 'PatternGraphAPIStub',
+        stubFile: 'architect/stubs/query/graph-handle.stub.ts',
+        targetPath: 'packages/architect-query/src/graph-handle.ts',
+        name: 'WidgetServiceStub',
       },
     ],
     deliverableManifest: {
-      pattern: 'PatternGraphAPI',
+      pattern: 'WidgetService',
       items: [
         {
           name: 'PatternGraph API module',
           status: 'active',
           tests: ['tests/features/query/pattern-graph.feature'],
-          location: 'packages/architect-query/src/pattern-graph-api.ts',
+          location: 'packages/architect-query/src/graph-handle.ts',
           finding: 'Keeps read operations centralized.',
         },
       ],
@@ -869,17 +869,17 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
   },
   DependencyEdge: {
     kind: 'DependencyEdge',
-    from: 'PatternGraphAPI',
+    from: 'WidgetService',
     to: 'PatternGraph',
     relationKind: 'depends-on',
   },
   DependencyEdgeSet: {
     kind: 'DependencyEdgeSet',
-    from: 'PatternGraphAPI',
+    from: 'WidgetService',
     items: [
       {
         kind: 'DependencyEdge',
-        from: 'PatternGraphAPI',
+        from: 'WidgetService',
         to: 'PatternGraph',
         relationKind: 'depends-on',
       },
@@ -887,7 +887,7 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
   },
   DependencyContext: {
     kind: 'DependencyContext',
-    focal: 'PatternGraphAPI',
+    focal: 'WidgetService',
     upstream: [
       {
         name: 'PatternGraph',
@@ -923,7 +923,7 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
   },
   ArchitectureNeighborhood: {
     kind: 'ArchitectureNeighborhood',
-    pattern: 'PatternGraphAPI',
+    pattern: 'WidgetService',
     context: 'api',
     role: 'service',
     layer: 'application',
@@ -937,8 +937,8 @@ export const FRAGMENT_VALID_FIXTURES: Record<PublicFragmentKind, Fragment> = {
     implements: ['PatternGraphReadModel'],
     implementedBy: [
       {
-        name: 'PatternGraphAPIImpl',
-        file: 'packages/architect-query/src/pattern-graph-api.ts',
+        name: 'WidgetServiceImpl',
+        file: 'packages/architect-query/src/graph-handle.ts',
         description: 'Concrete API adapter',
       },
     ],
@@ -1028,10 +1028,10 @@ export const FRAGMENT_INVALID_FIXTURES: Record<PublicFragmentKind, unknown> = {
           type: 'paragraph',
           text: 'This must be a mermaid block.',
         },
-        patterns: ['PatternGraphAPI'],
+        patterns: ['WidgetService'],
       },
     ],
-    patterns: ['PatternGraphAPI'],
+    patterns: ['WidgetService'],
   },
   PrChangeReview: {
     kind: 'PrChangeReview',
@@ -1292,7 +1292,7 @@ export const FRAGMENT_INVALID_FIXTURES: Record<PublicFragmentKind, unknown> = {
       count: false,
     },
     count: 1,
-    names: ['PatternGraphAPI'],
+    names: ['WidgetService'],
     items: [],
     unexpected: true,
   },
@@ -1302,7 +1302,7 @@ export const FRAGMENT_INVALID_FIXTURES: Record<PublicFragmentKind, unknown> = {
       {
         name: 'api',
         patternCount: '2',
-        patterns: ['PatternGraphAPI'],
+        patterns: ['WidgetService'],
         layers: ['application'],
         roles: ['service'],
       },
@@ -1337,17 +1337,17 @@ export const FRAGMENT_INVALID_FIXTURES: Record<PublicFragmentKind, unknown> = {
   },
   PatternSummary: {
     kind: 'PatternSummary',
-    patternName: 'PatternGraphAPI',
+    patternName: 'WidgetService',
     role: 'service',
-    file: 'packages/architect-query/src/pattern-graph-api.ts',
+    file: 'packages/architect-query/src/graph-handle.ts',
     source: 'typescript',
     extraField: true,
   },
   PatternDetail: {
     kind: 'PatternDetail',
-    patternName: 'PatternGraphAPI',
+    patternName: 'WidgetService',
     role: 'service',
-    file: 'packages/architect-query/src/pattern-graph-api.ts',
+    file: 'packages/architect-query/src/graph-handle.ts',
     source: 'typescript',
     deliverables: [],
     relationships: {
@@ -1368,18 +1368,18 @@ export const FRAGMENT_INVALID_FIXTURES: Record<PublicFragmentKind, unknown> = {
   },
   DependencyEdge: {
     kind: 'DependencyEdge',
-    from: 'PatternGraphAPI',
+    from: 'WidgetService',
     to: 'PatternGraph',
     relationKind: 'blocked-by',
   },
   DependencyEdgeSet: {
     kind: 'DependencyEdgeSet',
-    from: 'PatternGraphAPI',
+    from: 'WidgetService',
     items: 'not-an-array',
   },
   DependencyContext: {
     kind: 'DependencyContext',
-    focal: 'PatternGraphAPI',
+    focal: 'WidgetService',
     upstream: [
       {
         name: 'PatternGraph',
@@ -1402,7 +1402,7 @@ export const FRAGMENT_INVALID_FIXTURES: Record<PublicFragmentKind, unknown> = {
   },
   ArchitectureNeighborhood: {
     kind: 'ArchitectureNeighborhood',
-    pattern: 'PatternGraphAPI',
+    pattern: 'WidgetService',
     context: 'api',
     role: 'service',
     layer: 'application',
@@ -1414,7 +1414,7 @@ export const FRAGMENT_INVALID_FIXTURES: Record<PublicFragmentKind, unknown> = {
     enforcedBy: [],
     sameContext: ['ContextAssemblerImpl'],
     implements: ['PatternGraphReadModel'],
-    implementedBy: ['PatternGraphAPIImpl'],
+    implementedBy: ['WidgetServiceImpl'],
   },
   OpenQuestionList: {
     kind: 'OpenQuestionList',

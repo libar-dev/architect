@@ -128,13 +128,13 @@ Feature: Governance business rule projections
     @bundle
     Scenario: Feature scope aggregates the implementing features' rules
       Given a business rule projection context where a TS pattern is realized by two rule-owning features
-      When I project the business rule set scoped to feature "PatternGraphApi"
+      When I project the business rule set scoped to feature "GraphHandle"
       Then the projected rules should include the implementing features' rules with owning-feature provenance
 
     @bundle
     Scenario: Feature scope on a rule-owning feature returns its own rules
       Given a business rule projection context where a TS pattern is realized by two rule-owning features
-      When I project the business rule set scoped to feature "PatternGraphApiReverseLookup"
+      When I project the business rule set scoped to feature "GraphRelationshipLookupExecutableTests"
       Then the projected rules should be exactly that feature's own rules
 
   Rule: Decision scope aggregates rules across enforcing patterns

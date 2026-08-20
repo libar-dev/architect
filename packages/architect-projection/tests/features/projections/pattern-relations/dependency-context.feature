@@ -92,11 +92,12 @@ Feature: Dependency context projection
 
     **Rationale:** A decision's structured lineage lives entirely in its
     see-also cross-links to the decisions it stands beside; surfacing that chain
-    makes `dep-tree <ADR>` answer "what decisions does this build on" instead of
-    showing an isolated node, while the adr→adr scoping keeps traversal small
+    lets `getDependencyContext` and the `architect_dep_tree` MCP tool answer
+    "what decisions does this build on" instead of showing an isolated node,
+    while the adr→adr scoping keeps traversal small
     enough to stay clear of the perf gate.
 
-    **Verified by:** a decision focal expands its see-also decision chain upstream, non-decision see-also links are not followed for a decision focal
+    **Verified by:** a decision focal expands its see-also decision chain upstream, non-decision see-also links are not followed for a decision focal, a decision focal with a dependency chain also grafts its see-also lineage
 
     @acceptance-criteria
     Scenario: a decision focal expands its see-also decision chain upstream
@@ -109,3 +110,9 @@ Feature: Dependency context projection
       Given a dependency context with a three-decision governance chain
       When I project the dependency context for "ADR009ProjectionTrustBoundary" with max depth 10
       Then the dependency context upstream should not include "McpOutputSchemaValidation"
+
+    Scenario: a decision focal with a dependency chain also grafts its see-also lineage
+      Given a dependency context with a three-level chain and a three-decision governance chain
+      When I project the dependency context for "ADR009ProjectionTrustBoundary" with max depth 10
+      Then the dependency context upstream should expand the chain "MiddleService" then "RootLib" and the graft "ADR006SingleReadModelArchitecture" then "ADR005CodecBasedMarkdownRendering"
+      And the dependency context summary should report 2 direct and 4 transitive upstream

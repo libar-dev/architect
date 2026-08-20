@@ -238,8 +238,8 @@ function renderGeneratedViews(
 
 /**
  * The "START HERE" orientation block (rendered at `summary-with-references` and
- * `full`): the high-signal generated docs to read first, the `--disclosure`
- * drill-down mechanic, and the count + sample of roadmap patterns ready to
+ * `full`): the high-signal generated docs to read first, the typed
+ * `disclosure` input field, and the count + sample of roadmap patterns ready to
  * start. Steers a cold-start agent toward orientation + workable items.
  */
 function renderOverviewOrientation(

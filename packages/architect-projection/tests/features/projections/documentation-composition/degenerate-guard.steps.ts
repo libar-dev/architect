@@ -38,10 +38,10 @@ function populatedTraceabilityMatrix(): TraceabilityMatrix {
     kind: 'TraceabilityMatrix',
     rows: [
       {
-        pattern: 'PatternGraphApi',
+        pattern: 'GraphHandle',
         status: 'completed',
         tests: ['packages/architect-core/tests/features/read-api/consistency.feature'],
-        specs: ['packages/architect-core/src/read-api/pattern-graph-api.ts'],
+        specs: ['packages/architect-core/src/read-api/graph-handle.ts'],
         deliverables: [],
       },
     ],

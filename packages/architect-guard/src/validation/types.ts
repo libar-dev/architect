@@ -73,6 +73,9 @@ export type AntiPatternId =
   | 'process-in-code' // Process metadata in code (should be features-only)
   | 'removed-tag' // Removed tag still present in source (silent data loss)
   | 'gherkin-tag-space-form' // Identity tag uses space-form on a .feature file; Gherkin requires colon form (silent data loss)
+  | 'ts-missing-architect-marker' // Pattern JSDoc lacks a leading bare @architect (silent file skip)
+  | 'ts-tags-after-prose' // Architect tags after description prose (silent tag drop)
+  | 'ts-uses-space-form' // Multi-target TypeScript @architect-uses uses spaces instead of commas (silent node drop)
   | 'duplicate-pattern-identity' // Same @architect-pattern identity declared in >1 feature file (ADR-001)
   | 'magic-comments' // Generator hints in features
   | 'scenario-bloat' // Too many scenarios per feature

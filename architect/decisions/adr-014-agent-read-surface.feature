@@ -46,15 +46,17 @@ Feature: ADR-014 - Scriptable Graph Handle as the Agent Read Surface
      architecture is never derived from the import graph — divergence between
      the two surfaces is curation, not drift.
 
-  3. The handle freezes only irreducible cross-source joins: the entry
-     adapters (findByConcept, byFile, bySymbol — the grep-to-graph bridge),
-     the spec bridge (invariantsOf, specsReverifying — maturity- and
+  3. The handle exposes the complete, deeply frozen canonical PatternGraph
+     as `g.graph` and the four deterministic FSM operations as `g.fsm`. It
+     freezes only irreducible cross-source joins: the entry adapters
+     (findByConcept, byFile, bySymbol — the grep-to-graph bridge), the spec
+     bridge (invariantsOf, specsReverifying — maturity- and
      provenance-labeled), and blastRadius. Thin traversals over exposed
      fields (a groupBy, a transitive walk) stay scripts, deliberately —
-     freezing them is how a verb wall rebuilds. The canonical
-     PatternGraphAPI rides on the handle as `g.api` (ADR-006's read side),
-     so every deterministic read — including `isValidTransition` — stays one
-     script away without a bespoke verb.
+     freezing them is how a verb wall rebuilds. Reusable algorithms that
+     need the canonical graph, including dependency context and rule
+     aggregation, remain named pure core functions rather than handle
+     methods. There is no facade or query-envelope layer.
 
   4. The verb CLI is deleted, not deprecated (No-BC): the command families,
      the `query`/`arch` dispatchers, the REPL, their flag schemas, their

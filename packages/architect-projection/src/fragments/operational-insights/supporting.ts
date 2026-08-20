@@ -41,8 +41,8 @@ export const BlockingEntrySchema = z.strictObject({
 });
 
 /**
- * One entry in the generated-views index — the doc type it produces, the CLI
- * verb that generates it, and a short summary.
+ * One entry in the generated-views index — the doc type it produces, a typed
+ * `architect_documentation` MCP call hint, and a short summary.
  *
  * @architect-shape
  */
@@ -74,8 +74,8 @@ export const OverviewArchitectureSchema = z.strictObject({
 /**
  * One orientation reference in the overview's "start here" tier — a generated
  * doc the agent should read first (decisions, taxonomy, validation rules,
- * business rules, API reference), the `architect_documentation` tool that
- * emits it, and its display title. Derived from the documentation-type
+ * business rules, API reference), a typed `architect_documentation` MCP call
+ * hint that emits it, and its display title. Derived from the documentation-type
  * registry so the list never drifts from the supported set.
  *
  * @architect-shape
@@ -88,8 +88,8 @@ export const OrientationReferenceSchema = z.strictObject({
 
 /**
  * The overview's "start here" orientation block — the high-signal generated
- * docs to read first, a one-line note on the `--disclosure` drill-down
- * mechanic, and the count + sample of roadmap patterns whose dependencies are
+ * docs to read first, a one-line note on the typed `disclosure` input field,
+ * and the count + sample of roadmap patterns whose dependencies are
  * all satisfied (the "safe to start" actionable set, the complement of
  * BLOCKING). Rendered at `summary-with-references` and `full` richness so a
  * cold-start agent is steered toward orientation + workable items rather than

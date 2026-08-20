@@ -1,6 +1,6 @@
 # recipes — script the rest
 
-The handle (`packages/architect-cli/src/handle/graph.ts`) freezes only the **irreducible
+The published Graph (`@libar-dev/architect-core/graph`) freezes only the **irreducible
 joins** — the grep→graph entry adapters (`findByConcept`/`byFile`/`bySymbol`), the
 spec-bridge (`invariantsOf`/`specsReverifying`), and the firehose (`blastRadius`).
 **Everything else is a script you write**, because freezing one-consumer traversals is how
@@ -23,18 +23,16 @@ annotations, `<generics>`, `!` — it's plain JS at eval time); (2) **end with
 
 The surface you script over: `g.patterns` (decoded `PatternNode[]`), `g.pattern(name)`,
 `g.invariantsOf(x)`, `g.specsReverifying(x)`, `g.blastRadius(files)`, the entry adapters,
-the canonical **`g.api`** (PatternGraphAPI — every deterministic read incl.
-`isValidTransition`), and the raw escape hatches `g.mech` / `g.authored`. Read
-`packages/architect-cli/src/handle/schema.ts` + `graph.ts` for the shapes.
+the complete frozen **`g.graph`**, the deterministic **`g.fsm`**, and the raw escape
+hatches `g.mech` / `g.authored`. Read `packages/architect-core/src/graph/schema.ts` +
+`graph.ts` for the shapes.
 
-> **Want full TypeScript / a saved module instead?** Run it **standalone**: a file in
-> `playground/scratch/` that does
-> `import { loadGraph } from '../../packages/architect-cli/src/handle/graph.ts';` and
-> `const REPO_ROOT = new URL('../..', import.meta.url).pathname;` then
-> `const g = await loadGraph(REPO_ROOT);` (pass `cwd: REPO_ROOT` to any `git`/shell-out).
-> A standalone module bypasses `q`, so pass the flag yourself:
-> `pnpm exec tsx --conditions=source playground/scratch/<name>.ts`. Full TS, but you own the
-> imports + cwd; the piped form is lower-friction.
+> **Want full TypeScript / a programmatic consumer?** Import `Graph`, `createGraph`, schemas,
+> types, and trusted pure views from `@libar-dev/architect-core/graph`. Import named pure
+> kernels such as `getDependencyContext` and `getRulesForPattern` from
+> `@libar-dev/architect-core`. Callers supply already-built graph values; source/config/git
+> IO belongs to their composition root. For ad-hoc live repository reads, the piped `q`
+> form remains the front door.
 
 ---
 
@@ -45,9 +43,10 @@ Pattern-state questions are direct reads — no verb needed:
 ```js
 // one pattern's decoded state (need-shaped)
 return g.pattern('ProjectionBundle');
-// the full canonical record + deterministic reads → g.api:
-//   g.api.getPattern('X') · g.api.getStatusCounts() · g.api.getCurrentWork()
-//   g.api.isValidTransition('roadmap', 'active')  ← the FSM gate, one call
+// the full canonical record and direct deterministic reads:
+//   g.graph.patterns.find((p) => p.name === 'X') · g.graph.counts
+//   g.patterns.filter((p) => p.status === 'active')
+//   g.fsm.isValidTransition('roadmap', 'active')  ← the FSM gate, one call
 ```
 
 ```js
@@ -242,8 +241,10 @@ return g.patterns
 ```
 
 _Why a script:_ "significance" is the curator's definition to tune — a verb would freeze one
-policy. **The ADD side** (uncurated mechanical `uses` edges to author) is
-`g.graphDiff().aspirational` / `pnpm architect:graph fan-in`; this recipe is the REMOVE side
+policy. Mechanical imports are evidence, not authored architecture. Dark imports default to no
+action. **The ADD side** (an intentional dependency that merits a curated `uses` edge) is
+`g.graphDiff().aspirational` / `pnpm architect:graph fan-in`, but each candidate still needs the
+significance rubric and a human-readable architectural reason. This recipe is the REMOVE side
 plus the load-bearing-but-edge-dark cross-check.
 
 ---

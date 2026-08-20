@@ -115,9 +115,9 @@ export function buildFileReadingList(
   };
 }
 
-// Projection-owned legacy parity for `architect_files --related`: source paths sort
-// alphabetically, but design stub paths stay last so generated context keeps the
-// old CLI reading order. See MIGRATION.md Table C, `architect_files`.
+// Projection-owned ordering for the `architect_files` MCP tool with
+// `includeRelated: true`: source paths sort alphabetically, but design stub paths
+// stay last so generated context remains stable. See MIGRATION.md Table C.
 function sortArchitectureNeighborsForLegacyParity(paths: readonly string[]): string[] {
   return [...paths].sort((left, right) => {
     const leftIsStub = left.startsWith('architect/stubs/');

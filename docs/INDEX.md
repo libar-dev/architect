@@ -202,7 +202,7 @@ renderers instead.
 
 | Section           | Key Topics                                                     |
 | ----------------- | -------------------------------------------------------------- |
-| The q front door  | `pnpm architect:q '<js>'`, the `g` handle surface, `g.api`     |
+| The q front door  | `pnpm architect:q '<js>'`, `g.graph`, `g.fsm`, trusted joins   |
 | Named commands    | `pnpm architect:graph` census/diff/blast/fan-in/drift/…        |
 | The dangling gate | CI machine gate: `dangling --baseline <path> --strict`         |
 | Reference         | architect-graph-handle skill, ADR-014, generated docs pointers |
@@ -304,7 +304,7 @@ See [CLI.md](./CLI.md) and the `architect-graph-handle` skill.
 
 ```bash
 # Pre-flight FSM gate — ALWAYS check the transition first
-pnpm architect:q 'g.api.isValidTransition("roadmap","active")'
+pnpm architect:q 'g.fsm.isValidTransition("roadmap","active")'
 # Context bundle
 pnpm architect:q 'const p = g.pattern("MyPattern"); return {p, invariants: g.invariantsOf("MyPattern"), reverifies: g.specsReverifying(["MyPattern"]).length}'
 # Implementation paths

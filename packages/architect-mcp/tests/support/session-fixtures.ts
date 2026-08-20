@@ -1,8 +1,8 @@
 /**
  * Test-only session fixtures for architect-mcp handler tests.
  *
- * Builds an in-memory PatternGraph + PatternGraphAPI via architect-core public
- * factories, then wraps them in a PipelineSession and a minimal manager that
+ * Builds an in-memory PatternGraph via architect-core public factories, then
+ * wraps it in a PipelineSession and a minimal manager that
  * exposes the subset of the PipelineSessionManager API that invokeTool touches
  * (getSession, rebuild).
  */
@@ -14,7 +14,6 @@ import {
   asSourceFilePath,
   createDefaultTagRegistry,
   createPackageResolver,
-  createPatternGraphAPI,
   transformToPatternGraph,
   type ExtractedPattern,
 } from '@libar-dev/architect-core';
@@ -166,11 +165,9 @@ function buildRichSession(): PipelineSession {
   ) {
     (dataset.patterns as ExtractedPattern[]).push(parent);
   }
-  const api = createPatternGraphAPI(dataset);
 
   return {
     dataset,
-    api,
     registry,
     baseDir: '/tmp/architect-mcp-test-project',
     configPath: '/tmp/architect-mcp-test-project/architect.config.ts',

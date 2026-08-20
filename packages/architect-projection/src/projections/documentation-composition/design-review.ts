@@ -43,8 +43,9 @@
  *
  * ### When to Use
  *
- * - Projects the `design-review` documentation bundle (the `documentation
- *   design-review` verb and the `docs:all` generated `DESIGN-REVIEW.md`).
+ * - Projects the `design-review` documentation bundle consumed by the
+ *   `architect_documentation` MCP tool and `docs:all` generation of
+ *   `DESIGN-REVIEW.md`.
  * - `projectDesignReview` / `parseAndProjectDesignReview` project a scoped review
  *   for an ad-hoc related set (Studio and programmatic callers).
  */

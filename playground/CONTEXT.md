@@ -4,7 +4,7 @@ Conceptual + findings context for this folder: the **why**, the **mental model**
 **verified findings** of the experiment that produced the graph handle.
 
 > **GRADUATED (ADR-014).** The experiment concluded: the handle now lives at
-> `packages/architect-cli/src/handle/` behind the `architect` bin
+> `@libar-dev/architect-core/graph`, with live IO composition behind the `architect` bin
 > (`pnpm architect:q` / `pnpm architect:graph` — the old `pnpm playground:q` /
 > `pnpm playground:cli` commands in this doc are retired names), the decision is
 > `architect/decisions/adr-014-agent-read-surface.feature`, and the operational guide is

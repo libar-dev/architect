@@ -1,6 +1,21 @@
+/**
+ * @architect
+ * @architect-pattern CLIContextBuilder
+ * @architect-status completed
+ * @architect-role:service
+ * @architect-bounded-context:cli
+ * @architect-uses CLIContextTypes, ConfigLoader, ArchitectWorkspaceSources, BuildPipeline
+ *
+ * ## CLIContextBuilder - Live CLI graph composition
+ *
+ * Resolves the active source plan and delegates graph construction to the
+ * canonical pipeline, preserving one CLI context shape for handle and command consumers.
+ *
+ * **When to Use:** Use at CLI composition roots that need a live graph and its
+ * resolved build context.
+ */
 import {
   buildPatternGraph,
-  createPatternGraphAPI,
   findConfigFile,
   formatConfigError,
   loadProjectConfig,
@@ -77,6 +92,5 @@ export async function buildCliContext(args: BuildContextArgs): Promise<CliContex
   return {
     build: result.value,
     graph: result.value.graph,
-    api: createPatternGraphAPI(result.value.graph),
   };
 }

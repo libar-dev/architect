@@ -4,6 +4,7 @@
  * @architect-status active
  * @architect-role:service
  * @architect-bounded-context:scanner
+ * @architect-uses GherkinScanResultContract, HierarchyLevelDomain
  */
 import { z } from 'zod';
 import {

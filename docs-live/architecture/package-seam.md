@@ -7,7 +7,7 @@
 
 ## Overview
 
-This view captures 317 patterns across 8 diagrams in the Package architecture view.
+This view captures 321 patterns across 8 diagrams in the Package architecture view.
 
 ## Diagrams
 
@@ -17,11 +17,11 @@ Each node is a group; each arrow is a cross-group dependency (`depends-on` / `us
 
 ```mermaid
 graph LR
-  pkg_architect_cli["Architect CLI (11)"]
-  pkg_architect_core["Architect Core (91)"]
-  pkg_architect_guard["Architect Guard (20)"]
+  pkg_architect_cli["Architect CLI (10)"]
+  pkg_architect_core["Architect Core (93)"]
+  pkg_architect_guard["Architect Guard (22)"]
   pkg_architect_host_dev["Architect Host (Dev) (12)"]
-  pkg_architect_mcp["Architect MCP (9)"]
+  pkg_architect_mcp["Architect MCP (10)"]
   pkg_architect_package_content["Architect Package Content (16)"]
   pkg_architect_projection["Architect Projection (158)"]
   pkg_architect_cli --> pkg_architect_core
@@ -35,43 +35,38 @@ graph LR
   pkg_architect_projection --> pkg_architect_core
 ```
 
-### Package: Architect CLI (11 patterns)
+### Package: Architect CLI (10 patterns)
 
 ```mermaid
 graph TD
   authoredcorebuilder["AuthoredCoreBuilder<br/>(service)"]
   clicommandresolutionexecutabletests["CliCommandResolutionExecutableTests"]
+  clicontextbuilder["CLIContextBuilder<br/>(service)"]
   clicontexttypes["CLIContextTypes<br/>(contract)"]
   clierrorhandler["CLIErrorHandler<br/>(utility)"]
   cliflagparsingexecutabletests["CliFlagParsingExecutableTests"]
   cliruntimepaths["CLIRuntimePaths<br/>(utility)"]
   graphhandle["GraphHandle<br/>(service)"]
   graphhandlecli["GraphHandleCli<br/>(service)"]
-  graphhandleshapes["GraphHandleShapes<br/>(contract)"]
-  graphhandleviews["GraphHandleViews<br/>(service)"]
   mechanicalsubstrateextractor["MechanicalSubstrateExtractor<br/>(service)"]
   authoredcorebuilder -->|depends-on| clicontexttypes
-  authoredcorebuilder -->|depends-on| graphhandleshapes
+  clicontextbuilder -->|depends-on| clicontexttypes
   graphhandle -->|depends-on| authoredcorebuilder
-  graphhandle -->|depends-on| graphhandleshapes
-  graphhandle -->|depends-on| graphhandleviews
   graphhandle -->|depends-on| mechanicalsubstrateextractor
   graphhandlecli -->|depends-on| authoredcorebuilder
   graphhandlecli -->|depends-on| clicontexttypes
   graphhandlecli -->|depends-on| cliruntimepaths
   graphhandlecli -->|depends-on| graphhandle
-  graphhandlecli -->|depends-on| graphhandleviews
   graphhandlecli -->|depends-on| mechanicalsubstrateextractor
-  graphhandleviews -->|depends-on| graphhandleshapes
-  mechanicalsubstrateextractor -->|depends-on| graphhandleshapes
 ```
 
-### Package: Architect Core (91 patterns)
+### Package: Architect Core (93 patterns)
 
 ```mermaid
 graph TD
   architectconfigcontract["ArchitectConfigContract<br/>(contract)"]
   architectureinspection["ArchitectureInspection<br/>(utility)"]
+  architectworkspacesources["ArchitectWorkspaceSources<br/>(contract)"]
   argvhygiene["ArgvHygiene<br/>(utility)"]
   astparser["AstParser<br/>(service)"]
   blockschema["BlockSchema<br/>(contract)"]
@@ -86,6 +81,7 @@ graph TD
   configurationapi["ConfigurationAPI"]
   configvalidationschemas["ConfigValidationSchemas<br/>(contract)"]
   contextinference["ContextInference<br/>(service)"]
+  coregraphexecutabletests["CoreGraphExecutableTests"]
   crosspackageedgeclassification["CrossPackageEdgeClassification"]
   decisionresolution["DecisionResolution<br/>(utility)"]
   defineconfig["DefineConfig<br/>(utility)"]
@@ -126,9 +122,7 @@ graph TD
   packageresolverexecutabletests["PackageResolverExecutableTests"]
   patternclassification["PatternClassification<br/>(utility)"]
   patterngraph["PatternGraph<br/>(contract)"]
-  patterngraphapi["PatternGraphApi<br/>(utility)"]
-  patterngraphapiconsistencyexecutabletests["PatternGraphApiConsistencyExecutableTests<br/>(utility)"]
-  patterngraphapireverselookup["PatternGraphApiReverseLookup"]
+  patterngraphconsistencyexecutabletests["PatternGraphConsistencyExecutableTests"]
   patternhelpers["PatternHelpers<br/>(utility)"]
   patternreferencecontract["PatternReferenceContract<br/>(contract)"]
   patternreferencevalidation["PatternReferenceValidation"]
@@ -140,6 +134,7 @@ graph TD
   projectconfigresolution["ProjectConfigResolution<br/>(service)"]
   projectconfigschema["ProjectConfigSchema<br/>(codec)"]
   readapiresultcontract["ReadApiResultContract<br/>(contract)"]
+  readkernelexecutabletests["ReadKernelExecutableTests"]
   registrybuilder["RegistryBuilder<br/>(utility)"]
   relationshipresolver["RelationshipResolver<br/>(service)"]
   resultmonadtypes["ResultMonadTypes<br/>(contract)"]
@@ -158,6 +153,7 @@ graph TD
   transformdataset["TransformDataset<br/>(service)"]
   trustboundaryparser["TrustBoundaryParser<br/>(service)"]
   typescripttaxonomyimplementation["TypeScriptTaxonomyImplementation"]
+  validationoutputschemas["ValidationOutputSchemas<br/>(contract)"]
   valueformatcanonicalvaluesdispatch["ValueFormatCanonicalValuesDispatch"]
   workflowconfigschemasvalidation["WorkflowConfigSchemasValidation"]
   zoderrorboundary["ZodErrorBoundary<br/>(utility)"]
@@ -165,6 +161,8 @@ graph TD
   architectureinspection -->|depends-on| extractedpattern
   architectureinspection -->|depends-on| patterngraph
   architectureinspection -->|depends-on| patternhelpers
+  architectworkspacesources -->|depends-on| tagregistryschemas
+  astparser -->|depends-on| exportinfocontract
   buildpipeline -->|depends-on| astparser
   buildpipeline -->|depends-on| docextractor
   buildpipeline -->|depends-on| extractiondiagnostics
@@ -177,17 +175,25 @@ graph TD
   decisionresolution -->|depends-on| patterngraph
   decisionresolution -->|depends-on| patternhelpers
   docdirectivecontract -->|depends-on| tagregistryschemas
+  docextractor -->|depends-on| exportinfocontract
   docextractor -->|depends-on| shapeextractor
   dualsourceextractor -->|depends-on| extractedpattern
+  dualsourceextractor -->|depends-on| gherkinscanresultcontract
   dualsourceextractor -->|depends-on| patternhelpers
   dualsourceschemas -->|depends-on| deliverablestatusdomain
   dualsourceschemas -->|depends-on| domainenumschemas
+  dualsourceschemas -->|depends-on| hierarchyleveldomain
   dualsourceschemas -->|depends-on| statusvaluedomain
+  extractedpattern -->|depends-on| exportinfocontract
   fsmvalidator -->|depends-on| fsmstates
   fsmvalidator -->|depends-on| fsmtransitions
+  gherkinastparser -->|depends-on| gherkinscanresultcontract
+  gherkinastparser -->|depends-on| hierarchyleveldomain
   gherkinexternalrelationshiptagpropagation -. see-also .- gherkinrulessupport
   gherkinextractor -->|depends-on| gherkinastparser
+  gherkinextractor -->|depends-on| gherkinscanresultcontract
   gherkinextractor -->|depends-on| layerinference
+  gherkinscanner -->|depends-on| gherkinscanresultcontract
   graphinventory -->|depends-on| extractedpattern
   graphinventory -->|depends-on| patterngraph
   graphinventory -->|depends-on| patternhelpers
@@ -195,9 +201,6 @@ graph TD
   patternclassification -->|depends-on| extractedpattern
   patternclassification -->|depends-on| patterngraph
   patterngraph -->|depends-on| extractedpattern
-  patterngraphapi -->|depends-on| extractedpattern
-  patterngraphapi -->|depends-on| patterngraph
-  patterngraphapi -->|depends-on| patternhelpers
   patternhelpers -->|depends-on| extractedpattern
   patternhelpers -->|depends-on| patterngraph
   patternsourcemerger -->|depends-on| extractedpattern
@@ -218,6 +221,7 @@ graph TD
   projectconfigschema -->|depends-on| packagematchercontract
   projectconfigschema -->|depends-on| projectconfigcontract
   readapiresultcontract -->|depends-on| patterngraph
+  registrybuilder -->|depends-on| hierarchyleveldomain
   relationshipresolver -->|depends-on| decisionresolution
   relationshipresolver -->|depends-on| extractedpattern
   relationshipresolver -->|depends-on| patterngraph
@@ -237,15 +241,18 @@ graph TD
   transformdataset -->|depends-on| relationshipresolver
   transformdataset -->|depends-on| statusnormalization
   transformdataset -->|depends-on| statusvaluedomain
+  validationoutputschemas -->|depends-on| extractiondiagnostics
+  validationoutputschemas -->|depends-on| lintviolationcontract
   zoderrorboundary -->|depends-on| trustboundaryparser
 ```
 
-### Package: Architect Guard (20 patterns)
+### Package: Architect Guard (22 patterns)
 
 ```mermaid
 graph TD
   antipatterndetector["AntiPatternDetector<br/>(service)"]
   antipatternvalidationtypes["AntiPatternValidationTypes<br/>(contract)"]
+  danglingbaseline["DanglingBaseline<br/>(service)"]
   deriveprocessstate["DeriveProcessState<br/>(read-model)"]
   detectchanges["DetectChanges<br/>(service)"]
   gitbranchdiff["GitBranchDiff<br/>(utility)"]
@@ -262,6 +269,7 @@ graph TD
   processguardrulesexecutabletests["ProcessGuardRulesExecutableTests"]
   processguardtypes["ProcessGuardTypes<br/>(contract)"]
   sessionstatereader["SessionStateReader<br/>(service)"]
+  steplintcontract["StepLintContract<br/>(contract)"]
   validatepatternscli["ValidatePatternsCLI<br/>(service)"]
   validationmodule["ValidationModule<br/>(barrel)"]
   antipatterndetector -->|depends-on| antipatternvalidationtypes
@@ -304,12 +312,13 @@ graph TD
   validatorreadmodelconsolidation["ValidatorReadModelConsolidation"]
 ```
 
-### Package: Architect MCP (9 patterns)
+### Package: Architect MCP (10 patterns)
 
 ```mermaid
 graph TD
   mcpfilewatcher["MCPFileWatcher<br/>(utility)"]
   mcppipelinesession["MCPPipelineSession<br/>(service)"]
+  mcppipelinesessiondatasetlookupexecutabletests["MCPPipelineSessionDatasetLookupExecutableTests"]
   mcpruntimehardeningexecutabletests["MCPRuntimeHardeningExecutableTests"]
   mcpserver["MCPServer<br/>(service)"]
   mcpserverbin["MCPServerBin<br/>(utility)"]
@@ -545,6 +554,8 @@ graph TD
   architecturecomparisonprojection -->|depends-on| patternrelationsprojectionsupport
   architecturediagramprojection -->|depends-on| documentationcompositionprojectionsupport
   architecturediagramprojection -->|depends-on| projectionfragmentcontracts
+  architecturegraphprojection -->|depends-on| architecturegraphsupport
+  architecturegraphprojection -->|depends-on| projectioncontext
   architectureneighborhoodprojection -->|depends-on| architectureneighborhood
   architectureneighborhoodprojection -->|depends-on| patternrelationsfragmentcontracts
   architectureneighborhoodprojection -->|depends-on| patternrelationsprojectionsupport
@@ -624,6 +635,7 @@ graph TD
   markdownrenderer -->|depends-on| projectionfragmentschema
   markdownrouteprofile -->|depends-on| emissiondescriptor
   markdownrouteprofile -->|depends-on| logicalrouteid
+  openquestionlistprojection -->|depends-on| openquestionlist
   openquestionlistprojection -->|depends-on| patternrelationsfragmentcontracts
   openquestionlistprojection -->|depends-on| patternrelationsprojectionsupport
   operationalinsightsprojectionsupport -->|depends-on| businessrulereference
@@ -725,12 +737,12 @@ Most-depended-on patterns in this view, ranked by in-view dependant count.
 
 | Pattern                              | Dependants | Top dependants                                                                                                                                          |
 | ------------------------------------ | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ExtractedPattern                     | 21         | ArchitectureGraphSupport, ArchitectureInspection, BusinessRuleSetAssembly, DecisionResolution, DeliveryReportingProjectionSupport                       |
+| ExtractedPattern                     | 20         | ArchitectureGraphSupport, ArchitectureInspection, BusinessRuleSetAssembly, DecisionResolution, DeliveryReportingProjectionSupport                       |
 | ProjectionFragmentContracts          | 17         | ArchitectureDiagramProjection, BusinessRulesProjection, DecisionCatalogProjection, DeliverableProjection, DocumentationBundle                           |
-| PatternGraph                         | 15         | ArchitectureInspection, BuildPipeline, DecisionResolution, GraphInventory, PatternClassification                                                        |
+| PatternGraph                         | 14         | ArchitectureInspection, BuildPipeline, DecisionResolution, GraphInventory, PatternClassification                                                        |
 | PatternRelationsProjectionSupport    | 13         | ArchitectureComparisonProjection, ArchitectureNeighborhoodProjection, BoundedContextProjection, DependencyContextProjection, DependencyEdgeProjection   |
-| PatternHelpers                       | 11         | ArchitectureInspection, BusinessRuleSetAssembly, DecisionResolution, DualSourceExtractor, GraphInventory                                                |
 | PatternRelationsFragmentContracts    | 11         | ArchitectureComparisonProjection, ArchitectureNeighborhoodProjection, DependencyContextProjection, DependencyEdgeProjection, OpenQuestionListProjection |
+| PatternHelpers                       | 10         | ArchitectureInspection, BusinessRuleSetAssembly, DecisionResolution, DualSourceExtractor, GraphInventory                                                |
 | OperationalInsightsProjectionSupport | 8          | AnnotationCoverageProjection, OverviewProjection, RequirementDigestProjection, RequirementExecutableDigestProjection, RequirementSpecsDigestProjection  |
 | BlockSchema                          | 7          | ArchitectureDiagram, DecisionRecord, DocumentationCompositionSupporting, MarkdownRenderer, OperationalInsightsSupporting                                |
 | ProjectionFragmentSchema             | 7          | ApiReferenceProjection, CompactTextRenderer, FragmentRendererDispatch, JsonRenderer, MarkdownRenderer                                                   |
@@ -742,9 +754,9 @@ Bounded contexts whose patterns span more than one workspace package.
 
 | Bounded context | Packages                                                                            | Patterns |
 | --------------- | ----------------------------------------------------------------------------------- | -------- |
-| cli             | Architect CLI, Architect Core, Architect Guard, Architect Host (Dev), Architect MCP | 15       |
+| cli             | Architect CLI, Architect Core, Architect Guard, Architect Host (Dev), Architect MCP | 14       |
 | rendering       | Architect Core, Architect Projection                                                | 16       |
-| validation      | Architect Core, Architect Guard                                                     | 9        |
+| validation      | Architect Core, Architect Guard                                                     | 10       |
 
 ## Legend
 
@@ -786,6 +798,7 @@ Bounded contexts whose patterns span more than one workspace package.
 - ArchitectureNavigationProjectionExecutableTests
 - ArchitectureNeighborhood
 - ArchitectureNeighborhoodProjection
+- ArchitectWorkspaceSources
 - ArgvHygiene
 - AstParser
 - AuthoredCoreBuilder
@@ -805,6 +818,7 @@ Bounded contexts whose patterns span more than one workspace package.
 - ChangelogProjection
 - ChangelogProjectionExecutableTests
 - CliCommandResolutionExecutableTests
+- CLIContextBuilder
 - CLIContextTypes
 - CLIErrorHandler
 - CliFlagParsingExecutableTests
@@ -820,7 +834,9 @@ Bounded contexts whose patterns span more than one workspace package.
 - ConfigurationAPI
 - ConfigValidationSchemas
 - ContextInference
+- CoreGraphExecutableTests
 - CrossPackageEdgeClassification
+- DanglingBaseline
 - DataAPIOutputShaping
 - DecisionCatalog
 - DecisionCatalogProjection
@@ -905,8 +921,6 @@ Bounded contexts whose patterns span more than one workspace package.
 - GraphHandle
 - GraphHandleCli
 - GraphHandleCliExecutableTests
-- GraphHandleShapes
-- GraphHandleViews
 - GraphInventory
 - GroupedRoutedBundleSupport
 - HandoffProjection
@@ -933,6 +947,7 @@ Bounded contexts whose patterns span more than one workspace package.
 - MaturityLevelDomain
 - MCPFileWatcher
 - MCPPipelineSession
+- MCPPipelineSessionDatasetLookupExecutableTests
 - MCPRuntimeHardeningExecutableTests
 - MCPServer
 - MCPServerBin
@@ -968,9 +983,7 @@ Bounded contexts whose patterns span more than one workspace package.
 - PatternDetailProjection
 - PatternDetailProjectionExecutableTests
 - PatternGraph
-- PatternGraphApi
-- PatternGraphApiConsistencyExecutableTests
-- PatternGraphApiReverseLookup
+- PatternGraphConsistencyExecutableTests
 - PatternHelpers
 - PatternReferenceContract
 - PatternReferenceValidation
@@ -1009,6 +1022,7 @@ Bounded contexts whose patterns span more than one workspace package.
 - ProjectionKernelRelationshipContractExecutableTests
 - ProjectionTrustBoundary
 - ReadApiResultContract
+- ReadKernelExecutableTests
 - RegistryBuilder
 - RelationshipResolver
 - RendererDispatchSmokeExecutableTests
@@ -1044,6 +1058,7 @@ Bounded contexts whose patterns span more than one workspace package.
 - StatusDistributionProjection
 - StatusNormalization
 - StatusValueDomain
+- StepLintContract
 - StubTaxonomyTagTests
 - TagDirectiveRegexBuilders
 - TagRegistrySchemas
@@ -1066,6 +1081,7 @@ Bounded contexts whose patterns span more than one workspace package.
 - UiRendererExecutableTests
 - ValidatePatternsCLI
 - ValidationModule
+- ValidationOutputSchemas
 - ValidationRuleDigest
 - ValidationRuleDigestProjection
 - ValidatorReadModelConsolidation

@@ -55,8 +55,8 @@ export const MaturitySchema = z.enum(MATURITY_VALUES);
  *
  * The union of the authored accepted values (`candidate`, `roadmap`, `active`,
  * `completed`, `deferred`) plus the normalized-only bucket word `planned`
- * (= roadmap ∪ deferred), so every status word an agent reads in `overview` /
- * `getStatusDistribution` is a legal filter.
+ * (= roadmap ∪ deferred), so every normalized status word exposed by
+ * `g.graph.counts` or a `StatusDistribution` projection is a legal filter.
  *
  * DISTINCT from {@link AcceptedStatusSchema} (authored `@architect-status`
  * validation) and {@link ProcessStatusSchema} (FSM transition validation):

@@ -41,19 +41,19 @@ Feature: Pattern summary projection
 
     @acceptance-criteria
     Scenario: projecting a canonical pattern summary
-      Given a summary projection context with a pattern named "PatternGraphAPI"
-      When I project the summary for "PatternGraphAPI"
+      Given a summary projection context with a pattern named "WidgetService"
+      When I project the summary for "WidgetService"
       Then the projected summary should expose the canonical fragment fields
 
     Scenario: pattern lookup is case-insensitive
-      Given a summary projection context with a pattern named "PatternGraphAPI"
-      When I project the summary for "patterngraphapi"
-      Then the projected summary should still target "PatternGraphAPI"
+      Given a summary projection context with a pattern named "WidgetService"
+      When I project the summary for "widgetservice"
+      Then the projected summary should still target "WidgetService"
 
     Scenario: missing patterns return a suggested match
-      Given a summary projection context with a pattern named "PatternGraphAPI"
-      When I project the summary for the missing pattern "PatternGraphAp"
-      Then the summary projection should fail with a suggestion for "PatternGraphAPI"
+      Given a summary projection context with a pattern named "WidgetService"
+      When I project the summary for the missing pattern "WidgetServic"
+      Then the summary projection should fail with a suggestion for "WidgetService"
 
   Rule: Pattern catalogs own list filtering semantics
 
@@ -63,8 +63,8 @@ Feature: Pattern summary projection
     `namesOnly` and `count` flags omit `items` (and `names` when `count` is
     true) from the payload while still reporting the full `count`.
 
-    **Rationale:** Catalog consumers (CLI list, MCP search, UI pickers) must
-    see deterministic, filterable views without duplicating alias resolution
+    **Rationale:** Catalog consumers (`architect_list`, `architect_search`, and
+    UI pickers) must see deterministic, filterable views without duplicating alias resolution
     or sorting logic — and must be able to request just a count or just
     names when the full summaries would be wasteful.
 

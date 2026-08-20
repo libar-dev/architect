@@ -19,6 +19,7 @@
  */
 
 import {
+  findPatternByName,
   fuzzyMatchPatterns,
   inferHandoffSessionType,
   paragraph,
@@ -447,7 +448,7 @@ const TOOL_HANDLERS: Record<RegisteredToolName, ToolHandler> = {
       ...OptionalModifiedFilesShape,
     }),
     handle: ({ name, session: requestedSession, modifiedFiles }, session) => {
-      const pattern = session.api.getPattern(name);
+      const pattern = findPatternByName(session.dataset, name);
       const sessionType = requestedSession ?? inferHandoffSessionType(pattern?.status);
       return renderTextToolResult(
         projectHandoffRecord(getProjectionContext(session), {

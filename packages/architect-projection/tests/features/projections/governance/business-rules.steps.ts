@@ -293,21 +293,20 @@ function createSourceAgnosticBusinessRuleContext(): ProjectionContext {
 }
 
 function createImplementedByBusinessRuleContext(): ProjectionContext {
-  const reverseLookupFile =
-    'packages/architect-core/tests/features/read-api/pattern-graph-api.feature';
+  const reverseLookupFile = 'packages/architect-core/tests/features/read-api/graph-handle.feature';
   const consistencyFile =
-    'packages/architect-core/tests/features/read-api/pattern-graph-api-consistency.feature';
+    'packages/architect-core/tests/features/read-api/graph-handle-consistency.feature';
 
   return createProjectionContext({
     patterns: [
-      createPattern('PatternGraphApi', {
-        file: 'packages/architect-core/src/read-api/pattern-graph-api.ts',
+      createPattern('GraphHandle', {
+        file: 'packages/architect-core/src/read-api/graph-handle.ts',
         productArea: 'Data API',
       }),
-      createPattern('PatternGraphApiReverseLookup', {
+      createPattern('GraphRelationshipLookupExecutableTests', {
         file: reverseLookupFile,
         productArea: 'Data API',
-        implementsPatterns: ['PatternGraphApi'],
+        implementsPatterns: ['GraphHandle'],
         rules: [
           createRule({
             name: 'Reverse lookup resolves implementers',
@@ -317,10 +316,10 @@ function createImplementedByBusinessRuleContext(): ProjectionContext {
           }),
         ],
       }),
-      createPattern('PatternGraphApiConsistencyExecutableTests', {
+      createPattern('GraphFieldConsistencyExecutableTests', {
         file: consistencyFile,
         productArea: 'Data API',
-        implementsPatterns: ['PatternGraphApi'],
+        implementsPatterns: ['GraphHandle'],
         rules: [
           createRule({
             name: 'Status partition is exact',
@@ -332,10 +331,10 @@ function createImplementedByBusinessRuleContext(): ProjectionContext {
       }),
     ],
     relationshipIndex: {
-      PatternGraphApi: createRelationshipEntry({
+      GraphHandle: createRelationshipEntry({
         implementedBy: [
-          { name: 'PatternGraphApiReverseLookup', file: reverseLookupFile },
-          { name: 'PatternGraphApiConsistencyExecutableTests', file: consistencyFile },
+          { name: 'GraphRelationshipLookupExecutableTests', file: reverseLookupFile },
+          { name: 'GraphFieldConsistencyExecutableTests', file: consistencyFile },
         ],
       }),
     },
@@ -816,11 +815,11 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             expect(byFeature).toEqual(
               expect.arrayContaining([
                 {
-                  feature: 'PatternGraphApiReverseLookup',
+                  feature: 'GraphRelationshipLookupExecutableTests',
                   ruleName: 'Reverse lookup resolves implementers',
                 },
                 {
-                  feature: 'PatternGraphApiConsistencyExecutableTests',
+                  feature: 'GraphFieldConsistencyExecutableTests',
                   ruleName: 'Status partition is exact',
                 },
               ]),
@@ -856,7 +855,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           expect(rules.map((rule) => ({ feature: rule.feature, ruleName: rule.ruleName }))).toEqual(
             [
               {
-                feature: 'PatternGraphApiReverseLookup',
+                feature: 'GraphRelationshipLookupExecutableTests',
                 ruleName: 'Reverse lookup resolves implementers',
               },
             ],

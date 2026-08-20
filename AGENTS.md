@@ -23,7 +23,7 @@ architect/
 ├── tests/                        # dogfood smoke + regression; `tests/features/` is executable Gherkin
 ├── packages/
 │   ├── architect/                # `@libar-dev/architect` — meta package, bin-only
-│   ├── architect-core/           # PatternGraph composition → `PatternGraphAPI` (read side)
+│   ├── architect-core/           # PatternGraph build + frozen `./graph` contract + pure read kernels
 │   ├── architect-projection/     # Fragment / projection / renderer pipeline
 │   ├── architect-guard/          # FSM process guard + bespoke linters
 │   ├── architect-cli/            # thin composition root — CLI
@@ -177,7 +177,7 @@ Three skills carry the operational substance of this repo. **`architect-base` is
 
 **`architect-base`** hands you the PatternGraph + tag taxonomy, the four authored detail tiers plus executable + maintenance levels, the FSM lifecycle, value-transfer / spec-deletion doctrine, key ADRs, and the validation layers. The conceptual model that makes every other surface in this repo legible.
 
-**`architect-graph-handle`** (load on demand) is the agent read surface (ADR-014 — the verb CLI is retired). Whenever you need graph state — a pattern's status/deps/rules, a file's owner + neighborhood, a symbol's architectural usage, the blast radius of a diff, what a pattern guarantees, which specs re-verify a change — one command (`pnpm architect:q '<js>'`) builds the live graph in-process and hands you `g` to script the cut, returning the conclusion, not the firehose. `g.api` carries the canonical PatternGraphAPI for deterministic reads (including `isValidTransition`); ordinary grep stays the complement for content-level search; the `architect_*` MCP tools remain the stable typed surface for burst-mode/Studio use.
+**`architect-graph-handle`** (load on demand) is the agent read surface (ADR-014 — the verb CLI is retired). Whenever you need graph state — a pattern's status/deps/rules, a file's owner + neighborhood, a symbol's architectural usage, the blast radius of a diff, what a pattern guarantees, which specs re-verify a change — one command (`pnpm architect:q '<js>'`) builds the live graph in-process and hands you `g` to script the cut, returning the conclusion, not the firehose. `g.graph` is the complete frozen PatternGraph and `g.fsm` contains the deterministic transition operations. Programmatic consumers import `Graph`, `createGraph`, schemas, types, and trusted pure views from `@libar-dev/architect-core/graph`; named pure read kernels remain on `@libar-dev/architect-core`. Ordinary grep stays the complement for content-level search; the `architect_*` MCP tools remain the stable typed surface for burst-mode/Studio use.
 
 **`architect-sessions`** is the spec-driven delivery lifecycle — capture → design → implement → review → handoff — as one skill, with the per-session execution detail behind progressive disclosure so the always-loaded body stays small. Load it for any work that touches a spec, a pattern, or an FSM transition (which is nearly everything here).
 

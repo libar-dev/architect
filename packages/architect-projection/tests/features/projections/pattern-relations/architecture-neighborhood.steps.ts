@@ -60,7 +60,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           Given('an architecture neighborhood context with full direction coverage', () => {
             state!.context = createProjectionContext({
               patterns: [
-                createPattern('PatternGraphAPI', {
+                createPattern('WidgetService', {
                   archContext: 'api',
                   archLayer: 'application',
                 }),
@@ -70,7 +70,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 }),
               ],
               relationshipIndex: {
-                PatternGraphAPI: createRelationshipEntry({
+                WidgetService: createRelationshipEntry({
                   uses: ['PatternHelpers'],
                   usedBy: ['PatternBrowserView'],
                   dependsOn: ['PatternGraph'],
@@ -78,8 +78,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                   implementsPatterns: ['PatternGraphReadModel'],
                   implementedBy: [
                     {
-                      name: 'PatternGraphAPIImpl',
-                      file: 'packages/architect-query/src/pattern-graph-api.ts',
+                      name: 'WidgetServiceImpl',
+                      file: 'packages/architect-query/src/graph-handle.ts',
                       description: 'Concrete API adapter',
                     },
                   ],
@@ -89,8 +89,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             });
           });
 
-          When('I project the architecture neighborhood for "PatternGraphAPI"', () => {
-            state!.bundle = projectArchitectureNeighborhood(state!.context!, 'PatternGraphAPI');
+          When('I project the architecture neighborhood for "WidgetService"', () => {
+            state!.bundle = projectArchitectureNeighborhood(state!.context!, 'WidgetService');
           });
 
           Then(
@@ -98,7 +98,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             () => {
               expect(state!.bundle?.root).toEqual({
                 kind: 'ArchitectureNeighborhood',
-                pattern: 'PatternGraphAPI',
+                pattern: 'WidgetService',
                 context: 'api',
                 role: 'service',
                 layer: 'application',
@@ -112,8 +112,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 implements: ['PatternGraphReadModel'],
                 implementedBy: [
                   {
-                    name: 'PatternGraphAPIImpl',
-                    file: 'packages/architect-query/src/pattern-graph-api.ts',
+                    name: 'WidgetServiceImpl',
+                    file: 'packages/architect-query/src/graph-handle.ts',
                     description: 'Concrete API adapter',
                   },
                 ],
@@ -129,7 +129,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           Given('an architecture neighborhood context without a relationship index', () => {
             state!.context = createProjectionContext({
               patterns: [
-                createPattern('PatternGraphAPI', {
+                createPattern('WidgetService', {
                   archContext: 'api',
                   archLayer: 'application',
                 }),
@@ -142,15 +142,15 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             });
           });
 
-          When('I project the architecture neighborhood for "PatternGraphAPI"', () => {
-            state!.bundle = projectArchitectureNeighborhood(state!.context!, 'PatternGraphAPI');
+          When('I project the architecture neighborhood for "WidgetService"', () => {
+            state!.bundle = projectArchitectureNeighborhood(state!.context!, 'WidgetService');
           });
 
           Then(
             'the architecture neighborhood should keep empty directional arrays and preserve same-context neighbors',
             () => {
               expect(state!.bundle?.root).toMatchObject({
-                pattern: 'PatternGraphAPI',
+                pattern: 'WidgetService',
                 context: 'api',
                 sameContext: ['ContextAssemblerImpl'],
                 uses: [],
@@ -171,7 +171,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           Given('an architecture neighborhood context without an architecture index', () => {
             state!.context = createProjectionContext({
               patterns: [
-                createPattern('PatternGraphAPI', {
+                createPattern('WidgetService', {
                   archContext: 'api',
                   archLayer: 'application',
                 }),
@@ -181,13 +181,13 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 }),
               ],
               relationshipIndex: {
-                PatternGraphAPI: createRelationshipEntry({ uses: ['PatternHelpers'] }),
+                WidgetService: createRelationshipEntry({ uses: ['PatternHelpers'] }),
               },
             });
           });
 
-          When('I project the architecture neighborhood for "PatternGraphAPI"', () => {
-            state!.bundle = projectArchitectureNeighborhood(state!.context!, 'PatternGraphAPI');
+          When('I project the architecture neighborhood for "WidgetService"', () => {
+            state!.bundle = projectArchitectureNeighborhood(state!.context!, 'WidgetService');
           });
 
           Then('the architecture neighborhood should keep sameContext empty', () => {

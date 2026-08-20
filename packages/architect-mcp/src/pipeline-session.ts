@@ -3,14 +3,14 @@
  * @architect-pattern MCPPipelineSession
  * @architect-status completed
  * @architect-implements MCPToolRegistryIntegrationTests
- * @architect-uses MCPToolRegistry, MCPFileWatcher, BuildPipeline, PatternGraphApi
+ * @architect-uses MCPToolRegistry, MCPFileWatcher, BuildPipeline
  * @architect-role:service
  * @architect-bounded-context:api
  * @architect-product-area:DataAPI
  *
  * ## PipelineSessionManager — In-Memory PatternGraph Lifecycle
  *
- * Owns the long-lived PatternGraph/API pair for the split MCP runtime, including
+ * Owns the long-lived PatternGraph for the split MCP runtime, including
  * config auto-detection, fallback source planning, and coalesced rebuild behavior.
  *
  * **When to Use:** Use for any MCP flow that needs a stable in-process dataset
@@ -33,8 +33,6 @@ import {
   type RuntimePatternGraph,
   type TagRegistry,
   WORKSPACE_TAG_REGISTRY,
-  createPatternGraphAPI,
-  type PatternGraphAPI,
 } from '@libar-dev/architect-core';
 import { normalizeSessionBaseDir } from './runtime-helpers.js';
 
@@ -47,7 +45,6 @@ export interface SessionOptions {
 
 export interface PipelineSession {
   readonly dataset: RuntimePatternGraph;
-  readonly api: PatternGraphAPI;
   readonly registry: TagRegistry;
   readonly tagRegistryOverride?: TagRegistry | undefined;
   readonly baseDir: string;
@@ -194,12 +191,10 @@ export class PipelineSessionManager {
 
     const pipelineResult: BuildResult = result.value;
     const dataset = pipelineResult.graph;
-    const api = createPatternGraphAPI(dataset);
     const buildTimeMs = Date.now() - startMs;
 
     return {
       dataset,
-      api,
       registry: dataset.tagRegistry,
       ...(tagRegistryOverride !== undefined ? { tagRegistryOverride } : {}),
       baseDir,

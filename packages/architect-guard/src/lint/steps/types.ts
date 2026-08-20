@@ -1,4 +1,19 @@
 /**
+ * @architect
+ * @architect-pattern StepLintContract
+ * @architect-status completed
+ * @architect-role:contract
+ * @architect-bounded-context:lint
+ * @architect-uses LintViolationContract
+ *
+ * ## StepLintContract - Step linter contract
+ *
+ * Defines the rule, feature-step pair, and rule registry shapes shared by
+ * vitest-cucumber compatibility checks.
+ *
+ * **When to Use:** Use when defining or consuming step-lint rules and their
+ * feature/step pairing inputs.
+ *
  * Types for the vitest-cucumber step linter.
  *
  * Defines the shapes used by feature-only, step-only, and cross-file checks.

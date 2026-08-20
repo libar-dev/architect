@@ -17,6 +17,7 @@ docs-live/
 .full-review/
 .scratch/
 .pr-coordination/
+.omo/
 
 # Operational feedback log — append-only, and full of literal glob/tag patterns
 # (e.g. `*-values.ts`, `adr-*`) that prettier's markdown parser would silently

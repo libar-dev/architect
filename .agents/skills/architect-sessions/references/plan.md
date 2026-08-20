@@ -17,7 +17,7 @@ If the answers aren't there yet, refining intent in conversation is a valid outc
 
 ## Pre-flight
 
-Run the pre-flight from [`../../architect-graph-handle/SKILL.md`](../../architect-graph-handle/SKILL.md) — the read surface (ADR-014). Orient with `pnpm architect:q 'return {counts: g.api.getStatusCounts(), active: g.api.getCurrentWork().map(p => p.patternName ?? p.name)}'`; locate with `pnpm architect:q 'g.findByConcept("<q>")'` or `pnpm architect:q 'g.patterns.filter(p => p.status === "candidate").map(p => p.name)'`; for candidate readiness read the candidate's full record — `pnpm architect:q 'g.api.getPattern("<Name>")'` — and check its open-questions block. **No scope gate at this tier** — `architect_scope_validate` (MCP) accepts only `design` and `implement`; idea/candidate readiness is structural (the ladder reference).
+Run the pre-flight from [`../../architect-graph-handle/SKILL.md`](../../architect-graph-handle/SKILL.md) — the read surface (ADR-014). Orient with `pnpm architect:q 'return {counts: g.graph.counts, active: g.patterns.filter(p => p.status === "active").map(p => p.name)}'`; locate with `pnpm architect:q 'g.findByConcept("<q>")'` or `pnpm architect:q 'g.patterns.filter(p => p.status === "candidate").map(p => p.name)'`; for candidate readiness read the candidate's full record — `pnpm architect:q 'g.graph.patterns.find(p => p.name === "<Name>")'` — and check its open-questions block. **No scope gate at this tier** — `architect_scope_validate` (MCP) accepts only `design` and `implement`; idea/candidate readiness is structural (the ladder reference).
 
 ## Six-tag idea-tier minimum
 

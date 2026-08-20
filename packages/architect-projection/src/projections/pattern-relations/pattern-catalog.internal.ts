@@ -83,7 +83,7 @@ export function buildPatternCatalog(
 }
 
 /**
- * Resolves an incoming `--status` filter against a pattern's authored status.
+ * Resolves an incoming typed `status` filter against a pattern's authored status.
  * The normalized bucket word `planned` matches the roadmap ∪ deferred union via
  * `normalizeStatus`; every FSM-authored value (candidate/roadmap/active/
  * completed/deferred) matches exactly. `undefined` matches everything.

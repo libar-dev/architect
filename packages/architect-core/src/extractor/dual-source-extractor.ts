@@ -4,7 +4,7 @@
  * @architect-status active
  * @architect-role:service
  * @architect-bounded-context:extractor
- * @architect-uses ExtractedPattern, PatternHelpers
+ * @architect-uses ExtractedPattern, PatternHelpers, GherkinScanResultContract
  */
 import type { ExtractedPattern } from '../types/index.js';
 import { getPatternName } from '../read-api/pattern-helpers.js';

@@ -1,8 +1,8 @@
 # playground — scratch home + experiment findings
 
 **The handle graduated (ADR-014).** The two-surface graph handle that was prototyped here
-now lives in the product: library at `packages/architect-cli/src/handle/`
-(schema · extract · authored · views · graph), front door at the `architect` bin
+now lives in the product: pure frozen contract at `@libar-dev/architect-core/graph`
+(core schemas · trusted views · Graph), live IO composition in `architect-cli`, and the front door at the `architect` bin
 (`pnpm architect:q '<js>'` / `pnpm architect:graph <cmd>`), regression coverage at
 `tests/features/cli/graph-handle.feature`. The operational guide is the
 **`architect-graph-handle` skill** (`.agents/skills/architect-graph-handle/`), including the

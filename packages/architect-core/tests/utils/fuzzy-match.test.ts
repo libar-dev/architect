@@ -5,7 +5,7 @@ import { fuzzyMatchPatterns } from '../../src/utils/fuzzy-match.js';
 const NAMES = [
   'ADR009ProjectionTrustBoundary',
   'ADR006SingleReadModelArchitecture',
-  'PatternGraphApi',
+  'GraphHandle',
   'MarkdownRenderer',
 ] as const;
 

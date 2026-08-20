@@ -88,11 +88,11 @@ Run the read-surface pre-flight per
 (the read surface, ADR-014) — for a refactor that means:
 
 - **Orientation:**
-  `pnpm architect:q 'return {counts: g.api.getStatusCounts(), active: g.api.getCurrentWork().map(p => p.patternName ?? p.name)}'`
+  `pnpm architect:q 'return {counts: g.graph.counts, active: g.patterns.filter(p => p.status === "active").map(p => p.name)}'`
 - **Touched-file inventory:**
   `pnpm architect:q 'const p = g.pattern("<Pattern>"); return {file: p?.sourceFile, realizing: p?.implementedBy}'`
-- **Blast radius:**
-  `pnpm architect:q 'g.api.getDependencyContext("<Pattern>")'`
+- **Dependency context:**
+  `pnpm architect:q 'g.graph.relationshipIndex["<Pattern>"]'`
 - **Blocked work:**
   `pnpm architect:q 'g.patterns.filter(p => p.status === "roadmap" && p.uses.some(u => g.pattern(u)?.status !== "completed")).map(p => p.name)'`
 - **Graph-integrity gate** (also used in the closing checks below):
@@ -120,7 +120,7 @@ work is feature work disguised as refactor — route to
 2. **Read before edit.** Read the executable feature first; read every
    production file the inventory one-liner lists (`sourceFile` +
    `implementedBy`); read the
-   `pnpm architect:q 'g.api.getDependencyContext("<Pattern>")'` output
+   `pnpm architect:q 'g.graph.relationshipIndex["<Pattern>"]'` output
    to understand the blast radius. Do not skim.
 3. **Capture decisions before code.** Any invariant the refactor
    intends to change must be entered in `.pr-coordination/DECISIONS.md`
@@ -181,7 +181,7 @@ submodule` edges are acceptable. Verify against the barrel's actual
 Read back every such edge through the graph handle after authoring.
 The file edit is not proof until
 `pnpm architect:q 'g.pattern("<Pattern>")'` (the node carries
-`uses`/`usedBy`) or `g.api.getDependencyContext("<Pattern>")` shows
+`uses`/`usedBy`) or `g.graph.relationshipIndex["<Pattern>"]` shows
 the intended relationship in the live graph.
 
 ## Adapted invariant-carrier gate
@@ -210,7 +210,7 @@ five must hold before declaring the refactor done.
    `@architect-pattern` on the `.ts`; no stale `@architect-uses`
    referencing removed dependencies.
 5. **Graph integrity.** The
-   `g.api.getDependencyContext("<Pattern>")` after-state matches the
+   `g.graph.relationshipIndex["<Pattern>"]` after-state matches the
    refactor's intent — no surprise edges. The blocked-work script
    (`pnpm architect:q 'g.patterns.filter(p => p.status === "roadmap" && p.uses.some(u => g.pattern(u)?.status !== "completed")).map(p => p.name)'`)
    shows no new blockers introduced by the refactor. (Run both reads

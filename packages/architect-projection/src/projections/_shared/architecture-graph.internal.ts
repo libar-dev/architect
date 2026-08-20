@@ -29,8 +29,8 @@
  *
  * Lives in `_shared/` (not in documentation-composition) because two bounded
  * contexts consume it: `ArchitectureDiagramProjection` (the full architecture
- * doc) and `OverviewProjection` (the heads-up architecture glimpse on the
- * `overview` verb). Node collection, edge collection, grouping, inter-group edge
+ * doc) and `OverviewProjection` (the heads-up architecture glimpse exposed by
+ * the `architect_overview` MCP tool). Node collection, edge collection, grouping, inter-group edge
  * aggregation, and `graph LR` emission are identical for both; only the grouping
  * axis differs. The output is deterministic (every collection sorts), so the
  * `docs:all` determinism gate proves the architecture doc is byte-identical
@@ -604,7 +604,7 @@ function resolveNodeGroup(node: NodeShape, mode: GroupingMode): ResolvedGroup {
 
 /**
  * Collect the component-scope node + edge set once, for callers that need both
- * (e.g. the `overview` glimpse builds two charts — package + bounded-context —
+ * (e.g. the overview projection builds two charts — package + bounded-context —
  * off one collection). Applies the unconditional test-feature / decision-record
  * exclusion via the `'component'` scope, so node counts match the architecture
  * doc's context map.

@@ -53,14 +53,14 @@ Historical role names such as `core`, `api`, and `infra` are no longer part of t
 ## Generating the live reference
 
 ```bash
-# Recommended
-pnpm pkg:docs
+# Regenerate the taxonomy projection
+pnpm docs:taxonomy
 
-# Query the structured digest directly
-pnpm pkg:query -- taxonomy --format json
+# Query the structured live registry directly
+pnpm architect:q 'g.graph.tagRegistry'
 ```
 
-Use the generated docs when you need exact tag groups, allowed enum values, required flags, or examples. Use the JSON query when a tool needs the structured shape.
+Use the generated docs when you need exact tag groups, allowed enum values, required flags, or examples. Query `g.graph.tagRegistry` when a tool needs the structured shape.
 
 ---
 

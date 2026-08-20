@@ -1,3 +1,19 @@
+/**
+ * @architect
+ * @architect-pattern DanglingBaseline
+ * @architect-status completed
+ * @architect-role:service
+ * @architect-bounded-context:validation
+ * @architect-uses PipelineDatasetContract
+ *
+ * ## DanglingBaseline - Baseline comparison service
+ *
+ * Reads, normalizes, writes, and compares the persisted dangling-reference
+ * baseline used by the strict graph-integrity gate.
+ *
+ * **When to Use:** Use when the dangling gate needs deterministic baseline
+ * comparison or explicit baseline regeneration.
+ */
 import fs from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 

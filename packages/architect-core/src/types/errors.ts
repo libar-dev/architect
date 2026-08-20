@@ -4,6 +4,7 @@
  * @architect-pattern ErrorFactoryTypes
  * @architect-status completed
  * @architect-product-area CoreTypes
+ * @architect-bounded-context:domain
  *
  * ## Error Factories - Type Definitions
  *

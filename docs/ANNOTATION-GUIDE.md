@@ -173,20 +173,20 @@ Feature: Process Guard linter executable tests
 ### CLI commands
 
 ```bash
-# Structured taxonomy digest
-pnpm pkg:query -- taxonomy --format json
+# Structured live taxonomy registry
+pnpm architect:q 'g.graph.tagRegistry'
 
-# Files missing @architect opt-in
-pnpm pkg:query -- unannotated --path src/types
+# Curation candidates and diagnostic annotation coverage
+pnpm architect:graph census
 
-# Inventory by source type
-pnpm pkg:query -- sources
+# Inventory counts by source type
+pnpm architect:q 'Object.fromEntries(Object.entries(g.graph.bySourceType).map(([type, patterns]) => [type, patterns.length]))'
 
 # Full pattern context
-pnpm pkg:query -- pattern MyPattern --format json
+pnpm architect:q 'g.pattern("GraphHandle")'
 
-# Regenerate the docs snapshots
-pnpm pkg:docs
+# Regenerate the docs projections
+pnpm docs:all
 ```
 
 ### Common issues

@@ -28,21 +28,50 @@ Feature: Graph-handle CLI — the agent read surface
 
     @happy-path
     Scenario: argv expression round-trips against the live graph
-      When I run the graph CLI with q expression "g.patterns.length"
+      When I run the graph CLI with q expression "g.pattern('GraphHandle')?.name"
       Then the exit code is zero
-      And stdout is a number greater than 300
+      And stdout is "GraphHandle"
+
+    @happy-path
+    Scenario: the CLI composes the public core Graph
+      When I load the CLI graph composition
+      Then the handle is the public core Graph
+      And the handle has no api field
+      And the canonical graph and FSM are frozen
+      And deferred patterns have plan maturity
+
+    @happy-path
+    Scenario: the migrated handle exposes canonical graph and FSM values
+      When I run the migrated handle characterization
+      Then the exit code is zero
+      And the characterization reports api is absent
+      And the characterization reports FSM is available
+      And the characterization reports canonical graph is frozen
+      And the characterization reports deferred maturity is plan
 
     @happy-path
     Scenario: argv multi-statement body round-trips
-      When I run the graph CLI with q expression "const n = g.patterns.length; return n > 0"
+      When I run the graph CLI with q expression "const p = g.pattern('GraphHandle'); return p?.name"
       Then the exit code is zero
-      And stdout is "true"
+      And stdout is "GraphHandle"
 
     @happy-path
     Scenario: stdin script round-trips
-      When I pipe a script returning the pattern count into the graph CLI
+      When I pipe a script returning the GraphHandle sentinel into the graph CLI
       Then the exit code is zero
-      And stdout is a number greater than 300
+      And stdout is "GraphHandle"
+
+    @negative
+    Scenario: the removed api field fails loud
+      When I run the graph CLI with q expression "return g.api.getStatusCounts()"
+      Then the exit code is non-zero
+      And stderr mentions "getStatusCounts"
+
+    @negative
+    Scenario: canonical graph mutation cannot corrupt a fresh read
+      When I attempt canonical graph mutation through q
+      Then mutation throws or the GraphHandle sentinel remains unchanged
+      And a fresh q invocation returns the GraphHandle sentinel
 
     @negative
     Scenario: an import in the body fails loud with the injected-globals hint
@@ -75,8 +104,8 @@ Feature: Graph-handle CLI — the agent read surface
   Rule: The dangling gate is a deterministic machine contract
 
     **Invariant:** `architect dangling --baseline <committed> --strict` exits
-    zero when the working tree matches the committed baseline and reports
-    `drift` as a boolean in its JSON document.
+    zero when the working tree matches the committed baseline and returns the
+    exact established JSON document shape.
 
     **Rationale:** This is the ONE frozen machine contract on the bin (CI is
     its second caller, per the second-caller bar); its exit semantics are the
@@ -88,4 +117,4 @@ Feature: Graph-handle CLI — the agent read surface
     Scenario: the strict gate passes against the committed baseline
       When I run the graph CLI dangling gate against the committed baseline
       Then the exit code is zero
-      And stdout parses as JSON with "drift" false
+      And stdout matches the exact strict dangling JSON shape

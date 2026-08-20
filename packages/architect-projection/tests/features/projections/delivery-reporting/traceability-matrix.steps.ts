@@ -66,15 +66,15 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           Given('a traceability projection context with realized and unrealized patterns', () => {
             state!.context = createProjectionContext({
               patterns: [
-                createPattern('PatternGraphApi', {
+                createPattern('GraphHandle', {
                   status: 'completed',
-                  file: 'packages/architect-core/src/read-api/pattern-graph-api.ts',
+                  file: 'packages/architect-core/src/read-api/graph-handle.ts',
                   deliverables: [
                     {
                       name: 'Read API surface',
                       status: 'complete',
                       tests: 2,
-                      location: 'packages/architect-core/src/read-api/pattern-graph-api.ts',
+                      location: 'packages/architect-core/src/read-api/graph-handle.ts',
                     },
                   ],
                 }),
@@ -88,13 +88,13 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 }),
               ],
               relationshipIndex: {
-                PatternGraphApi: relationshipEntry([
+                GraphHandle: relationshipEntry([
                   {
-                    name: 'PatternGraphApiReverseLookup',
+                    name: 'GraphRelationshipLookupExecutableTests',
                     file: 'packages/architect-core/tests/features/read-api/reverse-lookup.feature',
                   },
                   {
-                    name: 'PatternGraphApiConsistencyExecutableTests',
+                    name: 'GraphFieldConsistencyExecutableTests',
                     file: 'packages/architect-core/tests/features/read-api/consistency.feature',
                   },
                 ]),
@@ -117,7 +117,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             'the traceability matrix should include only patterns with realization edges',
             () => {
               expect(state!.bundle?.root.rows.map((row) => row.pattern)).toEqual([
-                'PatternGraphApi',
+                'GraphHandle',
                 'TraceabilityMatrixProjection',
               ]);
             },
@@ -126,14 +126,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           And("each row's tests should be the realizing source files", () => {
             expect(state!.bundle?.root.rows).toEqual([
               {
-                pattern: 'PatternGraphApi',
+                pattern: 'GraphHandle',
                 status: 'completed',
                 tests: [
                   'packages/architect-core/tests/features/read-api/consistency.feature',
                   'packages/architect-core/tests/features/read-api/reverse-lookup.feature',
                 ],
-                specs: ['packages/architect-core/src/read-api/pattern-graph-api.ts'],
-                deliverables: ['packages/architect-core/src/read-api/pattern-graph-api.ts'],
+                specs: ['packages/architect-core/src/read-api/graph-handle.ts'],
+                deliverables: ['packages/architect-core/src/read-api/graph-handle.ts'],
               },
               {
                 pattern: 'TraceabilityMatrixProjection',
@@ -151,7 +151,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
           And('the traceability child keys should be deterministic', () => {
             expect(Object.keys(state!.bundle?.children ?? {})).toEqual([
-              'pattern-graph-api',
+              'graph-handle',
               'traceability-matrix-projection',
             ]);
           });

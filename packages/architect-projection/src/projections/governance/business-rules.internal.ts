@@ -177,10 +177,11 @@ function collectBusinessRules(
 }
 
 /**
- * The distinct product areas the `rules --product-area` filter can match — every
- * business rule's `productArea` (`pattern.productArea ?? DEFAULT_PRODUCT_AREA`),
- * deduped and sorted. This is the fail-loud accepted set for the CLI
- * `--product-area` filter: it INCLUDES the `DEFAULT_PRODUCT_AREA` bucket that the
+ * The distinct product areas the `architect_rules` MCP `productArea` filter can
+ * match — every business rule's `productArea`
+ * (`pattern.productArea ?? DEFAULT_PRODUCT_AREA`), deduped and sorted. This is
+ * the fail-loud accepted set for the typed filter: it INCLUDES the
+ * `DEFAULT_PRODUCT_AREA` bucket that the
  * pattern-keyed `graph.byProductArea` omits (a pattern with no `productArea` is
  * absent from `byProductArea`, yet its rules still bucket under the default), so
  * the accepted set equals the filter target by construction — a valid area never
@@ -220,11 +221,11 @@ function patternMatchesRuleSetScope(
 }
 
 /**
- * The set of lowercased canonical feature names a `--pattern` query resolves to:
- * the named pattern itself plus every pattern that realizes it via the derived
- * `implementedBy` reverse edge (ADR-002/ADR-003). This lets `rules --pattern
- * <TsPattern>` aggregate the rules authored on the implementing `.feature`
- * specs, not just the focal node's own rules.
+ * The set of lowercased canonical feature names a pattern-scoped rule query
+ * resolves to: the named pattern itself plus every pattern that realizes it via
+ * the derived `implementedBy` reverse edge (ADR-002/ADR-003). This lets the
+ * `architect_rules` MCP tool aggregate rules authored on the implementing
+ * `.feature` specs for a TypeScript pattern, not just the focal node's own rules.
  */
 function resolveFeatureScopeNames(context: ProjectionContext, scopeValue: string): Set<string> {
   const names = new Set<string>([scopeValue.toLowerCase()]);

@@ -276,7 +276,7 @@ function createBusinessRuleSetPerfContext(): BusinessRuleSetPerfFixture {
           name: `${productArea} rule ${ruleLabel} for ${patternName}`,
           description: [
             `**Invariant:** ${patternName} keeps rule ${ruleLabel} stable across grouped JSON output.`,
-            `**Rationale:** The rules command must keep ${productArea} semantics visible to renderer consumers.`,
+            `**Rationale:** The rules projection must keep ${productArea} semantics visible to renderer consumers.`,
             `**Verified by:** ${scenarioName}, ${patternName} rule ${ruleLabel} keeps pretty JSON parseable`,
           ].join('\n'),
           scenarioNames: [

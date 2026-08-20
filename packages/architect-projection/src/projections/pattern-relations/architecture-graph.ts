@@ -4,6 +4,7 @@
  * @architect-status active
  * @architect-role:projection
  * @architect-bounded-context:projection
+ * @architect-uses ArchitectureGraphSupport, ProjectionContext
  *
  * ## Whole-graph architecture dump
  *
@@ -20,7 +21,7 @@
  *
  * ### When to Use
  *
- * - Projects the whole component-scope architecture graph as structured nodes and typed edges for the `arch graph` verb and graph-explorer surfaces.
+ * - Projects the whole component-scope architecture graph as structured nodes and typed edges for programmatic projection consumers and graph-explorer surfaces.
  */
 import { z } from 'zod';
 

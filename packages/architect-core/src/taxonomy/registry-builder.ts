@@ -4,6 +4,7 @@
  * @architect-status active
  * @architect-role:utility
  * @architect-bounded-context:configuration
+ * @architect-uses HierarchyLevelDomain
  *
  * ## RegistryBuilder - Canonical TagRegistry Assembly
  *

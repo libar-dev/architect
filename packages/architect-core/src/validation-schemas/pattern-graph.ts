@@ -13,8 +13,8 @@
  *
  * The assembled runtime read model — patterns + `relationshipIndex` +
  * precomputed views — is the value produced by `transformToPatternGraph()`
- * (`generators/pipeline`) and served read-only by the `PatternGraphApi` facade
- * (`read-api`). Per ADR-006 (Single Read Model) that assembled value, not this
+ * (`generators/pipeline`) and exposed read-only through the frozen core Graph
+ * (`@libar-dev/architect-core/graph`). Per ADR-006 (Single Read Model) that assembled value, not this
  * schema, is the single read model every CLI subcommand, MCP tool, generated
  * doc, and desktop view queries. `RuntimePatternGraph` is a type alias of the
  * inferred `PatternGraph` type, so the schema below is the one canonical shape

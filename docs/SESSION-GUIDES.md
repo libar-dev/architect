@@ -34,7 +34,7 @@ Starting from pattern brief?
 
 ```bash
 # Project health
-pnpm architect:q 'return {counts: g.api.getStatusCounts(), active: g.api.getCurrentWork().map(p => p.patternName ?? p.name)}'
+pnpm architect:q 'return {counts: g.graph.counts, active: g.patterns.filter(p => p.status === "active").map(p => p.name)}'
 # Available patterns
 pnpm architect:q 'g.patterns.filter(p => p.status === "roadmap").map(p => p.name)'
 ```
@@ -104,7 +104,7 @@ See [`tests/features/validation/fsm-validator.feature`](../tests/features/valida
 # Full context bundle (typed bundles remain the architect_bundle / architect_context MCP tools)
 pnpm architect:q 'const p = g.pattern("<PatternName>"); return {p, invariants: g.invariantsOf("<PatternName>"), reverifies: g.specsReverifying(["<PatternName>"]).length}'
 # Dependency chain
-pnpm architect:q 'g.api.getDependencyContext("<PatternName>")'
+pnpm architect:q 'g.graph.relationshipIndex["<PatternName>"]'
 # Existing design stubs live on disk:
 ls architect/stubs/<pattern-name>/
 ```
@@ -177,7 +177,7 @@ Use these **before** launching explore agents. See [CLI.md](./CLI.md) and the `a
 # Pre-flight — catches FSM violations, missing deps, incomplete deliverables:
 # ALWAYS run the architect_scope_validate MCP tool (PASS/WARN/BLOCKED) first.
 # The deterministic FSM check from the CLI:
-pnpm architect:q 'g.api.isValidTransition("roadmap","active")'
+pnpm architect:q 'g.fsm.isValidTransition("roadmap","active")'
 
 # Curated context — deliverables, FSM state, test files
 pnpm architect:q 'const p = g.pattern("<PatternName>"); return {p, invariants: g.invariantsOf("<PatternName>"), reverifies: g.specsReverifying(["<PatternName>"]).length}'

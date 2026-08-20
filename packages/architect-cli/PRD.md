@@ -34,13 +34,13 @@ The retired 24-verb CLI is **deleted**, not deprecated. What remains:
 | Frozen machine gate                        | `dangling [--baseline <path>] [--write-baseline] [--strict]` — the CI graph-integrity gate                                            |
 | UX                                         | `help` / `--help` / `-h` · `version` / `--version` / `-v`                                                                             |
 
-`g.api` is the canonical `PatternGraphAPI` (ADR-006). Deterministic reads that used to be verbs (`getStatusCounts`, `isValidTransition`, …) are one `q` script away. Stable typed tools for Studio / burst-mode remain on **MCP** (`architect_scope_validate`, `architect_handoff`, …) — not this bin.
+`g.graph` is the complete deeply frozen PatternGraph and `g.fsm` exposes the four deterministic transition operations. Status/group/relationship reads are scripts over `g.graph`; transition checks use `g.fsm`. Stable typed tools for Studio / burst-mode remain on **MCP** (`architect_scope_validate`, `architect_handoff`, …) — not this bin.
 
 ## Enumerated functionality
 
-**`architect` graph-handle CLI** (`graph-cli.ts`, ADR-014): `--base-dir` resolution, the `q` eval front door (`node:vm`-compiled function body with `g` / `inspect` / `execFileSync` / `REPO_ROOT` injected), named demo commands over the handle, and the one frozen machine contract — `dangling --baseline --strict`. The handle library lives in `src/handle/`: schema (discovery shapes), extract (mechanical substrate), authored (live curated core via `buildCliContext`), views (pure view functions), graph (`Graph` + `loadGraph`, incl. `g.api`).
+**`architect` graph-handle CLI** (`graph-cli.ts`, ADR-014): `--base-dir` resolution, the `q` eval front door (`node:vm`-compiled function body with `g` / `inspect` / `execFileSync` / `REPO_ROOT` injected), named demo commands over the handle, and the one frozen machine contract — `dangling --baseline --strict`. The published pure Graph library lives at `@libar-dev/architect-core/graph`. CLI `src/handle/` retains only source/config/filesystem composition: mechanical extraction, authored graph construction, and `loadGraph()`.
 
-**Shared pipeline** (`cli-runtime.ts` + `cli-types.ts`): `buildCliContext` resolves workspace sources, builds the PatternGraph, and returns graph + API + the build's validation summary. Used by the handle and by the dangling gate.
+**Shared pipeline** (`cli-runtime.ts` + `cli-types.ts`): `buildCliContext` resolves workspace sources, builds the PatternGraph, and returns the graph plus the build's validation summary. Used by the handle and by the dangling gate.
 
 **`architect-generate`** — builds the PatternGraph and renders the documentation registry to `docs-live/`; maintains the generated-docs manifest; supports `--all`, `--list-generators`, output-dir + overwrite, disclosure level, and projection filter. The determinism-gate producer (`pnpm docs:all`).
 
@@ -50,11 +50,11 @@ The retired 24-verb CLI is **deleted**, not deprecated. What remains:
 
 Intra-repo (all `workspace:*`, direction = cli → dep):
 
-- `@libar-dev/architect-core` — boundary parsing, config loaders, PatternGraph build (`buildPatternGraph`), `PatternGraphAPI`, runtime-path helpers.
+- `@libar-dev/architect-core` — boundary parsing, config loaders, PatternGraph build (`buildPatternGraph`), pure read kernels, runtime-path helpers, and the published `@libar-dev/architect-core/graph` contract.
 - `@libar-dev/architect-projection` — documentation registry + projection functions used by `architect-generate` and (indirectly) MCP-owned sinks.
 - `@libar-dev/architect-guard` — lint/validate/guard CLI runtimes (re-exported wholesale) plus dangling-baseline compare/write used by `architect dangling`.
 
-External: `zod` (^4) only (runtime). Dev: `vitest` + `@amiceli/vitest-cucumber` for the executable features.
+External runtime dependencies are `typescript` (^5.8), which owns the CLI mechanical source walk, and `zod` (^4) for boundary validation. Dev dependencies include `vitest` + `@amiceli/vitest-cucumber` for the executable features.
 
 ## Consumers
 
@@ -86,4 +86,4 @@ External: `zod` (^4) only (runtime). Dev: `vitest` + `@amiceli/vitest-cucumber` 
 - **Approx LOC:** ~2.3k across `src/handle/` + `graph-cli.ts` + shared runtime/types; `generate-docs.ts` is the largest single file (~670).
 - **Dispatchable surfaces on `architect`:** 1 eval front door (`q`) + 11 named demos + 1 machine gate (`dangling`) + help/version.
 - **Bins:** 6 (1 graph-handle router + 1 generator + 4 thin guard/validate re-exports).
-- **Patterns owned (live graph):** GraphHandle, GraphHandleCli, GraphHandleShapes, GraphHandleViews, AuthoredCoreBuilder, MechanicalSubstrateExtractor, CLIContextTypes, CLIErrorHandler, CLIRuntimePaths, plus package executable-test features.
+- **Patterns owned (live graph):** `GraphHandle` is the CLI-owned live IO composition over the core Graph contract; `GraphHandleCli` owns the q/named-command front door. The other production nodes are `AuthoredCoreBuilder`, `MechanicalSubstrateExtractor`, `CLIContextBuilder`, `CLIContextTypes`, `CLIErrorHandler`, and `CLIRuntimePaths`. Executable-test nodes are `CliCommandResolutionExecutableTests`, `CliFlagParsingExecutableTests`, and `CliInvocationDirResolutionExecutableTests`. The frozen Graph implementation and query views themselves belong to `@libar-dev/architect-core/graph`.

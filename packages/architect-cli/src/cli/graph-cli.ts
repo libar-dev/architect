@@ -6,7 +6,7 @@
  * @architect-role:service
  * @architect-bounded-context:cli
  * @architect-product-area:DataAPI
- * @architect-uses GraphHandle, GraphHandleViews, AuthoredCoreBuilder, MechanicalSubstrateExtractor, CLIRuntimePaths, CLIContextTypes
+ * @architect-uses GraphHandle, AuthoredCoreBuilder, MechanicalSubstrateExtractor, CLIRuntimePaths, CLIContextTypes
  * @architect-enforces-decision:ADR014AgentReadSurface
  * @architect-usecase The `architect` bin — the agent read surface: `architect q '<js>'` evals against the live graph handle; named commands are thin demos; `architect dangling` is the CI graph-integrity gate.
  *
@@ -43,13 +43,14 @@ import {
   DANGLING_BASELINE_SOURCE_PATH,
   writeDanglingBaseline,
 } from '@libar-dev/architect-guard';
+import { MATURITY_VALUES } from '@libar-dev/architect-core';
 import { z } from 'zod';
 
 import { buildCliContext } from './cli-runtime.js';
 import type { BuildContextArgs } from './cli-types.js';
 import { readCliPackageMetadata, resolveCliBaseDirArg } from './runtime-helpers.js';
+import { censusCandidateLine, buildCensusReport } from './census-report.js';
 import { loadGraph } from '../handle/graph.js';
-import { MATURITIES } from '../handle/schema.js';
 
 // ─── argv: [--base-dir <dir>] <command> [args…] ──────────────────────────────
 // Zod-first boundary: the flag values this bin consumes are validated through
@@ -87,7 +88,7 @@ const USAGE = [
   '  q < script.js         multi-line script from stdin (plain JS function body)',
   '',
   'named demos (each is a script over the handle — runnable documentation):',
-  '  census                node/edge annotation coverage per package',
+  '  census                curation candidates, then diagnostic node/edge coverage per package',
   '  diff                  mechanical ⋈ authored edges: shared / dark / aspirational',
   '  blast [ref]           impact of `git diff <ref>`: downstream + at-risk specs',
   '  fan-in [min]          curation assist: load-bearing modules with no pattern node',
@@ -104,8 +105,8 @@ const USAGE = [
   '                        dangling-reference report; with --baseline compares and',
   '                        (--strict) exits 1 on drift; --write-baseline updates it',
   '',
-  'in q scope: g (the handle — see g.api for the canonical PatternGraphAPI), inspect,',
-  '            execFileSync, REPO_ROOT (the resolved base dir; cwd is set there).',
+  'in q scope: g (the frozen core Graph), inspect, execFileSync, REPO_ROOT',
+  '            (the resolved base dir; cwd is set there).',
 ].join('\n');
 
 // ─── untrusted git-ref hygiene (three layers; see ADR-009 posture) ────────────
@@ -223,18 +224,18 @@ const PROV = { executable: '✓exec', authored: '○auth' } as const;
 
 async function censusCmd(): Promise<void> {
   const g = await loadGraph(BASE_DIR);
-  const r = g.census();
-  console.log(`\nnode coverage (non-barrel src → pattern node):`);
+  const r = buildCensusReport(g);
+  console.log('\nsignificance candidates (curation assistance):');
+  for (const candidate of r.candidates) console.log(censusCandidateLine(candidate));
+  console.log('\npackage coverage (diagnostic-only):');
   for (const c of r.nodeCoverage)
     console.log(`  ${c.pkg.padEnd(22)} ${String(c.mapped)}/${String(c.total)} (${String(c.pct)}%)`);
   console.log(`\nedge density (of ${String(r.patternCount)} patterns):`);
   for (const [k, v] of Object.entries(r.edgeDensity))
     console.log(
-      `  ${k.padEnd(16)} ${String(v)} (${String(Math.round((v / r.patternCount) * 100))}%)`,
+      `  ${k.padEnd(16)} ${String(v)} (${String(Math.round((v / Math.max(r.patternCount, 1)) * 100))}%)`,
     );
-  console.log(
-    `  fully edge-dark: ${String(r.edgeDark)} (${String(Math.round((r.edgeDark / r.patternCount) * 100))}%)`,
-  );
+  console.log(`  fully edge-dark: ${String(r.edgeDark)} (${String(r.edgeDarkPercentage)}%)`);
 }
 
 async function diffCmd(): Promise<void> {
@@ -442,7 +443,7 @@ async function specsCmd(): Promise<void> {
 // few lines of groupBy stays here; only irreducible joins go on the handle.
 async function maturityCmd(): Promise<void> {
   const g = await loadGraph(BASE_DIR);
-  const rows = MATURITIES.map((m) => {
+  const rows = MATURITY_VALUES.map((m) => {
     const ps = g.patterns.filter((p) => p.maturity === m);
     // KNOWN SCOPE EDGE (intentional): counts only Rule blocks the pattern carries
     // DIRECTLY (`ruleCount`). A production pattern whose invariants live in a *realizing*

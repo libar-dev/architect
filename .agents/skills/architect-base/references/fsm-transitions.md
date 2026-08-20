@@ -4,7 +4,7 @@ Reference for the Architect PatternGraph's status transitions
 and the `@architect-unlock-reason:` audit-trail requirement. The
 `architect-sessions` implement and handoff references rely on this
 table, and the `architect_scope_validate` verdicts and
-`g.api.isValidTransition` answers on the read surface
+`g.fsm.isValidTransition` answers on the read surface
 (`architect-graph-handle`, ADR-014) resolve against it.
 
 The kernel splits "transitions" into two categories that are easy to
@@ -40,7 +40,7 @@ Notes:
   `architect_scope_validate` MCP tool as the pre-flight
   check that catches bad transitions before they fire.
 - Verify a candidate transition programmatically with
-  `pnpm architect:q 'g.api.isValidTransition("<currentState>","<targetState>")'`
+  `pnpm architect:q 'g.fsm.isValidTransition("<currentState>","<targetState>")'`
   — the check returns a deterministic answer.
 
 ## Maturity-driven status flips (acceptance-gate, not FSM)
@@ -81,7 +81,7 @@ Authoring rules (verified against the guard's runtime checks):
   `fixme`. Placeholder values are treated as no unlock reason at all.
 - The reason is human-readable, free-text, and shows up in audit
   reads over the read surface (e.g.
-  `pnpm architect:q 'g.api.getPattern("<Pattern>")'` — the full
+  `pnpm architect:q 'g.graph.patterns.find(p => p.name === "<Pattern>")'` — the full
   canonical record).
 
 ## Pre-flight: use scope-validate
@@ -91,7 +91,7 @@ Before transitioning a pattern, run the pre-flight via the
 session), and verify the FSM leg deterministically:
 
 ```bash
-pnpm architect:q 'g.api.isValidTransition("<from>","<to>")'
+pnpm architect:q 'g.fsm.isValidTransition("<from>","<to>")'
 ```
 
 The session parameter selects the readiness target. The check
@@ -107,10 +107,10 @@ above is the source of truth — promote through the missing rungs first.
 This file is **self-contained** — the FSM transition table, unlock-reason
 rules (10-char minimum, placeholder rejection), and the
 `isValidTransition` check are all canonical here. Verify the check
-live with `pnpm architect:q 'g.api.isValidTransition("roadmap","active")'`;
+live with `pnpm architect:q 'g.fsm.isValidTransition("roadmap","active")'`;
 verify the FSM behavior live with the `architect_scope_validate` MCP
 tool. No external doc dependency.
 
 See [`../SKILL.md`](../SKILL.md) §"Anti-anecdote" — when a sampled
 finding contradicts this table, the live graph
-(`g.api.isValidTransition`) wins, not the sample.
+(`g.fsm.isValidTransition`) wins, not the sample.

@@ -4,6 +4,7 @@
  * @architect-status active
  * @architect-role:service
  * @architect-bounded-context:scanner
+ * @architect-uses ExportInfoContract
  */
 import {
   AST_NODE_TYPES,

@@ -117,18 +117,18 @@ const OVERVIEW_CLI_HINTS: readonly string[] = [
   "pnpm architect:q '<js>'             evaluate a script against the live graph handle (g)",
   '',
   '  ORIENT',
-  '    g.api.getStatusCounts()               Status distribution · g.api.getCurrentWork() active work',
+  '    g.graph.counts                        Status distribution · g.graph.byStatus.active current work',
   "    g.findByConcept('<phrase>')           Fuzzy concept → ranked patterns",
   '    docs-live/ARCHITECTURE.md             THE architecture map · docs-live/TAXONOMY.md the tag set',
   '  INSPECT A PATTERN',
   "    g.pattern('<Name>')                   Decoded node: status · role · edges · maturity",
-  "    g.api.getPattern('<Name>')            Full canonical record (deps + rules + open questions)",
+  "    g.graph.patterns.find(p => p.name === '<Name>')  Full canonical record",
   "    g.invariantsOf('<Name>')              Invariants, labeled live-test vs authored",
   '  NAVIGATE / IMPACT',
   "    g.byFile('<path>') · g.bySymbol('<X>')  File / symbol → architectural context",
   '    g.blastRadius(changedFiles)           Exhaustive impact + at-risk specs',
   '  GATE',
-  '    g.api.isValidTransition(from, to)     Deterministic FSM check',
+  '    g.fsm.isValidTransition(from, to)     Deterministic FSM check',
   '    architect_scope_validate (MCP)        PASS / WARN / BLOCKED readiness verdict',
   '',
   'Named demos + the CI gate: pnpm architect:graph <census|blast|fan-in|drift|dangling|...>',
@@ -139,7 +139,7 @@ const OVERVIEW_CLI_HINTS: readonly string[] = [
  * The high-signal generated docs a cold-start agent should read first, by
  * documentation-type key. The overview owns this curation (which subset counts
  * as "orientation" is a presentation concern), but the reference CONTENT —
- * title, verb — is derived from the canonical documentation-type registry, and
+ * title and typed tool-call hint — is derived from the canonical documentation-type registry, and
  * `buildOrientationReferences` fails loud if a key here is absent from the
  * registry, so the two cannot silently drift.
  */
@@ -152,11 +152,12 @@ const ORIENTATION_DOC_KEYS: readonly string[] = [
 ];
 
 /**
- * One-line note teaching the disclosure drill-down mechanic on
- * `architect_documentation` (the tier vocabulary the orientation docs accept).
+ * One-line note teaching the typed `disclosure` input field on the
+ * `architect_documentation` MCP tool (the tier vocabulary the orientation docs
+ * accept).
  */
 const OVERVIEW_DISCLOSURE_HINT =
-  'Each doc accepts --disclosure essential|important|useful|advanced to control depth.';
+  'Call architect_documentation with { documentType, disclosure: "essential" | "important" | "useful" | "advanced" } to control depth.';
 
 /** Roadmap patterns to name in the "safe to start" sample before collapsing to a count. */
 const OVERVIEW_STARTABLE_SAMPLE_LIMIT = 8;
@@ -171,7 +172,7 @@ const OVERVIEW_STARTABLE_SAMPLE_LIMIT = 8;
 const OVERVIEW_GENERATED_VIEWS: readonly { docType: string; verb: string; summary: string }[] =
   SUPPORTED_DOCUMENTATION_TYPE_IDENTITIES.map((identity) => ({
     docType: identity.key,
-    verb: `architect_documentation ${identity.key}`,
+    verb: `architect_documentation { documentType: "${identity.key}" }`,
     summary: identity.description,
   }));
 
@@ -185,7 +186,7 @@ const OVERVIEW_ARCHITECTURE_POINTER =
 
 /**
  * Resolves the curated orientation-doc keys against the canonical
- * documentation-type registry, deriving each reference's verb + title from the
+ * documentation-type registry, deriving each reference's typed tool-call hint + title from the
  * single source. Fails loud if a key in `ORIENTATION_DOC_KEYS` is not a
  * supported documentation type, so the curated subset cannot silently drift
  * away from the registry.
@@ -203,7 +204,7 @@ function buildOrientationReferences(): OrientationReference[] {
     }
     return {
       docType: identity.key,
-      verb: `architect_documentation ${identity.key}`,
+      verb: `architect_documentation { documentType: "${identity.key}" }`,
       title: identity.displayTitle,
     };
   });
@@ -226,7 +227,7 @@ function buildRoleDistribution(patterns: readonly ExtractedPattern[]): RoleCount
  * Builds the high-level architecture glimpse for the overview: a coarse
  * package-level context map (always) plus the richer bounded-context map
  * (identical grouping to `docs-live/ARCHITECTURE.md`). Both derive from ONE
- * component-scope node/edge collection so the most-called verb pays a single
+ * component-scope node/edge collection so the frequently requested projection pays a single
  * graph walk; the renderer decides which chart each disclosure level shows.
  *
  * Best-effort: the glimpse needs every component node's source file to resolve

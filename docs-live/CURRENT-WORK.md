@@ -109,6 +109,7 @@ Current work timeline covering 178 patterns.
 | MarkdownRendererExecutableTests                     | active | projection | packages/architect-projection/tests/features/renderers/render-markdown.feature                                            |
 | MarkdownRouteProfile                                | active | service    | packages/architect-projection/src/renderers/markdown-paths.ts                                                             |
 | MaturityLevelDomain                                 | active | contract   | packages/architect-core/src/taxonomy/maturity-values.ts                                                                   |
+| MCPPipelineSessionDatasetLookupExecutableTests      | active |            | packages/architect-mcp/tests/features/mcp-pipeline-session-no-facade.feature                                              |
 | MCPRuntimeHardeningExecutableTests                  | active |            | packages/architect-mcp/tests/features/mcp-runtime-hardening.feature                                                       |
 | MCPServerLifecycleExecutableTests                   | active |            | packages/architect-mcp/tests/features/mcp-server-lifecycle.feature                                                        |
 | MCPToolInputValidationExecutableTests               | active |            | packages/architect-mcp/tests/features/mcp-tool-input-validation.feature                                                   |
@@ -128,9 +129,7 @@ Current work timeline covering 178 patterns.
 | PatternClassification                               | active | utility    | packages/architect-core/src/read-api/pattern-classification.ts                                                            |
 | PatternDetail                                       | active | contract   | packages/architect-projection/src/fragments/pattern-relations/pattern-detail.ts                                           |
 | PatternGraph                                        | active | contract   | packages/architect-core/src/validation-schemas/pattern-graph.ts                                                           |
-| PatternGraphApi                                     | active | utility    | packages/architect-core/src/read-api/pattern-graph-api.ts                                                                 |
-| PatternGraphApiConsistencyExecutableTests           | active | utility    | packages/architect-core/tests/features/read-api/pattern-graph-api-consistency.feature                                     |
-| PatternGraphApiReverseLookup                        | active |            | packages/architect-core/tests/features/read-api/pattern-graph-api.feature                                                 |
+| PatternGraphConsistencyExecutableTests              | active |            | packages/architect-core/tests/features/graph/pattern-graph-consistency.feature                                            |
 | PatternHelpers                                      | active | utility    | packages/architect-core/src/read-api/pattern-helpers.ts                                                                   |
 | PatternReferenceContract                            | active | contract   | packages/architect-core/src/validation-schemas/pattern-contract.ts                                                        |
 | PatternReferenceValidation                          | active |            | packages/architect-core/tests/features/extractor/pattern-reference-validation.feature                                     |
@@ -160,6 +159,7 @@ Current work timeline covering 178 patterns.
 | ProjectionKernelRelationshipContractExecutableTests | active | projection | packages/architect-projection/tests/features/projections/pattern-relations/kernel-relationship-contract.feature           |
 | ProjectionTrustBoundary                             | active | service    | packages/architect-projection/src/projections/\_shared/parse-and-project.internal.ts                                      |
 | ReadApiResultContract                               | active | contract   | packages/architect-core/src/read-api/types.ts                                                                             |
+| ReadKernelExecutableTests                           | active |            | packages/architect-core/tests/features/read-api/read-kernels.feature                                                      |
 | RegistryBuilder                                     | active | utility    | packages/architect-core/src/taxonomy/registry-builder.ts                                                                  |
 | RelationshipResolver                                | active | service    | packages/architect-core/src/generators/pipeline/relationship-resolver.ts                                                  |
 | RendererDispatchSmokeExecutableTests                | active | projection | packages/architect-projection/tests/features/renderers/renderer-smoke.feature                                             |

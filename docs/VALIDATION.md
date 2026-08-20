@@ -270,7 +270,7 @@ npx validate-patterns \
   --anti-patterns
 
 # Package-host dangling-reference baseline check
-pnpm pkg:query -- arch dangling --baseline packages/architect-guard/src/lint/dangling-baseline.json
+pnpm exec architect --base-dir . dangling --baseline packages/architect-guard/src/lint/dangling-baseline.json --strict
 ```
 
 ### CLI Flags
@@ -291,7 +291,7 @@ pnpm pkg:query -- arch dangling --baseline packages/architect-guard/src/lint/dan
 | `--mega-feature-threshold`  |       | Max lines per feature                            | 750      |
 | `--magic-comment-threshold` |       | Max magic comments                               | 5        |
 
-`validate-patterns` enforces the committed dangling-reference baseline during package-host validation. `arch dangling --baseline <path>` exposes the same baseline comparison for reviewers, `--write-baseline` rewrites the JSON file deterministically from the current graph, and `--strict` is caller-owned for explicit drift checks rather than a CI default.
+`validate-patterns` enforces the committed dangling-reference baseline during package-host validation. `architect dangling --baseline <path> --strict` exposes the same baseline comparison as the frozen graph gate; `--write-baseline` rewrites the JSON file deterministically from the current graph.
 
 ### Checks Available
 
@@ -351,7 +351,7 @@ Add these scripts to your project's `package.json`:
     "lint:process": "architect-guard --staged",
     "lint:process:ci": "architect-guard --all --strict",
     "validate:all": "validate-patterns -i 'src/**/*.ts' -F 'specs/**/*.feature' --dod --anti-patterns",
-    "validate:dangling-baseline": "architect arch dangling --baseline packages/architect-guard/src/lint/dangling-baseline.json"
+    "validate:dangling-baseline": "pnpm exec architect --base-dir . dangling --baseline packages/architect-guard/src/lint/dangling-baseline.json --strict"
   }
 }
 ```
@@ -376,7 +376,7 @@ npx architect-guard --staged
   run: npx validate-patterns -i "src/**/*.ts" -F "specs/**/*.feature" --dod --anti-patterns
 
 - name: Check dangling baseline
-  run: pnpm pkg:query -- arch dangling --baseline packages/architect-guard/src/lint/dangling-baseline.json
+  run: pnpm exec architect --base-dir . dangling --baseline packages/architect-guard/src/lint/dangling-baseline.json --strict
 ```
 
 ---

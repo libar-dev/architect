@@ -4,15 +4,15 @@
  * @architect-status completed
  * @architect-role:contract
  * @architect-bounded-context:cli
- * @architect-uses PatternGraphApi, PackageMatcherContract, PipelineDatasetContract, BuildPipeline, TagRegistrySchemas
+ * @architect-uses PackageMatcherContract, PipelineDatasetContract, BuildPipeline, TagRegistrySchemas
  *
  * ## CLIContextTypes — Shared CLI pipeline contracts
  *
  * The cross-cutting type and schema contract for live PatternGraph construction:
  * `BuildContextArgs` (the slim input to `buildCliContext`), `SourcePlan` (resolved
- * input/feature globs + package config), and `CliContext` (graph + API + the
- * build's validation summary). Wires handle / dangling bootstrap to the
- * architect-core read API.
+ * input/feature globs + package config), and `CliContext` (graph + the build's
+ * validation summary). Wires handle / dangling bootstrap to the canonical
+ * architect-core graph value.
  *
  * **When to Use:** when building a live PatternGraph for the handle, the dangling
  * gate, or any other composition-root consumer of `buildCliContext`.
@@ -22,7 +22,6 @@ import { z } from 'zod';
 import type {
   BuildResult,
   PackageConfig,
-  PatternGraphAPI,
   RuntimePatternGraph,
   TagRegistry,
 } from '@libar-dev/architect-core';
@@ -53,5 +52,4 @@ export interface SourcePlan {
 export interface CliContext {
   readonly build: BuildResult;
   readonly graph: RuntimePatternGraph;
-  readonly api: PatternGraphAPI;
 }

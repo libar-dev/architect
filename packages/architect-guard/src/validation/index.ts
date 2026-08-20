@@ -42,3 +42,9 @@ export {
   formatAntiPatternReport,
   toValidationIssues,
 } from './anti-patterns.js';
+
+export {
+  detectArchitectTagsAfterProse,
+  detectMissingArchitectMarker,
+  detectTsUsesSpaceForm,
+} from './ts-annotation-integrity.js';

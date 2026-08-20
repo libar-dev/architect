@@ -42,7 +42,7 @@ Feature: Architecture neighborhood projection
     @acceptance-criteria
     Scenario: architecture neighborhoods include all relationship directions
       Given an architecture neighborhood context with full direction coverage
-      When I project the architecture neighborhood for "PatternGraphAPI"
+      When I project the architecture neighborhood for "WidgetService"
       Then the architecture neighborhood should include all direction buckets and structured implementation refs
 
     Scenario: a decision neighborhood surfaces its see-also governance chain and enforcedBy rules
@@ -52,12 +52,12 @@ Feature: Architecture neighborhood projection
 
     Scenario: missing relationship indices keep neighborhood metadata but empty directional arrays
       Given an architecture neighborhood context without a relationship index
-      When I project the architecture neighborhood for "PatternGraphAPI"
+      When I project the architecture neighborhood for "WidgetService"
       Then the architecture neighborhood should keep empty directional arrays and preserve same-context neighbors
 
     Scenario: missing architecture indices remove same-context neighbors only
       Given an architecture neighborhood context without an architecture index
-      When I project the architecture neighborhood for "PatternGraphAPI"
+      When I project the architecture neighborhood for "WidgetService"
       Then the architecture neighborhood should keep sameContext empty
 
   Rule: Bounded-context navigation stays projection-owned

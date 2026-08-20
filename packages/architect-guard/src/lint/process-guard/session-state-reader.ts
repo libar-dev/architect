@@ -7,7 +7,7 @@
  * @architect-bounded-context:process-guard
  * @architect-implements ProcessGuardLinter
  * @architect-implements ProcessGuardPatternGraphMigration
- * @architect-uses GherkinScanner
+ * @architect-uses GherkinScanner, GherkinScanResultContract
  *
  * ## SessionStateReader - Read ProcessGuard Session State
  *

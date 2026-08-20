@@ -9,8 +9,8 @@ Feature: Projection Pipeline Redesign — Directional Context
   ideation carries the *why* behind a deliberately destructive rewrite, so a fresh
   session treats the breakage as intended rather than reckless. It does NOT re-teach
   process — the architect skills own the maturity ladder, the FSM, the review
-  protocol, and value-transfer; the live `pnpm architect:query` API owns current
-  state. Read those for how and what-now; read this for why.
+  protocol, and value-transfer; the live `pnpm architect:q '<js>'` handle owns
+  current state. Read those for how and what-now; read this for why.
 
   Lifetime: this is scaffolding, like any design-phase artifact. When the redesign
   lands as born-accepted ADRs + executable specs, the why has moved into those
@@ -121,7 +121,7 @@ Feature: Projection Pipeline Redesign — Directional Context
   Rule: Where the live truth is
 
     This ideation is directional and will drift; the graph will not. For current
-    state, query the API — the redesign lives there as the DocumentationProjection
+    state, read the live handle — the redesign lives there as the DocumentationProjection
     candidate epic and its members, and the governing decision is ADR-010
     (bundle DocumentationProjection, and pattern ADR010DocumentationCompositionHelpers).
     Trust the CLI over this note on any disagreement.

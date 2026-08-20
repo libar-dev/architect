@@ -4,6 +4,7 @@
  * @architect-pattern ResultMonadTypes
  * @architect-status completed
  * @architect-product-area CoreTypes
+ * @architect-bounded-context:domain
  *
  * ## Result Monad - Type Definitions
  *

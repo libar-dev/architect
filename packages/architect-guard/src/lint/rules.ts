@@ -5,6 +5,7 @@
  * @architect-status completed
  * @architect-role:service
  * @architect-bounded-context:lint
+ * @architect-uses HierarchyLevelDomain, LintViolationContract
  *
  * ## LintRules - Annotation Quality Rules
  *

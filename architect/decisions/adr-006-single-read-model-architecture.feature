@@ -20,7 +20,7 @@ Feature: ADR-006 - Single Read Model Architecture
   and a relationship index.
 
   ADR-005 established that codecs consume PatternGraph as their sole input.
-  The PatternGraphAPI consumes it. But the validation layer bypasses it,
+  The published Graph contract and pure read kernels consume it. But the validation layer bypasses it,
   wiring its own mini-pipeline from raw scanner/extractor output. It creates
   a lossy local type that discards relationship data, then discovers it
   lacks the information needed — requiring ad-hoc re-derivation of what
@@ -34,8 +34,8 @@ Feature: ADR-006 - Single Read Model Architecture
   **Decision:**
   The PatternGraph is the single read model for all consumers. No consumer
   re-derives pattern data from raw scanner/extractor output when that data
-  is available in the PatternGraph. Validators, codecs, and query APIs
-  consume the same pre-computed read model.
+  is available in the PatternGraph. Validators, codecs, Graph consumers,
+  and pure read kernels consume the same pre-computed read model.
 
   **Consequences:**
   | Type | Impact |
@@ -57,7 +57,7 @@ Feature: ADR-006 - Single Read Model Architecture
 
     | Layer | May Import | Examples |
     | Pipeline Orchestration | scanner/, extractor/, pipeline/ | orchestrator.ts, cli-runtime.ts pipeline setup |
-    | Feature Consumption | PatternGraph, relationshipIndex | codecs, PatternGraphAPI, validators, query handlers |
+    | Feature Consumption | PatternGraph, relationshipIndex | codecs, Graph, pure read kernels, validators |
 
     Exception: `lint-patterns.ts`, `AntiPatternDetector`, `CoverageAnalyzer`,
     and `SessionStateReader` are legitimate stage-1 consumers.

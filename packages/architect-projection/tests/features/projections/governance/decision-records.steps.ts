@@ -58,7 +58,7 @@ function createDecisionContext(): ProjectionContext {
         adr: '006',
         adrStatus: 'accepted',
         adrCategory: 'architecture',
-        uses: ['PatternGraphAPI'],
+        uses: ['WidgetService'],
         // Two see-also links: one to a decision (ADR-005, the governance chain)
         // and one to a non-decision pattern (filtered out of relatedDecisions).
         seeAlso: ['ADR005CodecBasedMarkdownRendering', 'McpOutputSchemaValidation'],
@@ -102,7 +102,7 @@ All read paths should project from the PatternGraph instead of rebuilding their 
     // (enforcedBy) is what makes the decision record navigable to its rules.
     relationshipIndex: {
       ADR006SingleReadModelArchitecture: createRelationshipEntry({
-        uses: ['PatternGraphAPI'],
+        uses: ['WidgetService'],
         seeAlso: ['ADR005CodecBasedMarkdownRendering', 'McpOutputSchemaValidation'],
         enforcedBy: ['ApiReferenceProjectionExecutableTests'],
       }),
@@ -149,7 +149,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               'ADR005CodecBasedMarkdownRendering',
               'ApiReferenceProjectionExecutableTests',
               'McpOutputSchemaValidation',
-              'PatternGraphAPI',
+              'WidgetService',
             ],
           });
           expect(state!.decision?.context[0]).toEqual({

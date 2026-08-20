@@ -5,7 +5,7 @@
  * @architect-status completed
  * @architect-role:service
  * @architect-bounded-context:validation
- * @architect-uses AntiPatternValidationTypes
+ * @architect-uses AntiPatternValidationTypes, GherkinScanResultContract
  *
  * ## AntiPatternDetector - Documentation Anti-Pattern Detection
  *
@@ -19,6 +19,9 @@
  * |----|----------|-------------|
  * | process-in-code | error | Process metadata in code (should be features-only) |
  * | removed-tag | error | Removed tag still present (silent data loss) |
+ * | ts-missing-architect-marker | error | Pattern JSDoc lacks leading @architect |
+ * | ts-tags-after-prose | error | Architect tags after description prose |
+ * | ts-uses-space-form | error | Space-separated TypeScript @architect-uses |
  * | magic-comments | warning | Generator hints in features |
  * | scenario-bloat | warning | Too many scenarios per feature |
  * | mega-feature | warning | Feature file too large |
@@ -36,6 +39,11 @@ import type { TagRegistry } from '@libar-dev/architect-core';
 import type { ScannedFile } from '@libar-dev/architect-core';
 import type { AntiPatternViolation, AntiPatternThresholds, WithTagRegistry } from './types.js';
 import { DEFAULT_THRESHOLDS } from './types.js';
+import {
+  detectArchitectTagsAfterProse,
+  detectMissingArchitectMarker,
+  detectTsUsesSpaceForm,
+} from './ts-annotation-integrity.js';
 import {
   ARCHITECT_PACKAGE_FEATURE_ONLY_TAG_SUFFIXES,
   DEFAULT_TAG_PREFIX,
@@ -445,7 +453,7 @@ export function detectMegaFeature(
  * ADR-001 requires exactly one file to own a pattern's identity. When two
  * features declare the same identity, the dual-source extractor's `featureIndex`
  * map silently last-write-wins (the second file's rules/scenarios are dropped),
- * and every downstream gate (`validate:all`, `arch dangling`, the process guard)
+ * and every downstream gate (`validate:all`, the `architect dangling` graph gate, the process guard)
  * passes over it because the duplicate has already collapsed to one node.
  *
  * This check runs over the RAW scanned feature files — the one place the
@@ -500,6 +508,9 @@ export function detectAntiPatterns(
     ...detectProcessInCode(scannedFiles, registry),
     ...detectRemovedTags(features, registry),
     ...detectGherkinTagSpaceForm(features, registry),
+    ...detectMissingArchitectMarker(scannedFiles, registry),
+    ...detectArchitectTagsAfterProse(scannedFiles, registry),
+    ...detectTsUsesSpaceForm(scannedFiles, registry),
     ...detectDuplicateFeatureIdentities(features),
     // Warning-level (hygiene issues)
     ...detectMagicComments(features, mergedThresholds.magicCommentThreshold),
@@ -564,6 +575,17 @@ export function formatAntiPatternReport(violations: AntiPatternViolation[]): str
   return lines.join('\n');
 }
 
+const TYPESCRIPT_ANTI_PATTERN_IDS = new Set<AntiPatternViolation['id']>([
+  'process-in-code',
+  'ts-missing-architect-marker',
+  'ts-tags-after-prose',
+  'ts-uses-space-form',
+]);
+
+function isTypeScriptAntiPattern(id: AntiPatternViolation['id']): boolean {
+  return TYPESCRIPT_ANTI_PATTERN_IDS.has(id);
+}
+
 /**
  * Convert anti-pattern violations to ValidationIssue format
  *
@@ -579,7 +601,7 @@ export function toValidationIssues(violations: readonly AntiPatternViolation[]):
   return violations.map((v) => ({
     severity: v.severity,
     message: `[${v.id}] ${v.message}`,
-    source: v.id === 'process-in-code' ? ('typescript' as const) : ('gherkin' as const),
+    source: isTypeScriptAntiPattern(v.id) ? ('typescript' as const) : ('gherkin' as const),
     file: v.file,
   }));
 }

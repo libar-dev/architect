@@ -38,6 +38,7 @@ import {
   getRelationships,
   scanGherkinFiles,
   scanPatterns,
+  findFilesToScan,
 } from '@libar-dev/architect-core';
 import { printVersionAndExit, isDirectCliEntrypoint } from './shared.js';
 import {
@@ -294,6 +295,9 @@ Cross-Source Validation Checks:
 Anti-Pattern Detection (--anti-patterns):
   error    process-in-code              Process metadata in code (should be features-only)
   error    removed-tag                  Removed tag still present (silent data loss)
+  error    ts-missing-architect-marker  Pattern JSDoc lacks leading @architect
+  error    ts-tags-after-prose          Architect tags after description prose
+  error    ts-uses-space-form           Space-separated TypeScript @architect-uses
   warning  magic-comments               Too many generator hints in features
   warning  scenario-bloat               Too many scenarios per feature
   warning  mega-feature                 Feature file too large
@@ -771,7 +775,17 @@ async function main(): Promise<void> {
         magicCommentThreshold: config.magicCommentThreshold,
       };
 
-      const violations = detectAntiPatterns(scanResult.value.files, gherkinScanResult.value.files, {
+      // Integrity detectors read raw JSDoc. Include globbed files the opt-in
+      // scanner skipped (pattern JSDoc with no leading bare @architect).
+      const globbedTypeScriptFiles = await findFilesToScan(scannerConfig);
+      const scannedByPath = new Map(
+        scanResult.value.files.map((file) => [file.filePath, file] as const),
+      );
+      const filesForAntiPatterns = globbedTypeScriptFiles.map(
+        (filePath) => scannedByPath.get(filePath) ?? { filePath, directives: [] },
+      );
+
+      const violations = detectAntiPatterns(filesForAntiPatterns, gherkinScanResult.value.files, {
         registry,
         thresholds,
       });

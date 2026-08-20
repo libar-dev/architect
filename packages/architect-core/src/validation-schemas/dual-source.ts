@@ -4,7 +4,7 @@
  * @architect-status active
  * @architect-role:contract
  * @architect-bounded-context:validation-schemas
- * @architect-uses DomainEnumSchemas, DeliverableStatusDomain, StatusValueDomain
+ * @architect-uses DomainEnumSchemas, DeliverableStatusDomain, StatusValueDomain, HierarchyLevelDomain
  */
 import { z } from 'zod';
 

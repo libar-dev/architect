@@ -6,7 +6,6 @@
  * @architect-role:service
  * @architect-bounded-context:cli
  * @architect-product-area:DataAPI
- * @architect-uses GraphHandleShapes
  * @architect-usecase Use when a question legitimately wants the import firehose — impact, find-all-usages, curation assist — never to derive the architecture.
  *
  * ## MechanicalSubstrateExtractor — Layer 1 builder (derived, exhaustive, 0 annotation burden)
@@ -33,7 +32,7 @@ import {
   type MechanicalCore,
   MechanicalCoreSchema,
   type SymbolNode,
-} from './schema.js';
+} from '@libar-dev/architect-core/graph';
 
 const pkgOf = (f: string) => /^packages\/([^/]+)\//.exec(f)?.[1] ?? '(root)';
 

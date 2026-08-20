@@ -1,3 +1,19 @@
+/**
+ * @architect
+ * @architect-pattern ValidationOutputSchemas
+ * @architect-status completed
+ * @architect-role:contract
+ * @architect-bounded-context:validation-schemas
+ * @architect-uses ExtractionDiagnostics, LintViolationContract
+ *
+ * ## ValidationOutputSchemas - Validation result contract
+ *
+ * Defines the Zod-validated output shapes shared by lint, extraction, and
+ * cross-source validation commands.
+ *
+ * **When to Use:** Use when producing or parsing validation summaries,
+ * diagnostics, or lint output at a command or projection boundary.
+ */
 import { z } from 'zod';
 
 import { SEVERITY_TYPES } from '../taxonomy/index.js';
