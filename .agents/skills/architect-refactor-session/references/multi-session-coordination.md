@@ -1,10 +1,10 @@
-# Multi-Session / PR Coordination (canonical reference)
+# Multi-session / PR coordination (canonical reference)
 
 **This skill is only for non-spec-driven development. DO NOT USE for refactoring based on a design-level spec.**
 
 The convention for any pull request whose work is large or risky enough
 that a single agent session cannot land it cleanly in one pass. This is
-**not refactor-specific** — feature PRs with cross-cutting changes,
+**not refactor-specific**. Feature PRs with cross-cutting changes,
 review follow-up waves, dep-bump waves, security-audit fixes, and staged
 migrations all benefit. Refactor PRs benefit most because they
 concentrate the "scope expands mid-session" risk.
@@ -15,21 +15,21 @@ scope-discovery rule below.
 
 ## When this applies
 
-- **Always:** any PR with ≥2 logical chunks, any review follow-up,
+- **Always.** Any PR with ≥2 logical chunks, any review follow-up,
   any modernization sweep, any staged migration, any refactor that
   touches ≥3 packages.
-- **Strongly recommended:** any PR with ≥1 architectural decision,
-  any PR likely to surface drift mid-session, any PR a fresh agent
+- **Strongly recommended.** Any PR with ≥1 architectural decision,
+  any PR likely to reveal drift mid-session, any PR a fresh agent
   session could not complete from the diff alone.
-- **Optional:** a 1-commit PR with no decisions and no cross-cutting
-  surface — the lone `DECISIONS.md` + the scope-discovery rule are
+- **Optional.** A 1-commit PR with no decisions and no cross-cutting
+  change. The lone `DECISIONS.md` + the scope-discovery rule are
   enough; the folder layout is overhead.
 
 ## The campaign rules (beyond the universal three)
 
-The three universal session rules — **graph handle first** (the read
-surface, ADR-014 — `pnpm architect:q`), **gates
-non-negotiable**, **commit hygiene** — are the floor for every session
+The three universal session rules, **graph handle first** (`pnpm architect:q`
+over `g.graph` / `g.fsm`, ADR-014), **gates
+non-negotiable**, **commit hygiene**, are the floor for every session
 (stated in [`../../architect-sessions/SKILL.md`](../../architect-sessions/SKILL.md)
 §"Universal session rules"). A campaign adds three more, which the
 sections below operationalize:
@@ -39,10 +39,10 @@ sections below operationalize:
    depends on it. Without this separation, agents fabricate answers
    under pressure.
 5. **Incomplete scope is next-session input, not silent debt.** When
-   investigation surfaces drift mid-session, stop and classify
+   investigation reveals drift mid-session, stop and classify
    (same-root-cause → fix inline + record; different-root-cause →
-   defer + record). Never land a surface-only commit. See
-   "Scope-discovery handling" below — the single most-reused heuristic
+   defer + record). Never land an incomplete commit. See
+   "Scope-discovery handling" below. The single most-reused heuristic
    across multi-session work.
 6. **Per-session learnings propagate forward.** After each session the
    coordinator appends one tight entry to the learnings log and
@@ -54,7 +54,7 @@ This file adds the package layout, the templates, and the
 campaign-specific discipline (coordinator split, scope-discovery
 handling) on top of those six.
 
-## Folder layout — `.pr-coordination/`
+## Folder layout: `.pr-coordination/`
 
 Coordination artifacts live in a committed plan package at the repo
 root:
@@ -77,7 +77,7 @@ the next campaign.
 The package is **committed to git** so every agent runtime
 (Claude Code, OpenCode, Codex/GPT, …) sees the same convention.
 Per-agent persistent memory (`~/.claude/`, opencode session store)
-MUST NOT hold convention-level guidance — it hides context from other
+MUST NOT hold convention-level guidance. It hides context from other
 runtimes.
 
 ## Coordinator + worker split (≥3 sessions)
@@ -86,10 +86,10 @@ A campaign with three or more sessions defaults to a
 **coordinator-plus-worker** topology. The split is load-bearing.
 
 - **The coordinator** (typically a long-lived session) holds the
-  campaign's working memory: decisions, drift surfaces, prior-session
+  campaign's working memory: decisions, drift findings, prior-session
   learnings, the unstarted-session prompts. It **never touches code**,
   never runs gates, never makes commits. Its only job is the
-  prompt-and-memory pipeline — pre-session brief, mid-campaign drift
+  prompt-and-memory pipeline: pre-session brief, mid-campaign drift
   classification, post-session learning extraction, and propagation
   of new rules into the next session's prompt.
 - **The workers** (fresh agent sessions, any runtime) read the plan
@@ -99,10 +99,10 @@ A campaign with three or more sessions defaults to a
   resume" property.
 - **Self-restraint defines the coordinator.** A coordinator that runs
   gates becomes another worker; a coordinator that does less is the
-  load-bearing primitive.
+  load-bearing rule.
 
 Worker session prompts under `sessions/NN-slug.md` are
-**paste-ready**: a fresh agent opens the file, executes it, runs
+**Paste-ready.** A fresh agent opens the file, executes it, runs
 gates, commits, returns. Runtime-specific shortcuts (Claude Code's
 `/fork`, OpenCode skill names) are **optional conveniences** described
 by the underlying action ("run a parallel inventory subagent") so any
@@ -111,20 +111,20 @@ runtime can execute the prompt.
 ## DECISIONS.md template
 
 ```
-# Decisions — questions that need human judgment
+# Decisions: questions that need human judgment
 
 > Tight entries only. Implementation details live in the session
 > prompt that consumes the decision, not here. Rewrites that bloat
 > this file with code snippets or step-by-step plans should be
 > rejected.
 
-## D-1 — <one-line question>
+## D-1: <one-line question>
 
-- **Question:** <what is being decided>
-- **Options:** <A / B / C with one-line tradeoff each>
-- **Recommendation:** <option + brief rationale>
-- **Consumed by:** sessions/<NN-slug.md>
-- **Status:** open | resolved (<commit-sha>)
+- **Question.** <what is being decided>
+- **Options.** <A / B / C with one-line tradeoff each>
+- **Recommendation.** <option + brief rationale>
+- **Consumed by.** sessions/<NN-slug.md>
+- **Status.** open | resolved (<commit-sha>)
 ```
 
 Rules: capture the decision **before** writing the code that depends
@@ -139,14 +139,14 @@ pressure.
 > Append-only log. One entry per session. Keep entries tight (< 20
 > lines per session). Lengthy session recaps are an anti-pattern.
 
-## Session N — <one-line title>
+## Session N: <one-line title>
 
 Completed Session N scope (<commit-sha>) [+ <inline-fix-shas>].
 
-**Additional scope discovered:** <short description, if any>.
+**Additional scope discovered.** <short description, if any>.
 <Why it matters in one or two sentences.>
 
-**Resolution:** inline (same commit) | deferred to Session M | recorded in DECISIONS.md as D-X.
+**Resolution.** inline (same commit) | deferred to Session M | recorded in DECISIONS.md as D-X.
 
 ### Rules for upcoming sessions
 
@@ -161,9 +161,9 @@ The "Additional scope discovered" section is the single most-reused
 heuristic across multi-session work. It is what the **scope-discovery
 rule** below produces.
 
-## Scope-discovery handling — load-bearing rule
+## Scope-discovery handling: load-bearing rule
 
-When investigation surfaces drift or additional scope mid-session:
+When investigation reveals drift or additional scope mid-session:
 
 1. **Do not follow the prompt blindly.** Stop and classify before
    writing code that papers over the surprise.
@@ -175,7 +175,7 @@ When investigation surfaces drift or additional scope mid-session:
    cleanly. Record either in `DECISIONS.md` (if it needs human
    judgment) or in the learnings log (if it just needs a new
    session). Do not silently absorb it into the current commit.
-4. **Never land a surface-only commit.** Gates must pass at HEAD;
+4. **Never land an incomplete commit.** Gates must pass at HEAD;
    resolve and verify in the same commit, or defer cleanly. No
    silent debt.
 5. **The coordinator propagates.** After the session, the coordinator
@@ -184,7 +184,7 @@ When investigation surfaces drift or additional scope mid-session:
    real surprises, not boilerplate.
 
 This rule applies whether or not the campaign uses the full package
-layout. A 1-session PR that surfaces unexpected scope still records
+layout. A 1-session PR that reveals unexpected scope still records
 the finding (in the PR description, or a `NOTES.md`) and decides
 inline-vs-defer before continuing.
 
@@ -198,13 +198,13 @@ inline-vs-defer before continuing.
   before any commit or handoff. Keep the closest targeted typecheck
   / test slice after each deliverable; the full sequence is the
   canonical commit-or-handoff gate.
-- A failing gate is stop-and-surface. No silencing, no mocking, no
+- A failing gate is stop-and-report. No silencing, no mocking, no
   `--no-verify`, no `--no-gpg-sign` shortcuts. A failing gate command
   or targeted slice still stops the session until the result is
-  surfaced and resolved or cleanly deferred.
+  reported and resolved or cleanly deferred.
 - Every commit lands with all gates green. If a session uncovers a
   pre-existing failure unrelated to its scope, that is a
-  scope-discovery event — apply the rule above.
+  scope-discovery event. Apply the rule above.
 
 ## Commit hygiene
 
@@ -212,21 +212,21 @@ inline-vs-defer before continuing.
   `fix(scope): …` / `feat(scope): …` on substantive commits.
 - Body references issue ids when relevant (e.g.,
   `Closes P0-1, P0-2 from .pr-coordination/CONFIRMED-ISSUES.md`).
-- Never `git add -A` on a multi-commit campaign branch — sweeps WIP
+- Never `git add -A` on a multi-commit campaign branch. Sweeps WIP
   into commits. Stage explicit files.
 
 ## Sibling references
 
 - [`../../architect-sessions/SKILL.md`](../../architect-sessions/SKILL.md)
-  §"Universal session rules" — the three universal rules (graph
+  §"Universal session rules". The three universal rules (graph
   handle first, gates, commit hygiene) that the campaign rules above
   build on.
 - [`../../architect-base/SKILL.md`](../../architect-base/SKILL.md)
-  §"Anti-anecdote" — the templates above are deliberately abstract;
+  §"Anti-anecdote". The templates above are deliberately abstract;
   past campaign artifacts are anecdote, useful for understanding why
   the rule exists but not authoritative for what the rule is.
 - [`../../architect-base/references/four-tier-ladder.md`](../../architect-base/references/four-tier-ladder.md)
-  — the refactoring carve-out (skip idea / candidate / plan to
-  executable-tier — a `*ExecutableTests` feature — when backfilling
+  The refactoring carve-out (skip idea / candidate / plan to
+  executable-tier, a `*ExecutableTests` feature, when backfilling
   coverage for already-shipped code) is one of the scope-discovery
   patterns Rule 5 anticipates.

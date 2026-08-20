@@ -1,6 +1,6 @@
 ---
 name: architect-graph-handle
-description: THE agent read surface over the live PatternGraph for this Architect repo (ADR-014 — the verb CLI is retired). Load whenever you need graph state — a pattern's status/deps/rules, an architectural slice, neighborhoods, blast radius of a diff, what a pattern guarantees, which specs re-verify a change — or when you would otherwise grep/Read across files to learn the architecture. One command (`pnpm architect:q '<js>'`) builds the graph live in-process and hands you `g`, a typed object whose methods return plain composable data; you script the cut in plain JS instead of calling pre-baked verbs. The complete frozen read model is `g.graph`, deterministic transition operations are `g.fsm`, and reusable read algorithms stay pure core functions. Ordinary grep over annotated source remains the complement for content-level search; MCP `architect_*` tools remain for burst-mode/Studio use.
+description: Agent read interface over the live PatternGraph (ADR-014). Load for graph state such as a pattern's status/deps/rules, an architectural slice, neighborhoods, blast radius of a diff, what a pattern guarantees, which specs re-verify a change, or when you would otherwise grep/Read across files to learn the architecture. One command (`pnpm architect:q '<js>'`) builds the graph live in-process and binds `g`, a typed object whose methods return plain composable data. Script the cut in plain JS. The complete frozen read model is `g.graph`, deterministic transition operations are `g.fsm`, and reusable read algorithms stay pure core functions. Ordinary grep over annotated source remains the complement for content-level search. MCP `architect_*` tools remain for burst-mode and Studio use.
 allowed-tools:
   - Bash
   - Read
@@ -8,22 +8,20 @@ allowed-tools:
   - Grep
 ---
 
-# Architect Graph Handle — `pnpm architect:q`
+# Architect graph handle (`pnpm architect:q`)
 
-The live, in-memory handle (`g`) over this repo's **PatternGraph** — the knowledge graph of
-architectural patterns (services, contracts, codecs, projections, specs) built from annotated
-source. You write a line of JS; `g` answers it in-process and only your **conclusion**
-returns — roughly ⅕ the context of grep or a verb round-trip, because the data never leaves
-the process.
+`g` is the live, in-memory handle over this repo's PatternGraph, the graph of architectural
+patterns (services, contracts, codecs, projections, specs) built from annotated source. You
+write a line of JS. `g` answers it in-process and only your conclusion comes back, roughly ⅕
+the context of grep or a verb round-trip, because the data never leaves the process.
 
-**This is the primary read surface (ADR-014).** The old `pnpm architect:query` verb CLI is
-deleted; pattern-state questions, architectural slices, and impact cuts are all answered
-here. What remains beside it: **grep** over annotated source (for content-level search the
-graph doesn't index), the **`architect_*` MCP tools** (the stable typed surface for
-burst-mode use and the Studio sink), and the deterministic gates (`pnpm architect:guard`,
-`pnpm architect:graph dangling`, `pnpm docs:check`).
+This is the primary agent read interface (ADR-014). The old `pnpm architect:query` verb CLI
+is gone. Pattern state, architectural slices, and impact cuts all go through `q`. Beside it:
+grep over annotated source for content-level search the graph doesn't index, the
+`architect_*` MCP tools for burst-mode use and the Studio sink, and the deterministic gates
+(`pnpm architect:guard`, `pnpm architect:graph dangling`, `pnpm docs:check`).
 
-## The one command
+## The command
 
 ```bash
 pnpm architect:q '<js expression OR statement body>'      # argv
@@ -31,24 +29,24 @@ pnpm architect:q < playground/scratch/my-cut.ts           # stdin, for multi-lin
 pnpm architect:graph <command>                            # named demos + the dangling gate
 ```
 
-`--conditions=source` is already baked into these `pnpm` scripts — don't add it. The graph
+`--conditions=source` is already baked into these `pnpm` scripts. Don't add it. The graph
 builds fresh from the working tree each call (~2s, no cache), so a just-saved annotation
 shows on the next call.
 
-**Inside a script** `g`, `inspect` (node:util), `execFileSync` (node:child_process), and
-`REPO_ROOT` (repo-root abs path) are injected; cwd is the repo root. Two rules, because the
-body is compiled as a **function body**: (1) **no `import`/`export`** and no TS-only syntax
-(type annotations, `<generics>`, `!`) — it's plain JS at eval time; (2) end an argv/stdin
+Inside a script, `g`, `inspect` (node:util), `execFileSync` (node:child_process), and
+`REPO_ROOT` (repo-root abs path) are injected. cwd is the repo root. Two rules, because the
+body is compiled as a function body: (1) no `import`/`export` and no TS-only syntax
+(type annotations, `<generics>`, `!`). It's plain JS at eval time. (2) End an argv/stdin
 body with `return <value>` (inspect-printed) and/or `console.log`. A single argv
-**expression** (`g.patterns.length`) works too — no `return` needed.
+expression (`g.patterns.length`) works too, no `return` needed.
 
-> **Automation/hooks: never call `architect:q` bare.** With no arg and a non-TTY stdin that
-> never sends EOF it waits on stdin. Always pass an arg or piped input (`… < /dev/null` is safe).
+> Never call `architect:q` bare from automation or hooks. With no arg and a non-TTY stdin that
+> never sends EOF, it waits on stdin. Always pass an arg or piped input (`… < /dev/null` is safe).
 
-## The surface (`g.*`)
+## What `g` exposes
 
 ```ts
-g.patterns              // PatternNode[] — {name, status, maturity, role, boundedContext, productArea,
+g.patterns              // PatternNode[]: {name, status, maturity, role, boundedContext, productArea,
                         //   sourceFile, level, parent, children[], uses[], usedBy[], implementedBy[],
                         //   implements[], enforcesDecisions[], ruleCount, scenarioCount}
 g.pattern(name)         // one PatternNode | undefined
@@ -61,28 +59,28 @@ g.fsm                   // four deterministic transition operations:
                         //   .isValidTransition · .validateTransition
                         //   .getValidTransitionsFrom · .getProtectionSummary
 
-// entry adapters — the grep→graph bridge (you start from a string / file / symbol, not a name):
+// entry adapters: the grep→graph bridge (you start from a string / file / symbol, not a name):
 g.findByConcept('rate limiter')   // fuzzy concept → ranked curated patterns (+ why each matched)
-g.byFile('packages/.../x.ts')     // file → owning pattern + neighborhood (dark files get the mechanical one)
+g.byFile('packages/.../x.ts')     // file → owner + neighborhood (dark files get the mechanical one)
 g.bySymbol('ProjectionBundle')    // exported symbol → defining file(s) + who imports it (.importedByPatterns)
 
-// the spec bridge — invariants & at-risk specs of ANY maturity, labeled exec vs authored:
+// the spec bridge: invariants & at-risk specs of ANY maturity, labeled exec vs authored:
 g.invariantsOf(patternOrFile)     // "what does this guarantee?" → Invariant[] (maturity + provenance)
 g.specsReverifying(filesOrNames)  // "what re-verifies if these change?" → AtRiskSpec[]
-g.blastRadius(changedFiles)       // exhaustive impact over the substrate (+ .atRiskSpecs, reaches dark files)
+g.blastRadius(changedFiles)       // exhaustive impact over the mechanical graph (+ .atRiskSpecs, reaches dark files)
 
 // curation-assist:
 g.fanInCandidates() · g.graphDiff() · g.census() · g.driftFlags(existsFn)
 
 `g.mech` imports are diagnostic context, not authored architecture. Dark imports default to no action; only add a curated edge when the significance rubric shows an intentional architectural dependency.
 
-// escape hatches — the raw shapes, never hidden:
+// escape hatches: the raw shapes
 g.authored              // {patterns, relationshipIndex}  (the curated core)
-g.mech                  // {symbols, edges, …}            (the mechanical substrate / firehose)
+g.mech                  // {symbols, edges, …}            (mechanical import graph / firehose)
 ```
 
-Accessors return plain data (no `{success, data}` envelopes) — compose them directly. The
-three bridge return shapes (so you don't have to inspect-and-guess):
+Accessors return plain data, no `{success, data}` envelopes. Compose them directly. Bridge
+return shapes, so you don't have to inspect-and-guess:
 
 ```ts
 Invariant   { rule, text, pattern, maturity, provenance, featureFile, provenByScenarios[], cohort? }
@@ -91,12 +89,12 @@ bySymbol →  { symbol, definedIn[{file,kind,pkg,pattern?}], importedByFiles[], 
 ```
 
 `provenance` is `'executable'` (a live test proves it) or `'authored'` (a working-spec).
-`cohort` is present only when the realizing feature covers >1 pattern (the result isn't
-specific to your one query). Full field shapes live in
+`cohort` is present only when the realizing feature covers >1 pattern, so the result isn't
+specific to your one query. Full field shapes live in
 `packages/architect-core/src/graph/schema.ts` + `graph.ts`. The published pure contract is
-`@libar-dev/architect-core/graph`; source/config/git IO remains in `architect-cli`.
+`@libar-dev/architect-core/graph`. Source/config/git IO remains in `architect-cli`.
 
-## Where to reach — the decision guide
+## Where to reach
 
 | You're starting from…                    | want…                               | reach for                                                      |
 | ---------------------------------------- | ----------------------------------- | -------------------------------------------------------------- |
@@ -107,12 +105,12 @@ specific to your one query). Full field shapes live in
 | a **diff / changeset**                   | impact + which specs re-verify      | `g.blastRadius` / `g.specsReverifying`                         |
 | an **FSM transition**                    | is it legal?                        | `g.fsm.isValidTransition(from, to)`                            |
 | a **custom cross-cut**                   | a slice no method pre-bakes         | script it (see [references/recipes.md](references/recipes.md)) |
-| **file contents** (strings, code idioms) | textual matches                     | plain grep — the graph doesn't index bodies                    |
-| a **burst** of ≥5 typed reads, or Studio | stable typed tools                  | the `architect_*` MCP surface                                  |
+| **file contents** (strings, code idioms) | textual matches                     | plain grep. The graph doesn't index bodies                     |
+| a **burst** of ≥5 typed reads, or Studio | stable typed tools                  | the `architect_*` MCP tools                                    |
 
-## Examples (each verified — real output)
+## Examples
 
-**Grep replacement — graph state instead of file-scanning.**
+Graph state, not file scanning.
 
 ```bash
 # who owns this file, and what's around it? (replaces several greps; maps results into the architecture)
@@ -125,7 +123,7 @@ pnpm architect:q 'g.bySymbol("ProjectionBundle").importedByPatterns'
 pnpm architect:q 'g.findByConcept("taxonomy").slice(0,5).map(h => [h.name, h.score])'
 ```
 
-**Pattern state — the old verb menu, one script each.**
+Pattern state. Each old verb is one script.
 
 ```bash
 pnpm architect:q 'g.pattern("GraphHandle")'                          # detail (need-shaped)
@@ -134,20 +132,19 @@ pnpm architect:q 'g.fsm.isValidTransition("roadmap","active")'       # determini
 pnpm architect:q 'g.patterns.filter(p => p.status === "active").map(p => p.name)'
 ```
 
-**Spec context — what does this guarantee, and is it proven?**
+What does this guarantee, and is it proven?
 
 ```bash
 # invariants of a pattern, each labeled live-test (executable) vs authored working-spec
 pnpm architect:q 'g.invariantsOf("GraphHandle").map(i => ({rule:i.rule, maturity:i.maturity, provenance:i.provenance}))'
 ```
 
-> **Honest nuance:** `invariantsOf` covers **Gherkin** invariants (Rule blocks). A
-> code-originated **contract** (e.g. `ProjectionContext`) returns `[]` because its guarantee
-> is its TS **type**, not a Rule — `[]` is _not_ "guarantees nothing."
-> `pnpm architect:graph invariants <name>` prints a note for that case; the GUARANTEE recipe
-> disambiguates in one line.
+> `invariantsOf` covers Gherkin invariants (Rule blocks). A code-originated contract such as
+> `ProjectionContext` returns `[]` because its guarantee is its TS type, not a Rule. `[]` is
+> not "guarantees nothing." `pnpm architect:graph invariants <name>` prints a note for that
+> case. The GUARANTEE recipe disambiguates in one line.
 
-**The headline — blast radius of a change + which specs re-verify.** Save to
+Blast radius of a change, plus which specs re-verify. Save to
 `playground/scratch/headline.ts` (no `import`; end with `return`), pipe it in:
 
 ```js
@@ -165,17 +162,17 @@ return {
 pnpm architect:q < playground/scratch/headline.ts
 ```
 
-To seed from a real diff, build `changed` in-script — `execFileSync` and `REPO_ROOT` are injected:
+To seed from a real diff, build `changed` in-script. `execFileSync` and `REPO_ROOT` are injected:
 `execFileSync('git', ['diff','--name-only','HEAD~10','--'], {encoding:'utf8', cwd: REPO_ROOT}).split('\n').filter(Boolean)`.
 
-**Navigate + reshape — pivot the shapes in-process.** An argv body may hold statements:
+Navigate and reshape in-process. An argv body may hold statements:
 
 ```bash
-# projection-role patterns with zero downstream consumers — deletion candidates
+# projection-role patterns with zero downstream consumers. Deletion candidates.
 pnpm architect:q 'const ps = g.patterns.filter(p => p.role === "projection" && p.usedBy.length === 0); return ps.length'
 ```
 
-**Escape hatch — raw shapes when no view fits.** The substrate is one property away:
+Raw shapes when no view fits. `g.mech` is one property away:
 
 ```bash
 pnpm architect:q 'const t = g.mech.edges.filter(e => e.typeOnly).length; return `${t}/${g.mech.edges.length} import edges are type-only`'
@@ -197,30 +194,30 @@ pnpm architect:graph invariants <Pattern>          # "what does this guarantee?"
 pnpm architect:graph specs HEAD~8                  # specs re-verifying a diff, labeled
 ```
 
-The named commands are **runnable documentation** over the handle — scripts, not contracts.
-The one exception is the machine gate CI consumes (frozen by the second-caller bar):
+Named commands are runnable documentation over the handle. They're scripts, not contracts.
+The one exception is the machine gate CI consumes, frozen by the second-caller bar:
 
 ```bash
 pnpm architect:graph dangling --baseline packages/architect-guard/src/lint/dangling-baseline.json --strict
 ```
 
-## The principle — script the rest, freeze almost nothing
+## Script the rest, freeze almost nothing
 
-Most questions are a **script over the exposed shapes**, not a new method. The handle freezes
-only **irreducible cross-source joins** — the entry adapters
+Most questions are a script over the exposed shapes, not a new method. The handle freezes
+only irreducible cross-source joins: the entry adapters
 (`findByConcept`/`byFile`/`bySymbol`), the spec bridge (`invariantsOf`/`specsReverifying`),
-and `blastRadius`. A `groupBy` over an exposed field stays a script, on purpose — freezing
-thin traversals is how this would quietly re-become the verb wall ADR-014 deleted. When no
+and `blastRadius`. A `groupBy` over an exposed field stays a script, on purpose. Freezing
+thin traversals is how this would quietly become the verb wall ADR-014 deleted. When no
 view fits, drop to `g.mech` / `g.authored` and script against the raw shapes.
 
 ## Depth
 
-- [references/recipes.md](references/recipes.md) — the "script the rest" recipe set
+- [references/recipes.md](references/recipes.md). The "script the rest" recipe set
   (STATE · I1 · MEMBERS · A1 · A2 · GUARANTEE · TRIAGE · IMPACT · DRIFT · COMPOSE · escape
-  hatch) + the freeze-vs-script graduation bar.
-- `packages/architect-core/src/graph/schema.ts` + `graph.ts` — the published Graph methods +
-  field shapes; `packages/architect-cli/src/handle/graph.ts` owns only live IO composition.
-- `architect/decisions/adr-014-agent-read-surface.feature` — the decision record (why the
-  verb CLI is gone, what stayed frozen, the trust posture).
-- `playground/CONTEXT.md` — the experiment findings that proved this direction (two-surface
-  model, curation-not-drift, context-efficiency numbers).
+  hatch) plus the freeze-vs-script graduation bar.
+- `packages/architect-core/src/graph/schema.ts` + `graph.ts`. Published Graph methods and
+  field shapes. `packages/architect-cli/src/handle/graph.ts` owns only live IO composition.
+- `architect/decisions/adr-014-agent-read-surface.feature`. The decision record: why the
+  verb CLI is gone, what stayed frozen, the trust posture.
+- `playground/CONTEXT.md`. Experiment notes behind this design: two-layer model,
+  curation not drift, context-efficiency numbers.

@@ -10,24 +10,24 @@ allowed-tools:
   - Grep
 ---
 
-# OmO Plan Author (Claude Code → Sisyphus handoff)
+# OmO plan author (Claude Code to Sisyphus handoff)
 
 Author OmO-compatible work plans from inside Claude Code so the user can run `/start-work` in OpenCode and have Sisyphus pick them up immediately. This skill encodes the Prometheus Claude-Opus-default plan rules with paths rewritten for this repo's state folder (`.sisyphus/` instead of `.omo/`).
 
 When you load this skill, briefly state that the **omo-plan-author** skill is loaded so the user can confirm activation.
 
-## 1. Identity — author, not executor
+## 1. Identity: author, not executor
 
 **You are authoring a plan. You are NOT executing it. The plan is for Sisyphus (OmO) to execute via `/start-work`.**
 
 - Output is exactly ONE file: `.sisyphus/plans/{slug}.md`.
 - The file is the only deliverable. No drafts, no companion docs, no commits.
 - Do not touch source code, do not run tests, do not start implementation.
-- Acceptance criteria in the plan must be agent-executable (Sisyphus or its dispatched workers will run them) — never "user manually verifies."
+- Acceptance criteria in the plan must be agent-executable (Sisyphus or its dispatched workers will run them). Never "user manually verifies."
 
-If the user asks you to also do the work — refuse politely. Generate the plan; let `/start-work` do execution. The whole point is that OmO/Sisyphus is better at parallel execution than Claude Code is at planning for OmO.
+If the user asks you to also do the work, refuse. Generate the plan; let `/start-work` do execution. OmO/Sisyphus is better at parallel execution than Claude Code is at planning for OmO.
 
-## 2. Paths in THIS repo
+## 2. Paths in this repo
 
 Prometheus's upstream prompt targets `.omo/`. This repo uses `.sisyphus/` as the OmO state folder. Rewrite throughout:
 
@@ -35,36 +35,36 @@ Prometheus's upstream prompt targets `.omo/`. This repo uses `.sisyphus/` as the
 | ------------------------------------- | ------------------------------------------------------------ |
 | `.omo/plans/{name}.md`                | `.sisyphus/plans/{slug}.md`                                  |
 | `.omo/evidence/task-{N}-{slug}.{ext}` | `.sisyphus/evidence/task-{N}-{slug}.{ext}`                   |
-| `.omo/drafts/`                        | **Do not use drafts** — Claude Code authoring is single-shot |
+| `.omo/drafts/`                        | **Do not use drafts.** Claude Code authoring is single-shot. |
 | `.omo/notepads/` (per-plan notes)     | `.sisyphus/notepads/{slug}/`                                 |
 
 The plan body text itself must use the `.sisyphus/...` form. Sisyphus's executor honors the canonical state folder; mismatched paths will leak into evidence files that no one finds.
 
-## 3. boulder.json — safety protocol (CRITICAL)
+## 3. boulder.json: safety protocol (CRITICAL)
 
 `/start-work` will only pick up a new plan when there is **no active boulder**. `boulder.json` is OmO's "currently-executing plan" pointer.
 
-**Rule**: never delete `boulder.json` without first confirming the prior plan is terminal.
+**Rule.** Never delete `boulder.json` without first confirming the prior plan is terminal.
 
 ### Read-before-delete protocol
 
-1. **Read `.sisyphus/boulder.json`**. If it doesn't exist → safe; no boulder to remove, write the new plan and stop.
+1. **Read `.sisyphus/boulder.json`**. If it doesn't exist, it is safe. No boulder to remove. Write the new plan and stop.
 2. If it exists, parse the JSON. Inspect these fields (observed shape, 2026-05-18):
-   - `active_plan` — absolute path to the plan markdown.
-   - `plan_name` — short slug.
-   - `started_at` — ISO timestamp.
-   - `session_ids` — array of OmO session IDs that have touched this boulder.
-   - `task_sessions` — object: task key → worker-session metadata (`session_id`, `agent`, `category`, `updated_at`).
-3. **Treat the boulder as IN-PROGRESS / PAUSED if any of these are true**:
+   - `active_plan`: absolute path to the plan markdown.
+   - `plan_name`: short slug.
+   - `started_at`: ISO timestamp.
+   - `session_ids`: array of OmO session IDs that have touched this boulder.
+   - `task_sessions`: object mapping task key to worker-session metadata (`session_id`, `agent`, `category`, `updated_at`).
+3. **Treat the boulder as IN-PROGRESS / PAUSED if any of these are true.**
    - `active_plan` resolves to a file that still exists.
    - `session_ids` array is non-empty.
    - `task_sessions` object has any entry.
-4. **If in-progress/paused**: STOP. Do not delete. Surface to the user:
+4. **If in-progress/paused.** STOP. Do not delete. Report to the user:
    - The active plan name + path.
    - When it was started.
    - The most recent `task_sessions` entry.
    - Ask explicitly: "There's an in-progress boulder for `{plan_name}` (last activity {updated_at}). Are you done with it, or do you want to keep it alive and just author the new plan without clearing the boulder?"
-5. **Only after the user explicitly confirms the prior plan is done**: proceed to the cleanup step below.
+5. **Only after the user explicitly confirms the prior plan is done.** Proceed to the cleanup step below.
 
 ### Cleanup step (only when user confirms prior plan terminal)
 
@@ -85,7 +85,7 @@ ls .sisyphus/notepads/ 2>/dev/null | grep -Ei "^${PRIOR_SLUG}(-session[0-9]+)?$"
 # Show matches first, get user confirmation, then rm -rf each matched dir.
 ```
 
-**Never delete evidence or notepads silently.** Always show the match list to the user and wait for explicit confirmation. The "similar name" rule is a nicety — show fuzzy matches, let the user decide.
+**Never delete evidence or notepads silently.** Always show the match list to the user and wait for explicit confirmation. The "similar name" rule is a nicety. Show fuzzy matches, let the user decide.
 
 ### When the user is starting fresh
 
@@ -93,48 +93,48 @@ If `boulder.json` doesn't exist, no cleanup is needed. Just write the new plan t
 
 ## 4. Plan workflow
 
-### Step 1 — Interview (if requirements are unclear)
+### Step 1: Interview (if requirements are unclear)
 
 If the user's request is ambiguous, run a short interview (3-5 targeted questions max):
 
-- Core objective in one sentence — what does success look like?
-- Scope IN / Scope OUT — what's explicitly excluded?
-- Test strategy — TDD, tests-after, or no tests + agent QA only?
-- Tech constraints — language, framework, existing patterns to follow?
-- Parallelism affordances — independent modules vs sequential dependencies?
+- Core objective in one sentence. What does success look like?
+- Scope IN / Scope OUT. What's explicitly excluded?
+- Test strategy. TDD, tests-after, or no tests + agent QA only?
+- Tech constraints. Language, framework, existing patterns to follow?
+- Parallelism affordances. Independent modules vs sequential dependencies?
 
 Skip the interview if the user has already described the work in enough detail; jump straight to plan generation.
 
-### Step 2 — Quick research
+### Step 2: Quick research
 
 Use `Read`, `Glob`, `Grep` (or the Explore agent) to verify any file/symbol references you plan to put in the plan. Plans that cite files that don't exist will reject in Sisyphus's compliance audit.
 
-### Step 3 — Write the plan
+### Step 3: Write the plan
 
-Use the template in § 6 below. Write to `.sisyphus/plans/{slug}.md`.
+Use the template in § 7 below. Write to `.sisyphus/plans/{slug}.md`.
 
-**Incremental-write protocol** (from Prometheus — applies here too):
+**Incremental-write protocol** (from Prometheus; applies here too):
 
 - Write the skeleton (all sections except individual TODO bodies) with `Write`.
 - Append TODO batches (2-4 tasks per `Edit` call) using `Edit` with `oldString="---\n\n## Final Verification Wave"` as the insertion anchor.
 - Read the file back at the end to verify nothing was truncated.
-- **Never call `Write` twice on the same file** — it overwrites the first call.
+- **Never call `Write` twice on the same file.** It overwrites the first call.
 
-### Step 4 — Present summary, hand off
+### Step 4: Present summary, hand off
 
 Present to the user:
 
 ```
 ## Plan Generated: {slug}
 
-**Key Decisions Made:**
+**Key Decisions Made.**
 - [Decision 1]: [Rationale]
 
-**Scope:**
+**Scope.**
 - IN: [list]
 - OUT: [list]
 
-**Guardrails:**
+**Guardrails.**
 - [Must-NOT-do]
 
 Plan saved to: `.sisyphus/plans/{slug}.md`
@@ -145,26 +145,26 @@ Next step:
 - If a boulder.json was preserved (prior plan in-progress), pause this plan until that one is done.
 ```
 
-Do not run `/start-work` yourself — it lives in OpenCode, not Claude Code.
+Do not run `/start-work` yourself. It lives in OpenCode, not Claude Code.
 
 ## 5. Long-running execution context (load-bearing for huge-scope plans)
 
-OmO is used almost exclusively for long-running work — typical runs are **12-24-48 hours, sometimes days**. Authoring plans for this needs three context pieces that Prometheus's upstream prompt does not state explicitly but which materially change plan shape.
+OmO is used almost exclusively for long-running work. Typical runs are **12-24-48 hours, sometimes days**. Authoring plans for this needs three context pieces that Prometheus's upstream prompt does not state explicitly but which materially change plan shape.
 
-### 5.1 The executor is a harness, not a hero model — and it is GPT, not Claude
+### 5.1 The executor is a routing layer, not a hero model, and it is GPT, not Claude
 
-OmO runs multi-day work through three delegation levels: **Atlas** (read-only conductor — reads the plan, writes the detailed 50–200-line worker prompts, accumulates wisdom into `.sisyphus/notepads/{slug}/` and passes it forward, enforces gates, delegates all writes) → **category routing** (`ultrabrain` / `deep` / `writing` / `quick` / … → Sisyphus-Junior workers on intent-matched models + fallback chains) → **specialized subagents** (Oracle architecture, Librarian docs, Explore codebase, Hephaestus deep reasoning), gated before execution by Metis (gap-analysis) and Momus (plan review). _"Intelligence resides in the harness, not the single worker model."_
+OmO runs multi-day work through three delegation levels. **Atlas** is the read-only conductor. It reads the plan, writes the detailed 50-200-line worker prompts, accumulates wisdom into `.sisyphus/notepads/{slug}/` and passes it forward, enforces gates, and delegates all writes. Next is **category routing** (`ultrabrain` / `deep` / `writing` / `quick` / … to Sisyphus-Junior workers on intent-matched models + fallback chains). Then **specialized subagents** (Oracle architecture, Librarian docs, Explore codebase, Hephaestus deep reasoning), gated before execution by Metis (gap-analysis) and Momus (plan review). Intelligence sits in the routing layer, not in any one worker model.
 
-**Match plan shape to the executor's model family — selection is characteristic-driven and version-specific** ("a model isn't just smarter or dumber — it thinks differently"):
+**Match plan shape to the executor's model family.** Selection is characteristic-driven and version-specific ("a model isn't just smarter or dumber. It thinks differently"):
 
-- **Claude** wants mechanics — checklists, templates, step-by-step recipes.
-- **GPT** wants goals — _"state the goal and let it figure out the mechanics."_
+- **Claude** wants mechanics: checklists, templates, step-by-step recipes.
+- **GPT** wants goals: _"state the goal and let it figure out the mechanics."_
 
-OmO's executors are **GPT, not Claude** — Claude is off-limits for OmO execution (Max-subscription ToS), so write for the GPT characteristic. _Which_ GPT version runs each tier rotates as models ship and the harness matures, so **read `~/.config/opencode/oh-my-openagent.jsonc` for the live wiring rather than trusting any version named in a skill**. So author **goal-stated scope + verifiable completion criteria, not taxative recipes**: Atlas writes the worker recipes at runtime, and a taxative plan is impossible for discovery work anyway (you cannot pre-enumerate a sweep). This **inverts the old Claude-era "recipe, not goal" rule** — for GPT, state the goal and let exhaustiveness find every file. Pick **categories by the characteristics a task needs** (reasoning depth / exhaustiveness / prose / speed), not by model name; the config resolves the model.
+OmO's executors are **GPT, not Claude**. Claude is off-limits for OmO execution (Max-subscription ToS), so write for the GPT characteristic. _Which_ GPT version runs each tier rotates as models ship and the routing config matures, so **read `~/.config/opencode/oh-my-openagent.jsonc` for the live wiring rather than trusting any version named in a skill**. Author **goal-stated scope + verifiable completion criteria, not taxative recipes**. Atlas writes the worker recipes at runtime, and a taxative plan is impossible for discovery work anyway (you cannot pre-enumerate a sweep). This **inverts the old Claude-era "recipe, not goal" rule**. For GPT, state the goal and let exhaustiveness find every file. Pick **categories by the characteristics a task needs** (reasoning depth / exhaustiveness / prose / speed), not by model name; the config resolves the model.
 
-Still true regardless of family: exhaustiveness is the executor's signature; references must be concrete and verified (§6) but are **starting points, not the boundary**; huge plans are fine (50–200 TODOs; the Single-Plan Mandate §6.1 holds).
+Still true regardless of family: exhaustiveness is the executor's signature; references must be concrete and verified (§6) but are **starting points, not the boundary**; huge plans are fine (50-200 TODOs; the Single-Plan Mandate §6.1 holds).
 
-### 5.2 Execution modes — `single-shot` / `loop` / `hybrid-loop`
+### 5.2 Execution modes: `single-shot` / `loop` / `hybrid-loop`
 
 Prometheus + Atlas now support three execution shapes. The mode is part of the plan and shapes its phase structure.
 
@@ -176,21 +176,21 @@ Prometheus + Atlas now support three execution shapes. The mode is part of the p
 
 **Default to `hybrid-loop` for any plan whose full scope cannot be Atlas-executed in a single session.** Single-shot is the exception, not the rule.
 
-The user picks the mode. If they don't say, **ask once** — it changes plan structure significantly.
+The user picks the mode. If they don't say, **ask once**. It changes plan structure significantly.
 
 When mode is `loop` or `hybrid-loop`, insert a `## Phase Plan` section between TL;DR and Context (template in § 7).
 
-### 5.3 Gates and mandatory commits — strong-language requirements (CRITICAL)
+### 5.3 Gates and mandatory commits: strong-language requirements (CRITICAL)
 
 Gates and mandatory commits do **not happen** in long Atlas runs unless the plan states them in strong, unambiguous language. This is load-bearing.
 
-**Write gates as imperatives, not as suggestions:**
+**Write gates as imperatives, not as suggestions.**
 
 - BAD: "It might be a good idea to run tests after this task."
 - BAD: "Consider committing here."
-- GOOD: "**MANDATORY GATE — STOP execution until all of: (a) `pnpm typecheck` returns exit 0, (b) `pnpm test` returns 0 failures, (c) `pnpm validate:all` returns exit 0. If ANY check fails, HANDOVER to Prometheus immediately.**"
+- GOOD: "**MANDATORY GATE. STOP execution until all of: (a) `pnpm typecheck` returns exit 0, (b) `pnpm test` returns 0 failures, (c) `pnpm validate:all` returns exit 0. If ANY check fails, HANDOVER to Prometheus immediately.**"
 
-**Every commit boundary must be:**
+**Every commit boundary must be.**
 
 1. **Explicitly marked** as `COMMIT: MANDATORY` or `COMMIT: NO`.
 2. **Named** with the exact commit message (`type(scope): imperative summary`).
@@ -199,7 +199,7 @@ Gates and mandatory commits do **not happen** in long Atlas runs unless the plan
 
 Atlas will obey `COMMIT: MANDATORY` + an exact message. Atlas will NOT infer commit intent from prose. Weak language = no commits.
 
-**Handover triggers (loop / hybrid-loop only) — write as a closed list per phase:**
+**Handover triggers (loop / hybrid-loop only).** Write as a closed list per phase.
 
 ```
 HANDOVER TO PROMETHEUS IF ANY:
@@ -212,9 +212,9 @@ HANDOVER TO PROMETHEUS IF ANY:
 
 The plan is the contract. If Atlas is unsure, it must hand over. Stating that weakly leads to off-plan execution that's expensive to roll back.
 
-### 5.4 Scope estimates — buckets, NOT time
+### 5.4 Scope estimates: buckets, NOT time
 
-Human-time estimates are nonsensical for these plans — Atlas's clock is not a human's clock, and Atlas-on-XL routinely takes 24+ hours by design. **Drop time framing entirely.**
+Human-time estimates are nonsensical for these plans. Atlas's clock is not a human's clock, and Atlas-on-XL routinely takes 24+ hours by design. **Drop time framing entirely.**
 
 The `Estimated Effort` field in the TL;DR uses **scope/complexity buckets**, not duration:
 
@@ -228,9 +228,9 @@ The `Estimated Effort` field in the TL;DR uses **scope/complexity buckets**, not
 
 Use these as **organizing buckets** when sizing waves. Never as time estimates. Never write "this will take 2 hours" or "estimated 3 days" in a plan body.
 
-### 5.5 Gates are adversarial — author for proof, not assertion
+### 5.5 Gates are adversarial: author for proof, not assertion
 
-OmO's review gates are ruthless and iterative: Oracle / Momus and the Final Verification Wave **reject completion over and over — 50+ rounds is normal — until every claim is done and its proof is recorded**. Your leverage is up front: write every acceptance criterion as **evidence-producing** — a command whose captured output lands in `.sisyphus/evidence/task-{N}-…` — never as an assertion a reviewer must take on faith. A criterion that cannot emit a recorded proof bounces the whole completion. Front-load the proofs the gates will demand; the cost of a vague criterion is paid 50× at the end, not once.
+OmO's review gates are ruthless and iterative. Oracle / Momus and the Final Verification Wave **reject completion over and over. 50+ rounds is normal.** They stop only when every claim is done and its proof is recorded. Do the work up front: write every acceptance criterion as **evidence-producing**, a command whose captured output lands in `.sisyphus/evidence/task-{N}-…`, never as an assertion a reviewer must take on faith. A criterion that cannot emit a recorded proof bounces the whole completion. Front-load the proofs the gates will demand. The cost of a vague criterion is paid 50× at the end, not once.
 
 ---
 
@@ -244,7 +244,7 @@ These are the same rules that Sisyphus's plan-compliance audit will check. Viola
 4. **Zero-human-intervention verification.** Every acceptance criterion must be agent-executable: command, tool invocation, file/diff check. "User manually verifies/tests/confirms" is FORBIDDEN.
 5. **QA scenarios are mandatory per task.** Minimum: 1 happy-path + 1 failure/edge case. Specific selectors, concrete test data, exact assertions, evidence file path. A task without QA scenarios is incomplete and will be rejected.
 6. **Evidence paths use `.sisyphus/evidence/task-{N}-{scenario-slug}.{ext}`.**
-7. **No retroactive scope creep in the plan body** — if mid-plan you discover scope is wrong, surface to the user and re-author, do not just edit silently around it.
+7. **No retroactive scope creep in the plan body.** If mid-plan you discover scope is wrong, report it to the user and re-author. Do not just edit silently around it.
 8. **Markdown only.** The plan is `.md`. No JSON sidecars, no scripts.
 
 ## 7. Plan template (the deliverable shape)
@@ -263,8 +263,8 @@ This is the Prometheus Claude-default template, paths rewritten to `.sisyphus/`.
 > - [Output 1]
 > - [Output 2]
 >
-> **Estimated Effort**: [Quick | Short | Medium | Large | XL] — scope bucket, NOT duration (see § 5.4)
-> **Execution Mode**: [single-shot | loop | hybrid-loop] — see § 5.2
+> **Estimated Effort**: [Quick | Short | Medium | Large | XL], scope bucket, NOT duration (see § 5.4)
+> **Execution Mode**: [single-shot | loop | hybrid-loop], see § 5.2
 > **Parallel Execution**: [YES - N waves | NO - sequential]
 > **Critical Path**: [Task X → Task Y → Task Z]
 
@@ -277,12 +277,12 @@ This is the Prometheus Claude-default template, paths rewritten to `.sisyphus/`.
 > **Mode**: loop | hybrid-loop
 > **Current phase**: {N} of {total} (this plan body covers Phase {N})
 
-### Phase 1 — {Title}
+### Phase 1: {Title}
 
 - **Scope**: [1-2 sentences capturing what this phase delivers]
-- **End condition**: [Concrete trigger — e.g., "F1-F4 verdicts all APPROVE for tasks 1-N", or "Subsystem X compiles and tests green"]
+- **End condition**: [Concrete trigger, e.g. "F1-F4 verdicts all APPROVE for tasks 1-N", or "Subsystem X compiles and tests green"]
 - **Mandatory commit boundaries within phase**: [List the COMMIT: MANDATORY anchors that must land before phase end]
-- **Handover trigger** (closed list — Atlas hands back to Prometheus if ANY):
+- **Handover trigger** (closed list. Atlas hands back to Prometheus if ANY):
   - Phase scope completed AND F1-F4 verdicts all APPROVE
   - A gate failed and the cause is not in the plan's "Must NOT do" list
   - A reference cited in the plan resolves to a non-existent file or symbol
@@ -290,13 +290,13 @@ This is the Prometheus Claude-default template, paths rewritten to `.sisyphus/`.
   - [Custom trigger specific to this plan]
 - **Detail level**: full TODOs in this plan body
 
-### Phase 2 — {Title} <!-- hybrid-loop only: outlined, not planned -->
+### Phase 2: {Title} <!-- hybrid-loop only: outlined, not planned -->
 
-- **Scope**: [1-2 sentences — what the next phase will cover]
-- **Why deferred to fresh planning**: [Why we plan this fresh after Phase 1 lands — usually: needs inspection of Phase 1's actual implementation]
+- **Scope**: [1-2 sentences. What the next phase will cover]
+- **Why deferred to fresh planning**: [Why we plan this fresh after Phase 1 lands. Usually: needs inspection of Phase 1's actual implementation]
 - **Detail level**: TBD by next Prometheus session
 
-### Phase N — ... <!-- additional phases for loop mode (fully planned) or hybrid-loop (headline only) -->
+### Phase N: ... <!-- additional phases for loop mode (fully planned) or hybrid-loop (headline only) -->
 
 ---
 
@@ -346,7 +346,7 @@ This is the Prometheus Claude-default template, paths rewritten to `.sisyphus/`.
 
 ## Verification Strategy (MANDATORY)
 
-> **ZERO HUMAN INTERVENTION** — ALL verification is agent-executed. No exceptions.
+> **ZERO HUMAN INTERVENTION.** ALL verification is agent-executed. No exceptions.
 > Acceptance criteria requiring "user manually tests/confirms" are FORBIDDEN.
 
 ### Test Decision
@@ -361,10 +361,10 @@ This is the Prometheus Claude-default template, paths rewritten to `.sisyphus/`.
 Every task MUST include agent-executed QA scenarios (see TODO template below).
 Evidence saved to `.sisyphus/evidence/task-{N}-{scenario-slug}.{ext}`.
 
-- **Frontend/UI**: Use Playwright (playwright skill) — navigate, interact, assert DOM, screenshot
-- **TUI/CLI**: Use interactive_bash (tmux) — run command, send keystrokes, validate output
-- **API/Backend**: Use Bash (curl) — send requests, assert status + response fields
-- **Library/Module**: Use Bash (bun/node REPL) — import, call functions, compare output
+- **Frontend/UI**: Use Playwright (playwright skill). Navigate, interact, assert DOM, screenshot.
+- **TUI/CLI**: Use interactive_bash (tmux). Run command, send keystrokes, validate output.
+- **API/Backend**: Use Bash (curl). Send requests, assert status + response fields.
+- **Library/Module**: Use Bash (bun/node REPL). Import, call functions, compare output.
 
 ---
 
@@ -376,20 +376,20 @@ Evidence saved to `.sisyphus/evidence/task-{N}-{scenario-slug}.{ext}`.
 > Target: 5-8 tasks per wave. Fewer than 3 per wave (except final) = under-splitting.
 ```
 
-Wave 1 (Start Immediately — foundation + scaffolding):
+Wave 1 (Start Immediately, foundation + stubs):
 ├── Task 1: [...] [quick]
 ├── Task 2: [...] [quick]
 └── Task 7: [...] [quick]
 
-Wave 2 (After Wave 1 — core modules, MAX PARALLEL):
+Wave 2 (After Wave 1, core modules, MAX PARALLEL):
 ├── Task 8: [...] (depends: 3, 5, 7) [deep]
 └── Task 14: [...] (depends: 5, 10) [unspecified-high]
 
-Wave 3 (After Wave 2 — integration + UI):
+Wave 3 (After Wave 2, integration + UI):
 ├── Task 15: [...] (depends: 6, 11, 14) [deep]
 └── Task 20: [...] (depends: 16) [visual-engineering]
 
-Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
+Wave FINAL (After ALL tasks, 4 parallel reviews, then user okay):
 ├── Task F1: Plan compliance audit (oracle)
 ├── Task F2: Code quality review (unspecified-high)
 ├── Task F3: Real manual QA (unspecified-high)
@@ -402,9 +402,9 @@ Max Concurrent: [N] (Wave [k])
 
 ```
 
-### Dependency Matrix (full — show ALL tasks)
+### Dependency Matrix (full, show ALL tasks)
 
-- **1**: — / 8, 14 / 1
+- **1**: none / 8, 14 / 1
 - **8**: 3, 5, 7 / 11, 15 / 2
 
 > Format: `{task}: {blocked-by} / {blocks} / {wave}`
@@ -438,7 +438,7 @@ Max Concurrent: [N] (Wave [k])
   - **Category**: `[visual-engineering | ultrabrain | artistry | quick | unspecified-low | unspecified-high | writing | deep]`
     - Reason: [Why this category fits the task domain]
   - **Skills**: [`skill-1`, `skill-2`]
-    - `skill-1`: [Why needed — domain overlap explanation]
+    - `skill-1`: [Why needed. Domain overlap explanation.]
   - **Skills Evaluated but Omitted**:
     - `omitted-skill`: [Why domain doesn't overlap]
 
@@ -448,48 +448,49 @@ Max Concurrent: [N] (Wave [k])
   - **Blocks**: [Tasks that depend on this task completing]
   - **Blocked By**: [Tasks this depends on] | None (can start immediately)
 
-  **References** (CRITICAL — Be Exhaustive):
+  **References** (CRITICAL. Be Exhaustive):
 
   > The executor has NO context from your interview. References are their ONLY guide.
   > Each reference must answer: "What should I look at and WHY?"
 
   **Pattern References** (existing code to follow):
-  - `path/to/file.ts:45-78` — [why this pattern applies]
+  - `path/to/file.ts:45-78`: [why this pattern applies]
 
   **API/Type References** (contracts to implement against):
-  - `path/to/types.ts:TypeName` — [shape this code must satisfy]
+  - `path/to/types.ts:TypeName`: [shape this code must satisfy]
 
   **Test References** (testing patterns to follow):
-  - `path/to/test.ts:describe("...")` — [test structure to mirror]
+  - `path/to/test.ts:describe("...")`: [test structure to mirror]
 
   **External References** (libraries and frameworks):
-  - Official docs: `https://...` — [exact section + what to use]
+  - Official docs: `https://...`: [exact section + what to use]
 
   **WHY Each Reference Matters**:
-  - [Don't just list files — explain what pattern/info to extract]
+  - [Don't just list files. Explain what pattern/info to extract.]
   - Bad: `src/utils.ts` (vague, which utils? why?)
-  - Good: `src/utils/validation.ts:sanitizeInput()` — use this sanitization pattern for user input
+  - Good: `src/utils/validation.ts:sanitizeInput()` uses this sanitization pattern for user input
 
   **Acceptance Criteria**:
 
-  > **AGENT-EXECUTABLE VERIFICATION ONLY** — no human action permitted.
+  > **AGENT-EXECUTABLE VERIFICATION ONLY.** No human action permitted.
   > Every criterion MUST be verifiable by running a command or using a tool.
 
   **If TDD (tests enabled):**
   - [ ] Test file created: path/to/test.ts
   - [ ] [test command] → PASS (N tests, 0 failures)
 
-  **QA Scenarios (MANDATORY — task is INCOMPLETE without these):**
+  **QA Scenarios (MANDATORY. Task is INCOMPLETE without these):**
 
   > Minimum: 1 happy path + 1 failure/edge case per task.
   > Each scenario = exact tool + exact steps + exact assertions + evidence path.
 
 ```
 
-Scenario: [Happy path — what SHOULD work]
+```
+Scenario: [Happy path. What SHOULD work]
 Tool: [Playwright / interactive_bash / Bash (curl)]
 Preconditions: [Exact setup state]
-Steps: 1. [Exact action — specific command/selector/endpoint] 2. [Next action — with expected intermediate state] 3. [Assertion — exact expected value]
+Steps: 1. [Exact action, specific command/selector/endpoint] 2. [Next action, with expected intermediate state] 3. [Assertion, exact expected value]
 Expected Result: [Concrete, observable, binary pass/fail]
 Failure Indicators: [What specifically would mean this failed]
 Evidence: .sisyphus/evidence/task-{N}-{scenario-slug}.{ext}
@@ -500,69 +501,73 @@ Preconditions: [Invalid input / missing dependency / error state]
 Steps: 1. [Trigger the error condition] 2. [Assert error is handled correctly]
 Expected Result: [Graceful failure with correct error message/code]
 Evidence: .sisyphus/evidence/task-{N}-{scenario-slug}-error.{ext}
+```
 
-````
-
-> **Specificity requirements:** specific CSS selectors, concrete test data, exact assertions, wait conditions where relevant, at least ONE failure/error scenario per task.
+> **Specificity requirements.** Specific CSS selectors, concrete test data, exact assertions, wait conditions where relevant, at least ONE failure/error scenario per task.
 >
-> **Anti-patterns (scenario is INVALID if it looks like this):**
-> - "Verify it works correctly" — HOW? What does "correctly" mean?
-> - "Check the API returns data" — WHAT data? WHAT fields?
-> - "Test the component renders" — WHERE? WHAT selector?
+> **Anti-patterns (scenario is INVALID if it looks like this).**
+>
+> - "Verify it works correctly". HOW? What does "correctly" mean?
+> - "Check the API returns data". WHAT data? WHAT fields?
+> - "Test the component renders". WHERE? WHAT selector?
 > - Any scenario without an evidence path
 
-**Evidence to Capture:**
+**Evidence to Capture.**
+
 - [ ] Each evidence file named: `task-{N}-{scenario-slug}.{ext}`
 - [ ] Screenshots for UI, terminal output for CLI, response bodies for API
 
-**Commit**: MANDATORY | NO (groups with N)
-- **If MANDATORY**: Atlas MUST commit at this boundary. Weak language = no commit.
+**Commit.** MANDATORY | NO (groups with N)
+
+- **If MANDATORY.** Atlas MUST commit at this boundary. Weak language = no commit.
 - Message: `type(scope): imperative summary` (exact, no placeholders)
 - Files: `path/to/file1`, `path/to/file2` (exact, no `git add -A`)
-- Pre-commit gate: `exact verification command(s)` — STOP commit on non-zero exit
+- Pre-commit gate: `exact verification command(s)`. STOP commit on non-zero exit.
 
 **Gate after this task** (if applicable):
-- **MANDATORY GATE**: [exact condition — e.g., "`pnpm typecheck && pnpm test` must return exit 0"]
-- **On gate failure**: HANDOVER to Prometheus immediately (do NOT silently retry, do NOT mask)
+
+- **MANDATORY GATE.** [exact condition, e.g. "`pnpm typecheck && pnpm test` must return exit 0"]
+- **On gate failure.** HANDOVER to Prometheus immediately (do NOT silently retry, do NOT mask)
 
 ---
 
-## Final Verification Wave (MANDATORY — after ALL implementation tasks)
+## Final Verification Wave (MANDATORY: after ALL implementation tasks)
 
 > 4 review agents run in PARALLEL. ALL must APPROVE. Present consolidated results to user; wait for explicit "okay" before completing.
 >
 > **Never mark F1-F4 as checked before getting user's okay.**
 
-- [ ] F1. **Plan Compliance Audit** — `oracle`
-Read the plan end-to-end. For each "Must Have": verify implementation exists (read file, curl endpoint, run command). For each "Must NOT Have": search codebase for forbidden patterns — reject with file:line if found. Check evidence files exist in `.sisyphus/evidence/`. Compare deliverables against plan.
-Output: `Must Have [N/N] | Must NOT Have [N/N] | Tasks [N/N] | VERDICT: APPROVE/REJECT`
+- [ ] F1. **Plan Compliance Audit.** `oracle`
+      Read the plan end-to-end. For each "Must Have": verify implementation exists (read file, curl endpoint, run command). For each "Must NOT Have": search codebase for forbidden patterns. Reject with file:line if found. Check evidence files exist in `.sisyphus/evidence/`. Compare deliverables against plan.
+      Output: `Must Have [N/N] | Must NOT Have [N/N] | Tasks [N/N] | VERDICT: APPROVE/REJECT`
 
-- [ ] F2. **Code Quality Review** — `unspecified-high`
-Run `tsc --noEmit` + linter + `bun test` (or this repo's equivalent: `pnpm typecheck && pnpm test && pnpm validate:all`). Review all changed files for: `as any`/`@ts-ignore`, empty catches, console.log in prod, commented-out code, unused imports. Check AI slop: excessive comments, over-abstraction, generic names (data/result/item/temp).
-Output: `Build [PASS/FAIL] | Lint [PASS/FAIL] | Tests [N pass/N fail] | Files [N clean/N issues] | VERDICT`
+- [ ] F2. **Code Quality Review.** `unspecified-high`
+      Run `tsc --noEmit` + linter + `bun test` (or this repo's equivalent: `pnpm typecheck && pnpm test && pnpm validate:all`). Review all changed files for: `as any`/`@ts-ignore`, empty catches, console.log in prod, commented-out code, unused imports. Check AI slop: excessive comments, over-abstraction, generic names (data/result/item/temp).
+      Output: `Build [PASS/FAIL] | Lint [PASS/FAIL] | Tests [N pass/N fail] | Files [N clean/N issues] | VERDICT`
 
-- [ ] F3. **Real Manual QA** — `unspecified-high` (+ `playwright` skill if UI)
-Start from clean state. Execute EVERY QA scenario from EVERY task — follow exact steps, capture evidence. Test cross-task integration (features working together, not isolation). Edge cases: empty state, invalid input, rapid actions. Save to `.sisyphus/evidence/final-qa/`.
-Output: `Scenarios [N/N pass] | Integration [N/N] | Edge Cases [N tested] | VERDICT`
+- [ ] F3. **Real Manual QA.** `unspecified-high` (+ `playwright` skill if UI)
+      Start from clean state. Execute EVERY QA scenario from EVERY task. Follow exact steps, capture evidence. Test cross-task integration (features working together, not isolation). Edge cases: empty state, invalid input, rapid actions. Save to `.sisyphus/evidence/final-qa/`.
+      Output: `Scenarios [N/N pass] | Integration [N/N] | Edge Cases [N tested] | VERDICT`
 
-- [ ] F4. **Scope Fidelity Check** — `deep`
-For each task: read "What to do", read actual diff (git log/diff). Verify 1:1 — everything in spec was built (no missing), nothing beyond spec was built (no creep). Check "Must NOT do" compliance. Detect cross-task contamination: Task N touching Task M's files. Flag unaccounted changes.
-Output: `Tasks [N/N compliant] | Contamination [CLEAN/N issues] | Unaccounted [CLEAN/N files] | VERDICT`
+- [ ] F4. **Scope Fidelity Check.** `deep`
+      For each task: read "What to do", read actual diff (git log/diff). Verify 1:1. Everything in spec was built (no missing), nothing beyond spec was built (no creep). Check "Must NOT do" compliance. Detect cross-task contamination: Task N touching Task M's files. Flag unaccounted changes.
+      Output: `Tasks [N/N compliant] | Contamination [CLEAN/N issues] | Unaccounted [CLEAN/N files] | VERDICT`
 
 ---
 
 ## Commit Strategy
 
-- **1**: `type(scope): desc` — file.ts, `pnpm typecheck && pnpm test` (or this repo's pre-commit chain)
+- **1.** `type(scope): desc`, file.ts, `pnpm typecheck && pnpm test` (or this repo's pre-commit chain)
 
 ---
 
 ## Success Criteria
 
 ### Verification Commands
+
 ```bash
 command  # Expected: output
-````
+```
 
 ### Final Checklist
 
@@ -575,23 +580,20 @@ command  # Expected: output
 
 ---
 
-```
-
 ## 8. What you do NOT do here
 
-- **No Metis / Oracle / Momus dispatch.** Those are OmO-internal agents Claude Code cannot dispatch. If the user explicitly wants Momus high-accuracy review, surface that they need to open OpenCode and run the plan through Prometheus directly (this skill is the lightweight Claude-side path).
+- **No Metis / Oracle / Momus dispatch.** Those are OmO-internal agents Claude Code cannot dispatch. If the user explicitly wants Momus high-accuracy review, tell them they need to open OpenCode and run the plan through Prometheus directly (this skill is the lightweight Claude-side path).
 - **No `/start-work` invocation.** That command lives in OpenCode. Tell the user to run it themselves.
 - **No execution.** Even if the user begs. Generate the plan, hand off, done.
-- **No drafts.** Single-shot authoring — the final plan IS the artifact.
+- **No drafts.** Single-shot authoring. The final plan IS the artifact.
 - **No edits to anything outside `.sisyphus/plans/{slug}.md`** (and conditionally `.sisyphus/boulder.json` + matched evidence/notepads on explicit cleanup).
 
 ## 9. Provenance
 
 Source of truth for the Prometheus Claude-default plan format:
 
-- `~/dev-projects/pi-setup-hq/reference-repos/oh-my-openagent/src/agents/prometheus/plan-template.ts` — markdown template body
-- `~/dev-projects/pi-setup-hq/reference-repos/oh-my-openagent/src/agents/prometheus/identity-constraints.ts` — single-plan mandate, max-parallelism, markdown-only, incremental write protocol
-- `~/dev-projects/pi-setup-hq/reference-repos/oh-my-openagent/src/agents/prometheus/plan-generation.ts` — workflow phases (Metis / Oracle / Momus — out of scope for Claude Code use)
+- `~/dev-projects/pi-setup-hq/reference-repos/oh-my-openagent/src/agents/prometheus/plan-template.ts`: markdown template body
+- `~/dev-projects/pi-setup-hq/reference-repos/oh-my-openagent/src/agents/prometheus/identity-constraints.ts`: single-plan mandate, max-parallelism, markdown-only, incremental write protocol
+- `~/dev-projects/pi-setup-hq/reference-repos/oh-my-openagent/src/agents/prometheus/plan-generation.ts`: workflow phases (Metis / Oracle / Momus, out of scope for Claude Code use)
 
 If Prometheus changes its template upstream, refresh this skill against those files. The Claude-default variant is selected by `getPrometheusPrompt()` when the agent's model is not GPT and not Gemini.
-```
