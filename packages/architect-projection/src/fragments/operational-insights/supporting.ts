@@ -74,9 +74,9 @@ export const OverviewArchitectureSchema = z.strictObject({
 /**
  * One orientation reference in the overview's "start here" tier — a generated
  * doc the agent should read first (decisions, taxonomy, validation rules,
- * business rules, API reference), the `documentation <type>` verb that emits
- * it, and its display title. Derived from the documentation-type registry so
- * the list never drifts from the supported set.
+ * business rules, API reference), the `architect_documentation` tool that
+ * emits it, and its display title. Derived from the documentation-type
+ * registry so the list never drifts from the supported set.
  *
  * @architect-shape
  */

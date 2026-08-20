@@ -899,7 +899,7 @@ GeneratedViewEntrySchema = z.strictObject({
 
 ### OrientationReferenceSchema
 
-One orientation reference in the overview's "start here" tier — a generated doc the agent should read first (decisions, taxonomy, validation rules, business rules, API reference), the \`documentation &lt;type&gt;\` verb that emits it, and its display title. Derived from the documentation-type registry so the list never drifts from the supported set.
+One orientation reference in the overview's "start here" tier — a generated doc the agent should read first (decisions, taxonomy, validation rules, business rules, API reference), the \`architect_documentation\` tool that emits it, and its display title. Derived from the documentation-type registry so the list never drifts from the supported set.
 
 ```ts
 OrientationReferenceSchema = z.strictObject({
@@ -1073,9 +1073,9 @@ PatternDetailSchema = PatternIdentitySchema.extend({
   kind: z.literal('PatternDetail'),
   // Classification axes beyond role (which PatternIdentity already carries):
   // bounded-context, product-area, and the hierarchy level. The source
-  // ExtractedPattern carries all three; surfacing them here lets `pattern <Name>`
-  // answer the full role · bounded-context · layer · product-area classification
-  // in one call instead of forcing a stitch across `arch neighborhood` / `taxonomy`.
+  // ExtractedPattern carries all three; surfacing them here lets `g.pattern('<Name>')`
+  // / `architect_pattern` answer the full role · bounded-context · layer ·
+  // product-area classification in one call.
   boundedContext: z.string().optional(),
   productArea: z.string().optional(),
   level: z.string().optional(),

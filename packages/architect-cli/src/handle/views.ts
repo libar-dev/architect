@@ -264,7 +264,7 @@ export interface ConceptHit {
   matchedOn: string[];
 }
 
-// ─── E1: findByConcept — CURATED, core-only ───────────────────────────────────
+// ─── E1: findByConcept — CURATED ──────────────────────────────────────────────
 // Fuzzy concept string → ranked patterns. Scores case-insensitive substring +
 // token-overlap against, in descending weight: name, whenToUse[], productArea,
 // directive.description. `matchedOn` reports which fields hit. Default limit 12.

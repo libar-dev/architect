@@ -78,9 +78,8 @@ Four logical layers:
 
 ## Consumers
 
-- **`architect-cli`** — the docs generator (`architect-generate`) and, formerly, the retired verb CLI (ADR-014) (overview / status / list / pattern / bundle /
-  dep-tree / context / rules / taxonomy / `documentation <type>`, etc.) render projections to
-  compact-text / JSON / markdown.
+- **`architect-cli`** — the docs generator (`architect-generate`) renders documentation
+  projections to markdown. Compact-text / JSON renderers are consumed by MCP, not a CLI verb wall.
 - **`architect-mcp`** — the `architect_*` tool twins call the same projection functions, returning
   fragment JSON.
 - **docgen (`pnpm docs:all` → `docs-live/`)** — drives `parseAndProjectDocumentationBundle` across

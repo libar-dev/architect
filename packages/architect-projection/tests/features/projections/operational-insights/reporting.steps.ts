@@ -179,7 +179,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 // projection uses — so this assertion never drifts from the supported set.
                 generatedViews: SUPPORTED_DOCUMENTATION_TYPE_IDENTITIES.map((identity) => ({
                   docType: identity.key,
-                  verb: `documentation ${identity.key}`,
+                  verb: `architect_documentation ${identity.key}`,
                   summary: identity.description,
                 })),
               },
@@ -282,14 +282,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             const output = state!.overviewRenderings!['summary']!;
             const blockingLines = output.split('\n').filter((line) => line.includes('blocked by:'));
             expect(blockingLines).toHaveLength(5);
-            expect(output).toContain('... and 1 more — run `arch blocking`');
-            expect(output).toContain('docs via `documentation <type>`:');
-            expect(output).not.toContain('— `documentation architecture`');
+            expect(output).toContain('... and 1 more — `architect_arch_blocking`');
+            expect(output).toContain('docs via `architect_documentation` / docs-live/:');
+            expect(output).not.toContain('— `architect_documentation architecture`');
             // summary shows the coarse package chart (one Mermaid block) + the
-            // API-promoting pointer, but NOT the richer bounded-context map.
+            // live-graph pointer, but NOT the richer bounded-context map.
             expect(output).toContain('=== ARCHITECTURE ===');
             expect(output.match(/```mermaid/g) ?? []).toHaveLength(1);
-            expect(output).toContain('Explore via the API, not grep');
+            expect(output).toContain('Explore via the live graph, not grep');
           },
         );
 
@@ -299,8 +299,8 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             const output = state!.overviewRenderings!['full']!;
             const blockingLines = output.split('\n').filter((line) => line.includes('blocked by:'));
             expect(blockingLines).toHaveLength(6);
-            expect(output).not.toContain('more — run `arch blocking`');
-            expect(output).toContain('— `documentation architecture`');
+            expect(output).not.toContain('more — `architect_arch_blocking`');
+            expect(output).toContain('— `architect_documentation architecture`');
             // full adds the bounded-context map below the package chart — two
             // Mermaid blocks in the architecture section.
             expect(output).toContain('=== ARCHITECTURE ===');

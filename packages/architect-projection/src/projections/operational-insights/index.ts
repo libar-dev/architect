@@ -152,8 +152,8 @@ const ORIENTATION_DOC_KEYS: readonly string[] = [
 ];
 
 /**
- * One-line note teaching the `--disclosure` drill-down mechanic on the
- * `documentation` verb (the tier vocabulary the orientation docs accept).
+ * One-line note teaching the disclosure drill-down mechanic on
+ * `architect_documentation` (the tier vocabulary the orientation docs accept).
  */
 const OVERVIEW_DISCLOSURE_HINT =
   'Each doc accepts --disclosure essential|important|useful|advanced to control depth.';
@@ -163,25 +163,25 @@ const OVERVIEW_STARTABLE_SAMPLE_LIMIT = 8;
 
 /**
  * The generated documentation surfaces this graph projects, each fetchable via
- * `documentation <type>`. Derived from the canonical documentation-type registry
- * (the same source the `documentation` verb dispatches on) so the count and list
- * never drift from the supported set. Rendered terse by default (one line) and
- * itemized at `full` disclosure.
+ * `architect_documentation` (MCP) or `docs-live/`. Derived from the canonical
+ * documentation-type registry so the count and list never drift from the
+ * supported set. Rendered terse by default (one line) and itemized at `full`
+ * disclosure.
  */
 const OVERVIEW_GENERATED_VIEWS: readonly { docType: string; verb: string; summary: string }[] =
   SUPPORTED_DOCUMENTATION_TYPE_IDENTITIES.map((identity) => ({
     docType: identity.key,
-    verb: `documentation ${identity.key}`,
+    verb: `architect_documentation ${identity.key}`,
     summary: identity.description,
   }));
 
 /**
- * The one-line "explore via the API, not grep" pointer rendered under the
- * architecture glimpse — names the verbs that drill from the chart into the
- * PatternGraph so agents reach for the Data API instead of file scanning.
+ * The one-line "explore via the live graph, not grep" pointer rendered under
+ * the architecture glimpse — names the handle / MCP cuts that drill from the
+ * chart into the PatternGraph.
  */
 const OVERVIEW_ARCHITECTURE_POINTER =
-  'Explore via the API, not grep: `documentation architecture` (full map) · `arch neighborhood <Pattern>` · `dep-tree <Pattern>`';
+  "Explore via the live graph, not grep: `docs-live/ARCHITECTURE.md` · `g.pattern('<Name>')` · `architect_arch_neighborhood` · `architect_dep_tree`";
 
 /**
  * Resolves the curated orientation-doc keys against the canonical
@@ -203,7 +203,7 @@ function buildOrientationReferences(): OrientationReference[] {
     }
     return {
       docType: identity.key,
-      verb: `documentation ${identity.key}`,
+      verb: `architect_documentation ${identity.key}`,
       title: identity.displayTitle,
     };
   });
@@ -234,7 +234,7 @@ function buildRoleDistribution(patterns: readonly ExtractedPattern[]): RoleCount
  * In a consumer repo (or test fixture) that has not declared `packages`
  * matchers, the shared resolver raises `UNMAPPED_PACKAGE` by design — so we omit
  * the glimpse (returning `undefined`) rather than crash this resilience-critical
- * health verb. The same config gap still fails LOUDLY in `docs:all` /
+ * health projection. The same config gap still fails LOUDLY in `docs:all` /
  * `validate:all`, which share the resolver's hard-error contract, so omitting
  * here hides nothing. Any other error is a real bug and propagates.
  */

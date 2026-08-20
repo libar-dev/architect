@@ -9,8 +9,8 @@
  *
  * **Value:** Emits the entire production architecture — every node (with role,
  * bounded-context, layer, and workspace package) and every typed edge — in ONE
- * structured call. Lets a consumer (the `arch graph` verb, a graph-explorer UI)
- * obtain the whole graph without an N-call `arch neighborhood` loop.
+ * structured call. Lets a consumer (Studio, `architect_arch_neighborhood`
+ * loops, a graph-explorer UI) obtain the whole graph in one payload.
  *
  * **Invariant:** Reuses the exact node/edge collection behind
  * `docs-live/ARCHITECTURE.md` and the `overview` glimpse (component scope,

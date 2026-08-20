@@ -92,7 +92,7 @@ export async function readDanglingBaseline(
   } catch (error) {
     if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
       throw new Error(
-        `Dangling baseline file not found at ${baselinePath}. Run architect-validate --base-dir . --update-baseline to create it.`,
+        `Dangling baseline file not found at ${baselinePath}. Run architect dangling --write-baseline to create it.`,
       );
     }
 

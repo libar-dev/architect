@@ -308,9 +308,7 @@ async function findCmd(): Promise<void> {
   if (!query) fail('usage: architect find <concept>');
   const g = await loadGraph(BASE_DIR);
   const r = g.findByConcept(query);
-  console.log(
-    `\nfindByConcept(${JSON.stringify(query)}) — top ${String(r.length)} (curated, core-only):`,
-  );
+  console.log(`\nfindByConcept(${JSON.stringify(query)}) — top ${String(r.length)} (curated):`);
   if (!r.length) {
     console.log('  (no matches)');
     return;

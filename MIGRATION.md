@@ -16,15 +16,15 @@ The v2 line publishes under the `next` dist-tag during the `2.0.0-pre.*` pre-rel
 
 All 7 bins remain reachable via the meta package `@libar-dev/architect` (now bin-only — no JS exports). Each bin is also directly reachable from the split that publishes it.
 
-| Bin                       | Published by               | Purpose                                                                                                                        |
-| ------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| `architect`               | `@libar-dev/architect-cli` | Pattern-graph query CLI: `overview`, `status`, `context`, `dep-tree`, `scope-validate`, `list`, `bundle`, etc.                 |
-| `architect-generate`      | `@libar-dev/architect-cli` | Doc generation; ~13 topics via `-g` flag (architecture, roadmap, requirements-executable, decisions, taxonomy, patterns, etc.) |
-| `architect-guard`         | `@libar-dev/architect-cli` | Process / FSM guard for pre-commit / pre-merge gates (`--staged`, `--all`, `--files`)                                          |
-| `architect-validate`      | `@libar-dev/architect-cli` | Pattern annotation vs Gherkin feature cross-validation (`--dod`, `--anti-patterns`)                                            |
-| `architect-lint-steps`    | `@libar-dev/architect-cli` | vitest-cucumber feature/step compatibility checks                                                                              |
-| `architect-lint-patterns` | `@libar-dev/architect-cli` | Pattern annotation quality lint                                                                                                |
-| `architect-mcp`           | `@libar-dev/architect-mcp` | MCP server (21 tools) — file watcher, pipeline session                                                                         |
+| Bin                       | Published by               | Purpose                                                                                                                                                                                     |
+| ------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `architect`               | `@libar-dev/architect-cli` | Graph-handle CLI: `q '<js>'` + named demos + the `dangling` CI gate (ADR-014). Pattern-state tools live on MCP (`architect_overview`, `architect_dep_tree`, `architect_scope_validate`, …). |
+| `architect-generate`      | `@libar-dev/architect-cli` | Doc generation; ~13 topics via `-g` flag (architecture, roadmap, requirements-executable, decisions, taxonomy, patterns, etc.)                                                              |
+| `architect-guard`         | `@libar-dev/architect-cli` | Process / FSM guard for pre-commit / pre-merge gates (`--staged`, `--all`, `--files`)                                                                                                       |
+| `architect-validate`      | `@libar-dev/architect-cli` | Pattern annotation vs Gherkin feature cross-validation (`--dod`, `--anti-patterns`)                                                                                                         |
+| `architect-lint-steps`    | `@libar-dev/architect-cli` | vitest-cucumber feature/step compatibility checks                                                                                                                                           |
+| `architect-lint-patterns` | `@libar-dev/architect-cli` | Pattern annotation quality lint                                                                                                                                                             |
+| `architect-mcp`           | `@libar-dev/architect-mcp` | MCP server (21 tools) — file watcher, pipeline session                                                                                                                                      |
 
 **Meta package:** `@libar-dev/architect` continues to expose all 7 bins via re-export. Consumers can install just the meta and get the full CLI surface. The meta package has **no JS exports** — `import … from '@libar-dev/architect'` will fail to resolve in v2.
 

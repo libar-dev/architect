@@ -145,7 +145,7 @@ function renderOverviewDigest(
     );
     const hidden = overview.blocking.length - shown.length;
     if (hidden > 0) {
-      lines.push(`... and ${String(hidden)} more — run \`arch blocking\``);
+      lines.push(`... and ${String(hidden)} more — \`architect_arch_blocking\``);
     }
     sections.push(renderMarker('BLOCKING', options) + '\n' + lines.join('\n'));
   }
@@ -165,7 +165,7 @@ function renderOverviewDigest(
     sections.push(
       renderMarker('READY TO START', options) +
         '\n' +
-        `${String(startableCount)} roadmap pattern(s) with dependencies satisfied${tail} — run \`arch workable\``,
+        `${String(startableCount)} roadmap pattern(s) with dependencies satisfied${tail}`,
     );
   }
 
@@ -232,7 +232,7 @@ function renderGeneratedViews(
   return (
     header +
     '\n' +
-    `${String(views.length)} docs via \`documentation <type>\`: ${views.map((view) => view.docType).join(', ')}`
+    `${String(views.length)} docs via \`architect_documentation\` / docs-live/: ${views.map((view) => view.docType).join(', ')}`
   );
 }
 
@@ -257,7 +257,7 @@ function renderOverviewOrientation(
     const suffix = orientation.startableCount > sample.length ? ', …' : '';
     const tail = sample.length > 0 ? `: ${sample.join(', ')}${suffix}` : '';
     lines.push(
-      `Ready to start (deps satisfied): ${String(orientation.startableCount)} roadmap pattern(s)${tail} — run \`arch workable\``,
+      `Ready to start (deps satisfied): ${String(orientation.startableCount)} roadmap pattern(s)${tail}`,
     );
   } else {
     lines.push('Ready to start: 0 roadmap patterns with all dependencies satisfied.');

@@ -14,7 +14,6 @@ import {
   parseAtBoundary,
   resolveInvocationDir,
   resolveProjectConfig,
-  resolveWorkspaceSources,
   type ResolvedConfig,
 } from '@libar-dev/architect-core';
 import {
@@ -235,11 +234,6 @@ async function withWorkingDirectory<T>(directory: string, operation: () => Promi
   }
 }
 
-function isWorkspaceConfigFallbackTarget(baseDir: string): boolean {
-  const workspaceSources = resolveWorkspaceSources(baseDir);
-  return workspaceSources.input.length > 0 && workspaceSources.features.length > 0;
-}
-
 async function loadGenerationConfig(baseDir: string): Promise<ResolvedConfig> {
   const configPath = await findConfigFile(baseDir);
   if (configPath === null) {
@@ -258,10 +252,6 @@ async function loadGenerationConfig(baseDir: string): Promise<ResolvedConfig> {
   const config = await withWorkingDirectory(baseDir, () => loadProjectConfig(baseDir));
   if (config.ok) {
     return config.value;
-  }
-
-  if (!isWorkspaceConfigFallbackTarget(baseDir)) {
-    return resolveProjectConfig(rawConfig, { configPath });
   }
 
   return resolveProjectConfig(rawConfig, { configPath });
