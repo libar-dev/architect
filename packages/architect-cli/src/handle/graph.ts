@@ -26,10 +26,13 @@
  * only irreducible cross-source joins (entry adapters, the spec bridge, the
  * firehose); everything else stays a script the agent writes.
  *
- *   import { loadGraph } from '@libar-dev/architect-cli/handle';
+ * Primary surface is the `architect` bin (ADR-014), not a published package export:
+ *   pnpm architect:q 'g.invariantsOf("packages/architect-core/src/foo.ts")'
+ *   pnpm architect:q 'g.specsReverifying(changedFiles)'
+ *
+ * Dogfood / workspace scripts may import relatively:
+ *   import { loadGraph } from '../../packages/architect-cli/src/handle/graph.ts';
  *   const g = await loadGraph(baseDir);                     // async: builds live from source
- *   g.invariantsOf('packages/architect-core/src/foo.ts');   // → Invariant[], any maturity
- *   g.specsReverifying(changedFiles);                       // → AtRiskSpec[]
  */
 import type { PatternGraphAPI } from '@libar-dev/architect-core';
 
@@ -444,7 +447,7 @@ export class Graph {
 
 // ─── the one entry point — build both cores LIVE, join, parse once ───────────
 // Async because the authored core is built from the live pipeline (buildCliContext).
-// Each call reflects the working tree (~1.5s): no dump, noCache. When running from
+// Each call reflects the working tree (~1.5s): no dump. When running from
 // workspace source, run with `--conditions=source` (see authored.ts) or the
 // authored side resolves stale dist/.
 export async function loadGraph(baseDir: string): Promise<Graph> {

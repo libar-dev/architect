@@ -53,10 +53,8 @@ graph LR
   api --> rendering
   cli --> api
   cli --> configuration
-  cli --> domain
   cli --> lint
   cli --> pipeline
-  cli --> projection
   cli --> read_api
   cli --> role_contract
   cli --> scanner
@@ -620,7 +618,7 @@ Most-depended-on patterns in this view, ranked by in-view dependant count.
 | OperationalInsightsProjectionSupport | 8          | AnnotationCoverageProjection, OverviewProjection, RequirementDigestProjection, RequirementExecutableDigestProjection, RequirementSpecsDigestProjection  |
 | BlockSchema                          | 7          | ArchitectureDiagram, DecisionRecord, DocumentationCompositionSupporting, MarkdownRenderer, OperationalInsightsSupporting                                |
 | ProjectionFragmentSchema             | 7          | ApiReferenceProjection, CompactTextRenderer, FragmentRendererDispatch, JsonRenderer, MarkdownRenderer                                                   |
-| ProjectionContext                    | 6          | BusinessRuleSetAssembly, CLIContextTypes, DocumentationDefinitionRegistry, PatternBundleAssembly, PatternCatalogAssembly                                |
+| ExecutionContextProjectionSupport    | 5          | DeliverableProjection, FileReadingListProjection, HandoffProjection, ScopeReadinessProjection, SessionContextProjection                                 |
 
 ## Cross-package bounded contexts
 

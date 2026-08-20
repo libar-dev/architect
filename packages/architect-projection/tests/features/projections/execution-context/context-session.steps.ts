@@ -916,14 +916,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
             const completedContext = createProjectionContext({
               patterns: [
-                createPattern('PatternGraphAPICLI', {
+                createPattern('GraphHandleCli', {
                   status: 'completed',
                   deliverables: [
                     {
-                      name: 'CLI subcommand registry',
+                      name: 'Graph-handle CLI dispatch',
                       status: 'complete',
                       tests: 2,
-                      location: 'packages/architect-cli/src/cli/commands/index.ts',
+                      location: 'packages/architect-cli/src/cli/graph-cli.ts',
                     },
                   ],
                 }),
@@ -931,12 +931,12 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
             });
 
             const completedHandoff = parseAndProjectHandoffRecord(completedContext, {
-              pattern: 'PatternGraphAPICLI',
+              pattern: 'GraphHandleCli',
               sessionType: 'implement',
             });
 
             expect(completedHandoff.root.status).toBe('completed');
-            expect(completedHandoff.root.pattern).toBe('PatternGraphAPICLI');
+            expect(completedHandoff.root.pattern).toBe('GraphHandleCli');
           },
         );
       },

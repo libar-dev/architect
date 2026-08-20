@@ -45,8 +45,8 @@ import {
 } from '@libar-dev/architect-guard';
 import { z } from 'zod';
 
-import { buildCliContext } from './pattern-graph-cli-runtime.js';
-import type { ParsedArgs } from './pattern-graph-cli-types.js';
+import { buildCliContext } from './cli-runtime.js';
+import type { BuildContextArgs } from './cli-types.js';
 import { readCliPackageMetadata, resolveCliBaseDirArg } from './runtime-helpers.js';
 import { loadGraph } from '../handle/graph.js';
 import { MATURITIES } from '../handle/schema.js';
@@ -278,7 +278,14 @@ async function blastCmd(): Promise<void> {
 
 async function fanInCmd(): Promise<void> {
   const g = await loadGraph(BASE_DIR);
-  const min = cmdArgs[0] !== undefined ? Number(cmdArgs[0]) : 4;
+  let min = 4;
+  if (cmdArgs[0] !== undefined) {
+    const parsed = Number(cmdArgs[0]);
+    if (!Number.isFinite(parsed) || !Number.isInteger(parsed) || parsed < 1) {
+      fail('usage: architect fan-in [min]  (min must be a positive integer)');
+    }
+    min = parsed;
+  }
   const r = g.fanInCandidates({ min });
   console.log(
     `\ncuration candidates — load-bearing modules with NO pattern node (top ${String(r.length)}):`,
@@ -499,20 +506,10 @@ async function danglingCmd(): Promise<void> {
   const writeBaseline = flags.writeBaseline === true;
   const strict = flags.strict === true;
 
-  const liveArgs: ParsedArgs = {
+  const liveArgs: BuildContextArgs = {
     baseDir: BASE_DIR,
     input: [],
     features: [],
-    command: null,
-    commandArgs: [],
-    help: false,
-    version: false,
-    dryRun: false,
-    noCache: true,
-    format: 'json',
-    sessionType: 'planning',
-    sessionTypeExplicit: false,
-    depth: 1,
   };
   const context = await buildCliContext(liveArgs);
   const current = context.build.validation.danglingReferences;

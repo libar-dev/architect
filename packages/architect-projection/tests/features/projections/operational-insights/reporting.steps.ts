@@ -537,7 +537,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
                 archLayer: 'application',
                 team: 'tooling',
                 workflow: 'documentation',
-                file: 'packages/architect-cli/src/cli/pattern-graph-cli.ts',
+                file: 'packages/architect-cli/src/cli/graph-cli.ts',
               }),
               createPattern('DecisionRecord', {
                 status: 'completed',
@@ -636,7 +636,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
               count: 3,
               locationPattern: 'packages/**/*.ts',
               files: [
-                'packages/architect-cli/src/cli/pattern-graph-cli.ts',
+                'packages/architect-cli/src/cli/graph-cli.ts',
                 'packages/architect-projection/src/projections/operational-insights/overview.ts',
                 'packages/architect-projection/src/projections/operational-insights/support.ts',
               ],

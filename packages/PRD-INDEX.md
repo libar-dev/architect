@@ -46,4 +46,4 @@ Remove those (plus the non-gating lints and the stranded core/shell bits) and ro
 - Root `package.json` has **no** `pkg:*` or `ci:architect:*` script families — AGENTS.md/CLAUDE.md overstate the script surface.
 - `architect-lint-patterns` bin may be **dangling** — no wired root-script entrypoint; confirm it's reached by the guard pipeline.
 - `architect-mcp` has **no** `architect-guard` dependency (core + projection only); guard/FSM is reached indirectly via `projectScopeReadinessReport`.
-- `pnpm -s architect:query list --package <pkg>` returned empty — consistent with the disposable annotations; all inventory was taken from code.
+- Package inventory was taken from code (the retired `architect:query list --package` verb returned empty for disposable annotations; post-ADR-014 use `pnpm architect:q` / the live graph).

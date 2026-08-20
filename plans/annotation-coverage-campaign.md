@@ -64,9 +64,10 @@ absent on ~⅓ of patterns.
    `architect-guard/src/cli/shared.ts`, `architect-guard/src/lint/steps/types.ts`) — the
    assist loop has already drained the big hubs; treat remaining entries as a per-batch
    pickup, not a campaign.
-2. **`pattern-graph-cli-runtime.ts` (`buildCliContext`)** — now the single bootstrap every
-   consumer (handle, docs generator, snapshot-style scripts) flows through, and still
-   node-dark. High signal-per-node; annotate as a `service` in `bounded-context:cli`.
+2. **`cli-runtime.ts` (`buildCliContext`)** — live-graph bootstrap for the handle
+   and the dangling gate, still node-dark. (`architect-generate` builds through its
+   own `buildGraph` + `createCliProjectionContext`.) High signal-per-node; annotate
+   as a `service` in `bounded-context:cli`.
 3. **Guard (52%) before the rest**: validation rules are what agents confront when gates
    fire; a dark guard subsystem means gate failures explain themselves with file spelunking
    instead of `g.byFile`. MCP is small (4/7) — finish it opportunistically.

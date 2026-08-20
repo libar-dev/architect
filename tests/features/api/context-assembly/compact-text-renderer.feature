@@ -54,9 +54,9 @@ Feature: Compact Text Renderer - Plain Text Rendering
 
   Rule: formatOverview renders progress summary
 
-    **Invariant:** The overview compact renderer must render a progress summary line showing completion metrics for the project and point users to the current query script name.
+    **Invariant:** The overview compact renderer must render a progress summary line showing completion metrics for the project and point users to the graph-handle read surface (`pnpm architect:q`).
     **Rationale:** The progress line is the first thing developers see when starting a session — it provides immediate project health awareness, and the follow-up command guidance must be copy-pasteable.
-    **Verified by:** Overview renders progress line, Overview renders architect query guidance
+    **Verified by:** Overview renders progress line, Overview renders read-surface guidance
 
     @acceptance-criteria @happy-path
     Scenario: Overview renders progress line

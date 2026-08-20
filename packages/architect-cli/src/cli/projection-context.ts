@@ -1,8 +1,4 @@
-import {
-  PatternGraphSchema,
-  createPackageResolver,
-  type TagRegistry,
-} from '@libar-dev/architect-core';
+import { createPackageResolver } from '@libar-dev/architect-core';
 import type { ProjectionContext } from '@libar-dev/architect-projection';
 
 interface CreateCliProjectionContextOptions {
@@ -27,24 +23,4 @@ export function createCliProjectionContext({
     ...(projectMetadata !== undefined ? { projectMetadata } : {}),
     ...(tagExampleOverrides !== undefined ? { tagExampleOverrides } : {}),
   };
-}
-
-export function createCliTaxonomyProjectionContext(tagRegistry: TagRegistry): ProjectionContext {
-  const graph: ProjectionContext['graph'] = {
-    patterns: [],
-    tagRegistry: { ...tagRegistry, $schema: tagRegistry.$schema ?? '' },
-    byStatus: { candidate: [], roadmap: [], active: [], completed: [], deferred: [] },
-    byNormalizedStatus: { completed: [], active: [], planned: [], candidate: [] },
-    byMaturity: {},
-    byRole: {},
-    bySourceType: { typescript: [], gherkin: [], roadmap: [], prd: [] },
-    byProductArea: {},
-    counts: { completed: 0, active: 0, planned: 0, candidate: 0, total: 0 },
-    roleCount: 0,
-    relationshipIndex: {},
-  };
-
-  PatternGraphSchema.parse(graph);
-
-  return createCliProjectionContext({ graph, packageEntries: [] });
 }

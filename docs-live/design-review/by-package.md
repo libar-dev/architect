@@ -24,7 +24,6 @@ graph LR
   pkg_architect_package_content["Architect Package Content (43)"]
   pkg_architect_projection["Architect Projection (127)"]
   pkg_architect_cli --> pkg_architect_core
-  pkg_architect_cli --> pkg_architect_projection
   pkg_architect_core --> pkg_architect_projection
   pkg_architect_guard --> pkg_architect_core
   pkg_architect_mcp --> pkg_architect_core

@@ -56,10 +56,8 @@ graph LR
   api --> rendering
   cli --> api
   cli --> configuration
-  cli --> domain
   cli --> lint
   cli --> pipeline
-  cli --> projection
   cli --> read_api
   cli --> role_contract
   cli --> scanner

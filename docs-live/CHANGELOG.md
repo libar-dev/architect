@@ -47,7 +47,7 @@ Completed milestones timeline covering 139 patterns.
 | ChangelogProjection                                   | completed | projection | packages/architect-projection/src/projections/delivery-reporting/index.ts                                            |
 | ChangelogProjectionExecutableTests                    | completed | projection | packages/architect-projection/tests/features/projections/delivery-reporting/changelog.feature                        |
 | CliCommandResolutionExecutableTests                   | completed |            | packages/architect-cli/tests/features/cli-command-resolution.feature                                                 |
-| CLIContextTypes                                       | completed | contract   | packages/architect-cli/src/cli/pattern-graph-cli-types.ts                                                            |
+| CLIContextTypes                                       | completed | contract   | packages/architect-cli/src/cli/cli-types.ts                                                                          |
 | CLIErrorHandler                                       | completed | utility    | packages/architect-cli/src/cli/error-handler.ts                                                                      |
 | CliFlagParsingExecutableTests                         | completed |            | packages/architect-cli/tests/features/cli-flag-parsing.feature                                                       |
 | CLIRuntimePaths                                       | completed | utility    | packages/architect-cli/src/cli/runtime-helpers.ts                                                                    |

@@ -19,36 +19,25 @@
  * own discovery-surface schema.
  *
  * ── Freshness (non-negotiable) ────────────────────────────────────────────────
- *   `noCache: true` forces a fresh scan of the working tree, so a just-saved
- *   annotation is reflected on the very next `loadGraph()`. There is NO dump on
- *   disk; both cores build in-process each call. When running from workspace
- *   source (dogfood), invoke with `--conditions=source` so `@libar-dev/*`
- *   resolves live `src/*.ts` instead of stale compiled `dist/` — the root
- *   `architect:q` / `architect:graph` scripts bake the flag in.
+ *   Each `loadGraph()` scans the working tree. There is no dump on disk; both
+ *   cores build in-process each call. When running from workspace source
+ *   (dogfood), invoke with `--conditions=source` so `@libar-dev/*` resolves live
+ *   `src/*.ts` instead of stale compiled `dist/` — the root `architect:q` /
+ *   `architect:graph` scripts bake the flag in.
  */
 import type { PatternGraphAPI } from '@libar-dev/architect-core';
 
-import { buildCliContext } from '../cli/pattern-graph-cli-runtime.js';
-import type { ParsedArgs } from '../cli/pattern-graph-cli-types.js';
+import { buildCliContext } from '../cli/cli-runtime.js';
+import type { BuildContextArgs } from '../cli/cli-types.js';
 
 import { type AuthoredCore, AuthoredCoreSchema } from './schema.js';
 
-// Minimal ParsedArgs: empty input/features lets the runtime resolve workspace
-// sources exactly as every other consumer does; noCache forces a fresh build.
-const liveArgs = (baseDir: string): ParsedArgs => ({
+// Empty input/features lets the runtime resolve workspace sources exactly as
+// every other consumer does.
+const liveArgs = (baseDir: string): BuildContextArgs => ({
   baseDir,
   input: [],
   features: [],
-  command: null,
-  commandArgs: [],
-  help: false,
-  version: false,
-  dryRun: false,
-  noCache: true,
-  format: 'json',
-  sessionType: 'planning',
-  sessionTypeExplicit: false,
-  depth: 1,
 });
 
 /**

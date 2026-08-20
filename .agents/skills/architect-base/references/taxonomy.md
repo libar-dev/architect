@@ -57,13 +57,13 @@ The validation registry currently defines **8 roles**, **21 metadata tags**, and
 
 <!-- architect:gen taxonomy-tag-count end -->
 
-But the scanner also recognizes tags that are **not** in that registry — notably `@architect-executable-specs` and `@architect-usecase`, parsed straight into pattern metadata. So neither the generated doc nor any hand-list is a complete view of _recognized_ tags. When unsure whether a tag is recognized, the live graph is the arbiter: author it and inspect the pattern's parsed metadata (`pnpm architect:q 'g.pattern("<Name>")'`). (This two-source gap is logged in `FEEDBACK.md`.)
+But the scanner also recognizes tags that are **not** in that registry — notably `@architect-executable-specs` and `@architect-usecase`, parsed straight into pattern metadata. So neither the generated doc nor any hand-list is a complete view of _recognized_ tags. When unsure whether a tag is recognized, the live graph is the arbiter: author it and inspect the pattern's parsed metadata (`pnpm architect:q 'g.pattern("<Name>")'`). Surprises against this two-source reality go in `FEEDBACK.md`, not into a hand-maintained tag list.
 
 ## Authoring syntax — csv vs colon (lint-enforced)
 
 Two shapes, do not mix them:
 
-- **`@architect-uses` is a csv tag — space- or comma-separated, NO colon per item.** `@architect-uses PatternA, PatternB` is correct; `@architect-uses:PatternA` is malformed.
+- **`@architect-uses` is a csv tag — comma-separated, NO colon per item.** `@architect-uses PatternA, PatternB` is correct; `@architect-uses:PatternA` is malformed. Space-separated values (`A B C`) fail `PatternReferenceSchema` and drop the whole node.
 - **`@architect-role:` and `@architect-bounded-context:` take a colon** — `@architect-role:codec`.
 
 **One `@architect-uses` line per pattern, comma-separated.** The parser retains only one `@architect-uses` line; a second line is silently dropped. When adding a dependency to a pattern that already has the tag, **extend the existing line** — never append a second one. (This is the most common edge-authoring bug; it surfaced repeatedly during the annotation-re-enablement campaign.)

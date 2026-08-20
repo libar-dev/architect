@@ -39,9 +39,9 @@ The barrel (`src/index.ts`) re-exports everything; there is no `exports` subpath
 
 ## Consumers
 
-- **architect-cli** (`workspace:*` dep) — wraps the four runners into bins: `architect-guard`, `architect-lint-patterns`, `architect-lint-steps`, `architect-validate` (and re-uses guard types in `_shared/structured.ts`).
-- **Root dogfood scripts** (`package.json`) — `architect:guard` (`architect-guard --base-dir . --staged`), `architect:guard:all`, `validate:patterns`, `validate:all` (`--dod --anti-patterns`); plus `scripts/api-capability-tour.sh`.
-- **Pre-push / CI** — the staged process guard is the loop-protecting gate; `validate:all` runs DoD + anti-patterns.
+- **architect-cli** (`workspace:*` dep) — wraps the four runners into bins: `architect-guard`, `architect-lint-patterns`, `architect-lint-steps`, `architect-validate`; and consumes dangling-baseline compare/write from the `architect dangling` graph-integrity gate (`graph-cli.ts`, ADR-014).
+- **Root dogfood scripts** (`package.json`) — `architect:guard` (`architect-guard --base-dir . --staged`), `architect:guard:all`, `validate:patterns`, `validate:all`; CI runs the dangling gate via `pnpm architect:graph dangling --baseline … --strict`.
+- **Pre-push / CI** — the staged process guard is the loop-protecting gate; `validate:all` runs DoD + anti-patterns; `ci:verify` includes the dangling baseline gate.
 - **architect-core** references guard only in config defaults/self-hosting and one test step — no runtime cycle.
 - **MCP** — no direct dependency observed.
 

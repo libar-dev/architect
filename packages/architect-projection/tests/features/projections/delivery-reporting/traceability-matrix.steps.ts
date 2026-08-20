@@ -164,20 +164,20 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           () => {
             state!.context = createProjectionContext({
               patterns: [
-                createPattern('PatternGraphAPICLI', {
+                createPattern('GraphHandleCliExecutableTests', {
                   status: 'completed',
-                  file: 'tests/features/cli/pattern-graph-cli-core.feature',
+                  file: 'tests/features/cli/graph-handle.feature',
                 }),
               ],
               relationshipIndex: {
-                PatternGraphAPICLI: relationshipEntry([
+                GraphHandleCliExecutableTests: relationshipEntry([
                   {
-                    name: 'PatternGraphCLI',
-                    file: 'packages/architect-cli/src/cli/pattern-graph-cli.ts',
+                    name: 'GraphHandleCli',
+                    file: 'packages/architect-cli/src/cli/graph-cli.ts',
                   },
                   {
-                    name: 'PatternGraphCliSubcommands',
-                    file: 'tests/features/cli/pattern-graph-cli-subcommands.feature',
+                    name: 'GraphHandleCliPackageTests',
+                    file: 'packages/architect-cli/tests/features/cli-command-resolution.feature',
                   },
                 ]),
               },
@@ -192,7 +192,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         Then("the row's tests should contain only the executable feature file", () => {
           expect(state!.bundle?.root.rows).toHaveLength(1);
           expect(state!.bundle?.root.rows[0]?.tests).toEqual([
-            'tests/features/cli/pattern-graph-cli-subcommands.feature',
+            'packages/architect-cli/tests/features/cli-command-resolution.feature',
           ]);
         });
       });
